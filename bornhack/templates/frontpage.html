@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="inner cover">
+  <h1 class="cover-heading">Bornhack - the Initial Commit</h1>
+  <hr />
+  <p class="lead">
+    Bornhack is a camp where hackers, makers and people with an interest
+    in technology come together for a week to celebrate technology,
+    socialise and have fun.
+  </p>
+
+  <p class="lead">
+    It takes place for the first time from August 27 to September
+    3rd 2016 on the Danish island Bornholm where we have found the
+    geography as well as backbone to make it happen.
+  </p>
+
+  <p class="lead">
+    Bornhack is a participatory event where we expect people to come
+    up with crazy ideas and help make the content. We will try to
+    attract interesting people for holding talks and make workshops,
+    but this is just a frame - the rest is up to you.
+  </p>
+
+  <p class="lead">
+    We hope you will show your interest by signing up such that you
+    can help us understand what you think would be fun.
+    This is a new event, so we don't yet know exactly where this is
+    going - but give us your feedback and you can help us form this.
+    We are also on IRC at #bornhack on irc.freenode.net where you are
+    always welcome.
+  </p>
+
+  <p class="lead">
+    We hope you want to be a part of Bornhack
+  </p>
+
+  <div class="regards-and-button">
+    <p class="lead">
+      Sincerely<br />
+      The Bornhack Team
+
+    </p>
+    <a href="{% url 'account_signup' %}"
+       class="btn btn-primary btn-lg">
+      Signup for more info
+    </a>
+  </div>
+
+</div>
+
+
+{% endblock %}
+

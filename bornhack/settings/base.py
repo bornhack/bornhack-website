@@ -10,6 +10,8 @@ def local_dir(entry):
 WSGI_APPLICATION = 'bornhack.wsgi.application'
 ROOT_URLCONF = 'bornhack.urls'
 
+SITE_ID = 1
+
 INSTALLED_APPS = [
     'flat',
     'django.contrib.admin',
@@ -18,6 +20,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    'allauth',
+    'allauth.account',
+    'bootstrap3',
 
     'profiles',
     'camps',
@@ -25,6 +32,7 @@ INSTALLED_APPS = [
 
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
+STATICFILES_DIRS = [local_dir('static_src')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = local_dir('media')
 
@@ -61,3 +69,17 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 ]
+
+LOGIN_REDIRECT_URL = 'profiles:detail'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Login to admin with username
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = True
+ACCOUNT_EMAIL_SUBJECT_PREFIX = '[bornhack]'
+ACCOUNT_USERNAME_REQUIRED = False
+LOGIN_URL = '/login/'

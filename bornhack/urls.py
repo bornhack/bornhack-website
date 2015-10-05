@@ -1,21 +1,53 @@
-"""bornhack URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.8/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
-Including another URLconf
-    1. Add an import:  from blog import urls as blog_urls
-    2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
-"""
+from allauth.account.views import (
+    SignupView,
+    LoginView,
+    LogoutView,
+    ConfirmEmailView,
+    EmailVerificationSentView, PasswordResetView)
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import TemplateView
 
 urlpatterns = [
+    url(
+        r'$^',
+        TemplateView.as_view(template_name='frontpage.html'),
+        name='frontpage'
+    ),
+    url(
+        r'^login/$',
+        LoginView.as_view(),
+        name='account_login',
+    ),
+    url(
+        r'^logout/$',
+        LogoutView.as_view(),
+        name='account_logout',
+    ),
+    url(
+        r'^confirm/(?P<key>\S+)$',
+        ConfirmEmailView.as_view(),
+        name='account_confirm_email',
+    ),
+    url(
+        r'^signup/done/$',
+        EmailVerificationSentView.as_view(),
+        name='account_email_verification_sent',
+    ),
+    url(
+        r'^signup/$',
+        SignupView.as_view(),
+        name='account_signup',
+    ),
+    url(
+        r'^reset-password/$',
+        PasswordResetView.as_view(),
+        name='account_reset_password',
+    ),
+    url(
+        r'^profile/',
+        include('profiles.urls', namespace='profiles')
+    ),
+
     url(r'^admin/', include(admin.site.urls)),
 ]

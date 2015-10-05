@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -32,6 +33,37 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             self.name,
             self.start.year,
         )
+
+    def create_days(self):
+        delta = self.end - self.start
+        for day_offset in range(1, delta.days + 1):
+            day, created = self.days.get_or_create(
+                date=self.start + datetime.timedelta(days=day_offset)
+            )
+            if created:
+                print('{} created'.format(day))
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        self.create_days()
+
+
+class Day(CreatedUpdatedModel, UUIDModel):
+    class Meta:
+        verbose_name = _('Day')
+        verbose_name_plural = _('Days')
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        verbose_name=_('Camp'),
+        help_text=_('Which camp does this day belong to.'),
+        related_name='days',
+    )
+
+    date = models.DateField(
+        verbose_name=_('Date'),
+        help_text=_('What date?')
+    )
 
 
 class Expense(CreatedUpdatedModel, UUIDModel):

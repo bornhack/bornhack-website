@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load account %}
+
+{% block content %}
+
+  <div class="cover center">
+    <h1>{% trans "Confirm E-mail Address" %}</h1>
+
+    {% user_display confirmation.email_address.user as user_display %}
+
+    <p>{% blocktrans with confirmation.email_address.email as email %}You have confirmed that <a href="mailto:{{email}}">{{ email }}</a> is an e-mail address for user {{ user_display }}.{% endblocktrans %}</p>
+  </div>
+
+{% endblock %}
