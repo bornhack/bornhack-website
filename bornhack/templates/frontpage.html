@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
+{% load static from staticfiles %}
 
 {% block content %}
 
 <div class="inner cover">
-  <h1 class="cover-heading">Bornhack - the Initial Commit</h1>
+  <h1 class="cover-heading">
+  <img src="{% static 'img/logo.svg' %}" height="400" width="350">
+  </h1>
   <hr />
   <p class="lead">
     Bornhack is a camp where hackers, makers and people with an interest
