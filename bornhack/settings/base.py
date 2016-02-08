@@ -13,7 +13,6 @@ ROOT_URLCONF = 'bornhack.urls'
 SITE_ID = 1
 
 INSTALLED_APPS = [
-    'flat',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -26,8 +25,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'bootstrap3',
 
-    'profiles',
-    'camps',
+    # 'profiles',
+    # 'camps',
 ]
 
 STATIC_URL = '/static/'
