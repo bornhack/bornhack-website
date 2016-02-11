@@ -116,7 +116,7 @@ body {
 }
 .cover .lead {
   text-align: justify;
-  font-family: 'Hack';
+  font-family: "Lucida Console", Monaco, monospace;
 }
 
 .cover.center, .cover.center p {
