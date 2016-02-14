@@ -2,7 +2,7 @@
 
 Django project to power Bornhack.
 
-Features include:
+Features do not include:
 - Create camp
 - Control expenses for a camp
 - Manage signups for attendees for a camp
