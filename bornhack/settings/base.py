@@ -25,8 +25,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'bootstrap3',
 
-    # 'profiles',
-    # 'camps',
+    'profiles',
+    'camps',
 ]
 
 STATIC_URL = '/static/'
@@ -79,6 +79,6 @@ AUTHENTICATION_BACKENDS = (
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = True
-ACCOUNT_EMAIL_SUBJECT_PREFIX = '[bornhack]'
+ACCOUNT_EMAIL_SUBJECT_PREFIX = '[bornhack] '
 ACCOUNT_USERNAME_REQUIRED = False
 LOGIN_URL = '/login/'

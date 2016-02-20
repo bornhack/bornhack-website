@@ -2,6 +2,10 @@ body {
   margin-top: 90px;
 }
 
+* {
+  border-radius: 0 !important;
+}
+
 a, a:active, a:focus {
    outline: none;
 }
