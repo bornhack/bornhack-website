@@ -1,16 +1,34 @@
-from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import DetailView, UpdateView
+from django.core.urlresolvers import reverse_lazy
+from django.contrib import messages
 
-from .models import Profile
+
+from . import models, forms
 
 
-class ProfileDetail(DetailView):
-    model = Profile
-
-    @method_decorator(login_required)
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+class ProfileDetail(LoginRequiredMixin, DetailView):
+    model = models.Profile
 
     def get_object(self, queryset=None):
-        return Profile.objects.get(user=self.request.user)
+        return models.Profile.objects.get(user=self.request.user)
+
+
+class ProfileUpdate(LoginRequiredMixin, UpdateView):
+    model = models.Profile
+    form_class = forms.ProfileForm
+    success_url = reverse_lazy('profiles:detail')
+
+    def get_object(self, queryset=None):
+        return models.Profile.objects.get(user=self.request.user)
+
+    def get_form_kwargs(self):
+        kwargs = super(ProfileUpdate, self).get_form_kwargs()
+        kwargs['initial'] = {'email': self.object.user.email}
+        return kwargs
+
+    def form_valid(self, form, **kwargs):
+        self.object.user.email = form.cleaned_data['email']
+        self.object.user.save()
+        messages.info(self.request, 'Your profile has been updated.')
+        return super(ProfileUpdate, self).form_valid(form, **kwargs)

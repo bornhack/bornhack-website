@@ -1,4 +1,5 @@
 {% load static from staticfiles %}
+{% load bootstrap3 %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -49,6 +50,7 @@
     </nav>
 
     <div id="main" class="container container-fluid">
+      {% bootstrap_messages %}
       {% block content %}{% endblock %}
     </div>
     <script src="{% static 'js/bootstrap.min.js' %}">
