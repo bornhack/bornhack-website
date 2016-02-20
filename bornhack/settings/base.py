@@ -21,12 +21,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'profiles',
+    'camps',
+
     'allauth',
     'allauth.account',
     'bootstrap3',
-
-    'profiles',
-    'camps',
 ]
 
 STATIC_URL = '/static/'

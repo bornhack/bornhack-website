@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load account %}
+{% load bootstrap3 %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <p>
+        <a href="{% url 'account_change_password' %}" class="btn btn-black">
+          Change password
+        </a>
+        <a href="{% url 'account_email' %}" class="btn btn-black">
+          Manage email
+        </a>
+      </p>
+    <hr />
+    </div>
+  </div>
+
+
+  {% block profile_content %}{% endblock %}
+
+{% endblock %}
