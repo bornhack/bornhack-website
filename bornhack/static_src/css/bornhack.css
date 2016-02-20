@@ -6,13 +6,7 @@ a, a:active, a:focus {
    outline: none;
 }
 
-.navbar {
-  width: 700px;
-  margin: auto;
-  background-color: rgb(255, 255, 255);
-  border-bottom: 1px solid rgb(250, 250, 250);
-}
-
+/* Main width */
 #main {
   width: 700px
 }
@@ -29,10 +23,34 @@ a, a:active, a:focus {
   }
 }
 
+/* Front page stuff */
+#front-logo {
+  margin: auto;
+}
+
+/* Navbar stuff */
+.navbar {
+  width: 700px;
+  margin: auto;
+  background-color: rgb(255, 255, 255);
+  border-bottom: 1px solid rgb(250, 250, 250);
+}
+
 .navbar-fixed-top {
   min-height: 80px;
 }
 
 .nav li a {
   padding: 30px 25px;
+}
+
+/* Form stuff */
+
+.form-control, .form-control:focus {
+  box-shadow: none;
+}
+
+.btn-black {
+  background-color: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
 }
