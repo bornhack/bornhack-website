@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>
+        Where is BornHack going to take place?
+      </h2>
+      <div id="map" class="map"></div>
+      <p>
+      <strong>Coordinates</strong>: 55.011520, 14.975360<br />
+      <strong>Address</strong>: Baunevej 11, 3720 Aakirkeby
+      </p>
+    </div>
+  </div>
+
+
+  <script src="{% static 'js/leaflet.js' %}"></script>
+  <script>
+    var map = L.map('map', {center: [55.131520, 14.903000], zoom: 10});
+
+    L.tileLayer(
+        'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors',
+        }
+    ).addTo(map);
+
+    var camp_latlong = [55.011520, 14.975360];
+    L.marker(camp_latlong).addTo(map);
+  </script>
+{% endblock %}

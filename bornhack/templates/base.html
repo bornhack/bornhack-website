@@ -14,6 +14,9 @@
 
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
+
+    {% block extra_head %}
+    {% endblock %}
   </head>
 
   <body>
@@ -34,7 +37,7 @@
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav pull-right">
-            <li><a href="#FAQ">FAQ</a></li>
+            <li><a href="{% url 'good-to-know' %}">Good to know</a></li>
             <li><a href="https://wiki.bornhack.dk">Wiki</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>

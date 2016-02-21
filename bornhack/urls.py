@@ -12,9 +12,14 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(
-        r'$^',
+        r'^$',
         TemplateView.as_view(template_name='frontpage.html'),
         name='frontpage'
+    ),
+    url(
+        r'good-to-know/',
+        TemplateView.as_view(template_name='good_to_know.html'),
+        name='good-to-know'
     ),
     url(
         r'^login/$',
