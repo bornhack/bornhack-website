@@ -56,6 +56,6 @@
       {% bootstrap_messages %}
       {% block content %}{% endblock %}
     </div>
-    <script src="{% static 'js/bootstrap.min.js' %}">
+    {% bootstrap_javascript jquery=1 %}
   </body>
 </html>
