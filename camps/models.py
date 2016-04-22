@@ -118,35 +118,3 @@ class Expense(CreatedUpdatedModel, UUIDModel):
             self.get_currency_display(),
             self.camp,
         )
-
-
-class Signup(CreatedUpdatedModel, UUIDModel):
-    class Meta:
-        verbose_name = _('Signup')
-        verbose_name_plural = _('Signups')
-
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp that has been signed up for.'),
-    )
-
-    user = models.ForeignKey(
-        'auth.User',
-        verbose_name=_('User'),
-        help_text=_('The user that has signed up.'),
-    )
-
-    cost = models.DecimalField(
-        verbose_name=_('Cost'),
-        help_text=_('What the user should/is willing to pay for this signup.'),
-        max_digits=7,
-        decimal_places=2,
-        default=1500.0
-    )
-
-    paid = models.BooleanField(
-        verbose_name=_('Paid?'),
-        help_text=_('Whether the user has paid.'),
-        default=False,
-    )

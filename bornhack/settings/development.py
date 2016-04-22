@@ -7,8 +7,12 @@ DEBUG = True
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': local_dir('db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'bornhack_dev',
+        'USER': 'bornhack',
+        'PASSWORD': 'bornhack',
+        'HOST': 'localhost',
+        'PORT': 5432,
     }
 }
 

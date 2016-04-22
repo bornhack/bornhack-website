@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Camp, Day, Expense, Signup
+from .models import Camp, Day, Expense
 
 
 @admin.register(Expense)
@@ -10,15 +10,6 @@ class ExpenseAdmin(admin.ModelAdmin):
 
 class ExpenseInlineAdmin(admin.TabularInline):
     model = Expense
-
-
-@admin.register(Signup)
-class SignupAdmin(admin.ModelAdmin):
-    pass
-
-
-class SignupInlineAdmin(admin.TabularInline):
-    model = Signup
 
 
 @admin.register(Day)
@@ -35,5 +26,4 @@ class CampAdmin(admin.ModelAdmin):
     inlines = [
         DayInlineAdmin,
         ExpenseInlineAdmin,
-        SignupInlineAdmin
     ]
