@@ -85,3 +85,8 @@ ACCOUNT_USERNAME_REQUIRED = False
 LOGIN_URL = '/login/'
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+BOOTSTRAP3 = {
+        'jquery_url': '/static/js/jquery.min.js',
+        'javascript_url': '/static/js/bootstrap.min.js'
+}
