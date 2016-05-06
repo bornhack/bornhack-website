@@ -36,7 +36,7 @@
         </div>
 
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav pull-right">
+          <ul class="nav navbar-nav">
             <li><a href="{% url 'good-to-know' %}">Good to know</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
