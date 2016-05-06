@@ -8,14 +8,12 @@ class TicketAdmin(admin.ModelAdmin):
     list_display = [
         'user',
         'ticket_type',
-        'camp',
         'paid',
     ]
 
     list_filter = [
         'paid',
         'ticket_type',
-        'camp',
     ]
 
 

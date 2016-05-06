@@ -35,6 +35,10 @@ urlpatterns = [
         r'^profile/',
         include('profiles.urls', namespace='profiles')
     ),
+    url(
+        r'^tickets/',
+        include('tickets.urls', namespace='tickets')
+    ),
     url(r'^accounts/', include('allauth.urls')),
 
     url(r'^admin/', include(admin.site.urls)),

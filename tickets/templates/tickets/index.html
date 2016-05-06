@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Tickets</h2>
+
+<p class="lead">
+Here you can see the different ticket types, their prices and availability.
+</p>
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>
+        Description
+      <th>
+        Price
+      <th>
+        Availability
+      <th>
+        Buy
+
+  <tbody>
+
+{% for ticket_type in ticket_types %}
+
+    <tr {% if not ticket_type.is_available %}style="color: lightgrey"{%endif%}>
+        <td>
+          {{ ticket_type.name }}
+        <td>
+          {{ ticket_type.price }} DKK
+        <td>
+          {{ ticket_type.available_in.lower }}
+          {% if ticket_type.available_in.upper %}
+            - {{ ticket_type.available_in.upper }}
+          {% endif %}
+        <td>
+          {% if ticket_type.is_available %}
+            <a href="{% url 'tickets:buy' %}?ticket_type={{ ticket_type.pk }}">Buy</a>
+          {% else %}
+            N/A
+          {% endif %}
+
+{% endfor %}
+
+</table>
+
+
+{% if user.is_authenticated %}
+  <hr />
+  <h3>Your tickets</h3>
+    <table class="table table-hover">
+    {% for ticket in user.tickets.all %}
+    <tr>
+      <td>
+        {{ ticket.ticket_type.name }}
+      <td>
+        {% if ticket.paid %} Paid {% else %} Not paid {% endif %}
+    {% empty %}
+    <tr>
+      <td colspan=3>
+        You don't have a ticket! Why don't buy one and join the fun?
+    {% endfor %}
+    </table>
+
+    <a href="{% url 'tickets:buy' %}" class="btn btn-success">Buy tickets</a>
+
+{% else %}
+  <a href="{% url 'account_signup' %}?next={% url 'tickets:index' %}">Sign up</a> or
+  <a href="{% url 'account_login' %}?next={% url 'tickets:index' %}">login</a> to buy tickets.
+{% endif %}
+
+{% endblock %}

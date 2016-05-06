@@ -1,8 +1,11 @@
 from django.db import models
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
+
+from .managers import TicketTypeQuerySet
 
 
 class Ticket(CreatedUpdatedModel, UUIDModel):
@@ -10,16 +13,11 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         verbose_name = _('Ticket')
         verbose_name_plural = _('Tickets')
 
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp this ticket is for.'),
-    )
-
     user = models.ForeignKey(
         'auth.User',
         verbose_name=_('User'),
         help_text=_('The user this ticket belongs to.'),
+        related_name='tickets',
     )
 
     paid = models.BooleanField(
@@ -31,14 +29,20 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
     ticket_type = models.ForeignKey(
         'tickets.TicketType',
         verbose_name=_('Ticket type'),
-        help_text=_('The type of the ticket.'),
     )
+
+    def __str__(self):
+        return '{} ({})'.format(
+            self.ticket_type.name,
+            self.ticket_type.camp
+        )
 
 
 class TicketType(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = _('Ticket Type')
         verbose_name_plural = _('Ticket Types')
+        ordering = ['available_in']
 
     name = models.CharField(max_length=150)
 
@@ -53,8 +57,20 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
     )
 
     available_in = DateTimeRangeField(
-        help_text=_('Which period is this ticket available for purchase?')
+        help_text=_(
+            'Which period is this ticket available for purchase? | '
+            '(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'
+        )
     )
 
+    objects = TicketTypeQuerySet.as_manager()
+
     def __str__(self):
-        return self.name
+        return '{} ({} DKK)'.format(
+            self.name,
+            self.price,
+        )
+
+    def is_available(self):
+        now = timezone.now()
+        return now in self.available_in
