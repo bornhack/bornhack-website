@@ -13,7 +13,7 @@ class CampTicketSaleCheck(object):
     def dispatch(self, *args, **kwargs):
         current_camp = Camp.objects.current()
         if current_camp and current_camp.ticket_sale_open:
-            return super().dispatch(*args, **kwargs)
+            return super(CampTicketSaleCheck, self).dispatch(*args, **kwargs)
         raise Http404()
 
 
@@ -21,7 +21,7 @@ class TicketIndexView(CampTicketSaleCheck, TemplateView):
     template_name = "tickets/index.html"
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = super(TicketIndexView, self).get_context_data(**kwargs)
         context['ticket_types'] = TicketType.objects.all()
         return context
 
@@ -38,7 +38,7 @@ class BuyTicketView(CampTicketSaleCheck, CreateView):
     form_class = TicketForm
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
+        kwargs = super(BuyTicketView, self).get_form_kwargs()
         ticket_type = self.request.GET.get('ticket_type', None)
         if ticket_type:
             kwargs['initial'] = {

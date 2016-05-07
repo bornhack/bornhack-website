@@ -52,7 +52,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             )
 
     def save(self, **kwargs):
-        super().save(**kwargs)
+        super(Camp, self).save(**kwargs)
         self.create_days()
 
 
