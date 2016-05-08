@@ -2,6 +2,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.views.generic import CreateView, TemplateView, DetailView
 from django.core.urlresolvers import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from camps.models import Camp
 
@@ -26,13 +27,13 @@ class TicketIndexView(CampTicketSaleCheck, TemplateView):
         return context
 
 
-class TicketDetailView(CampTicketSaleCheck, DetailView):
+class TicketDetailView(LoginRequiredMixin, CampTicketSaleCheck, DetailView):
     model = Ticket
     template_name = 'tickets/detail.html'
     context_object_name = 'ticket'
 
 
-class BuyTicketView(CampTicketSaleCheck, CreateView):
+class BuyTicketView(LoginRequiredMixin, CampTicketSaleCheck, CreateView):
     model = Ticket
     template_name = "tickets/buy.html"
     form_class = TicketForm
