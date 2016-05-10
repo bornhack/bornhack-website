@@ -55,7 +55,7 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         )
 
     def get_absolute_url(self):
-        return reverse_lazy('ticket:detail', kwargs={
+        return reverse_lazy('tickets:detail', kwargs={
             'pk': self.pk
         })
 
