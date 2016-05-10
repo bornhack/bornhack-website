@@ -84,15 +84,15 @@ class EpayView(TemplateView):
         description = str(ticket.user.pk)
 
         hashstring = (
-            '{merchantnumber}{description}11{amount}DKK'
+            '{merchant_number}{description}11{amount}DKK'
             '{order_id}{accept_url}{md5_secret}'
         ).format(
-            settings.EPAY_MERCHANT_NUMBER,
-            description,
-            str(amount),
-            str(order_id),
-            accept_url,
-            settings.EPAY_MD5_SECRET,
+            merchant_number=settings.EPAY_MERCHANT_NUMBER,
+            description=description,
+            amount=str(amount),
+            order_id=str(order_id),
+            accept_url=accept_url,
+            md5_secret=settings.EPAY_MD5_SECRET,
         )
         epay_hash = hashlib.md5(hashstring).hexdigest()
 
@@ -124,15 +124,15 @@ class EpayCallbackView(View):
             )
 
             hashstring = (
-                '{merchantnumber}{description}11{amount}DKK'
+                '{merchant_number}{description}11{amount}DKK'
                 '{order_id}{accept_url}{md5_secret}'
             ).format(
-                query.get('merchantnumber'),
-                query.get('description'),
-                query.get('amount'),
-                query.get('order_id'),
-                query.get('accept_url'),
-                settings.EPAY_MD5_SECRET,
+                merchant_number=query.get('merchantnumber'),
+                description=query.get('description'),
+                amount=query.get('amount'),
+                order_id=query.get('orderid'),
+                accept_url=query.get('accepturl'),
+                md5_secret=settings.EPAY_MD5_SECRET,
             )
             epay_hash = hashlib.md5(hashstring).hexdigest()
 
