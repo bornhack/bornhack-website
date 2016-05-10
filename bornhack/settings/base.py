@@ -1,5 +1,8 @@
 import os
 
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 def local_dir(entry):
     return os.path.join(
@@ -91,3 +94,6 @@ BOOTSTRAP3 = {
     'jquery_url': '/static/js/jquery.min.js',
     'javascript_url': '/static/js/bootstrap.min.js'
 }
+
+EPAY_MERCHANT_NUMBER = env('EPAY_MERCHANT_NUMBER')
+EPAY_MD5_SECRET = env('EPAY_MD5_SECRET')

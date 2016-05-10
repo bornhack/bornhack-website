@@ -1,7 +1,8 @@
 from django.db import models
-from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.core.urlresolvers import reverse_lazy
 
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
 
@@ -31,11 +32,32 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         verbose_name=_('Ticket type'),
     )
 
+    CREDIT_CARD = 'credit_card'
+    ALTCOIN = 'altcoin'
+    BANK_TRANSFER = 'bank_transfer'
+
+    PAYMENT_METHODS = [
+        (CREDIT_CARD, 'Credit card'),
+        (ALTCOIN, 'Altcoin'),
+        (BANK_TRANSFER, 'Bank transfer'),
+    ]
+
+    payment_method = models.CharField(
+        max_length=50,
+        choices=PAYMENT_METHODS,
+        default=CREDIT_CARD
+    )
+
     def __str__(self):
         return '{} ({})'.format(
             self.ticket_type.name,
             self.ticket_type.camp
         )
+
+    def get_absolute_url(self):
+        return reverse_lazy('ticket:detail', kwargs={
+            'pk': self.pk
+        })
 
 
 class TicketType(CreatedUpdatedModel, UUIDModel):
@@ -74,3 +96,20 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
     def is_available(self):
         now = timezone.now()
         return now in self.available_in
+
+
+class EpayCallback(CreatedUpdatedModel, UUIDModel):
+    class Meta:
+        verbose_name = 'Epay Callback'
+        verbose_name_plural = 'Epay Callbacks'
+    payload = JSONField()
+
+
+class EpayPayment(CreatedUpdatedModel, UUIDModel):
+    class Meta:
+        verbose_name = 'Epay Payment'
+        verbose_name_plural = 'Epay Payments'
+
+    ticket = models.OneToOneField('tickets.Ticket')
+    callback = models.ForeignKey('tickets.EpayCallback')
+    txnid = models.IntegerField()

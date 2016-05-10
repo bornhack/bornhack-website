@@ -8,9 +8,14 @@ class TicketForm(forms.ModelForm):
         model = Ticket
         fields = [
             'ticket_type',
+            'payment_method',
         ]
+        widgets = {
+            'payment_method': forms.RadioSelect()
+        }
 
     ticket_type = forms.ModelChoiceField(
         queryset=TicketType.objects.available()
     )
+
 

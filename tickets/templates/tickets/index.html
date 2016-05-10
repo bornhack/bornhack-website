@@ -36,7 +36,9 @@ Here you can see the different ticket types, their prices and availability.
           {% endif %}
         <td>
           {% if ticket_type.is_available %}
-            <a href="{% url 'tickets:buy' %}?ticket_type={{ ticket_type.pk }}">Buy</a>
+            <a href="{% url 'tickets:order' %}?ticket_type={{ ticket_type.pk }}">
+                Order
+            </a>
           {% else %}
             N/A
           {% endif %}
@@ -63,7 +65,7 @@ Here you can see the different ticket types, their prices and availability.
     {% endfor %}
     </table>
 
-    <a href="{% url 'tickets:buy' %}" class="btn btn-success">Buy tickets</a>
+    <a href="{% url 'tickets:order' %}" class="btn btn-success">Order tickets</a>
 
 {% else %}
   <a href="{% url 'account_signup' %}?next={% url 'tickets:index' %}">Sign up</a> or
