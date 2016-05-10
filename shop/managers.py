@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 
 
-class TicketTypeQuerySet(QuerySet):
+class ProductQuerySet(QuerySet):
 
     def available(self):
         now = timezone.now()

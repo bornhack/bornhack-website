@@ -2,34 +2,36 @@ from django.db import models
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.core.urlresolvers import reverse_lazy
 
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
 
-from .managers import TicketTypeQuerySet
+from .managers import ProductQuerySet
 
 
-class Ticket(CreatedUpdatedModel, UUIDModel):
-    class Meta:
-        verbose_name = _('Ticket')
-        verbose_name_plural = _('Tickets')
+class Order(CreatedUpdatedModel):
+
+    products = models.ManyToManyField(
+        'shop.Product',
+        through='shop.OrderProductRelation'
+    )
 
     user = models.ForeignKey(
         'auth.User',
         verbose_name=_('User'),
-        help_text=_('The user this ticket belongs to.'),
-        related_name='tickets',
+        help_text=_('The user this order belongs to.'),
+        related_name='orders',
     )
 
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
-        help_text=_('Whether the user has paid.'),
+        help_text=_('Whether this order has been paid.'),
         default=False,
     )
 
-    ticket_type = models.ForeignKey(
-        'tickets.TicketType',
-        verbose_name=_('Ticket type'),
+    camp = models.ForeignKey(
+        'camps.Camp',
+        verbose_name=_('Camp'),
+        help_text=_('The camp this order is for.'),
     )
 
     CREDIT_CARD = 'credit_card'
@@ -48,44 +50,42 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         default=CREDIT_CARD
     )
 
-    def __str__(self):
-        return '{} ({})'.format(
-            self.ticket_type.name,
-            self.ticket_type.camp
-        )
 
-    def get_absolute_url(self):
-        return reverse_lazy('tickets:detail', kwargs={
-            'pk': self.pk
-        })
-
-
-class TicketType(CreatedUpdatedModel, UUIDModel):
+class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:
-        verbose_name = _('Ticket Type')
-        verbose_name_plural = _('Ticket Types')
-        ordering = ['available_in']
+        verbose_name = 'Product category'
+        verbose_name_plural = 'Product categories'
 
     name = models.CharField(max_length=150)
 
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp this ticket type is for.'),
-    )
+    def __str__(self):
+        return self.name
+
+
+class Product(CreatedUpdatedModel, UUIDModel):
+    class Meta:
+        verbose_name = 'Product'
+        verbose_name_plural = 'Products'
+        ordering = ['available_in']
+
+    category = models.ForeignKey('shop.ProductCategory')
+
+    name = models.CharField(max_length=150)
 
     price = models.IntegerField(
-        help_text=_('Price of the ticket (in DKK).')
+        help_text=_('Price of the product (in DKK).')
     )
+
+    description = models.TextField()
 
     available_in = DateTimeRangeField(
         help_text=_(
-            'Which period is this ticket available for purchase? | '
+            'Which period is this product available for purchase? | '
             '(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'
         )
     )
 
-    objects = TicketTypeQuerySet.as_manager()
+    objects = ProductQuerySet.as_manager()
 
     def __str__(self):
         return '{} ({} DKK)'.format(
@@ -96,6 +96,13 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
     def is_available(self):
         now = timezone.now()
         return now in self.available_in
+
+
+class OrderProductRelation(models.Model):
+    order = models.ForeignKey('shop.Order')
+    product = models.ForeignKey('shop.Product')
+    quantity = models.PositiveIntegerField()
+    handed_out = models.BooleanField(default=False)
 
 
 class EpayCallback(CreatedUpdatedModel, UUIDModel):
@@ -110,6 +117,6 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
         verbose_name = 'Epay Payment'
         verbose_name_plural = 'Epay Payments'
 
-    ticket = models.OneToOneField('tickets.Ticket')
-    callback = models.ForeignKey('tickets.EpayCallback')
+    order = models.OneToOneField('shop.Order')
+    callback = models.ForeignKey('shop.EpayCallback')
     txnid = models.IntegerField()

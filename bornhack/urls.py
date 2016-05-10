@@ -36,8 +36,8 @@ urlpatterns = [
         include('profiles.urls', namespace='profiles')
     ),
     url(
-        r'^tickets/',
-        include('tickets.urls', namespace='tickets')
+        r'^shop/',
+        include('shop.urls', namespace='shop')
     ),
     url(r'^accounts/', include('allauth.urls')),
 

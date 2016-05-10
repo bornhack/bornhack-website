@@ -30,9 +30,9 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         unique=True,
     )
 
-    ticket_sale_open = models.BooleanField(
-        verbose_name=_('Ticket sale open?'),
-        help_text=_('Whether tickets are for sale or not.'),
+    shop_open = models.BooleanField(
+        verbose_name=_('Shop open?'),
+        help_text=_('Whether the shop is open or not.'),
         default=False,
     )
 

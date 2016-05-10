@@ -37,8 +37,8 @@
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            {% if current_camp.ticket_sale_open %}
-            <li><a href="{% url 'tickets:index' %}">Tickets</a></li>
+            {% if current_camp.shop_open %}
+            <li><a href="{% url 'shop:index' %}">Shop</a></li>
             {% endif %}
             <li><a href="{% url 'good-to-know' %}">Good to know</a></li>
             {% if user.is_authenticated %}

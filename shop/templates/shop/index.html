@@ -22,21 +22,21 @@ Here you can see the different ticket types, their prices and availability.
 
   <tbody>
 
-{% for ticket_type in ticket_types %}
+{% for product in tickets %}
 
-    <tr {% if not ticket_type.is_available %}style="color: lightgrey"{%endif%}>
+    <tr {% if not product.is_available %}style="color: lightgrey"{%endif%}>
         <td>
-          {{ ticket_type.name }}
+          {{ product.name }}
         <td>
-          {{ ticket_type.price }} DKK
+          {{ product.price }} DKK
         <td>
-          {{ ticket_type.available_in.lower }}
-          {% if ticket_type.available_in.upper %}
-            - {{ ticket_type.available_in.upper }}
+          {{ product.available_in.lower }}
+          {% if product.available_in.upper %}
+            - {{ product.available_in.upper }}
           {% endif %}
         <td>
-          {% if ticket_type.is_available %}
-            <a href="{% url 'tickets:order' %}?ticket_type={{ ticket_type.pk }}">
+          {% if product.is_available %}
+            <a href="">
                 Order
             </a>
           {% else %}
@@ -47,7 +47,7 @@ Here you can see the different ticket types, their prices and availability.
 
 </table>
 
-
+{% comment %}
 {% if user.is_authenticated %}
   <hr />
   <h3>Your tickets</h3>
@@ -71,5 +71,6 @@ Here you can see the different ticket types, their prices and availability.
   <a href="{% url 'account_signup' %}?next={% url 'tickets:index' %}">Sign up</a> or
   <a href="{% url 'account_login' %}?next={% url 'tickets:index' %}">login</a> to buy tickets.
 {% endif %}
+{% endcomment %}
 
 {% endblock %}
