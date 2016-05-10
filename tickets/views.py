@@ -77,7 +77,9 @@ class EpayView(TemplateView):
     template_name = 'tickets/epay_form.html'
 
     def get_context_data(self, **kwargs):
-        ticket = Ticket.objects.get(pk=kwargs).select_related('ticket_type')
+        ticket = Ticket.objects.get(
+            pk=kwargs.get('ticket_id')
+        ).select_related('ticket_type')
         accept_url = ticket.get_absolute_url()
         amount = ticket.ticket_type.price * 100
         order_id = str(ticket.pk)
