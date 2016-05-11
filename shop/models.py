@@ -35,12 +35,12 @@ class Order(CreatedUpdatedModel):
     )
 
     CREDIT_CARD = 'credit_card'
-    ALTCOIN = 'altcoin'
+    BLOCKCHAIN = 'blockchain'
     BANK_TRANSFER = 'bank_transfer'
 
     PAYMENT_METHODS = [
         (CREDIT_CARD, 'Credit card'),
-        (ALTCOIN, 'Altcoin'),
+        (BLOCKCHAIN, 'Blockchain'),
         (BANK_TRANSFER, 'Bank transfer'),
     ]
 
@@ -109,6 +109,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Epay Callback'
         verbose_name_plural = 'Epay Callbacks'
+
     payload = JSONField()
 
 
