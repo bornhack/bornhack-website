@@ -38,8 +38,7 @@ class CheckoutView(LoginRequiredMixin, DetailView):
 
 class PaymentView(LoginRequiredMixin, FormView):
     """
-    One final chance to change payment method (in case another method failed),
-    and a submit button to intiate payment with selected metod
+    Select payment method and goto payment
     """
     template_name = 'shop/payment.html'
     form_class = PaymentMethodForm
