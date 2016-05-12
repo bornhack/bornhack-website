@@ -44,14 +44,14 @@ class PaymentView(LoginRequiredMixin, FormView):
     form_class = PaymentMethodForm
 
     def get(self, request, *args, **kwargs):
-        if self.instance.user != self.request.user:
+        if self.get_object().user != request.user:
             raise Http404("Order not found")
 
-        if self.instance.paid:
+        if self.get_object().paid:
             messages.error('This order is already paid for!')
             return HttpResponseRedirect('shop:order_detail')
 
-        if not self.instance.products:
+        if not self.get_object().products:
             messages.error('This order contains no products!')
             return HttpResponseRedirect('shop:order_detail')
 
