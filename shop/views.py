@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 
 from .models import Order, Product, EpayCallback, EpayPayment
+from .forms import PaymentMethodForm
 
 
 class ShopIndexView(TemplateView):
