@@ -35,6 +35,11 @@ class CheckoutView(LoginRequiredMixin, DetailView):
     template_name = 'shop/order_detail.html'
     context_object_name = 'order'
 
+    def get(self, request, *args, **kwargs):
+        if self.get_object().user != request.user:
+            raise Http404("Order not found")
+        return self.render_to_response(self.get_context_data())
+
 
 class PaymentView(LoginRequiredMixin, FormView):
     """
