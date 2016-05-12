@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% load bootstrap3 %}
+
+{% block content %}
+
+<form method="POST">
+    {% csrf_token %}
+    {% bootstrap_button "Pay with credit card" name="credit_card" button_type="submit" button_class="btn-primary" %}
+    {% bootstrap_button "Pay with blockchain" name="blockchain" button_type="submit" button_class="btn-primary" %}
+    {% bootstrap_button "Pay with bank transfer" name="bank_transfer" button_type="submit" button_class="btn-primary" %}
+</form>
+
+{% endblock %}

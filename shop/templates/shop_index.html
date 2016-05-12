@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Shop</h2>
+
+<p class="lead">
+Here you can see the different products and prices.
+</p>
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Availability</th>
+      <th>Buy</th>
+    </tr>
+  </thead>
+
+  <tbody>
+{% for product in product_list %}
+    <tr {% if not product.is_available %}style="color: lightgrey"{%endif%}>
+        <td>{{ product.name }}</td>
+        <td>{{ product.price }} DKK</td>
+        <td>{{ product.available_in.lower }}
+          {% if product.available_in.upper %}
+            - {{ product.available_in.upper }}
+          {% endif %}
+        </td>
+        <td>
+          {% if product.is_available %}
+            <a href="">
+                Add to order
+            </a>
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+    </tr>
+  </tbody>
+{% endfor %}
+</table>
+
+{% endblock %}

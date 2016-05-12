@@ -1,52 +1,42 @@
 import hashlib
 
 from django.http import HttpResponseRedirect, Http404
-from django.views.generic import CreateView, TemplateView, DetailView, View, FormView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView, View, FormView
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.contrib import messages
 
 from .models import Order, Product, EpayCallback, EpayPayment
-from .forms import PaymentMethodForm
+from .forms import CheckoutForm
 
 
-class ShopIndexView(TemplateView):
-    template_name = "shop/index.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(ShopIndexView, self).get_context_data(**kwargs)
-        context['tickets'] = Product.objects.filter(category__name='Tickets')
-        return context
+class ShopIndexView(ListView):
+    model = Product
+    template_name = "shop_index.html"
 
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
-    template_name = 'product/detail.html'
+    template_name = 'product_detail.html'
     context_object_name = 'product'
 
 
-class CheckoutView(LoginRequiredMixin, DetailView):
-    """
-    Shows a summary of all products contained in an order, 
-    total price, VAT, and a button to go to the payment
-    """
-    model = Order
-    template_name = 'shop/order_detail.html'
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Product
+    template_name = 'order_detail.html'
     context_object_name = 'order'
 
-    def get(self, request, *args, **kwargs):
-        if self.get_object().user != request.user:
-            raise Http404("Order not found")
-        return self.render_to_response(self.get_context_data())
 
-
-class PaymentView(LoginRequiredMixin, FormView):
+class CheckoutView(LoginRequiredMixin, FormView):
     """
-    Select payment method and goto payment
+    Shows a summary of all products contained in an order, 
+    total price, VAT info, and a button to finalize order and go to payment
     """
-    template_name = 'shop/payment.html'
-    form_class = PaymentMethodForm
+    model = Order
+    template_name = 'checkout.html'
+    context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
         if self.get_object().user != request.user:
@@ -62,15 +52,39 @@ class PaymentView(LoginRequiredMixin, FormView):
 
         return self.render_to_response(self.get_context_data())
 
-    def get_context_data(self, **kwargs):
-        order = Order.objects.get(pk=kwargs.get('order_id'))
-        context = super(CheckoutView, self).get_context_data(**kwargs)
-        context['order'] = order
-        return context
+    def form_valid(self, form):
+        ### mark order as finalizedredirect user to payment
+        form.instance.finalized=True
+
+        ### set payment_method based on submit button used
+        if 'credit_card' in form.data:
+            form.instance.payment_method=='credit_card'
+        elif 'blockchain' in form.data:
+            form.instance.payment_method=='blockchain'
+        elif 'bank_transfer' in form.data:
+            form.instance.payment_method=='bank_transfer'
+        else:
+            ### unknown submit button
+            messages.error(request, 'Unknown submit button :(')
+            return reverse('shop:checkout', kwargs={'orderid': self.get_object.id})
+
+        return super(CheckoutView, self).form_valid(form)
+
+    def get_success_url(self):
+        if self.get_object.payment_method == 'credit_card':
+            return reverse('shop:epay_form', kwargs={'orderid': self.get_object.id})
+        elif self.get_object.payment_method == 'blockchain':
+            return reverse('shop:coinify_pay', kwargs={'orderid': self.get_object.id})
+        elif self.get_object.payment_method == 'bank_transfer':
+            return reverse('shop:bank_transfer', kwargs={'orderid': self.get_object.id})
+        else:
+            ### unknown payment method
+            messages.error(request, 'Unknown payment method :(')
+            return reverse('shop:checkout', kwargs={'orderid': self.get_object.id})
 
 
-class CoinifyView(TemplateView):
-    template_name = 'shop/coinify_form.html'
+class CoinifyRedirectView(TemplateView):
+    template_name = 'coinify_redirect.html'
     
     def get_context_data(self, **kwargs):
         order = Order.objects.get(pk=kwargs.get('order_id'))

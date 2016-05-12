@@ -47,7 +47,7 @@ class Order(CreatedUpdatedModel):
     payment_method = models.CharField(
         max_length=50,
         choices=PAYMENT_METHODS,
-        default=CREDIT_CARD
+        default=BLOCKCHAIN
     )
 
 
