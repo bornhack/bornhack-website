@@ -27,7 +27,8 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
 
 class CheckoutView(LoginRequiredMixin, DetailView):
     """
-    Shows the products contained in an order, and a button to go to the payment
+    Shows a summary of all products contained in an order, 
+    total price, VAT, and a button to go to the payment
     """
     model = Order
     template_name = 'shop/order_detail.html'
