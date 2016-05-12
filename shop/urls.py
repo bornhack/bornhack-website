@@ -1,13 +1,7 @@
 from django.conf.urls import url
-
-from .views import (
-    ShopIndexView,
-    # EpayView,
-    # EpayCallbackView,
-)
+import .views
 
 urlpatterns = [
-    #url(r'order/$', TicketOrderView.as_view(), name='order'),
     #url(
         #r'pay/credit_card/(?P<ticket_id>[a-zA-Z0-9\-]+)/$',
         #EpayView.as_view(),
@@ -18,10 +12,7 @@ urlpatterns = [
         #EpayCallbackView,
         #name='epay_callback'
     #),
-    #url(
-        #r'detail/(?P<pk>[a-zA-Z0-9\-]+)/$',
-        #TicketDetailView.as_view(),
-        #name='detail'
-    #),
     url(r'$', ShopIndexView.as_view(), name='index'),
+    url(r'orders/(?P<pk>[0-9]+)/$', OrderDetailView.as_view(), name='order_detail'),
+    url(r'orders/(?P<pk>[0-9]+)/checkout/$', CheckoutView.as_view(), name='checkout'),
 ]

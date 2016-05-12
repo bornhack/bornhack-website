@@ -1,7 +1,7 @@
 import hashlib
 
 from django.http import HttpResponseRedirect, Http404
-from django.views.generic import CreateView, TemplateView, DetailView, View
+from django.views.generic import CreateView, TemplateView, DetailView, View, FormView
 from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,6 +23,74 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
     model = Product
     template_name = 'product/detail.html'
     context_object_name = 'product'
+
+
+class CheckoutView(LoginRequiredMixin, DetailView):
+    """
+    Shows the products contained in an order, and a button to go to the payment
+    """
+    model = Order
+    template_name = 'shop/order_detail.html'
+    context_object_name = 'order'
+
+
+class PaymentView(LoginRequiredMixin, FormView):
+    """
+    One final chance to change payment method (in case another method failed),
+    and a submit button to intiate payment with selected metod
+    """
+    template_name = 'shop/payment.html'
+    form_class = PaymentMethodForm
+
+    def get(self, request, *args, **kwargs):
+        if self.instance.user != self.request.user:
+            raise Http404("Order not found")
+
+        if self.instance.paid:
+            messages.error('This order is already paid for!')
+            return HttpResponseRedirect('shop:order_detail')
+
+        if not self.instance.products:
+            messages.error('This order contains no products!')
+            return HttpResponseRedirect('shop:order_detail')
+
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        order = Order.objects.get(pk=kwargs.get('order_id')
+        context = super(CheckoutView, self).get_context_data(**kwargs)
+        context['order'] = order
+        return context
+
+
+class CoinifyView(TemplateView):
+    template_name = 'shop/coinify_form.html'
+    
+    def get_context_data(self, **kwargs):
+        order = Order.objects.get(pk=kwargs.get('order_id')
+        context = super(CoinifyView, self).get_context_data(**kwargs)
+        context['order'] = order
+        
+        coinifyapi = CoinifyAPI(settings.COINIFY_API_KEY, settings.COINIFY_API_SECRET)
+
+        response = coinifyapi.invoice_create(
+            amount,
+            currency,
+            plugin_name='BornHack 2016 webshop',
+            plugin_version='1.0',
+            description='BornHack 2016 order id #%s' % order.id,
+            callback_url=reverse('shop:coinfy_callback', kwargs={'orderid': order.id}),
+            return_url=reverse('shop:order_paid', kwargs={'orderid': order.id}),
+        )
+
+        if not response['success']:
+            api_error = response['error']
+            print "API error: %s (%s)" % (api_error['message'], api_error['code'] )
+
+        invoice = response['data']
+        ### change this to pass only needed data when we get that far
+        context['invoice'] = invoice
+        return context
 
 
 # class EpayView(TemplateView):
