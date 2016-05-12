@@ -58,7 +58,7 @@ class PaymentView(LoginRequiredMixin, FormView):
         return self.render_to_response(self.get_context_data())
 
     def get_context_data(self, **kwargs):
-        order = Order.objects.get(pk=kwargs.get('order_id')
+        order = Order.objects.get(pk=kwargs.get('order_id'))
         context = super(CheckoutView, self).get_context_data(**kwargs)
         context['order'] = order
         return context
@@ -68,7 +68,7 @@ class CoinifyView(TemplateView):
     template_name = 'shop/coinify_form.html'
     
     def get_context_data(self, **kwargs):
-        order = Order.objects.get(pk=kwargs.get('order_id')
+        order = Order.objects.get(pk=kwargs.get('order_id'))
         context = super(CoinifyView, self).get_context_data(**kwargs)
         context['order'] = order
         
