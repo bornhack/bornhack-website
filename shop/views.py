@@ -40,7 +40,6 @@ class ProductDetailView(LoginRequiredMixin, FormView):
             order = Order.objects.create(user=request.user)
 
         ### get product from kwargs
-        product = Product.objects.get(id=
         if self.product in order.products.all():
             ### this product is already added to this order, increase count by one
             OrderProductRelation.objects.filter(product=self.product, order=order).update(quantity=F('quantity') + 1)
