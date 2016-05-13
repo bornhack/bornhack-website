@@ -26,6 +26,12 @@ class Order(CreatedUpdatedModel):
         default=False,
     )
 
+    finalized = models.BooleanField(
+        verbose_name=_('Finalized?'),
+        help_text=_('Whether this order has been finalized.'),
+        default=False,
+    )
+
     camp = models.ForeignKey(
         'camps.Camp',
         verbose_name=_('Camp'),
