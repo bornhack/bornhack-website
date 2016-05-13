@@ -17,7 +17,7 @@ class ShopIndexView(ListView):
     template_name = "shop_index.html"
 
     def get_context_data(self, **kwargs):
-        context = super(EpayView, self).get_context_data(**kwargs)
+        context = super(ShopIndexView, self).get_context_data(**kwargs)
         context['orders'] = Order.objects.filter(user=self.request.user)
         return context
 
@@ -136,7 +136,7 @@ class CoinifyRedirectView(TemplateView):
 
     def get_context_data(self, **kwargs):
         order = Order.objects.get(pk=kwargs.get('order_id'))
-        context = super(CoinifyView, self).get_context_data(**kwargs)
+        context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
         context['order'] = order
         
         ### Initiate coinify API and create invoice
