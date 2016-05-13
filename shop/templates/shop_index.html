@@ -20,15 +20,17 @@ Here you can see your orders and available products in the shop.
   </thead>
   <tbody>
 {% for order in orders %}
-    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{%endif%}>
+    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{% endif %}>
         <td>{{ order.id }}</td>
         <td>{{ order.finalized }}</td>
         <td>{{ order.paid }}</td>
         <td>?</td>
         <td>
         {% if order.finalized and not order.paid %}
-            {% bootstrap_button "Pay order" href="{% reverse 'shop:order_detail' pk=order.id %}" button_class="btn-primary" %}
-            {% bootstrap_button "Cancel order" href="{% reverse 'shop:order_cancel' pk=order.id %}" button_class="btn-primary" %}
+            {% url 'shop:order_detail' pk=order.id as order_detail_url %}
+            {% url 'shop:order_cancel' pk=order.id as order_cancel_url %}
+            {% bootstrap_button "Pay order" href=order_detail_url button_class="btn-primary" %}
+            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary" %}
         {% endif %}
         </td>
     </tr>
@@ -58,7 +60,8 @@ Here you can see your orders and available products in the shop.
         </td>
         <td>
           {% if product.is_available %}
-            {% bootstrap_button "Add to order" href="{% reverse 'shop:product_detail' pk=product.id %}" button_class="btn-primary" %}
+            {% url 'shop:product_detail' pk=product.id as product_detail_url %}
+            {% bootstrap_button "Add to order" href=product_detail_url button_class="btn-primary" %}
           {% else %}
             N/A
           {% endif %}
