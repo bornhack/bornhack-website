@@ -2,9 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
-
 from .managers import ProductQuerySet
 
 

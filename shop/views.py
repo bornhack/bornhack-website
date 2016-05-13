@@ -8,19 +8,47 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.contrib import messages
 
-from .models import Order, Product, EpayCallback, EpayPayment
-from .forms import CheckoutForm
+from .models import Order, Product, EpayCallback, EpayPayment, OrderProductRelation
+from .forms import CheckoutForm, AddToOrderForm
 
 
 class ShopIndexView(ListView):
     model = Product
     template_name = "shop_index.html"
 
+    def get_context_data(self, **kwargs):
+        context = super(EpayView, self).get_context_data(**kwargs)
+        context['orders'] = Order.objects.filter(user=self.request.user)
+        return context
 
-class ProductDetailView(LoginRequiredMixin, DetailView):
+
+class ProductDetailView(LoginRequiredMixin, FormView):
     model = Product
     template_name = 'product_detail.html'
+    form_class = 'AddToOrderForm'
     context_object_name = 'product'
+
+    def get(self, request, *args, **kwargs):
+        self.product == Product.objects.get(id=kwargs.get('product_id'))
+
+    def form_valid(self, form):
+        ### do we have an open order?
+        try:
+            order = Order.objects.get(user=self.request.user, finalized=False)
+        except Order.DoesNotExist:
+            ### no open order - open a new one
+            order = Order.objects.create(user=request.user)
+
+        ### get product from kwargs
+        product = Product.objects.get(id=
+        if self.product in order.products.all():
+            ### this product is already added to this order, increase count by one
+            OrderProductRelation.objects.filter(product=self.product, order=order).update(quantity=F('quantity') + 1)
+        else:
+            order.products.add(self.product)
+
+        ### done
+        return super(ProductDetailView, self).form_valid(form)
 
 
 class OrderDetailView(LoginRequiredMixin, DetailView):
@@ -36,6 +64,7 @@ class CheckoutView(LoginRequiredMixin, FormView):
     """
     model = Order
     template_name = 'checkout.html'
+    form_class='CheckoutForm'
     context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
@@ -43,17 +72,17 @@ class CheckoutView(LoginRequiredMixin, FormView):
             raise Http404("Order not found")
 
         if self.get_object().paid:
-            messages.error('This order is already paid for!')
+            messages.error(request, 'This order is already paid for!')
             return HttpResponseRedirect('shop:order_detail')
 
         if not self.get_object().products:
-            messages.error('This order contains no products!')
+            messages.error(request, 'This order contains no products!')
             return HttpResponseRedirect('shop:order_detail')
 
         return self.render_to_response(self.get_context_data())
 
     def form_valid(self, form):
-        ### mark order as finalizedredirect user to payment
+        ### mark order as finalized and redirect user to payment
         form.instance.finalized=True
 
         ### set payment_method based on submit button used
@@ -86,13 +115,33 @@ class CheckoutView(LoginRequiredMixin, FormView):
 class CoinifyRedirectView(TemplateView):
     template_name = 'coinify_redirect.html'
     
+    def get(self, request, *args, **kwargs):
+        ### validate a few things
+        self.order = Order.objects.get(pk=kwargs.get('order_id'))
+        if self.order.user != request.user:
+            raise Http404("Order not found")
+
+        if not self.order.finalized:
+            messages.error(request, 'This order is still open!')
+            return HttpResponseRedirect('shop:order_detail')
+
+        if self.order.paid:
+            messages.error(request, 'This order is already paid for!')
+            return HttpResponseRedirect('shop:order_detail')
+
+        if not self.get_object().products:
+            messages.error(request, 'This order contains no products!')
+            return HttpResponseRedirect('shop:order_detail')
+
+        return self.render_to_response(self.get_context_data())
+
     def get_context_data(self, **kwargs):
         order = Order.objects.get(pk=kwargs.get('order_id'))
         context = super(CoinifyView, self).get_context_data(**kwargs)
         context['order'] = order
         
+        ### Initiate coinify API and create invoice
         coinifyapi = CoinifyAPI(settings.COINIFY_API_KEY, settings.COINIFY_API_SECRET)
-
         response = coinifyapi.invoice_create(
             amount,
             currency,

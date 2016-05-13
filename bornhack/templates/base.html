@@ -40,7 +40,7 @@
             {% if current_camp.shop_open %}
             <li><a href="{% url 'shop:index' %}">Shop</a></li>
             {% endif %}
-            <li><a href="{% url 'good-to-know' %}">Good to know</a></li>
+            <li><a href="{% url 'good-to-know' %}">Info</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
             <li><a href="{% url 'account_logout' %}">Logout</a></li>

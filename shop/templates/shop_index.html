@@ -1,13 +1,41 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <h2>Shop</h2>
 
 <p class="lead">
-Here you can see the different products and prices.
+Here you can see your orders and available products in the shop.
 </p>
+<h3>Orders</h3>
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Open?</th>
+      <th>Paid?</th>
+      <th>Delivered?</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for order in orders %}
+    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{%endif%}>
+        <td>{{ order.id }}</td>
+        <td>{{ order.finalized }}</td>
+        <td>{{ order.paid }}</td>
+        <td>?</td>
+        <td>
+        {% if order.finalized and not order.paid %}
+            {% bootstrap_button "Pay order" href="{% reverse 'shop:order_detail' pk=order.id %}" button_class="btn-primary" %}
+            {% bootstrap_button "Cancel order" href="{% reverse 'shop:order_cancel' pk=order.id %}" button_class="btn-primary" %}
+        {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
 
+<h3>Products</h3>
 <table class="table table-bordered table-hover">
   <thead>
     <tr>
@@ -17,7 +45,6 @@ Here you can see the different products and prices.
       <th>Buy</th>
     </tr>
   </thead>
-
   <tbody>
 {% for product in product_list %}
     <tr {% if not product.is_available %}style="color: lightgrey"{%endif%}>
@@ -30,9 +57,7 @@ Here you can see the different products and prices.
         </td>
         <td>
           {% if product.is_available %}
-            <a href="">
-                Add to order
-            </a>
+            {% bootstrap_button "Add to order" href="{% reverse 'shop:product_detail' pk=product.id %}" button_class="btn-primary" %}
           {% else %}
             N/A
           {% endif %}
@@ -41,5 +66,4 @@ Here you can see the different products and prices.
   </tbody>
 {% endfor %}
 </table>
-
 {% endblock %}
