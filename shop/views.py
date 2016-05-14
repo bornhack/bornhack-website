@@ -25,7 +25,7 @@ class ShopIndexView(ListView):
 class ProductDetailView(LoginRequiredMixin, FormView):
     model = Product
     template_name = 'product_detail.html'
-    form_class = 'AddToOrderForm'
+    form_class = AddToOrderForm
     context_object_name = 'product'
 
     def get(self, request, *args, **kwargs):
@@ -63,7 +63,7 @@ class CheckoutView(LoginRequiredMixin, FormView):
     """
     model = Order
     template_name = 'checkout.html'
-    form_class='CheckoutForm'
+    form_class = CheckoutForm
     context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
