@@ -7,6 +7,5 @@ class CheckoutForm(forms.Form):
     pass
 
 class AddToOrderForm(forms.Form):
-    # no fields, just a submit button
-    pass
+    quantity = forms.IntegerField()
 
