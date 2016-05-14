@@ -60,7 +60,7 @@ Here you can see your orders and available products in the shop.
         </td>
         <td>
           {% if product.is_available %}
-            {% url 'shop:product_detail' pk=product.id as product_detail_url %}
+            {% url 'shop:product_detail' pk=product.pk as product_detail_url %}
             {% bootstrap_button "Add to order" href=product_detail_url button_class="btn-primary" %}
           {% else %}
             N/A
