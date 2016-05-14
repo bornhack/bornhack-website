@@ -12,7 +12,7 @@ urlpatterns = [
         #EpayCallbackView,
         #name='epay_callback'
     #),
-    url(r'$', ShopIndexView.as_view(), name='index'),
+    url(r'^$', ShopIndexView.as_view(), name='index'),
     url(r'products/(?P<pk>[a-zA-Z0-9\-]+)/$', ProductDetailView.as_view(), name='product_detail'),
     url(r'orders/(?P<pk>[0-9]+)/$', OrderDetailView.as_view(), name='order_detail'),
     url(r'orders/(?P<pk>[0-9]+)/checkout/$', CheckoutView.as_view(), name='checkout'),
