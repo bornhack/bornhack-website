@@ -57,6 +57,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'camps.context_processors.current_camp',
+                'shop.context_processors.current_order',
             ],
         },
     },

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.aggregates import Sum
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -53,6 +54,11 @@ class Order(CreatedUpdatedModel):
         choices=PAYMENT_METHODS,
         default=BLOCKCHAIN
     )
+
+    def get_number_of_items(self):
+        return self.products.aggregate(
+            sum=Sum('orderproductrelation__quantity')
+        )['sum']
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
