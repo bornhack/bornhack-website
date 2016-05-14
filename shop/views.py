@@ -30,6 +30,7 @@ class ProductDetailView(LoginRequiredMixin, FormView):
 
     def get(self, request, *args, **kwargs):
         self.product = Product.objects.get(pk=kwargs.get('pk'))
+        return self.render_to_response(self.get_context_data())
 
     def form_valid(self, form):
         ### do we have an open order?
