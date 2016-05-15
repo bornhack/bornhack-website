@@ -1,73 +1,61 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
+
 {% block content %}
 
-<h2>Shop</h2>
+<div class="row">
+  <div class="col-md-12">
+    Categories:
+    {% for category in categories %}
+    <a href="{% url 'shop:index' %}?category={{category.slug}}"
+       class="label label-{% if category.slug == current_category %}primary{% else %}default{% endif %}">
+        {{category}}
+    </a>&nbsp;
+    {% endfor %}
+  </div>
+</div>
 
-<p class="lead">
-Here you can see your orders and available products in the shop.
-</p>
-<h3>Orders</h3>
-<table class="table table-bordered table-hover">
-  <thead>
-    <tr>
-      <th>Order ID</th>
-      <th>Open?</th>
-      <th>Paid?</th>
-      <th>Delivered?</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-{% for order in orders %}
-    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{% endif %}>
-        <td>{{ order.id }}</td>
-        <td>{{ order.finalized }}</td>
-        <td>{{ order.paid }}</td>
-        <td>?</td>
-        <td>
-        {% if order.finalized and not order.paid %}
-            {% url 'shop:order_detail' pk=order.id as order_detail_url %}
-            {% url 'shop:order_cancel' pk=order.id as order_cancel_url %}
-            {% bootstrap_button "Pay order" href=order_detail_url button_class="btn-primary" %}
-            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary" %}
-        {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-  </tbody>
-</table>
+<hr />
 
-<h3>Products</h3>
-<table class="table table-bordered table-hover">
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Price</th>
-      <th>Availability</th>
-      <th>Buy</th>
-    </tr>
-  </thead>
-  <tbody>
-{% for product in product_list %}
-    <tr {% if not product.is_available %}style="color: lightgrey"{%endif%}>
-        <td>{{ product.name }}</td>
-        <td>{{ product.price }} DKK</td>
-        <td>{{ product.available_in.lower }}
-          {% if product.available_in.upper %}
-            - {{ product.available_in.upper }}
-          {% endif %}
-        </td>
-        <td>
-          {% if product.is_available %}
-            {% url 'shop:product_detail' pk=product.pk as product_detail_url %}
-            {% bootstrap_button "Add to order" href=product_detail_url button_class="btn-primary" %}
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-    </tr>
-  </tbody>
-{% endfor %}
+<div class="row">
+
+  {% for product in products %}
+
+  <a href="{% url 'shop:product_detail' slug=product.slug %}">
+    <div class="col-sm-4 col-lg-4 col-md-4">
+      <div class="thumbnail">
+        <img src="http://placehold.it/320x200" alt="">
+        <div class="caption">
+          <h5>{{ product.category.name }}</h5>
+
+          <h4>
+            {{ product.name }}
+          </h4>
+
+          <h4>
+            Price: {{ product.price }} DKK
+          </h4>
+
+          <p>
+            {{ product.description }}
+          </p>
+
+          <small>
+            <strong>Availability:</strong><br/>
+            {{ product.available_in.lower|date:"Y-m-d H:i" }}
+            {% if product.available_in.upper %}
+            - {{ product.available_in.upper|date:"Y-m-d H:i" }}
+            {% endif %}
+          </small>
+        </div>
+      </div>
+    </div>
+  </a>
+
+  {% endfor %}
+
+</div>
+
+
 </table>
 {% endblock %}

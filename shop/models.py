@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.aggregates import Sum
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
+from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
@@ -8,6 +9,9 @@ from .managers import ProductQuerySet
 
 
 class Order(CreatedUpdatedModel):
+
+    class Meta:
+        unique_together = ('user', 'open')
 
     products = models.ManyToManyField(
         'shop.Product',
@@ -27,10 +31,10 @@ class Order(CreatedUpdatedModel):
         default=False,
     )
 
-    finalized = models.BooleanField(
-        verbose_name=_('Finalized?'),
-        help_text=_('Whether this order has been finalized.'),
-        default=False,
+    open = models.NullBooleanField(
+        verbose_name=_('Open?'),
+        help_text=_('Whether this order is open or not. "None" means closed.'),
+        default=True,
     )
 
     camp = models.ForeignKey(
@@ -44,6 +48,12 @@ class Order(CreatedUpdatedModel):
     BANK_TRANSFER = 'bank_transfer'
 
     PAYMENT_METHODS = [
+        CREDIT_CARD,
+        BLOCKCHAIN,
+        BANK_TRANSFER,
+    ]
+
+    PAYMENT_METHOD_CHOICES = [
         (CREDIT_CARD, 'Credit card'),
         (BLOCKCHAIN, 'Blockchain'),
         (BANK_TRANSFER, 'Bank transfer'),
@@ -51,7 +61,7 @@ class Order(CreatedUpdatedModel):
 
     payment_method = models.CharField(
         max_length=50,
-        choices=PAYMENT_METHODS,
+        choices=PAYMENT_METHOD_CHOICES,
         default=BLOCKCHAIN
     )
 
@@ -67,9 +77,14 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Product categories'
 
     name = models.CharField(max_length=150)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.name
+
+    def save(self, **kwargs):
+        self.slug = slugify(self.name)
+        super(ProductCategory, self).save(**kwargs)
 
 
 class Product(CreatedUpdatedModel, UUIDModel):
@@ -78,9 +93,13 @@ class Product(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Products'
         ordering = ['available_in']
 
-    category = models.ForeignKey('shop.ProductCategory')
+    category = models.ForeignKey(
+        'shop.ProductCategory',
+        related_name='products'
+    )
 
     name = models.CharField(max_length=150)
+    slug = models.SlugField()
 
     price = models.IntegerField(
         help_text=_('Price of the product (in DKK).')
@@ -103,6 +122,10 @@ class Product(CreatedUpdatedModel, UUIDModel):
             self.price,
         )
 
+    def save(self, **kwargs):
+        self.slug = slugify(self.name)
+        super(Product, self).save(**kwargs)
+
     def is_available(self):
         now = timezone.now()
         return now in self.available_in
@@ -113,6 +136,10 @@ class OrderProductRelation(models.Model):
     product = models.ForeignKey('shop.Product')
     quantity = models.PositiveIntegerField()
     handed_out = models.BooleanField(default=False)
+
+    @property
+    def total(self):
+        return self.product.price * self.quantity
 
 
 class EpayCallback(CreatedUpdatedModel, UUIDModel):

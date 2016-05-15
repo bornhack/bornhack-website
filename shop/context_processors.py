@@ -1,7 +1,7 @@
 def current_order(request):
     if request.user.is_authenticated():
         order = None
-        orders = request.user.orders.filter(finalized=False)
+        orders = request.user.orders.filter(open__isnull=False)
 
         if orders:
             order = orders[0]

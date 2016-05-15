@@ -1,70 +1,60 @@
-import hashlib
-
-from django.http import HttpResponseRedirect, Http404
-from django.views.generic import CreateView, TemplateView, ListView, DetailView, View, FormView
-from django.core.urlresolvers import reverse_lazy
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.urlresolvers import reverse_lazy
+from django.db.models import Count, F
+from django.http import HttpResponseRedirect, Http404
+from django.views.generic import (
+    TemplateView,
+    ListView,
+    DetailView,
+    FormView,
+)
 
-from .models import Order, Product, EpayCallback, EpayPayment, OrderProductRelation
-from .forms import CheckoutForm, AddToOrderForm
+from shop.models import (
+    Order,
+    Product,
+    OrderProductRelation,
+    ProductCategory,
+)
+from .forms import AddToOrderForm
 
 
 class ShopIndexView(ListView):
     model = Product
     template_name = "shop_index.html"
+    context_object_name = 'products'
 
     def get_context_data(self, **kwargs):
         context = super(ShopIndexView, self).get_context_data(**kwargs)
+
+        if 'category' in self.request.GET:
+            category = self.request.GET.get('category')
+            context['products'] = context['products'].filter(
+                category__slug=category
+            )
+            context['current_category'] = category
+        context['categories'] = ProductCategory.objects.annotate(
+            num_products=Count('products')
+        ).filter(
+            num_products__gt=0
+        )
+        return context
+
+
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = "order_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderListView, self).get_context_data(**kwargs)
         context['orders'] = Order.objects.filter(user=self.request.user)
         return context
 
 
-class ProductDetailView(LoginRequiredMixin, FormView):
-    model = Product
-    template_name = 'product_detail.html'
-    form_class = AddToOrderForm
-    context_object_name = 'product'
-
-    def get(self, request, *args, **kwargs):
-        self.product = Product.objects.get(pk=kwargs.get('pk'))
-        return self.render_to_response(self.get_context_data())
-
-    def form_valid(self, form):
-        ### do we have an open order?
-        try:
-            order = Order.objects.get(user=self.request.user, finalized=False)
-        except Order.DoesNotExist:
-            ### no open order - open a new one
-            order = Order.objects.create(user=request.user)
-
-        ### get product from kwargs
-        if self.product in order.products.all():
-            ### this product is already added to this order, increase count by one
-            OrderProductRelation.objects.filter(product=self.product, order=order).update(quantity=F('quantity') + 1)
-        else:
-            order.products.add(self.product)
-
-        ### done
-        return super(ProductDetailView, self).form_valid(form)
-
-
 class OrderDetailView(LoginRequiredMixin, DetailView):
-    model = Product
-    template_name = 'order_detail.html'
-    context_object_name = 'order'
-
-
-class CheckoutView(LoginRequiredMixin, FormView):
-    """
-    Shows a summary of all products contained in an order, 
-    total price, VAT info, and a button to finalize order and go to payment
-    """
     model = Order
-    template_name = 'checkout.html'
-    form_class = CheckoutForm
+    template_name = 'order_detail.html'
     context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
@@ -79,44 +69,97 @@ class CheckoutView(LoginRequiredMixin, FormView):
             messages.error(request, 'This order contains no products!')
             return HttpResponseRedirect('shop:order_detail')
 
-        return self.render_to_response(self.get_context_data())
+        return super(OrderDetailView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        # mark order as finalized and redirect user to payment
+        order = self.get_object()
+        payment_method = request.POST.get('payment_method')
+
+        if payment_method in order.PAYMENT_METHODS:
+            order.payment_method = payment_method
+        else:
+            # unknown submit button
+            messages.error(self.request, 'Unknown submit button :(')
+            return reverse_lazy(
+                'shop:checkout',
+                kwargs={'orderid': self.get_object.id}
+            )
+
+        order.finalized = True
+
+        reverses = {
+            Order.CREDIT_CARD: reverse_lazy(
+                'shop:epay_form',
+                kwargs={'orderid': order.id}
+            ),
+            Order.BLOCKCHAIN: reverse_lazy(
+                'shop:coinify_pay',
+                kwargs={'orderid': order.id}
+            ),
+            Order.BANK_TRANSFER: reverse_lazy(
+                'shop:bank_transfer',
+                kwargs={'orderid': order.id}
+            )
+        }
+
+        return HttpResponseRedirect(reverses[payment_method])
+
+
+class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
+    model = Product
+    template_name = 'product_detail.html'
+    form_class = AddToOrderForm
+    context_object_name = 'product'
 
     def form_valid(self, form):
-        ### mark order as finalized and redirect user to payment
-        form.instance.finalized=True
+        product = self.get_object()
+        quantity = form.cleaned_data.get('quantity'),
 
-        ### set payment_method based on submit button used
-        if 'credit_card' in form.data:
-            form.instance.payment_method=='credit_card'
-        elif 'blockchain' in form.data:
-            form.instance.payment_method=='blockchain'
-        elif 'bank_transfer' in form.data:
-            form.instance.payment_method=='bank_transfer'
+        # do we have an open order?
+        try:
+            order = Order.objects.get(
+                user=self.request.user,
+                finalized=False
+            )
+        except Order.DoesNotExist:
+            # no open order - open a new one
+            order = Order.objects.create(user=self.request.user)
+
+        # get product from kwargs
+        if product in order.products.all():
+            # this product is already added to this order,
+            # increase count by quantity
+            OrderProductRelation.objects.filter(
+                product=product,
+                order=order
+            ).update(quantity=F('quantity') + quantity)
         else:
-            ### unknown submit button
-            messages.error(request, 'Unknown submit button :(')
-            return reverse('shop:checkout', kwargs={'orderid': self.get_object.id})
+            order.products.add(product)
 
-        return super(CheckoutView, self).form_valid(form)
+        messages.info(
+            self.request,
+            '{}x {} has been added to your order.'.format(
+                quantity,
+                product.name
+            )
+        )
+
+        # done
+        return super(ProductDetailView, self).form_valid(form)
 
     def get_success_url(self):
-        if self.get_object.payment_method == 'credit_card':
-            return reverse('shop:epay_form', kwargs={'orderid': self.get_object.id})
-        elif self.get_object.payment_method == 'blockchain':
-            return reverse('shop:coinify_pay', kwargs={'orderid': self.get_object.id})
-        elif self.get_object.payment_method == 'bank_transfer':
-            return reverse('shop:bank_transfer', kwargs={'orderid': self.get_object.id})
-        else:
-            ### unknown payment method
-            messages.error(request, 'Unknown payment method :(')
-            return reverse('shop:checkout', kwargs={'orderid': self.get_object.id})
+        return reverse_lazy(
+            'shop:product_detail',
+            kwargs={'slug': self.get_object().slug}
+        )
 
 
 class CoinifyRedirectView(TemplateView):
     template_name = 'coinify_redirect.html'
-    
+
     def get(self, request, *args, **kwargs):
-        ### validate a few things
+        # validate a few things
         self.order = Order.objects.get(pk=kwargs.get('order_id'))
         if self.order.user != request.user:
             raise Http404("Order not found")
@@ -139,25 +182,37 @@ class CoinifyRedirectView(TemplateView):
         order = Order.objects.get(pk=kwargs.get('order_id'))
         context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
         context['order'] = order
-        
-        ### Initiate coinify API and create invoice
-        coinifyapi = CoinifyAPI(settings.COINIFY_API_KEY, settings.COINIFY_API_SECRET)
+
+        # Initiate coinify API and create invoice
+        coinifyapi = CoinifyAPI(
+            settings.COINIFY_API_KEY,
+            settings.COINIFY_API_SECRET
+        )
         response = coinifyapi.invoice_create(
             amount,
             currency,
             plugin_name='BornHack 2016 webshop',
             plugin_version='1.0',
             description='BornHack 2016 order id #%s' % order.id,
-            callback_url=reverse('shop:coinfy_callback', kwargs={'orderid': order.id}),
-            return_url=reverse('shop:order_paid', kwargs={'orderid': order.id}),
+            callback_url=reverse(
+                'shop:coinfy_callback',
+                kwargs={'orderid': order.id}
+            ),
+            return_url=reverse(
+                'shop:order_paid',
+                kwargs={'orderid': order.id}
+            ),
         )
 
         if not response['success']:
             api_error = response['error']
-            print "API error: %s (%s)" % (api_error['message'], api_error['code'] )
+            print "API error: %s (%s)" % (
+                api_error['message'],
+                api_error['code']
+            )
 
         invoice = response['data']
-        ### change this to pass only needed data when we get that far
+        # change this to pass only needed data when we get that far
         context['invoice'] = invoice
         return context
 

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<h3>Orders</h3>
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Open?</th>
+      <th>Paid?</th>
+      <th>Delivered?</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for order in orders %}
+    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{% endif %}>
+        <td>{{ order.id }}</td>
+        <td>{{ order.finalized }}</td>
+        <td>{{ order.paid }}</td>
+        <td>?</td>
+        <td>
+        {% if order.finalized and not order.paid %}
+            {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
+            {% url 'shop:order_cancel' pk=order.pk as order_cancel_url %}
+            {% bootstrap_button "Pay order" href=order_detail_url button_class="btn-primary" %}
+            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary" %}
+        {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

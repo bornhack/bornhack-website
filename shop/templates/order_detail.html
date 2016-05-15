@@ -1,7 +1,48 @@
 {% extends 'base.html' %}
+{% load bootstrap3 %}
 
 {% block content %}
 
-<b>details for order {{ order.id }}</b>
+<h1>Order #{{ order.id }}</h1>
+
+<table class="table table-bordered table-hover">
+
+  <thead>
+    <tr>
+      <th>
+        Name
+      <th>
+        Quantity
+      <th>
+        Price
+      <th>
+        Total
+
+  <tbody>
+{% for order_product in order.orderproductrelation_set.all %}
+  <tr>
+    <td>
+      {{ order_product.product.name }}
+    <td>
+      {{ order_product.quantity }}
+    <td>
+      {{ order_product.product.price }}
+    <td>
+      {{ order_product.total }}
+
+{% endfor %}
+
+{# TODO: Add total + VAT info #}
+
+</table>
+
+{% if order.open %}
+<form method="POST">
+  {% csrf_token %}
+  {% bootstrap_button "Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
+  {% bootstrap_button "Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
+  {% bootstrap_button "Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
+</form>
+{% endif %}
 
 {% endblock %}
