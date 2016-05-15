@@ -11,6 +11,7 @@ from django.views.generic import (
     FormView,
 )
 
+from camps.models import Camp
 from shop.models import (
     Order,
     Product,
@@ -114,7 +115,7 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
 
     def form_valid(self, form):
         product = self.get_object()
-        quantity = form.cleaned_data.get('quantity'),
+        quantity = form.cleaned_data.get('quantity')
 
         # do we have an open order?
         try:
@@ -124,7 +125,10 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
             )
         except Order.DoesNotExist:
             # no open order - open a new one
-            order = Order.objects.create(user=self.request.user)
+            order = Order.objects.create(
+                user=self.request.user,
+                camp=Camp.objects.current()
+            )
 
         # get product from kwargs
         if product in order.products.all():
@@ -135,7 +139,10 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
                 order=order
             ).update(quantity=F('quantity') + quantity)
         else:
-            order.products.add(product)
+            order.orderproductrelation_set.create(
+                product=product,
+                quantity=quantity,
+            )
 
         messages.info(
             self.request,
