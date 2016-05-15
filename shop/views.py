@@ -72,7 +72,6 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # mark order as finalized and redirect user to payment
         order = self.get_object()
         payment_method = request.POST.get('payment_method')
 
@@ -86,7 +85,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
                 kwargs={'orderid': self.get_object.id}
             )
 
-        order.finalized = True
+        # Mark the order as closed
+        order.open = None
 
         reverses = {
             Order.CREDIT_CARD: reverse_lazy(
@@ -120,7 +120,7 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         try:
             order = Order.objects.get(
                 user=self.request.user,
-                finalized=False
+                open__isnull=False
             )
         except Order.DoesNotExist:
             # no open order - open a new one
@@ -164,7 +164,7 @@ class CoinifyRedirectView(TemplateView):
         if self.order.user != request.user:
             raise Http404("Order not found")
 
-        if not self.order.finalized:
+        if self.order.open is None:
             messages.error(request, 'This order is still open!')
             return HttpResponseRedirect('shop:order_detail')
 
