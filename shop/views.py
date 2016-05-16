@@ -19,7 +19,7 @@ from shop.models import (
     ProductCategory,
 )
 from .forms import AddToOrderForm
-
+import hashlib
 
 class ShopIndexView(ListView):
     model = Product
