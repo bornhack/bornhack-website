@@ -78,19 +78,20 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
             # Mark the order as closed
             order.open = None
+            order.save()
 
             reverses = {
                 Order.CREDIT_CARD: reverse_lazy(
                     'shop:epay_form',
-                    kwargs={'orderid': order.id}
+                    kwargs={'pk': order.id}
                 ),
                 Order.BLOCKCHAIN: reverse_lazy(
                     'shop:coinify_pay',
-                    kwargs={'orderid': order.id}
+                    kwargs={'pk': order.id}
                 ),
                 Order.BANK_TRANSFER: reverse_lazy(
                     'shop:bank_transfer',
-                    kwargs={'orderid': order.id}
+                    kwargs={'pk': order.id}
                 )
             }
 
