@@ -163,10 +163,7 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return super(ProductDetailView, self).form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy(
-            'shop:product_detail',
-            kwargs={'slug': self.get_object().slug}
-        )
+        return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
 class CoinifyRedirectView(TemplateView):
