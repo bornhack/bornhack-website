@@ -208,11 +208,11 @@ class CoinifyRedirectView(TemplateView):
             plugin_name='BornHack 2016 webshop',
             plugin_version='1.0',
             description='BornHack 2016 order id #%s' % order.id,
-            callback_url=reverse(
+            callback_url=reverse_lazy(
                 'shop:coinfy_callback',
                 kwargs={'orderid': order.id}
             ),
-            return_url=reverse(
+            return_url=reverse_lazy(
                 'shop:order_paid',
                 kwargs={'orderid': order.id}
             ),
