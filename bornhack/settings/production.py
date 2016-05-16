@@ -46,3 +46,5 @@ LOGGING = {
 ADMINS = (
     ('bornhack sysadm', 'sysadm@bornhack.org'),
 )
+
+LETTERHEAD_PDF_PATH = os.path.join(local_dir('static_src'), 'pdf', 'bornhack_2016_letterhead.pdf')
