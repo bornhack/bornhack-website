@@ -235,11 +235,11 @@ class EpayFormView(TemplateView):
     template_name = 'epay_form.html'
 
     def get_context_data(self, **kwargs):
-        ticket = Ticket.objects.get(pk=kwargs.get('ticket_id'))
-        accept_url = ticket.get_absolute_url()
-        amount = ticket.ticket_type.price * 100
-        order_id = str(ticket.pk)
-        description = str(ticket.user.pk)
+        order = Order.objects.get(pk=kwargs.get('pk'))
+        accept_url = order.get_absolute_url()
+        amount = order.total
+        order_id = str(order.pk)
+        description = "BornHack 2016 order #%s" % order.pk
 
         hashstring = (
             '{merchant_number}{description}11{amount}DKK'
@@ -248,7 +248,7 @@ class EpayFormView(TemplateView):
             merchant_number=settings.EPAY_MERCHANT_NUMBER,
             description=description,
             amount=str(amount),
-            order_id=str(order_id),
+            order_id=order_id,
             accept_url=accept_url,
             md5_secret=settings.EPAY_MD5_SECRET,
         )
