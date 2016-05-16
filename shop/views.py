@@ -19,6 +19,7 @@ from shop.models import (
     Product,
     OrderProductRelation,
     ProductCategory,
+    EpayCallback,
 )
 from .forms import AddToOrderForm
 import hashlib
