@@ -11,6 +11,8 @@ from django.views.generic import (
     DetailView,
     FormView,
 )
+from django.views.generic.detail import SingleObjectMixin
+
 from camps.models import Camp
 from shop.models import (
     Order,
@@ -20,6 +22,19 @@ from shop.models import (
 )
 from .forms import AddToOrderForm
 import hashlib
+
+
+class EnsureUserOwnsOrderMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object().user != request.user:
+            raise Http404("Order not found")
+
+        return super(EnsureUserOwnsOrderMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
 
 class ShopIndexView(ListView):
     model = Product
@@ -53,16 +68,13 @@ class OrderListView(LoginRequiredMixin, ListView):
         return context
 
 
-class OrderDetailView(LoginRequiredMixin, DetailView):
+class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
     model = Order
     template_name = 'order_detail.html'
     context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
         order = self.get_object()
-
-        if order.user != request.user:
-            raise Http404("Order not found")
 
         if not order.products.count() > 0:
             return HttpResponseRedirect(reverse_lazy('shop:index'))
@@ -166,31 +178,30 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
-class CoinifyRedirectView(TemplateView):
+class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+    model = Order
     template_name = 'coinify_redirect.html'
 
     def get(self, request, *args, **kwargs):
         # validate a few things
-        self.order = Order.objects.get(pk=kwargs.get('order_id'))
-        if self.order.user != request.user:
-            raise Http404("Order not found")
+        order = self.get_object()
 
-        if self.order.open is None:
+        if order.open is not None:
             messages.error(request, 'This order is still open!')
             return HttpResponseRedirect('shop:order_detail')
 
-        if self.order.paid:
+        if order.paid:
             messages.error(request, 'This order is already paid for!')
             return HttpResponseRedirect('shop:order_detail')
 
-        if not self.get_object().products:
+        if not order.products.count() > 0:
             messages.error(request, 'This order contains no products!')
             return HttpResponseRedirect('shop:order_detail')
 
-        return self.render_to_response(self.get_context_data())
+        return super(CoinifyRedirectView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        order = Order.objects.get(pk=kwargs.get('order_id'))
+        order = self.get_object()
         context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
         context['order'] = order
 
@@ -228,11 +239,12 @@ class CoinifyRedirectView(TemplateView):
         return context
 
 
-class EpayFormView(TemplateView):
+class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+    model = Order
     template_name = 'epay_form.html'
 
     def get_context_data(self, **kwargs):
-        order = Order.objects.get(pk=kwargs.get('pk'))
+        order = self.get_object()
         accept_url = 'https://' + self.request.get_host() + str(order.get_absolute_url())
         amount = order.total * 100
         order_id = str(order.pk)
