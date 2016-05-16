@@ -73,7 +73,7 @@ class Order(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return (self.total/100)*25
+        return self.total*0.2
 
     @property
     def total(self):
