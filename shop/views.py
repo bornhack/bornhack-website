@@ -10,8 +10,8 @@ from django.views.generic import (
     ListView,
     DetailView,
     FormView,
+    View,
 )
-
 from camps.models import Camp
 from shop.models import (
     Order,
