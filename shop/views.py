@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse_lazy
 from django.db.models import Count, F
 from django.http import HttpResponseRedirect, Http404
 from django.views.generic import (
+    View,
     TemplateView,
     ListView,
     DetailView,
@@ -78,34 +79,40 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
         if payment_method in order.PAYMENT_METHODS:
             order.payment_method = payment_method
-        else:
-            # unknown submit button
-            messages.error(self.request, 'Unknown submit button :(')
-            return reverse_lazy(
-                'shop:checkout',
-                kwargs={'orderid': self.get_object.id}
-            )
 
-        # Mark the order as closed
-        order.open = None
-        order.save()
+            # Mark the order as closed
+            order.open = None
 
-        reverses = {
-            Order.CREDIT_CARD: reverse_lazy(
-                'shop:epay_form',
-                kwargs={'orderid': order.id}
-            ),
-            Order.BLOCKCHAIN: reverse_lazy(
-                'shop:coinify_pay',
-                kwargs={'orderid': order.id}
-            ),
-            Order.BANK_TRANSFER: reverse_lazy(
-                'shop:bank_transfer',
-                kwargs={'orderid': order.id}
-            )
-        }
+            reverses = {
+                Order.CREDIT_CARD: reverse_lazy(
+                    'shop:epay_form',
+                    kwargs={'orderid': order.id}
+                ),
+                Order.BLOCKCHAIN: reverse_lazy(
+                    'shop:coinify_pay',
+                    kwargs={'orderid': order.id}
+                ),
+                Order.BANK_TRANSFER: reverse_lazy(
+                    'shop:bank_transfer',
+                    kwargs={'orderid': order.id}
+                )
+            }
 
-        return HttpResponseRedirect(reverses[payment_method])
+            return HttpResponseRedirect(reverses[payment_method])
+
+        if 'update_order' in request.POST:
+            for order_product in order.orderproductrelation_set.all():
+                order_product_id = str(order_product.pk)
+                if order_product_id in request.POST:
+                    new_quantity = int(request.POST.get(order_product_id))
+                    order_product.quantity = new_quantity
+                    order_product.save()
+
+        product_remove = request.POST.get('remove_product')
+        if product_remove:
+            order.orderproductrelation_set.filter(pk=product_remove).delete()
+
+        return super(OrderDetailView, self).get(request, *args, **kwargs)
 
 
 class ProductDetailView(LoginRequiredMixin, FormView, DetailView):

@@ -3,5 +3,5 @@ from .models import Order
 
 
 class AddToOrderForm(forms.Form):
-    quantity = forms.IntegerField()
+    quantity = forms.IntegerField(initial=1)
 

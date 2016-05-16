@@ -131,7 +131,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
         return now in self.available_in
 
 
-class OrderProductRelation(models.Model):
+class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order')
     product = models.ForeignKey('shop.Product')
     quantity = models.PositiveIntegerField()

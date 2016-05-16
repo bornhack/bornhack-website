@@ -5,6 +5,11 @@
 
 <h1>Order #{{ order.id }}</h1>
 
+{% if not order.open == None %}
+<form method="POST" class="form-inline">
+  {% csrf_token %}
+{% endif %}
+
 <table class="table table-bordered table-hover">
 
   <thead>
@@ -24,7 +29,18 @@
     <td>
       {{ order_product.product.name }}
     <td>
+      {% if not order.open == None %}
+      <input type="number"
+             class="form-control"
+             style="width: 75px;"
+             min=1
+             name="{{ order_product.id }}"
+             value="{{ order_product.quantity }}" />
+        {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
+      </form>
+      {% else %}
       {{ order_product.quantity }}
+      {% endif %}
     <td>
       {{ order_product.product.price }}
     <td>
@@ -36,12 +52,17 @@
 
 </table>
 
-{% if order.open %}
+{% if not order.open == None %}
+
+  {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+
+<hr />
+<h3>Checkout</h3>
 <form method="POST">
   {% csrf_token %}
-  {% bootstrap_button "Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
-  {% bootstrap_button "Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
-  {% bootstrap_button "Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
+  {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
+  {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
+  {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
 </form>
 {% endif %}
 
