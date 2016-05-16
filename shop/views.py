@@ -246,7 +246,7 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
-        accept_url = 'https://' + self.request.get_host() + str(order.get_absolute_url())
+        accept_url = 'https://' + self.request.get_host() + str(reverse_lazy('epay_thanks', kwargs={'pk': order.pk}))
         amount = order.total * 100
         order_id = str(order.pk)
         description = "BornHack 2016 order #%s" % order.pk

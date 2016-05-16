@@ -176,3 +176,4 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
     order = models.OneToOneField('shop.Order')
     callback = models.ForeignKey('shop.EpayCallback')
     txnid = models.IntegerField()
+
