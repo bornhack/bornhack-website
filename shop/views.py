@@ -316,6 +316,21 @@ class EpayCallbackView(View):
         return HttpResponse('OK')
 
 
-class BankTransferView(TemplateView):
-    template_name = 'epay_form.html'
+class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+    model = Order
+    template_name = 'epay_thanks.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if order.open:
+            ### this order is open, what is the user doing here?
+            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': order.pk}))
+
+        return super(EpayThanksView, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
+class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+    model = Order
+    template_name = 'bank_transfer.html'
 
