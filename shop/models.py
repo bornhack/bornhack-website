@@ -86,7 +86,7 @@ class Order(CreatedUpdatedModel):
         )['sum']
 
     def get_absolute_url(self):
-        return reverse_lazy('order_detail', kwargs={'pk': self.pk})
+        return reverse_lazy('shop:order_detail', kwargs={'pk': self.pk})
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
