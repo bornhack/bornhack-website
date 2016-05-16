@@ -1,7 +1,9 @@
 from django.contrib import admin
 
-from .models import Order, ProductCategory, Product, OrderProductRelation
+from .models import Order, ProductCategory, Product, OrderProductRelation, EpayCallback, EpayPayment
 
+admin.site.register(EpayCallback)
+admin.site.register(EpayPayment)
 
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
