@@ -71,10 +71,6 @@ class Order(CreatedUpdatedModel):
         )['sum']
 
     @property
-    def subtotal(self):
-        return self.total - self.vat
-
-    @property
     def vat(self):
         return (self.total/100)*25
 
