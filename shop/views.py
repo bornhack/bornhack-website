@@ -60,16 +60,13 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     context_object_name = 'order'
 
     def get(self, request, *args, **kwargs):
-        if self.get_object().user != request.user:
+        order = self.get_object()
+
+        if order.user != request.user:
             raise Http404("Order not found")
 
-        if self.get_object().paid:
-            messages.error(request, 'This order is already paid for!')
-            return HttpResponseRedirect('shop:order_detail')
-
-        if not self.get_object().products:
-            messages.error(request, 'This order contains no products!')
-            return HttpResponseRedirect('shop:order_detail')
+        if not order.products.count() > 0:
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 
@@ -111,6 +108,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         product_remove = request.POST.get('remove_product')
         if product_remove:
             order.orderproductrelation_set.filter(pk=product_remove).delete()
+            if not order.products.count() > 0:
+                return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 

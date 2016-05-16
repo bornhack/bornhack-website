@@ -70,6 +70,24 @@ class Order(CreatedUpdatedModel):
             sum=Sum('orderproductrelation__quantity')
         )['sum']
 
+    @property
+    def subtotal(self):
+        return self.products.aggregate(
+            sum=Sum(
+                models.F('orderproductrelation__product__price') *
+                models.F('orderproductrelation__quantity'),
+                output_field=models.IntegerField()
+            )
+        )['sum']
+
+    @property
+    def vat(self):
+        return (self.subtotal/100)*25
+
+    @property
+    def total(self):
+        return self.subtotal + self.vat
+
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:

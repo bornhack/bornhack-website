@@ -48,7 +48,26 @@
 
 {% endfor %}
 
-{# TODO: Add total + VAT info #}
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Subtotal</strong>
+    <td>
+      {{ order.subtotal }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>VAT (25%)</strong>
+    <td>
+      {{ order.vat }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ order.total }}
 
 </table>
 
