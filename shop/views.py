@@ -282,13 +282,13 @@ class EpayCallbackView(View):
         )
 
         if 'orderid' in request.GET:
-            order = get_object_or_404(Order, pk=query.get('orderid'))
             query = dict(
                 map(
                     lambda x: tuple(x.split('=')),
                     request.META['QUERY_STRING'].split('&')
                 )
             )
+            order = get_object_or_404(Order, pk=query.get('orderid'))
 
             hashstring = (
                 '{merchant_number}{description}11{amount}DKK'
