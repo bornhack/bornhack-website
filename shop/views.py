@@ -233,7 +233,7 @@ class EpayFormView(TemplateView):
 
     def get_context_data(self, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
-        accept_url = order.get_absolute_url()
+        accept_url = 'https://' + request.get_host() + order.get_absolute_url()
         amount = order.total
         order_id = str(order.pk)
         description = "BornHack 2016 order #%s" % order.pk
