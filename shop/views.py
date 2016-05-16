@@ -281,7 +281,7 @@ class EpayCallbackView(View):
         )
 
         if 'orderid' in request.GET:
-            order = Order.objects.get(pk=request.GET.get('order_id'))
+            order = get_object_or_404(Order, pk=query.get('orderid'))
             query = dict(
                 map(
                     lambda x: tuple(x.split('=')),
@@ -302,13 +302,13 @@ class EpayCallbackView(View):
             )
             epay_hash = hashlib.md5(hashstring).hexdigest()
 
-            if not epay_hash == request.GET['hash']:
+            if not epay_hash == query.get('hash'):
                 return HttpResponse(status=400)
 
             EpayPayment.objects.create(
-                ticket=ticket,
+                order=order,
                 callback=callback,
-                txnid=request.GET['txnid'],
+                txnid=query.get('txnid'),
             )
         else:
             return HttpResponse(status=400)
