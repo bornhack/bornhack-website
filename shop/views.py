@@ -10,7 +10,6 @@ from django.views.generic import (
     ListView,
     DetailView,
     FormView,
-    View,
 )
 from camps.models import Camp
 from shop.models import (
@@ -304,3 +303,8 @@ class EpayCallbackView(View):
             return HttpResponse(status=400)
 
         return HttpResponse('OK')
+
+
+class BankTransferView(TemplateView):
+    template_name = 'epay_form.html'
+
