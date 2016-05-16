@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.core.urlresolvers import reverse_lazy
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
 from .managers import ProductQuerySet
 
@@ -85,7 +86,7 @@ class Order(CreatedUpdatedModel):
         )['sum']
 
     def get_absolute_url(self):
-        return reverse('order_detail', kwargs={'pk': self.pk})
+        return reverse_lazy('order_detail', kwargs={'pk': self.pk})
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
