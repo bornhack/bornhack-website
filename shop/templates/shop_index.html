@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
+{% load shop_tags %}
 
 {% block content %}
 
@@ -33,7 +34,7 @@
           </h4>
 
           <h4>
-            Price: {{ product.price }} DKK
+            Price: {{ product.price|currency }}
           </h4>
 
           <p>

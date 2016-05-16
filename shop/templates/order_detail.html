@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
+{% load shop_tags %}
 
 {% block content %}
 
@@ -42,9 +43,9 @@
       {{ order_product.quantity }}
       {% endif %}
     <td>
-      {{ order_product.product.price }}
+      {{ order_product.product.price|currency }}
     <td>
-      {{ order_product.total }}
+      {{ order_product.total|currency }}
 
 {% endfor %}
 
@@ -53,14 +54,14 @@
     <td>
       <strong>Hereof VAT (25%)</strong>
     <td>
-      {{ order.vat }}
+      {{ order.vat|currency }}
 
   <tr>
     <td colspan="2">
     <td>
       <strong>Total</strong>
     <td>
-      {{ order.total }}
+      {{ order.total|currency }}
 
 </table>
 
