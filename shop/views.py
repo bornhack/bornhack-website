@@ -247,11 +247,11 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
-        accept_url = order.get_epay_accept_url(request)
-        cancel_url = order.get_epay_cancel_url(request)
+        accept_url = order.get_epay_accept_url(self.request)
+        cancel_url = order.get_epay_cancel_url(self.request)
         amount = order.total * 100
 
-        epay_hash = calculate_epay_hash(order, request)
+        epay_hash = calculate_epay_hash(order, self.request)
 
         context = super(EpayFormView, self).get_context_data(**kwargs)
         context['merchant_number'] = settings.EPAY_MERCHANT_NUMBER
