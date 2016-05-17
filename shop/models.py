@@ -179,7 +179,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
     md5valid = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'callback at %s (%smd5 valid)' % (self.created, 'not ' if not self.md5valid)
+        return 'callback at %s (md5 valid: %s)' % (self.created, self.md5valid)
 
 
 class EpayPayment(CreatedUpdatedModel, UUIDModel):
