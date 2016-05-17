@@ -21,6 +21,7 @@ from shop.models import (
     OrderProductRelation,
     ProductCategory,
     EpayCallback,
+    EpayPayment,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
