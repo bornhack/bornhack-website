@@ -91,7 +91,7 @@ class ShopIndexView(ListView):
         if 'category' in self.request.GET:
             category = self.request.GET.get('category')
             try:
-                categoryobj = ProductCategory.objects.get(slug='category')
+                categoryobj = ProductCategory.objects.get(slug=category)
                 if not categoryobj.public:
                     raise Http404("Category not found")
             except ProductCategory.DoesNotExist:
