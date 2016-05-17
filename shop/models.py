@@ -95,6 +95,9 @@ class Order(CreatedUpdatedModel):
     def description(self):
         return "BornHack 2016 order #%s" % self.pk
 
+    def get_absolute_url(self):
+        return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
+
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Product category'
