@@ -307,9 +307,13 @@ class EpayCallbackView(View):
                 print "bad epay callback!"
                 return HttpResponse(status=400)
             
-            ### epay callback is valid - if the order been paid in full,
-            ### create an EpayPayment object linking the callback to the order
+            if order.paid:
+                ### this order is already paid, perhaps we are seeing a double callback?
+                return HttpResponse('OK')
+
+            ### epay callback is valid - has the order been paid in full?
             if int(query['amount']) == order.total * 100:
+                ### create an EpayPayment object linking the callback to the order
                 EpayPayment.objects.create(
                     order=order,
                     callback=callback,
