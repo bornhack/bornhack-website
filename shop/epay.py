@@ -8,7 +8,7 @@ def calculate_epay_hash(order, request):
     ).format(
         merchant_number=settings.EPAY_MERCHANT_NUMBER,
         description=order.description,
-        amount=order.amount*100,
+        amount=order.total*100,
         order_id=order.pk,
         accept_url = order.get_epay_accept_url(request),
         cancel_url = order.get_epay_cancel_url(request),
