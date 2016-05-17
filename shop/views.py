@@ -24,6 +24,7 @@ from shop.models import (
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
+from collections import OrderedDict
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -271,7 +272,7 @@ class EpayCallbackView(View):
         )
 
         if 'orderid' in request.GET:
-            query = dict(
+            query = OrderedDict(
                 map(
                     lambda x: tuple(x.split('=')),
                     request.META['QUERY_STRING'].split('&')
