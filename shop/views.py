@@ -91,7 +91,8 @@ class ShopIndexView(ListView):
         if 'category' in self.request.GET:
             category = self.request.GET.get('category')
             context['products'] = context['products'].filter(
-                category__slug=category
+                category__slug=category,
+                public=True,
             )
             context['current_category'] = category
         context['categories'] = ProductCategory.objects.annotate(
