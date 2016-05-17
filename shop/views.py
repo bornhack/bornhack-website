@@ -280,15 +280,24 @@ class EpayCallbackView(View):
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
 
-            if not validate_epay_callback(query):
+            if validate_epay_callback(query):
+                callback.md5valid=True
+                callback.save()
+            else:
                 print "bad epay callback!"
                 return HttpResponse(status=400)
-
-            EpayPayment.objects.create(
-                order=order,
-                callback=callback,
-                txnid=query.get('txnid'),
-            )
+            
+            ### epay callback is valid - if the order been paid in full,
+            ### create an EpayPayment object linking the callback to the order
+            if query['amount'] == order.total * 100:
+                EpayPayment.objects.create(
+                    order=order,
+                    callback=callback,
+                    txnid=query.get('txnid'),
+                )
+                ### and mark order as paid
+                order.paid=True
+                order.save()
         else:
             return HttpResponse(status=400)
 

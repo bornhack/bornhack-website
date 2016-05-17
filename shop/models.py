@@ -175,6 +175,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Epay Callbacks'
 
     payload = JSONField()
+    md5valid = models.BooleanField(default=False)
 
 
 class EpayPayment(CreatedUpdatedModel, UUIDModel):
