@@ -173,9 +173,13 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Epay Callback'
         verbose_name_plural = 'Epay Callbacks'
+        ordering = ['-created']
 
     payload = JSONField()
     md5valid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'callback at %s (%smd5 valid)' % (self.created, 'not ' if not self.md5valid)
 
 
 class EpayPayment(CreatedUpdatedModel, UUIDModel):
