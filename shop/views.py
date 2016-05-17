@@ -289,7 +289,7 @@ class EpayCallbackView(View):
             
             ### epay callback is valid - if the order been paid in full,
             ### create an EpayPayment object linking the callback to the order
-            if query['amount'] == order.total * 100:
+            if int(query['amount']) == order.total * 100:
                 EpayPayment.objects.create(
                     order=order,
                     callback=callback,
@@ -298,6 +298,8 @@ class EpayCallbackView(View):
                 ### and mark order as paid
                 order.paid=True
                 order.save()
+            else:
+                print "valid epay callback with wrong amount detected"
         else:
             return HttpResponse(status=400)
 
