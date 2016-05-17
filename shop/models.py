@@ -98,6 +98,7 @@ class Order(CreatedUpdatedModel):
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
+
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Product category'
@@ -139,6 +140,11 @@ class Product(CreatedUpdatedModel, UUIDModel):
             'Which period is this product available for purchase? | '
             '(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'
         )
+    )
+    
+    public = models.BooleanField(
+        default=True,
+        help_text='Is this product publicly available in the webshop?'
     )
 
     objects = ProductQuerySet.as_manager()

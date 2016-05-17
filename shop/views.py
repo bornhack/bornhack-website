@@ -168,6 +168,11 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
     form_class = AddToOrderForm
     context_object_name = 'product'
 
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().public:
+            ### this product is not publicly available
+            raise Http404("Product not found")
+
     def form_valid(self, form):
         product = self.get_object()
         quantity = form.cleaned_data.get('quantity')
