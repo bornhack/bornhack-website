@@ -23,7 +23,7 @@ from shop.models import (
     EpayCallback,
 )
 from .forms import AddToOrderForm
-from .epay import calculate_epay_hash
+from .epay import calculate_epay_hash, validate_epay_callback
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -279,8 +279,8 @@ class EpayCallbackView(View):
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
 
-            epay_hash = calculate_epay_hash(order, request)
-            if not epay_hash == query.get('hash'):
+            if not validate_epay_callback(query):
+                print "bad epay callback!"
                 return HttpResponse(status=400)
 
             EpayPayment.objects.create(

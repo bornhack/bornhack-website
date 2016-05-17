@@ -17,3 +17,12 @@ def calculate_epay_hash(order, request):
     epay_hash = hashlib.md5(hashstring).hexdigest()
     return epay_hash
 
+
+def validate_epay_callback(query):
+    hashstring = ''
+    for key, value in query.iteritems():
+        if key != 'hash':
+            hashstring += value
+    hash = hashlib.md5(hashstring).hexdigest()
+    return hash == query['hash']
+
