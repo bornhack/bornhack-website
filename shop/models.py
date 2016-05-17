@@ -86,10 +86,10 @@ class Order(CreatedUpdatedModel):
         )['sum']
 
     def get_epay_accept_url(self, request):
-        return 'https://' + request.get_host() + str(reverse_lazy('epay_thanks', kwargs={'pk': self.pk}))
+        return 'https://' + request.get_host() + str(reverse_lazy('shop:epay_thanks', kwargs={'pk': self.pk}))
 
     def get_epay_cancel_url(self, request):
-        return 'https://' + request.get_host() + str(reverse_lazy('order_detail', kwargs={'pk': self.pk}))
+        return 'https://' + request.get_host() + str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
     @property
     def description(self):
