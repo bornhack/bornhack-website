@@ -90,6 +90,8 @@ class ShopIndexView(ListView):
 
         if 'category' in self.request.GET:
             category = self.request.GET.get('category')
+            if not category.public:
+                raise Http404("Category not found")
             context['products'] = context['products'].filter(
                 category__slug=category,
                 public=True,
@@ -98,7 +100,8 @@ class ShopIndexView(ListView):
         context['categories'] = ProductCategory.objects.annotate(
             num_products=Count('products')
         ).filter(
-            num_products__gt=0
+            num_products__gt=0,
+            public=True,
         )
         return context
 
