@@ -23,7 +23,7 @@ from shop.models import (
     EpayCallback,
 )
 from .forms import AddToOrderForm
-from .utils import calculate_epay_hash
+from .epay import calculate_epay_hash
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):

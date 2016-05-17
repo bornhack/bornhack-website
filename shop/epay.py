@@ -10,8 +10,8 @@ def calculate_epay_hash(order, request):
         description=order.description,
         amount=order.amount*100,
         order_id=order.pk,
-        accept_url = order.get_epay_accept_url(request)
-        cancel_url = order.get_epay_cancel_url(request)
+        accept_url = order.get_epay_accept_url(request),
+        cancel_url = order.get_epay_cancel_url(request),
         md5_secret=settings.EPAY_MD5_SECRET,
     )
     epay_hash = hashlib.md5(hashstring).hexdigest()
