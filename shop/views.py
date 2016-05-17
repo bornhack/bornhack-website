@@ -39,6 +39,17 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
             request, *args, **kwargs
         )
 
+class EnsureUnpaidOrderMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object().paid:
+            messages.error(request, "This order is already paid for!")
+            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+
+        return super(EnsureUnpaidOrderMixin, self).dispatch(
+            request, *args, **kwargs
+        )
 
 class ShopIndexView(ListView):
     model = Product
@@ -182,7 +193,7 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
-class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
     model = Order
     template_name = 'coinify_redirect.html'
 
@@ -243,7 +254,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailVi
         return context
 
 
-class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
     model = Order
     template_name = 'epay_form.html'
 
@@ -322,7 +333,7 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
         )
 
 
-class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
     model = Order
     template_name = 'bank_transfer.html'
 
