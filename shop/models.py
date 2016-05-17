@@ -106,6 +106,7 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
 
     name = models.CharField(max_length=150)
     slug = models.SlugField()
+    public = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -142,11 +143,6 @@ class Product(CreatedUpdatedModel, UUIDModel):
         )
     )
     
-    public = models.BooleanField(
-        default=True,
-        help_text='Is this product publicly available in the webshop?'
-    )
-
     objects = ProductQuerySet.as_manager()
 
     def __str__(self):

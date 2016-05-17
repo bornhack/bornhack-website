@@ -170,7 +170,7 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
     context_object_name = 'product'
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.get_object().public:
+        if not self.get_object().category.public:
             ### this product is not publicly available
             raise Http404("Product not found")
 
