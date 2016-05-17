@@ -299,6 +299,7 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
     template_name = 'epay_thanks.html'
 
     def dispatch(self, request, *args, **kwargs):
+        order = self.get_object()
         if order.open:
             ### this order is open, what is the user doing here?
             return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': order.pk}))
