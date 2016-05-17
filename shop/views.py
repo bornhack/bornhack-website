@@ -39,6 +39,7 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
             request, *args, **kwargs
         )
 
+
 class EnsureUnpaidOrderMixin(SingleObjectMixin):
     model = Order
 
@@ -50,6 +51,7 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
         return super(EnsureUnpaidOrderMixin, self).dispatch(
             request, *args, **kwargs
         )
+
 
 class ShopIndexView(ListView):
     model = Product
@@ -203,10 +205,6 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
 
         if order.open is not None:
             messages.error(request, 'This order is still open!')
-            return HttpResponseRedirect('shop:order_detail')
-
-        if order.paid:
-            messages.error(request, 'This order is already paid for!')
             return HttpResponseRedirect('shop:order_detail')
 
         if not order.products.count() > 0:
