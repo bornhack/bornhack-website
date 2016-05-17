@@ -23,7 +23,7 @@ from shop.models import (
     EpayCallback,
 )
 from .forms import AddToOrderForm
-import hashlib
+from epay.utils import calculate_epay_hash
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -247,30 +247,19 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
-        accept_url = 'https://' + self.request.get_host() + str(reverse_lazy('epay_thanks', kwargs={'pk': order.pk}))
+        accept_url = order.get_epay_accept_url(request)
+        cancel_url = order.get_epay_cancel_url(request)
         amount = order.total * 100
-        order_id = str(order.pk)
-        description = "BornHack 2016 order #%s" % order.pk
 
-        hashstring = (
-            '{merchant_number}{description}11{amount}DKK'
-            '{order_id}{accept_url}{md5_secret}'
-        ).format(
-            merchant_number=settings.EPAY_MERCHANT_NUMBER,
-            description=description,
-            amount=str(amount),
-            order_id=order_id,
-            accept_url=accept_url,
-            md5_secret=settings.EPAY_MD5_SECRET,
-        )
-        epay_hash = hashlib.md5(hashstring).hexdigest()
+        epay_hash = calculate_epay_hash(order, request)
 
         context = super(EpayFormView, self).get_context_data(**kwargs)
         context['merchant_number'] = settings.EPAY_MERCHANT_NUMBER
-        context['description'] = description
-        context['order_id'] = order_id
-        context['accept_url'] = accept_url
+        context['description'] = order.description
         context['amount'] = amount
+        context['order_id'] = order.pk
+        context['accept_url'] = accept_url
+        context['cancel_url'] = cancel_url
         context['epay_hash'] = epay_hash
         return context
 
@@ -290,19 +279,7 @@ class EpayCallbackView(View):
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
 
-            hashstring = (
-                '{merchant_number}{description}11{amount}DKK'
-                '{order_id}{accept_url}{md5_secret}'
-            ).format(
-                merchant_number=query.get('merchantnumber'),
-                description=query.get('description'),
-                amount=query.get('amount'),
-                order_id=query.get('orderid'),
-                accept_url=query.get('accepturl'),
-                md5_secret=settings.EPAY_MD5_SECRET,
-            )
-            epay_hash = hashlib.md5(hashstring).hexdigest()
-
+            epay_hash = calculate_epay_hash(order, request)
             if not epay_hash == query.get('hash'):
                 return HttpResponse(status=400)
 

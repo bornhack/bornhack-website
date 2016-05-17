@@ -85,9 +85,15 @@ class Order(CreatedUpdatedModel):
             )
         )['sum']
 
-    def get_absolute_url(self):
-        return reverse_lazy('shop:order_detail', kwargs={'pk': self.pk})
+    def get_epay_accept_url(self, request):
+        return 'https://' + request.get_host() + str(reverse_lazy('epay_thanks', kwargs={'pk': self.pk}))
 
+    def get_epay_cancel_url(self, request):
+        return 'https://' + request.get_host() + str(reverse_lazy('order_detail', kwargs={'pk': self.pk}))
+
+    @property
+    def description(self):
+        return "BornHack 2016 order #%s" % self.pk
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:
