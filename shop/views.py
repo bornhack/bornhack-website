@@ -26,6 +26,7 @@ from shop.models import (
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
+from vendor.coinify_api import CoinifyAPI
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -49,6 +50,32 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
             return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
 
         return super(EnsureUnpaidOrderMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
+class EnsureClosedOrderMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object().open is not None:
+            messages.error(request, 'This order is still open!')
+            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+
+        return super(EnsureClosedOrderMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
+class EnsureOrderHasProductsMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().products.count() > 0:
+            messages.error(request, 'This order has no products!')
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        return super(EnsureOrderHasProductsMixin, self).dispatch(
             request, *args, **kwargs
         )
 
@@ -85,18 +112,10 @@ class OrderListView(LoginRequiredMixin, ListView):
         return context
 
 
-class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'order_detail.html'
     context_object_name = 'order'
-
-    def get(self, request, *args, **kwargs):
-        order = self.get_object()
-
-        if not order.products.count() > 0:
-            return HttpResponseRedirect(reverse_lazy('shop:index'))
-
-        return super(OrderDetailView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         order = self.get_object()
@@ -195,23 +214,9 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
-class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
+class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'coinify_redirect.html'
-
-    def get(self, request, *args, **kwargs):
-        # validate a few things
-        order = self.get_object()
-
-        if order.open is not None:
-            messages.error(request, 'This order is still open!')
-            return HttpResponseRedirect('shop:order_detail')
-
-        if not order.products.count() > 0:
-            messages.error(request, 'This order contains no products!')
-            return HttpResponseRedirect('shop:order_detail')
-
-        return super(CoinifyRedirectView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
@@ -252,7 +257,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
         return context
 
 
-class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
+class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'epay_form.html'
 
@@ -331,7 +336,7 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
         )
 
 
-class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, DetailView):
+class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'bank_transfer.html'
 
