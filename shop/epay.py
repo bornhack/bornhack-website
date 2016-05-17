@@ -23,6 +23,6 @@ def validate_epay_callback(query):
     for key, value in query.iteritems():
         if key != 'hash':
             hashstring += value
-    hash = hashlib.md5(hashstring).hexdigest()
+    hash = hashlib.md5(hashstring + settings.EPAY_MD5_SECRET).hexdigest()
     return hash == query['hash']
 
