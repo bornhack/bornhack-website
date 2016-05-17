@@ -197,3 +197,17 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
     callback = models.ForeignKey('shop.EpayCallback')
     txnid = models.IntegerField()
 
+
+class Invoice(CreatedUpdatedModel):
+    order = models.OneToOneField('shop.Order')
+    sent_to_customer = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'invoice#%s - order %s - %s - total %s DKK (sent to customer: %s)' % (
+            self.id,
+            self.order.id,
+            self.order.created,
+            self.order.total,
+            self.sent_to_customer,
+        )
+
