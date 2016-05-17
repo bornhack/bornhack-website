@@ -174,6 +174,10 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
             ### this product is not publicly available
             raise Http404("Product not found")
 
+        return super(ProductDetailView, self).dispatch(
+            request, *args, **kwargs
+        )
+
     def form_valid(self, form):
         product = self.get_object()
         quantity = form.cleaned_data.get('quantity')
