@@ -1,0 +1,16 @@
+{% extends 'shop_base.html' %}
+
+{% block shop_content %}
+
+<div class="row">
+  <div class="col-sm-12 col-md-12 col-lg-12">
+    <a href="{% url 'shop:privacy-policy' %}">Privacy Policy</a><br />
+    <a href="{% url 'shop:return-policy' %}">Return Policy</a><br />
+    <a href="{% url 'shop:general-terms' %}">General Terms & Conditions</a><br />
+  </div>
+</div>
+
+{% block law-content %}
+{% endblock %}
+
+{% endblock %}

@@ -22,6 +22,11 @@ urlpatterns = [
         name='good-to-know'
     ),
     url(
+        r'contact/',
+        TemplateView.as_view(template_name='contact.html'),
+        name='contact'
+    ),
+    url(
         r'^login/$',
         LoginView.as_view(),
         name='account_login',

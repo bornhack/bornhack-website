@@ -86,3 +86,13 @@ a, a:active, a:focus {
   height: 500px;
 }
 
+
+/* Footer */
+footer {
+    position: fixed;
+    width: 700px;
+    text-align: center;
+    background-color: white;
+    bottom: 0px;
+    padding: 5px;
+}
