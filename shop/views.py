@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.db.models import Count, F
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import (
     View,
@@ -22,11 +22,13 @@ from shop.models import (
     ProductCategory,
     EpayCallback,
     EpayPayment,
+    CoinifyAPIInvoice,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
 from vendor.coinify_api import CoinifyAPI
+from vendor.coinify_callback import CoinifyCallback
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -234,49 +236,6 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
-class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
-    model = Order
-    template_name = 'coinify_redirect.html'
-
-    def get_context_data(self, **kwargs):
-        order = self.get_object()
-        context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
-        context['order'] = order
-
-        # Initiate coinify API and create invoice
-        coinifyapi = CoinifyAPI(
-            settings.COINIFY_API_KEY,
-            settings.COINIFY_API_SECRET
-        )
-        response = coinifyapi.invoice_create(
-            amount,
-            currency,
-            plugin_name='BornHack 2016 webshop',
-            plugin_version='1.0',
-            description='BornHack 2016 order id #%s' % order.id,
-            callback_url=reverse_lazy(
-                'shop:coinfy_callback',
-                kwargs={'orderid': order.id}
-            ),
-            return_url=reverse_lazy(
-                'shop:order_paid',
-                kwargs={'orderid': order.id}
-            ),
-        )
-
-        if not response['success']:
-            api_error = response['error']
-            print "API error: %s (%s)" % (
-                api_error['message'],
-                api_error['code']
-            )
-
-        invoice = response['data']
-        # change this to pass only needed data when we get that far
-        context['invoice'] = invoice
-        return context
-
-
 class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'epay_form.html'
@@ -285,6 +244,7 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
         order = self.get_object()
         accept_url = order.get_epay_accept_url(self.request)
         cancel_url = order.get_epay_cancel_url(self.request)
+        callback_url = order.get_epay_callback_url(self.request)
         amount = order.total * 100
 
         epay_hash = calculate_epay_hash(order, self.request)
@@ -296,6 +256,7 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
         context['order_id'] = order.pk
         context['accept_url'] = accept_url
         context['cancel_url'] = cancel_url
+        context['callback_url'] = callback_url
         context['epay_hash'] = epay_hash
         return context
 
@@ -363,4 +324,90 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
 class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'bank_transfer.html'
+
+
+class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+    model = Order
+    template_name = 'coinify_redirect.html'
+
+    def get_context_data(self, **kwargs):
+        order = self.get_object()
+        context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
+
+        if hasattr(order, 'coinifyapiinvoice'):
+            # we already have an invoice for this order, just redirect
+            context['redirecturl'] == order.coinifyapiinvoice.payload['data']['payment_url']
+        else:
+            # Initiate coinify API and create invoice
+            coinifyapi = CoinifyAPI(
+                settings.COINIFY_API_KEY,
+                settings.COINIFY_API_SECRET
+            )
+            response = coinifyapi.invoice_create(
+                order.total,
+                'DKK',
+                plugin_name='BornHack 2016 webshop',
+                plugin_version='1.0',
+                description='BornHack 2016 order id #%s' % order.id,
+                callback_url=reverse_lazy(
+                    'shop:coinfy_callback',
+                    kwargs={'orderid': order.id}
+                ),
+                return_url=reverse_lazy(
+                    'shop:coinify_thanks',
+                    kwargs={'orderid': order.id}
+                ),
+            )
+
+            if not response['success']:
+                api_error = response['error']
+                print "API error: %s (%s)" % (
+                    api_error['message'],
+                    api_error['code']
+                )
+            else:
+                # save this coinify invoice
+                CoinifyAPIInvoice.objects.create(
+                    invoicejson = response['data'],
+                    order = order,
+                )
+                context['redirecturl'] == response['data']['payment_url']
+        return context
+
+
+class CoinifyCallbackView(View):
+    def post(self, request, *args, **kwargs):
+        # Get the signature from the HTTP or email headers
+        signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
+        sdk = CoinifyCallback(
+            settings.COINIFY_API_KEY,
+            settings.COINIFY_API_SECRET
+        )
+
+        if sdk.validate_callback(request.body, signature):
+            # callback is valid, save it to db
+            callbackobject = CoinifyCallback.objects.create(
+                payload=request.body
+            )
+
+            # parse json
+            callbackjson = json.loads(request.body)
+            if callbackjson['event'] == 'invoice_state_change' or callbackjson['event'] == 'invoice_manual_resend':
+                # get invoice from db
+                try:
+                    invoice = CoinifyAPIInvoice.objects.get(id=callbackjson['data']['id'])
+                except CoinifyAPIInvoice.DoesNotExist:
+                    return HttpResponseBadRequest('bad invoice id')
+
+                # save new invoice payload
+                invoice.payload = callbackjson['data']
+                invoice.save()
+                
+                # so, is the invoice paid now?
+                if callbackjson['data']['state'] == 'complete':
+                    invoice.order.mark_as_paid()
+            else:
+                HttpResponseBadRequest('unsupported event')
+        else:
+            HttpResponseBadRequest('something is fucky')
 

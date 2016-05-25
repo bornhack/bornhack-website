@@ -91,6 +91,9 @@ class Order(CreatedUpdatedModel):
     def get_epay_cancel_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
+    def get_epay_callback_url(self, request):
+        return 'https://' + request.get_host() + str(reverse_lazy('shop:epay_callback', kwargs={'pk': self.pk}))
+
     @property
     def description(self):
         return "BornHack 2016 order #%s" % self.pk
@@ -206,4 +209,16 @@ class Invoice(CreatedUpdatedModel):
             self.order.total,
             self.sent_to_customer,
         )
+
+
+class CoinifyAPIInvoice(CreatedUpdatedModel):
+    invoicejson = JSONField()
+    order = models.OneToOneField('shop.Order')
+
+
+class CoinifyCallback(CreatedUpdatedModel):
+    payload = JSONField()
+
+    def __str__(self):
+        return 'callback at %s' % self.created
 

@@ -18,3 +18,5 @@ DATABASES = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 LETTERHEAD_PDF_PATH = os.path.join(local_dir('static_src'), 'pdf', 'bornhack_2016_test_letterhead.pdf')
+COINIFY_API_KEY = '{{ coinify_api_key }}'
+COINIFY_API_SECRET = '{{ coinify_api_secret }}'
