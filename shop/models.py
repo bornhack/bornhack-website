@@ -105,6 +105,21 @@ class Order(CreatedUpdatedModel):
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
+    def mark_as_paid(self):
+        self.paid = True
+        for order_product in self.orderproductrelation_set.all():
+            category_pk = str(order_product.product.category.pk)
+            print(order_product, category_pk, settings.TICKET_CATEGORY_ID)
+            if category_pk == settings.TICKET_CATEGORY_ID:
+                for _ in range(0, order_product.quantity):
+                    ticket = Ticket(
+                        order=self,
+                        product=order_product.product,
+                    )
+                    ticket.save()
+        self.save()
+
+
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:

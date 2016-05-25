@@ -27,6 +27,13 @@ class ProductInline(admin.TabularInline):
     model = models.OrderProductRelation
 
 
+class TicketInline(admin.TabularInline):
+    model = models.Ticket
+    exclude = ['qrcode_base64']
+
+
+
+
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
@@ -45,7 +52,14 @@ class OrderAdmin(admin.ModelAdmin):
 
     exclude = ['products']
 
-    inlines = [ProductInline]
+    inlines = [ProductInline, TicketInline]
+
+    actions = ['mark_order_as_paid']
+
+    def mark_order_as_paid(self, request, queryset):
+        for order in queryset.filter(paid=False):
+            order.mark_as_paid()
+    mark_order_as_paid.description = 'Mark order(s) as paid'
 
 
 @admin.register(models.Ticket)
