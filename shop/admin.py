@@ -1,18 +1,19 @@
 from django.contrib import admin
 
-from .models import Order, ProductCategory, Product, OrderProductRelation, EpayCallback, EpayPayment
+from . import models
 
-admin.site.register(EpayCallback)
-admin.site.register(EpayPayment)
+admin.site.register(models.EpayCallback)
+admin.site.register(models.EpayPayment)
 
-@admin.register(ProductCategory)
+
+@admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = [
         'name',
     ]
 
 
-@admin.register(Product)
+@admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -23,10 +24,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductInline(admin.TabularInline):
-    model = OrderProductRelation
+    model = models.OrderProductRelation
 
 
-@admin.register(Order)
+@admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'user',
@@ -46,3 +47,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     inlines = [ProductInline]
 
+
+@admin.register(models.Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    pass
