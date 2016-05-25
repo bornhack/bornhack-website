@@ -1,18 +1,19 @@
 from django.contrib import admin
 
-from .models import Order, ProductCategory, Product, OrderProductRelation, EpayCallback, EpayPayment
+from . import models
 
-admin.site.register(EpayCallback)
-admin.site.register(EpayPayment)
+admin.site.register(models.EpayCallback)
+admin.site.register(models.EpayPayment)
 
-@admin.register(ProductCategory)
+
+@admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = [
         'name',
     ]
 
 
-@admin.register(Product)
+@admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -23,10 +24,17 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductInline(admin.TabularInline):
-    model = OrderProductRelation
+    model = models.OrderProductRelation
 
 
-@admin.register(Order)
+class TicketInline(admin.TabularInline):
+    model = models.Ticket
+    exclude = ['qrcode_base64']
+
+
+
+
+@admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'user',
@@ -44,5 +52,16 @@ class OrderAdmin(admin.ModelAdmin):
 
     exclude = ['products']
 
-    inlines = [ProductInline]
+    inlines = [ProductInline, TicketInline]
 
+    actions = ['mark_order_as_paid']
+
+    def mark_order_as_paid(self, request, queryset):
+        for order in queryset.filter(paid=False):
+            order.mark_as_paid()
+    mark_order_as_paid.description = 'Mark order(s) as paid'
+
+
+@admin.register(models.Ticket)
+class TicketAdmin(admin.ModelAdmin):
+    pass

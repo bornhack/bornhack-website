@@ -53,6 +53,7 @@
 
             {% endif %}
             <li><a href="{% url 'good-to-know' %}">Info</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
             <li><a href="{% url 'account_logout' %}">Logout</a></li>
@@ -69,6 +70,11 @@
     <div id="main" class="container container-fluid">
       {% bootstrap_messages %}
       {% block content %}{% endblock %}
+      <footer class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+          {% block footer %}{% endblock %}
+        </div>
+      </footer>
     </div>
     {% bootstrap_javascript jquery=1 %}
   </body>

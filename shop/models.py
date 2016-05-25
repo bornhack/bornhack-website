@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Sum
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
@@ -7,6 +8,12 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
 from .managers import ProductQuerySet
+
+import hashlib
+import io
+import base64
+
+import qrcode
 
 
 class Order(CreatedUpdatedModel):
@@ -100,6 +107,21 @@ class Order(CreatedUpdatedModel):
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
+
+    def mark_as_paid(self):
+        self.paid = True
+        for order_product in self.orderproductrelation_set.all():
+            category_pk = str(order_product.product.category.pk)
+            print(order_product, category_pk, settings.TICKET_CATEGORY_ID)
+            if category_pk == settings.TICKET_CATEGORY_ID:
+                for _ in range(0, order_product.quantity):
+                    ticket = Ticket(
+                        order=self,
+                        product=order_product.product,
+                    )
+                    ticket.save()
+        self.save()
+
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
@@ -221,4 +243,48 @@ class CoinifyCallback(CreatedUpdatedModel):
 
     def __str__(self):
         return 'callback at %s' % self.created
+
+
+class Ticket(CreatedUpdatedModel, UUIDModel):
+    order = models.ForeignKey('shop.Order')
+    product = models.ForeignKey('shop.Product')
+    qrcode_base64 = models.TextField(null=True, blank=True)
+
+    name = models.CharField(
+        max_length=100,
+        help_text=(
+            'Name of the person this ticket belongs to. '
+            'This can be different from the buying user.'
+        ),
+    )
+
+    def __str__(self):
+        return 'Ticket {user} {product}'.format(
+            user=self.order.user,
+            product=self.product
+        )
+
+    def save(self, **kwargs):
+        super(Ticket, self).save(**kwargs)
+        self.qrcode_base64 = self.get_qr_code()
+        super(Ticket, self).save(**kwargs)
+
+    def get_token(self):
+        return hashlib.sha256(
+            '{ticket_id}{user_id}{secret_key}'.format(
+                ticket_id=self.pk,
+                user_id=self.order.user.pk,
+                secret_key=settings.SECRET_KEY,
+            )
+        ).hexdigest()
+
+    def get_qr_code(self):
+        qr = qrcode.make(self.get_token())
+        file_like = io.BytesIO()
+        qr.save(file_like)
+        qrcode_base64 = base64.b64encode(file_like.getvalue())
+        return qrcode_base64
+
+    def get_qr_code_url(self):
+        return 'data:image/png;base64,{}'.format(self.qrcode_base64)
 
