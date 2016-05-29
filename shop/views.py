@@ -117,7 +117,6 @@ class ShopIndexView(ListView):
         return context
 
 
-
 class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
     model = Product
     template_name = 'product_detail.html'
@@ -315,6 +314,10 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
             # epay redirects the user back to our accepturl with a long
             # and ugly querystring, redirect user to the clean url
             return HttpResponseRedirect(reverse('shop:epay_thanks', kwargs={'pk': self.get_object().pk}))
+
+        return super(EpayThanksView, self).dispatch(
+            request, *args, **kwargs
+        )
 
 #################################################################################
 
