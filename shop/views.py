@@ -14,6 +14,8 @@ from django.views.generic import (
 )
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 from camps.models import Camp
 from shop.models import (
@@ -379,6 +381,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
 
 
 class CoinifyCallbackView(SingleObjectMixin, View):
+    @method_decorator(csrf_exempt)
     def post(self, request, *args, **kwargs):
         # Get the signature from the HTTP headers
         signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
