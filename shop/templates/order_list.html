@@ -27,10 +27,10 @@
         <td class="text-center">{{ order.handed_out_status }}</td>
         <td>
         {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
-        {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-sm" %}
+        {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
         {% if not order.paid %}
             {% url 'shop:order_cancel' pk=order.pk as order_cancel_url %}
-            {% bootstrap_button "Cancel order" icon="remove" href=order_cancel_url button_class="btn-danger btn-sm" %}
+            {% bootstrap_button "Cancel order" icon="remove" href=order_cancel_url button_class="btn-danger btn-xs" %}
         {% endif %}
         </td>
     </tr>
