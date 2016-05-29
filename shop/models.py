@@ -244,8 +244,10 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
 
 class CoinifyCallback(CreatedUpdatedModel):
+    headers = JSONField()
     payload = JSONField()
     order = models.ForeignKey('shop.Order')
+    valid = models.BooleanField(default=False)
 
     def __str__(self):
         return 'callback at %s' % self.created

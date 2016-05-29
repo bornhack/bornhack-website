@@ -368,12 +368,22 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             settings.COINIFY_API_SECRET
         )
 
+        # make a dict with all HTTP_ headers
+        headerdict = {}
+        for key, value in request.META.iteritems():
+            if key[:5] == 'HTTP_':
+                headerdict[key[5:]] = value
+
+        # save callback to db
+        callbackobject = CoinifyCallback.objects.create(
+            headers=json.dumps(headerdict),
+            payload=request.body,
+            order=self.get_object()
+        )
         if sdk.validate_callback(request.body, signature):
-            # callback is valid, save it to db
-            callbackobject = CoinifyCallback.objects.create(
-                payload=request.body,
-                order=self.get_object()
-            )
+            # mark callback as valid in db
+            callbackobject.valid=True
+            callbackobject.save()
 
             # parse json
             callbackjson = json.loads(request.body)
@@ -394,6 +404,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             else:
                 HttpResponseBadRequest('unsupported event')
         else:
+            print "invalid callback detected"
             HttpResponseBadRequest('something is fucky')
 
 
