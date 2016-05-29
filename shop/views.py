@@ -332,7 +332,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 description='BornHack 2016 order id #%s' % order.id,
                 callback_url=order.get_coinify_callback_url(request),
                 return_url=order.get_coinify_thanks_url(request),
-                cancel_url=order.get_coinify_cancel_url(request),
+                cancel_url=order.get_cancel_url(request),
             )
 
             # Parse response
