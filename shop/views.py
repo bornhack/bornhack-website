@@ -12,6 +12,7 @@ from django.views.generic import (
     DetailView,
     FormView,
 )
+from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
 from camps.models import Camp
