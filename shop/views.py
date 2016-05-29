@@ -258,6 +258,8 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
 
 
 class EpayCallbackView(SingleObjectMixin, View):
+    model = Order
+
     def get(self, request, **kwargs):
         callback = EpayCallback.objects.create(
             payload=request.GET
