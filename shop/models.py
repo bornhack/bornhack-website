@@ -276,7 +276,7 @@ class CoinifyAPICallback(CreatedUpdatedModel):
     valid = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'callback at %s' % self.created
+        return 'order #%s callback at %s' % (self.order.id, self.created)
 
 
 class Ticket(CreatedUpdatedModel, UUIDModel):
