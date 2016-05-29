@@ -66,11 +66,11 @@
 </table>
 
 {% if not order.open == None %}
-
   {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+{% endif %}
 
 <hr />
-<h3>Payment options</h3>
+<h3>Payment</h3>
 {% if not order.paid %}
 <p class="lead">Your order is currently unpaid. Please pick a payment option below.</p>
 <p><i>If you have already paid but your order is still showing unpaid, 
@@ -86,7 +86,6 @@ the other payment methods should be more or less instant.</i></p>
 </form>
 {% else %}
 <p class="lead">Your order is paid in full.</p>
-{% endif %}
 {% endif %}
 
 {% endblock %}
