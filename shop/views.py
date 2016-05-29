@@ -300,9 +300,19 @@ class EpayCallbackView(View):
         return HttpResponse('OK')
 
 
-class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
+class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, View):
     model = Order
     template_name = 'epay_thanks.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.GET:
+            # epay redirects the user back to our accepturl with a long
+            # and ugly querystring, redirect user to the clean url
+            return HttpResponseRedirect(reverse_lazy('shop:epay_thanks', kwargs={'pk': self.pk})
+        else:
+            return super(EpayThanksView, self).get(
+                request, *args, **kwargs
+            )
 
 
 class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
