@@ -15,7 +15,7 @@ class Order(CreatedUpdatedModel):
 
     class Meta:
         unique_together = ('user', 'open')
-        ordering = '-created'
+        ordering = ['-created']
 
     products = models.ManyToManyField(
         'shop.Product',
