@@ -82,6 +82,7 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
             request, *args, **kwargs
         )
 
+#################################################################################
 
 class ShopIndexView(ListView):
     model = Product
@@ -115,65 +116,6 @@ class ShopIndexView(ListView):
         )
         return context
 
-
-class OrderListView(LoginRequiredMixin, ListView):
-    model = Order
-    template_name = "order_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super(OrderListView, self).get_context_data(**kwargs)
-        context['orders'] = Order.objects.filter(user=self.request.user)
-        return context
-
-
-class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderHasProductsMixin, DetailView):
-    model = Order
-    template_name = 'order_detail.html'
-    context_object_name = 'order'
-
-    def post(self, request, *args, **kwargs):
-        order = self.get_object()
-        payment_method = request.POST.get('payment_method')
-
-        if payment_method in order.PAYMENT_METHODS:
-            order.payment_method = payment_method
-
-            # Mark the order as closed
-            order.open = None
-            order.save()
-
-            reverses = {
-                Order.CREDIT_CARD: reverse_lazy(
-                    'shop:epay_form',
-                    kwargs={'pk': order.id}
-                ),
-                Order.BLOCKCHAIN: reverse_lazy(
-                    'shop:coinify_pay',
-                    kwargs={'pk': order.id}
-                ),
-                Order.BANK_TRANSFER: reverse_lazy(
-                    'shop:bank_transfer',
-                    kwargs={'pk': order.id}
-                )
-            }
-
-            return HttpResponseRedirect(reverses[payment_method])
-
-        if 'update_order' in request.POST:
-            for order_product in order.orderproductrelation_set.all():
-                order_product_id = str(order_product.pk)
-                if order_product_id in request.POST:
-                    new_quantity = int(request.POST.get(order_product_id))
-                    order_product.quantity = new_quantity
-                    order_product.save()
-
-        product_remove = request.POST.get('remove_product')
-        if product_remove:
-            order.orderproductrelation_set.filter(pk=product_remove).delete()
-            if not order.products.count() > 0:
-                return HttpResponseRedirect(reverse_lazy('shop:index'))
-
-        return super(OrderDetailView, self).get(request, *args, **kwargs)
 
 
 class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
@@ -237,7 +179,68 @@ class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
         return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
 
 
-class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = "order_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderListView, self).get_context_data(**kwargs)
+        context['orders'] = Order.objects.filter(user=self.request.user)
+        return context
+
+
+class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+    model = Order
+    template_name = 'order_detail.html'
+    context_object_name = 'order'
+
+    def post(self, request, *args, **kwargs):
+        order = self.get_object()
+        payment_method = request.POST.get('payment_method')
+
+        if payment_method in order.PAYMENT_METHODS:
+            order.payment_method = payment_method
+
+            # Mark the order as closed
+            order.open = None
+            order.save()
+
+            reverses = {
+                Order.CREDIT_CARD: reverse_lazy(
+                    'shop:epay_form',
+                    kwargs={'pk': order.id}
+                ),
+                Order.BLOCKCHAIN: reverse_lazy(
+                    'shop:coinify_pay',
+                    kwargs={'pk': order.id}
+                ),
+                Order.BANK_TRANSFER: reverse_lazy(
+                    'shop:bank_transfer',
+                    kwargs={'pk': order.id}
+                )
+            }
+
+            return HttpResponseRedirect(reverses[payment_method])
+
+        if 'update_order' in request.POST:
+            for order_product in order.orderproductrelation_set.all():
+                order_product_id = str(order_product.pk)
+                if order_product_id in request.POST:
+                    new_quantity = int(request.POST.get(order_product_id))
+                    order_product.quantity = new_quantity
+                    order_product.save()
+
+        product_remove = request.POST.get('remove_product')
+        if product_remove:
+            order.orderproductrelation_set.filter(pk=product_remove).delete()
+            if not order.products.count() > 0:
+                return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        return super(OrderDetailView, self).get(request, *args, **kwargs)
+
+#################################################################################
+
+class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, View):
     model = Order
     template_name = 'epay_form.html'
 
@@ -255,7 +258,7 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
         return context
 
 
-class EpayCallbackView(View):
+class EpayCallbackView(SingleObjectMixin, View):
     def get(self, request, **kwargs):
         callback = EpayCallback.objects.create(
             payload=request.GET
@@ -269,6 +272,9 @@ class EpayCallbackView(View):
                 )
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
+            if order.pk != self.get_object().pk:
+                print "bad epay callback, orders do not match!"
+                return HttpResponse(status=400)
 
             if validate_epay_callback(query):
                 callback.md5valid=True
@@ -304,21 +310,19 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
     model = Order
     template_name = 'epay_thanks.html'
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if request.GET:
             # epay redirects the user back to our accepturl with a long
             # and ugly querystring, redirect user to the clean url
             return HttpResponseRedirect(reverse('shop:epay_thanks', kwargs={'pk': self.get_object().pk}))
-        else:
-            return super(EpayThanksView, self).get(
-                request, *args, **kwargs
-            )
 
+#################################################################################
 
-class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, View):
     model = Order
     template_name = 'bank_transfer.html'
 
+#################################################################################
 
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
@@ -418,7 +422,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             HttpResponseBadRequest('something is fucky')
 
 
-class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
+class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, View):
     model = Order
     template_name = 'coinify_thanks.html'
 
