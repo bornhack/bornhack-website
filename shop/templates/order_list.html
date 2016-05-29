@@ -7,6 +7,8 @@
   <thead>
     <tr>
       <th>Order ID</th>
+      <th>Items</th>
+      <th>Total amount</th>
       <th>Open?</th>
       <th>Paid?</th>
       <th>Delivered?</th>
@@ -15,17 +17,19 @@
   </thead>
   <tbody>
 {% for order in orders %}
-    <tr {% if not order.open and order.paid %}style="color: lightgrey"{% endif %}>
+    <tr {% if not order.open and order.paid and order.is_fully_handed_out %}style="color: lightgrey"{% endif %}>
         <td>{{ order.id }}</td>
+        <td>{{ order.get_number_of_items }}</td>
+        <td>{{ order.total }}</td>
         <td>{{ order.open }}</td>
         <td>{{ order.paid }}</td>
         <td>{{ order.handed_out_status }}</td>
         <td>
-        {% if not order.open and not order.paid %}
-            {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
+        {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
+        {% bootstrap_button "Order details" href=order_detail_url button_class="btn-primary btn-small" %}
+        {% if not order.paid %}
             {% url 'shop:order_cancel' pk=order.pk as order_cancel_url %}
-            {% bootstrap_button "Order details" href=order_detail_url button_class="btn-primary" %}
-            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary" %}
+            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary btn-small" %}
         {% endif %}
         </td>
     </tr>
