@@ -22,9 +22,9 @@
         <td>{{ order.id }}</td>
         <td>{{ order.get_number_of_items }}</td>
         <td>{{ order.total|currency }}</td>
-        <td>{{ order.open }}</td>
-        <td>{{ order.paid }}</td>
-        <td>{{ order.handed_out_status }}</td>
+        <td class="text-center">{{ order.open|truefalseicon }}</td>
+        <td class="text-center">{{ order.paid|truefalseicon }}</td>
+        <td class="text-center">{{ order.handed_out_status }}</td>
         <td>
         {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
         {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-sm" %}
