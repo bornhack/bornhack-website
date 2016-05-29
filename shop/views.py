@@ -382,6 +382,8 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
 
 
 class CoinifyCallbackView(SingleObjectMixin, View):
+    model = Order
+
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(CoinifyCallbackView, self).dispatch(*args, **kwargs)
