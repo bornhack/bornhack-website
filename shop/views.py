@@ -306,19 +306,9 @@ class EpayCallbackView(View):
         return HttpResponse('OK')
 
 
-class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, DetailView):
+class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
     model = Order
     template_name = 'epay_thanks.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        order = self.get_object()
-        if order.open:
-            ### this order is open, what is the user doing here?
-            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': order.pk}))
-
-        return super(EpayThanksView, self).dispatch(
-            request, *args, **kwargs
-        )
 
 
 class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
@@ -375,9 +365,9 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
         return context
 
 
-class CoinifyCallbackView(View):
+class CoinifyCallbackView(SingleObjectMixin, View):
     def post(self, request, *args, **kwargs):
-        # Get the signature from the HTTP or email headers
+        # Get the signature from the HTTP headers
         signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
         sdk = CoinifyCallback(
             settings.COINIFY_API_KEY,
@@ -387,7 +377,8 @@ class CoinifyCallbackView(View):
         if sdk.validate_callback(request.body, signature):
             # callback is valid, save it to db
             callbackobject = CoinifyCallback.objects.create(
-                payload=request.body
+                payload=request.body,
+                order=self.get_object()
             )
 
             # parse json
@@ -410,4 +401,9 @@ class CoinifyCallbackView(View):
                 HttpResponseBadRequest('unsupported event')
         else:
             HttpResponseBadRequest('something is fucky')
+
+
+class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
+    model = Order
+    template_name = 'coinify_thanks.html'
 
