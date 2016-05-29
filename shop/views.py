@@ -382,6 +382,9 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
 
 class CoinifyCallbackView(SingleObjectMixin, View):
     @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(CoinifyCallbackView, self).dispatch(*args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         # Get the signature from the HTTP headers
         signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
