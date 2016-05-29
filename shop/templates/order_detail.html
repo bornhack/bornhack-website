@@ -70,13 +70,23 @@
   {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
 
 <hr />
-<h3>Checkout</h3>
+<h3>Payment options</h3>
+{% if not order.paid %}
+<p class="lead">Your order is currently unpaid. Please pick a payment option below.</p>
+<p><i>If you have already paid but your order is still showing unpaid, 
+you can <a href="mailto:info@bornhack.dk">email us</a> or use the 
+<a href="{% url 'contact' %}">contact</a> page for other options. 
+Please allow for up to a week for bank transfers to be registered, 
+the other payment methods should be more or less instant.</i></p>
 <form method="POST">
   {% csrf_token %}
   {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
 </form>
+{% else %}
+<p class="lead">Your order is paid in full.</p>
+{% endif %}
 {% endif %}
 
 {% endblock %}

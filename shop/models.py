@@ -92,6 +92,12 @@ class Order(CreatedUpdatedModel):
             )
         )['sum']
 
+    def get_coinify_callback_url(self, request):
+        return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))
+
+    def get_coinify_thanks_url(self, request):
+        return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_thanks', kwargs={'pk': self.pk}))
+
     def get_epay_accept_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:epay_thanks', kwargs={'pk': self.pk}))
 

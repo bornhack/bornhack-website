@@ -337,14 +337,8 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 plugin_name='BornHack 2016 webshop',
                 plugin_version='1.0',
                 description='BornHack 2016 order id #%s' % order.id,
-                callback_url=reverse(
-                    'shop:coinify_callback',
-                    kwargs={'pk': order.id}
-                ),
-                return_url=reverse(
-                    'shop:coinify_thanks',
-                    kwargs={'pk': order.id}
-                ),
+                callback_url=order.get_coinify_callback_url,
+                return_url=order.get_coinify_thanks_url,
             )
 
             # Parse response
