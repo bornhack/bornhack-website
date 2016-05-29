@@ -15,16 +15,16 @@
   </thead>
   <tbody>
 {% for order in orders %}
-    <tr {% if order.finalized and order.paid %}style="color: lightgreen"{% endif %}>
+    <tr {% if not order.open and order.paid %}style="color: lightgrey"{% endif %}>
         <td>{{ order.id }}</td>
-        <td>{{ order.finalized }}</td>
+        <td>{{ order.open }}</td>
         <td>{{ order.paid }}</td>
-        <td>?</td>
+        <td>{{ order.handed_out_status }}</td>
         <td>
-        {% if order.finalized and not order.paid %}
+        {% if not order.open and not order.paid %}
             {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
             {% url 'shop:order_cancel' pk=order.pk as order_cancel_url %}
-            {% bootstrap_button "Pay order" href=order_detail_url button_class="btn-primary" %}
+            {% bootstrap_button "Order details" href=order_detail_url button_class="btn-primary" %}
             {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary" %}
         {% endif %}
         </td>

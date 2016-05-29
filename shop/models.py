@@ -8,12 +8,7 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
 from bornhack.utils import CreatedUpdatedModel, UUIDModel
 from .managers import ProductQuerySet
-
-import hashlib
-import io
-import base64
-
-import qrcode
+import hashlib, io, base64, qrcode
 
 
 class Order(CreatedUpdatedModel):
@@ -109,7 +104,7 @@ class Order(CreatedUpdatedModel):
 
     @property
     def description(self):
-        return "BornHack 2016 order #%s" % self.pk
+        return "BornHack %s order #%s" % (self.camp.start.year, self.pk)
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
@@ -127,6 +122,36 @@ class Order(CreatedUpdatedModel):
                     )
                     ticket.save()
         self.save()
+
+    def is_not_handed_out(self):
+        if self.orderproductrelation_set.filter(handed_out=True).count() == 0:
+            return True
+        else:
+            return False
+
+    def is_partially_handed_out(self):
+        if self.orderproductrelation_set.filter(handed_out=True).count() != 0 and self.orderproductrelation_set.filter(handed_out=False).count() != 0:
+            # some products are handed out, others are not
+            return True
+        else:
+            return False
+
+    def is_fully_handed_out(self):
+        if self.orderproductrelation_set.filter(handed_out=False).count() == 0:
+            return True
+        else:
+            return False
+
+    @property
+    def handed_out_status(self):
+        if self.is_not_handed_out():
+            return "no"
+        elif self.is_partially_handed_out():
+            return "partially"
+        elif self.is_fully_handed_out():
+            return "fully"
+        else:
+            return False
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
