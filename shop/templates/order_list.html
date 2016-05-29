@@ -1,5 +1,6 @@
 {% extends 'shop_base.html' %}
 {% load bootstrap3 %}
+{% load shop_tags %}
 
 {% block shop_content %}
 <h3>Orders</h3>
@@ -20,16 +21,16 @@
     <tr {% if not order.open and order.paid and order.is_fully_handed_out %}style="color: lightgrey"{% endif %}>
         <td>{{ order.id }}</td>
         <td>{{ order.get_number_of_items }}</td>
-        <td>{{ order.total }}</td>
+        <td>{{ order.total|currency }}</td>
         <td>{{ order.open }}</td>
         <td>{{ order.paid }}</td>
         <td>{{ order.handed_out_status }}</td>
         <td>
         {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
-        {% bootstrap_button "Order details" href=order_detail_url button_class="btn-primary btn-small" %}
+        {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-sm" %}
         {% if not order.paid %}
             {% url 'shop:order_cancel' pk=order.pk as order_cancel_url %}
-            {% bootstrap_button "Cancel order" href=order_cancel_url button_class="btn-primary btn-small" %}
+            {% bootstrap_button "Cancel order" icon="remove" href=order_cancel_url button_class="btn-danger btn-sm" %}
         {% endif %}
         </td>
     </tr>
