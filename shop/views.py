@@ -426,11 +426,14 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 # so, is the invoice paid now?
                 if callbackjson['data']['state'] == 'complete':
                     invoice.order.mark_as_paid()
+
+                # return 200 OK
+                return HttpResponse('OK')
             else:
-                HttpResponseBadRequest('unsupported event')
+                return HttpResponseBadRequest('unsupported event')
         else:
             print "invalid callback detected"
-            HttpResponseBadRequest('something is fucky')
+            return HttpResponseBadRequest('something is fucky')
 
 
 class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
