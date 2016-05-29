@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Count, F
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404
 from django.shortcuts import get_object_or_404
@@ -339,11 +339,11 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 plugin_name='BornHack 2016 webshop',
                 plugin_version='1.0',
                 description='BornHack 2016 order id #%s' % order.id,
-                callback_url=reverse_lazy(
+                callback_url=reverse(
                     'shop:coinfy_callback',
                     kwargs={'orderid': order.id}
                 ),
-                return_url=reverse_lazy(
+                return_url=reverse(
                     'shop:coinify_thanks',
                     kwargs={'orderid': order.id}
                 ),
