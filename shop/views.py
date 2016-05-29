@@ -319,15 +319,17 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
 
-    def dispatch(self, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
         if not hasattr(order, 'coinifyapiinvoice'):
-            # Initiate coinify API and create invoice
+            # Initiate coinify API
             coinifyapi = CoinifyAPI(
                 settings.COINIFY_API_KEY,
                 settings.COINIFY_API_SECRET
             )
+            
+            # create coinify API
             response = coinifyapi.invoice_create(
                 order.total,
                 'DKK',
@@ -344,12 +346,15 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 ),
             )
 
+            # Parse response
             if not response['success']:
                 api_error = response['error']
                 print "API error: %s (%s)" % (
                     api_error['message'],
                     api_error['code']
                 )
+                messages.error(request, "There was a problem with the payment provider. Please try again later")
+                return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
             else:
                 # save this coinify invoice
                 CoinifyAPIInvoice.objects.create(
@@ -357,7 +362,11 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     order = order,
                 )
 
-    def get_redirect_url(self, *args, **kwargs):):
+        return super(CoinifyRedirectView, self).dispatch(
+            request, *args, **kwargs
+        )
+
+    def get_redirect_url(self, *args, **kwargs):
         return self.get_object().coinifyapiinvoice.payload['data']['payment_url']
 
 
