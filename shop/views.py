@@ -308,7 +308,7 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
         if request.GET:
             # epay redirects the user back to our accepturl with a long
             # and ugly querystring, redirect user to the clean url
-            return HttpResponseRedirect(reverse('shop:epay_thanks', kwargs={'pk': self.pk}))
+            return HttpResponseRedirect(reverse('shop:epay_thanks', kwargs={'pk': self.get_object().pk}))
         else:
             return super(EpayThanksView, self).get(
                 request, *args, **kwargs
