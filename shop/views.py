@@ -26,6 +26,7 @@ from shop.models import (
     EpayCallback,
     EpayPayment,
     CoinifyAPIInvoice,
+    CoinifyAPICallback,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
@@ -397,7 +398,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 headerdict[key[5:]] = value
 
         # save callback to db
-        callbackobject = CoinifyCallback.objects.create(
+        callbackobject = CoinifyAPICallback.objects.create(
             headers=json.dumps(headerdict),
             payload=request.body,
             order=self.get_object()

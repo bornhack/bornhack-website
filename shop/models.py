@@ -269,7 +269,7 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
     order = models.OneToOneField('shop.Order')
 
 
-class CoinifyCallback(CreatedUpdatedModel):
+class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
     payload = JSONField()
     order = models.ForeignKey('shop.Order')
