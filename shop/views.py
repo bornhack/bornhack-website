@@ -243,22 +243,15 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
-        accept_url = order.get_epay_accept_url(self.request)
-        cancel_url = order.get_epay_cancel_url(self.request)
-        callback_url = order.get_epay_callback_url(self.request)
-        amount = order.total * 100
-
-        epay_hash = calculate_epay_hash(order, self.request)
-
         context = super(EpayFormView, self).get_context_data(**kwargs)
         context['merchant_number'] = settings.EPAY_MERCHANT_NUMBER
         context['description'] = order.description
-        context['amount'] = amount
+        context['amount'] = order.total * 100
         context['order_id'] = order.pk
-        context['accept_url'] = accept_url
-        context['cancel_url'] = cancel_url
-        context['callback_url'] = callback_url
-        context['epay_hash'] = epay_hash
+        context['accept_url'] = order.get_epay_accept_url(self.request)
+        context['cancel_url'] = order.get_cancel_url(self.request)
+        context['callback_url'] = order.get_epay_callback_url(self.request)
+        context['epay_hash'] = calculate_epay_hash(order, self.request)
         return context
 
 
@@ -339,6 +332,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 description='BornHack 2016 order id #%s' % order.id,
                 callback_url=order.get_coinify_callback_url(request),
                 return_url=order.get_coinify_thanks_url(request),
+                cancel_url=order.get_coinify_cancel_url(request),
             )
 
             # Parse response

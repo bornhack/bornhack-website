@@ -101,7 +101,7 @@ class Order(CreatedUpdatedModel):
     def get_epay_accept_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:epay_thanks', kwargs={'pk': self.pk}))
 
-    def get_epay_cancel_url(self, request):
+    def get_cancel_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
     def get_epay_callback_url(self, request):
@@ -127,7 +127,6 @@ class Order(CreatedUpdatedModel):
                     )
                     ticket.save()
         self.save()
-
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
