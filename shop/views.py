@@ -401,8 +401,8 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # save callback to db
         callbackobject = CoinifyAPICallback.objects.create(
-            headers=json.dumps(headerdict),
-            payload=request.body,
+            headers=headerdict,
+            payload=json.loads(request.body),
             order=self.get_object()
         )
         if sdk.validate_callback(request.body, signature):
@@ -432,7 +432,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             else:
                 return HttpResponseBadRequest('unsupported event')
         else:
-            print "invalid callback detected"
+            print "invalid coinify callback detected"
             return HttpResponseBadRequest('something is fucky')
 
 
