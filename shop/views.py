@@ -316,18 +316,13 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
     template_name = 'bank_transfer.html'
 
 
-class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
-    template_name = 'coinify_redirect.html'
 
-    def get_context_data(self, **kwargs):
+    def dispatch(self, **kwargs):
         order = self.get_object()
-        context = super(CoinifyRedirectView, self).get_context_data(**kwargs)
 
-        if hasattr(order, 'coinifyapiinvoice'):
-            # we already have an invoice for this order, just redirect
-            context['redirecturl'] == order.coinifyapiinvoice.payload['data']['payment_url']
-        else:
+        if not hasattr(order, 'coinifyapiinvoice'):
             # Initiate coinify API and create invoice
             coinifyapi = CoinifyAPI(
                 settings.COINIFY_API_KEY,
@@ -361,8 +356,9 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     invoicejson = response['data'],
                     order = order,
                 )
-                context['redirecturl'] == response['data']['payment_url']
-        return context
+
+    def get_redirect_url(self, *args, **kwargs):):
+        return self.get_object().coinifyapiinvoice.payload['data']['payment_url']
 
 
 class CoinifyCallbackView(SingleObjectMixin, View):
