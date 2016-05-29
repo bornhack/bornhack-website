@@ -1,4 +1,5 @@
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -8,10 +9,10 @@ def currency(value):
     return "{0:.2f} DKK".format(value)
 
 
-@register.filter(is_safe=True)
+@register.filter()
 def truefalseicon(value):
     if value:
-        return "<span class='text-success'>{% bootstrap_icon 'ok' %}</span>"
+        return mark_safe("<span class='text-success'>{% bootstrap_icon 'ok' %}</span>")
     else:
-        return "<span class='text-danger'>{% bootstrap_icon 'remove' %}</span>"
+        return mark_safe("<span class='text-danger'>{% bootstrap_icon 'remove' %}</span>")
 
