@@ -239,7 +239,7 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
 
 #################################################################################
 
-class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, View):
+class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, TemplateView):
     model = Order
     template_name = 'epay_form.html'
 
@@ -305,7 +305,7 @@ class EpayCallbackView(SingleObjectMixin, View):
         return HttpResponse('OK')
 
 
-class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, View):
+class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, TemplateView):
     model = Order
     template_name = 'epay_thanks.html'
 
@@ -321,7 +321,7 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
 
 #################################################################################
 
-class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, View):
+class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, TemplateView):
     model = Order
     template_name = 'bank_transfer.html'
 
@@ -425,7 +425,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             HttpResponseBadRequest('something is fucky')
 
 
-class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, View):
+class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, SingleObjectMixin, TemplateView):
     model = Order
     template_name = 'coinify_thanks.html'
 
