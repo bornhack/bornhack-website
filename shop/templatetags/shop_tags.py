@@ -12,7 +12,7 @@ def currency(value):
 @register.filter()
 def truefalseicon(value):
     if value:
-        return mark_safe("<span class='text-success'>{% bootstrap_icon 'ok' %}</span>")
+        return mark_safe("<span class='text-success glyphicon glyphicon-th-ok'></span>")
     else:
-        return mark_safe("<span class='text-danger'>{% bootstrap_icon 'remove' %}</span>")
+        return mark_safe("<span class='text-success glyphicon glyphicon-th-remove'></span>")
 
