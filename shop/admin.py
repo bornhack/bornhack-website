@@ -4,7 +4,9 @@ from . import models
 
 admin.site.register(models.EpayCallback)
 admin.site.register(models.EpayPayment)
-
+admin.site.register(models.CoinifyAPIInvoice)
+admin.site.register(models.CoinifyCallback)
+admin.site.register(models.Invoice)
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
