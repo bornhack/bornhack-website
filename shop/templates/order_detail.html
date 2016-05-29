@@ -73,17 +73,20 @@
 <h3>Payment</h3>
 {% if not order.paid %}
 <p class="lead">Your order is currently unpaid. Please pick a payment option below.</p>
-<p><i>If you have already paid but your order is still showing unpaid, 
-you can <a href="mailto:info@bornhack.dk">email us</a> or use the 
-<a href="{% url 'contact' %}">contact</a> page for other options. 
-Please allow for up to a week for bank transfers to be registered, 
-the other payment methods should be more or less instant.</i></p>
+<p><i>Once you go to the payment your order will be finalized and you
+will no longer be able to change the products or quantities - so make sure
+your order is correct before proceeding!</i></p>
 <form method="POST">
   {% csrf_token %}
   {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
 </form>
+<p><i>If you have already paid but your order is still showing unpaid, 
+you can <a href="mailto:info@bornhack.dk">email us</a> or use the 
+<a href="{% url 'contact' %}">contact</a> page for other options. 
+Please allow for up to a week for bank transfers to be registered, 
+the other payment methods should be more or less instant.</i></p>
 {% else %}
 <p class="lead">Your order is paid in full.</p>
 {% endif %}
