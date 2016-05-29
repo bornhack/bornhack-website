@@ -388,10 +388,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
     def post(self, request, *args, **kwargs):
         # Get the signature from the HTTP headers
         signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
-        sdk = CoinifyCallback(
-            settings.COINIFY_API_KEY,
-            settings.COINIFY_API_SECRET
-        )
+        sdk = CoinifyCallback(settings.COINIFY_API_SECRET)
 
         # make a dict with all HTTP_ headers
         headerdict = {}
