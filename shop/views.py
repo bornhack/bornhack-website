@@ -356,7 +356,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
         )
 
     def get_redirect_url(self, *args, **kwargs):
-        return self.get_object().coinifyapiinvoice.invoicejson['data']['payment_url']
+        return self.get_object().coinifyapiinvoice.invoicejson['payment_url']
 
 
 class CoinifyCallbackView(SingleObjectMixin, View):
