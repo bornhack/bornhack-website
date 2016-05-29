@@ -12,7 +12,8 @@
        class="label label-{% if category.slug == current_category %}primary{% else %}default{% endif %}">
         {{category}}
     </a>&nbsp;
-    {% endfor %}
+    {% endfor %}<br>
+    <i>Looking for your <a href="{% url 'order_list' %}">previous orders</a>?</i>
   </div>
 </div>
 
