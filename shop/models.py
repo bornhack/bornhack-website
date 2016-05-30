@@ -69,6 +69,9 @@ class Order(CreatedUpdatedModel):
         default=BLOCKCHAIN
     )
 
+    def __str__(self):
+        return 'order id #%s' % self.pk
+
     def get_number_of_items(self):
         return self.products.aggregate(
             sum=Sum('orderproductrelation__quantity')
