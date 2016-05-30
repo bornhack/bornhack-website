@@ -2,22 +2,19 @@
 {% load bootstrap3 %}
 {% load shop_tags %}
 
-{% block shop_content %}
-
-<div class="row">
-  <div class="col-md-12">
+{% block shop_left_top %}
   <p>
     Categories:
     {% for category in categories %}
     <a href="{% url 'shop:index' %}?category={{category.slug}}"
        class="label label-{% if category.slug == current_category %}primary{% else %}default{% endif %}">
-        {{category}}
+      {{category}}
     </a>&nbsp;
-    {% endfor %}</p>
-    <p><i>Looking for your <a href="{% url 'shop:order_list' %}">previous orders</a>?</i></p>
-  </div>
-</div>
+    {% endfor %}
+  </p>
+{% endblock %}
 
+{% block shop_content %}
 <hr />
 
 <div class="row">

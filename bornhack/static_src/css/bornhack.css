@@ -83,6 +83,11 @@ a, a:active, a:focus {
   color: rgb(255, 255, 255);
 }
 
+.btn-grey {
+  background-color: #777;
+  color: rgb(255, 255, 255);
+}
+
 #map {
   height: 500px;
 }

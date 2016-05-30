@@ -2,6 +2,22 @@
 
 {% block content %}
 
+
+<div class="row">
+  <div class="col-md-6">
+  {% block shop_left_top %}
+  {% endblock %}
+  </div>
+  <div class="col-md-6">
+    <div class="pull-right">
+      {% if user.is_authenticated and user.orders.exists %}
+      <a href="{% url 'shop:order_list' %}" class="btn btn-grey">Previous orders</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
 {% block shop_content %}
 {% endblock %}
 
