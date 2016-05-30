@@ -39,7 +39,7 @@ def generate_pdf_letter(filename, template, formatdict):
         finalpdf.addPage(page)
 
     ### save the generated pdf to the archive
-    with open(settings.PDF_ARCHIVE_PATH+filename, 'w') as fh:
+    with open(settings.PDF_ARCHIVE_PATH+filename, 'wb') as fh:
         finalpdf.write(fh)
         print('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
 
