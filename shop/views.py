@@ -27,6 +27,7 @@ from shop.models import (
     EpayPayment,
     CoinifyAPIInvoice,
     CoinifyAPICallback,
+    Ticket,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
@@ -473,4 +474,15 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
     model = Order
     template_name = 'coinify_thanks.html'
+
+
+class TicketListView(LoginRequiredMixin, ListView):
+    model = Ticket
+    template_name = 'ticket_list.html'
+    context_object_name = 'tickets'
+
+    def get_queryset(self):
+        tickets = super(TicketListView, self).get_queryset()
+        user = self.request.user
+        return tickets.filter(order__user=user)
 
