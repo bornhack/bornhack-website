@@ -1,5 +1,6 @@
 body {
   margin-top: 90px;
+  margin-bottom: 35px;
 }
 
 * {
@@ -86,6 +87,9 @@ a, a:active, a:focus {
   height: 500px;
 }
 
+.thumbnail {
+  height: 330px;
+}
 
 /* Footer */
 footer {
