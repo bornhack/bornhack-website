@@ -105,3 +105,5 @@ COINIFY_API_KEY = env('COINIFY_API_KEY')
 COINIFY_API_SECRET = env('COINIFY_API_SECRET')
 
 PDF_ARCHIVE_PATH='/usr/local/www/pdf_archive/'
+
+LETTERHEAD_PDF_PATH = os.path.join(local_dir('static_src'), 'pdf', env('PDF_LETTERHEAD_FILENAME'))
