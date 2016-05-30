@@ -1,7 +1,19 @@
 {% load shop_tags %}
-This is an invoice.
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-<table class="table table-bordered table-hover">
+<table style="width:100%;">
+    <tr>
+        <td style="text-align: right">Order number: {{ ordernumber }}</td>
+    </tr>
+    <tr>
+        <td style="text-align: right">Invoice number: {{ invoicenumber }}</td>
+    </tr>
+    <tr>
+        <td style="text-align: right">Date: {% now "j/n-Y" %}</td>
+    </tr>
+</table>
+
+<table style="width:100%;">
   <thead>
     <tr>
       <th>
