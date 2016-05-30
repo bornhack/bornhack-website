@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.conf import settings
 from shop.pdf import generate_pdf_letter
 from shop.email import send_invoice_email
 from shop.models import Order, Invoice
