@@ -120,7 +120,7 @@ class ShopIndexView(ListView):
         return context
 
 
-class ProductDetailView(LoginRequiredMixin, FormView, DetailView):
+class ProductDetailView(FormView, DetailView):
     model = Product
     template_name = 'product_detail.html'
     form_class = AddToOrderForm

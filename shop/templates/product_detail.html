@@ -5,9 +5,21 @@
 
 <h2>{{ product.name }}</h2>
 
+<p>
+    {{ product.description }}
+</p>
+
+{% if user.is_authenticated %}
 <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "Add to order" button_type="submit" button_class="btn-primary" %}
 </form>
+{% else %}
+  <a href="{% url 'account_signup' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+    Signup</a> or
+  <a href="{% url 'account_login' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+    login</a>
+to order this product
+{% endif %}
 {% endblock %}
