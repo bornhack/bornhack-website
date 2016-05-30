@@ -104,4 +104,4 @@ TICKET_CATEGORY_ID = env('TICKET_CATEGORY_ID')
 COINIFY_API_KEY = env('COINIFY_API_KEY')
 COINIFY_API_SECRET = env('COINIFY_API_SECRET')
 
-PDF_ARCHIVE_PATH='/usr/local/www/pdf_arhcive/'
+PDF_ARCHIVE_PATH='/usr/local/www/pdf_archive/'
