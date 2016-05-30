@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 from shop.pdf import generate_pdf_letter
 from shop.email import send_invoice_email
+from shop.models import Order, Invoice
+from time import sleep
 
 
 class Command(BaseCommand):
