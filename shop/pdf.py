@@ -4,7 +4,7 @@ from django.test.client import RequestFactory
 from django.conf import settings
 import StringIO
 
-def generate_pdf_letter(template, formatdict):
+def generate_pdf_letter(filename, template, formatdict):
     ### produce text-only PDF from template
     pdfgenerator = PDFTemplateResponse(
         request=RequestFactory().get('/'), 
@@ -38,8 +38,13 @@ def generate_pdf_letter(template, formatdict):
         ### add page to output
         finalpdf.addPage(page)
 
+    ### save the generated pdf to the archive
+    with open(settings.PDF_ARCHIVE_PATH+filename, 'w') as fh:
+        finalpdf.write(fh)
+        self.stdout.write('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
+
     ### return a file object with the data
     returnfile = StringIO.StringIO()
-    finalpdf.write(returnfile)
+    finalpdf.write(returnfile)
     return returnfile
 

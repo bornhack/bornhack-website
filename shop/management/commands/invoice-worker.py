@@ -5,7 +5,7 @@ from shop.email import send_invoice_email
 
 class Command(BaseCommand):
     args = 'none'
-    help = 'Send out invoices that has not been sent yet'
+    help = 'Send out invoices that have not been sent yet'
 
     def handle(self, *args, **options):
         self.stdout.write('Invoice worker running...')
@@ -14,25 +14,47 @@ class Command(BaseCommand):
             for order in Order.objects.filter(paid=True, invoice__isnull=True):
                 ### generate invoice for this Order
                 Invoice.objects.create(order=order)
+                self.stdout.write('Generated Invoice object for order %s' % order)
+
+            ### check if we need to generate any pdf invoices
+            for invoice in Invoice.objects.filter(pdf_generated=False):
+                # put the dict with data for the pdf together
+                formatdict = {
+                    'invoice': invoice,
+                }
+                # generate the pdf
+                try:
+                    pdffile = generate_pdf_letter(
+                        filename=invoice.filename,
+                        template='invoice.html',
+                        formatdict=formatdict,
+                    )
+                    self.stdout.write('Generated pdf for invoice %s' % invoice)
+                except Exception as E:
+                    self.stdout.write('ERROR: Unable to generate PDF file for invoice #%s. Error: %s' % (invoice.pk, E))
+                    continue
+                # so, do we have a pdf?
+                if not pdffile:
+                    self.stdout.write('ERROR: Unable to generate PDF file for invoice #%s' % invoice.pk)
+                    continue
+
+                # update invoice object
+                invoice.pdf_generated=True
+                invoice.save()
 
             ### check if we need to send out any invoices
-            for invoice in Invoice.objects.filter(sent_to_customer=False):
-                ### generate PDF invoice
-                try:
-                    pdffile = generate_pdf_letter('invoice.html', formatdict)
-                except Exception as E:
-                    self.stdout.write('ERROR: Unable to generate PDF file. Error: %s' % E)
-                    continue
-                if not pdffile:
-                    self.stdout.write('ERROR: Unable to generate PDF file')
-                    continue
+            for invoice in Invoice.objects.filter(sent_to_customer=False, pdf_generated=True):
+                # read the pdf invoice from the archive
+                with open(settings.INVOICE_ARCHIVE_PATH+invoice.filename, 'r') as fh:
+                    pdffile = fh.read()
 
-                if send_invoice_email(recipient=invoice.order.user.email, invoice=invoice, attachment=pdffile):
+                # send the email
+                if send_invoice_email(invoice=invoice, attachment=pdffile):
                     self.stdout.write('OK: Invoice email sent to %s' % order.user.email)
                     invoice.sent_to_customer=True
                     invoice.save()
                 else:
-                    self.stdout.write('ERROR: Unable to send invoice email to %s' % order.user.email)
+                    self.stdout.write('ERROR: Unable to send invoice email for order %s to %s' % (order.pk, order.user.email))
 
             ### pause for a bit
             sleep(60)

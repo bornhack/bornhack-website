@@ -252,6 +252,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
 
 class Invoice(CreatedUpdatedModel):
     order = models.OneToOneField('shop.Order')
+    pdf_generated = models.BooleanField(default=False)
     sent_to_customer = models.BooleanField(default=False)
 
     def __str__(self):
@@ -262,6 +263,10 @@ class Invoice(CreatedUpdatedModel):
             self.order.total,
             self.sent_to_customer,
         )
+
+    @property
+    def filename(self):
+        return 'bornhack_invoice_%s.pdf' % self.pk
 
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
