@@ -28,8 +28,8 @@
         <td class="text-center">{{ order.handed_out_status }}</td>
         <td>
         {% if order.invoice.pdf %}
-            {% url 'shop:download_invoice' pk=order.pk as order_download_url %}
-            {% bootstrap_button "PDF" icon="save-file" href=order_download_url button_class="btn-primary btn-xs" %}
+            {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+            {% bootstrap_button "PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
         {% else %}
         N/A
         {% endif %}

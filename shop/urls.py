@@ -8,7 +8,7 @@ urlpatterns = [
 
     url(r'orders/$', OrderListView.as_view(), name='order_list'),
     url(r'orders/(?P<pk>[0-9]+)/$', OrderDetailView.as_view(), name='order_detail'),
-    url(r'orders/(?P<pk>[0-9]+)/$', DownloadInvoiceView.as_view(), name='download_invoice'),
+    url(r'orders/(?P<pk>[0-9]+)/invoice/$', DownloadInvoiceView.as_view(), name='download_invoice'),
 
     url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/$', EpayFormView.as_view(), name='epay_form'),
     url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/callback/$',EpayCallbackView.as_view(), name='epay_callback'),
