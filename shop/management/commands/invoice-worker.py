@@ -14,13 +14,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Invoice worker running...')
         while True:
-            ### check if we need to generate any invoices
+            # check if we need to generate any invoices
             for order in Order.objects.filter(paid=True, invoice__isnull=True):
-                ### generate invoice for this Order
+                # generate invoice for this Order
                 Invoice.objects.create(order=order)
                 self.stdout.write('Generated Invoice object for order %s' % order)
 
-            ### check if we need to generate any pdf invoices
+            # check if we need to generate any pdf invoices
             for invoice in Invoice.objects.filter(pdf__isnull=True):
                 # put the dict with data for the pdf together
                 formatdict = {
@@ -48,8 +48,8 @@ class Command(BaseCommand):
                 invoice.pdf.save(invoice.filename, File(pdffile))
                 invoice.save()
 
-            ### check if we need to send out any invoices
-            for invoice in Invoice.objects.filter(sent_to_customer=False, pdf__isnull=False):
+            # check if we need to send out any invoices (only where pdf has been generated)
+            for invoice in Invoice.objects.filter(sent_to_customer=False).exclude(pdf=''):
                 # send the email
                 if send_invoice_email(invoice=invoice):
                     self.stdout.write('OK: Invoice email sent to %s' % invoice.order.user.email)
@@ -58,6 +58,6 @@ class Command(BaseCommand):
                 else:
                     self.stdout.write('ERROR: Unable to send invoice email for order %s to %s' % (invoice.order.pk, invoice.order.user.email))
 
-            ### pause for a bit
+            # pause for a bit
             sleep(60)
 
