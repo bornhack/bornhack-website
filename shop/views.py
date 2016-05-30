@@ -273,7 +273,7 @@ class DownloadInvoiceView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsurePa
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % self.get_object().invoice.filename
-        response.write(self.get_object().pdf.read())
+        response.write(self.get_object().invoice.pdf.read())
         return response
 
 #################################################################################
