@@ -36,9 +36,8 @@ INSTALLED_APPS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]
-MEDIA_URL = '/media/'
-MEDIA_ROOT = local_dir('media')
-
+#MEDIA_URL = '/media/'
+MEDIA_ROOT = env('MEDIA_ROOT')
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
