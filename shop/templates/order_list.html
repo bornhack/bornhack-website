@@ -13,6 +13,7 @@
       <th>Open?</th>
       <th>Paid?</th>
       <th>Delivered?</th>
+      <th>Invoice</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -25,6 +26,14 @@
         <td class="text-center">{{ order.open|truefalseicon }}</td>
         <td class="text-center">{{ order.paid|truefalseicon }}</td>
         <td class="text-center">{{ order.handed_out_status }}</td>
+        <td>
+        {% if order.invoice.pdf %}
+            {% url 'shop:download_invoice' pk=order.pk as order_download_url %}
+            {% bootstrap_button "PDF" icon="save-file" href=order_download_url button_class="btn-primary btn-xs" %}
+        {% else %}
+        N/A
+        {% endif %}
+        </td>
         <td>
         {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
         {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}

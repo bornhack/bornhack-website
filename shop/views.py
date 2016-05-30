@@ -60,6 +60,19 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
         )
 
 
+class EnsurePaidOrderMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().paid:
+            messages.error(request, "This order is not paid for!")
+            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+
+        return super(EnsurePaidOrderMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
 class EnsureClosedOrderMixin(SingleObjectMixin):
     model = Order
 
@@ -82,6 +95,18 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
             return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         return super(EnsureOrderHasProductsMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().invoice.pdf:
+            messages.error(request, "This order has no invoice yet!")
+            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+
+        return super(EnsureOrderHasInvoicePDFMixin, self).dispatch(
             request, *args, **kwargs
         )
 
@@ -240,6 +265,16 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 
+
+class DownloadInvoiceView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsurePaidOrderMixin, EnsureOrderHasInvoicePDFMixin, SingleObjectMixin, View):
+    model = Order
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % self.get_object().invoice.filename
+        response.write(self.get_object().pdf.read())
+        return response
+
 #################################################################################
 
 class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
@@ -263,7 +298,7 @@ class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrd
 class EpayCallbackView(SingleObjectMixin, View):
     model = Order
 
-    def get(self, request, **kwargs):
+    def get(self, request, *args, **kwargs):
         callback = EpayCallback.objects.create(
             payload=request.GET
         )
