@@ -20,7 +20,7 @@ class Command(BaseCommand):
                 self.stdout.write('Generated Invoice object for order %s' % order)
 
             ### check if we need to generate any pdf invoices
-            for invoice in Invoice.objects.filter(pdf_generated=False):
+            for invoice in Invoice.objects.filter(pdf__isnull=True):
                 # put the dict with data for the pdf together
                 formatdict = {
                     'invoice': invoice,
@@ -48,13 +48,9 @@ class Command(BaseCommand):
                 invoice.save()
 
             ### check if we need to send out any invoices
-            for invoice in Invoice.objects.filter(sent_to_customer=False, pdf_generated=True):
-                # read the pdf invoice from the archive
-                with open(settings.INVOICE_ARCHIVE_PATH+invoice.filename, 'r') as fh:
-                    pdffile = fh.read()
-
+            for invoice in Invoice.objects.filter(sent_to_customer=False, pdf__isnull=False):
                 # send the email
-                if send_invoice_email(invoice=invoice, attachment=pdffile):
+                if send_invoice_email(invoice=invoice):
                     self.stdout.write('OK: Invoice email sent to %s' % order.user.email)
                     invoice.sent_to_customer=True
                     invoice.save()

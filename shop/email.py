@@ -40,7 +40,7 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <nore
     return True
 
 
-def send_invoice_email(invoice, attachment):
+def send_invoice_email(invoice):
     # put formatdict together
     formatdict = {
         'ordernumber': invoice.order.pk,
@@ -57,6 +57,7 @@ def send_invoice_email(invoice, attachment):
         formatdict=formatdict,
         subject=subject,
         sender='noreply@bornfiber.dk',
+        attachment=invoice.pdf,
     )
 
 
