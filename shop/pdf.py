@@ -41,7 +41,7 @@ def generate_pdf_letter(filename, template, formatdict):
     ### save the generated pdf to the archive
     with open(settings.PDF_ARCHIVE_PATH+filename, 'w') as fh:
         finalpdf.write(fh)
-        self.stdout.write('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
+        print('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
 
     ### return a file object with the data
     returnfile = StringIO.StringIO()
