@@ -299,9 +299,8 @@ class EpayCallbackView(SingleObjectMixin, View):
                     callback=callback,
                     txnid=query.get('txnid'),
                 )
-                ### and mark order as paid
-                order.paid=True
-                order.save()
+                ### and mark order as paid (this will create tickets)
+                order.mark_as_paid()
             else:
                 print "valid epay callback with wrong amount detected"
         else:
