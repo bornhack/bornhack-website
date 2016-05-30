@@ -1,0 +1,42 @@
+{% load shop_tags %}
+This is an invoice.
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>
+        Name
+      <th>
+        Quantity
+      <th>
+        Price
+      <th>
+        Total
+  <tbody>
+{% for order_product in invoice.order.orderproductrelation_set.all %}
+  <tr>
+    <td>
+      {{ order_product.product.name }}
+    <td>
+      {{ order_product.quantity }}
+    <td>
+      {{ order_product.product.price|currency }}
+    <td>
+      {{ order_product.total|currency }}
+{% endfor %}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Hereof VAT (25%)</strong>
+    <td>
+      {{ order.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ order.total|currency }}
+
+</table>

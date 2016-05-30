@@ -24,6 +24,7 @@ class Command(BaseCommand):
                 formatdict = {
                     'invoice': invoice,
                 }
+
                 # generate the pdf
                 try:
                     pdffile = generate_pdf_letter(
@@ -35,6 +36,7 @@ class Command(BaseCommand):
                 except Exception as E:
                     self.stdout.write('ERROR: Unable to generate PDF file for invoice #%s. Error: %s' % (invoice.pk, E))
                     continue
+
                 # so, do we have a pdf?
                 if not pdffile:
                     self.stdout.write('ERROR: Unable to generate PDF file for invoice #%s' % invoice.pk)
@@ -60,5 +62,4 @@ class Command(BaseCommand):
 
             ### pause for a bit
             sleep(60)
-
 

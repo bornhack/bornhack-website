@@ -8,9 +8,9 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <nore
     html_template=None
 
     if emailtype == 'invoice':
-        text_template = 'emails/invoice.txt'
-        html_template = 'emails/invoice.html'
-        attachment_filename = formatdict['attachmentname']
+        text_template = 'emails/invoice_email.txt'
+        html_template = 'emails/invoice_email.html'
+        attachment_filename = formatdict['filename']
     elif emailtype == 'testmail':
         text_template = 'emails/testmail.txt'
     else:
@@ -25,7 +25,7 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <nore
         if html_template:
             msg.attach_alternative(render_to_string(html_template, formatdict), 'text/html')
 
-        ### is there an attachment to this mail?
+        ### is there a pdf attachment to this mail?
         if attachment:
             msg.attach(attachment_filename, attachment, 'application/pdf')
 
@@ -43,16 +43,17 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <nore
 def send_invoice_email(invoice, attachment):
     # put formatdict together
     formatdict = {
-        'order': invoice.order,
-        'attachmentname': invoice.filename,
+        'ordernumber': invoice.order.pk,
+        'invoicenumber': invoice.pk,
+        'filename': invoice.filename,
     }
 
-    subject = 'BornHack invoice %s' % order.pk
+    subject = 'BornHack invoice %s' % invoice.pk
 
     # send mail
     return send_email(
         emailtype='invoice',
-        recipient=order.user.email,
+        recipient=invoice.order.user.email,
         formatdict=formatdict,
         subject=subject,
         sender='noreply@bornfiber.dk',
