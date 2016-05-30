@@ -6,7 +6,10 @@ register = template.Library()
 
 @register.filter
 def currency(value):
-    return "{0:.2f} DKK".format(value)
+    try:
+        return "{0:.2f} DKK".format(int(value))
+    except ValueError:
+        return False
 
 
 @register.filter()
