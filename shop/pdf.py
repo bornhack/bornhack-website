@@ -29,9 +29,9 @@ def generate_pdf_letter(filename, template, formatdict):
 
     ### add the watermark to all pages
     for pagenum in xrange(pdfreader.getNumPages()):
-        page = pdfreader.getPage(pagenum)
+        page = watermark.getPage(0)
         try:
-            page.mergePage(watermark.getPage(0))
+            page.mergePage(pdfreader.getPage(pagenum))
         except ValueError:
             ### watermark pdf might be broken?
             return False
