@@ -3,9 +3,38 @@
 {% load shop_tags %}
 
 {% block shop_content %}
+<h3>Tickets</h3>
 
-{% for ticket in tickets %}
-  {{ ticket }}
-{% endfor %}
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>
+        Ticket owner
+      <th>
+        Product name
+      <th>
+        Price
+
+  <tbody>
+    {% for ticket in tickets %}
+    <tr>
+      <td>
+        <a href="{% url 'shop:ticket_detail' pk=ticket.pk %}" class="btn">
+          {% if ticket.name %}
+          {{ ticket.name }}
+          {% else %}
+          Click here to set the owner of this ticket
+          {% endif %}
+        </a>
+      <td>
+        <a href="{% url 'shop:ticket_detail' pk=ticket.pk %}" class="btn">
+          {{ ticket.product.name }}
+          <i class="glyphicon glyphicon-eye"></i>
+        </a>
+      <td>
+        {{ ticket.product.price|currency }}
+    {% endfor %}
+</table>
+
 
 {% endblock %}

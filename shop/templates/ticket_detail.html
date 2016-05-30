@@ -1,0 +1,39 @@
+{% extends 'shop_base.html' %}
+{% load bootstrap3 %}
+{% load shop_tags %}
+
+{% block shop_content %}
+
+<div class="well">
+
+  <div class="row">
+    <div class="col-md-5" style="text-align: center;">
+      <h3>{{ ticket.product.name }} ticket</h3>
+      <div style="margin:0px auto;width:250px;height:250px;background-image:url({{ ticket.get_qr_code_url }});"></div>
+    </div>
+
+    <div class="col-md-7">
+      <div class="pull-right">
+        <h2>{{ ticket.order.camp }}</h2>
+        <form method="POST" class="form">
+          {% csrf_token %}
+          {% bootstrap_field form.name %}
+          {% bootstrap_field form.email %}
+          <button class="btn btn-primary form-control" type="submit"><i class="glyphicon glyphicon-check"></i> Save</button>
+        </form>
+
+        <hr />
+
+        <div class="pull-right">
+          <a href="#" class="btn btn-default">Answer questionnaire</a>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+
+</div>
+
+{% endblock %}

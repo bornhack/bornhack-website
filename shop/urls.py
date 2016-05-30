@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'orders/(?P<pk>[0-9]+)/pay/banktransfer/$', BankTransferView.as_view(), name='bank_transfer'),
 
     url(r'tickets/$', TicketListView.as_view(), name='ticket_list'),
+    url(r'tickets/(?P<pk>\b[0-9A-Fa-f]{8}\b(-\b[0-9A-Fa-f]{4}\b){3}-\b[0-9A-Fa-f]{12}\b)$', TicketDetailView.as_view(), name='ticket_detail'),
 
     url(r'privacy-policy/$', TemplateView.as_view(template_name='law/privacy_policy.html'), name='privacy-policy'),
     url(r'return-policy/$', TemplateView.as_view(template_name='law/return_policy.html'), name='return-policy'),

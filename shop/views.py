@@ -11,6 +11,7 @@ from django.views.generic import (
     ListView,
     DetailView,
     FormView,
+    UpdateView,
 )
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
@@ -486,3 +487,19 @@ class TicketListView(LoginRequiredMixin, ListView):
         user = self.request.user
         return tickets.filter(order__user=user)
 
+
+class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
+    model = Ticket
+    template_name = 'ticket_detail.html'
+    context_object_name = 'ticket'
+    fields = ['name', 'email']
+
+    def form_valid(self, form):
+        messages.info(self.request, 'Ticket updated!')
+        return super(TicketDetailView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        if ticket.order.user != request.user:
+            return Http404
+        return super(TicketDetailView, self).dispatch(request, *args, **kwargs)

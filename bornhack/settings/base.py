@@ -59,6 +59,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'camps.context_processors.current_camp',
                 'shop.context_processors.current_order',
+                'shop.context_processors.user_has_tickets',
             ],
         },
     },

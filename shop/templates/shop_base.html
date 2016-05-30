@@ -13,7 +13,10 @@
       <li class="active">{{ current_category }}</li>
       {% endif %}
       {% if user.is_authenticated and user.orders.exists %}
-      <li class="pull-right"><a href="{% url 'shop:order_list' %}">Previous orders</a></li>
+      {% if has_tickets %}
+      <li class="pull-right"><a href="{% url 'shop:ticket_list' %}">Tickets</a></li>
+      {% endif %}
+      <li class="pull-right no-before"><a href="{% url 'shop:order_list' %}">Orders</a></li>
       {% endif %}
     </ol>
   </div>

@@ -106,6 +106,6 @@ footer {
     padding: 5px;
 }
 
-.breadcrumb > li.pull-right::before {
+.breadcrumb > li.no-before::before {
     content: "";
 }

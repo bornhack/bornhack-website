@@ -288,8 +288,8 @@ class CoinifyAPICallback(CreatedUpdatedModel):
 
 
 class Ticket(CreatedUpdatedModel, UUIDModel):
-    order = models.ForeignKey('shop.Order')
-    product = models.ForeignKey('shop.Product')
+    order = models.ForeignKey('shop.Order', related_name='tickets')
+    product = models.ForeignKey('shop.Product', related_name='tickets')
     qrcode_base64 = models.TextField(null=True, blank=True)
 
     name = models.CharField(
@@ -298,6 +298,11 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
             'Name of the person this ticket belongs to. '
             'This can be different from the buying user.'
         ),
+    )
+
+    email = models.EmailField(
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
@@ -321,12 +326,18 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         ).hexdigest()
 
     def get_qr_code(self):
-        qr = qrcode.make(self.get_token())
+        qr = qrcode.make(
+            self.get_token(),
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H
+        ).resize((250,250))
         file_like = io.BytesIO()
-        qr.save(file_like)
+        qr.save(file_like, format='png')
         qrcode_base64 = base64.b64encode(file_like.getvalue())
         return qrcode_base64
 
     def get_qr_code_url(self):
         return 'data:image/png;base64,{}'.format(self.qrcode_base64)
 
+    def get_absolute_url(self):
+        return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
