@@ -4,15 +4,23 @@
 
 <div class="row">
   <div class="col-md-12">
-    <div class="pull-right">
-      {% if user.is_authenticated and user.orders.exists %}
-      <a href="{% url 'shop:order_list' %}" class="btn btn-grey">Previous orders</a>
+    <ol class="breadcrumb">
+      <li><a href="{% url 'shop:index' %}">Shop</a></li>
+      {% if product %}
+      <li><a href="{% url 'shop:index' %}?category={{product.category.slug}}">{{ product.category }}</a></li>
+      <li class="active">{{ product.name }}</li>
+      {% elif current_category %}
+      <li class="active">{{ current_category }}</li>
       {% endif %}
-    </div>
+      {% if user.is_authenticated and user.orders.exists %}
+      <li class="pull-right"><a href="{% url 'shop:order_list' %}">Previous orders</a></li>
+      {% endif %}
+    </ol>
   </div>
 </div>
 
 {% block shop_content %}
+
 {% endblock %}
 
 {% endblock %}

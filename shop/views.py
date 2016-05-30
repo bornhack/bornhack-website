@@ -110,7 +110,7 @@ class ShopIndexView(ListView):
             context['products'] = context['products'].filter(
                 category__slug=category
             )
-            context['current_category'] = category
+            context['current_category'] = categoryobj
         context['categories'] = ProductCategory.objects.annotate(
             num_products=Count('products')
         ).filter(
