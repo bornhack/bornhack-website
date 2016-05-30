@@ -298,6 +298,8 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
             'Name of the person this ticket belongs to. '
             'This can be different from the buying user.'
         ),
+        null=True,
+        blank=True,
     )
 
     email = models.EmailField(
