@@ -52,11 +52,11 @@ class Command(BaseCommand):
             for invoice in Invoice.objects.filter(sent_to_customer=False, pdf__isnull=False):
                 # send the email
                 if send_invoice_email(invoice=invoice):
-                    self.stdout.write('OK: Invoice email sent to %s' % order.user.email)
+                    self.stdout.write('OK: Invoice email sent to %s' % invoice.order.user.email)
                     invoice.sent_to_customer=True
                     invoice.save()
                 else:
-                    self.stdout.write('ERROR: Unable to send invoice email for order %s to %s' % (order.pk, order.user.email))
+                    self.stdout.write('ERROR: Unable to send invoice email for order %s to %s' % (invoice.order.pk, invoice.order.user.email))
 
             ### pause for a bit
             sleep(60)
