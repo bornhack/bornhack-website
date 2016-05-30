@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'camps',
     'shop',
     'news',
+    'utils',
 
     'allauth',
     'allauth.account',

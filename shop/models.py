@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
-from bornhack.utils import CreatedUpdatedModel, UUIDModel
+from utils.models import UUIDModel, CreatedUpdatedModel
 from .managers import ProductQuerySet
 import hashlib, io, base64, qrcode
 

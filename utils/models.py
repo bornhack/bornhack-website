@@ -3,14 +3,6 @@ import uuid
 from django.db import models
 
 
-class CreatedUpdatedModel(models.Model):
-    class Meta:
-        abstract = True
-
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-
-
 class UUIDModel(models.Model):
     class Meta:
         abstract = True
@@ -20,3 +12,11 @@ class UUIDModel(models.Model):
         default=uuid.uuid4,
         editable=False,
     )
+
+
+class CreatedUpdatedModel(models.Model):
+    class Meta:
+        abstract = True
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)

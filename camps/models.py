@@ -2,7 +2,7 @@ import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from bornhack.utils import CreatedUpdatedModel, UUIDModel
+from utils.models import UUIDModel, CreatedUpdatedModel
 
 from .managers import CampQuerySet
 

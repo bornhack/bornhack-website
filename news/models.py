@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 
-from bornhack.utils import CreatedUpdatedModel
+from utils.models import CreatedUpdatedModel
 from news.managers import NewsItemQuerySet
 
 
