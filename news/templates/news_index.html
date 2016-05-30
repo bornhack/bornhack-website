@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for item in news_items %}
+  <div>
+    <h3>{{ item.title }} <small>{{ item.published_at|date:"Y-m-d" }}</small></h3>
+  </div>
+  {{ item.content }}
+  {% if not forloop.last %}
+    <hr />
+  {% endif %}
+{% empty %}
+  <h3>No news yet. Stay tuned!</h3>
+{% endfor %}
+{% endblock %}

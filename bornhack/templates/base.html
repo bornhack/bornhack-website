@@ -52,6 +52,7 @@
             {% endif %}
 
             {% endif %}
+            <li><a href="{% url 'news:index' %}">News</a></li>
             <li><a href="{% url 'good-to-know' %}">Info</a></li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}

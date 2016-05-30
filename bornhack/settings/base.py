@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'profiles',
     'camps',
     'shop',
+    'news',
 
     'allauth',
     'allauth.account',

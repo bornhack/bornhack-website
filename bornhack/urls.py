@@ -44,6 +44,10 @@ urlpatterns = [
         r'^shop/',
         include('shop.urls', namespace='shop')
     ),
+    url(
+        r'^news/',
+        include('news.urls', namespace='news')
+    ),
     url(r'^accounts/', include('allauth.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
