@@ -43,8 +43,8 @@ class Command(BaseCommand):
                     self.stdout.write('ERROR: Unable to generate PDF file for invoice #%s' % invoice.pk)
                     continue
 
-                # update invoice object
-                invoice.pdf_generated=True
+                # update invoice object with the file
+                invoice.pdf.save(invoice.filename, File(pdffile))
                 invoice.save()
 
             ### check if we need to send out any invoices

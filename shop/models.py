@@ -255,7 +255,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
 
 class Invoice(CreatedUpdatedModel):
     order = models.OneToOneField('shop.Order')
-    pdf_generated = models.BooleanField(default=False)
+    pdf = models.FileField(null=True, blank=True)
     sent_to_customer = models.BooleanField(default=False)
 
     def __str__(self):
