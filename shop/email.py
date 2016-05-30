@@ -57,7 +57,7 @@ def send_invoice_email(invoice):
         formatdict=formatdict,
         subject=subject,
         sender='noreply@bornfiber.dk',
-        attachment=invoice.pdf,
+        attachment=invoice.pdf.read(),
     )
 
 
