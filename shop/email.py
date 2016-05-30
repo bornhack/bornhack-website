@@ -3,7 +3,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 
-def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <noreply@bornhack.dk>', attachment=None):
+def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info@bornhack.dk>', attachment=None):
     ### determine email type, set template and attachment vars
     html_template=None
 
@@ -56,7 +56,7 @@ def send_invoice_email(invoice):
         recipient=invoice.order.user.email,
         formatdict=formatdict,
         subject=subject,
-        sender='noreply@bornfiber.dk',
+        sender='info@bornhack.dk',
         attachment=invoice.pdf.read(),
     )
 
