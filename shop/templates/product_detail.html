@@ -1,6 +1,7 @@
 {% extends 'shop_base.html' %}
 {% load bootstrap3 %}
 {% load commonmark %}
+{% load shop_tags %}
 
 {% block shop_content %}
 
@@ -12,6 +13,13 @@
   </div>
 
   <div class="col-sm-12 col-md-4">
+
+    <h3>
+      <small>Price</small><br />
+      {{ product.price|currency }}
+    </h3>
+
+    <hr />
 
     <h3>Add to order</h3>
 
