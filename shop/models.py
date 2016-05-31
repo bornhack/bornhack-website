@@ -79,17 +79,17 @@ class Order(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return self.total*0.2
+        return Decimal(self.total*0.2)
 
     @property
     def total(self):
-        return self.products.aggregate(
+        return Decimal(self.products.aggregate(
             sum=Sum(
                 models.F('orderproductrelation__product__price') *
                 models.F('orderproductrelation__quantity'),
                 output_field=models.IntegerField()
             )
-        )['sum']
+        )['sum'])
 
     def get_coinify_callback_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))

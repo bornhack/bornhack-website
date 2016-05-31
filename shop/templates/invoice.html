@@ -3,28 +3,26 @@
 
 <table style="width:100%;">
     <tr>
-        <td style="text-align: right">Order number: {{ ordernumber }}</td>
+        <td style="text-align: right">Order number: {{ invoice.order.pk }}</td>
     </tr>
     <tr>
-        <td style="text-align: right">Invoice number: {{ invoicenumber }}</td>
+        <td style="text-align: right">Invoice number: {{ invoice.pk }}</td>
     </tr>
     <tr>
         <td style="text-align: right">Date: {% now "j/n-Y" %}</td>
     </tr>
 </table>
 
-<table style="width:100%;">
-  <thead>
+<table style="width:100%;"  border=1>
     <tr>
-      <th>
-        Name
-      <th>
-        Quantity
-      <th>
-        Price
-      <th>
-        Total
-  <tbody>
+      <td>
+        <b>Name
+      <td>
+        <b>Quantity
+      <td>
+        <b>Price
+      <td>
+        <b>Total
 {% for order_product in invoice.order.orderproductrelation_set.all %}
   <tr>
     <td>
@@ -40,7 +38,7 @@
   <tr>
     <td colspan="2">
     <td>
-      <strong>Hereof VAT (25%)</strong>
+      <strong>Danish VAT (25%)</strong>
     <td>
       {{ order.vat|currency }}
 

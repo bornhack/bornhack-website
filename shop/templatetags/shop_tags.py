@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from decimal import Decimal
 
 register = template.Library()
 
@@ -7,7 +8,7 @@ register = template.Library()
 @register.filter
 def currency(value):
     try:
-        return "{0:.2f} DKK".format(int(value))
+        return "{0:.2f} DKK".format(Decimal(value))
     except ValueError:
         return False
 

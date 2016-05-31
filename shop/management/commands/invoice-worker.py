@@ -6,6 +6,7 @@ from shop.pdf import generate_pdf_letter
 from shop.email import send_invoice_email
 from shop.models import Order, Invoice
 from time import sleep
+from decimal import Decimal
 
 
 class Command(BaseCommand):
