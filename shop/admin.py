@@ -39,6 +39,7 @@ class TicketInline(admin.TabularInline):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = [
+        'id',
         'user',
         'camp',
         'payment_method',
