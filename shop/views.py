@@ -396,7 +396,11 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 # this coinifyinvoice expired, delete it
                 print "order %s has an expired coinifyapiinvoice, delete it.." % order.pk
                 order.coinifyapiinvoice.delete()
-                time.sleep(2)
+                if hasattr(order, 'coinifyapiinvoice'):
+                    print "deleted coinifyapiinvoice but order %s still hasattr(coinifyapiinvoice), sleeping 5 secs" % order.pk
+                time.sleep(5)
+                if hasattr(order, 'coinifyapiinvoice'):
+                    print "deleted coinifyapiinvoice and slept 5 secs but order %s still hasattr(coinifyapiinvoice), what the fuck" % order.pk
 
         # create a new coinify invoice if needed
         print "checking if order %s has coinifyapiinvoice" % order.pk
