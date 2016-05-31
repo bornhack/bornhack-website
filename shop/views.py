@@ -464,14 +464,13 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                     print "unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id']
                     return HttpResponseBadRequest('bad coinifyinvoice id')
 
-                # save new invoice payload
-                invoice = coinifyinvoice.order.invoice
-                invoice.payload = callbackjson['data']
-                invoice.save()
+                # save new coinifyinvoice payload
+                coinifyinvoice.invoicejson = callbackjson['data']
+                coinifyinvoice.save()
 
-                # so, is the invoice paid in full now?
+                # so, is the order paid in full now?
                 if callbackjson['data']['state'] == 'complete':
-                    invoice.order.mark_as_paid()
+                    coinifyinvoice.order.mark_as_paid()
 
                 # return 200 OK
                 return HttpResponse('OK')
