@@ -383,7 +383,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             
             # create coinify API
             response = coinifyapi.invoice_create(
-                order.total,
+                float(order.total),
                 'DKK',
                 plugin_name='BornHack 2016 webshop',
                 plugin_version='1.0',
