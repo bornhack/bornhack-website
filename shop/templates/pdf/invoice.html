@@ -7,7 +7,7 @@
         <td style="width: 60%;">&nbsp;</td>
         <td><h1>Order #{{ invoice.order.pk }}</h1></td>
         <td><h1>Invoice #{{ invoice.pk }}</h1></td>
-        <td><h1>Invoice date {% invoice.created|date:"b jS, Y" %}</h1></td>
+        <td><h1>Invoice date {{ invoice.created|date:"b jS, Y" }}</h1></td>
     </tr>
 </table>
 <br>
