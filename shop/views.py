@@ -387,16 +387,21 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
     def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
+        print "checking if order %s has coinifyapiinvoice" % order.pk
         if hasattr(order, 'coinifyapiinvoice'):
             # we already have a coinifyinvoice for this order,
             # check if it expired
+            print "order %s has coinifyapiinvoice, check expire time.." % order.pk
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
+                print "order %s has an expired coinifyapiinvoice, delete it.." % order.pk
                 order.coinifyapiinvoice.delete()
-                time.sleep(1)
+                time.sleep(2)
 
         # create a new coinify invoice if needed
+        print "checking if order %s has coinifyapiinvoice" % order.pk
         if not hasattr(order, 'coinifyapiinvoice'):
+            print "order %s has no coinifyapiinvoice, creating one.." % order.pk
             # Initiate coinify API
             coinifyapi = CoinifyAPI(
                 settings.COINIFY_API_KEY,
@@ -431,6 +436,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     order = order,
                 )
 
+        print "done" % order.pk
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
