@@ -398,9 +398,14 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 order.coinifyapiinvoice.delete()
                 if hasattr(order, 'coinifyapiinvoice'):
                     print "deleted coinifyapiinvoice but order %s still hasattr(coinifyapiinvoice), sleeping 5 secs" % order.pk
-                time.sleep(5)
+                time.sleep(2)
                 if hasattr(order, 'coinifyapiinvoice'):
-                    print "deleted coinifyapiinvoice and slept 5 secs but order %s still hasattr(coinifyapiinvoice), what the fuck" % order.pk
+                    print "deleted coinifyapiinvoice and slept 2 secs but order %s still hasattr(coinifyapiinvoice), what the fuck" % order.pk
+                order.refresh_from_db()
+                if hasattr(order, 'coinifyapiinvoice'):
+                    print "refreshed order %s from db but it still hasattr(coinifyapiinvoice), what the fuck" % order.pk
+                else:
+                    print "refreshed order %s from db which helped" % order.pk
 
         # create a new coinify invoice if needed
         print "checking if order %s has coinifyapiinvoice" % order.pk
