@@ -5,13 +5,15 @@
 <table style="width:100%;">
     <tr>
         <td style="width: 60%;">&nbsp;</td>
-        <td><h2>Order #{{ invoice.order.pk }}</h2></td>
+        <td><h3>Order #{{ invoice.order.pk }}</h3></td>
     </tr>
     <tr>
-        <td><h2>Invoice #{{ invoice.pk }}</h2></td>
+        <td style="width: 60%;">&nbsp;</td>
+        <td><h3>Invoice #{{ invoice.pk }}</h3></td>
     </tr>
     <tr>
-        <td><h2>Invoice date {{ invoice.created|date:"b jS, Y" }}</h2></td>
+        <td style="width: 60%;">&nbsp;</td>
+        <td><h3>Date {{ invoice.created|date:"b jS, Y" }}</h3></td>
     </tr>
 </table>
 <br>
