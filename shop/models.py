@@ -273,7 +273,7 @@ class Invoice(CreatedUpdatedModel):
         return 'bornhack_invoice_%s.pdf' % self.pk
 
     def regretdate(self):
-        return inv.created+timedelta(days=14)
+        return self.created+timedelta(days=14)
 
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
