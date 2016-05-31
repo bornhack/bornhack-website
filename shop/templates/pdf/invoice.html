@@ -1,0 +1,74 @@
+{% load shop_tags %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 20%;"><h1>BornHack IVS</h1></td>
+        <td style="width: 60%;">&nbsp;</td>
+        <td style="text-align: left"><h1>Invoice {{ invoice.pk }}</h1></td>
+    </tr>
+    <tr>
+        <td style="width: 20%;"><img src="{% static 'img/logo-new.png' %}"></td>
+        <td style="width: 60%;">&nbsp;</td>
+        <td style="text-align: left">
+            <b>Order number: {{ invoice.order.pk }}<br>
+            Invoice number: {{ invoice.pk }}<br>
+            Invoice date: {% now "b js, Y" %}</b>
+        </td>
+    </tr>
+</table>
+<br>
+<br>
+<br>
+<h2>Products</h2>
+<table style="width:90%; margin:1em;">
+    <tr>
+      <td>
+        <b>Name
+      <td>
+        <b>Quantity
+      <td>
+        <b>Price
+      <td>
+        <b>Total
+{% for order_product in invoice.order.orderproductrelation_set.all %}
+  <tr>
+    <td>
+      {{ order_product.product.name }}
+    <td>
+      {{ order_product.quantity }}
+    <td>
+      {{ order_product.product.price|currency }}
+    <td>
+      {{ order_product.total|currency }}
+{% endfor %}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Danish VAT (25%)</strong>
+    <td>
+      {{ order.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ order.total|currency }}
+
+</table>
+
+<h3>The order has been paid in full.</h3>
+<p>
+<ul>
+    <li>Tickets will be generated before the event and can be downloaded from the webshop by then.</li>
+    <li>Merchandise can be picked up from the info booth during the event.</li>
+    <li>Accomodation/lodges and village tents will be available when the event begins.</li>
+</p>
+
+<p>Note: Danish law grants everyone a 14 days 'cooling-off' period for 
+internet purchases, in which the customer can regret the purchase for any 
+reason (including just changing your mind). In case you regret this purchase 
+please contact us on info@bornhack.org for a full refund. This is possible until
+{{ invoice.regretdate|date:"b js, Y" }}</p>

@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 try:
                     pdffile = generate_pdf_letter(
                         filename=invoice.filename,
-                        template='invoice.html',
+                        template='pdf/invoice.html',
                         formatdict=formatdict,
                     )
                     self.output('Generated pdf for invoice %s' % invoice)

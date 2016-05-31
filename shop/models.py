@@ -271,6 +271,8 @@ class Invoice(CreatedUpdatedModel):
     def filename(self):
         return 'bornhack_invoice_%s.pdf' % self.pk
 
+    def regretdate(self):
+        return inv.created+timedelta(days=14)
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
     invoicejson = JSONField()
