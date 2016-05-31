@@ -18,6 +18,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 
 from camps.models import Camp
 from shop.models import (
