@@ -212,10 +212,6 @@ class Product(CreatedUpdatedModel, UUIDModel):
             self.price,
         )
 
-    def save(self, **kwargs):
-        self.slug = slugify(self.name)
-        super(Product, self).save(**kwargs)
-
     def is_available(self):
         now = timezone.now()
         return now in self.available_in
