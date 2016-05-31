@@ -263,7 +263,14 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
         if product_remove:
             order.orderproductrelation_set.filter(pk=product_remove).delete()
             if not order.products.count() > 0:
+                order.delete()
+                messages.info(request, 'Order cancelled!')
                 return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        if 'cancel_order' in request.POST:
+            order.delete()
+            messages.info(request, 'Order cancelled!')
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 

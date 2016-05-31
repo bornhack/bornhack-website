@@ -67,6 +67,7 @@
 
 {% if not order.open == None %}
   {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger pull-right" name="cancel_order" %}
 {% endif %}
 
 <hr />
