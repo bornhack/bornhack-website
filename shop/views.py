@@ -387,30 +387,16 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
     def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
-        print "checking if order %s has coinifyapiinvoice" % order.pk
         if hasattr(order, 'coinifyapiinvoice'):
             # we already have a coinifyinvoice for this order,
             # check if it expired
-            print "order %s has coinifyapiinvoice, check expire time.." % order.pk
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
-                print "order %s has an expired coinifyapiinvoice, delete it.." % order.pk
                 order.coinifyapiinvoice.delete()
-                if hasattr(order, 'coinifyapiinvoice'):
-                    print "deleted coinifyapiinvoice but order %s still hasattr(coinifyapiinvoice), sleeping 5 secs" % order.pk
-                time.sleep(2)
-                if hasattr(order, 'coinifyapiinvoice'):
-                    print "deleted coinifyapiinvoice and slept 2 secs but order %s still hasattr(coinifyapiinvoice), what the fuck" % order.pk
-                order.refresh_from_db()
-                if hasattr(order, 'coinifyapiinvoice'):
-                    print "refreshed order %s from db but it still hasattr(coinifyapiinvoice), what the fuck" % order.pk
-                else:
-                    print "refreshed order %s from db which helped" % order.pk
+                order = self.get_object()
 
         # create a new coinify invoice if needed
-        print "checking if order %s has coinifyapiinvoice" % order.pk
         if not hasattr(order, 'coinifyapiinvoice'):
-            print "order %s has no coinifyapiinvoice, creating one.." % order.pk
             # Initiate coinify API
             coinifyapi = CoinifyAPI(
                 settings.COINIFY_API_KEY,
@@ -445,7 +431,6 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     order = order,
                 )
 
-        print "done"
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
