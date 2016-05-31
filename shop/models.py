@@ -10,7 +10,7 @@ from utils.models import UUIDModel, CreatedUpdatedModel
 from .managers import ProductQuerySet
 import hashlib, io, base64, qrcode
 from decimal import Decimal
-from timezone import timedelta
+from datetime import timedelta
 
 
 class Order(CreatedUpdatedModel):
