@@ -4,18 +4,10 @@
 
 <table style="width:100%;">
     <tr>
-        <td style="width: 20%;"><h1>BornHack IVS</h1></td>
         <td style="width: 60%;">&nbsp;</td>
-        <td style="text-align: left"><h1>Invoice {{ invoice.pk }}</h1></td>
-    </tr>
-    <tr>
-        <td style="width: 20%;"><img src="{% static 'img/logo-new.png' %}"></td>
-        <td style="width: 60%;">&nbsp;</td>
-        <td style="text-align: left">
-            <b>Order number: {{ invoice.order.pk }}<br>
-            Invoice number: {{ invoice.pk }}<br>
-            Invoice date: {% now "b js, Y" %}</b>
-        </td>
+        <td><h1>Order #{{ invoice.order.pk }}</h1></td>
+        <td><h1>Invoice #{{ invoice.pk }}</h1></td>
+        <td><h1>Invoice date {% invoice.created|date:"b jS, Y" %}</h1></td>
     </tr>
 </table>
 <br>
@@ -66,10 +58,11 @@
     <li>Tickets will be generated before the event and can be downloaded from the webshop by then.</li>
     <li>Merchandise can be picked up from the info booth during the event.</li>
     <li>Accomodation/lodges and village tents will be available when the event begins.</li>
+</ul>
 </p>
 
 <p>Note: Danish law grants everyone a 14 days 'cooling-off' period for 
 internet purchases, in which the customer can regret the purchase for any 
 reason (including just changing your mind). In case you regret this purchase 
 please contact us on info@bornhack.org for a full refund. This is possible until
-{{ invoice.regretdate|date:"b js, Y" }}</p>
+<b>{{ invoice.regretdate|date:"b jS, Y" }}</b></p>
