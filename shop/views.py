@@ -37,7 +37,7 @@ from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
 from vendor.coinify_api import CoinifyAPI
 from vendor.coinify_callback import CoinifyCallback
-import json
+import json, time
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -393,6 +393,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
                 order.coinifyapiinvoice.delete()
+                time.sleep(1)
 
         # create a new coinify invoice if needed
         if not hasattr(order, 'coinifyapiinvoice'):
