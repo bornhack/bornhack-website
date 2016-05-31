@@ -39,11 +39,13 @@ from vendor.coinify_api import CoinifyAPI
 from vendor.coinify_callback import CoinifyCallback
 import json
 
+
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
     model = Order
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_object().user != request.user:
+        # If the user does not own this ticket OR is not staff
+        if self.get_object().user != request.user or not request.user.is_staff:
             raise Http404("Order not found")
 
         return super(EnsureUserOwnsOrderMixin, self).dispatch(

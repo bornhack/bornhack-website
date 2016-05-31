@@ -8,6 +8,7 @@ admin.site.register(models.CoinifyAPIInvoice)
 admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
 
+
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = [
@@ -35,9 +36,9 @@ class TicketInline(admin.TabularInline):
 
 
 
-
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
+    change_form_template = 'admin/change_order_form.html'
     list_display = [
         'id',
         'user',

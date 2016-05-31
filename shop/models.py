@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Sum
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
+from django.http import HttpResponse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
