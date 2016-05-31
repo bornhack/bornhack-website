@@ -4,12 +4,12 @@
 
 <table style="width:100%;">
     <tr>
-        <td style="width: 70%;">&nbsp;</td>
+        <td style="width: 75%;">&nbsp;</td>
         <td>
             <h3>
+                {{ invoice.created|date:"b jS, Y" }}<br>
                 Order #{{ invoice.order.pk }}<br>
-                Invoice #{{ invoice.pk }}<br>
-                Date {{ invoice.created|date:"b jS, Y" }}
+                Invoice #{{ invoice.pk }}
             </h3>
         </td>
     </tr>
