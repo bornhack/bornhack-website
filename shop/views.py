@@ -100,6 +100,7 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
             request, *args, **kwargs
         )
 
+
 class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
     model = Order
 
@@ -456,16 +457,18 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             # parse json
             callbackjson = json.loads(request.body)
             if callbackjson['event'] == 'invoice_state_change' or callbackjson['event'] == 'invoice_manual_resend':
-                # get invoice from db
+                # find coinify invoice in db
                 try:
-                    invoice = CoinifyAPIInvoice.objects.get(id=callbackjson['data']['id'])
+                    coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=['data']['id'])
                 except CoinifyAPIInvoice.DoesNotExist:
-                    return HttpResponseBadRequest('bad invoice id')
+                    print "unable to find CoinifyAPIInvoice with id %s" % ['data']['id']
+                    return HttpResponseBadRequest('bad coinifyinvoice id')
 
                 # save new invoice payload
+                invoice = coinifyinvoice.order.invoice
                 invoice.payload = callbackjson['data']
                 invoice.save()
-                
+
                 # so, is the invoice paid now?
                 if callbackjson['data']['state'] == 'complete':
                     invoice.order.mark_as_paid()
