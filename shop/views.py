@@ -45,8 +45,9 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
 
     def dispatch(self, request, *args, **kwargs):
         # If the user does not own this ticket OR is not staff
-        if self.get_object().user != request.user or not request.user.is_staff:
-            raise Http404("Order not found")
+        if not request.user.is_staff:
+            if self.get_object().user != request.user:
+                raise Http404("Order not found")
 
         return super(EnsureUserOwnsOrderMixin, self).dispatch(
             request, *args, **kwargs
