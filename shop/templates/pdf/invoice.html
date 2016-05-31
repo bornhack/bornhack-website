@@ -5,19 +5,15 @@
 <table style="width:100%;">
     <tr>
         <td style="width: 60%;">&nbsp;</td>
-        <td><h3>Order #{{ invoice.order.pk }}</h3></td>
-    </tr>
-    <tr>
-        <td style="width: 60%;">&nbsp;</td>
-        <td><h3>Invoice #{{ invoice.pk }}</h3></td>
-    </tr>
-    <tr>
-        <td style="width: 60%;">&nbsp;</td>
-        <td><h3>Date {{ invoice.created|date:"b jS, Y" }}</h3></td>
+        <td>
+            <h3>
+                Order #{{ invoice.order.pk }}<br>
+                Invoice #{{ invoice.pk }}<br>
+                Date {{ invoice.created|date:"b jS, Y" }}
+            </h3>
+        </td>
     </tr>
 </table>
-<br>
-<br>
 <br>
 <h2>Products</h2>
 <table style="width:90%; margin:1em;">
