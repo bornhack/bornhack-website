@@ -281,7 +281,6 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
         return "coinifyinvoice for order #%s" % self.order.id
 
 
-
 class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
     payload = JSONField()

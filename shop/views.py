@@ -17,6 +17,7 @@ from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.dateparse import parse_datetime
 
 from camps.models import Camp
 from shop.models import (
@@ -382,6 +383,14 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
     def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
+        if hasattr(order, 'coinifyapiinvoice'):
+            # we already have a coinifyinvoice for this order,
+            # check if it expired
+            if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
+                # this coinifyinvoice expired, delete it
+                order.coinifyapiinvoice.delete()
+
+        # create a new coinify invoice if needed
         if not hasattr(order, 'coinifyapiinvoice'):
             # Initiate coinify API
             coinifyapi = CoinifyAPI(
