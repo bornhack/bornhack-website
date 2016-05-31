@@ -19,6 +19,7 @@
   </thead>
   <tbody>
 {% for order in orders %}
+    {% if order.products.exists %}
     <tr {% if not order.open and order.paid and order.is_fully_handed_out %}style="color: lightgrey"{% endif %}>
         <td>{{ order.id }}</td>
         <td>{{ order.get_number_of_items }}</td>
@@ -43,6 +44,7 @@
         {% endif %}
         </td>
     </tr>
+  {% endif %}
 {% endfor %}
   </tbody>
 </table>
