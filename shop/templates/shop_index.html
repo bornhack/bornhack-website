@@ -51,7 +51,9 @@
               {% endif %}
           </td>
           <td>
-            {{ product.price|currency }}
+            <div class="pull-right">
+              {{ product.price|currency }}
+            </div>
           </td>
         </tr>
       {% endfor %}
