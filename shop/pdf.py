@@ -11,7 +11,7 @@ def generate_pdf_letter(filename, template, formatdict):
         template=template, 
         context=formatdict,
         cmd_options={
-            'margin-top': 60,
+            'margin-top': 50,
             'margin-bottom': 50,
         },
     )
