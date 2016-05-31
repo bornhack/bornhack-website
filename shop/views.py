@@ -392,6 +392,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # check if it expired
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
+                print "deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id']
                 order.coinifyapiinvoice.delete()
                 order = self.get_object()
 
@@ -426,11 +427,11 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
             else:
                 # save this coinify invoice
-                CoinifyAPIInvoice.objects.create(
+                coinifyinvoice = CoinifyAPIInvoice.objects.create(
                     invoicejson = response['data'],
                     order = order,
                 )
-
+                print "created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id']
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
