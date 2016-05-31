@@ -6,11 +6,6 @@ Your order number is {{ ordernumber }} and your invoice number is {{ invoicenumb
 Your order has been paid in full. The invoice is attached in PDF 
 format with the filename {{ filename }}.
 
-Tickets will be generated closer to the event. Ticket 
-holders will receive an email when tickets can be downloaded
-from the webshop. Merchandise can be picked up from the info 
-booth during the event.
-
 Thank your for your purchase!
 
 
