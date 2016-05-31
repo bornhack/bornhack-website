@@ -436,7 +436,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     order = order,
                 )
 
-        print "done" % order.pk
+        print "done"
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
