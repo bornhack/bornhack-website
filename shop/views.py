@@ -459,9 +459,9 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             if callbackjson['event'] == 'invoice_state_change' or callbackjson['event'] == 'invoice_manual_resend':
                 # find coinify invoice in db
                 try:
-                    coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=['data']['id'])
+                    coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=callbackjson['data']['id'])
                 except CoinifyAPIInvoice.DoesNotExist:
-                    print "unable to find CoinifyAPIInvoice with id %s" % ['data']['id']
+                    print "unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id']
                     return HttpResponseBadRequest('bad coinifyinvoice id')
 
                 # save new invoice payload
@@ -469,7 +469,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 invoice.payload = callbackjson['data']
                 invoice.save()
 
-                # so, is the invoice paid now?
+                # so, is the invoice paid in full now?
                 if callbackjson['data']['state'] == 'complete':
                     invoice.order.mark_as_paid()
 
