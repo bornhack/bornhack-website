@@ -228,7 +228,7 @@ class OrderProductRelation(CreatedUpdatedModel):
 
     @property
     def total(self):
-        return self.product.price * self.quantity
+        return Decimal(self.product.price * self.quantity)
 
 
 class EpayCallback(CreatedUpdatedModel, UUIDModel):
@@ -274,6 +274,7 @@ class Invoice(CreatedUpdatedModel):
 
     def regretdate(self):
         return inv.created+timedelta(days=14)
+
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
     invoicejson = JSONField()
