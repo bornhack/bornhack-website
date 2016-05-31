@@ -277,6 +277,10 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
     invoicejson = JSONField()
     order = models.OneToOneField('shop.Order')
 
+    def __str__(self):
+        return "coinifyinvoice for order #%s" % self.order.id
+
+
 
 class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
