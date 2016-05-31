@@ -10,6 +10,7 @@ from utils.models import UUIDModel, CreatedUpdatedModel
 from .managers import ProductQuerySet
 import hashlib, io, base64, qrcode
 from decimal import Decimal
+from timezone import timedelta
 
 
 class Order(CreatedUpdatedModel):
@@ -273,7 +274,7 @@ class Invoice(CreatedUpdatedModel):
         return 'bornhack_invoice_%s.pdf' % self.pk
 
     def regretdate(self):
-        return self.created+timedelta(days=14)
+        return self.created+timedelta(days=15)
 
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
