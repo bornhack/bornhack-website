@@ -88,7 +88,6 @@ quantities - so make sure your order is correct before proceeding!</p>
       <label><input type="checkbox" name="accept_terms"> Accept <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. If you have puchased merchandise you also accept that the payment will be drawn on your account when you pay, but the merchandise will not be delivered until you pick it up during the event.</label>
     </div>
   </p>
-  {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
 </form>
