@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
 from utils.models import UUIDModel, CreatedUpdatedModel
-from .managers import ProductQuerySet
+from .managers import ProductQuerySet, OrderQuerySet
 import hashlib, io, base64, qrcode
 from decimal import Decimal
 from datetime import timedelta
@@ -71,6 +71,10 @@ class Order(CreatedUpdatedModel):
         choices=PAYMENT_METHOD_CHOICES,
         default=BLOCKCHAIN
     )
+
+    cancelled = models.BooleanField(default=False)
+
+    objects = OrderQuerySet.as_manager()
 
     def __str__(self):
         return 'order id #%s' % self.pk
@@ -159,6 +163,11 @@ class Order(CreatedUpdatedModel):
             return "fully"
         else:
             return False
+
+    def mark_as_cancelled(self):
+        self.cancelled = True
+        self.open = None
+        self.save()
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):

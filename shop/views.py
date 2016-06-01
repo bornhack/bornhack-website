@@ -106,6 +106,22 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
         )
 
 
+class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
+    model = Order
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.get_object().cancelled:
+            messages.error(
+                request,
+                'Order #{} is cancelled!'.format(self.get_object().id)
+            )
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        return super(EnsureOrderHasProductsMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
 class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
     model = Order
 
@@ -217,14 +233,20 @@ class ProductDetailView(FormView, DetailView):
 class OrderListView(LoginRequiredMixin, ListView):
     model = Order
     template_name = "order_list.html"
+    context_object_name = 'orders'
 
-    def get_context_data(self, **kwargs):
-        context = super(OrderListView, self).get_context_data(**kwargs)
-        context['orders'] = Order.objects.filter(user=self.request.user)
-        return context
+    def get_queryset(self):
+        queryset = super(OrderListView, self).get_queryset()
+        return queryset.filter(user=self.request.user).not_cancelled()
 
 
-class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+class OrderDetailView(
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureOrderHasProductsMixin,
+    EnsureOrderIsNotCancelledMixin,
+    DetailView
+):
     model = Order
     template_name = 'order_detail.html'
     context_object_name = 'order'
@@ -269,12 +291,12 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
         if product_remove:
             order.orderproductrelation_set.filter(pk=product_remove).delete()
             if not order.products.count() > 0:
-                order.delete()
+                order.mark_as_cancelled()
                 messages.info(request, 'Order cancelled!')
                 return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         if 'cancel_order' in request.POST:
-            order.delete()
+            order.mark_as_cancelled()
             messages.info(request, 'Order cancelled!')
             return HttpResponseRedirect(reverse_lazy('shop:index'))
 

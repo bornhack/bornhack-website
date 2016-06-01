@@ -45,6 +45,7 @@ class OrderAdmin(admin.ModelAdmin):
         'camp',
         'payment_method',
         'paid',
+        'cancelled',
     ]
 
     list_filter = [

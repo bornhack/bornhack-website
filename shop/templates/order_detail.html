@@ -6,7 +6,7 @@
 
 <h1>Order #{{ order.id }}</h1>
 
-{% if not order.open == None %}
+{% if not order.paid %}
 <form method="POST" class="form-inline">
   {% csrf_token %}
 {% endif %}
@@ -66,8 +66,11 @@
 </table>
 
 {% if not order.open == None %}
-  {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
-  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger pull-right" name="cancel_order" %}
+    {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+{% endif %}
+
+{% if not order.paid %}
+  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
 {% endif %}
 
 <hr />
