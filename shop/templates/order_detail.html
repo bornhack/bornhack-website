@@ -74,14 +74,18 @@
 {% endif %}
 
 <hr />
+
 <h3>Payment</h3>
 {% if not order.paid %}
 <p class="lead">Your order is currently unpaid. Please pick a payment option below.</p>
-<p><i>Once you go to the payment your order will be finalized and you
-will no longer be able to change the products or quantities - so make sure
-your order is correct before proceeding!</i></p>
+<p><i>Once you accept the terms and go to the payment your order will be 
+finalized and you will no longer be able to change the products or 
+quantities - so make sure your order is correct before proceeding!</i></p>
 <form method="POST">
   {% csrf_token %}
+  <div class="checkbox">
+    <label><input type="checkbox" name="accept_terms"> Accept <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. If you have puchased merchadise you also accept that the payment will be drawn on your account when you pay, but the merchandise will not be delivered until you pick it up during the event.</label>
+  </div>
   {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
   {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
