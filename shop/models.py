@@ -191,7 +191,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ['available_in']
+        ordering = ['available_in', 'price']
 
     category = models.ForeignKey(
         'shop.ProductCategory',
@@ -357,3 +357,4 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
+
