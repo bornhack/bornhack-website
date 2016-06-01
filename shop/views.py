@@ -379,6 +379,12 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
     model = Order
     template_name = 'bank_transfer.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(BankTransferView, self).get_context_data(**kwargs)
+        context['iban'] = settings.BANKACCOUNT_IBAN
+        context['swiftbic'] = settings.BANKACCOUNT_SWIFTBIC
+        return context
+
 #################################################################################
 
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
