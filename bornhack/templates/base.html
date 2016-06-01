@@ -37,6 +37,9 @@
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
+            <li><a href="{% url 'news:index' %}">News</a></li>
+            <li><a href="{% url 'info' %}">Info</a></li>
+
             {% if current_camp.shop_open %}
             <li><a href="{% url 'shop:index' %}">Shop</a></li>
 
@@ -52,8 +55,6 @@
             {% endif %}
 
             {% endif %}
-            <li><a href="{% url 'news:index' %}">News</a></li>
-            <li><a href="{% url 'good-to-know' %}">Info</a></li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>

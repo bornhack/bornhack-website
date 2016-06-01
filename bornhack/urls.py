@@ -17,9 +17,9 @@ urlpatterns = [
         name='frontpage'
     ),
     url(
-        r'good-to-know/',
-        TemplateView.as_view(template_name='good_to_know.html'),
-        name='good-to-know'
+        r'info/',
+        TemplateView.as_view(template_name='info.html'),
+        name='info'
     ),
     url(
         r'contact/',
