@@ -6,14 +6,20 @@
 
 <h2>Pay by Bank Transfer</h2>
 <p>To pay order #{{ orderid }} you need to make a bank transfer 
-of the full amount of <b>{{ total|currency }}</b> to the following account:</p>
+of the full amount of <b>{{ total|currency }}</b> using the following information:</p>
 
-<p class="lead">
-IBAN: {{ iban }}<br>
-Swift/BIC: {{ swiftbic }}
-</p>
+<ul class="lead">
+  <li><strong>IBAN</strong>: {{ iban }}</li>
+  <li><strong>Swift/BIC</strong>: {{ swiftbic }}</li>
+  <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
+</ul>
 
 <p>Note: Please allow for up to a week before we register your bank 
 transfer, especially if you are outside of the SEPA region.</p>
+
+<p>
+  <strong>*</strong> This reference is a message to the payee (BornHack) and
+  enables us to register your payment.
+</p>
 
 {% endblock %}
