@@ -383,6 +383,8 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
         context = super(BankTransferView, self).get_context_data(**kwargs)
         context['iban'] = settings.BANKACCOUNT_IBAN
         context['swiftbic'] = settings.BANKACCOUNT_SWIFTBIC
+        context['orderid'] = self.get_object().pk
+        context['total'] = self.get_object().total
         return context
 
 #################################################################################

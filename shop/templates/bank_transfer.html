@@ -4,12 +4,15 @@
 {% block shop_content %}
 
 <h2>Pay by Bank Transfer</h2>
+<p>To pay order #{{ orderid }} you need to make a bank transfer 
+of the full amount of <b>{{ total|currency }}</b> to the following account:</p>
 
 <p class="lead">
 IBAN: {{ iban }}<br>
 Swift/BIC: {{ swiftbic }}
 </p>
 
-<p>Note: Please allow for up to a week before we register your bank transfer, especially if you are outside of the SEPA region.</p>
+<p>Note: Please allow for up to a week before we register your bank 
+transfer, especially if you are outside of the SEPA region.</p>
 
 {% endblock %}
