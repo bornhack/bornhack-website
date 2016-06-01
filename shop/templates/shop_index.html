@@ -28,14 +28,13 @@
         <tr>
           <th>Product</th>
           <th>Category</th>
-          <th>Availability</th>
           <th>Price</th>
         </tr>
       </thead>
       <tbody>
 
       {% for product in products %}
-        <tr {% if not product.is_available %}class="mute"{% endif %}>
+        <tr {% if not product.is_available %}class="text-muted"{% endif %}>
           <td>
             <a href="{% url 'shop:product_detail' slug=product.slug %}">
             {{ product.name }}
@@ -45,19 +44,12 @@
             {{ product.category }}
           </td>
           <td>
-              {{ product.available_in.lower|date:"Y-m-d H:i" }}
-              {% if product.available_in.upper %}
-              - {{ product.available_in.upper|date:"Y-m-d H:i" }}
-              {% endif %}
-          </td>
-          <td>
             <div class="pull-right">
               {{ product.price|currency }}
             </div>
           </td>
         </tr>
       {% endfor %}
-
       </tbody>
     </table>
 
