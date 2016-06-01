@@ -1,0 +1,25 @@
+{% extends 'shop_base.html' %}
+{% load bootstrap3 %}
+{% load shop_tags %}
+
+{% block shop_content %}
+
+<h2>Pay by Bank Transfer</h2>
+<p>To pay order #{{ orderid }} you need to make a bank transfer 
+of the full amount of <b>{{ total|currency }}</b> using the following information:</p>
+
+<ul class="lead">
+  <li><strong>Swift/BIC</strong>: {{ swiftbic }} (Danish reg. no. {{ regno }})</li>
+  <li><strong>IBAN</strong>: {{ iban }} (Danish account no. {{ accountno }})</li>
+  <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
+</ul>
+
+<p>Note: Please allow for up to a week before we register your bank 
+transfer, especially if you are outside of the SEPA region.</p>
+
+<p>
+  <strong>*</strong> This reference is a message to the payee (BornHack) and
+  enables us to register your payment.
+</p>
+
+{% endblock %}

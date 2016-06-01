@@ -4,7 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
-from bornhack.utils import CreatedUpdatedModel, UUIDModel
+from utils.models import UUIDModel, CreatedUpdatedModel
 
 
 class Profile(CreatedUpdatedModel, UUIDModel):

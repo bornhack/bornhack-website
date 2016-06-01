@@ -1,0 +1,48 @@
+{% extends 'shop_base.html' %}
+{% load bootstrap3 %}
+{% load shop_tags %}
+
+{% block shop_content %}
+<h3>Orders</h3>
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Items</th>
+      <th>Total amount</th>
+      <th>Open?</th>
+      <th>Paid?</th>
+      <th>Delivered?</th>
+      <th>Invoice</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for order in orders %}
+    {% if order.products.exists %}
+    <tr {% if not order.open and order.paid and order.is_fully_handed_out %}style="color: lightgrey"{% endif %}>
+        <td>{{ order.id }}</td>
+        <td>{{ order.get_number_of_items }}</td>
+        <td>{{ order.total|currency }}</td>
+        <td class="text-center">{{ order.open|truefalseicon }}</td>
+        <td class="text-center">{{ order.paid|truefalseicon }}</td>
+        <td class="text-center">{{ order.handed_out_status }}</td>
+        <td>
+        {% if order.invoice.pdf %}
+            {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+            {% bootstrap_button "PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
+        {% else %}
+        N/A
+        {% endif %}
+        </td>
+        <td>
+        {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
+        {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
+        </td>
+    </tr>
+  {% endif %}
+{% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

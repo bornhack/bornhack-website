@@ -1,0 +1,104 @@
+{% extends 'shop_base.html' %}
+{% load bootstrap3 %}
+{% load shop_tags %}
+
+{% block shop_content %}
+
+<h1>Order #{{ order.id }}</h1>
+
+{% if not order.paid %}
+<form method="POST" class="form-inline">
+  {% csrf_token %}
+{% endif %}
+
+<table class="table table-bordered table-hover">
+
+  <thead>
+    <tr>
+      <th>
+        Name
+      <th>
+        Quantity
+      <th>
+        Price
+      <th>
+        Total
+
+  <tbody>
+{% for order_product in order.orderproductrelation_set.all %}
+  <tr>
+    <td>
+      {{ order_product.product.name }}
+    <td>
+      {% if not order.open == None %}
+      <input type="number"
+             class="form-control"
+             style="width: 75px;"
+             min=1
+             name="{{ order_product.id }}"
+             value="{{ order_product.quantity }}" />
+        {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
+      </form>
+      {% else %}
+      {{ order_product.quantity }}
+      {% endif %}
+    <td>
+      {{ order_product.product.price|currency }}
+    <td>
+      {{ order_product.total|currency }}
+
+{% endfor %}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Hereof VAT (25%)</strong>
+    <td>
+      {{ order.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ order.total|currency }}
+
+</table>
+
+{% if not order.open == None %}
+    {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+{% endif %}
+
+{% if not order.paid %}
+  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
+{% endif %}
+
+<hr />
+
+<h3>Payment</h3>
+{% if not order.paid %}
+<p class="lead">Your order is currently unpaid. Please pick a payment option below.</p>
+<p>Once you accept the terms and go to the payment your order will be 
+finalized and you will no longer be able to change the products or 
+quantities - so make sure your order is correct before proceeding!</p>
+<form method="POST">
+  {% csrf_token %}
+  <p>
+    <div class="checkbox">
+      <label><input type="checkbox" name="accept_terms"> Accept <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. If you have puchased merchandise you also accept that the payment will be drawn on your account when you pay, but the merchandise will not be delivered until you pick it up during the event.</label>
+    </div>
+  </p>
+  {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
+  {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
+</form>
+<br>
+<p><i>If you have already paid but your order is still showing unpaid, 
+you can <a href="mailto:info@bornhack.dk">email us</a> or use the 
+<a href="{% url 'contact' %}">contact</a> page for other options. 
+Please allow for up to a week for bank transfers to be registered, 
+the other payment methods should be more or less instant.</i></p>
+{% else %}
+<p class="lead">Your order is paid in full.</p>
+{% endif %}
+
+{% endblock %}

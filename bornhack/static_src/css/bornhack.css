@@ -1,5 +1,6 @@
 body {
   margin-top: 90px;
+  margin-bottom: 35px;
 }
 
 * {
@@ -82,7 +83,29 @@ a, a:active, a:focus {
   color: rgb(255, 255, 255);
 }
 
+.btn-grey {
+  background-color: #777;
+  color: rgb(255, 255, 255);
+}
+
 #map {
   height: 500px;
 }
 
+.thumbnail {
+  height: 350px;
+}
+
+/* Footer */
+footer {
+    position: fixed;
+    width: 700px;
+    text-align: center;
+    background-color: white;
+    bottom: 0px;
+    padding: 5px;
+}
+
+.breadcrumb > li.no-before::before {
+    content: "";
+}

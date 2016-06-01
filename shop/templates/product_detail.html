@@ -1,0 +1,56 @@
+{% extends 'shop_base.html' %}
+{% load bootstrap3 %}
+{% load commonmark %}
+{% load shop_tags %}
+
+{% block shop_content %}
+
+<div class="row">
+
+  <div class="col-sm-12 col-md-8">
+    <h2>{{ product.name }}</h2>
+    {{ product.description|commonmark }}
+  </div>
+
+  <div class="col-sm-12 col-md-4">
+
+    <h3>
+      <small>Price</small><br />
+      {{ product.price|currency }}
+    </h3>
+
+    <hr />
+
+    <h3>Add to order</h3>
+
+    {% if user.is_authenticated %}
+
+    {% if product.is_available %}
+
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% bootstrap_button "Add to order" button_type="submit" button_class="btn-primary" %}
+    </form>
+
+    {% else %}
+
+    <p>
+      This product is available from
+      {{ product.available_in.lower|date:"Y-m-d H:i" }}
+    </p>
+
+    {% endif %}
+
+    {% else %}
+    <a href="{% url 'account_signup' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+      Signup</a> or
+    <a href="{% url 'account_login' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+      login</a>
+    to order this product
+    {% endif %}
+    {% endblock %}
+
+  </div>
+
+</div>

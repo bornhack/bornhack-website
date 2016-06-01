@@ -1,0 +1,71 @@
+{% load static from staticfiles %}
+{% load shop_tags %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 75%;">&nbsp;</td>
+        <td>
+            <h3>
+                {{ invoice.created|date:"b jS, Y" }}<br>
+                Order #{{ invoice.order.pk }}<br>
+                Invoice #{{ invoice.pk }}
+            </h3>
+        </td>
+    </tr>
+</table>
+<br>
+<br>
+<h2>INVOICE</h2>
+<table style="width:90%; margin:1em;">
+    <tr>
+      <td>
+        <b>Name
+      <td>
+        <b>Quantity
+      <td>
+        <b>Price
+      <td>
+        <b>Total
+{% for order_product in invoice.order.orderproductrelation_set.all %}
+  <tr>
+    <td>
+      {{ order_product.product.name }}
+    <td>
+      {{ order_product.quantity }}
+    <td>
+      {{ order_product.product.price|currency }}
+    <td>
+      {{ order_product.total|currency }}
+{% endfor %}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Danish VAT (25%)</strong>
+    <td>
+      {{ invoice.order.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ invoice.order.total|currency }}
+</table>
+<br>
+<h3>The order has been paid in full.</h3>
+<p>
+    <ul>
+        <li>Tickets can be downloaded from the webshop.</li>
+        <li>Merchandise can be picked up from the info booth during the event.</li>
+        <li>Accomodation/lodges and village tents will be available when the event begins.</li>
+    </ul>
+</p>
+
+<p>Note: Danish law grants everyone a 14 days 'cooling-off' period for 
+internet purchases, in which the customer can regret the purchase for any 
+reason (including just changing your mind). In case you regret this purchase 
+please contact us on info@bornhack.dk for a full refund. This is possible until
+<b>{{ invoice.regretdate|date:"b jS, Y" }}</b>. Please see our General 
+Terms &amp; Conditions on our website for more information on order cancellation.</p>

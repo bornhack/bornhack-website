@@ -37,7 +37,25 @@
 
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="{% url 'good-to-know' %}">Good to know</a></li>
+            <li><a href="{% url 'news:index' %}">News</a></li>
+            <li><a href="{% url 'info' %}">Info</a></li>
+
+            {% if current_camp.shop_open %}
+            <li><a href="{% url 'shop:index' %}">Shop</a></li>
+
+            {% if current_order and current_order.get_number_of_items %}
+            <li>
+                <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
+                <i class="glyphicon glyphicon-shopping-cart"></i>
+                <span class="badge">
+                {{ current_order.get_number_of_items }}
+                </span>
+              </a>
+            </li>
+            {% endif %}
+
+            {% endif %}
+            <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
             <li><a href="{% url 'account_logout' %}">Logout</a></li>
@@ -54,6 +72,14 @@
     <div id="main" class="container container-fluid">
       {% bootstrap_messages %}
       {% block content %}{% endblock %}
+      <footer class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            {% block footer %}
+            <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> | 
+            <a href="{% url 'privacy-policy' %}">Privacy Policy</a>
+            {% endblock %}
+        </div>
+      </footer>
     </div>
     {% bootstrap_javascript jquery=1 %}
   </body>

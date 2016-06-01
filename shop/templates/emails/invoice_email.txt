@@ -1,0 +1,14 @@
+Hello!
+
+This email contains the invoice for your purchase from BornHack.
+Your order number is {{ ordernumber }} and your invoice number is {{ invoicenumber }}.
+
+Your order has been paid in full. The invoice is attached in PDF 
+format with the filename {{ filename }}.
+
+Thank your for your purchase!
+
+
+Best regards,
+
+The BornHack Team

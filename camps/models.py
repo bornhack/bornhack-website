@@ -2,7 +2,9 @@ import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from bornhack.utils import CreatedUpdatedModel, UUIDModel
+from utils.models import UUIDModel, CreatedUpdatedModel
+
+from .managers import CampQuerySet
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -28,6 +30,14 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         unique=True,
     )
 
+    shop_open = models.BooleanField(
+        verbose_name=_('Shop open?'),
+        help_text=_('Whether the shop is open or not.'),
+        default=False,
+    )
+
+    objects = CampQuerySet.as_manager()
+
     def __str__(self):
         return _('{} {}').format(
             self.name,
@@ -36,15 +46,13 @@ class Camp(CreatedUpdatedModel, UUIDModel):
 
     def create_days(self):
         delta = self.end - self.start
-        for day_offset in range(1, delta.days + 1):
+        for day_offset in range(0, delta.days + 1):
             day, created = self.days.get_or_create(
                 date=self.start + datetime.timedelta(days=day_offset)
             )
-            if created:
-                print('{} created'.format(day))
 
     def save(self, **kwargs):
-        super().save(**kwargs)
+        super(Camp, self).save(**kwargs)
         self.create_days()
 
 
