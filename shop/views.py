@@ -256,7 +256,7 @@ class OrderDetailView(
         payment_method = request.POST.get('payment_method')
 
         if not request.POST.get('accept_terms'):
-            messages.error(request, "You need to accept the general terms &amp; conditions before you can continue!")
+            messages.error(request, "You need to accept the general terms and conditions before you can continue!")
             return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': order.pk}))
 
         if payment_method in order.PAYMENT_METHODS:
