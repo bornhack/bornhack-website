@@ -37,6 +37,16 @@ urlpatterns = [
         name='account_logout',
     ),
     url(
+        r'privacy-policy/$',
+        TemplateView.as_view(template_name='legal/privacy_policy.html'),
+        name='privacy-policy'
+    ),
+    url(
+        r'general-terms-and-conditions/$',
+        TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'),
+        name='general-terms'
+    ),
+    url(
         r'^profile/',
         include('profiles.urls', namespace='profiles')
     ),
@@ -50,6 +60,4 @@ urlpatterns = [
     ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'privacy-policy/$', TemplateView.as_view(template_name='legal/privacy_policy.html'), name='privacy-policy'),
-    url(r'general-terms-and-conditions/$', TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'), name='general-terms')
 ]
