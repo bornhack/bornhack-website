@@ -117,7 +117,7 @@ class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
             )
             return HttpResponseRedirect(reverse_lazy('shop:index'))
 
-        return super(EnsureOrderHasProductsMixin, self).dispatch(
+        return super(EnsureOrderIsNotCancelledMixin, self).dispatch(
             request, *args, **kwargs
         )
 
