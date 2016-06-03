@@ -13,6 +13,17 @@
         <a href="{% url 'account_email' %}" class="btn btn-black">
           Manage emails
         </a>
+
+        {% if user.is_authenticated and user.orders.exists %}
+      <a href="{% url 'shop:order_list' %}" class="btn btn-black">
+        Orders
+      </a>
+        {% if has_tickets %}
+        <a href="{% url 'shop:ticket_list' %}" class="btn btn-black">
+          Tickets
+        </a>
+        {% endif %}
+      {% endif %}
       </p>
     <hr />
     </div>
