@@ -141,6 +141,10 @@ class ShopIndexView(ListView):
     template_name = "shop_index.html"
     context_object_name = 'products'
 
+    def get_queryset(self):
+        queryset = super(ShopIndexView, self).get_queryset()
+        return queryset.order_by('category__name', 'price')
+
     def get_context_data(self, **kwargs):
         context = super(ShopIndexView, self).get_context_data(**kwargs)
 
