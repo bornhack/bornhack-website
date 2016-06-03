@@ -27,21 +27,29 @@
       <thead>
         <tr>
           <th>Product</th>
-          <th>Category</th>
           <th class="pull-right">Price</th>
         </tr>
       </thead>
       <tbody>
 
       {% for product in products %}
+
+        {% ifchanged product.category %}
+        <tr style="background-color: #cccccc">
+          <td colspan="2">
+            <strong>
+              {{ product.category }}
+            </strong>
+          </td>
+          </td>
+        </tr>
+        {% endifchanged %}
+
         <tr {% if not product.is_available %}class="text-muted"{% endif %}>
           <td>
             <a href="{% url 'shop:product_detail' slug=product.slug %}">
             {{ product.name }}
             </a>
-          </td>
-          <td>
-            {{ product.category }}
           </td>
           <td>
             <div class="pull-right">
