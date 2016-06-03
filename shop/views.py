@@ -566,3 +566,20 @@ class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
         if ticket.order.user != request.user:
             return Http404
         return super(TicketDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
+
+    model = Order
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, 'You do not have permissions to do that.')
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
+        else:
+            messages.success(request, 'The order has been marked as paid.')
+            order = self.get_object()
+            order.mark_as_paid()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+

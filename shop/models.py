@@ -122,9 +122,9 @@ class Order(CreatedUpdatedModel):
 
     def mark_as_paid(self):
         self.paid = True
+        self.open = None
         for order_product in self.orderproductrelation_set.all():
             category_pk = str(order_product.product.category.pk)
-            print(order_product, category_pk, settings.TICKET_CATEGORY_ID)
             if category_pk == settings.TICKET_CATEGORY_ID:
                 for _ in range(0, order_product.quantity):
                     ticket = Ticket(
