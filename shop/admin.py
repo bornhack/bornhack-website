@@ -42,7 +42,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'user',
-        'email',
+        'user__email',
         'total',
         'payment_method',
         'open',
