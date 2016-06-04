@@ -90,13 +90,16 @@ class Order(CreatedUpdatedModel):
 
     @property
     def total(self):
-        return Decimal(self.products.aggregate(
-            sum=Sum(
-                models.F('orderproductrelation__product__price') *
-                models.F('orderproductrelation__quantity'),
-                output_field=models.IntegerField()
-            )
-        )['sum'])
+        if self.products.all():
+            return Decimal(self.products.aggregate(
+                sum=Sum(
+                    models.F('orderproductrelation__product__price') *
+                    models.F('orderproductrelation__quantity'),
+                    output_field=models.IntegerField()
+                )
+            )['sum'])
+        else:
+            return False
 
     def get_coinify_callback_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))
