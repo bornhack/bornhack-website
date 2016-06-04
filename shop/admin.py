@@ -42,8 +42,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'user',
-        'camp',
+        'email',
+        'total',
         'payment_method',
+        'open',
         'paid',
         'cancelled',
     ]
@@ -52,7 +54,9 @@ class OrderAdmin(admin.ModelAdmin):
         'user',
         'camp',
         'payment_method',
+        'open',
         'paid',
+        'cancelled',
     ]
 
     exclude = ['products']
