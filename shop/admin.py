@@ -39,10 +39,14 @@ class TicketInline(admin.TabularInline):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_order_form.html'
+
+    def get_email(self, obj):
+        return obj.user.email
+
     list_display = [
         'id',
         'user',
-        'user__email',
+        'get_email',
         'total',
         'payment_method',
         'open',
