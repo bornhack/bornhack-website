@@ -69,7 +69,7 @@ class Order(CreatedUpdatedModel):
     payment_method = models.CharField(
         max_length=50,
         choices=PAYMENT_METHOD_CHOICES,
-        default=BLOCKCHAIN
+        default='',
     )
 
     cancelled = models.BooleanField(default=False)
