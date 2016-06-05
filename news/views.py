@@ -12,4 +12,5 @@ class NewsIndex(ListView):
 class NewsDetail(DetailView):
     model = models.NewsItem
     template_name = 'news_detail.html'
+    context_object_name = 'news_item'
 
