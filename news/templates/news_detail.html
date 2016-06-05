@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+
+{% block content %}
+  <div>
+    <h3>{{ news_item.title }} <small>{{ news_item.published_at|date:"Y-m-d" }}</small></h3>
+  </div>
+  {{ news_item.content|commonmark }}
+{% endblock %}

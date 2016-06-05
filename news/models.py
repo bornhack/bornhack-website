@@ -14,6 +14,7 @@ class NewsItem(CreatedUpdatedModel):
     content = models.TextField()
     public = models.BooleanField(default=False)
     published_at = models.DateTimeField()
+    slug = models.SlugField()
 
     def __str__(self):
         return self.title
