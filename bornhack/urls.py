@@ -8,7 +8,7 @@ from allauth.account.views import (
 )
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 urlpatterns = [
     url(
@@ -31,6 +31,18 @@ urlpatterns = [
         TemplateView.as_view(template_name='coc.html'),
         name='conduct'
     ),
+    url(
+        r'call-for-sponsors/',
+        TemplateView.as_view(template_name='sponsors.html'),
+        name='call-for-sponsors'
+    ),
+    url(r'^sponsors/$', RedirectView.as_view(url=reverse_lazy('call-for-sponsors'), permanent=True)),
+    url(
+        r'call-for-speakers/',
+        TemplateView.as_view(template_name='speakers.html'),
+        name='call-for-speakers'
+    ),
+    url(r'^speakers/$', RedirectView.as_view(url=reverse_lazy('call-for-speakers'), permanent=True)),
     url(
         r'^login/$',
         LoginView.as_view(),
@@ -65,4 +77,5 @@ urlpatterns = [
     ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
 ]
