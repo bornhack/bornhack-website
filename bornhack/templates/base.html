@@ -55,13 +55,13 @@
             {% endif %}
 
             {% endif %}
+            <li><a href="{% url 'call-for-speakers' %}">Speakers</a></li>
+            <li><a href="{% url 'call-for-sponsors' %}">Sponsors</a></li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
-            <li><a href="{% url 'account_logout' %}">Logout</a></li>
             {% else %}
             <li><a href="{% url 'account_login' %}">Login</a></li>
-            <li><a href="{% url 'account_signup' %}">Sign up</a></li>
             {% endif %}
           </ul>
         </div>
