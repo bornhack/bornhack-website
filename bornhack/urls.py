@@ -27,6 +27,11 @@ urlpatterns = [
         name='contact'
     ),
     url(
+        r'conduct/',
+        TemplateView.as_view(template_name='coc.html'),
+        name='conduct'
+    ),
+    url(
         r'^login/$',
         LoginView.as_view(),
         name='account_login',

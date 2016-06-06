@@ -85,7 +85,7 @@ quantities - so make sure your order is correct before proceeding!</p>
   {% csrf_token %}
   <p>
     <div class="checkbox">
-      <label><input type="checkbox" name="accept_terms"> Accept <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. If you have puchased merchandise you also accept that the payment will be drawn on your account when you pay, but the merchandise will not be delivered until you pick it up during the event.</label>
+      <label><input type="checkbox" name="accept_terms"> Accept <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. If you have puchased merchandise you also accept that the payment will be drawn on your account when you pay, but the merchandise will not be delivered until you pick it up during the event. Finally you accept to adhere to our <a href="{% url 'conduct' %}">Code of Conduct</a> during the event as well as online.</label>
     </div>
   </p>
   {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
