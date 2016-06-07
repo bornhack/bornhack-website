@@ -109,3 +109,7 @@ footer {
 .breadcrumb > li.no-before::before {
     content: "";
 }
+
+.nav li a {
+   padding: 30px 7px;
+}
