@@ -18,8 +18,14 @@ class NewsDetail(DetailView):
     def get_context_data(self, **kwargs):
         context = super(NewsDetail, self).get_context_data(**kwargs)
         news_item = self.get_object()
-        context['draft'] = False
-        if news_item.public and news_item.published_at > timezone.now():
-            context['draft'] = True
+        timed = news_item.published_at > timezone.now()
+
+        if news_item.public and timed:
+            context['not_public'] = True
+            context['timed'] = True
+        elif not news_item.public:
+            context['not_public'] = True
+            context['timed'] = False
+
         return context
 

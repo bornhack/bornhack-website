@@ -3,9 +3,9 @@
 
 {% block content %}
   <div>
-    {% if draft %}
+    {% if not_public %}
     <div class="alert alert-danger">
-      <strong>This news item is not yet public.</strong> It will become public at {{ news_item.published_at|date:'Y-m-d H:i' }}.
+      <strong>This news item is not yet public.</strong> {% if timed %}It will become public at {{ news_item.published_at|date:'Y-m-d H:i' }}.{% endif%}
     </div>
     {% endif %}
     <h3>{{ news_item.title }} <small>{{ news_item.published_at|date:"Y-m-d" }}</small></h3>
