@@ -11,9 +11,9 @@ urlpatterns = [
     url(r'orders/(?P<pk>[0-9]+)/invoice/$', DownloadInvoiceView.as_view(), name='download_invoice'),
     url(r'orders/(?P<pk>[0-9]+)/mark_as_paid/$', OrderMarkAsPaidView.as_view(), name='mark_order_as_paid'),
 
-    #url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/$', EpayFormView.as_view(), name='epay_form'),
-    #url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/callback/$',EpayCallbackView.as_view(), name='epay_callback'),
-    #url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/thanks/$', EpayThanksView.as_view(), name='epay_thanks'),
+    url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/$', EpayFormView.as_view(), name='epay_form'),
+    url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/callback/$',EpayCallbackView.as_view(), name='epay_callback'),
+    url(r'orders/(?P<pk>[0-9]+)/pay/creditcard/thanks/$', EpayThanksView.as_view(), name='epay_thanks'),
 
     url(r'orders/(?P<pk>[0-9]+)/pay/blockchain/$', CoinifyRedirectView.as_view(), name='coinify_pay'),
     url(r'orders/(?P<pk>[0-9]+)/pay/blockchain/callback/$', CoinifyCallbackView.as_view(), name='coinify_callback'),
