@@ -5,9 +5,11 @@ from . import models
 
 class NewsIndex(ListView):
     model = models.NewsItem
-    queryset = models.NewsItem.objects.public()
     template_name = 'news_index.html'
     context_object_name = 'news_items'
+
+    def get_queryset(self):
+        return self.model.objects.public()
 
 
 class NewsDetail(DetailView):
