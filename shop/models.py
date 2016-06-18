@@ -25,6 +25,12 @@ class Order(CreatedUpdatedModel):
         through='shop.OrderProductRelation'
     )
 
+    user = models.ForeignKey(
+        'auth.User',
+        verbose_name=_('User'),
+        help_text=_('The user this order belongs to.'),
+        related_name='orders',
+    )
 
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
@@ -259,7 +265,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
 
 
 class CreditNote(CreatedUpdatedModel):
-    amount = models.DecimalField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     text = models.TextField()
     pdf = models.FileField(
         null=True,
@@ -294,6 +300,7 @@ class CreditNote(CreatedUpdatedModel):
     @property
     def filename(self):
         return 'bornhack_creditnote_%s.pdf' % self.pk
+
 
 class Invoice(CreatedUpdatedModel):
     order = models.OneToOneField('shop.Order')
