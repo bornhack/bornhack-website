@@ -33,9 +33,9 @@
       {{ order_product.product.name }}
     <td>
       {{ order_product.quantity }}
-    <td>
+    <td align="right">
       {{ order_product.product.price|currency }}
-    <td>
+    <td align="right">
       {{ order_product.total|currency }}
 {% endfor %}
 
@@ -43,14 +43,14 @@
     <td colspan="2">
     <td>
       <strong>Danish VAT (25%)</strong>
-    <td>
+    <td align="right">
       {{ invoice.order.vat|currency }}
 
   <tr>
     <td colspan="2">
     <td>
       <strong>Total</strong>
-    <td>
+    <td align="right">
       {{ invoice.order.total|currency }}
 </table>
 <br>
