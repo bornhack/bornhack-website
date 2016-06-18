@@ -8,6 +8,7 @@ admin.site.register(models.CoinifyAPIInvoice)
 admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
+admin.site.register(models.Ticket)
 
 
 @admin.register(models.ProductCategory)
@@ -76,6 +77,3 @@ class OrderAdmin(admin.ModelAdmin):
     mark_order_as_paid.description = 'Mark order(s) as paid'
 
 
-@admin.register(models.Ticket)
-class TicketAdmin(admin.ModelAdmin):
-    pass
