@@ -295,7 +295,7 @@ class CreditNote(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return Decimal(self.total*Decimal(0.2))
+        return Decimal(self.amount*Decimal(0.2))
 
     @property
     def filename(self):
