@@ -25,12 +25,6 @@ class Order(CreatedUpdatedModel):
         through='shop.OrderProductRelation'
     )
 
-    user = models.ForeignKey(
-        'auth.User',
-        verbose_name=_('User'),
-        help_text=_('The user this order belongs to.'),
-        related_name='orders',
-    )
 
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
@@ -264,17 +258,55 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
     txnid = models.IntegerField()
 
 
+class CreditNote(CreatedUpdatedModel):
+    amount = models.DecimalField()
+    text = models.TextField()
+    pdf = models.FileField(
+        null=True,
+        blank=True,
+        upload_to='creditnotes/'
+    )
+    user = models.ForeignKey(
+        'auth.User',
+        verbose_name=_('User'),
+        help_text=_('The user this credit note belongs to.'),
+        related_name='creditnotes',
+    )
+    paid = models.BooleanField(
+        verbose_name=_('Paid?'),
+        help_text=_('Whether this creditnote has been paid.'),
+        default=False,
+    )
+    sent_to_customer = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'creditnote#%s - %s DKK (sent to %s: %s)' % (
+            self.id,
+            self.amount,
+            self.user.email,
+            self.sent_to_customer,
+        )
+
+    @property
+    def vat(self):
+        return Decimal(self.total*Decimal(0.2))
+
+    @property
+    def filename(self):
+        return 'bornhack_creditnote_%s.pdf' % self.pk
+
 class Invoice(CreatedUpdatedModel):
     order = models.OneToOneField('shop.Order')
     pdf = models.FileField(null=True, blank=True, upload_to='invoices/')
     sent_to_customer = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'invoice#%s - order %s - %s - total %s DKK (sent to customer: %s)' % (
+        return 'invoice#%s - order %s - %s - total %s DKK (sent to %s: %s)' % (
             self.id,
             self.order.id,
             self.order.created,
             self.order.total,
+            self.order.user.email,
             self.sent_to_customer,
         )
 

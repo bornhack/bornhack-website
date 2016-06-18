@@ -1,0 +1,44 @@
+{% load static from staticfiles %}
+{% load shop_tags %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 75%;">&nbsp;</td>
+        <td>
+            <h3>
+                {{ creditnote.created|date:"b jS, Y" }}<br>
+                Creditnote #{{ invoice.pk }}
+            </h3>
+        </td>
+    </tr>
+</table>
+<h3>Customer: {{ creditnote.order.user.email }}</h3>
+<br>
+<h2>CREDITNOTE</h2>
+<table style="width:90%; margin:1em;">
+    <tr>
+      <td>
+        <b>Text
+      <td>
+        <b>Amount
+  <tr>
+    <td>
+      {{ creditnote.text }}
+    <td>
+      {{ creditnote.amount|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Danish VAT (25%)</strong>
+    <td>
+      {{ creditnote.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td>
+      {{ creditnote.amount|currency }}
+</table>

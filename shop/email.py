@@ -11,6 +11,10 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info
         text_template = 'emails/invoice_email.txt'
         html_template = 'emails/invoice_email.html'
         attachment_filename = formatdict['filename']
+    if emailtype == 'creditnote':
+        text_template = 'emails/creditnote_email.txt'
+        html_template = 'emails/creditnote_email.html'
+        attachment_filename = formatdict['creditnote'].filename
     elif emailtype == 'testmail':
         text_template = 'emails/testmail.txt'
     else:
@@ -39,6 +43,24 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info
     ### all good
     return True
 
+
+def send_creditnote_email(creditnote):
+    # put formatdict together
+    formatdict = {
+        'creditnote': creditnote,
+    }
+
+    subject = 'BornHack creditnote %s' % creditnote.pk
+
+    # send mail
+    return send_email(
+        emailtype='creditnote',
+        recipient=creditnote.user.email,
+        formatdict=formatdict,
+        subject=subject,
+        sender='info@bornhack.dk',
+        attachment=creditnote.pdf.read(),
+    )
 
 def send_invoice_email(invoice):
     # put formatdict together

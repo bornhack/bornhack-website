@@ -7,6 +7,7 @@ admin.site.register(models.EpayPayment)
 admin.site.register(models.CoinifyAPIInvoice)
 admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
+admin.site.register(models.CreditNote)
 
 
 @admin.register(models.ProductCategory)
@@ -55,12 +56,12 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     list_filter = [
-        'user',
         'camp',
         'payment_method',
         'open',
         'paid',
         'cancelled',
+        'user',
     ]
 
     exclude = ['products']
