@@ -74,6 +74,12 @@ class Order(CreatedUpdatedModel):
 
     cancelled = models.BooleanField(default=False)
 
+    refunded = models.BooleanField(
+        verbose_name=_('Refunded?'),
+        help_text=_('Whether this order has been refunded.'),
+        default=False,
+    )
+
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
@@ -135,6 +141,12 @@ class Order(CreatedUpdatedModel):
                         product=order_product.product,
                     )
                     ticket.save()
+        self.save()
+
+    def mark_as_refunded(self):
+        self.refunded=True
+        ### delete any tickets related to this order
+        self.tickets.all().delete()
         self.save()
 
     def is_not_handed_out(self):

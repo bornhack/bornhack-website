@@ -54,6 +54,7 @@ class OrderAdmin(admin.ModelAdmin):
         'open',
         'paid',
         'cancelled',
+        'refunded',
     ]
 
     list_filter = [
@@ -62,6 +63,7 @@ class OrderAdmin(admin.ModelAdmin):
         'open',
         'paid',
         'cancelled',
+        'refunded',
         'user',
     ]
 
@@ -69,11 +71,15 @@ class OrderAdmin(admin.ModelAdmin):
 
     inlines = [ProductInline, TicketInline]
 
-    actions = ['mark_order_as_paid']
+    actions = ['mark_order_as_paid', 'mark_order_as_refunded']
 
     def mark_order_as_paid(self, request, queryset):
         for order in queryset.filter(paid=False):
             order.mark_as_paid()
     mark_order_as_paid.description = 'Mark order(s) as paid'
 
+    def mark_order_as_refunded(self, request, queryset):
+        for order in queryset.filter(refunded=False):
+            order.mark_as_refunded()
+    mark_order_as_refunded.description = 'Mark order(s) as refunded'
 
