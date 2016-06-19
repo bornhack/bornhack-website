@@ -80,6 +80,6 @@ class OrderAdmin(admin.ModelAdmin):
 
     def mark_order_as_refunded(self, request, queryset):
         for order in queryset.filter(refunded=False):
-            order.mark_as_refunded()
+            order.mark_as_refunded(request)
     mark_order_as_refunded.description = 'Mark order(s) as refunded'
 

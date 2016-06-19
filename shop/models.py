@@ -144,9 +144,9 @@ class Order(CreatedUpdatedModel):
                     ticket.save()
         self.save()
 
-    def mark_as_refunded(self):
+    def mark_as_refunded(self, request):
         if not self.paid:
-            messages.error(self.request, "Order %s is not paid so cannot mark as refunded!" % self.pk)
+            messages.error(request, "Order %s is not paid, so cannot mark it as refunded!" % self.pk)
         else:
             self.refunded=True
             ### delete any tickets related to this order
