@@ -31,6 +31,7 @@ from shop.models import (
     CoinifyAPIInvoice,
     CoinifyAPICallback,
     Ticket,
+    CreditNote,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
