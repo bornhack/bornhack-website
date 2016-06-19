@@ -348,7 +348,6 @@ class DownloadInvoiceView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsurePa
         return response
 
 
-
 class CreditNoteListView(LoginRequiredMixin, ListView):
     model = CreditNote
     template_name = "creditnote_list.html"
@@ -361,7 +360,7 @@ class DownloadCreditNoteView(LoginRequiredMixin, EnsureUserOwnsCreditNoteMixin, 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = 'attachment; filename="%s"' % self.get_object().filename
-        response.write(self.get_object().invoice.pdf.read())
+        response.write(self.get_object().pdf.read())
         return response
 
 
