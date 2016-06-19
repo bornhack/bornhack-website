@@ -23,4 +23,7 @@ urlpatterns = [
 
     url(r'tickets/$', TicketListView.as_view(), name='ticket_list'),
     url(r'tickets/(?P<pk>\b[0-9A-Fa-f]{8}\b(-\b[0-9A-Fa-f]{4}\b){3}-\b[0-9A-Fa-f]{12}\b)$', TicketDetailView.as_view(), name='ticket_detail'),
+
+    url(r'creditnotes/$', CreditNoteListView.as_view(), name='creditnote_list'),
+    url(r'creditnotes/(?P<pk>[0-9]+)/pdf/$', DownloadCreditNoteView.as_view(), name='download_creditnote'),
 ]

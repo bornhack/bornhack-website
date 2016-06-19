@@ -285,6 +285,9 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
 
 
 class CreditNote(CreatedUpdatedModel):
+    class Meta:
+        ordering = ['-created']
+
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     text = models.TextField()
     pdf = models.FileField(
@@ -300,7 +303,7 @@ class CreditNote(CreatedUpdatedModel):
     )
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
-        help_text=_('Whether this creditnote has been paid.'),
+        help_text=_('Whether the amount in this creditnote has been paid back to the customer.'),
         default=False,
     )
     sent_to_customer = models.BooleanField(default=False)

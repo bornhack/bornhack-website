@@ -40,11 +40,38 @@ from vendor.coinify_callback import CoinifyCallback
 import json, time
 
 
+class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
+    model = CreditNote
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.get_object().pdf:
+            messages.error(request, "This creditnote has no PDF yet!")
+            return HttpResponseRedirect(reverse_lazy('shop:creditnote_list'))
+
+        return super(EnsureCreditNoteHasPDFMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
+class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
+    model = CreditNote
+
+    def dispatch(self, request, *args, **kwargs):
+        # If the user does not own this creditnote OR is not staff
+        if not request.user.is_staff:
+            if self.get_object().user != request.user:
+                raise Http404("CreditNote not found")
+
+        return super(EnsureUserOwnsCreditNoteMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
     model = Order
 
     def dispatch(self, request, *args, **kwargs):
-        # If the user does not own this ticket OR is not staff
+        # If the user does not own this order OR is not staff
         if not request.user.is_staff:
             if self.get_object().user != request.user:
                 raise Http404("Order not found")
@@ -318,6 +345,24 @@ class DownloadInvoiceView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsurePa
         response['Content-Disposition'] = 'attachment; filename="%s"' % self.get_object().invoice.filename
         response.write(self.get_object().invoice.pdf.read())
         return response
+
+
+
+class CreditNoteListView(LoginRequiredMixin, ListView):
+    model = CreditNote
+    template_name = "creditnote_list.html"
+    context_object_name = 'creditnotes'
+
+
+class DownloadCreditNoteView(LoginRequiredMixin, EnsureUserOwnsCreditNoteMixin, EnsureCreditNoteHasPDFMixin, SingleObjectMixin, View):
+    model = CreditNote
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % self.get_object().filename
+        response.write(self.get_object().invoice.pdf.read())
+        return response
+
 
 #################################################################################
 
