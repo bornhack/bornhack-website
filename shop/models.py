@@ -150,7 +150,11 @@ class Order(CreatedUpdatedModel):
         else:
             self.refunded=True
             ### delete any tickets related to this order
-            self.tickets.all().delete()
+            if self.tickets.all():
+                messages.success(request, "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.tickets.count()))
+                self.tickets.all().delete()
+            else:
+                messages.success(request, "Order %s marked as refunded, no tickets to delete" % self.pk)
             self.save()
 
     def is_not_handed_out(self):
