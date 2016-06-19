@@ -144,10 +144,13 @@ class Order(CreatedUpdatedModel):
         self.save()
 
     def mark_as_refunded(self):
-        self.refunded=True
-        ### delete any tickets related to this order
-        self.tickets.all().delete()
-        self.save()
+        if not self.paid:
+            messages.error(self.request, "Order %s is not paid so cannot mark as refunded!" % self.pk)
+        else:
+            self.refunded=True
+            ### delete any tickets related to this order
+            self.tickets.all().delete()
+            self.save()
 
     def is_not_handed_out(self):
         if self.orderproductrelation_set.filter(handed_out=True).count() == 0:
