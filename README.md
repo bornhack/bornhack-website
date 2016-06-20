@@ -10,8 +10,7 @@ Features do not include:
 
 ## Quickstart
 
-
-Create a virtual environment and activate it:
+Create a Python 2.7 virtual environment and activate it:
 
     $ virtualenv venv
     $ source venv/bin/activate
