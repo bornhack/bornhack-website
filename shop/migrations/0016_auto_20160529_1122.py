@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='coinifycallback',
             name='headers',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=''),
+            field=django.contrib.postgres.fields.jsonb.JSONField(default=None),
             preserve_default=False,
         ),
         migrations.AddField(

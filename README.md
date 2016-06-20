@@ -12,7 +12,7 @@ Features do not include:
 
     $ source path/to/venv/bin/activate
     $ pip install -r requirements/development.txt
-    $ ./manage.py makemigrations
-    $ ./manage.py migrate
-    $ ./manage.py createsuperuser
-    $ ./manage.py runserver
+    $ ./dev.sh makemigrations
+    $ ./dev.sh migrate
+    $ ./dev.sh createsuperuser
+    $ ./dev.sh runserver
