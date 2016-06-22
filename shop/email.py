@@ -11,7 +11,7 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info
         text_template = 'emails/invoice_email.txt'
         html_template = 'emails/invoice_email.html'
         attachment_filename = formatdict['filename']
-    if emailtype == 'creditnote':
+    elif emailtype == 'creditnote':
         text_template = 'emails/creditnote_email.txt'
         html_template = 'emails/creditnote_email.html'
         attachment_filename = formatdict['creditnote'].filename
