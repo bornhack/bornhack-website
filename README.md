@@ -10,9 +10,26 @@ Features do not include:
 
 ## Quickstart
 
-    $ source path/to/venv/bin/activate
-    $ pip install -r requirements/development.txt
-    $ ./manage.py makemigrations
-    $ ./manage.py migrate
-    $ ./manage.py createsuperuser
-    $ ./manage.py runserver
+
+Create a virtual environment and activate it:
+
+    $ virtualenv venv
+    $ source venv/bin/activate
+
+Install dependencies:
+
+    (venv) $ pip install -r requirements/development.txt
+
+Copy environment file and change settings like DATABASE_URL:
+
+    (venv) $ cp bornhack/settings/env.dist bornhack/settings/.env
+
+Run `make`
+
+    (venv) $  make
+
+Which is equivalent with this:
+
+    (venv) $ ./manage.py migrate --settings=bornhack.settings.development
+    (venv) $ ./manage.py createsuperuser --settings=bornhack.settings.development
+    (venv) $ ./manage.py runserver --settings=bornhack.settings.development
