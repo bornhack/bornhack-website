@@ -21,7 +21,7 @@ class VillageDetailView(DetailView):
 class VillageCreateView(CreateView):
     model = Village
     template_name = 'village_form.html'
-    fields = ['name', 'description', 'open']
+    fields = ['name', 'description', 'private']
     success_url = reverse_lazy('villages:list')
 
     def form_valid(self, form):
@@ -34,7 +34,7 @@ class VillageCreateView(CreateView):
 class VillageUpdateView(UpdateView):
     model = Village
     template_name = 'village_form.html'
-    fields = ['name', 'description', 'open']
+    fields = ['name', 'description', 'private']
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
