@@ -21,7 +21,7 @@ class Village(CreatedUpdatedModel, UUIDModel):
     description = models.TextField()
 
     private = models.BooleanField(
-        default=True,
+        default=False,
         help_text='Check if your village is privately organized'
     )
 
