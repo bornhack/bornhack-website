@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}
+Info | {{ block.super }}
+{% endblock %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock %}
