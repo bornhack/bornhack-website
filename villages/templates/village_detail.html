@@ -9,7 +9,7 @@
 
 <hr />
 
-{% if user in village.users.all %}
+{% if user == village.contact %}
 <a href="{% url 'villages:update' slug=village.slug %}">Edit</a>
 {% endif %}
 
