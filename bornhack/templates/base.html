@@ -42,19 +42,8 @@
 
             {% if current_camp.shop_open %}
             <li><a href="{% url 'shop:index' %}">Shop</a></li>
-
-            {% if current_order and current_order.get_number_of_items %}
-            <li>
-                <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
-                <i class="glyphicon glyphicon-shopping-cart"></i>
-                <span class="badge">
-                {{ current_order.get_number_of_items }}
-                </span>
-              </a>
-            </li>
             {% endif %}
-
-            {% endif %}
+            <li><a href="{% url 'villages:list' %}">Villages</a></li>
             <li><a href="{% url 'call-for-speakers' %}">Speakers</a></li>
             <li><a href="{% url 'call-for-sponsors' %}">Sponsors</a></li>
             <li><a href="{% url 'contact' %}">Contact</a></li>

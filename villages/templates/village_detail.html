@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+
+{% block content %}
+
+<h3>{{ village.name }}</h3>
+
+{{ village.description|commonmark }}
+
+<hr />
+
+{% if user in village.users.all %}
+<a href="{% url 'villages:update' slug=village.slug %}">Edit</a>
+{% endif %}
+
+{% endblock %}

@@ -19,7 +19,21 @@
         {% if has_tickets %}
           <li class="pull-right"><a href="{% url 'shop:ticket_list' %}">Tickets</a></li>
         {% endif %}
-        <li class="pull-right no-before"><a href="{% url 'shop:order_list' %}">Orders</a></li>
+        <li class="pull-right"><a href="{% url 'shop:order_list' %}">Orders</a></li>
+        <li class="pull-right no-before">
+
+          {% if current_order and current_order.get_number_of_items %}
+          <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
+          {% endif %}
+
+            <i class="glyphicon glyphicon-shopping-cart"></i>
+                      <span class="badge">
+                      {{ current_order.get_number_of_items|default:0 }}
+                      </span>
+          {% if current_order and current_order.get_number_of_items %}
+          </a>
+          {% endif %}
+        </li>
       {% endif %}
     </ol>
   </div>
