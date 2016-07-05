@@ -20,9 +20,9 @@ class Village(CreatedUpdatedModel, UUIDModel):
     slug = models.SlugField(max_length=255, blank=True)
     description = models.TextField()
 
-    open = models.BooleanField(
-        default=False,
-        help_text='Is this village open for others to join?'
+    private = models.BooleanField(
+        default=True,
+        help_text='Check if your village is privately organized'
     )
 
     def __str__(self):
