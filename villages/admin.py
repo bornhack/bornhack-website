@@ -5,4 +5,13 @@ from .models import Village
 
 @admin.register(Village)
 class VillageAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        'name',
+        'private',
+        'deleted',
+    ]
+
+    list_filter = [
+        'private',
+        'deleted',
+    ]
