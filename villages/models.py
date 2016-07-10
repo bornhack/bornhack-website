@@ -7,6 +7,8 @@ from django.utils.text import slugify
 from camps.models import Camp
 from utils.models import CreatedUpdatedModel, UUIDModel
 
+from .managers import VillageQuerySet
+
 
 class Village(CreatedUpdatedModel, UUIDModel):
 
@@ -18,12 +20,20 @@ class Village(CreatedUpdatedModel, UUIDModel):
 
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
-    description = models.TextField()
+    description = models.TextField(
+        help_text="A descriptive text about your village. Markdown is supported."
+    )
 
     private = models.BooleanField(
         default=False,
         help_text='Check if your village is privately organized'
     )
+
+    deleted = models.BooleanField(
+        default=False,
+    )
+
+    objects = VillageQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -56,3 +66,7 @@ class Village(CreatedUpdatedModel, UUIDModel):
             self.camp = Camp.objects.current()
 
         super(Village, self).save(**kwargs)
+
+    def delete(self, using=None, keep_parents=False):
+        self.deleted = True
+        self.save()

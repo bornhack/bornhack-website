@@ -10,7 +10,8 @@
 <hr />
 
 {% if user == village.contact %}
-<a href="{% url 'villages:update' slug=village.slug %}">Edit</a>
+<a href="{% url 'villages:update' slug=village.slug %}">Edit</a> |
+<a href="{% url 'villages:delete' slug=village.slug %}">Delete</a>
 {% endif %}
 
 {% endblock %}
