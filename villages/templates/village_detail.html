@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 
+{% block title %}
+Village: {{ village.name }} | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <h3>{{ village.name }}</h3>
