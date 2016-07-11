@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 
+{% block title %}
+News | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 {% for item in news_items %}
   <div>

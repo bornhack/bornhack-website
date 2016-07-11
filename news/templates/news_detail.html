@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 
+{% block title %}
+{{ news_item.title }} | {{ block.super }}
+{% endblock %}
+
 {% block content %}
   <div>
     {% if not_public %}

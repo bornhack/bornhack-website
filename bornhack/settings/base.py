@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'shop',
     'news',
     'utils',
+    'villages',
 
     'allauth',
     'allauth.account',

@@ -3,6 +3,10 @@
 {% load commonmark %}
 {% load shop_tags %}
 
+{% block title %}
+{{ product.name }} | {{ block.super }}
+{% endblock %}
+
 {% block shop_content %}
 
 <div class="row">
