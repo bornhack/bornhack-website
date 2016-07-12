@@ -15,8 +15,34 @@ from decimal import Decimal
 from datetime import timedelta
 
 
-class Order(CreatedUpdatedModel):
+class CustomOrder(CreatedUpdatedModel):
+    camp = models.ForeignKey(
+        'camps.Camp',
+        verbose_name=_('Camp'),
+        help_text=_('The camp this custom order is for.'),
+    )
 
+    text = models.TextField()
+
+    amount = models.IntegerField(
+        help_text=_('Amount of this custom order (in DKK, including VAT).')
+    )
+
+    paid = models.BooleanField(
+        verbose_name=_('Paid?'),
+        help_text=_('Whether this custom order has been paid.'),
+        default=False,
+    )
+
+    def __str__(self):
+        return 'custom order id #%s' % self.pk
+
+    @property
+    def vat(self):
+        return Decimal(self.amount*Decimal(0.2))
+
+
+class Order(CreatedUpdatedModel):
     class Meta:
         unique_together = ('user', 'open')
         ordering = ['-created']
@@ -29,26 +55,26 @@ class Order(CreatedUpdatedModel):
     user = models.ForeignKey(
         'auth.User',
         verbose_name=_('User'),
-        help_text=_('The user this order belongs to.'),
+        help_text=_('The user this shop order belongs to.'),
         related_name='orders',
     )
 
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
-        help_text=_('Whether this order has been paid.'),
+        help_text=_('Whether this shop order has been paid.'),
         default=False,
     )
 
     open = models.NullBooleanField(
         verbose_name=_('Open?'),
-        help_text=_('Whether this order is open or not. "None" means closed.'),
+        help_text=_('Whether this shop order is open or not. "None" means closed.'),
         default=True,
     )
 
     camp = models.ForeignKey(
         'camps.Camp',
         verbose_name=_('Camp'),
-        help_text=_('The camp this order is for.'),
+        help_text=_('The camp this shop order is for.'),
     )
 
     CREDIT_CARD = 'credit_card'
@@ -84,7 +110,7 @@ class Order(CreatedUpdatedModel):
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
-        return 'order id #%s' % self.pk
+        return 'shop order id #%s' % self.pk
 
     def get_number_of_items(self):
         return self.products.aggregate(
@@ -225,7 +251,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     slug = models.SlugField()
 
     price = models.IntegerField(
-        help_text=_('Price of the product (in DKK).')
+        help_text=_('Price of the product (in DKK, including VAT).')
     )
 
     description = models.TextField()
@@ -326,19 +352,29 @@ class CreditNote(CreatedUpdatedModel):
 
 
 class Invoice(CreatedUpdatedModel):
-    order = models.OneToOneField('shop.Order')
+    order = models.OneToOneField('shop.Order', null=True, blank=True)
+    customorder = models.OneToOneField('shop.CustomOrder', null=True, blank=True)
     pdf = models.FileField(null=True, blank=True, upload_to='invoices/')
     sent_to_customer = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'invoice#%s - order %s - %s - total %s DKK (sent to %s: %s)' % (
-            self.id,
-            self.order.id,
-            self.order.created,
-            self.order.total,
-            self.order.user.email,
-            self.sent_to_customer,
-        )
+        if self.order:
+            return 'invoice#%s - shop order %s - %s - total %s DKK (sent to %s: %s)' % (
+                self.id,
+                self.order.id,
+                self.order.created,
+                self.order.total,
+                self.order.user.email,
+                self.sent_to_customer,
+            )
+        elif self.customorder:
+            return 'invoice#%s - custom order %s - %s - amount %s DKK (customer: %s)' % (
+                self.id,
+                self.customorder.id,
+                self.customorder.created,
+                self.customorder.amount,
+                self.customorder.customer,
+            )
 
     @property
     def filename(self):

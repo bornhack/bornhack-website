@@ -4,7 +4,7 @@ from django.conf import settings
 from django.utils import timezone
 from shop.pdf import generate_pdf_letter
 from shop.email import send_invoice_email, send_creditnote_email
-from shop.models import Order, Invoice, CreditNote
+from shop.models import Order, CustomOrder, Invoice, CreditNote
 from time import sleep
 from decimal import Decimal
 
@@ -19,11 +19,17 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.output('Invoice worker running...')
         while True:
-            # check if we need to generate any invoices
+            # check if we need to generate any invoices for shop orders
             for order in Order.objects.filter(paid=True, invoice__isnull=True):
                 # generate invoice for this Order
                 Invoice.objects.create(order=order)
-                self.output('Generated Invoice object for order %s' % order)
+                self.output('Generated Invoice object for %s' % order)
+
+            # check if we need to generate any invoices for custom orders
+            for customorder in CustomOrder.objects.filter(paid=True, invoice__isnull=True):
+                # generate invoice for this CustomOrder
+                Invoice.objects.create(customorder=customorder)
+                self.output('Generated Invoice object for %s' % customorder)
 
             # check if we need to generate any pdf invoices
             for invoice in Invoice.objects.filter(pdf=''):
@@ -34,9 +40,13 @@ class Command(BaseCommand):
 
                 # generate the pdf
                 try:
+                    if invoice.customorder:
+                        template='pdf/custominvoice.html'
+                    else:
+                        template='pdf/invoice.html'
                     pdffile = generate_pdf_letter(
                         filename=invoice.filename,
-                        template='pdf/invoice.html',
+                        template=template,
                         formatdict=formatdict,
                     )
                     self.output('Generated pdf for invoice %s' % invoice)
@@ -54,8 +64,8 @@ class Command(BaseCommand):
                 invoice.save()
 
             ###############################################################
-            # check if we need to send out any invoices (only where pdf has been generated)
-            for invoice in Invoice.objects.filter(sent_to_customer=False).exclude(pdf=''):
+            # check if we need to send out any invoices (only for shop orders, and only where pdf has been generated)
+            for invoice in Invoice.objects.filter(order__isnull=False, sent_to_customer=False).exclude(pdf=''):
                 # send the email
                 if send_invoice_email(invoice=invoice):
                     self.output('OK: Invoice email sent to %s' % invoice.order.user.email)

@@ -1,0 +1,57 @@
+{% load static from staticfiles %}
+{% load shop_tags %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 75%;">&nbsp;</td>
+        <td>
+            <h3>
+                {{ invoice.created|date:"b jS, Y" }}<br>
+                Order CU#{{ invoice.customorder.pk }}<br>
+                Invoice #{{ invoice.pk }}
+            </h3>
+        </td>
+    </tr>
+</table>
+<h3>Customer: {{ invoice.customorder.customer }}</h3>
+<br>
+<h2>INVOICE</h2>
+<table style="width:90%; margin:1em;">
+    <tr>
+      <td>
+        <b>Text
+      <td>
+        <b>Quantity
+      <td>
+        <b>Price
+      <td>
+        <b>Total
+  <tr>
+    <td>
+      {{ invoice.customorder.text }}
+    <td>
+      1
+    <td align="right">
+      {{ invoice.customorder.amount|currency }}
+    <td align="right">
+      {{ invoice.customorder.amount|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Danish VAT (25%)</strong>
+    <td align="right">
+      {{ invoice.customorder.vat|currency }}
+
+  <tr>
+    <td colspan="2">
+    <td>
+      <strong>Total</strong>
+    <td align="right">
+      {{ invoice.customorder.amount|currency }}
+</table>
+<br>
+<p class="lead">
+Payment should be made by bank transfer to Arbejdernes Landsbank reg. 5371 account no. 0244504 within two weeks from {{ invoice.created|date:"b jS, Y" }} please. Thank you!
+</p>
