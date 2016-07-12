@@ -9,7 +9,7 @@ admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
 admin.site.register(models.Ticket)
-
+admin.site.register(models.CustomOrder)
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
