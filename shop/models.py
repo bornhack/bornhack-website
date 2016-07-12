@@ -27,7 +27,7 @@ class CustomOrder(CreatedUpdatedModel):
     )
 
     customer = models.TextField(
-        help_text=_('The customer info for this order, use <br> for newlines')
+        help_text=_('The customer info for this order')
     )
 
     amount = models.IntegerField(
