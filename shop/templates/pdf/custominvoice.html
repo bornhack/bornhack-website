@@ -20,28 +20,28 @@
 <br>
 
 <h2>INVOICE</h2>
-<table style="width:90%; margin:1em;">
+<table style="width:90%">
     <tr>
       <td>
         <b>Text
-      <td class="text-center" style="width: 20%">
+      <td align="center" style="width: 20%">
         <b>Price
   <tr>
     <td>
       {{ invoice.customorder.text|linebreaks }}
-    <td class="text-right">
+    <td align="right">
       {{ invoice.customorder.amount|currency }}
 
   <tr>
-    <td class="text-right">
+    <td align="right">
       <strong>Danish VAT (25%)</strong>
-    <td class="text-right">
+    <td align="right">
       {{ invoice.customorder.vat|currency }}
 
   <tr>
-    <td class="text-right">
+    <td align="right">
       <strong>Total</strong>
-    <td class="text-right">
+    <td align="right">
       {{ invoice.customorder.amount|currency }}
 </table>
 <br>
