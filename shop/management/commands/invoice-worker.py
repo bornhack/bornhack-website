@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 self.output('Generated Invoice object for %s' % order)
 
             # check if we need to generate any invoices for custom orders
-            for customorder in CustomOrder.objects.filter(paid=True, invoice__isnull=True):
+            for customorder in CustomOrder.objects.filter(invoice__isnull=True):
                 # generate invoice for this CustomOrder
                 Invoice.objects.create(customorder=customorder)
                 self.output('Generated Invoice object for %s' % customorder)
