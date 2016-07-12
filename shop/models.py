@@ -22,7 +22,13 @@ class CustomOrder(CreatedUpdatedModel):
         help_text=_('The camp this custom order is for.'),
     )
 
-    text = models.TextField()
+    text = models.TextField(
+        help_text=_('The invoice text')
+    )
+
+    customer = models.TextField(
+        help_text=_('The customer info for this order, use <br> for newlines')
+    )
 
     amount = models.IntegerField(
         help_text=_('Amount of this custom order (in DKK, including VAT).')

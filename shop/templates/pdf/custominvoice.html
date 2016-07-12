@@ -22,36 +22,26 @@
       <td>
         <b>Text
       <td>
-        <b>Quantity
-      <td>
         <b>Price
-      <td>
-        <b>Total
   <tr>
     <td>
       {{ invoice.customorder.text }}
-    <td>
-      1
-    <td align="right">
-      {{ invoice.customorder.amount|currency }}
     <td align="right">
       {{ invoice.customorder.amount|currency }}
 
   <tr>
-    <td colspan="2">
-    <td>
+    <td align="right">
       <strong>Danish VAT (25%)</strong>
     <td align="right">
       {{ invoice.customorder.vat|currency }}
 
   <tr>
-    <td colspan="2">
-    <td>
+    <td align="right">
       <strong>Total</strong>
     <td align="right">
       {{ invoice.customorder.amount|currency }}
 </table>
 <br>
 <p class="lead">
-Payment should be made by bank transfer to Arbejdernes Landsbank reg. 5371 account no. 0244504 within two weeks from {{ invoice.created|date:"b jS, Y" }} please. Thank you!
+Payment should be made by bank transfer to our account in Arbejdernes Landsbank reg. 5371 account no. 0244504 within two weeks from {{ invoice.created|date:"b jS, Y" }} please. Thank you!
 </p>
