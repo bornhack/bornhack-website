@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Villages | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<p>
+  If this is your first hackercamp the term 'Village' might be confusing but it
+  is fairly simple: a village is just a spot on the campsite where you and a
+  bunch of your friends/likeminded people camp together. Apart from peoples
+  individual tents which they sleep in, many villages bring a large common tent
+  where you can hack and hang out during the day.
+</p>
+
+<p class="lead">
+  <a href="https://bornhack.dk/shop/?category=villages">
+    It is also possible to rent a tent, chairs and tables for villages here.
+  </a>
+</p>
+
+{% if user.is_authenticated %}
+<a href="{% url 'villages:create' %}" class="btn btn-primary">Create a village</a>
+{% endif %}
+
+<hr />
+
+<table class="table table-hover table-condensed table-striped">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Public</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for village in villages %}
+    <tr>
+      <td>
+        <a href="{% url 'villages:detail' slug=village.slug %}">
+          {{ village.name }}
+        </a>
+      </td>
+      <td>
+        {{ village.description|truncatewords:50 }}
+      </td>
+      <td>
+        <i class="glyphicon glyphicon-{% if village.private %}remove{% else %}ok{% endif %}"></i>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

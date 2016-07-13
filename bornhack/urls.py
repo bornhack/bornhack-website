@@ -74,6 +74,10 @@ urlpatterns = [
         r'^news/',
         include('news.urls', namespace='news')
     ),
+    url(
+        r'^villages/',
+        include('villages.urls', namespace='villages')
+    ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ]

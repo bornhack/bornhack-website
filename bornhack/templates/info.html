@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
 
+{% block title %}
+Info | {{ block.super }}
+{% endblock %}
+
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock %}
@@ -201,16 +205,22 @@
         confusing but it is fairly simple: a village is just a spot on the
         campsite where you and a bunch of your friends/likeminded people camp
         together. Apart from peoples individual tents which they sleep in, many
-        villages bring a large common tent where you can hack and hang out during the day.
+        villages bring a large common tent where you can hack and hang out
+        during the day.
       </p>
-      <p>Villages can also rent village tents. The details are not in place yet,
-        but stay tuned for the announcement. The idea is that you order and pay
-        for a large tent which will then be setup and ready when you arrive. The
-        tents have wooden floors and you can rent folding tables and chairs as needed.
+      <p>Villages can also rent village tents via us, head over to the
+       <a href="{% url 'shop:index' %}?category=villages">
+         villages section of the shop</a>.
+       The tents will be ready for when you arrive and will be teared down
+       again saturday the 3rd of September at 12:00. The tents have optional
+       floors and you can rent folding tables and chairs as needed. You do not
+       have to register a village or have a concept to rent a big tent.
       </p>
-      <p>Village registration is not finished yet, but stay tuned! 
-        If you don't want to make your own village you will likely 
-        be able to find and join one that suits your interests.</p>
+      <p><a href="{% url 'villages:list' %}">You can register your village registration here</a>!
+        If you don't want to make your own village you will possibly be able to
+        find and join one that suits your interests.
+        Get in touch if you have any questions!
+      </p>
     </div>
   </div>
 
@@ -231,7 +241,6 @@
           <dt>Kiosk</dt>
           <dd>We sell a few beverages and sweets as well as practical things like coal for the barbeque. We will accept the same payment methods at the venue as we do on the website: cash, cards, and blockchain.</dd>
         </dl>
-      </p>
     </div>
   </div>
 

@@ -9,7 +9,7 @@ admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
 admin.site.register(models.Ticket)
-
+admin.site.register(models.CustomOrder)
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
@@ -41,6 +41,7 @@ class TicketInline(admin.TabularInline):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_order_form.html'
+    readonly_fields = ('paid',)
 
     def get_email(self, obj):
         return obj.user.email

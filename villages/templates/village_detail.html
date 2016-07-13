@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+
+{% block title %}
+Village: {{ village.name }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<h3>{{ village.name }}</h3>
+
+{{ village.description|commonmark }}
+
+{% if user == village.contact %}
+<hr />
+<a href="{% url 'villages:update' slug=village.slug %}" class="btn btn-primary">Edit</a>
+<a href="{% url 'villages:delete' slug=village.slug %}" class="btn btn-danger">Delete</a>
+{% endif %}
+
+{% endblock %}
