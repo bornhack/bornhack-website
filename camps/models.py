@@ -73,6 +73,12 @@ class Day(CreatedUpdatedModel, UUIDModel):
         help_text=_('What date?')
     )
 
+    def __str__(self):
+        return '{} {}'.format(
+            self.date,
+            self.camp
+        )
+
 
 class Expense(CreatedUpdatedModel, UUIDModel):
     class Meta:

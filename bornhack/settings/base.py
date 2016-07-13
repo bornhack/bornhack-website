@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'news',
     'utils',
     'villages',
+    'program',
 
     'allauth',
     'allauth.account',
