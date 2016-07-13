@@ -60,6 +60,7 @@ class Day(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = _('Day')
         verbose_name_plural = _('Days')
+        ordering = ['date']
 
     camp = models.ForeignKey(
         'camps.Camp',
@@ -74,9 +75,9 @@ class Day(CreatedUpdatedModel, UUIDModel):
     )
 
     def __str__(self):
-        return '{} {}'.format(
-            self.date,
-            self.camp
+        return '{} ({})'.format(
+            self.date.strftime('%A'),
+            self.date
         )
 
 

@@ -10,7 +10,19 @@ class EventTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        'title',
+        'event_type',
+        'get_days',
+        'start',
+        'end'
+    ]
+
+    def get_days(self, obj):
+        return ', '.join([
+            str(day.date.strftime('%a'))
+            for day in obj.days.all()
+        ])
 
 
 @admin.register(Speaker)
