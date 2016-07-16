@@ -1,11 +1,13 @@
+from django.http import Http404
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView
 )
-from .models import (
-    Village,
-)
+from django.views.generic.detail import SingleObjectMixin
+
+from .models import Village
 
 
 class VillageListView(ListView):
@@ -20,7 +22,7 @@ class VillageDetailView(DetailView):
     context_object_name = 'village'
 
 
-class VillageCreateView(CreateView):
+class VillageCreateView(LoginRequiredMixin, CreateView):
     model = Village
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
@@ -33,7 +35,21 @@ class VillageCreateView(CreateView):
         return HttpResponseRedirect(village.get_absolute_url())
 
 
-class VillageUpdateView(UpdateView):
+class EnsureUserOwnsVillageMixin(SingleObjectMixin):
+    model = Village
+
+    def dispatch(self, request, *args, **kwargs):
+        # If the user is not contact for this village OR is not staff
+        if not request.user.is_staff:
+            if self.get_object().contact != request.user:
+                raise Http404("Village not found")
+
+        return super(EnsureUserOwnsVillageMixin, self).dispatch(
+            request, *args, **kwargs
+        )
+
+
+class VillageUpdateView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, UpdateView):
     model = Village
     queryset = Village.objects.not_deleted()
     template_name = 'village_form.html'
@@ -43,7 +59,7 @@ class VillageUpdateView(UpdateView):
         return self.get_object().get_absolute_url()
 
 
-class VillageDeleteView(DeleteView):
+class VillageDeleteView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, DeleteView):
     model = Village
     success_url = reverse_lazy('villages:list')
     template_name = 'village_confirm_delete.html'
