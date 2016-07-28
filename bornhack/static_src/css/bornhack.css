@@ -113,3 +113,9 @@ footer {
 .nav li a {
    padding: 30px 7px;
 }
+
+.text-container {
+    display: flex;
+    align-items: center;
+    height: 200px;
+}
