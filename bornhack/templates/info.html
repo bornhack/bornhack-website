@@ -31,10 +31,12 @@ Info | {{ block.super }}
         Where is BornHack going to take place?
       </h2>
       <div id="map" class="map"></div>
-      <p>
-      <strong>Coordinates</strong>: 55.011520, 14.975360<br />
-      <strong>Address</strong>: Baunevej 11, 3720 Aakirkeby
-      </p>
+      <noscript>
+        <p>
+         <strong>Coordinates</strong>: 55.011520, 14.975360<br />
+         <strong>Address</strong>: Baunevej 11, 3720 Aakirkeby
+        </p>
+      </noscript>
     </div>
   </div>
 
@@ -258,5 +260,9 @@ Info | {{ block.super }}
 
     var camp_latlong = [55.011520, 14.975360];
     L.marker(camp_latlong).addTo(map);
+
+    L.marker(camp_latlong).addTo(map)
+      .bindPopup('<strong>Coordinates:</strong><br>55.011520, 14.975360<br><strong>Address:</strong><br>Baunevej 11, 3720 Aakirkeby')
+      .openPopup();
   </script>
 {% endblock %}
