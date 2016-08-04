@@ -8,6 +8,15 @@ class EventTypeAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Speaker)
+class SpeakerAdmin(admin.ModelAdmin):
+    pass
+
+
+class SpeakerInline(admin.StackedInline):
+    model = Speaker.events.through
+
+
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = [
@@ -15,7 +24,7 @@ class EventAdmin(admin.ModelAdmin):
         'event_type',
         'get_days',
         'start',
-        'end'
+        'end',
     ]
 
     def get_days(self, obj):
@@ -24,9 +33,9 @@ class EventAdmin(admin.ModelAdmin):
             for day in obj.days.all()
         ])
 
+    inlines = [
+        SpeakerInline
+    ]
 
-@admin.register(Speaker)
-class SpeakerAdmin(admin.ModelAdmin):
-    pass
 
 

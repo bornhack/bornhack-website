@@ -8,6 +8,8 @@ class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
     name = models.CharField(max_length=100)
     slug = models.SlugField()
+    color = models.CharField(max_length=50)
+    light_text = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -34,7 +36,8 @@ class Speaker(CreatedUpdatedModel):
     events = models.ManyToManyField(
         Event,
         related_name='speakers',
-        related_query_name='speaker'
+        related_query_name='speaker',
+        blank=True,
     )
 
     def __str__(self):

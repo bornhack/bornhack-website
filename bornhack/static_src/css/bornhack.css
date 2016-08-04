@@ -113,3 +113,10 @@ footer {
 .nav li a {
    padding: 30px 7px;
 }
+
+.event {
+    width: 100px;
+    display: inline-block;
+    margin: 0 5px;
+    padding: 5px;
+}

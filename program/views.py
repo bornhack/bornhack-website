@@ -1,26 +1,59 @@
 from collections import OrderedDict
 
-from django.views.generic import ListView
+import datetime
+from django.views.generic import ListView, TemplateView
 
 from camps.models import Day
 from . import models
 
 
-class ProgramView(ListView):
+class ProgramOverviewView(ListView):
     model = models.Event
-    template_name = 'program.html'
+    template_name = 'program_overview.html'
 
     def get_context_data(self, **kwargs):
         context = super(
-            ProgramView, self
+            ProgramOverviewView, self
         ).get_context_data(**kwargs)
 
         days = Day.objects.all()
+        context['days'] = days
 
-        context['days'] = OrderedDict([
-            (day, self.get_queryset().filter(days__in=[day]))
+        filter = {}
+        if 'type' in self.request.GET:
+            event_type = self.request.GET['type']
+            filter["event_type__slug"] = event_type
+
+        context['day_events'] = OrderedDict([
+            (
+                day,
+                self.get_queryset().filter(
+                    days__in=[day],
+                    **filter
+                ).order_by(
+                    'start'
+                )
+            )
             for day in days
         ])
 
+        context['event_types'] = models.EventType.objects.all()
+
+        return context
+
+
+class ProgramDayView(TemplateView):
+    template_name = 'program_day.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProgramDayView, self).get_context_data(**kwargs)
+        year = int(kwargs['year'])
+        month = int(kwargs['month'])
+        day = int(kwargs['day'])
+        date = datetime.date(year=year, month=month, day=day)
+        day = Day.objects.filter(date=date)
+        context['events'] = models.Event.objects.filter(days=day)
+        context['event_types'] = models.EventType.objects.all()
+        context['days'] = Day.objects.filter(date__year=year)
         return context
 

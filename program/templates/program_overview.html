@@ -1,0 +1,30 @@
+{% extends 'program_base.html' %}
+
+{% block program_content %}
+
+<a href="{% url 'program:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
+  All
+</a>
+{% for event_type in event_types %}
+<a href="{% url 'program:index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; {% if event_type.light_text %}color: white;{% endif %}; display: inline-block; padding: 5px;">
+  {{ event_type.name }}
+</a>
+{% endfor %}
+
+<hr />
+
+{% for day, events in day_events.items %}
+  {{ day.date|date:"D d/m" }} <br />
+  <div style="display: flex; flex-wrap: wrap;">
+    {% for event in events %}
+    <div class="event"
+         style="background-color: {{ event.event_type.color }}; border: 0; {% if event.event_type.light_text %}color: white;{% endif %};">
+      <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
+      {{ event }}
+    </div>
+    {% endfor %}
+  </div>
+<hr />
+{% endfor %}
+
+{% endblock %}
