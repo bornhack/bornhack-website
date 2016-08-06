@@ -10,47 +10,34 @@ Info | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-  <style>
-    .collapse {
-        display: block;
-    }
-  </style>
   <div class="row">
     <div class="col-md-12">
       <h2>When is BornHack happening?</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#when1">BornHack Opening</a>
-            </h4>
+            <h4 class="panel-title">BornHack Opening</h4>
           </div>
-          <div id="when1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack 2016 starts saturday, august 27th, at noon (12).
-                It will be possible to access the venue before noon if 
-                for example you arrive early in the morning with the ferry.
-                But please don't expect everything to be ready before noon :)
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              BornHack 2016 starts saturday, august 27th, at noon (12).
+              It will be possible to access the venue before noon if 
+              for example you arrive early in the morning with the ferry.
+              But please don't expect everything to be ready before noon :)
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#when2">BornHack Closing</a>
-            </h4>
+            <h4 class="panel-title">BornHack Closing</h4>
           </div>
-          <div id="when2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack 2016 ends saturday, september 3rd, at noon (12:00).
-                Rented village tents must be empty and cleaned at this time, 
-                ready to take down. Participants must leave the site no later
-                than 17:00 on the closing day (or stay and help us clean up).
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              BornHack 2016 ends saturday, september 3rd, at noon (12:00).
+              Rented village tents must be empty and cleaned at this time, 
+              ready to take down. Participants must leave the site no later
+              than 17:00 on the closing day (or stay and help us clean up).
+            </p>
           </div>
         </div>
       </div>
@@ -64,97 +51,89 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#where1">The Venue</a>
-            </h4>
+            <h4 class="panel-title">The Venue</h4>
           </div>
-          <div id="where1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <div id="map" class="map"></div>
-              <noscript>
-                <p>
-                 <strong>Venue coordinates</strong>: 55.011520, 14.975360<br />
-                 <strong>Parking space</strong>: Across from Bonaveddevejen 12, 3720 Aakirkeby<br />
-                 <strong>Main entrance</strong>: Next to Bonaveddevejen 12, 3720 Aakirkeby<br />
-                 <strong>Service entrance</strong>: Baunevej 11, 3720 Aakirkeby
-                </p>
-              </noscript>
-            </div>
+          <div class="panel-body">
+            <div id="map" class="map"></div>
+            <noscript>
+              <p>
+               <strong>Venue coordinates</strong>: 55.011520, 14.975360<br />
+               <strong>Parking space</strong>: Across from Bonaveddevejen 12, 3720 Aakirkeby<br />
+               <strong>Main entrance</strong>: Next to Bonaveddevejen 12, 3720 Aakirkeby<br />
+               <strong>Service entrance</strong>: Baunevej 11, 3720 Aakirkeby
+              </p>
+            </noscript>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#where2">Travel Information</a>
-            </h4>
+            <h4 class="panel-title">Travel Information</h4>
           </div>
-          <div id="where2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <h4>From/Via Copenhagen</h4>
-              <p>
-                There are several ways to get to Bornholm from Copenhagen.
-                A domestic plane departs from Copenhagen Airport, and you
-                can get from Copenhagen Central station by either bus or
-                train via Ystad or the Køge-Rønne ferry connection.
-              </p>
-              <dl>
-                <dt>Plane (very fast, most expensive)</dt>
-                <dd>
-                  You can check plane departures and book tickets at
-                  <a href="https://www.dat.dk/en/" target="_blank">dat.dk</a>. There are
-                  multiple departures daily. The flight takes approximately
-                  25 minutes.
-                </dd>
+          <div class="panel-body">
+            <h4>From/Via Copenhagen</h4>
+            <p>
+              There are several ways to get to Bornholm from Copenhagen.
+              A domestic plane departs from Copenhagen Airport, and you
+              can get from Copenhagen Central station by either bus or
+              train via Ystad or the Køge-Rønne ferry connection.
+            </p>
+            <dl>
+              <dt>Plane (very fast, most expensive)</dt>
+              <dd>
+                You can check plane departures and book tickets at
+                <a href="https://www.dat.dk/en/" target="_blank">dat.dk</a>. There are
+                multiple departures daily. The flight takes approximately
+                25 minutes.
+              </dd>
 
-                <dt>Via Ystad (quick, cheap and easy, crosses Sweden border)</dt>
-                <dd>
-                  You can drive over Øresundsbroen to Ystad or you can
-                  take the train/bus from Copenhagen Central Station. You
-                  can buy train and ferry ticket at
-                  <a href="http://www.dsb.dk/en/#open" target="_blank">dsb.dk</a> (Type
-                  in "København H" and "Rønne Havn"). More information
-                  about the <a href="http://www.faergen.com/services/fares/bornholmerfaergen/ystad-roenne.aspx" target="_blank">
-                  crossing</a>.
-                  The crossing takes 1 hour 20 minutes. In total about
-                  3 hours 15 minutes. Due to recent developments an ID
-                  (passport, drivers license or similar) is required when
-                  crossing the Denmark/Sweden border.
-                </dd>
+              <dt>Via Ystad (quick, cheap and easy, crosses Sweden border)</dt>
+              <dd>
+                You can drive over Øresundsbroen to Ystad or you can
+                take the train/bus from Copenhagen Central Station. You
+                can buy train and ferry ticket at
+                <a href="http://www.dsb.dk/en/#open" target="_blank">dsb.dk</a> (Type
+                in "København H" and "Rønne Havn"). More information
+                about the <a href="http://www.faergen.com/services/fares/bornholmerfaergen/ystad-roenne.aspx" target="_blank">
+                crossing</a>.
+                The crossing takes 1 hour 20 minutes. In total about
+                3 hours 15 minutes. Due to recent developments an ID
+                (passport, drivers license or similar) is required when
+                crossing the Denmark/Sweden border.
+              </dd>
 
-                <dt>Via Køge (cheap, slow)</dt>
-                <dd>
-                  Take the S-train to Køge Station (you need an "all zones"
-                  ticket) or travel by car. The ferry terminal is within
-                  walking distance from the station. You can check out
-                  prices
-                  <a href="http://www.faergen.com/services/fares/bornholmerfaergen/koege-roenne.aspx" target="_blank">here</a>.
-                  It takes approximately 1 hour to get to Køge. The crossing
-                  takes 5 hours 30 minutes.
-                </dd>
-              </dl>
+              <dt>Via Køge (cheap, slow)</dt>
+              <dd>
+                Take the S-train to Køge Station (you need an "all zones"
+                ticket) or travel by car. The ferry terminal is within
+                walking distance from the station. You can check out
+                prices
+                <a href="http://www.faergen.com/services/fares/bornholmerfaergen/koege-roenne.aspx" target="_blank">here</a>.
+                It takes approximately 1 hour to get to Køge. The crossing
+                takes 5 hours 30 minutes.
+              </dd>
+            </dl>
 
-              <h4>From Abroad</h4>
-              <p>If you are going to BornHack from abroad you have different options as well.</p>
-              <dl>
-                <dt>Sassnitz (Germany)</dt>
-                <dd>
-                  There is a direct ferry taking cars going from 
-                  <a href="http://www.faergen.com/services/fares/bornholmerfaergen/sassnitz-roenne.aspx" target="_blank">Sassnitz</a>.
-                </dd>
+            <h4>From Abroad</h4>
+            <p>If you are going to BornHack from abroad you have different options as well.</p>
+            <dl>
+              <dt>Sassnitz (Germany)</dt>
+              <dd>
+                There is a direct ferry taking cars going from 
+                <a href="http://www.faergen.com/services/fares/bornholmerfaergen/sassnitz-roenne.aspx" target="_blank">Sassnitz</a>.
+              </dd>
 
-                <dt>Kolobrzeg (Poland)</dt>
-                <dd>
-                  There is a passenger ferry from Kolobrzeg to Nexø havn.
-                </dd>
-              </dl>
-              <h4>Getting from Rønne to the Venue</h4>
-              <p>
-                The venue is 24km from Rønne. We will have a shuttle bus
-                that will pick people up and take them to the venue. It is 
-                also possible to take a public bus to near the venue. Local 
-                taxis can also get you here.
-              </p>
-            </div>
+              <dt>Kolobrzeg (Poland)</dt>
+              <dd>
+                There is a passenger ferry from Kolobrzeg to Nexø havn.
+              </dd>
+            </dl>
+            <h4>Getting from Rønne to the Venue</h4>
+            <p>
+              The venue is 24km from Rønne. We will have a shuttle bus
+              that will pick people up and take them to the venue. It is 
+              also possible to take a public bus to near the venue. Local 
+              taxis can also get you here.
+            </p>
           </div>
         </div>
       </div>
@@ -168,38 +147,30 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#sleep1">Camping</a>
-            </h4>
+            <h4 class="panel-title">Camping</h4>
           </div>
-          <div id="sleep1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack is first and foremost a tent camp. You need to 
-                bring a tent to sleep in. Most people go with some friends 
-                and make a camp somewhere at the venue. See also the section 
-                on Villages - you might be able to find some likeminded
-                people to camp with.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              BornHack is first and foremost a tent camp. You need to 
+              bring a tent to sleep in. Most people go with some friends 
+              and make a camp somewhere at the venue. See also the section 
+              on Villages - you might be able to find some likeminded
+              people to camp with.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#sleep2">Cabins</a>
-            </h4>
+            <h4 class="panel-title">Cabins</h4>
           </div>
-          <div id="sleep2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                We rent out a few cabins at the venue with 8 beds each 
-                for people who don't want to sleep in tents for some 
-                reason. A tent is the cheapest sleeping option (you just need
-                a ticket), but <a href="/shop/?category=cabins">the cabins 
-                are there</a> if you want them.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              We rent out a few cabins at the venue with 8 beds each 
+              for people who don't want to sleep in tents for some 
+              reason. A tent is the cheapest sleeping option (you just need
+              a ticket), but <a href="/shop/?category=cabins">the cabins 
+              are there</a> if you want them.
+            </p>
           </div>
         </div>
       </div>
@@ -213,68 +184,52 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#power1">Power</a>
-            </h4>
+            <h4 class="panel-title">Power</h4>
           </div>
-          <div id="power1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                We are working on sorting out the details. Plugs will be standard 
-                European 230V supply with type <a href="http://www.worldstandards.eu/electricity/plugs-and-sockets/" target="_blank">K plugs</a>.
-                Standard red 400V 16A CEE plugs will also be possible.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              We are working on sorting out the details. Plugs will be standard 
+              European 230V supply with type <a href="http://www.worldstandards.eu/electricity/plugs-and-sockets/" target="_blank">K plugs</a>.
+              Standard red 400V 16A CEE plugs will also be possible.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#power2">Wired Network</a>
-            </h4>
+            <h4 class="panel-title">Wired Network</h4>
           </div>
-          <div id="power2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack will have a wired and a wireless network. The wired
-                network will run with public internet addresses (v6 and v6)
-                so you must protect yourself with a firewall at all times.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              BornHack will have a wired and a wireless network. The wired
+              network will run with public internet addresses (v6 and v6)
+              so you must protect yourself with a firewall at all times.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#power3">Wireless Network</a>
-            </h4>
+            <h4 class="panel-title">Wireless Network</h4>
           </div>
-          <div id="power3" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                There will be two wireless networks, one with public
-                addresses like the wired, and one which is behind NAT for 
-                ipv4 a stateful firewall for ipv6. The security on the
-                wireless network will be EAP-TLS where any credentials
-                will work.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              There will be two wireless networks, one with public
+              addresses like the wired, and one which is behind NAT for 
+              ipv4 a stateful firewall for ipv6. The security on the
+              wireless network will be EAP-TLS where any credentials
+              will work.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#power4">Bandwidth and Uplink</a>
-            </h4>
+            <h4 class="panel-title">Bandwidth and Uplink</h4>
           </div>
-          <div id="power4" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack will have a 1 gigabit fibre uplink to the outside
-                world generously sponsored by BornFiber. We will have plenty
-                of IP space to go around, courtesy of RIPE.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              BornHack will have a 1 gigabit fibre uplink to the outside
+              world generously sponsored by BornFiber. We will have plenty
+              of IP space to go around, courtesy of RIPE.
+            </p>
           </div>
         </div>
       </div>
@@ -288,48 +243,40 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#bar1">The Bar</a>
-            </h4>
+            <h4 class="panel-title">The Bar</h4>
           </div>
-          <div id="bar1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                The bar area is the place to go when you are all hacked out and want
-                to socialize with the other participants. Enjoy a cold beer or drink
-                and some music, and discuss your projects with the people around you.
-              </p>
-              <p>
-                The bar will be run with an open budget and flexible prices. More on
-                that later.
-              </p>
-              <p>
-                Opening hours of the bar have not been decided yet (but they will be
-                compatible with the average hackers sleep cycle).
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              The bar area is the place to go when you are all hacked out and want
+              to socialize with the other participants. Enjoy a cold beer or drink
+              and some music, and discuss your projects with the people around you.
+            </p>
+            <p>
+              The bar will be run with an open budget and flexible prices. More on
+              that later.
+            </p>
+            <p>
+              Opening hours of the bar have not been decided yet (but they will be
+              compatible with the average hackers sleep cycle).
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#bar2">The Noisy Area</a>
-            </h4>
+            <h4 class="panel-title">The Noisy Area</h4>
           </div>
-          <div id="bar2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                Surrounding the bar area is the noisy area. This is where
-                you should place your tent / camp / village if you expect to
-                make a lot of noise, especially at nighttime. Coversely the
-                noisy area is a bad place to stay if you value peace and
-                quite at night.
-              </p>
-              <p>
-                The noisy area forms square from top left I17 to bottom 
-                right Q23 on the map.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              Surrounding the bar area is the noisy area. This is where
+              you should place your tent / camp / village if you expect to
+              make a lot of noise, especially at nighttime. Coversely the
+              noisy area is a bad place to stay if you value peace and
+              quite at night.
+            </p>
+            <p>
+              The noisy area forms square from top left I17 to bottom 
+              right Q23 on the map.
+            </p>
           </div>
         </div>
       </div>
@@ -343,59 +290,47 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#village1">What is a Village?</a>
-            </h4>
+            <h4 class="panel-title">What is a Village?</h4>
           </div>
-          <div id="village1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>If this is your first hackercamp the term 'Village' might
-                be confusing but it is fairly simple: a village is just a 
-                spot on the campsite where you and a bunch of your 
-                friends/likeminded people camp together. Apart from 
-                peoples individual tents which they sleep in, many
-                villages bring a large common tent where you can hack 
-                and hang out during the day.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>If this is your first hackercamp the term 'Village' might
+              be confusing but it is fairly simple: a village is just a 
+              spot on the campsite where you and a bunch of your 
+              friends/likeminded people camp together. Apart from 
+              peoples individual tents which they sleep in, many
+              villages bring a large common tent where you can hack 
+              and hang out during the day.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#village2">Renting Village Tents</a>
-            </h4>
+            <h4 class="panel-title">Renting Village Tents</h4>
           </div>
-          <div id="village2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                Villages can also rent village tents via us, head over to 
-                the <a href="{% url 'shop:index' %}?category=villages">
-                villages section of the shop</a>. The tents will be ready 
-                when you arrive and will be taken down again saturday the 
-                3rd of September from 12:00. The tents have optional floors 
-                and you can rent folding tables and chairs as needed. You do 
-                not have to register a village or have a concept to rent a big 
-                tent.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              Villages can also rent village tents via us, head over to 
+              the <a href="{% url 'shop:index' %}?category=villages">
+              villages section of the shop</a>. The tents will be ready 
+              when you arrive and will be taken down again saturday the 
+              3rd of September from 12:00. The tents have optional floors 
+              and you can rent folding tables and chairs as needed. You do 
+              not have to register a village or have a concept to rent a big 
+              tent.
+            </p>
           </div>
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#village3">Registering a Village</a>
-            </h4>
+            <h4 class="panel-title">Registering a Village</h4>
           </div>
-          <div id="village3" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p><a href="{% url 'villages:list' %}">You can register your village here</a>!
-                If you don't want to make your own village you might be able to
-                find and join one that suits your interests. Get in touch with the
-                <a href="mailto:villages@bornhack.org">villages team</a> if you have 
-                any questions!
-              </p>
-            </div>
+          <div class="panel-body">
+            <p><a href="{% url 'villages:list' %}">You can register your village here</a>!
+              If you don't want to make your own village you might be able to
+              find and join one that suits your interests. Get in touch with the
+              <a href="mailto:villages@bornhack.org">villages team</a> if you have 
+              any questions!
+            </p>
           </div>
         </div>
       </div>
@@ -408,120 +343,99 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#food1">Food Vendors</a>
-            </h4>
+            <h4 class="panel-title">Food Vendors</h4>
           </div>
-          <div id="food1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                We are lucky enough to have a local food vendor (from the town 
-                Nexø) at the venue. He sells high quality sausages and burgers, 
-                Danish style. We are also looking into an agreement with a
-                nearby pizza delivery place. More on that later.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              We are lucky enough to have a local food vendor (from the town 
+              Nexø) at the venue. He sells high quality sausages and burgers, 
+              Danish style. We are also looking into an agreement with a
+              nearby pizza delivery place. More on that later.
+            </p>
           </div>
         </div>
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#food2">Cooking</a>
-            </h4>
+            <h4 class="panel-title">Cooking</h4>
           </div>
-          <div id="food2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                We know that hackers like to cook for themselves, not just 
-                because of vegetarians/vegan diets. Everyone is encouraged
-                to cook their own food, either in their own village kitchen 
-                or in the food area. Please note that coal powered barbeques 
-                are <b>strictly forbidden</b> on the camp grounds for fire 
-                safety reasons. If you want to cook with coal use the big 
-                barbeque in the food area! Gas and electrical barbeques are 
-                allowed in villages.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              We know that hackers like to cook for themselves, not just 
+              because of vegetarians/vegan diets. Everyone is encouraged
+              to cook their own food, either in their own village kitchen 
+              or in the food area. Please note that coal powered barbeques 
+              are <b>strictly forbidden</b> on the camp grounds for fire 
+              safety reasons. If you want to cook with coal use the big 
+              barbeque in the food area! Gas and electrical barbeques are 
+              allowed in villages.
+            </p>
           </div>
         </div>
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#food3">The Food Area</a>
-            </h4>
+            <h4 class="panel-title">The Food Area</h4>
           </div>
-          <div id="food3" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                Part of the food area is a large outdoor kitchen area
-                where participants are invited to cook their meals.
-                <ul>
-                  <li>Lots of seating, both with and without rain protection</li>
-                  <li>An outdoor kitchen (meaning running water and tables for food preparation). You must bring your own dishes and other cooking/eating equipment.</li>
-                  <li>Ample barbeque capacity, including a barbeque exclusive to vegans/vegetatians. We sell charcoal in the kiosk.</li>
-                </ul>
-                Villages without a kitchen of their own are invited to utilize 
-                this area for cooking. Please clean up after yourselves! :)
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              Part of the food area is a large outdoor kitchen area
+              where participants are invited to cook their meals.
+              <ul>
+                <li>Lots of seating, both with and without rain protection</li>
+                <li>An outdoor kitchen (meaning running water and tables for food preparation). You must bring your own dishes and other cooking/eating equipment.</li>
+                <li>Ample barbeque capacity, including a barbeque exclusive to vegans/vegetatians. We sell charcoal in the kiosk.</li>
+              </ul>
+              Villages without a kitchen of their own are invited to utilize 
+              this area for cooking. Please clean up after yourselves! :)
+            </p>
+          </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h4 class="panel-title">Buying Groceries</h4>
+          </div>
+          <div class="panel-body">
+            <p>
+              The closest place to buy groceries is a small place 
+              approximately 3.5 km away at Pedersker. About 7 km from 
+              the venue there is a larger selection at Aakirkeby. About 20km
+              from the venue at Nexø there is an even larger selection still.
+              We have a shuttle bus that will transport participants to and 
+              from grocery shopping, free of charge.
+            </p>
           </div>
         </div>
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#food4">Buying Groceries</a>
-            </h4>
+            <h4 class="panel-title">The Shop/Kiosk</h4>
           </div>
-          <div id="food4" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                The closest place to buy groceries is a small place 
-                approximately 3.5 km away at Pedersker. About 7 km from 
-                the venue there is a larger selection at Aakirkeby. About 20km
-                from the venue at Nexø there is an even larger selection still.
-                We have a shuttle bus that will transport participants to and 
-                from grocery shopping, free of charge.
-              </p>
-            </div>
-          </div>
-        </div>
+          <div class="panel-body">
+            <p>
+              BornHack will have a shop/kiosk where you can buy a small
+              selection of stuff you might need. We sell candy and a bit
+              of food, softdrinks, charcoal for the barbeques, network 
+              cables, power adapters, power adapters, a small selection of 
+              electronics, and so on.
+            </p>
 
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#food5">The Shop/Kiosk</a>
-            </h4>
-          </div>
-          <div id="food5" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                BornHack will have a shop/kiosk where you can buy a small
-                selection of stuff you might need. We sell candy and a bit
-                of food, softdrinks, charcoal for the barbeques, network 
-                cables, power adapters, power adapters, a small selection of 
-                electronics, and so on.
-              </p>
+            <p>
+              The kiosk will also sell coffee (freshly ground quality beans) 
+              and tea. We also have an agreement with a local quality bakery 
+              which will deliver a selection of fresh bread every morning. 
+              Apart from what we sell in the shop you will be able to order
+              bread the day before and it will be ready for you in the morning.
+            </p>
 
-              <p>
-                The kiosk will also sell coffee (freshly ground quality beans) 
-                and tea. We also have an agreement with a local quality bakery 
-                which will deliver a selection of fresh bread every morning. 
-                Apart from what we sell in the shop you will be able to order
-                bread the day before and it will be ready for you in the morning.
-              </p>
-
-              <p>
-                The kiosk will be open from 8:00 in the morning (so hackers
-                can get their morning coffee) until 20:00 in the evening. After
-                20:00 you can still get coffee, tea and softdrinks at the bar. 
-                But make sure you buy anything else you might need before 20:00 
-                (charcoal for cooking late, or snacks for the the evening/night,
-                or those LEDs you will need for a project later, and so on).
-              </p>
-            </div>
+            <p>
+              The kiosk will be open from 8:00 in the morning (so hackers
+              can get their morning coffee) until 20:00 in the evening. After
+              20:00 you can still get coffee, tea and softdrinks at the bar. 
+              But make sure you buy anything else you might need before 20:00 
+              (charcoal for cooking late, or snacks for the the evening/night,
+              or those LEDs you will need for a project later, and so on).
+            </p>
           </div>
         </div>
       </div>
@@ -535,51 +449,43 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#infocert1">Infodesk</a>
-            </h4>
+            <h4 class="panel-title">Infodesk</h4>
           </div>
-          <div id="infocert1" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                The infodesk is where you go to find an organizer when you
-                have questions of any kind. The infodesk is also where you 
-                go to:
-                <ul>
-                  <li>Book a ride on the shuttle bus</li>
-                  <li>Book one (or more) of the ten available BornHack bicycles</li>
-                  <li>Get any merchandise you bought</li>
-                </ul>
-              </p>
-              <p>
-                The infodesk is located around M15 on the map (right 
-                outside the food area in the direction towards the bar).
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              The infodesk is where you go to find an organizer when you
+              have questions of any kind. The infodesk is also where you 
+              go to:
+              <ul>
+                <li>Book a ride on the shuttle bus</li>
+                <li>Book one (or more) of the ten available BornHack bicycles</li>
+                <li>Get any merchandise you bought</li>
+              </ul>
+            </p>
+            <p>
+              The infodesk is located around M15 on the map (right 
+              outside the food area in the direction towards the bar).
+            </p>
           </div>
         </div>
     
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">
-              <a data-toggle="collapse" href="#infocert2">CERT</a>
-            </h4>
+            <h4 class="panel-title">CERT</h4>
           </div>
-          <div id="infocert2" class="panel-collapse collapse">
-            <div class="panel-body">
-              <p>
-                CERT is short for Community Emergency Response Team.
-                In case of a dangerous situation (accidents, fire and so on)
-                these are the people to contact.
-              </p>
-              <p>
-                While the infodesk is open (from 10:00 to 20:00 every day)
-                the CERT people can be reached here. Outside infodesk
-                opening hours CERT can be reached at the official BornHack
-                phonenumber which is +4593863720. This number is open 24
-                hours.
-              </p>
-            </div>
+          <div class="panel-body">
+            <p>
+              CERT is short for Community Emergency Response Team.
+              In case of a dangerous situation (accidents, fire and so on)
+              these are the people to contact.
+            </p>
+            <p>
+              While the infodesk is open (from 10:00 to 20:00 every day)
+              the CERT people can be reached here. Outside infodesk
+              opening hours CERT can be reached at the official BornHack
+              phonenumber which is +4593863720. This number is open 24
+              hours.
+            </p>
           </div>
         </div>
       </div>
