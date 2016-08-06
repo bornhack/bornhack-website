@@ -10,6 +10,15 @@ Info | {{ block.super }}
 {% endblock %}
 
 {% block content %}
+  <style>
+    .anchor{
+      display: block;
+      height: 80px; /*same height as header*/
+      margin-top: -80px; /*same height as header*/
+      visibility: hidden;
+    }
+  </style>
+
   <div class="row">
     <div class="col-md-12">
       <h2>Table of Contents</h2>
@@ -28,9 +37,10 @@ Info | {{ block.super }}
     </div>
   </div>
 
+  <span class="anchor" id="when"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="when">When is BornHack happening?</a></h2>
+      <h2>When is BornHack happening?</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -63,9 +73,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="where"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="where">Where is BornHack going to take place?</a></h2>
+      <h2>Where is BornHack going to take place?</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -88,9 +99,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="travel"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="travel">Travel Information</a></h2>
+      <h2>Travel Information</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -187,9 +199,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="sleep"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="sleep">Where do I sleep?</a></h2>
+      <h2>Where do I sleep?</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -224,9 +237,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="power"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="power">Power and Connectivity</a></h2>
+      <h2>Power and Connectivity</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -284,9 +298,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="bar"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="bar">Bar Area</a></h2>
+      <h2>Bar Area</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -331,9 +346,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="villages"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="villages">Villages</a></h2>
+      <h2>Villages</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -385,9 +401,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="food"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="food">Food, Drink and Groceries</a></h2>
+      <h2>Food, Drink and Groceries</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
@@ -503,9 +520,10 @@ Info | {{ block.super }}
   </div>
 
 
+  <span class="anchor" id="info"></span>
   <div class="row">
     <div class="col-md-12">
-      <h2><a name="info">Infodesk and CERT</a></h2>
+      <h2>Infodesk and CERT</h2>
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
