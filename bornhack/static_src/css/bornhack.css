@@ -122,3 +122,9 @@ footer {
     padding: 5px;
     flex: 1 1 auto;
 }
+
+.event:hover {
+    background-color: black !important;
+    color: white !important;
+    text-decoration: none;
+}

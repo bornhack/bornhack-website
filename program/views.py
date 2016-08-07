@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 import datetime
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, DetailView
 
 from camps.models import Day
 from . import models
@@ -57,3 +57,13 @@ class ProgramDayView(TemplateView):
         context['days'] = Day.objects.filter(date__year=year)
         return context
 
+
+class EventDetailView(DetailView):
+    model = models.Event
+    template_name = 'program_event_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(EventDetailView, self).get_context_data(**kwargs)
+        # TODO: date__year is hardcoded here - need fix for 2017 :P
+        context['days'] = Day.objects.filter(date__year=2016)
+        return context

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.text import slugify
+
 from utils.models import CreatedUpdatedModel
 
 
@@ -18,7 +20,8 @@ class EventType(CreatedUpdatedModel):
 class Event(CreatedUpdatedModel):
     """ Something that is on the program. """
     title = models.CharField(max_length=255)
-    description = models.TextField()
+    slug = models.SlugField(blank=True, max_length=255)
+    abstract = models.TextField()
     event_type = models.ForeignKey(EventType)
     days = models.ManyToManyField('camps.Day')
     start = models.TimeField()
@@ -26,6 +29,11 @@ class Event(CreatedUpdatedModel):
 
     def __str__(self):
         return self.title
+
+    def save(self, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super(Event, self).save(**kwargs)
 
 
 class Speaker(CreatedUpdatedModel):
