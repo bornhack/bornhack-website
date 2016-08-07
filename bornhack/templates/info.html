@@ -572,6 +572,13 @@ Info | {{ block.super }}
               network will run with public internet addresses (v4 and v6)
               so you must protect yourself with a firewall at all times.
             </p>
+            <p>
+              The wired network will be split in two parts where one uses
+              static, manually configured IP addresses, and the other uses
+              dynamic (DHCP) allocation. If you want to set up servers with
+              static IP's you should use the static network. You can also use
+              static configuration on clients to avoid attacks involving
+              rogue DHCP servers and similar.
           </div>
         </div>
         <div class="panel panel-default">
