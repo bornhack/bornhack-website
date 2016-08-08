@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p class="lead">
+  An alphabetical list of all speakers, workshop hosts and other 
+  event anchors at BornHack 2016.
+</p>
+
+<div class="list-group">
+  {% for speaker in speaker_list %}
+  <a href="{% url 'program:speaker_detail' slug=speaker.slug %}" class="list-group-item">
+    {{ speaker.name }}
+  </a>
+  {% endfor %}
+</div>
+{% endblock content %}

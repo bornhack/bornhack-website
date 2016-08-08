@@ -23,9 +23,12 @@ class Event(CreatedUpdatedModel):
     slug = models.SlugField(blank=True, max_length=255)
     abstract = models.TextField()
     event_type = models.ForeignKey(EventType)
-    days = models.ManyToManyField('camps.Day')
-    start = models.TimeField()
-    end = models.TimeField()
+    days = models.ManyToManyField('camps.Day', null=True, blank=True)
+    start = models.TimeField(null=True, blank=True)
+    end = models.TimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['title']
 
     def __str__(self):
         return self.title
@@ -41,6 +44,7 @@ class Speaker(CreatedUpdatedModel):
     name = models.CharField(max_length=150)
     biography = models.TextField()
     picture = models.ImageField(null=True, blank=True)
+    slug = models.SlugField(blank=True, max_length=255)
     events = models.ManyToManyField(
         Event,
         related_name='speakers',
@@ -48,5 +52,14 @@ class Speaker(CreatedUpdatedModel):
         blank=True,
     )
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Event, self).save(**kwargs)
+

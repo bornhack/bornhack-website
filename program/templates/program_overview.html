@@ -1,6 +1,9 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
+<a href="{% url 'call-for-speakers' %}" class="btn">Call for Speakers</a>
+<a href="{% url 'program:speakers_index' %}" class="btn">Speakers</a>
+<a href="{% url 'program:events_index' %}" class="btn">Talks &amp; Events</a>
 
 <a href="{% url 'program:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
   All

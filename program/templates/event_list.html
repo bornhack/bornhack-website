@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p class="lead">
+  An alphabetical list of all talks, workshops, keynotes and other events
+  at BornHack 2016.
+</p>
+
+<div class="list-group">
+  {% for event in event_list %}
+  <a href="{% url 'program:event' slug=event.slug %}" class="list-group-item">
+    {{ event.title }}
+  </a>
+  {% endfor %}
+</div>
+{% endblock content %}
