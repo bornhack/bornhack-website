@@ -10,7 +10,7 @@
   {% for speaker in speaker_list %}
   <a href="{% url 'schedule:speaker_detail' slug=speaker.slug %}" class="list-group-item">
     {{ speaker.name }}
-  </a>
+  </a> ({{ speaker.events.all.count }} event{{ speaker.events.all.count|pluralize }})
   {% endfor %}
 </div>
 {% endblock content %}
