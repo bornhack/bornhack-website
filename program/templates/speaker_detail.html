@@ -11,7 +11,7 @@
 {% if speaker.events.exists %}
 {% for event in speaker.events.all %}
 
-  <h3>{{ event.title }}</h3>
+  <h3><a href="{% url 'schedule:event' slug=event.slug %}">{{ event.title }}</a></h3>
   {{ event.abstract|commonmark }}
 
 {% endfor %}

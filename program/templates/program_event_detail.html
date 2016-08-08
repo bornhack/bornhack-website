@@ -26,7 +26,7 @@ Not scheduled yet
 {% if event.speakers.exists %}
 {% for speaker in event.speakers.all %}
 
-  <h3>{{ speaker }}</h3>
+  <h3><a href="{% url 'schedule:speaker_detail' slug=speaker.slug %}">{{ speaker }}</a></h3>
   {{ speaker.biography|commonmark }}
 
 {% endfor %}
