@@ -78,6 +78,10 @@ urlpatterns = [
         r'^villages/',
         include('villages.urls', namespace='villages')
     ),
+    url(
+        r'^program/',
+        include('program.urls', namespace='program')
+    ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ]

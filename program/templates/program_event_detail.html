@@ -1,0 +1,32 @@
+{% extends 'program_base.html' %}
+{% load commonmark %}
+
+{% block program_content %}
+
+<h3>
+  <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+    {{ event.event_type.name }}
+  </small>
+  {{ event.title }}
+</h3>
+
+<h4>
+  {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} at
+  {% for day in event.days.all %}{{ day.date|date:"l" }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+</h4>
+
+{{ event.abstract|commonmark }}
+
+<hr />
+
+{% if event.speakers.exists %}
+{% for speaker in event.speakers.all %}
+
+  <h3>{{ speaker }}</h3>
+  {{ speaker.biography|commonmark }}
+
+{% endfor %}
+
+{% endif %}
+
+{% endblock %}

@@ -60,6 +60,7 @@ class Day(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = _('Day')
         verbose_name_plural = _('Days')
+        ordering = ['date']
 
     camp = models.ForeignKey(
         'camps.Camp',
@@ -72,6 +73,12 @@ class Day(CreatedUpdatedModel, UUIDModel):
         verbose_name=_('Date'),
         help_text=_('What date?')
     )
+
+    def __str__(self):
+        return '{} ({})'.format(
+            self.date.strftime('%A'),
+            self.date
+        )
 
 
 class Expense(CreatedUpdatedModel, UUIDModel):
