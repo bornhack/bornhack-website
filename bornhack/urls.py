@@ -38,27 +38,27 @@ urlpatterns = [
         name='frontpage'
     ),
     url(
-        r'info/',
+        r'^info/',
         TemplateView.as_view(template_name='info.html'),
         name='info'
     ),
     url(
-        r'contact/',
+        r'^contact/',
         TemplateView.as_view(template_name='contact.html'),
         name='contact'
     ),
     url(
-        r'conduct/',
+        r'^conduct/',
         TemplateView.as_view(template_name='coc.html'),
         name='conduct'
     ),
     url(
-        r'sponsors/',
+        r'^sponsors/',
         TemplateView.as_view(template_name='sponsors.html'),
         name='call-for-sponsors'
     ),
     url(
-        r'speakers/',
+        r'^speakers/',
         TemplateView.as_view(template_name='speakers.html'),
         name='call-for-speakers'
     ),
@@ -73,12 +73,12 @@ urlpatterns = [
         name='account_logout',
     ),
     url(
-        r'privacy-policy/$',
+        r'^privacy-policy/$',
         TemplateView.as_view(template_name='legal/privacy_policy.html'),
         name='privacy-policy'
     ),
     url(
-        r'general-terms-and-conditions/$',
+        r'^general-terms-and-conditions/$',
         TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'),
         name='general-terms'
     ),
