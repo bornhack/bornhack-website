@@ -61,5 +61,5 @@ class Speaker(CreatedUpdatedModel):
     def save(self, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super(Event, self).save(**kwargs)
+        super(Speaker, self).save(**kwargs)
 
