@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'schedule_base.html' %}
 
-{% block content %}
+{% block schedule_content %}
 
 <a href="{% url 'schedule:index' %}" class="btn btn-default" style="display: inline-block; padding: 5px;">
   Overview
@@ -18,6 +18,6 @@
 <hr />
 
 {% block program_content %}
-{% endblock %}
+{% endblock program_content %}
 
-{% endblock %}
+{% endblock schedule_content %}

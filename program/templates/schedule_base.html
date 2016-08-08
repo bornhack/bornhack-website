@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>
+  <a href="{% url 'schedule:index' %}" class="btn btn-default">Schedule</a>
+  <a href="{% url 'call-for-speakers' %}" class="btn btn-default">Call for Speakers</a>
+  <a href="{% url 'schedule:speaker_index' %}" class="btn btn-default">Speakers</a>
+  <a href="{% url 'schedule:event_index' %}" class="btn btn-default">Talks &amp; Events</a>
+</p>
+
+<hr />
+
+{% block schedule_content %}
+{% endblock schedule_content %}
+
+{% endblock content %}
