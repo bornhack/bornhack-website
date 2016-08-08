@@ -2,14 +2,14 @@
 
 {% block program_content %}
 <a href="{% url 'call-for-speakers' %}" class="btn">Call for Speakers</a>
-<a href="{% url 'program:speakers_index' %}" class="btn">Speakers</a>
-<a href="{% url 'program:events_index' %}" class="btn">Talks &amp; Events</a>
+<a href="{% url 'schedule:speakers_index' %}" class="btn">Speakers</a>
+<a href="{% url 'schedule:events_index' %}" class="btn">Talks &amp; Events</a>
 
-<a href="{% url 'program:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
+<a href="{% url 'schedule:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
   All
 </a>
 {% for event_type in event_types %}
-<a href="{% url 'program:index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+<a href="{% url 'schedule:index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
   {{ event_type.name }}
 </a>
 {% endfor %}
@@ -21,7 +21,7 @@
   <div style="display: flex; flex-wrap: wrap;">
     {% for event in events %}
     <a class="event"
-       href="{% url 'program:event' slug=event.slug %}"
+       href="{% url 'schedule:event' slug=event.slug %}"
        style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
       <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
       <br />

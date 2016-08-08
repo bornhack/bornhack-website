@@ -10,7 +10,7 @@
   {% endifchanged %}
 
     <a class="event"
-         href="{% url 'program:event' slug=event.slug %}"
+         href="{% url 'schedule:event' slug=event.slug %}"
          style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
       <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
       <br />

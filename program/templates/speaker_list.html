@@ -8,7 +8,7 @@
 
 <div class="list-group">
   {% for speaker in speaker_list %}
-  <a href="{% url 'program:speaker_detail' slug=speaker.slug %}" class="list-group-item">
+  <a href="{% url 'schedule:speaker_detail' slug=speaker.slug %}" class="list-group-item">
     {{ speaker.name }}
   </a>
   {% endfor %}
