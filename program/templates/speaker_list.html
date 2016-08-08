@@ -9,8 +9,8 @@
 <div class="list-group">
   {% for speaker in speaker_list %}
   <a href="{% url 'schedule:speaker_detail' slug=speaker.slug %}" class="list-group-item">
-    {{ speaker.name }}
-  </a> ({{ speaker.events.all.count }} event{{ speaker.events.all.count|pluralize }})
+    {{ speaker.name }} ({{ speaker.events.all.count }} event{{ speaker.events.all.count|pluralize }})
+  </a>
   {% endfor %}
 </div>
 {% endblock schedule_content %}
