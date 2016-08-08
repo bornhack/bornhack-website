@@ -22,6 +22,11 @@
       <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
       <br />
       {{ event }}
+      <br />
+      {% if event.speakers.exists %}
+      <i>by {{ event.speakers.all|join:", " }}
+    {% endif %}</i>
+
     </a>
     {% endfor %}
   </div>
