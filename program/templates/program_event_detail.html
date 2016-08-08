@@ -11,8 +11,12 @@
 </h3>
 
 <h4>
-  {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} at
+{% if event.start and event.end and event.days.all.exists %}
+  {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} on
   {% for day in event.days.all %}{{ day.date|date:"l" }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+{% else %}
+Not scheduled yet
+{% endif %}
 </h4>
 
 {{ event.abstract|commonmark }}
