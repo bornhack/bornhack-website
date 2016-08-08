@@ -23,7 +23,7 @@ class Event(CreatedUpdatedModel):
     slug = models.SlugField(blank=True, max_length=255)
     abstract = models.TextField()
     event_type = models.ForeignKey(EventType)
-    days = models.ManyToManyField('camps.Day', null=True, blank=True)
+    days = models.ManyToManyField('camps.Day', blank=True)
     start = models.TimeField(null=True, blank=True)
     end = models.TimeField(null=True, blank=True)
 
