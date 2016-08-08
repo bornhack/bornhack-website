@@ -5,7 +5,6 @@ from django.utils.text import slugify
 
 from utils.models import CreatedUpdatedModel
 
-from unidecode import unidecode
 
 class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
@@ -14,7 +13,7 @@ class EventType(CreatedUpdatedModel):
     color = models.CharField(max_length=50)
     light_text = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
 
@@ -31,12 +30,12 @@ class Event(CreatedUpdatedModel):
     class Meta:
         ordering = ['title']
 
-    def __str__(self):
+    def __unicode__(self):
         return self.title
 
     def save(self, **kwargs):
         if not self.slug:
-            self.slug = slugify(unidecode(self.title))
+            self.slug = slugify(self.title)
         super(Event, self).save(**kwargs)
 
 
@@ -56,11 +55,11 @@ class Speaker(CreatedUpdatedModel):
     class Meta:
         ordering = ['name']
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def save(self, **kwargs):
         if not self.slug:
-            self.slug = slugify(unidecode(self.name))
+            self.slug = slugify(self.name)
         super(Speaker, self).save(**kwargs)
 
