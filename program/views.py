@@ -6,6 +6,11 @@ from django.views.generic import ListView, TemplateView, DetailView
 from camps.models import Day
 from . import models
 
+
+class SpeakerDetailView(DetailView):
+    model = models.Speaker
+    template_name = 'speaker_detail.html'
+
 class SpeakerListView(ListView):
     model = models.Speaker
     template_name = 'speaker_list.html'
