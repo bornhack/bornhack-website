@@ -11,13 +11,14 @@
 {% if speaker.events.exists %}
 {% for event in speaker.events.all %}
 
-  <h3><a href="{% url 'schedule:event' slug=event.slug %}">{{ event.title }}</a></h3>
+  <h3>
+    <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+      {{ event.event_type.name }}
+    </small><br>
+<a href="{% url 'schedule:event' slug=event.slug %}">{{ event.title }}</a></h3>
   {{ event.abstract|commonmark }}
-  <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-    {{ event.event_type.name }}
-  </small> at
 {% if event.start and event.end and event.days.all.exists %}
-  {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} on
+  At {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} on
   {% for day in event.days.all %}{{ day.date|date:"l" }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
 {% else %}
 Not scheduled yet
