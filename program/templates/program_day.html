@@ -1,7 +1,7 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
-<h2>{{ date|date:"I, F jS" }}</h2>
+<h2>{{ date|date:"l, F jS" }}</h2>
 {% for event in events %}
   {% ifchanged event.event_type %}
     {% if not forloop.first %}</div>{% endif %}
