@@ -13,6 +13,26 @@ from django.core.urlresolvers import reverse_lazy
 
 urlpatterns = [
     url(
+        r'^profile/',
+        include('profiles.urls', namespace='profiles')
+    ),
+    url(
+        r'^shop/',
+        include('shop.urls', namespace='shop')
+    ),
+    url(
+        r'^news/',
+        include('news.urls', namespace='news')
+    ),
+    url(
+        r'^villages/',
+        include('villages.urls', namespace='villages')
+    ),
+    url(
+        r'^schedule/',
+        include('program.urls', namespace='schedule')
+    ),
+    url(
         r'^$',
         TemplateView.as_view(template_name='frontpage.html'),
         name='frontpage'
@@ -61,26 +81,6 @@ urlpatterns = [
         r'general-terms-and-conditions/$',
         TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'),
         name='general-terms'
-    ),
-    url(
-        r'^profile/',
-        include('profiles.urls', namespace='profiles')
-    ),
-    url(
-        r'^shop/',
-        include('shop.urls', namespace='shop')
-    ),
-    url(
-        r'^news/',
-        include('news.urls', namespace='news')
-    ),
-    url(
-        r'^villages/',
-        include('villages.urls', namespace='villages')
-    ),
-    url(
-        r'^schedule/',
-        include('program.urls', namespace='schedule')
     ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
