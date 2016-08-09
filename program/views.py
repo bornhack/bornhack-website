@@ -65,7 +65,7 @@ class ProgramDayView(TemplateView):
         date = datetime.date(year=year, month=month, day=day)
         day = Day.objects.filter(date=date)
         context['date'] = date
-        context['events'] = models.Event.objects.filter(days=day).order_by('start', 'event_type')
+        context['events'] = models.Event.objects.filter(days=day).order_by('event_type', 'start')
         context['event_types'] = models.EventType.objects.all()
         context['days'] = Day.objects.filter(date__year=year)
         return context
