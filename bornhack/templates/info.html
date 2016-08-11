@@ -17,13 +17,19 @@ Info | {{ block.super }}
       margin-top: -80px; /*same height as header*/
       visibility: hidden;
     }
+
+    .sub-anchor{
+      display: block;
+      height: 94px; /*same height as header*/
+      margin-top: -94px; /*same height as header*/
+      visibility: hidden;
+    }
   </style>
 
   <div class="row">
     <div class="col-md-12">
       <h2>Table of Contents</h2>
-      <p>
-        <div class="list-group">
+        <p class="list-group">
           <a href="#when" class="list-group-item">When is BornHack happening?</a>
           <a href="#where" class="list-group-item">Where is BornHack going to take place?</a>
           <a href="#travel" class="list-group-item">Travel Information</a>
@@ -37,8 +43,7 @@ Info | {{ block.super }}
           <a href="#power_and_network" class="list-group-item">Power and Connectivity</a>
           <a href="#shuttlebus" class="list-group-item">Shuttle Bus</a>
           <a href="#info_and_cert" class="list-group-item">Infodesk and CERT</a>
-        </div>
-      </p>
+        </p>
     </div>
   </div>
 
@@ -49,7 +54,13 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Opening</h4>
+            <span class="sub-anchor" id="opening"></span>
+            <h4 class="panel-title">
+              Opening
+              <a href="#opening">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -62,7 +73,13 @@ Info | {{ block.super }}
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Closing</h4>
+            <span class="sub-anchor" id="closing"></span>
+            <h4 class="panel-title">
+              Closing
+              <a href="#closing">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -85,7 +102,13 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Venue</h4>
+            <span class="sub-anchor" id="the-venue"></span>
+            <h4 class="panel-title">
+              The Venue
+              <a href="#the-venue">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <div id="map" class="map"></div>
@@ -109,7 +132,13 @@ Info | {{ block.super }}
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Public Transportation</h4>
+            <span class="sub-anchor" id="public-transportation"></span>
+            <h4 class="panel-title">
+              Public Transportation
+              <a href="#public-transportation">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <h4>From/Via Copenhagen</h4>
@@ -213,7 +242,13 @@ Info | {{ block.super }}
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Bus to and from BornHack</h4>
+            <span class="sub-anchor" id="bus-to-and-from-bornhack"></span>
+            <h4 class="panel-title">
+              Bus to and from BornHack
+              <a href="#bus-to-and-from-bornhack">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -298,7 +333,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Driving and Parking</h4>
+            <span class="sub-anchor" id="driving-and-parking"></span>
+            <h4 class="panel-title">
+              Driving and Parking
+              <a href="#driving-and-parking">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -326,7 +367,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Camping</h4>
+            <span class="sub-anchor" id="camping"></span>
+            <h4 class="panel-title">
+              Camping
+              <a href="#camping">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -340,7 +387,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Cabins</h4>
+            <span class="sub-anchor" id="cabins"></span>
+            <h4 class="panel-title">
+              Cabins
+              <a href="#cabins">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -364,7 +417,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Map</h4>
+            <span class="sub-anchor" id="the-map"></span>
+            <h4 class="panel-title">
+              The Map
+              <a href="#the-map">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p class="text-center">
@@ -444,7 +503,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Quiet Area</h4>
+            <span class="sub-anchor" id="quiet-area"></span>
+            <h4 class="panel-title">
+              Quiet Area
+              <a href="#quiet-area">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -457,7 +522,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Family Area</h4>
+            <span class="sub-anchor" id="family-area"></span>
+            <h4 class="panel-title">
+              Family Area
+              <a href="#family-area">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -472,7 +543,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Nature Area</h4>
+            <span class="sub-anchor" id="nature-area"></span>
+            <h4 class="panel-title">
+              Nature Area
+              <a href="#nature-area">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -487,7 +564,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Noisy Area</h4>
+            <span class="sub-anchor" id="the-noisy-area"></span>
+            <h4 class="panel-title">
+              The Noisy Area
+              <a href="#the-noisy-area">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -510,7 +593,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Bar</h4>
+            <span class="sub-anchor" id="the-bar"></span>
+            <h4 class="panel-title">
+              The Bar
+              <a href="#the-bar">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -541,7 +630,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">What is a Village?</h4>
+            <span class="sub-anchor" id="what-is-a-village"></span>
+            <h4 class="panel-title">
+              What is a Village?
+              <a href="#what-is-a-village">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>If this is your first hackercamp the term 'Village' might
@@ -556,7 +651,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Renting Village Tents</h4>
+            <span class="sub-anchor" id="renting-village-tents"></span>
+            <h4 class="panel-title">
+              Renting Village Tents
+              <a href="#renting-village-tents">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -573,7 +674,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Registering a Village</h4>
+            <span class="sub-anchor" id="registering-a-village"></span>
+            <h4 class="panel-title">
+              Registering a Village
+              <a href="#registering-a-village">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p><a href="{% url 'villages:list' %}">You can register your village here</a>!
@@ -595,7 +702,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Showers</h4>
+            <span class="sub-anchor" id="showers"></span>
+            <h4 class="panel-title">
+              Showers
+              <a href="#showers">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -611,7 +724,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Toilets</h4>
+            <span class="sub-anchor" id="toilets"></span>
+            <h4 class="panel-title">
+              Toilets
+              <a href="#toilets">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -626,7 +745,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Pissoirs</h4>
+            <span class="sub-anchor" id="pissoirs"></span>
+            <h4 class="panel-title">
+              Pissoirs
+              <a href="#pissoirs">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -650,7 +775,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Food Vendors</h4>
+            <span class="sub-anchor" id="food-vendors"></span>
+            <h4 class="panel-title">
+              Food Vendors
+              <a href="#food-vendors">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -664,7 +795,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Cooking</h4>
+            <span class="sub-anchor" id="cooking"></span>
+            <h4 class="panel-title">
+              Cooking
+              <a href="#cooking">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -682,7 +819,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Outdoor Kitchen</h4>
+            <span class="sub-anchor" id="the-outdoor-kitchen"></span>
+            <h4 class="panel-title">
+              The Outdoor Kitchen
+              <a href="#the-outdoor-kitchen">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -701,7 +844,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Buying Groceries</h4>
+            <span class="sub-anchor" id="buying-groceries"></span>
+            <h4 class="panel-title">
+              Buying Groceries
+              <a href="#buying-groceries">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -718,7 +867,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Shop/Kiosk</h4>
+            <span class="sub-anchor" id="the-shop-kiosk"></span>
+            <h4 class="panel-title">
+              The Shop/Kiosk
+              <a href="#the-shop-kiosk">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -748,7 +903,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Breakfeast/Bakery</h4>
+            <span class="sub-anchor" id="breakfeast-bakery"></span>
+            <h4 class="panel-title">
+              Breakfeast/Bakery
+              <a href="#breakfeast-bakery">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -763,7 +924,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">The Farmer Next Door</h4>
+            <span class="sub-anchor" id="the-farmer-next-door"></span>
+            <h4 class="panel-title">
+              The Farmer Next Door
+              <a href="#the-farmer-next-door">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -785,7 +952,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Power</h4>
+            <span class="sub-anchor" id="power"></span>
+            <h4 class="panel-title">
+              Power
+              <a href="#power">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -797,7 +970,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Internet Connection and Uplink</h4>
+            <span class="sub-anchor" id="internet-connection-and-uplink"></span>
+            <h4 class="panel-title">
+              Internet Connection and Uplink
+              <a href="#internet-connection-and-uplink">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -806,9 +985,16 @@ We encourage our attendees to make use of this offer!
               of IP space to go around, courtesy of RIPE NCC temporary assignment.
             </p>
           </div>
-        </div>        <div class="panel panel-default">
+        </div>
+        <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Networks: Wired and Wireless</h4>
+            <span class="sub-anchor" id="networks-wired-and-wireless"></span>
+            <h4 class="panel-title">
+              Networks: Wired and Wireless
+              <a href="#networks-wired-and-wireless">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -828,7 +1014,13 @@ We encourage our attendees to make use of this offer!
         </div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Wireless Network</h4>
+            <span class="sub-anchor" id="wireless-network"></span>
+            <h4 class="panel-title">
+              Wireless Network
+              <a href="#wireless-network">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -860,7 +1052,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Opening Day</h4>
+            <span class="sub-anchor" id="opening-day"></span>
+            <h4 class="panel-title">
+              Opening Day
+              <a href="#opening-day">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -876,7 +1074,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Grocery Shopping</h4>
+            <span class="sub-anchor" id="grocery-shopping"></span>
+            <h4 class="panel-title">
+              Grocery Shopping
+              <a href="#grocery-shopping">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -895,7 +1099,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Closing Day</h4>
+            <span class="sub-anchor" id="closing-day"></span>
+            <h4 class="panel-title">
+              Closing Day
+              <a href="#closing-day">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -919,7 +1129,13 @@ We encourage our attendees to make use of this offer!
       <div class="panel-group">
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">Infodesk</h4>
+            <span class="sub-anchor" id="infodesk"></span>
+            <h4 class="panel-title">
+              Infodesk
+              <a href="#infodesk">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
@@ -941,7 +1157,13 @@ We encourage our attendees to make use of this offer!
 
         <div class="panel panel-default">
           <div class="panel-heading">
-            <h4 class="panel-title">CERT</h4>
+            <span class="sub-anchor" id="CERT"></span>
+            <h4 class="panel-title">
+              CERT
+              <a href="#CERT">
+                <i class="glyphicon glyphicon-link"></i>
+              </a>
+            </h4>
           </div>
           <div class="panel-body">
             <p>
