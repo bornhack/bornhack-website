@@ -246,7 +246,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Product'
         verbose_name_plural = 'Products'
-        ordering = ['available_in', 'price']
+        ordering = ['available_in', 'price', 'name']
 
     category = models.ForeignKey(
         'shop.ProductCategory',
