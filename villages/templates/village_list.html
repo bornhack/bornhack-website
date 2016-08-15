@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load commonmark %}
 
 {% block title %}
 Villages | {{ block.super }}
@@ -43,7 +44,7 @@ Villages | {{ block.super }}
         </a>
       </td>
       <td>
-        {{ village.description|truncatewords:50 }}
+        {{ village.description|truncatewords:50|commonmark }}
       </td>
       <td>
         <i class="glyphicon glyphicon-{% if village.private %}remove{% else %}ok{% endif %}"></i>
