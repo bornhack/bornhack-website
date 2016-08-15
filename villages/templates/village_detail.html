@@ -9,7 +9,7 @@ Village: {{ village.name }} | {{ block.super }}
 
 <h3>{{ village.name }}</h3>
 
-{{ village.description|commonmark }}
+{{ village.description|escape|commonmark }}
 
 {% if user == village.contact %}
 <hr />
