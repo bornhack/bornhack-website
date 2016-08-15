@@ -12,6 +12,14 @@ register = template.Library()
 def commonmark(value):
     parser = CommonMark.Parser()
     renderer = CommonMark.HtmlRenderer()
+    ast = parser.parse(value)
+    return mark_safe(renderer.render(ast))
+
+@register.filter
+@stringfilter
+def unsafecommonmark(value):
+    parser = CommonMark.Parser()
+    renderer = CommonMark.HtmlRenderer()
     ast = parser.parse(bleach.clean(value))
     return mark_safe(renderer.render(ast))
 
