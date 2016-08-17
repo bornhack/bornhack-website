@@ -40,7 +40,7 @@ class CustomOrder(CreatedUpdatedModel):
         default=False,
     )
 
-    def __str__(self):
+    def __unicode__(self):
         return 'custom order id #%s' % self.pk
 
     @property
@@ -115,7 +115,7 @@ class Order(CreatedUpdatedModel):
 
     objects = OrderQuerySet.as_manager()
 
-    def __str__(self):
+    def __unicode__(self):
         return 'shop order id #%s' % self.pk
 
     def get_number_of_items(self):
@@ -234,7 +234,7 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
     slug = models.SlugField()
     public = models.BooleanField(default=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def save(self, **kwargs):
@@ -271,7 +271,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     
     objects = ProductQuerySet.as_manager()
 
-    def __str__(self):
+    def __unicode__(self):
         return '{} ({} DKK)'.format(
             self.name,
             self.price,
@@ -302,7 +302,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
     payload = JSONField()
     md5valid = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return 'callback at %s (md5 valid: %s)' % (self.created, self.md5valid)
 
 
@@ -340,7 +340,7 @@ class CreditNote(CreatedUpdatedModel):
     )
     sent_to_customer = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return 'creditnote#%s - %s DKK (sent to %s: %s)' % (
             self.id,
             self.amount,
@@ -363,7 +363,7 @@ class Invoice(CreatedUpdatedModel):
     pdf = models.FileField(null=True, blank=True, upload_to='invoices/')
     sent_to_customer = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         if self.order:
             return 'invoice#%s - shop order %s - %s - total %s DKK (sent to %s: %s)' % (
                 self.id,
@@ -394,7 +394,7 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
     invoicejson = JSONField()
     order = models.OneToOneField('shop.Order')
 
-    def __str__(self):
+    def __unicode__(self):
         return "coinifyinvoice for order #%s" % self.order.id
 
 
@@ -404,7 +404,7 @@ class CoinifyAPICallback(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order')
     valid = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __unicode__(self):
         return 'order #%s callback at %s' % (self.order.id, self.created)
 
 
@@ -428,7 +428,7 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         blank=True,
     )
 
-    def __str__(self):
+    def __unicode__(self):
         return 'Ticket {user} {product}'.format(
             user=self.order.user,
             product=self.product
