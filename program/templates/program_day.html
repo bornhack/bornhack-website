@@ -3,10 +3,13 @@
 {% block program_content %}
 <h2>{{ date|date:"l, F jS" }}</h2>
 {% for event in events %}
+
   {% ifchanged event.event_type %}
+
     {% if not forloop.first %}</div>{% endif %}
     <h3>{{ event.event_type }}</h3>
     <div style="display: flex; flex-wrap: wrap;">
+
   {% endifchanged %}
 
     <a class="event"
@@ -22,5 +25,6 @@
     </a>
 
 {% endfor %}
+</div>
 
 {% endblock program_content %}
