@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
 from utils.models import UUIDModel, CreatedUpdatedModel
 from .managers import ProductQuerySet, OrderQuerySet
-import hashlib, io, base64, qrcode
+import hashlib, io, base64, qrcode, unidecode
 from decimal import Decimal
 from datetime import timedelta
 
@@ -379,7 +379,7 @@ class Invoice(CreatedUpdatedModel):
                 self.customorder.id,
                 self.customorder.created,
                 self.customorder.amount,
-                self.customorder.customer,
+                unidecode(self.customorder.customer),
             )
 
     @property
