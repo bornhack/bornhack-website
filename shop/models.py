@@ -10,9 +10,10 @@ from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
 from utils.models import UUIDModel, CreatedUpdatedModel
 from .managers import ProductQuerySet, OrderQuerySet
-import hashlib, io, base64, qrcode, unidecode
+import hashlib, io, base64, qrcode
 from decimal import Decimal
 from datetime import timedelta
+from unidecode import unidecode
 
 
 class CustomOrder(CreatedUpdatedModel):
