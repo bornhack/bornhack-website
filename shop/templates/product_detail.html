@@ -40,8 +40,12 @@
     {% else %}
 
     <p>
+    {% if product.is_old %}
+      This product is not available anymore.
+    {% elif product.is_upcoming %}
       This product is available from
       {{ product.available_in.lower|date:"Y-m-d H:i T" }}
+    {% endif %}
     </p>
 
     {% endif %}

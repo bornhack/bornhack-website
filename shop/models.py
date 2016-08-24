@@ -282,6 +282,16 @@ class Product(CreatedUpdatedModel, UUIDModel):
         now = timezone.now()
         return now in self.available_in
 
+    def is_old(self):
+        now = timezone.now()
+        if hasattr(self.available_in, 'upper') and self.available_in.upper:
+            return self.available_in.upper < now
+        return False
+
+    def is_upcoming(self):
+        now = timezone.now()
+        return self.available_in.lower >  now
+
 
 class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order')
