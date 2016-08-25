@@ -171,7 +171,7 @@ class ShopIndexView(ListView):
 
     def get_queryset(self):
         queryset = super(ShopIndexView, self).get_queryset()
-        return queryset.order_by('category__name', 'price', 'name')
+        return queryset.available().order_by('category__name', 'price', 'name')
 
     def get_context_data(self, **kwargs):
         context = super(ShopIndexView, self).get_context_data(**kwargs)
@@ -197,6 +197,7 @@ class ShopIndexView(ListView):
         ).filter(
             num_products__gt=0,
             public=True,
+            products__available_in__contains=timezone.now()
         )
         return context
 

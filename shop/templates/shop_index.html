@@ -49,7 +49,7 @@ Shop | {{ block.super }}
         </tr>
         {% endifchanged %}
 
-        <tr {% if not product.is_available %}class="text-muted"{% endif %}>
+        <tr>
           <td>
             <a href="{% url 'shop:product_detail' slug=product.slug %}">
             {{ product.name }}
@@ -61,6 +61,12 @@ Shop | {{ block.super }}
             </div>
           </td>
         </tr>
+      {% empty %}
+      <tr>
+        <td colspan="2">
+            Sorry no products found.
+        </td>
+      </tr>
       {% endfor %}
       </tbody>
     </table>
