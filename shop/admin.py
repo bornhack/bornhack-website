@@ -100,6 +100,8 @@ class TicketModelAdmin(admin.ModelAdmin):
         'checked_in'
     ]
 
+    list_filter = ['product']
+
 
     actions = ['mark_as_arrived']
 
