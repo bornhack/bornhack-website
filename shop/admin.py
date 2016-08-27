@@ -84,9 +84,22 @@ class OrderAdmin(admin.ModelAdmin):
     mark_order_as_refunded.description = 'Mark order(s) as refunded'
 
 
+def get_user_email(obj):
+    return obj.order.user.email
+
+
 @admin.register(models.Ticket)
 class TicketModelAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'name', 'email', 'get_token', 'checked_in']
+    list_display = [
+        'order',
+        'product',
+        'name',
+        'email',
+        get_user_email,
+        'get_token',
+        'checked_in'
+    ]
+
 
     actions = ['mark_as_arrived']
 
