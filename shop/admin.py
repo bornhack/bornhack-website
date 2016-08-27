@@ -8,8 +8,8 @@ admin.site.register(models.CoinifyAPIInvoice)
 admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
-admin.site.register(models.Ticket)
 admin.site.register(models.CustomOrder)
+
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
@@ -35,7 +35,6 @@ class ProductInline(admin.TabularInline):
 class TicketInline(admin.TabularInline):
     model = models.Ticket
     exclude = ['qrcode_base64']
-
 
 
 @admin.register(models.Order)
@@ -83,4 +82,15 @@ class OrderAdmin(admin.ModelAdmin):
         for order in queryset.filter(refunded=False):
             order.mark_as_refunded(request)
     mark_order_as_refunded.description = 'Mark order(s) as refunded'
+
+
+@admin.register(models.Ticket)
+class TicketModelAdmin(admin.ModelAdmin):
+    list_display = ['order', 'product', 'name', 'email', 'get_token', 'checked_in']
+
+    actions = ['mark_as_arrived']
+
+    def mark_as_arrived(self, request, queryset):
+        queryset.update(checked_in=True)
+
 

@@ -439,6 +439,8 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
         blank=True,
     )
 
+    checked_in = models.BooleanField(default=False)
+
     def __unicode__(self):
         return 'Ticket {user} {product}'.format(
             user=self.order.user,
