@@ -33,4 +33,4 @@ export EMAIL_USE_TLS=""
 export DEFAULT_FROM_EMAIL="bornhax@localhost"
 export ARCHIVE_EMAIL=""
 
-python manage.py $@
+python manage.py $@ --settings=bornhack.settings.development
