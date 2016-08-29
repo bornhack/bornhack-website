@@ -77,6 +77,7 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'csp.middleware.CSPMiddleware',
 ]
 
 LOGIN_REDIRECT_URL = 'profiles:detail'
@@ -117,3 +118,8 @@ BANKACCOUNT_REG = env('BANKACCOUNT_REG')
 BANKACCOUNT_ACCOUNT = env('BANKACCOUNT_ACCOUNT')
 
 TICKET_CATEGORY_ID = env('TICKET_CATEGORY_ID')
+
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'",)
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'",)
+CSP_IMG_SRC = ("*",)
+CSP_FONT_SRC = ("'self'",)
