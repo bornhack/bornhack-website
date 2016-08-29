@@ -610,7 +610,7 @@ class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     def dispatch(self, request, *args, **kwargs):
         ticket = self.get_object()
         if ticket.order.user != request.user:
-            return Http404
+            raise Http404
         return super(TicketDetailView, self).dispatch(request, *args, **kwargs)
 
 
