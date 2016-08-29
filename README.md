@@ -23,12 +23,18 @@ Copy environment file and change settings like DATABASE_URL:
 
     (venv) $ cp bornhack/settings/env.dist bornhack/settings/.env
 
-Run `make`
+Run `make` (removing USE_SQLITE=1 if you want to use postgres)
 
-    (venv) $  make
+    (venv) $ SQLITE=1 make
 
 Which is equivalent with this:
 
     (venv) $ ./manage.py migrate --settings=bornhack.settings.development
     (venv) $ ./manage.py createsuperuser --settings=bornhack.settings.development
     (venv) $ ./manage.py runserver --settings=bornhack.settings.development
+
+### Setting up Postgres
+
+Using Postgres is only necessary for purposes og using Postgis for a few maps on the site.
+To use default settings and make commands, create a user `bornhack`, password `bornhack`
+and database `bornhack_dev` to use default setttings.
