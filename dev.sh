@@ -3,7 +3,7 @@
 # Directory of this script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if ! [ -f "$DIR/.env" ]
+if ! [ -f "$DIR/bornhack/settings/.env" ]
 then
 	echo "Creating .env file from template..."
 	echo "MEDIA_ROOT=\"$DIR/.dev/media\"" > "$DIR/bornhack/settings/.env"
