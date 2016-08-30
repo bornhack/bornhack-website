@@ -35,6 +35,10 @@ Which is equivalent with this:
 
 ### Setting up Postgres
 
-Using Postgres is only necessary for purposes og using Postgis for a few maps on the site.
-To use default settings and make commands, create a user `bornhack`, password `bornhack`
-and database `bornhack_dev` to use default setttings.
+Using Postgres is only necessary for purposes of the special
+[JSONField](https://docs.djangoproject.com/en/1.10/ref/contrib/postgres/fields/).
+The field is active on our shop mainly, so you can still develop things for most
+parts of the site without installing Postgres.
+
+To use default settings and make commands, create a user `bornhack`, password
+`bornhack` and database `bornhack_dev` to use default setttings.
