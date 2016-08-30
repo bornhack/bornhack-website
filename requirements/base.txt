@@ -10,3 +10,4 @@ qrcode==5.3
 CommonMark==0.6.4
 django-bleach==0.3.0
 Unidecode==0.4.19
+icalendar==3.10

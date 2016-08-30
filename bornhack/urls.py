@@ -10,6 +10,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.core.urlresolvers import reverse_lazy
+from program.views import ICSView
 
 urlpatterns = [
     url(
@@ -84,4 +85,5 @@ urlpatterns = [
     ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^calendar/', ICSView.as_view()),
 ]
