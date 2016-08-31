@@ -12,16 +12,21 @@ Features do not include:
 
 Create a Python 2.7 virtual environment and activate it:
 
-    $ virtualenv venv
+    $ virtualenv venv -p python2
     $ source venv/bin/activate
+
+There is an imaging library and a postgres library in the dependencies that
+need host system dependencies to be buit.
+
+    # On Debian
+    $ sudo apt-get install postgresql-server-dev-all libjpeg62-turbo libjpeg62-turbo-dev zlib1g zlib1g-dev
+
+    # On Ubuntu
+    $ sudo apt-get install postgresql-server-dev-all libjpeg9 libjpeg9-dev zlib1g zlib1g-dev
 
 Install dependencies:
 
     (venv) $ pip install -r requirements/development.txt
-
-Copy environment file and change settings like DATABASE_URL:
-
-    (venv) $ cp bornhack/settings/env.dist bornhack/settings/.env
 
 Run `make` (removing USE_SQLITE=1 if you want to use postgres)
 
