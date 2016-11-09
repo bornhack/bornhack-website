@@ -22,6 +22,10 @@ DATABASES = {
     'default': env.db(),
 }
 
+ADMINS = (
+    ('bornhack sysadm', 'sysadm@bornhack.org'),
+)
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

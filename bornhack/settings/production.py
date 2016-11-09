@@ -36,5 +36,3 @@ LOGGING = {
     }
 }
 
-ADMINS = env('ADMINS')
-
