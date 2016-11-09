@@ -64,8 +64,10 @@
 
 </table>
 
+{% if order.open == None and order.customer_comment or order.open %}
 <h3>Comment:</h3>
 <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="If you have any comments for this order please enter them here..." value="{{ order.customer_comment }}" {% if order.open == None %}readonly{% endif %}></p>
+{% endif %}
 
 {% if not order.open == None %}
     {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
