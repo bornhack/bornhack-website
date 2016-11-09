@@ -310,6 +310,10 @@ class OrderDetailView(
                 Order.BANK_TRANSFER: reverse_lazy(
                     'shop:bank_transfer',
                     kwargs={'pk': order.id}
+                ),
+                Order.CASH: reverse_lazy(
+                    'shop:cash',
+                    kwargs={'pk': order.id}
                 )
             }
 
@@ -464,7 +468,14 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
         context['total'] = self.get_object().total
         return context
 
+
 #################################################################################
+### Cash payment view
+
+class CashView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
+    model = Order
+    template_name = 'cash.html'
+
 
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
