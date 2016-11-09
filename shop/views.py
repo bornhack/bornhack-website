@@ -41,6 +41,8 @@ from vendor.coinify_callback import CoinifyCallback
 import json, time
 
 
+#################################################################################
+### Mixins
 class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
     model = CreditNote
 
@@ -162,8 +164,9 @@ class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
             request, *args, **kwargs
         )
 
-#################################################################################
 
+#################################################################################
+### Shop views
 class ShopIndexView(ListView):
     model = Product
     template_name = "shop_index.html"
@@ -369,7 +372,51 @@ class DownloadCreditNoteView(LoginRequiredMixin, EnsureUserOwnsCreditNoteMixin, 
         return response
 
 
+class TicketListView(LoginRequiredMixin, ListView):
+    model = Ticket
+    template_name = 'ticket_list.html'
+    context_object_name = 'tickets'
+
+    def get_queryset(self):
+        tickets = super(TicketListView, self).get_queryset()
+        user = self.request.user
+        return tickets.filter(order__user=user)
+
+
+class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
+    model = Ticket
+    template_name = 'ticket_detail.html'
+    context_object_name = 'ticket'
+    fields = ['name', 'email']
+
+    def form_valid(self, form):
+        messages.info(self.request, 'Ticket updated!')
+        return super(TicketDetailView, self).form_valid(form)
+
+    def dispatch(self, request, *args, **kwargs):
+        ticket = self.get_object()
+        if ticket.order.user != request.user:
+            raise Http404
+        return super(TicketDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
+
+    model = Order
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            messages.error(request, 'You do not have permissions to do that.')
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
+        else:
+            messages.success(request, 'The order has been marked as paid.')
+            order = self.get_object()
+            order.mark_as_paid()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 #################################################################################
+### Epay views
 
 class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
@@ -452,7 +499,9 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
             request, *args, **kwargs
         )
 
+
 #################################################################################
+### Bank Transfer view
 
 class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
@@ -476,6 +525,9 @@ class CashView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMi
     model = Order
     template_name = 'cash.html'
 
+
+#################################################################################
+### Coinify views
 
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
@@ -595,48 +647,4 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):
     model = Order
     template_name = 'coinify_thanks.html'
-
-
-class TicketListView(LoginRequiredMixin, ListView):
-    model = Ticket
-    template_name = 'ticket_list.html'
-    context_object_name = 'tickets'
-
-    def get_queryset(self):
-        tickets = super(TicketListView, self).get_queryset()
-        user = self.request.user
-        return tickets.filter(order__user=user)
-
-
-class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
-    model = Ticket
-    template_name = 'ticket_detail.html'
-    context_object_name = 'ticket'
-    fields = ['name', 'email']
-
-    def form_valid(self, form):
-        messages.info(self.request, 'Ticket updated!')
-        return super(TicketDetailView, self).form_valid(form)
-
-    def dispatch(self, request, *args, **kwargs):
-        ticket = self.get_object()
-        if ticket.order.user != request.user:
-            raise Http404
-        return super(TicketDetailView, self).dispatch(request, *args, **kwargs)
-
-
-class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
-
-    model = Order
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            messages.error(request, 'You do not have permissions to do that.')
-            return HttpResponseRedirect(reverse_lazy('shop:index'))
-        else:
-            messages.success(request, 'The order has been marked as paid.')
-            order = self.get_object()
-            order.mark_as_paid()
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
 
