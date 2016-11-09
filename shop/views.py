@@ -299,6 +299,7 @@ class OrderDetailView(
             # Set payment method and mark the order as closed
             order.payment_method = payment_method
             order.open = None
+            order.customer_comment = request.POST.get('customer_comment')
             order.save()
 
             reverses = {
@@ -329,6 +330,8 @@ class OrderDetailView(
                     new_quantity = int(request.POST.get(order_product_id))
                     order_product.quantity = new_quantity
                     order_product.save()
+            order.customer_comment = request.POST.get('customer_comment')
+            order.save()
 
         product_remove = request.POST.get('remove_product')
         if product_remove:

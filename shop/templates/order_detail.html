@@ -38,7 +38,6 @@
              name="{{ order_product.id }}"
              value="{{ order_product.quantity }}" />
         {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
-      </form>
       {% else %}
       {{ order_product.quantity }}
       {% endif %}
@@ -64,6 +63,9 @@
       {{ order.total|currency }}
 
 </table>
+
+<h3>Comment:</h3>
+<input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="If you have any comments for this order please enter them here..." value="{{ order.customer_comment }}" {% if order.open == None %}readonly{% endif %}></p>
 
 {% if not order.open == None %}
     {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}

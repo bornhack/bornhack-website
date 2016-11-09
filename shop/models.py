@@ -117,6 +117,13 @@ class Order(CreatedUpdatedModel):
         default=False,
     )
 
+    customer_comment = models.TextField(
+        verbose_name=_('Customer comment'),
+        help_text=_('If you have any comments about the order please enter them here.'),
+        default='',
+    )
+
+
     objects = OrderQuerySet.as_manager()
 
     def __unicode__(self):
