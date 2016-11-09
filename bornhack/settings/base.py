@@ -13,7 +13,14 @@ def local_dir(entry):
 WSGI_APPLICATION = 'bornhack.wsgi.application'
 ROOT_URLCONF = 'bornhack.urls'
 
+SECRET_KEY = env('SECRET_KEY')
+ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
+
 SITE_ID = 1
+
+DATABASES = {
+    'default': env.db(),
+}
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,7 +47,6 @@ INSTALLED_APPS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]
-#MEDIA_URL = '/media/'
 MEDIA_ROOT = env('MEDIA_ROOT')
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
