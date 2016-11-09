@@ -8,7 +8,8 @@ class ProductQuerySet(QuerySet):
 
     def available(self):
         return self.filter(
-            available_in__contains=timezone.now()
+            available_in__contains=timezone.now(),
+            category__public=True
         )
 
 
