@@ -7,9 +7,8 @@ from django.utils import timezone
 class ProductQuerySet(QuerySet):
 
     def available(self):
-        now = timezone.now()
         return self.filter(
-            available_in__contains=DateTimeTZRange(now, None)
+            available_in__contains=timezone.now()
         )
 
 
