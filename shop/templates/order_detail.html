@@ -65,7 +65,7 @@
 </table>
 
 {% if order.open == None and order.customer_comment or order.open %}
-<h3>Comment:</h3>
+<h3>Shipping Address:</h3>
 <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter shipping address and comments here..." value="{{ order.customer_comment }}" {% if order.open == None %}readonly{% endif %}></p>
 {% endif %}
 
