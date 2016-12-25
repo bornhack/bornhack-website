@@ -23,9 +23,7 @@ class Event(CreatedUpdatedModel):
     slug = models.SlugField(blank=True, max_length=255)
     abstract = models.TextField()
     event_type = models.ForeignKey(EventType)
-    days = models.ManyToManyField('camps.Day', blank=True)
-    start = models.TimeField(null=True, blank=True)
-    end = models.TimeField(null=True, blank=True)
+    camp = models.ForeignKey('camps.Camp', null=True)
 
     class Meta:
         ordering = ['title']
@@ -37,6 +35,20 @@ class Event(CreatedUpdatedModel):
         if not self.slug:
             self.slug = slugify(self.title)
         super(Event, self).save(**kwargs)
+
+
+class EventInstance(CreatedUpdatedModel):
+    """ An instance of an event """
+    event = models.ForeignKey('program.event', related_name='instances')
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+
+    class Meta:
+        ordering = ['start']
+
+    def __unicode__(self):
+        return '%s (%s to %s)' % (self.event, self.start, self.end)
+
 
 
 class Speaker(CreatedUpdatedModel):

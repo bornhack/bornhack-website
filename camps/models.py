@@ -1,135 +1,93 @@
 import datetime
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
 from utils.models import UUIDModel, CreatedUpdatedModel
-
-from .managers import CampQuerySet
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
-        verbose_name = _('Camp')
-        verbose_name_plural = _('Camps')
+        verbose_name = 'Camp'
+        verbose_name_plural = 'Camps'
 
-    name = models.CharField(
-        verbose_name=_('Name'),
-        help_text=_('Name of the camp, ie. Bornhack.'),
+    title = models.CharField(
+        verbose_name='Title',
+        help_text='Title of the camp, ie. Bornhack 2016.',
         max_length=255,
     )
 
-    start = models.DateTimeField(
-        verbose_name=_('Start date'),
-        help_text=_('When the camp starts.'),
-        unique=True,
+    tagline = models.CharField(
+        verbose_name='Tagline',
+        help_text='Tagline of the camp, ie. "Initial Commit"',
+        max_length=255,
     )
 
-    end = models.DateTimeField(
-        verbose_name=_('End date'),
-        help_text=_('When the camp ends.'),
-        unique=True,
+    slug = models.SlugField(
+        verbose_name='Url Slug',
+        help_text='The url slug to use for this camp'
     )
 
-    shop_open = models.BooleanField(
-        verbose_name=_('Shop open?'),
-        help_text=_('Whether the shop is open or not.'),
-        default=False,
+    buildup_start = models.DateTimeField(
+        verbose_name='Buildup Start date',
+        help_text='When the camp buildup starts.',
     )
 
-    objects = CampQuerySet.as_manager()
-
-    def __str__(self):
-        return _('{} {}').format(
-            self.name,
-            self.start.year,
-        )
-
-    def create_days(self):
-        delta = self.end - self.start
-        for day_offset in range(0, delta.days + 1):
-            day, created = self.days.get_or_create(
-                date=self.start + datetime.timedelta(days=day_offset)
-            )
-
-    def save(self, **kwargs):
-        super(Camp, self).save(**kwargs)
-        self.create_days()
-
-
-class Day(CreatedUpdatedModel, UUIDModel):
-    class Meta:
-        verbose_name = _('Day')
-        verbose_name_plural = _('Days')
-        ordering = ['date']
-
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('Which camp does this day belong to.'),
-        related_name='days',
+    camp_start = models.DateTimeField(
+        verbose_name='Start date',
+        help_text='When the camp starts.',
     )
 
-    date = models.DateField(
-        verbose_name=_('Date'),
-        help_text=_('What date?')
+    camp_end = models.DateTimeField(
+        verbose_name='End date',
+        help_text='When the camp ends.',
     )
 
-    def __str__(self):
-        return '{} ({})'.format(
-            self.date.strftime('%A'),
-            self.date
-        )
+    teardown_end = models.DateTimeField(
+        verbose_name='Start date',
+        help_text='When the camp teardown ends.',
+    )
+
+    def __unicode__(self):
+        return "%s - %s" % (self.title, self.tagline)
 
 
 class Expense(CreatedUpdatedModel, UUIDModel):
     class Meta:
-        verbose_name = _('Expense')
-        verbose_name_plural = _('Expenses')
+        verbose_name = 'Expense'
+        verbose_name_plural = 'Expenses'
 
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp to which this expense relates to.'),
+    payment_time = models.DateTimeField(
+        verbose_name='Expense date/time',
+        help_text='The date and time this expense was paid.',
     )
 
     description = models.CharField(
-        verbose_name=_('Description'),
-        help_text=_('What this expense covers.'),
+        verbose_name='Description',
+        help_text='What this expense covers.',
         max_length=255,
     )
 
-    amount = models.DecimalField(
-        verbose_name=_('Amount'),
-        help_text=_('The amount of the expense.'),
+    dkk_amount = models.DecimalField(
+        verbose_name='DKK Amount',
+        help_text='The DKK amount of the expense.',
         max_digits=7,
         decimal_places=2,
     )
 
-    CURRENCIES = [
-        ('btc', 'BTC'),
-        ('dkk', 'DKK'),
-        ('eur', 'EUR'),
-        ('sek', 'SEK'),
-    ]
-
-    currency = models.CharField(
-        verbose_name=_('Currency'),
-        help_text=_('What currency the amount is in.'),
-        choices=CURRENCIES,
-        max_length=3,
+    receipt = models.ImageField(
+        verbose_name='Image of receipt',
+        help_text='Upload a scan or image of the receipt',
     )
 
-    covered_by = models.ForeignKey(
+    refund_user = models.ForeignKey(
         'auth.User',
-        verbose_name=_('Covered by'),
-        help_text=_('Which user, if any, covered this expense.'),
+        verbose_name='Refund user',
+        help_text='Which user, if any, covered this expense and should be refunded.',
         null=True,
         blank=True,
     )
 
-    def __str__(self):
-        return _('{} {} for {}').format(
-            self.amount,
-            self.get_currency_display(),
-            self.camp,
-        )
+    refund_paid = models.BooleanField(
+        default=False,
+        verbose_name='Refund paid?',
+        help_text='Has this expense been refunded to the user?',
+    )
+

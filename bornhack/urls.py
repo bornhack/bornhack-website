@@ -10,6 +10,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.core.urlresolvers import reverse_lazy
+from camps.views import *
+from info.views import CampInfoView
+
 
 urlpatterns = [
     url(
@@ -84,4 +87,57 @@ urlpatterns = [
     ),
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
+
+    # camp specific urls below here
+
+    url(r'(?P<camp_slug>[-_\w+]+)/', include([
+        url(
+            r'^$',
+            CampDetailView.as_view(),
+            name='camp_detail'
+        ),
+        url(
+            r'^info/$',
+            CampInfoView.as_view(),
+            name='info'
+        ),
+        url(
+            r'^schedule/$',
+            CampScheduleView.as_view(),
+            name='schedule'
+        ),
+        url(
+            r'^sponsors/$',
+            CampSponsorView.as_view(),
+            name='camp_sponsors'
+        ),
+        url(r'^villages/$', include([
+            url(
+                r'^$',
+                VillageListView.as_view(),
+                name='village_list'
+            ),
+            url(
+                r'create/$',
+                VillageCreateView.as_view(),
+                name='village_create'
+            ),
+            url(
+                r'(?P<slug>[-_\w+]+)/delete/$',
+                VillageDeleteView.as_view(),
+                name='village_delete'
+            ),
+            url(
+                r'(?P<slug>[-_\w+]+)/edit/$',
+                VillageUpdateView.as_view(),
+                name='village_update'
+            ),
+            url(
+                r'(?P<slug>[-_\w+]+)/$',
+                VillageDetailView.as_view(),
+                name='village_detail'
+            ),
+        ])),
+    ])),
 ]
+

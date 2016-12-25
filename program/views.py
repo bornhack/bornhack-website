@@ -2,24 +2,27 @@ from collections import OrderedDict
 
 import datetime
 from django.views.generic import ListView, TemplateView, DetailView
+from camp.mixins import CampViewMixin
 
-from camps.models import Day
 from . import models
 
 
-class SpeakerDetailView(DetailView):
+class SpeakerDetailView(CampViewMixin, DetailView):
     model = models.Speaker
     template_name = 'speaker_detail.html'
 
-class SpeakerListView(ListView):
+
+class SpeakerListView(CampViewMixin, ListView):
     model = models.Speaker
     template_name = 'speaker_list.html'
 
-class EventListView(ListView):
+
+class EventListView(CampViewMixin, ListView):
     model = models.Event
     template_name = 'event_list.html'
 
-class ProgramOverviewView(ListView):
+
+class ProgramOverviewView(CampViewMixin, ListView):
     model = models.Event
     template_name = 'program_overview.html'
 
@@ -54,7 +57,7 @@ class ProgramOverviewView(ListView):
         return context
 
 
-class ProgramDayView(TemplateView):
+class ProgramDayView(CampViewMixin, TemplateView):
     template_name = 'program_day.html'
 
     def get_context_data(self, **kwargs):
@@ -71,7 +74,7 @@ class ProgramDayView(TemplateView):
         return context
 
 
-class EventDetailView(DetailView):
+class EventDetailView(CampViewMixin, DetailView):
     model = models.Event
     template_name = 'program_event_detail.html'
 
@@ -80,3 +83,5 @@ class EventDetailView(DetailView):
         # TODO: date__year is hardcoded here - need fix for 2017 :P
         context['days'] = Day.objects.filter(date__year=2016)
         return context
+
+

@@ -38,14 +38,26 @@
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="{% url 'news:index' %}">News</a></li>
-            <li><a href="{% url 'info' %}">Info</a></li>
-
-            {% if current_camp.shop_open %}
             <li><a href="{% url 'shop:index' %}">Shop</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                {% for camp in upcoming_camps %}
+                    <li><a href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a></li>
+                {% endfor %}
+                <li role="separator" class="divider"></li>
+                {% for camp in previous_camps %}
+                    <li><a href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a></li>
+                {% endfor %}
+              </ul>
+            </li>
+            {# only include camp specific menu items when relevant #}
+            {% if request.resolver_match.kwargs.camp_slug %}
+              <li><a href="{% url 'camp_info' camp_slug=camp.slug %}">Info</a></li>
+              <li><a href="{% url 'camp_villages' camp_slug=camp.slug %}">Villages</a></li>
+              <li><a href="{% url 'camp_schedule' camp_slug=camp.slug %}">Schedule</a></li>
+              <li><a href="{% url 'camp_sponsors' camp_slug=camp.slug %}">Sponsors</a></li>
             {% endif %}
-            <li><a href="{% url 'villages:list' %}">Villages</a></li>
-            <li><a href="{% url 'schedule:index' %}">Schedule</a></li>
-            <li><a href="{% url 'call-for-sponsors' %}">Sponsors</a></li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
@@ -55,7 +67,6 @@
           </ul>
         </div>
       </div>
-
     </nav>
 
     <div id="main" class="container container-fluid">

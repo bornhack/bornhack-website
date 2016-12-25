@@ -1,5 +1,11 @@
+from django.conf import settings
 from .models import Camp
+from django.utils import timezone
 
 
-def current_camp(request):
-    return {'current_camp': Camp.objects.current()}
+def camps(request):
+    return {
+        'upcoming_camps': Camp.objects.filter(camp_start__gt=timezone.now()),
+        'previous_camps': Camp.objects.filter(camp_start__lt=timezone.now()),
+    }
+

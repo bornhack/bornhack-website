@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+
+{% block title %}
+Info | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+{% endblock %}
+
+{% block content %}
+  <style>
+    .anchor{
+      display: block;
+      height: 80px; /*same height as header*/
+      margin-top: -80px; /*same height as header*/
+      visibility: hidden;
+    }
+
+    .sub-anchor{
+      display: block;
+      height: 94px; /*same height as header*/
+      margin-top: -94px; /*same height as header*/
+      visibility: hidden;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Table of Contents</h2>
+        <p class="list-group">
+          {% for category in categories %}
+            <a href="#{{ category.anchor }}" class="list-group-item">{{ category.headline }}</a>
+          {% endfor %}
+        </p>
+    </div>
+  </div>
+
+  {% for category in categories %}
+    <span class="anchor" id="{{ category.anchor }}"></span>
+    <div class="row">
+      <div class="col-md-12">
+        <h2>When is BornHack happening?</h2>
+        <div class="panel-group">
+          {% for item in category.infoitems %}
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <span class="sub-anchor" id="{{ item.anchor }}"></span>
+                <h4 class="panel-title">
+                  {{ item.title }}
+                  <a href="#{{ item.anchor }}">
+                    <i class="glyphicon glyphicon-link"></i>
+                  </a>
+                </h4>
+              </div>
+              <div class="panel-body">
+                <p>{{ item.body }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+ 
+  <script src="{% static 'js/leaflet.js' %}"></script>
+  <script>
+    var map = L.map('map', {center: [55.131520, 14.903000], zoom: 10});
+
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            attribution: '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+        }
+    ).addTo(map);
+
+    var camp_latlong = [55.011520, 14.975360];
+    L.marker(camp_latlong).addTo(map);
+
+    L.marker(camp_latlong).addTo(map)
+      .bindPopup('<strong>Coordinates:</strong><br>55.011520, 14.975360<br><strong>Address:</strong><br>Baunevej 11, 3720 Aakirkeby')
+      .openPopup();
+  </script>
+{% endblock %}

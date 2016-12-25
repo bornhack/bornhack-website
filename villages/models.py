@@ -4,7 +4,6 @@ from django.core.urlresolvers import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
 
-from camps.models import Camp
 from utils.models import CreatedUpdatedModel, UUIDModel
 
 from .managers import VillageQuerySet
@@ -15,7 +14,6 @@ class Village(CreatedUpdatedModel, UUIDModel):
     class Meta:
         ordering = ['name']
 
-    camp = models.ForeignKey('camps.Camp')
     contact = models.ForeignKey('auth.User')
 
     name = models.CharField(max_length=255)
@@ -62,11 +60,9 @@ class Village(CreatedUpdatedModel, UUIDModel):
                 incrementer += 1
             self.slug = slug
 
-        if not hasattr(self, 'camp'):
-            self.camp = Camp.objects.current()
-
         super(Village, self).save(**kwargs)
 
     def delete(self, using=None, keep_parents=False):
         self.deleted = True
         self.save()
+

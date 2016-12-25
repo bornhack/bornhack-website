@@ -42,47 +42,12 @@ INSTALLED_APPS = [
     'utils',
     'villages',
     'program',
+    'info',
 
     'allauth',
     'allauth.account',
     'bootstrap3',
 ]
-
-DEBUG = env('DEBUG')
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    INSTALLED_APPS += ['debug_toolbar', ]
-else:
-    EMAIL_HOST = env('EMAIL_HOST')
-    EMAIL_PORT = env('EMAIL_PORT')
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-    SERVER_EMAIL = env('DEFAULT_FROM_EMAIL')
-    ARCHIVE_EMAIL = env('ARCHIVE_EMAIL')
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-            },
-            'console': {
-                'level':'DEBUG',
-                'class':'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-        }
-    }
 
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
@@ -105,9 +70,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'camps.context_processors.current_camp',
                 'shop.context_processors.current_order',
                 'shop.context_processors.user_has_tickets',
+                'camps.context_processors.camps',
             ],
         },
     },
@@ -128,8 +93,8 @@ MIDDLEWARE_CLASSES = [
 LOGIN_REDIRECT_URL = 'profiles:detail'
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',  # Login to admin with username
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Handles login to admin with username
+    'allauth.account.auth_backends.AuthenticationBackend', # Handles regular logins
 )
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -163,3 +128,42 @@ BANKACCOUNT_REG = env('BANKACCOUNT_REG')
 BANKACCOUNT_ACCOUNT = env('BANKACCOUNT_ACCOUNT')
 
 TICKET_CATEGORY_ID = env('TICKET_CATEGORY_ID')
+
+DEBUG = env('DEBUG')
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    INSTALLED_APPS += ['debug_toolbar', ]
+    MIDDLEWARE_CLASSES += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
+
+else:
+    EMAIL_HOST = env('EMAIL_HOST')
+    EMAIL_PORT = env('EMAIL_PORT')
+    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+    EMAIL_USE_TLS = env('EMAIL_USE_TLS')
+    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
+    SERVER_EMAIL = env('DEFAULT_FROM_EMAIL')
+    ARCHIVE_EMAIL = env('ARCHIVE_EMAIL')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+        'console': {
+            'level':'DEBUG',
+            'class':'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
