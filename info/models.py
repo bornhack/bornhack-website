@@ -9,6 +9,7 @@ class InfoCategory(CreatedUpdatedModel):
     class Meta:
         ordering = ['-weight', 'headline']
         unique_together = (('anchor', 'camp'), ('headline', 'camp'))
+        verbose_name_plural = "Info Categories"
 
     camp = models.ForeignKey(
         'camps.Camp',
@@ -26,13 +27,17 @@ class InfoCategory(CreatedUpdatedModel):
     )
 
     weight = models.PositiveIntegerField(
-        help_text = 'Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically.'
+        help_text = 'Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically. Defaults to 100.',
+        default = 100,
     )
 
     def clean(self):
-        if InfoItem.objects.filter(camp=self.camp, anchor=self.anchor).exists():
+        if InfoItem.objects.filter(category__camp=self.camp, anchor=self.anchor).exists():
             # this anchor is already in use on an item, so it cannot be used (must be unique on the page)
             raise ValidationError({'anchor': 'Anchor is already in use on an info item for this camp'})
+
+    def __str__(self):
+        return '%s (%s)' % (self.headline, self.camp)
 
 
 class InfoItem(CreatedUpdatedModel):
@@ -60,11 +65,12 @@ class InfoItem(CreatedUpdatedModel):
     )
 
     weight = models.PositiveIntegerField(
-        help_text = 'Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically.'
+        help_text = 'Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.',
+        default = 100,
     )
 
     def clean(self):
-        if InfoCategory.objects.filter(camp=self.camp, anchor=self.anchor).exists():
+        if InfoCategory.objects.filter(camp=self.category.camp, anchor=self.anchor).exists():
             # this anchor is already in use on a category, so it cannot be used here (they must be unique on the entire page)
             raise ValidationError({'anchor': 'Anchor is already in use on an info category for this camp'})
 

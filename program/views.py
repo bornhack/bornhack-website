@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 import datetime
 from django.views.generic import ListView, TemplateView, DetailView
-from camp.mixins import CampViewMixin
+from camps.mixins import CampViewMixin
 
 from . import models
 

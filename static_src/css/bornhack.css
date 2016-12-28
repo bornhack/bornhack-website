@@ -1,5 +1,5 @@
 body {
-  margin-top: 90px;
+  margin-top: 85px;
   margin-bottom: 35px;
 }
 
@@ -42,23 +42,7 @@ a, a:active, a:focus {
 }
 
 .navbar-fixed-top {
-  min-height: 80px;
-}
-
-@media (min-width: 768px) {
-  .nav li a {
-    padding: 30px 15px;
-  }
-  .nav {
-    float: right!important;
-  }
-}
-
-@media (max-width: 767px) {
-  .nav li {
-    text-align: center;
-    font-size: 20px;
-  }
+  min-height: 70px;
 }
 
 .navbar-toggle .icon-bar {

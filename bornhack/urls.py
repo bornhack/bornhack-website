@@ -11,8 +11,10 @@ from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.core.urlresolvers import reverse_lazy
 from camps.views import *
-from info.views import CampInfoView
-
+from info.views import * 
+from villages.views import *
+from program.views import *
+from sponsors.views import *
 
 urlpatterns = [
     url(
@@ -28,22 +30,9 @@ urlpatterns = [
         include('news.urls', namespace='news')
     ),
     url(
-        r'^villages/',
-        include('villages.urls', namespace='villages')
-    ),
-    url(
-        r'^schedule/',
-        include('program.urls', namespace='schedule')
-    ),
-    url(
         r'^$',
         TemplateView.as_view(template_name='frontpage.html'),
         name='frontpage'
-    ),
-    url(
-        r'^info/',
-        TemplateView.as_view(template_name='info.html'),
-        name='info'
     ),
     url(
         r'^contact/',
@@ -90,54 +79,91 @@ urlpatterns = [
 
     # camp specific urls below here
 
-    url(r'(?P<camp_slug>[-_\w+]+)/', include([
-        url(
-            r'^$',
-            CampDetailView.as_view(),
-            name='camp_detail'
-        ),
-        url(
-            r'^info/$',
-            CampInfoView.as_view(),
-            name='info'
-        ),
-        url(
-            r'^schedule/$',
-            CampScheduleView.as_view(),
-            name='schedule'
-        ),
-        url(
-            r'^sponsors/$',
-            CampSponsorView.as_view(),
-            name='camp_sponsors'
-        ),
-        url(r'^villages/$', include([
+    url(
+        r'(?P<camp_slug>[-_\w+]+)/', include([
             url(
                 r'^$',
-                VillageListView.as_view(),
-                name='village_list'
+                CampDetailView.as_view(),
+                name='camp_detail'
             ),
+
             url(
-                r'create/$',
-                VillageCreateView.as_view(),
-                name='village_create'
+                r'^info/$',
+                CampInfoView.as_view(),
+                name='info'
             ),
+
             url(
-                r'(?P<slug>[-_\w+]+)/delete/$',
-                VillageDeleteView.as_view(),
-                name='village_delete'
+                r'^schedule/', include([
+                    url(
+                        r'^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/$',
+                        ProgramDayView.as_view(),
+                        name='schedule_day'
+                    ),
+                    url(
+                        r'^$',
+                        ProgramOverviewView.as_view(),
+                        name='schedule_index'
+                    ),
+                    url(
+                        r'^speakers/$',
+                        SpeakerListView.as_view(),
+                        name='speaker_index'
+                    ),
+                    url(
+                        r'^speakers/(?P<slug>[-_\w+]+)/$',
+                        SpeakerDetailView.as_view(),
+                        name='speaker_detail'
+                    ),
+                    url(
+                        r'^events/$',
+                        EventListView.as_view(),
+                        name='event_index'
+                    ),
+                    url(
+                        r'^(?P<slug>[-_\w+]+)/$',
+                        EventDetailView.as_view(),
+                        name='event'
+                    ),
+                ])
             ),
+
             url(
-                r'(?P<slug>[-_\w+]+)/edit/$',
-                VillageUpdateView.as_view(),
-                name='village_update'
+                r'^sponsors/$',
+                SponsorIndexView.as_view(),
+                name='sponsors'
             ),
+
             url(
-                r'(?P<slug>[-_\w+]+)/$',
-                VillageDetailView.as_view(),
-                name='village_detail'
+                r'^villages/', include([
+                    url(
+                        r'^$',
+                        VillageListView.as_view(),
+                        name='village_list'
+                   ),
+                   url(
+                        r'create/$',
+                        VillageCreateView.as_view(),
+                        name='village_create'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/delete/$',
+                        VillageDeleteView.as_view(),
+                        name='village_delete'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/edit/$',
+                        VillageUpdateView.as_view(),
+                        name='village_update'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/$',
+                        VillageDetailView.as_view(),
+                        name='village_detail'
+                    ),
+                ])
             ),
-        ])),
-    ])),
+        ])
+    )
 ]
 

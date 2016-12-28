@@ -15,7 +15,7 @@ class Village(CreatedUpdatedModel, UUIDModel):
         ordering = ['name']
 
     contact = models.ForeignKey('auth.User')
-
+    camp = models.ForeignKey('camps.Camp')
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
     description = models.TextField(
@@ -37,7 +37,7 @@ class Village(CreatedUpdatedModel, UUIDModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('villages:detail', kwargs={'slug': self.slug})
+        return reverse_lazy('village_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
     def save(self, **kwargs):
         if (

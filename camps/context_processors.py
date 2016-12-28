@@ -3,9 +3,16 @@ from .models import Camp
 from django.utils import timezone
 
 
-def camps(request):
+def camp(request):
+    if 'camp_slug' in request.resolver_match.kwargs:
+        camp = Camp.objects.get(slug=request.resolver_match.kwargs['camp_slug'])
+        request.session['campslug'] = camp.slug
+    else:
+        request.session['campslug'] = None
+        camp = None
+
     return {
-        'upcoming_camps': Camp.objects.filter(camp_start__gt=timezone.now()),
-        'previous_camps': Camp.objects.filter(camp_start__lt=timezone.now()),
+        'camps': Camp.objects.all().order_by('-camp_start'),
+        'camp': camp
     }
 

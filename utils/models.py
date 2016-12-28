@@ -1,5 +1,5 @@
 import uuid
-
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -19,7 +19,7 @@ class CleanedModel(models.Model):
             print(message)
             # dont save, just return
             return
-        super(CreatedUpdatedModel, self).save(**kwargs)
+        super(CleanedModel, self).save(**kwargs)
 
 
 class UUIDModel(CleanedModel):

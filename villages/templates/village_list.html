@@ -6,7 +6,7 @@ Villages | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-
+<h2>Villages</h2>
 <p>
   If this is your first hackercamp the term 'Village' might be confusing but it
   is fairly simple: a village is just a spot on the campsite where you and a
@@ -16,17 +16,15 @@ Villages | {{ block.super }}
 </p>
 
 <p class="lead">
-  <a href="https://bornhack.dk/shop/?category=villages">
-    It is also possible to rent a tent, chairs and tables for villages here.
-  </a>
+  It is also possible to rent a tent, chairs and tables in the shop!
 </p>
 
 {% if user.is_authenticated %}
-<a href="{% url 'villages:create' %}" class="btn btn-primary">Create a village</a>
+<a href="{% url 'village_create' camp_slug=camp.slug %}" class="btn btn-primary">Create a village</a>
 {% endif %}
 
 <hr />
-
+{% if villages %}
 <table class="table table-hover table-condensed table-striped">
   <thead>
   <tr>
@@ -39,7 +37,7 @@ Villages | {{ block.super }}
     {% for village in villages %}
     <tr>
       <td>
-        <a href="{% url 'villages:detail' slug=village.slug %}">
+        <a href="{% url 'village_detail' camp_slug=camp.slug slug=village.slug %}">
           {{ village.name }}
         </a>
       </td>
@@ -53,5 +51,7 @@ Villages | {{ block.super }}
     {% endfor %}
   </tbody>
 </table>
-
+{% else %}
+<h4>No villages for <b>{{ camp.title }}</b> yet!</h4>
+{% endif %}
 {% endblock %}
