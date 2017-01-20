@@ -238,69 +238,95 @@ class Command(BaseCommand):
         )
         ei2 = EventInstance.objects.create(
             event=ev1,
-            start=timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 28, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 28, 13, 0, tzinfo=timezone.utc),
+            )
         )
         ei3 = EventInstance.objects.create(
             event=ev2,
-            start=timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 29, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 29, 13, 0, tzinfo=timezone.utc),
+            )
         )
         ei4 = EventInstance.objects.create(
             event=ev4,
-            start=timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 28, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 28, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei5 = EventInstance.objects.create(
             event=ev4,
-            start=timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 29, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 29, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei6 = EventInstance.objects.create(
             event=ev4,
-            start=timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 30, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 30, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei7 = EventInstance.objects.create(
             event=ev4,
-            start=timezone.datetime(2016, 8, 30, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 31, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 30, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 31, 5, 0, tzinfo=timezone.utc),
+            )
         )
 
         ei8 = EventInstance.objects.create(
             event=ev7,
-            start=timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 27, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 27, 13, 0, tzinfo=timezone.utc),
+            )
         )
         ei9 = EventInstance.objects.create(
             event=ev5,
-            start=timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 28, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 28, 13, 0, tzinfo=timezone.utc),
+            )
         )
         ei10 = EventInstance.objects.create(
             event=ev6,
-            start=timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 29, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 29, 13, 0, tzinfo=timezone.utc),
+            )
         )
         ei11 = EventInstance.objects.create(
             event=ev8,
-            start=timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 28, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 28, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei12 = EventInstance.objects.create(
             event=ev8,
-            start=timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 29, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 28, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 29, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei13 = EventInstance.objects.create(
             event=ev8,
-            start=timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 30, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 29, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 30, 5, 0, tzinfo=timezone.utc),
+            )
         )
         ei14 = EventInstance.objects.create(
             event=ev8,
-            start=timezone.datetime(2016, 8, 30, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 31, 5, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 30, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 31, 5, 0, tzinfo=timezone.utc),
+            )
         )
 
 
