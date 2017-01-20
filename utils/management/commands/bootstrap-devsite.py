@@ -18,16 +18,57 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.output('Creating camps...')
         camp1 = Camp.objects.create(
-            name='BornHack 2016',
+            title='BornHack 2016',
+            tagline='Initial Commit',
             slug='bornhack-2016',
-            start=timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 9, 4, 12, 0, tzinfo=timezone.utc)
+            buildup = (
+                timezone.datetime(2016, 8, 25, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+            ),
+            camp = (
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 9, 04, 12, 0, tzinfo=timezone.utc),
+            ),
+            teardown = (
+                timezone.datetime(2016, 9, 04, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 9, 06, 12, 0, tzinfo=timezone.utc),
+            ),
         )
+
         camp2 = Camp.objects.create(
-            name='BornHack 2015',
-            slug='bornhack-2015',
-            start=timezone.datetime(2015, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2015, 9, 4, 12, 0, tzinfo=timezone.utc)
+            title='BornHack 2017',
+            tagline='Make Tradition',
+            slug='bornhack-2017',
+            buildup = (
+                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 22, 12, 0, tzinfo=timezone.utc),
+            ),
+            camp = (
+                timezone.datetime(2017, 8, 22, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 29, 12, 0, tzinfo=timezone.utc),
+            ),
+            teardown = (
+                timezone.datetime(2015, 8, 29, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2015, 8, 31, 12, 0, tzinfo=timezone.utc),
+            ),
+        )
+
+        camp3 = Camp.objects.create(
+            title='BornHack 2018',
+            tagline='Undecided',
+            slug='bornhack-2018',
+            buildup = (
+                timezone.datetime(2018, 8, 13, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2018, 8, 16, 12, 0, tzinfo=timezone.utc),
+            ),
+            camp = (
+                timezone.datetime(2018, 8, 16, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2018, 8, 23, 12, 0, tzinfo=timezone.utc),
+            ),
+            teardown = (
+                timezone.datetime(2018, 8, 23, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2018, 8, 26, 12, 0, tzinfo=timezone.utc),
+            ),
         )
 
         self.output('Creating news...')
@@ -46,15 +87,15 @@ class Command(BaseCommand):
             content='unpublished news body here',
         )
         news4 = NewsItem.objects.create(
-            title='welcome to bornhack 2015',
+            title='welcome to bornhack 2017',
             content='news body here',
-            published_at=timezone.datetime(2015, 8, 22, 12, 0, tzinfo=timezone.utc),
+            published_at=timezone.datetime(2017, 8, 22, 12, 0, tzinfo=timezone.utc),
             archived=True
         )
         news5 = NewsItem.objects.create(
-            title='bornhack 2015 is over',
+            title='bornhack 2017 is over',
             content='news body here',
-            published_at=timezone.datetime(2015, 8, 27, 12, 0, tzinfo=timezone.utc),
+            published_at=timezone.datetime(2017, 8, 29, 12, 0, tzinfo=timezone.utc),
             archived=True
         )
 
@@ -190,8 +231,10 @@ class Command(BaseCommand):
         self.output("creating eventinstances...")
         ei1 = EventInstance.objects.create(
             event=ev3,
-            start=timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-            end=timezone.datetime(2016, 8, 27, 13, 0, tzinfo=timezone.utc),
+            when=(
+                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 8, 27, 13, 0, tzinfo=timezone.utc)
+            )
         )
         ei2 = EventInstance.objects.create(
             event=ev1,

@@ -4,6 +4,11 @@ from django.utils import timezone
 
 
 def camp(request):
+    """
+    if we have a camp_slug url component then get the "current" Camp object.
+    Return it after adding the slug to request.session along with a "camps"
+    queryset containing all camps (used to build the menu and such)
+    """
     if 'camp_slug' in request.resolver_match.kwargs:
         camp = Camp.objects.get(slug=request.resolver_match.kwargs['camp_slug'])
         request.session['campslug'] = camp.slug
@@ -12,7 +17,7 @@ def camp(request):
         camp = None
 
     return {
-        'camps': Camp.objects.all().order_by('-camp_start'),
+        'camps': Camp.objects.all().order_by('-camp'),
         'camp': camp
     }
 

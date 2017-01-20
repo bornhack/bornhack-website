@@ -74,4 +74,7 @@ class InfoItem(CreatedUpdatedModel):
             # this anchor is already in use on a category, so it cannot be used here (they must be unique on the entire page)
             raise ValidationError({'anchor': 'Anchor is already in use on an info category for this camp'})
 
+    def __str__(self):
+        return '%s (%s)' % (self.headline, self.category)
+
 

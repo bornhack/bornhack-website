@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
-
+{% load imageutils %}
 {% block content %}
 
 <div class="row">
   <div class="col-md-12">
-      <img src="{% static 'img/logo.png' %}" class="img-responsive"
-          id="front-logo" />
+      <img src="{% static 'img/logo-large.png' %}" class="img-responsive" id="front-logo" />
 
       <br />
 
@@ -19,11 +18,7 @@
           </div>
         </div>
         <div class="col-md-4">
-          <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_162831.jpg">
-            <img class="img-thumbnail"
-                 src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_162831_tn.jpg"
-                 alt="Tents at CCCamp2015" title="Tents at CCCamp2015">
-          </a>
+	    {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1961.JPG' 'BornHack' %}
         </div>
       </div>
 
@@ -31,11 +26,7 @@
 
       <div class="row">
         <div class="col-md-4">
-          <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/jarlsgaard.jpg">
-            <img class="img-thumbnail"
-                 src="https://people.bornhack.org/tyk/ohm_cccamp_pics/jarlsgaard_tn.jpg"
-                 alt="Jarlsgaard from above" title="Jarlsgaard from above">
-          </a>
+	    {% thumbnail 'img/bornhack-2016/ahf' 'jarlsgaard.jpg' 'Jarlsgård buildings from above' %}
         </div>
         <div class="col-md-8 text-container">
           <div class="lead">
@@ -57,11 +48,7 @@
           </p>
         </div>
         <div class="col-md-4">
-          <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5755.jpg">
-            <img class="img-thumbnail"
-                 src="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5755_tn.jpg"
-                 alt="Hacking in Baconsvin village at OHM2013" title="Hacking in Baconsvin village at OHM2013">
-          </a>
+	    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5090.JPG' 'Talk at BornHack 2016' %}
         </div>
       </div>
 
@@ -87,43 +74,15 @@
       </div>
 
     <p align="center">
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_141706.jpg">
-        <img class="img-thumbnail"
-             src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_141706_tn.jpg"
-             alt="Hacking sign at CCCamp2015" title="Hacking sign at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_163606.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_163606_tn.jpg"
-             alt="Entrance to Baconsvin village at CCCamp2015" title="Entrance to Baconsvin village at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_201635.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150812_201635_tn.jpg"
-             alt="Dome being built at CCCamp2015" title="Dome being built at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5746.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5746_tn.jpg"
-             alt="Person swinging lights in the night at OHM2013" title="Person swinging lights in the night at OHM2013">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150814_145204.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150814_145204_tn.jpg"
-             alt="Queer Feminist Geeks village at CCCamp2015" title="Queer Feminist Geeks village at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_154027.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_154027_tn.jpg"
-             alt="Dome at CCCamp2015" title="Dome at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5736.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/_MG_5736_tn.jpg"
-             alt="Lights at night at OHM2013" title="Lights at night at OHM2013">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_154119.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150815_154119_tn.jpg"
-             alt="Free Chelsea Manning sign at CCCamp2015" title="Free Chelsea Manning sign at CCCamp2015">
-      </a>
-      <a href="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150816_153404.jpg">
-        <img class="img-thumbnail" src="https://people.bornhack.org/tyk/ohm_cccamp_pics/IMG_20150816_153404_tn.jpg"
-             alt="Swedish Embassy sign at CCCamp2015" title="Swedish Embassy sign at CCCamp2015">
-      </a>
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1983.JPG' 'Happy organisers welcoming people at the entrance to BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1986.JPG' 'A bus full of hackers arrive at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5126.JPG' 'Late night hacking at Baconsvin village at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5168.JPG' '#irl_bar by night at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5265.JPG' 'Happy organisers welcoming people to BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2452.jpg' 'Soldering the BornHack 2016 badge' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2485.jpg' 'Colored light in the grass' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2624.jpg' 'Working on decorations' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2604.jpg' 'Sitting around the campfire at BornHack 2016' %}
     </p>
 </div>
 

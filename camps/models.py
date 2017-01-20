@@ -1,6 +1,8 @@
 import datetime
 from django.db import models
 from utils.models import UUIDModel, CreatedUpdatedModel
+from program.models import EventType
+from django.contrib.postgres.fields import DateTimeRangeField
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -25,69 +27,34 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         help_text='The url slug to use for this camp'
     )
 
-    buildup_start = models.DateTimeField(
-        verbose_name='Buildup Start date',
-        help_text='When the camp buildup starts.',
+    buildup = DateTimeRangeField(
+        verbose_name='Buildup Period',
+        help_text='The camp buildup period.',
     )
 
-    camp_start = models.DateTimeField(
-        verbose_name='Start date',
-        help_text='When the camp starts.',
+    camp = DateTimeRangeField(
+        verbose_name='Camp Period',
+        help_text='The camp period.',
     )
 
-    camp_end = models.DateTimeField(
-        verbose_name='End date',
-        help_text='When the camp ends.',
-    )
-
-    teardown_end = models.DateTimeField(
-        verbose_name='Start date',
-        help_text='When the camp teardown ends.',
+    teardown = DateTimeRangeField(
+        verbose_name='Teardown period',
+        help_text='The camp teardown period.',
     )
 
     def __unicode__(self):
         return "%s - %s" % (self.title, self.tagline)
 
+    @property
+    def event_types(self):
+        # return all event types with at least one event in this camp
+        return EventType.objects.filter(event__instances__isnull=False, event__camp=self).distinct()
 
-class Expense(CreatedUpdatedModel, UUIDModel):
-    class Meta:
-        verbose_name = 'Expense'
-        verbose_name_plural = 'Expenses'
+    @property
+    def logo_small(self):
+        return 'img/%(slug)s/logo/%(slug)s-logo-small.png' % {'slug': self.slug}
 
-    payment_time = models.DateTimeField(
-        verbose_name='Expense date/time',
-        help_text='The date and time this expense was paid.',
-    )
-
-    description = models.CharField(
-        verbose_name='Description',
-        help_text='What this expense covers.',
-        max_length=255,
-    )
-
-    dkk_amount = models.DecimalField(
-        verbose_name='DKK Amount',
-        help_text='The DKK amount of the expense.',
-        max_digits=7,
-        decimal_places=2,
-    )
-
-    receipt = models.ImageField(
-        verbose_name='Image of receipt',
-        help_text='Upload a scan or image of the receipt',
-    )
-
-    refund_user = models.ForeignKey(
-        'auth.User',
-        verbose_name='Refund user',
-        help_text='Which user, if any, covered this expense and should be refunded.',
-        null=True,
-        blank=True,
-    )
-
-    refund_paid = models.BooleanField(
-        default=False,
-        verbose_name='Refund paid?',
-        help_text='Has this expense been refunded to the user?',
-    )
+    @property
+    def logo_large(self):
+        return 'img/%(slug)s/logo/%(slug)s-logo-large.png' % {'slug': self.slug}
 

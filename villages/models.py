@@ -24,7 +24,7 @@ class Village(CreatedUpdatedModel, UUIDModel):
 
     private = models.BooleanField(
         default=False,
-        help_text='Check if your village is privately organized'
+        help_text='Check if your village is invite only. Leave unchecked to welcome strangers.'
     )
 
     deleted = models.BooleanField(

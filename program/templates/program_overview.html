@@ -4,8 +4,8 @@
 <a href="{% url 'schedule:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
   All
 </a>
-{% for event_type in event_types %}
-<a href="{% url 'schedule:index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+{% for event_type in camp.event_types %}
+<a href="{% url 'schedule_index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
   {{ event_type.name }}
 </a>
 {% endfor %}

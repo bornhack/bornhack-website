@@ -7,11 +7,11 @@ class NewsIndex(ListView):
     template_name = 'news_index.html'
     context_object_name = 'news_items'
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self):
         return NewsItem.objects.filter(
             published_at__isnull=False,
             published_at__lt=timezone.now(),
-            archived=False
+            archived=self.kwargs['archived']
         )
 
 

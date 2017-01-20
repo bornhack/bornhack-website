@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.utils.text import slugify
 
@@ -18,7 +18,7 @@ class EventType(CreatedUpdatedModel):
 
 
 class Event(CreatedUpdatedModel):
-    """ Something that is on the program. """
+    """ Something that is on the program one or more times. """
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, max_length=255)
     abstract = models.TextField()
@@ -40,19 +40,17 @@ class Event(CreatedUpdatedModel):
 class EventInstance(CreatedUpdatedModel):
     """ An instance of an event """
     event = models.ForeignKey('program.event', related_name='instances')
-    start = models.DateTimeField()
-    end = models.DateTimeField()
+    when = DateTimeRangeField()
 
     class Meta:
-        ordering = ['start']
+        ordering = ['when']
 
     def __unicode__(self):
-        return '%s (%s to %s)' % (self.event, self.start, self.end)
-
+        return '%s (%s)' % (self.event, self.when)
 
 
 class Speaker(CreatedUpdatedModel):
-    """ Person anchoring an event. """
+    """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
     biography = models.TextField()
     picture = models.ImageField(null=True, blank=True)

@@ -5,6 +5,8 @@ from .models import *
 
 class CampDetailView(DetailView):
     model = Camp
-    template_name = 'camp_detail.html'
     slug_url_kwarg = 'camp_slug'
+
+    def get_template_names(self):
+        return 'camp_detail_%s.html' % self.get_object().slug
 
