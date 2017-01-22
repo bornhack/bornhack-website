@@ -9,7 +9,7 @@
 <div class="list-group">
   {% for event in event_list %}
   {% if event.event_type.name != "Facilities" %}
-  <a href="{% url 'schedule:event' slug=event.slug %}" class="list-group-item">
+  <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item">
     <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
       {{ event.event_type.name }}
     </small>

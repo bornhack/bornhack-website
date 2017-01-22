@@ -3,6 +3,9 @@ from django.db import models
 from utils.models import UUIDModel, CreatedUpdatedModel
 from program.models import EventType
 from django.contrib.postgres.fields import DateTimeRangeField
+from psycopg2.extras import DateTimeTZRange
+from django.core.exceptions import ValidationError
+from datetime import timedelta
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -42,6 +45,36 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         help_text='The camp teardown period.',
     )
 
+    def clean(self):
+        ''' Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown '''
+        errors = []
+        # sanity checking for buildup
+        if self.buildup.lower > self.buildup.upper:
+            errors.append(ValidationError({'buildup', 'Start of buildup must be before end of buildup'}))
+
+        # sanity checking for camp
+        if self.camp.lower > self.camp.upper:
+            errors.append(ValidationError({'camp', 'Start of camp must be before end of camp'}))
+
+        # sanity checking for teardown
+        if self.teardown.lower > self.teardown.upper:
+            errors.append(ValidationError({'teardown', 'Start of teardown must be before end of teardown'}))
+
+        # check for overlaps buildup vs. camp
+        if self.buildup.upper > self.camp.lower:
+            msg = "End of buildup must not be after camp start"
+            errors.append(ValidationError({'buildup', msg}))
+            errors.append(ValidationError({'camp', msg}))
+
+        # check for overlaps camp vs. teardown
+        if self.camp.upper > self.teardown.lower:
+            msg = "End of camp must not be after teardown start"
+            errors.append(ValidationError({'camp', msg}))
+            errors.append(ValidationError({'teardown', msg}))
+
+        if errors:
+            raise ValidationError(errors)
+
     def __unicode__(self):
         return "%s - %s" % (self.title, self.tagline)
 
@@ -57,4 +90,69 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     @property
     def logo_large(self):
         return 'img/%(slug)s/logo/%(slug)s-logo-large.png' % {'slug': self.slug}
+
+    def get_days(self, camppart):
+        '''
+        Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
+        '''
+        if not hasattr(self, camppart):
+            print("nonexistant field/attribute")
+            return False
+
+        field = getattr(self, camppart)
+
+        if not hasattr(field, '__class__') or not hasattr(field.__class__, '__name__') or not field.__class__.__name__ == 'DateTimeTZRange':
+            print("this attribute is not a datetimetzrange field: %s" % field)
+            return False
+
+        daycount = (field.upper - field.lower).days
+        days = []
+        for i in range(0, daycount):
+            if i == 0:
+                # on the first day use actual start time instead of midnight
+                days.append(
+                    DateTimeTZRange(
+                        field.lower, 
+                        (field.lower+timedelta(days=i+1)).replace(hour=0)
+                    )
+                )
+            elif i == daycount-1:
+                # on the last day use actual end time instead of midnight
+                days.append(
+                    DateTimeTZRange(
+                        (field.lower+timedelta(days=i)).replace(hour=0),
+                        field.lower+timedelta(days=i+1)
+                    )
+                )
+            else:
+                # neither first nor last day, goes from midnight to midnight
+                days.append(
+                    DateTimeTZRange(
+                        (field.lower+timedelta(days=i)).replace(hour=0),
+                        (field.lower+timedelta(days=i+1)).replace(hour=0)
+                    )
+                )
+        return days
+
+    @property
+    def buildup_days(self):
+        '''
+        Returns a list of DateTimeTZRanges representing the days during the buildup.
+        '''
+        return self.get_days('buildup')
+
+    @property
+    def camp_days(self):
+        '''
+        Returns a list of DateTimeTZRanges representing the days during the camp.
+        '''
+        return self.get_days('camp')
+
+    @property
+    def teardown_days(self):
+        '''
+        Returns a list of DateTimeTZRanges representing the days during the buildup.
+        '''
+        return self.get_days('teardown')
+
 

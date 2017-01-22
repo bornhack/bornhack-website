@@ -54,10 +54,14 @@ STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]
 MEDIA_ROOT = env('MEDIA_ROOT')
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
+TIME_ZONE = env('TIME_ZONE')
+#USE_I18N = True
+#USE_L10N = True
 USE_TZ = True
+SHORT_DATE_FORMAT = 'd/m-Y'
+DATE_FORMAT = 'd/m-Y'
+DATETIME_FORMAT = 'd/m-Y H:i'
+TIME_FORMAT = 'H:i'
 
 TEMPLATES = [
     {
@@ -166,4 +170,8 @@ LOGGING = {
         },
     }
 }
+
+# schedule settings
+SCHEDULE_MIDNIGHT_OFFSET_HOURS=int(env('SCHEDULE_MIDNIGHT_OFFSET_HOURS'))
+SCHEDULE_TIMESLOT_LENGTH_MINUTES=int(env('SCHEDULE_TIMESLOT_LENGTH_MINUTES'))
 

@@ -105,13 +105,8 @@ footer {
 }
 
 .event {
-    max-width: 200px;
     width: 200px;
-    height: 150px;
-    display: inline-block;
-    margin: 5px 5px;
     padding: 5px;
-    flex: 1 1 auto;
 }
 
 .event:hover {
@@ -119,3 +114,4 @@ footer {
     color: white !important;
     text-decoration: none;
 }
+

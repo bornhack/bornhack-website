@@ -1,10 +1,11 @@
 from collections import OrderedDict
-
 import datetime
 from django.views.generic import ListView, TemplateView, DetailView
 from camps.mixins import CampViewMixin
-
 from . import models
+from django.http import Http404
+import datetime
+from django.conf import settings
 
 
 class SpeakerDetailView(CampViewMixin, DetailView):
@@ -29,10 +30,56 @@ class ProgramOverviewView(CampViewMixin, ListView):
 
 class ProgramDayView(CampViewMixin, TemplateView):
     template_name = 'program_day.html'
+    def dispatch(self, *args, **kwargs):
+        """ If an event type has been supplied check if it is valid """
+        if 'type' in self.request.GET:
+            try:
+                eventtype = EventType.objects.get(
+                    slug=self.request.GET['type']
+                )
+            except EventType.DoesNotExist:
+                raise Http404
+        return super(ProgramDayView, self).dispatch(*args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ProgramDayView, self).get_context_data(**kwargs)
+        when = datetime.datetime(year=int(self.kwargs['year']), month=int(self.kwargs['month']), day=int(self.kwargs['day']))
+        eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
+        skip = []
+        for ei in eventinstances:
+            if ei.schedule_date != when.date():
+                print "skipping ei %s (wrong date %s vs %s)" % (ei, ei.schedule_date, when.date())
+                skip.append(ei.id)
+            else:
+                if 'type' in self.request.GET:
+                    eventtype = EventType.objects.get(
+                        slug=self.request.GET['type']
+                    )
+                    if ei.event.event_type != eventtype:
+                        print "skipping ei %s (wrong type)" % ei
+                        skip.append(ei.id)
+        print "skipping %s" % skip
+        context['eventinstances'] = eventinstances.exclude(id__in=skip).order_by('event__event_type')
+
+        start = when + datetime.timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
+        timeslots = []
+        # calculate how many timeslots we have in the schedule based on the lenght of the timeslots in minutes,
+        # and the number of minutes in 24 hours
+        for i in range(0,(24*60)/settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES):
+            timeslot = start + datetime.timedelta(minutes=i*settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)
+            timeslots.append(timeslot)
+        context['timeslots'] = timeslots
+
+        return context
 
 
 class EventDetailView(CampViewMixin, DetailView):
     model = models.Event
     template_name = 'program_event_detail.html'
+
+
+class CallForSpeakersView(CampViewMixin, TemplateView):
+    def get_template_names(self):
+        return 'call_for_speakers_%s.html' % self.get_object().slug
 
 

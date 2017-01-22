@@ -2,17 +2,15 @@
 
 {% block schedule_content %}
 
-<a href="{% url 'schedule:index' %}" class="btn btn-default" style="display: inline-block; padding: 5px;">
-  Overview
-</a>
-{% for day in days %}
-{% with day.date|date:"m" as month_padded %}
-{% with day.date|date:"d" as day_padded %}
-<a href="{% url 'schedule:day' year=day.date.year month=month_padded day=day_padded %}" class="btn btn-default" style="display: inline-block; padding: 5px;">
-  {{ day.date|date:"l" }}
-</a>
-{% endwith %}
-{% endwith %}
+<a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn btn-default" style="display: inline-block; padding: 5px;">Overview</a>
+{% for day in camp.camp_days %}
+  {% with day.lower.date|date:"m" as month_padded %}
+    {% with day.lower.date|date:"d" as day_padded %}
+      <a href="{% url 'schedule_day' camp_slug=camp.slug year=day.lower.date.year month=month_padded day=day_padded %}" class="btn btn-default" style="display: inline-block; padding: 5px;">
+        {{ day.lower.date|date:"l" }}
+      </a>
+    {% endwith %}
+  {% endwith %}
 {% endfor %}
 
 <hr />
