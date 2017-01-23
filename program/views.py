@@ -87,7 +87,17 @@ class ProgramDayView(CampViewMixin, TemplateView):
             timeslots.append(timeslot)
         context['timeslots'] = timeslots
 
+        # include the components to make the urls
+        context['urlyear'] = self.kwargs['year']
+        context['urlmonth'] = self.kwargs['month']
+        context['urlday'] = self.kwargs['day']
+
+        if 'type' in self.request.GET:
+            context['eventtype'] = models.EventType.objects.get(slug=self.request.GET['type'])
+
+        print dir(self.request.resolver_match.func.view_class)
         return context
+
 
 
 class EventDetailView(CampViewMixin, DetailView):

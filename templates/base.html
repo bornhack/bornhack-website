@@ -1,5 +1,6 @@
 {% load static from staticfiles %}
 {% load bootstrap3 %}
+{% load menubutton %}
 {% static "" as baseurl %}
 
 <!DOCTYPE html>
@@ -33,13 +34,13 @@
           </button>
           <a class="navbar-brand" href="/">
             {% if request.resolver_match.kwargs.camp_slug %}
-	    <img src="{% static camp.logo_small %}" class="img-responsive" />
+              <img src="{% static camp.logo_small %}" class="img-responsive" />
             {% else %}
               <img src="{% static 'img/logo-small.png' %}" class="img-responsive" />
             {% endif %}
           </a>
         </div>
-	<div id="navbar" class="navbar-collapse collapse">
+        <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li><a href="{% url 'news:index' %}">News</a></li>
             <li><a href="{% url 'shop:index' %}">Shop</a></li>
@@ -51,7 +52,7 @@
                 {% endfor %}
               </ul>
             </li>
-	    <li><a href="{% url 'contact' %}">Contact</a></li>
+            <li><a href="{% url 'contact' %}">Contact</a></li>
           </ul> 
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}
@@ -63,19 +64,19 @@
         </div>
       </div>
     </nav>
- 
+
     <div id="main" class="container container-fluid">
       {% if camp %}
         <div class="row">
           <div class="btn-group btn-group-justified">
-            <a class="btn {% if request.resolver_match.url_name == "camp_detail" %}btn-primary{% else %}btn-default{% endif %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
-            <a class="btn {% if request.resolver_match.url_name == "info" %}btn-primary{% else %}btn-default{% endif %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a></li>
-            <a class="btn {% if request.resolver_match.url_name == "village_list" %}btn-primary{% else %}btn-default{% endif %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
-            <a class="btn {% if request.resolver_match.url_name == "schedule_index" %}btn-primary{% else %}btn-default{% endif %}" href="{% url 'schedule_index' camp_slug=camp.slug %}">Schedule</a>
-            <a class="btn {% if request.resolver_match.url_name == "sponsors" %}btn-primary{% else %}btn-default{% endif %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+            <a class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
+            <a class="btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a></li>
+            <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
+            <a class="btn {% menubuttonclass 'program' %}" href="{% url 'schedule_index' camp_slug=camp.slug %}">Schedule</a>
+            <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
           </div>
-<p>
-</div>
+        <p>
+      </div>
       {% endif %}
       {% bootstrap_messages %}
       {% block content %}{% endblock %}
@@ -93,3 +94,4 @@
     {% bootstrap_javascript jquery=1 %}
   </body>
 </html>
+

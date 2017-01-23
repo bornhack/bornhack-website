@@ -102,7 +102,7 @@ class Speaker(CreatedUpdatedModel):
         ordering = ['name']
 
     def __unicode__(self):
-        return self.name
+        return '%s (%s)' % (self.name, self.camp)
 
     def save(self, **kwargs):
         if not self.slug:
