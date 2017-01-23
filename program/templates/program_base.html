@@ -15,6 +15,17 @@
 
 <hr />
 
+<a href="{% url 'schedule_index' camp_slug=camp.slug %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
+  All
+</a>
+{% for event_type in camp.event_types %}
+<a href="{% url 'schedule_index' camp_slug=camp.slug %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+  {{ event_type.name }}
+</a>
+{% endfor %}
+
+<hr />
+
 {% block program_content %}
 {% endblock program_content %}
 

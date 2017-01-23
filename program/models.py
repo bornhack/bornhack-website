@@ -90,6 +90,7 @@ class Speaker(CreatedUpdatedModel):
     biography = models.TextField()
     picture = models.ImageField(null=True, blank=True)
     slug = models.SlugField(blank=True, max_length=255)
+    camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
     events = models.ManyToManyField(
         Event,
         related_name='speakers',

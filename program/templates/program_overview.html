@@ -1,23 +1,13 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
-<a href="{% url 'schedule_index' camp_slug=camp.slug %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
-  All
-</a>
-{% for event_type in camp.event_types %}
-<a href="{% url 'schedule_index' camp_slug=camp.slug %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-  {{ event_type.name }}
-</a>
-{% endfor %}
-
-<hr />
-
 {% for day in camp.camp_days %}
   {{ day.lower.date|date:"D d/m" }} <br />
   <div style="display: flex; flex-wrap: wrap;">
   {% for event in camp.events.all %}
     {% for eventinstance in event.instances.all %}
     {% if eventinstance.schedule_date == day.lower.date %}
+    {% if not eventtype or eventtype == eventinstance.event.event_type %}
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
        style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eveninstance.event.event_type.light_text %}white{% else %}black{% endif %};">
@@ -27,6 +17,7 @@
       <br />
       {% if event.speakers.exists %}<i>by {{ event.speakers.all|join:", " }}{% endif %}</i>
     </a>
+    {% endif %}
     {% endif %}
  {% endfor %}
   {% endfor %}
