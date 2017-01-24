@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'villages',
     'program',
     'info',
+    'sponsors',
 
     'allauth',
     'allauth.account',

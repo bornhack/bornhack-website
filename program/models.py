@@ -38,6 +38,12 @@ class Event(CreatedUpdatedModel):
             self.slug = slugify(self.title)
         super(Event, self).save(**kwargs)
 
+    @property
+    def speakers_list(self):
+        if self.speakers.exists():
+            return ", ".join(self.speakers.all().values_list('name', flat=True))
+        return False
+
 
 class EventInstance(CreatedUpdatedModel):
     """ An instance of an event """

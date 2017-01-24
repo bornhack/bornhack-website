@@ -2,35 +2,32 @@
 {% load commonmark %}
 
 {% block schedule_content %}
+<div class="panel panel-default">
+    <div class="panel-heading" ><span style="font-size: x-large"><span style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">{{ event.event_type.name }}</span> {{ event.title }}</span></div>
+  <div class="panel-body">
+    <p>
+    {{ event.abstract|commonmark }}
+    {% if event.speakers.exists %}
+        <hr>
+        {% for speaker in event.speakers.all %}
+          <h4><a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker }}</a></h4>
+          {{ speaker.biography|commonmark }}
+        {% endfor %}
+    {% endif %}
+    </p>
 
-<h3>
-  <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-    {{ event.event_type.name }}
-  </small>
-  {{ event.title }}
-</h3>
+    <hr>
 
-<h4>
-{% if event.start and event.end and event.days.all.exists %}
-  {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} on
-  {% for day in event.days.all %}{{ day.date|date:"l" }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
-{% else %}
-Not scheduled yet
-{% endif %}
-</h4>
-
-{{ event.abstract|commonmark }}
-
-<hr />
-
-{% if event.speakers.exists %}
-{% for speaker in event.speakers.all %}
-
-  <h3><a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker }}</a></h3>
-  {{ speaker.biography|commonmark }}
-
-{% endfor %}
-
-{% endif %}
-
+    <h4>Instances</h4>
+    <ul class="list-group">
+    {% for ei in event.instances.all %}
+      <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
+    {% empty %}
+      No instances scheduled yet
+    {% endfor %}
+    </ul>
+    </h4>
+  </div>
+</div>
 {% endblock schedule_content %}
+

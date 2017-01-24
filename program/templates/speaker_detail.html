@@ -9,23 +9,27 @@
 <hr />
 
 {% if speaker.events.exists %}
-{% for event in speaker.events.all %}
+    {% for event in speaker.events.all %}
+        <h3>
+            <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
+                {{ event.event_type.name }}
+            </small>
+            <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+        </h3>
+        {{ event.abstract|commonmark }}
 
-  <h3>
-    <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-      {{ event.event_type.name }}
-    </small><br>
-<a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></h3>
-  {{ event.abstract|commonmark }}
-{% if event.start and event.end and event.days.all.exists %}
-  At {{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }} on
-  {% for day in event.days.all %}{{ day.date|date:"l" }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
-{% else %}
-Not scheduled yet
+        <h4>Instances</h4>
+            <ul class="list-group">
+                {% for ei in event.instances.all %}
+                    <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
+                {% empty %}
+                    No instances scheduled yet
+                {% endfor %}
+            </ul>
+        </h4>
+        <hr>
+    {% empty %}
+      No events registered for this speaker yet
+    {% endfor %}
 {% endif %}
-
-{% endfor %}
-
-{% endif %}
-
 {% endblock schedule_content %}

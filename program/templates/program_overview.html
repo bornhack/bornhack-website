@@ -15,7 +15,7 @@
       <br />
       {{ event }}
       <br />
-      {% if event.speakers.exists %}<i>by {{ event.speakers.all|join:", " }}{% endif %}</i>
+      {% if event.speakers.exists %}<i>by {{ event.speakers_list }}{% endif %}</i>
     </a>
     {% endif %}
     {% endif %}

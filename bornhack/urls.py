@@ -45,11 +45,6 @@ urlpatterns = [
         name='conduct'
     ),
     url(
-        r'^sponsors/',
-        TemplateView.as_view(template_name='sponsors.html'),
-        name='call-for-sponsors'
-    ),
-    url(
         r'^login/$',
         LoginView.as_view(),
         name='account_login',
@@ -116,7 +111,7 @@ urlpatterns = [
                         name='event_index'
                     ),
                     url(
-                        r'^call/$',
+                        r'^call-for-speakers/$',
                         CallForSpeakersView.as_view(),
                         name='call_for_speakers'
                     ),
@@ -130,7 +125,7 @@ urlpatterns = [
 
             url(
                 r'^sponsors/$',
-                SponsorIndexView.as_view(),
+                SponsorView.as_view(),
                 name='sponsors'
             ),
 
