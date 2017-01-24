@@ -107,6 +107,6 @@ class EventDetailView(CampViewMixin, DetailView):
 
 class CallForSpeakersView(CampViewMixin, TemplateView):
     def get_template_names(self):
-        return 'call_for_speakers_%s.html' % self.get_object().slug
+        return 'call_for_speakers_%s.html' % self.camp.slug
 
 

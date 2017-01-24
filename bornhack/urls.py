@@ -116,14 +116,14 @@ urlpatterns = [
                         name='event_index'
                     ),
                     url(
+                        r'^call/$',
+                        CallForSpeakersView.as_view(),
+                        name='call_for_speakers'
+                    ),
+                    url(
                         r'^(?P<slug>[-_\w+]+)/$',
                         EventDetailView.as_view(),
                         name='event_detail'
-                    ),
-                    url(
-                        r'^call-for-speakers/$',
-                        CallForSpeakersView.as_view(),
-                        name='call_for_speakers'
                     ),
                ])
             ),
