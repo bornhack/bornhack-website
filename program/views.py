@@ -95,7 +95,6 @@ class ProgramDayView(CampViewMixin, TemplateView):
         if 'type' in self.request.GET:
             context['eventtype'] = models.EventType.objects.get(slug=self.request.GET['type'])
 
-        print dir(self.request.resolver_match.func.view_class)
         return context
 
 
