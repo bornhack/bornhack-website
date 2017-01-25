@@ -99,8 +99,6 @@ class Speaker(CreatedUpdatedModel):
     camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
     events = models.ManyToManyField(
         Event,
-        related_name='speakers',
-        related_query_name='speaker',
         blank=True,
     )
 

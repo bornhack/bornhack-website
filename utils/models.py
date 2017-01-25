@@ -17,8 +17,8 @@ class CleanedModel(models.Model):
             if hasattr(self, 'request'):
                 messages.error(self.request, message)
             print(message)
-            # dont save, just return
-            return
+            # dont save, re-raise the exception
+            raise
         super(CleanedModel, self).save(**kwargs)
 
 
