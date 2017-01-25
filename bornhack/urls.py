@@ -67,6 +67,12 @@ urlpatterns = [
     url(r'^accounts/', include('allauth.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
+    url(
+        r'^camps/$',
+        CampListView.as_view(),
+        name='camp_list'
+    ),
+
     # camp specific urls below here
 
     url(

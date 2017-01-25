@@ -18,6 +18,8 @@
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
 
+    {% bootstrap_javascript jquery=1 %}
+
     {% block extra_head %}
     {% endblock %}
   </head>
@@ -47,9 +49,8 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
               <ul class="dropdown-menu">
-                {% for camp in camps %}
-                  <li><a href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a></li>
-                {% endfor %}
+                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2017' %}">BornHack 2017</a></li>
+                <li><a href="{% url 'camp_list' %}">Other camps</a></li>
               </ul>
             </li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
@@ -91,7 +92,6 @@
         </div>
       </footer>
     </div>
-    {% bootstrap_javascript jquery=1 %}
   </body>
 </html>
 

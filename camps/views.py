@@ -10,3 +10,8 @@ class CampDetailView(DetailView):
     def get_template_names(self):
         return 'camp_detail_%s.html' % self.get_object().slug
 
+
+class CampListView(ListView):
+    model = Camp
+    template_name = 'camp_list.html'
+
