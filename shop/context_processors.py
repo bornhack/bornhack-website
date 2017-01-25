@@ -20,3 +20,4 @@ def user_has_tickets(request):
     ).exists():
         has_tickets = True
     return {'has_tickets': has_tickets}
+

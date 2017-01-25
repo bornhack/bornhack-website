@@ -13,8 +13,8 @@ Village: {{ village.name }} | {{ block.super }}
 
 {% if user == village.contact %}
 <hr />
-<a href="{% url 'villages:update' slug=village.slug %}" class="btn btn-primary">Edit</a>
-<a href="{% url 'villages:delete' slug=village.slug %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'village_update' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-primary">Edit</a>
+<a href="{% url 'village_delete' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-danger">Delete</a>
 {% endif %}
 
 {% endblock %}

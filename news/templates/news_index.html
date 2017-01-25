@@ -6,6 +6,9 @@ News | {{ block.super }}
 {% endblock %}
 
 {% block content %}
+{% if request.resolver_match.kwargs.archived %}
+<i>Showing archived news items. <a href="{% url 'news:index' archived=False %}">Show regular news items</a></i>
+{% endif %}
 {% for item in news_items %}
   <div>
     <h3><a href="{% url 'news:detail' slug=item.slug %}">{{ item.title }}</a> <small>{{ item.published_at|date:"Y-m-d" }}</small></h3>
@@ -17,4 +20,9 @@ News | {{ block.super }}
 {% empty %}
   <h3>No news yet. Stay tuned!</h3>
 {% endfor %}
+{% if not request.resolver_match.kwargs.archived %}
+<hr />
+<i><a href="{% url 'news:archive' archived=True %}">Show archived news items</a></i>
+{% endif %}
 {% endblock %}
+

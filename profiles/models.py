@@ -30,3 +30,4 @@ class Profile(CreatedUpdatedModel, UUIDModel):
 def create_profile(sender, created, instance, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+

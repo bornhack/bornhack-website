@@ -17,12 +17,6 @@ from unidecode import unidecode
 
 
 class CustomOrder(CreatedUpdatedModel):
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp this custom order is for.'),
-    )
-
     text = models.TextField(
         help_text=_('The invoice text')
     )
@@ -76,12 +70,6 @@ class Order(CreatedUpdatedModel):
         verbose_name=_('Open?'),
         help_text=_('Whether this shop order is open or not. "None" means closed.'),
         default=True,
-    )
-
-    camp = models.ForeignKey(
-        'camps.Camp',
-        verbose_name=_('Camp'),
-        help_text=_('The camp this shop order is for.'),
     )
 
     CREDIT_CARD = 'credit_card'
@@ -168,7 +156,7 @@ class Order(CreatedUpdatedModel):
 
     @property
     def description(self):
-        return "BornHack %s order #%s" % (self.camp.start.year, self.pk)
+        return "Order #%s" % self.pk
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))

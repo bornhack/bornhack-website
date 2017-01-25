@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+      <img src="{% static 'img/logo-large.png' %}" class="img-responsive" id="front-logo" />
+
+      <br />
+
+      <div class="row">
+        <div class="col-md-8 text-container">
+          <div class="lead">
+            <strong>Bornhack</strong> is an annual 7 day outdoor tent camping festival
+            where people with an interest in technology, security and society
+            come together to celebrate technology, socialise, learn and <strong>have fun</strong>.
+          </div>
+        </div>
+        <div class="col-md-4">
+	    {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1961.JPG' 'BornHack' %}
+        </div>
+      </div>
+
+      <br />
+
+      <div class="row">
+        <div class="col-md-4">
+	    {% thumbnail 'img/bornhack-2016/ahf' 'jarlsgaard.jpg' 'Jarlsgård buildings from above' %}
+        </div>
+        <div class="col-md-8 text-container">
+          <div class="lead">
+            The first Bornhack took place from <strong>August 27 to September 3rd 2016</strong>
+            on the Danish island of <strong>Bornholm</strong>. We are preparing 
+            <strong>BornHack 2017</strong> which will be from <strong>22nd to 27th of August 2017</strong>.
+          </div>
+        </div>
+      </div>
+
+      <br />
+
+      <div class="row">
+        <div class="col-md-8 text-container">
+          <p class="lead">
+            Bornhack is a <strong>participatory</strong> event where we expect people
+            to come up with ideas and projects, and help make the content. We will reach out to
+            people to ensure interesting, high quality talks and workshops.
+          </p>
+        </div>
+        <div class="col-md-4">
+	    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5090.JPG' 'Talk at BornHack 2016' %}
+        </div>
+      </div>
+
+      <br />
+
+      <p class="lead">
+        You are very welcome to ask questions and show your interest on our different channels:
+      </p>
+      {% include 'includes/contact.html' %}
+      <p class="lead">
+        Follow and like us to get updates about BornHack.
+      </p>
+
+      <p class="lead">
+        We hope you want to be a part of Bornhack. Ticket sales for 2017 will be open soon!
+      </p>
+
+      <div class="regards-and-button">
+        <p class="lead">
+          Sincerely<br />
+          The Bornhack Team
+        </p>
+      </div>
+
+    <p align="center">
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1983.JPG' 'Happy organisers welcoming people at the entrance to BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FA0_1986.JPG' 'A bus full of hackers arrive at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5126.JPG' 'Late night hacking at Baconsvin village at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5168.JPG' '#irl_bar by night at BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5265.JPG' 'Happy organisers welcoming people to BornHack 2016' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2452.jpg' 'Soldering the BornHack 2016 badge' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2485.jpg' 'Colored light in the grass' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2624.jpg' 'Working on decorations' %}
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2604.jpg' 'Sitting around the campfire at BornHack 2016' %}
+    </p>
+</div>
+
+
+{% endblock %}
+

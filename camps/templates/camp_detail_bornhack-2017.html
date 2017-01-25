@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <img src="{% static camp.logo_large %}" class="img-responsive" id="front-logo" />
+
+        <br />
+
+        <div class="col-md-8 text-container">
+            <div class="lead">
+                <strong>Bornhack 2017</strong> will be the second BornHack. It will take place from <strong>August 22nd to August 29th 2017</strong> on the Danish island of Bornholm. The tagline of this event will be <strong>Make Tradition</strong>.
+            </div>
+        </div>
+        <div class="col-md-4">
+            {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2610.jpg' 'The family area at BornHack 2016' %}
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2631.jpg' 'The BornHack 2016 organiser team' %}
+    </div>
+    <div class="col-md-8 text-container">
+        <div class="lead">
+            The BornHack team looks forward to organising another great event for the hacker community. We <strong>still need volunteers</strong>, so please let us know if you want to help!
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-8 text-container">
+        <div class="lead">We want to encourage <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> and anyone else with an interest in <strong>technology and society</strong> to read our <a href="{% url 'call_for_speakers' camp_slug=camp.slug %}">call for speakers</a>.</div>
+    </div>
+    <div class="col-md-4">
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5149.JPG' 'Danish politicians debating at BornHack 2016' %}
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-4">
+        {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5265.JPG' 'Organisers thanking the BornHack 2016 sponsors' %}
+    </div>
+    <div class="col-md-8 text-container">
+        <div class="lead">
+            BornHack aims to <strong>keep ticket prices affordable</strong> for everyone and to that end <strong>we need sponsors</strong>. Please see our <a href="{% url 'sponsors' camp_slug=camp.slug %}">call for sponsors</a> if you want to sponsor us, or if you work for a company you think might be able to help.
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+

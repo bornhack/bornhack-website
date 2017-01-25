@@ -1,36 +1,28 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
-<a href="{% url 'schedule:index' %}" style="background-color: black; border: 0; color: white; display: inline-block; padding: 5px;">
-  All
-</a>
-{% for event_type in event_types %}
-<a href="{% url 'schedule:index' %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-  {{ event_type.name }}
-</a>
-{% endfor %}
-
-<hr />
-
-{% for day, events in day_events.items %}
-  {{ day.date|date:"D d/m" }} <br />
+{% for day in camp.camp_days %}
+  {{ day.lower.date|date:"D d/m" }} <br />
   <div style="display: flex; flex-wrap: wrap;">
-    {% for event in events %}
+  {% for event in camp.events.all %}
+    {% for eventinstance in event.instances.all %}
+    {% if eventinstance.schedule_date == day.lower.date %}
+    {% if not eventtype or eventtype == eventinstance.event.event_type %}
     <a class="event"
-       href="{% url 'schedule:event' slug=event.slug %}"
-       style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
-      <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
+       href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
+       style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eveninstance.event.event_type.light_text %}white{% else %}black{% endif %};">
+      <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
       <br />
       {{ event }}
       <br />
-      {% if event.speakers.exists %}
-      <i>by {{ event.speakers.all|join:", " }}
-    {% endif %}</i>
-
+      {% if event.speakers.exists %}<i>by {{ event.speakers_list }}{% endif %}</i>
     </a>
-    {% endfor %}
+    {% endif %}
+    {% endif %}
+ {% endfor %}
+  {% endfor %}
   </div>
 <hr />
-{% endfor %}
+ {% endfor %}
 
 {% endblock program_content %}

@@ -3,17 +3,14 @@
 {% block program_content %}
 <h2>{{ date|date:"l, F jS" }}</h2>
 {% for event in events %}
-
   {% ifchanged event.event_type %}
-
     {% if not forloop.first %}</div>{% endif %}
     <h3>{{ event.event_type }}</h3>
     <div style="display: flex; flex-wrap: wrap;">
-
   {% endifchanged %}
 
     <a class="event"
-         href="{% url 'schedule:event' slug=event.slug %}"
+         href="{% url 'event_detail' camp_slut=camp.slug slug=event.slug %}"
          style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
       <small>{{ event.start|date:"H:i" }} - {{ event.end|date:"H:i" }}</small>
       <br />
@@ -25,6 +22,27 @@
     </a>
 
 {% endfor %}
-</div>
+
+<table>
+    <tbody>
+        <table>
+            {% for timeslot in timeslots %}
+            <tr>
+                <td style="height: 50px; padding: 5px;">{{ timeslot.time }}</td>
+                {% for eventinstance in eventinstances %}
+                    {% if eventinstance.when.lower.time == timeslot.time %}
+                    <td style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if event.event_type.light_text %}white{% else %}black{% endif %};" class="event" rowspan={{ eventinstance.timeslots }}>
+                        <a style="color:inherit;" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}">
+                            {{ eventinstance.event.title }}<br>
+                            {{ eventinstance.when.lower.time }}-{{ eventinstance.when.upper.time }}
+                        </a>
+                    </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </tbody>
+</table>
 
 {% endblock program_content %}

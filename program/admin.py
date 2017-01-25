@@ -1,7 +1,11 @@
 from django.contrib import admin
 
-from .models import Event, Speaker, EventType
+from .models import Event, Speaker, EventType, EventInstance
 
+
+@admin.register(EventInstance)
+class EventInstanceAdmin(admin.ModelAdmin):
+    pass
 
 @admin.register(EventType)
 class EventTypeAdmin(admin.ModelAdmin):
@@ -22,16 +26,7 @@ class EventAdmin(admin.ModelAdmin):
     list_display = [
         'title',
         'event_type',
-        'get_days',
-        'start',
-        'end',
     ]
-
-    def get_days(self, obj):
-        return ', '.join([
-            str(day.date.strftime('%a'))
-            for day in obj.days.all()
-        ])
 
     inlines = [
         SpeakerInline

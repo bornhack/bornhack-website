@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<div class="row">
+  <div class="btn-group btn-group-justified">
+  <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-default{% endif %}">Schedule</a>
+  <a href="{% url 'call_for_speakers' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "call_for_speakers" %}btn-primary{% else %}btn-default{% endif %}">Call for Speakers</a>
+  <a href="{% url 'speaker_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "speaker_index" %}btn-primary{% else %}btn-default{% endif %}">Speakers</a>
+  <a href="{% url 'event_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "event_index" %}btn-primary{% else %}btn-default{% endif %}">Talks &amp; Events</a>
+  </div>
+</div>
 <p>
-  <a href="{% url 'schedule:index' %}" class="btn btn-default">Schedule</a>
-  <a href="{% url 'call-for-speakers' %}" class="btn btn-default">Call for Speakers</a>
-  <a href="{% url 'schedule:speaker_index' %}" class="btn btn-default">Speakers</a>
-  <a href="{% url 'schedule:event_index' %}" class="btn btn-default">Talks &amp; Events</a>
-</p>
-
-<hr />
-
 {% block schedule_content %}
 {% endblock schedule_content %}
 

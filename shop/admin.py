@@ -58,7 +58,6 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
     list_filter = [
-        'camp',
         'payment_method',
         'open',
         'paid',

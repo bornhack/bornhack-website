@@ -20,7 +20,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 
-from camps.models import Camp
 from shop.models import (
     Order,
     Product,
@@ -234,7 +233,6 @@ class ProductDetailView(FormView, DetailView):
             # no open order - open a new one
             order = Order.objects.create(
                 user=self.request.user,
-                camp=Camp.objects.current()
             )
 
         # get product from kwargs

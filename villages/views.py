@@ -2,21 +2,20 @@ from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponseRedirect
-from django.views.generic import (
-    ListView, DetailView, CreateView, UpdateView, DeleteView
-)
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.detail import SingleObjectMixin
-
 from .models import Village
+from camps.models import Camp
+from camps.mixins import CampViewMixin
 
 
-class VillageListView(ListView):
+class VillageListView(CampViewMixin, ListView):
     queryset = Village.objects.not_deleted()
     template_name = 'village_list.html'
     context_object_name = 'villages'
 
 
-class VillageDetailView(DetailView):
+class VillageDetailView(CampViewMixin, DetailView):
     queryset = Village.objects.not_deleted()
     template_name = 'village_detail.html'
     context_object_name = 'village'
@@ -31,6 +30,7 @@ class VillageCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         village = form.save(commit=False)
         village.contact = self.request.user
+        village.camp = Camp.objects.get(slug=self.request.session['campslug'])
         village.save()
         return HttpResponseRedirect(village.get_absolute_url())
 
@@ -64,3 +64,4 @@ class VillageDeleteView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, DeleteVi
     success_url = reverse_lazy('villages:list')
     template_name = 'village_confirm_delete.html'
     context_object_name = 'village'
+
