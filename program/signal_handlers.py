@@ -10,7 +10,8 @@ def check_speaker_event_camp_consistency(sender, instance, **kwargs):
                 raise ValidationError({'events': 'One or more events belong to a different camp (%s) than the speaker (%s) does' % (event.camp, instance.camp)})
 
 def check_speaker_camp_change(sender, instance, **kwargs):
-    for event in instance.events.all():
-        if event.camp != instance.camp:
-            raise ValidationError({'camp': 'You cannot change the camp a speaker belongs to if the speaker is associated with one or more events.'})
+    if instance.pk:
+        for event in instance.events.all():
+            if event.camp != instance.camp:
+                raise ValidationError({'camp': 'You cannot change the camp a speaker belongs to if the speaker is associated with one or more events.'})
 
