@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import django.contrib.postgres.fields.ranges
 from django.db import migrations
+from django.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -16,16 +17,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='camp',
             name='buildup',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp buildup period.', verbose_name=b'Buildup Period'),
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp buildup period.', verbose_name=b'Buildup Period', default=(timezone.now(),None)),
         ),
         migrations.AlterField(
             model_name='camp',
             name='camp',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp period.', verbose_name=b'Camp Period'),
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp period.', verbose_name=b'Camp Period', default=(timezone.now(),None)),
         ),
         migrations.AlterField(
             model_name='camp',
             name='teardown',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp teardown period.', verbose_name=b'Teardown period'),
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp teardown period.', verbose_name=b'Teardown period', default=(timezone.now(),None)),
         ),
     ]
