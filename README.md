@@ -53,3 +53,14 @@ Otherwise start uwsgi or similar to serve the application.
 
 Enjoy!
 
+## Notes
+
+### How to add a camp
+
+* Add a new camp in the admin interface.
+* Add a sponsers page, `{camp-slug}-sponsors.html`, to `sponsors/templates`.
+* Add a frontpage, `{camp-slug}-camp_detail.html`, to `camps/templates`.
+* Add a call for speakers page, `{camp-slug}-call_for_speakers.html`, to `program/templates`.
+* Create `static/img/{camp-slug}/logo` and add two logos:
+    * `{camp-slug}-logo-large.png`
+    * `{camp-slug}-logo-small.png`
