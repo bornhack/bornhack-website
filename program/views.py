@@ -98,7 +98,6 @@ class ProgramDayView(CampViewMixin, TemplateView):
         return context
 
 
-
 class EventDetailView(CampViewMixin, DetailView):
     model = models.Event
     template_name = 'program_event_detail.html'
@@ -106,6 +105,5 @@ class EventDetailView(CampViewMixin, DetailView):
 
 class CallForSpeakersView(CampViewMixin, TemplateView):
     def get_template_names(self):
-        return 'call_for_speakers_%s.html' % self.camp.slug
-
+        return '%s_call_for_speakers.html' % self.camp.slug
 

@@ -8,7 +8,7 @@ class CampDetailView(DetailView):
     slug_url_kwarg = 'camp_slug'
 
     def get_template_names(self):
-        return 'camp_detail_%s.html' % self.get_object().slug
+        return '%s_camp_detail.html' % self.get_object().slug
 
 
 class CampListView(ListView):
