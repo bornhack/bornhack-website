@@ -103,8 +103,6 @@ class EventDetailView(CampViewMixin, DetailView):
     model = models.Event
     template_name = 'program_event_detail.html'
 
-    def get_object(self):
-        return self.camp.events.get(slug=self.kwargs['slug'])
 
 class CallForSpeakersView(CampViewMixin, TemplateView):
     def get_template_names(self):
