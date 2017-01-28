@@ -13,8 +13,8 @@ $ source venv/bin/activate
 
 ### System libraries
 Install system dependencies (method depends on OS):
-- postgresql headers (for psychopg2):
-  - Debian: ?
+- postgresql headers (for psycopg2):
+  - Debian: libpq-dev
   - FreeBSD: ?
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
