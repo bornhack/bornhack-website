@@ -10,7 +10,7 @@ from datetime import timedelta
 
 class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField()
     color = models.CharField(max_length=50)
     light_text = models.BooleanField(default=False)
@@ -29,6 +29,7 @@ class Event(CreatedUpdatedModel):
 
     class Meta:
         ordering = ['title']
+        unique_together = (('camp', 'slug'), ('camp', 'title'))
 
     def __unicode__(self):
         return '%s (%s)' % (self.title, self.camp.title)
@@ -104,6 +105,7 @@ class Speaker(CreatedUpdatedModel):
 
     class Meta:
         ordering = ['name']
+        unique_together = (('camp', 'name'), ('camp', 'slug'))
 
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.camp)
