@@ -196,12 +196,6 @@ class Command(BaseCommand):
                 event_type=talk,
                 camp=camp
             )
-            ev8 = Event.objects.create(
-                title='bar is open',
-                abstract='the bar is open, yay',
-                event_type=facility,
-                camp=camp
-            )
             ev9 = Event.objects.create(
                 title='The Alternative Welcoming',
                 abstract='Why does The Alternative support BornHack? Why does The Alternative think IT is an overlooked topic? A quick runt-hrough of our program and workshops. We will bring an IT political debate to both the stage and the beer tents.',
@@ -521,34 +515,6 @@ Ahmia has been in part sponsored by the Google Summer of Code.
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
-                )
-            )
-            EventInstance.objects.create(
-                event=ev8,
-                when=(
-                    timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 28, 5, 0, tzinfo=timezone.utc),
-                )
-            )
-            EventInstance.objects.create(
-                event=ev8,
-                when=(
-                    timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 29, 5, 0, tzinfo=timezone.utc),
-                )
-            )
-            EventInstance.objects.create(
-                event=ev8,
-                when=(
-                    timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 30, 5, 0, tzinfo=timezone.utc),
-                )
-            )
-            EventInstance.objects.create(
-                event=ev8,
-                when=(
-                    timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 31, 5, 0, tzinfo=timezone.utc),
                 )
             )
             EventInstance.objects.create(
