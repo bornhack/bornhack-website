@@ -129,6 +129,13 @@ class Command(BaseCommand):
             light_text=False
         )
 
+        slack = EventType.objects.create(
+            name='Slacking Off',
+            slug='slacking-off',
+            color='#0000ff',
+            light_text=False
+        )
+
         self.output("creating productcategories...")
         transportation = ProductCategory.objects.create(
             name='Transportation',
@@ -333,6 +340,138 @@ and law enforcement agencies to keep Finnish exit nodes online.
                 event_type=talk,
                 camp=camp
             )
+            ev19 = Event.objects.create(
+                title='Hacker Jeopardy Qualifier',
+                abstract='Hacker Jeopardy qualifying',
+                event_type=slack,
+                camp=camp
+            )
+            ev20 = Event.objects.create(
+                title='Hacker Jeopardy Finals',
+                abstract='Hacker Jeopardy Finals between the winners of the qualifying games',
+                event_type=slack,
+                camp=camp
+            )
+            ev21 = Event.objects.create(
+                title='Incompleteness Phenomena in Mathematics: From Kurt Gödel to Harvey Friedman',
+                abstract='''
+In the first half of the 20th century the dreams of a complete and
+consistent formalization of mathematics was destroyed, when Kurt Gödel
+proved the existence of true but unprovable sentences in every
+reasonable formalization of mathematics.
+
+However, the explicit sentence constructed in the proof was tailored to
+cause trouble and therefore was not of much interest to mathematicians
+in general. Since then various incompleteness phenomena have been
+discovered and many of these (relative) unprovable sentences are of genuine mathematical interest. In recent years Harvey Friedman have taken this enterprise to a new level by constructing sentences about "low level" mathematics and showed that these sentences are provably equivalent to the consistency of axiomatic systems far stronger than classical set theory (ZFC). In this talk I will try to introduce concepts of mathematical logic together with some highlights in the history of incompleteness phenomena and discuss the philosophical implications of these.
+
+Note that these (early 20th century) developments also play an important role in developing the theoretical computer.
+                ''',
+                event_type=talk,
+                camp=camp
+            )
+            ev22 = Event.objects.create(
+                title='Infocalypse Now - and how to Survive It?',
+                abstract='''
+Digitalization is on everybodys mind - and so is control and registration
+of citizens. States and businesses all choose sadly unsecure
+data-silo-systems and piles up sensitive data without securing anything.
+Critical Infrastructure is privatized and sold off and secure, analog
+systems are being torn down in the name of progress.
+Its an evolving Infocalypse, where all info can be manipulated, stolen and
+used, our money system, personal data and administrations are doomed in a
+world of greedy blackhats, cyberwarfare-troops, autonomous drones,
+herfbombs, solarstorms and intelligence agencies on steroids
+The Beast is unleashed, can it be stopped, or is it anyone for him self?
+                ''',
+                event_type=keynote,
+                camp=camp
+            )
+            ev23 = Event.objects.create(
+                title='Liquid Democracy (Introduction and Debate)',
+                abstract='''
+A lot has happened ever since the German pirates developed the first visions about a dynamic representational democracy. Google and other big players have experimented with the disciplines, and the idea of a more modern form of democracy has grown steadily.
+
+Monday will primarily be focused around The Alternatives experiment with Liquid Democracy and a constructive debate about how liquid democracy can improve The Alternative. Rolf Bjerre leads the process.
+                ''',
+                event_type=talk,
+                camp=camp
+            )
+            ev24 = Event.objects.create(
+                title='Badge Workshop',
+                abstract='''
+In this workshop you can learn how to solder and get help assembling your badge. We will have soldering irons and other tools to help things along. You can also discuss your ideas for badge hacks and modifications with the other participants and the host, Thomas Flummer.
+                ''',
+                event_type=workshop,
+                camp=camp
+            )
+            ev25 = Event.objects.create(
+                title='Checking a Distributed Hash Table for Correctness',
+                abstract='''
+Distributed Hash Tables are used as name-lookups in large decentralized
+distributed systems
+such as peer-to-peer networks and loosely connected machine clusters.
+Correctness is
+complicated by their distributed nature. This talk presents an
+implementation of one such DHT,
+written in Erlang, based on the Kademlia data structure. Its unique feature
+is that it comes equipped with
+a full QuickCheck specification, which semi-formally verifies its correct
+behaviour through random
+test generation.
+
+The talk focuses on the test aspect of the system, and how one builds
+fairly large QuickCheck
+specifications for real-world systems, in particular by slicing a large
+specification into isolated
+parts and then reassembling those parts into a full model. It is intended
+to give people an overview
+of how to attack larger code bases with (semi-) formal methods.
+                ''',
+                event_type=talk,
+                camp=camp
+            )
+            ev26 = Event.objects.create(
+                title='GraphQL - A Data Language',
+                abstract='''
+GraphQL is a query-language for data, intended for the modern internet
+clients on the web and
+inside mobile phones, invented inside Facebook around 2012, it is currently
+in a draft specification
+phase with several open source implementations of the underlying ideas.
+
+The main feature of GraphQL is a shift away from RESTful services where all
+of the query
+declaration is on the server side, to one where the client is in control
+of declaring what it wants.
+The result is a system which is easy to work with for the front-end
+developer. GraphQL also
+supports backward compatibility to earlier client versions. All while being
+able to maintain a
+security level at least as good as REST. On the server side, GraphQL
+provides much the same
+benefits, acting as a protocol and contract between the server and client.
+
+This talk presents GraphQL itself, and also presents how one goes about
+building an implementation
+of the language. The running example is a GraphQL compiler written for
+Erlang.
+                ''',
+                event_type=talk,
+                camp=camp
+            )
+            ev27 = Event.objects.create(
+                title='Visualisation of Public Datasets',
+                abstract='''
+At the same time as society is getting more complex, the amount of data is growing exponentially. How are everyday citizens to relate to National budgets used in the media? I am going to talk about one of the ways I think will make it easier to understand the datasets used in the media.
+
+I will present some portals where it is possible to get public datasets. Afterwards we will reflect about the use of these datasets.
+
+Towards the end we will open up to debate about how to use these resources or if there are other solutions.
+                ''',
+                event_type=workshop,
+                camp=camp
+            )
 
             self.output("creating speakers for {}...".format(year))
             sp1 = Speaker.objects.create(
@@ -362,14 +501,14 @@ and law enforcement agencies to keep Finnish exit nodes online.
                 slug='jesper-arp',
                 camp=camp
             )
-            sp4.events.add(ev9)
+            sp4.events.add(ev9, ev27)
             sp5 = Speaker.objects.create(
                 name='Rolf Bjerre',
                 biography='The green pirate',
                 slug='rolf-bjerre',
                 camp=camp
             )
-            sp5.events.add(ev9)
+            sp5.events.add(ev9, ev23)
             sp6 = Speaker.objects.create(
                 name='Emma Holten',
                 biography='Emma Holten is a feminist and human rights activist. She is co-founder and editor of the standard critical magazine Friktion and also a student at the University of Copenhagen. She speaks in both national and global contexts of feminism, digital activism and why privacy on the internet is crucial to a democracy, where everyone is equal.',
@@ -452,6 +591,59 @@ Ahmia has been in part sponsored by the Google Summer of Code.
                 camp=camp
             )
             sp13.events.add(ev18)
+            sp14 = Speaker.objects.create(
+                name='Lasse Andersen',
+                biography='''
+My educational background is a masters degree in philosophy &
+mathematics and a PhD in applied mathematics and road engineering.
+My personal interests cover philosophy of IT, philosophy of math,
+programming, machine learning, road engineering.
+
+Also, I enjoy nature quite a bit. Presently, I work at the Danish Road Directorate with rolling resistance modelling and pavement management as the main focus. Besides doing a lot of programming at work (primarily Python) I also experiment with Erlang in my spare time trying to build peer2peer software.
+                ''',
+                slug='lasse-andersen',
+                camp=camp
+            )
+            sp14.events.add(ev21)
+            sp15 = Speaker.objects.create(
+                name='Anders Kjærulff',
+                biography='''
+Anders Kjærulff is a jounalist, poet, technology-critic and radiohost
+with a weekly, one hour radioshow on privacy and data protection. He is
+currently working on a dystopic book about the end of all privacy and the
+dim future, that lies ahead.
+
+Website: [aflyttet.dk](https://aflyttet.dk)
+                ''',
+                slug='anders-kjrulff',
+                camp=camp
+            )
+            sp15.events.add(ev22)
+            sp16 = Speaker.objects.create(
+                name='Thomas Flummer',
+                biography='''
+Thomas is an electronics engineer, though he is mostly doing software development in his professional life. For the past 7 years Thomas has been a member of the hackerspace Labitat, where he has been doing various projects, mostly with electronics, 3D printing and video documentation.
+                ''',
+                slug='thomas-flummer',
+                camp=camp
+            )
+            sp16.events.add(ev24)
+            sp17 = Speaker.objects.create(
+                name='Jesper Louis Andersen',
+                biography='''
+Jesper Louis Andersen bridges the gap between theory and practice. He has a
+curiosity for
+programming language theory, math, and logic, but dabbles in many other
+fields of computer
+science as well. His main interest is to move state-of-the-art computer
+science research into
+real world use whenever possible. His dayjob involves functional
+programming for a danish startup.
+                ''',
+                slug='jesper-louis-andersen',
+                camp=camp
+            )
+            sp17.events.add(ev25, ev26)
 
             self.output("creating eventinstances for {}...".format(year))
             EventInstance.objects.create(
@@ -501,6 +693,27 @@ Ahmia has been in part sponsored by the Google Summer of Code.
                 when=(
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 5, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev4,
+                when=(
+                    timezone.datetime(year, 8, 31, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 1, 5, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev4,
+                when=(
+                    timezone.datetime(year, 9, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 2, 5, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev4,
+                when=(
+                    timezone.datetime(year, 9, 2, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 3, 5, 0, tzinfo=timezone.utc),
                 )
             )
             EventInstance.objects.create(
@@ -585,6 +798,97 @@ Ahmia has been in part sponsored by the Google Summer of Code.
                 when=(
                     timezone.datetime(year, 8, 31, 17, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 18, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev19,
+                when=(
+                    timezone.datetime(year, 8, 30, 22, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 30, 23, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev19,
+                when=(
+                    timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 29, 23, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev19,
+                when=(
+                    timezone.datetime(year, 8, 28, 22, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 28, 23, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev19,
+                when=(
+                    timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 31, 23, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev19,
+                when=(
+                    timezone.datetime(year, 9, 1, 22, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 1, 23, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev20,
+                when=(
+                    timezone.datetime(year, 9, 2, 20, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 2, 22, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev21,
+                when=(
+                    timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev22,
+                when=(
+                    timezone.datetime(year, 8, 28, 18, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 28, 19, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev23,
+                when=(
+                    timezone.datetime(year, 8, 29, 9, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 29, 11, 30, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev24,
+                when=(
+                    timezone.datetime(year, 8, 29, 20, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev25,
+                when=(
+                    timezone.datetime(year, 9, 1, 17, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 1, 18, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev26,
+                when=(
+                    timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev26,
+                when=(
+                    timezone.datetime(year, 9, 1, 11, 45, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 1, 12, 30, tzinfo=timezone.utc),
                 )
             )
 
