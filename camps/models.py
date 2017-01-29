@@ -6,6 +6,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from psycopg2.extras import DateTimeTZRange
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+from django.utils import timezone
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -48,18 +49,6 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     def clean(self):
         ''' Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown '''
         errors = []
-        # sanity checking for buildup
-        if self.buildup.lower > self.buildup.upper:
-            errors.append(ValidationError({'buildup', 'Start of buildup must be before end of buildup'}))
-
-        # sanity checking for camp
-        if self.camp.lower > self.camp.upper:
-            errors.append(ValidationError({'camp', 'Start of camp must be before end of camp'}))
-
-        # sanity checking for teardown
-        if self.teardown.lower > self.teardown.upper:
-            errors.append(ValidationError({'teardown', 'Start of teardown must be before end of teardown'}))
-
         # check for overlaps buildup vs. camp
         if self.buildup.upper > self.camp.lower:
             msg = "End of buildup must not be after camp start"
