@@ -130,8 +130,13 @@ urlpatterns = [
             ),
 
             url(
+                r'^sponsors/call/$',
+                CallForSponsorsView.as_view(),
+                name='call-for-sponsors'
+            ),
+            url(
                 r'^sponsors/$',
-                SponsorView.as_view(),
+                SponsorsView.as_view(),
                 name='sponsors'
             ),
 

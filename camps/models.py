@@ -151,3 +151,11 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         else:
             return True
 
+    @property
+    def call_for_sponsors_open(self):
+        """ Keep call for sponsors open 30 days after camp end """
+        if self.camp.upper + timedelta(days=30) < timezone.now():
+            return False
+        else:
+            return True
+
