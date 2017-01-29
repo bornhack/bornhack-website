@@ -144,4 +144,10 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         '''
         return self.get_days('teardown')
 
+    @property
+    def call_for_speakers_open(self):
+        if self.camp.upper < timezone.now():
+            return False
+        else:
+            return True
 
