@@ -29,11 +29,11 @@ class Command(BaseCommand):
             ),
             camp=(
                 timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2016, 9, 0o4, 11, 59, tzinfo=timezone.utc),
+                timezone.datetime(2016, 9, 4, 11, 59, tzinfo=timezone.utc),
             ),
             teardown=(
-                timezone.datetime(2016, 9, 0o4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2016, 9, 0o6, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 9, 4, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2016, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
         )
 
@@ -47,11 +47,11 @@ class Command(BaseCommand):
             ),
             camp=(
                 timezone.datetime(2017, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 9, 0o4, 11, 59, tzinfo=timezone.utc),
+                timezone.datetime(2017, 9, 4, 11, 59, tzinfo=timezone.utc),
             ),
             teardown=(
-                timezone.datetime(2017, 9, 0o4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 9, 0o6, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 9, 4, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
         )
 
@@ -65,11 +65,11 @@ class Command(BaseCommand):
             ),
             camp=(
                 timezone.datetime(2018, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2018, 9, 0o4, 11, 59, tzinfo=timezone.utc),
+                timezone.datetime(2018, 9, 4, 11, 59, tzinfo=timezone.utc),
             ),
             teardown=(
-                timezone.datetime(2018, 9, 0o4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2018, 9, 0o6, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2018, 9, 4, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2018, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
         )
 

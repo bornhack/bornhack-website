@@ -24,19 +24,19 @@ class Plugin(object):
     def server_ready(self, **kwargs):
         """triggered after the server sent the MOTD (require core plugin)"""
         if settings.DEBUG:
-            print(("inside server_ready(), kwargs: %s" % kwargs))
+            print("inside server_ready(), kwargs: %s" % kwargs)
 
 
     def connection_lost(self, **kwargs):
         """triggered when connection is lost"""
         if settings.DEBUG:
-            print(("inside connection_lost(), kwargs: %s" % kwargs))
+            print("inside connection_lost(), kwargs: %s" % kwargs)
 
 
     def connection_made(self, **kwargs):
         """triggered when connection is up"""
         if settings.DEBUG:
-            print(("inside connection_made(), kwargs: %s" % kwargs))
+            print("inside connection_made(), kwargs: %s" % kwargs)
 
 
     ###############################################################################################
@@ -46,7 +46,7 @@ class Plugin(object):
     def on_join_part_quit(self, **kwargs):
         """triggered when there is a join part or quit on a channel the bot is in"""
         if settings.DEBUG:
-            print(("inside on_join_part_quit(), kwargs: %s" % kwargs))
+            print("inside on_join_part_quit(), kwargs: %s" % kwargs)
         if self.bot.nick == kwargs['mask'].split("!")[0] and kwargs['channel'] == "#tirsdagsfilm":
             self.bot.loop.call_later(1, self.bot.get_outgoing_messages)
 
@@ -55,13 +55,13 @@ class Plugin(object):
     def on_privmsg(self, **kwargs):
         """triggered when a privmsg is sent to the bot or to a channel the bot is in"""
         if settings.DEBUG:
-            print(("inside on_privmsg(), kwargs: %s" % kwargs))
+            print("inside on_privmsg(), kwargs: %s" % kwargs)
 
 
     @irc3.event(irc3.rfc.KICK)
     def on_kick(self, **kwargs):
         if settings.DEBUG:
-            print(("inside on_kick(), kwargs: %s" % kwargs))
+            print("inside on_kick(), kwargs: %s" % kwargs)
 
 
     ###############################################################################################
@@ -78,12 +78,12 @@ class Plugin(object):
         print("inside get_outgoing_messages()")
         for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by('created_date'):
             if msg.target[0] == "#" and msg.target in self.bot.channels:
-                print(("sending privmsg to %s: %s" % (msg.target, msg.message)))
+                print("sending privmsg to %s: %s" % (msg.target, msg.message))
                 self.bot.privmsg(msg.target, msg.message)
                 msg.processed=True
                 msg.save()
             else:
-                print(("skipping message to channel %s because the bot is not in the channel" % msg.target))
+                print("skipping message to channel %s because the bot is not in the channel" % msg.target)
 
         # call this function again in 60 seconds
         self.bot.loop.call_later(60, self.bot.get_outgoing_messages)

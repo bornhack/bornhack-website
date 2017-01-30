@@ -91,7 +91,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         field = getattr(self, camppart)
 
         if not hasattr(field, '__class__') or not hasattr(field.__class__, '__name__') or not field.__class__.__name__ == 'DateTimeTZRange':
-            print(("this attribute is not a datetimetzrange field: %s" % field))
+            print("this attribute is not a datetimetzrange field: %s" % field)
             return False
 
         daycount = (field.upper - field.lower).days

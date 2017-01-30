@@ -7,7 +7,7 @@ import io
 def generate_pdf_letter(filename, template, formatdict):
     ### produce text-only PDF from template
     pdfgenerator = PDFTemplateResponse(
-        request=RequestFactory().get('/'), 
+        request=RequestFactory().get('/'),
         template=template, 
         context=formatdict,
         cmd_options={
