@@ -6,6 +6,7 @@ Unidecode==0.04.20
 argparse==1.2.1
 asyncio==3.4.3
 bleach==1.5.0
+defusedxml==0.4.1
 django-allauth==0.30.0
 django-bleach==0.3.0
 django-bootstrap3==8.1.0
@@ -19,7 +20,7 @@ irc3==0.9.8
 oauthlib==2.0.1
 olefile==0.44
 psycopg2==2.6.2
-python-openid==2.2.5
+python3-openid==3.0.10
 pytz==2016.10
 qrcode==5.3
 requests==2.12.5
