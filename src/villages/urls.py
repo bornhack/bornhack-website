@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from views import *
+from .views import *
 
 urlpatterns = [
     url(r'^$', VillageListView.as_view(), name='list'),

@@ -21,7 +21,7 @@ def calculate_epay_hash(order, request):
 
 def validate_epay_callback(query):
     hashstring = ''
-    for key, value in query.iteritems():
+    for key, value in query.items():
         if key != 'hash':
             hashstring += value
     hash = hashlib.md5(hashstring + settings.EPAY_MD5_SECRET).hexdigest()

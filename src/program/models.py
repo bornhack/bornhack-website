@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.utils.text import slugify

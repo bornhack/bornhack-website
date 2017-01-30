@@ -538,7 +538,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # check if it expired
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
-                print("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id'])
+                print(("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id']))
                 order.coinifyapiinvoice.delete()
                 order = self.get_object()
 
@@ -565,10 +565,10 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # Parse response
             if not response['success']:
                 api_error = response['error']
-                print("API error: %s (%s)" % (
+                print(("API error: %s (%s)" % (
                     api_error['message'],
                     api_error['code']
-                ))
+                )))
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
             else:
@@ -577,7 +577,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     invoicejson = response['data'],
                     order = order,
                 )
-                print("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id'])
+                print(("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id']))
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
@@ -600,7 +600,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # make a dict with all HTTP_ headers
         headerdict = {}
-        for key, value in request.META.items():
+        for key, value in list(request.META.items()):
             if key[:5] == 'HTTP_':
                 headerdict[key[5:]] = value
 
@@ -622,7 +622,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 try:
                     coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=callbackjson['data']['id'])
                 except CoinifyAPIInvoice.DoesNotExist:
-                    print("unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id'])
+                    print(("unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id']))
                     return HttpResponseBadRequest('bad coinifyinvoice id')
 
                 # save new coinifyinvoice payload

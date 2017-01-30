@@ -2,7 +2,7 @@ from wkhtmltopdf.views import PDFTemplateResponse
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from django.test.client import RequestFactory
 from django.conf import settings
-import StringIO
+import io
 
 def generate_pdf_letter(filename, template, formatdict):
     ### produce text-only PDF from template
@@ -15,7 +15,7 @@ def generate_pdf_letter(filename, template, formatdict):
             'margin-bottom': 50,
         },
     )
-    textonlypdf = StringIO.StringIO()
+    textonlypdf = io.StringIO()
     textonlypdf.write(pdfgenerator.rendered_content)
 
     ### create a blank pdf to work with
@@ -28,7 +28,7 @@ def generate_pdf_letter(filename, template, formatdict):
     watermark = PdfFileReader(open(settings.LETTERHEAD_PDF_PATH, 'rb'))
 
     ### add the watermark to all pages
-    for pagenum in xrange(pdfreader.getNumPages()):
+    for pagenum in range(pdfreader.getNumPages()):
         page = watermark.getPage(0)
         try:
             page.mergePage(pdfreader.getPage(pagenum))
@@ -41,10 +41,10 @@ def generate_pdf_letter(filename, template, formatdict):
     ### save the generated pdf to the archive
     with open(settings.PDF_ARCHIVE_PATH+filename, 'wb') as fh:
         finalpdf.write(fh)
-        print('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
+        print(('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename))
 
     ### return a file object with the data
-    returnfile = StringIO.StringIO()
-    finalpdf.write(returnfile)
+    returnfile = io.StringIO()
+    finalpdf.write(returnfile)
     return returnfile
 

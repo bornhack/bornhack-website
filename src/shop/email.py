@@ -18,7 +18,7 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info
     elif emailtype == 'testmail':
         text_template = 'emails/testmail.txt'
     else:
-        print 'Unknown email type: %s' % emailtype
+        print('Unknown email type: %s' % emailtype)
         return False
 
     try:
@@ -34,7 +34,7 @@ def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info
             msg.attach(attachment_filename, attachment, 'application/pdf')
 
     except Exception as E:
-        print 'exception while rendering email: %s' % E
+        print('exception while rendering email: %s' % E)
         return False
     
     ### send the email
