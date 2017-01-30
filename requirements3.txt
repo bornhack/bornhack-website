@@ -28,4 +28,3 @@ six==1.10.0
 sqlparse==0.2.2
 venusian==1.0
 webencodings==0.5
-wsgiref==0.1.2

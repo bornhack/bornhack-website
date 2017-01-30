@@ -447,21 +447,18 @@ class EpayCallbackView(SingleObjectMixin, View):
 
         if 'orderid' in request.GET:
             query = OrderedDict(
-                map(
-                    lambda x: tuple(x.split('=')),
-                    request.META['QUERY_STRING'].split('&')
-                )
+                [tuple(x.split('=')) for x in request.META['QUERY_STRING'].split('&')]
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
             if order.pk != self.get_object().pk:
-                print "bad epay callback, orders do not match!"
+                print("bad epay callback, orders do not match!")
                 return HttpResponse(status=400)
 
             if validate_epay_callback(query):
                 callback.md5valid=True
                 callback.save()
             else:
-                print "bad epay callback!"
+                print("bad epay callback!")
                 return HttpResponse(status=400)
             
             if order.paid:
@@ -479,7 +476,7 @@ class EpayCallbackView(SingleObjectMixin, View):
                 ### and mark order as paid (this will create tickets)
                 order.mark_as_paid()
             else:
-                print "valid epay callback with wrong amount detected"
+                print("valid epay callback with wrong amount detected")
         else:
             return HttpResponse(status=400)
 
@@ -541,7 +538,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # check if it expired
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
-                print "deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id']
+                print("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id'])
                 order.coinifyapiinvoice.delete()
                 order = self.get_object()
 
@@ -568,10 +565,10 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # Parse response
             if not response['success']:
                 api_error = response['error']
-                print "API error: %s (%s)" % (
+                print("API error: %s (%s)" % (
                     api_error['message'],
                     api_error['code']
-                )
+                ))
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
             else:
@@ -580,7 +577,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     invoicejson = response['data'],
                     order = order,
                 )
-                print "created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id']
+                print("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id'])
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
@@ -603,7 +600,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # make a dict with all HTTP_ headers
         headerdict = {}
-        for key, value in request.META.iteritems():
+        for key, value in request.META.items():
             if key[:5] == 'HTTP_':
                 headerdict[key[5:]] = value
 
@@ -625,7 +622,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 try:
                     coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=callbackjson['data']['id'])
                 except CoinifyAPIInvoice.DoesNotExist:
-                    print "unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id']
+                    print("unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id'])
                     return HttpResponseBadRequest('bad coinifyinvoice id')
 
                 # save new coinifyinvoice payload
@@ -641,7 +638,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             else:
                 return HttpResponseBadRequest('unsupported event')
         else:
-            print "invalid coinify callback detected"
+            print("invalid coinify callback detected")
             return HttpResponseBadRequest('something is fucky')
 
 

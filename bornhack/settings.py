@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'program',
     'info',
     'sponsors',
+    'ircbot',
 
     'allauth',
     'allauth.account',
