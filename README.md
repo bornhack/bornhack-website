@@ -5,7 +5,7 @@ Django project to power Bornhack. Features include news, villages, webshop, and 
 ## Quickstart
 
 ### Virtualenv
-Create a Python 2.7 virtual environment and activate it:
+Create a Python 3 virtual environment and activate it:
 ```
 $ virtualenv venv
 $ source venv/bin/activate
