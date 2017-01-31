@@ -5,4 +5,5 @@ db.sqlite3
 *.sw*
 *.pyc
 venv/
+environment_settings.py
 
