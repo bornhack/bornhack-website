@@ -11,7 +11,6 @@ django-allauth==0.30.0
 django-bleach==0.3.0
 django-bootstrap3==8.1.0
 django-debug-toolbar==1.6
-django-environ==0.4.1
 django-wkhtmltopdf==3.1.0
 docopt==0.6.2
 future==0.16.0

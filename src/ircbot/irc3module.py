@@ -63,29 +63,39 @@ class Plugin(object):
         if settings.DEBUG:
             print("inside on_kick(), kwargs: %s" % kwargs)
 
-
     ###############################################################################################
     ### custom irc3 methods
+
     @irc3.extend
     def get_outgoing_messages(self):
         """
             This method gets unprocessed OutgoingIrcMessage objects and attempts to send them to
             the target channel. Messages are skipped if the bot is not in the channel.
         """
-        # TODO: handle privmsg to users
-        # TODO: set a timeout for messages.. a few minutes maybe?
-        # TODO: make sleep time configurable
         print("inside get_outgoing_messages()")
         for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by('created_date'):
+            # if this message expired mark it as expired and processed without doing anything
+            if msg.timeout < timezone.now():
+                # this message is expired
+                msg.expired=True
+                msg.processed=True
+                msg.save()
+                continue
+
+            # is this message for a channel or a nick?
             if msg.target[0] == "#" and msg.target in self.bot.channels:
                 print("sending privmsg to %s: %s" % (msg.target, msg.message))
                 self.bot.privmsg(msg.target, msg.message)
                 msg.processed=True
                 msg.save()
+            elif msg.target:
+                self.bot.privmsg(msg.target, msg.message)
+                msg.processed=True
+                msg.save()
             else:
-                print("skipping message to channel %s because the bot is not in the channel" % msg.target)
+                print("skipping message to %s" % msg.target)
 
         # call this function again in 60 seconds
-        self.bot.loop.call_later(60, self.bot.get_outgoing_messages)
+        self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
 
 

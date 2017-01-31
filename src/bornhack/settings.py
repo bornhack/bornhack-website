@@ -1,8 +1,5 @@
 import os
-
-import environ
-env = environ.Env()
-environ.Env.read_env()
+from .environment_settings import *
 
 def local_dir(entry):
     return os.path.join(
@@ -13,14 +10,8 @@ def local_dir(entry):
 WSGI_APPLICATION = 'bornhack.wsgi.application'
 ROOT_URLCONF = 'bornhack.urls'
 
-SECRET_KEY = env('SECRET_KEY')
-ALLOWED_HOSTS = env('ALLOWED_HOSTS').split(',')
 
 SITE_ID = 1
-
-DATABASES = {
-    'default': env.db(),
-}
 
 ADMINS = (
     ('bornhack sysadm', 'sysadm@bornhack.org'),
@@ -54,9 +45,7 @@ INSTALLED_APPS = [
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]
-MEDIA_ROOT = env('MEDIA_ROOT')
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = env('TIME_ZONE')
 #USE_I18N = True
 #USE_L10N = True
 USE_TZ = True
@@ -84,18 +73,6 @@ TEMPLATES = [
     },
 ]
 
-
-MIDDLEWARE_CLASSES = [
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-]
-
 LOGIN_REDIRECT_URL = 'profiles:detail'
 
 AUTHENTICATION_BACKENDS = (
@@ -118,38 +95,10 @@ BOOTSTRAP3 = {
     'javascript_url': '/static/js/bootstrap.min.js'
 }
 
-EPAY_MERCHANT_NUMBER = env('EPAY_MERCHANT_NUMBER')
-EPAY_MD5_SECRET = env('EPAY_MD5_SECRET')
-
-COINIFY_API_KEY = env('COINIFY_API_KEY')
-COINIFY_API_SECRET = env('COINIFY_API_SECRET')
-COINIFY_IPN_SECRET = env('COINIFY_IPN_SECRET')
-
-LETTERHEAD_PDF_PATH = os.path.join(local_dir('static_src'), 'pdf', env('PDF_LETTERHEAD_FILENAME'))
-PDF_ARCHIVE_PATH='/usr/local/www/pdf_archive/'
-
-BANKACCOUNT_IBAN = env('BANKACCOUNT_IBAN')
-BANKACCOUNT_SWIFTBIC = env('BANKACCOUNT_SWIFTBIC')
-BANKACCOUNT_REG = env('BANKACCOUNT_REG')
-BANKACCOUNT_ACCOUNT = env('BANKACCOUNT_ACCOUNT')
-
-TICKET_CATEGORY_ID = env('TICKET_CATEGORY_ID')
-
-DEBUG = env('DEBUG')
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     INSTALLED_APPS += ['debug_toolbar', ]
-    MIDDLEWARE_CLASSES += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
-
-else:
-    EMAIL_HOST = env('EMAIL_HOST')
-    EMAIL_PORT = env('EMAIL_PORT')
-    EMAIL_HOST_USER = env('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-    EMAIL_USE_TLS = env('EMAIL_USE_TLS')
-    DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL')
-    SERVER_EMAIL = env('DEFAULT_FROM_EMAIL')
-    ARCHIVE_EMAIL = env('ARCHIVE_EMAIL')
+    MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware']
 
 LOGGING = {
     'version': 1,
@@ -172,8 +121,4 @@ LOGGING = {
         },
     }
 }
-
-# schedule settings
-SCHEDULE_MIDNIGHT_OFFSET_HOURS=int(env('SCHEDULE_MIDNIGHT_OFFSET_HOURS'))
-SCHEDULE_TIMESLOT_LENGTH_MINUTES=int(env('SCHEDULE_TIMESLOT_LENGTH_MINUTES'))
 

@@ -16,11 +16,11 @@ class Command(BaseCommand):
         self.output('IRC bot worker running...')
         # connect to IRC
         config = {
-            'nick': 'BornHack',
-            'autojoins': ['#tirsdagsfilm'],
-            'host': 'ircd.tyknet.dk',
-            'port': 6697,
-            'ssl': True,
+            'nick': settings.IRCBOT_NICK,
+            'autojoins': [settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL],
+            'host': settings.IRCBOT_SERVER_HOSTNAME,
+            'port': settings.IRCBOT_SERVER_PORT,
+            'ssl': settings.IRCBOT_SERVER_USETLS,
             'timeout': 30,
             'includes': [
                 'ircbot.irc3module',
