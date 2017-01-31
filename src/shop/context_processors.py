@@ -16,7 +16,7 @@ def current_order(request):
 def user_has_tickets(request):
     has_tickets = False
     if hasattr(request.user, 'orders') and request.user.orders.filter(
-        tickets__product__category__pk=settings.TICKET_CATEGORY_ID
+        tickets__product__category__name=settings.TICKET_CATEGORY_NAME
     ).exists():
         has_tickets = True
     return {'has_tickets': has_tickets}
