@@ -15,7 +15,7 @@ class EventType(CreatedUpdatedModel):
     color = models.CharField(max_length=50)
     light_text = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
@@ -31,7 +31,7 @@ class Event(CreatedUpdatedModel):
         ordering = ['title']
         unique_together = (('camp', 'slug'), ('camp', 'title'))
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.title, self.camp.title)
 
     def save(self, **kwargs):
@@ -54,7 +54,7 @@ class EventInstance(CreatedUpdatedModel):
     class Meta:
         ordering = ['when']
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s (%s)' % (self.event, self.when)
 
     def __clean__(self):
@@ -107,7 +107,7 @@ class Speaker(CreatedUpdatedModel):
         ordering = ['name']
         unique_together = (('camp', 'name'), ('camp', 'slug'))
 
-    def __unicode__(self):
+    def __str___(self):
         return '%s (%s)' % (self.name, self.camp)
 
     def save(self, **kwargs):
