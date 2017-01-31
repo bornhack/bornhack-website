@@ -15,10 +15,10 @@ $ source venv/bin/activate
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev
-  - FreeBSD: ?
+  - FreeBSD: databases/postgresql93-client 
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
-  - FreeBSD: ?
+  - FreeBSD: graphics/jpeg-turbo
 
 ### Python packages
 Install pip packages:
