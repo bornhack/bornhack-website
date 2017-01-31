@@ -10,6 +10,8 @@ def local_dir(entry):
         entry
     )
 
+DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
+
 WSGI_APPLICATION = 'bornhack.wsgi.application'
 ROOT_URLCONF = 'bornhack.urls'
 
