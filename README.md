@@ -57,6 +57,13 @@ Enjoy!
 
 ### How to add a camp
 
+Add a new camp in the admin interface and run `
+
+```
+    (venv) $ ./manage.py createcamp {camp-slug}
+```
+or go through the manuel process below:
+
 * Add a new camp in the admin interface.
 * Add a sponsers page, `{camp-slug}-sponsors.html`, to `sponsors/templates`.
 * Add a frontpage, `{camp-slug}-camp_detail.html`, to `camps/templates`.
@@ -66,7 +73,8 @@ Enjoy!
     * `{camp-slug}-logo-small.png`
 
 ### multicamp prod migration notes
-#### when villages.0008 migration fails go add camp_id to all existing villages
-#### go to admin interface and add bornhack 2017, and set slug for bornhack 2016
-#### convert events to the new format (somehow)
+
+* when villages.0008 migration fails go add camp_id to all existing villages
+* go to admin interface and add bornhack 2017, and set slug for bornhack 2016
+* convert events to the new format (somehow)
 
