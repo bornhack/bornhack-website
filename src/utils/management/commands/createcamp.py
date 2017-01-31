@@ -35,7 +35,7 @@ class Command(BaseCommand):
 
         # directories to create, relative to DJANGO_BASE_PATH
         dirs = [
-            'static/img/{camp_slug}/logo'
+            'static_src/img/{camp_slug}/logo'
         ]
 
         camp_slug = options['camp_slug']
@@ -60,11 +60,11 @@ class Command(BaseCommand):
         self.output('All there is left is to create:')
         self.output(
             self.local_dir(
-                'static/img/{camp_slug}/logo/{camp_slug}-logo-large.png'.format(camp_slug=camp_slug)
+                'static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png'.format(camp_slug=camp_slug)
             )
         )
         self.output(
             self.local_dir(
-                'static/img/{camp_slug}/logo/{camp_slug}-logo-small.png'.format(camp_slug=camp_slug)
+                'static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png'.format(camp_slug=camp_slug)
             )
         )

@@ -68,7 +68,7 @@ or go through the manuel process below:
 * Add a sponsers page, `{camp-slug}-sponsors.html`, to `sponsors/templates`.
 * Add a frontpage, `{camp-slug}-camp_detail.html`, to `camps/templates`.
 * Add a call for speakers page, `{camp-slug}-call_for_speakers.html`, to `program/templates`.
-* Create `static/img/{camp-slug}/logo` and add two logos:
+* Create `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
 
