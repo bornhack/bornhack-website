@@ -82,7 +82,7 @@ class ProgramDayView(CampViewMixin, TemplateView):
         timeslots = []
         # calculate how many timeslots we have in the schedule based on the lenght of the timeslots in minutes,
         # and the number of minutes in 24 hours
-        for i in range(0,(24*60)/settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES):
+        for i in range(0,int((24*60)/settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)):
             timeslot = start + datetime.timedelta(minutes=i*settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)
             timeslots.append(timeslot)
         context['timeslots'] = timeslots
