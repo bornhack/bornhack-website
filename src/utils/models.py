@@ -11,7 +11,12 @@ class CleanedModel(models.Model):
         try:
             # call this models full_clean() method before saving,
             # which in turn calls .clean_fields(), .clean() and .validate_unique()
-            self.full_clean()
+            #self.full_clean()
+            # for some reason self.full_clean() appears to call self.clean() before self.clean_fields()
+            # which is not supposed to happen. Call them manually one by one instead.
+            self.clean_fields()
+            self.clean()
+            self.validate_unique()
         except ValidationError as e:
             message = "Got ValidationError while saving: %s" % e
             if hasattr(self, 'request'):

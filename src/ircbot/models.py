@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from utils.models import UUIDModel, CreatedUpdatedModel
 from django.db import models
+from django.utils import timezone
 
 
 class OutgoingIrcMessage(CreatedUpdatedModel):

@@ -1,6 +1,7 @@
 import irc3
 from ircbot.models import OutgoingIrcMessage
 from django.conf import settings
+from django.utils import timezone
 
 
 @irc3.plugin
@@ -73,7 +74,7 @@ class Plugin(object):
             the target channel. Messages are skipped if the bot is not in the channel.
         """
         print("inside get_outgoing_messages()")
-        for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by('created_date'):
+        for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by('created'):
             # if this message expired mark it as expired and processed without doing anything
             if msg.timeout < timezone.now():
                 # this message is expired
