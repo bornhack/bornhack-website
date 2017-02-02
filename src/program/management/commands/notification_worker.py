@@ -1,0 +1,45 @@
+from django.core.management.base import BaseCommand
+from django.conf import settings
+from django.utils import timezone
+from time import sleep
+import irc3, sys, asyncio
+from ircbot.models import OutgoingIrcMessage
+from camps.utils import get_current_camp
+from django.utils import timezone
+from program.models import EventInstance
+from datetime import timedelta
+
+
+class Command(BaseCommand):
+    args = 'none'
+    help = 'Queue notifications for channels and users for upcoming event instances.'
+
+    def output(self, message):
+        self.stdout.write('%s: %s' % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message))
+
+    def handle(self, *args, **options):
+        self.output('Schedule notification worker running...')
+        while True:
+            camp = get_current_camp()
+            if camp:
+                print("working with camp %s" % camp)
+                # a camp is currently going on, check if we need to send out any notifications
+                for ei in EventInstance.objects.filter(
+                    event__camp=camp,
+                    event__event_type__notifications=True,
+                    notifications_sent=False,
+                    when__startswith__lt=timezone.now()+timedelta(minutes=settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES), # start of event is less than X minutes away
+                    when__startswith__gt=timezone.now() # but event has not started yet
+                ):
+                    # this event is less than settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES minutes from starting, queue an IRC notificatio
+                    OutgoingIrcMessage.objects.create(
+                        target=settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL,
+                        message="starting soon: %s" % ei,
+                        timeout=ei.when.lower
+                    )
+                    ei.notifications_sent=True
+                    ei.save()
+
+            # check once per minute
+            sleep(60)
+

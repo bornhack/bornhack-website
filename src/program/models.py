@@ -14,6 +14,7 @@ class EventType(CreatedUpdatedModel):
     slug = models.SlugField()
     color = models.CharField(max_length=50)
     light_text = models.BooleanField(default=False)
+    notifications = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -50,6 +51,7 @@ class EventInstance(CreatedUpdatedModel):
     """ An instance of an event """
     event = models.ForeignKey('program.event', related_name='instances')
     when = DateTimeRangeField()
+    notifications_sent = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['when']
