@@ -22,7 +22,6 @@ class Command(BaseCommand):
         while True:
             camp = get_current_camp()
             if camp:
-                print("working with camp %s" % camp)
                 # a camp is currently going on, check if we need to send out any notifications
                 for ei in EventInstance.objects.filter(
                     event__camp=camp,
@@ -32,11 +31,12 @@ class Command(BaseCommand):
                     when__startswith__gt=timezone.now() # but event has not started yet
                 ):
                     # this event is less than settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES minutes from starting, queue an IRC notificatio
-                    OutgoingIrcMessage.objects.create(
+                    oim = OutgoingIrcMessage.objects.create(
                         target=settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL,
                         message="starting soon: %s" % ei,
                         timeout=ei.when.lower
                     )
+                    print("added irc message id %s for eventinstance %s" % (oim.id, ei))
                     ei.notifications_sent=True
                     ei.save()
 
