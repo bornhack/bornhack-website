@@ -1,49 +1,71 @@
 {% extends 'schedule_base.html' %}
+{% load dateutils %}
 
 {% block schedule_content %}
-<div class="row">
-  <div class="btn-group btn-group-justified">
-    <a href="{% url 'schedule_index' camp_slug=camp.slug %}{% if eventtype %}?type={{ eventtype.slug }}{% endif %}" class="btn {% if urlyear %}btn-default{% else %}btn-primary{% endif %}">Overview</a>
-    {% for day in camp.camp_days %}
-      {% with day.lower.date|date:"m" as month_padded %}
-        {% with day.lower.date|date:"d" as day_padded %}
-        <a href="{% url 'schedule_day' camp_slug=camp.slug year=day.lower.date.year month=month_padded day=day_padded %}{% if eventtype %}?type={{ eventtype.slug }}{% endif %}" class="btn btn-sm {% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}btn-primary{% else %}btn-default{% endif %}">
-            {{ day.lower.date|date:"l" }}
-          </a>
-        {% endwith %}
+  <div class="btn-group">
+    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Day: {% if urlyear %}{% get_weekday urlyear urlmonth urlday %}{% else %}All{% endif %} <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu list-group">
+        <a href="{% url 'schedule_index' camp_slug=camp.slug %}{% if location and eventtype %}?location={{ location.slug }}&type={{ eventtype.slug }}{% elif location and not eventtype %}?location={{ location.slug }}{% elif eventtype and not location %}?type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if not urlyear %} active{% endif %}">
+          All
+      </a>
+     {% for day in camp.camp_days %}
+      {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
+        {% url 'schedule_day' camp_slug=camp.slug year=day.lower.date.year month=month_padded day=day_padded as baseurl %}
+        <a href="{{ baseurl }}{% if location and eventtype %}?location={{ location.slug }}&type={{ eventtype.slug }}{% elif location and not eventtype %}?location={{ location.slug }}{% elif eventtype and not location %}?type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %} active{% endif %}">
+          {{ day.lower.date|date:"l" }}
+        </a>
       {% endwith %}
     {% endfor %}
+    </ul>
   </div>
-</div>
 
-<p>
-
-<div class="row">
-  <div class="btn-group btn-group-justified">
-
-    {% if not urlyear %}
-    <a href="{% url 'schedule_index' camp_slug=camp.slug %}" style="background-color: black; border: 0; color: white;" class="btn">
-        {% if eventtype %}All{% else %}<b>All</b>{% endif %}
-    </a>
-    {% else %}
-    <a href="{% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday %}" style="background-color: black; border: 0; color: white;" class="btn">
-        {% if eventtype %}All{% else %}<b>All</b>{% endif %}
-    </a>
-    {% endif %}
-
-    {% for event_type in camp.event_types %}
+   <div class="btn-group">
+    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Type: {% if eventtype %}<span style="color: {{ eventtype.color }};" class="glyphicon glyphicon-filter" aria-hidden="true"></span> {% endif %}{% if eventtype %}{{ eventtype.name }}{% else %}All{% endif %} <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu list-group">
+      {% if not urlyear %}
+        {% url 'schedule_index' camp_slug=camp.slug as baseurl %}
+      {% else %}
+        {% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday as baseurl %}
+      {% endif %}
+      <a href="{{ baseurl }}{% if location %}?location={{ location.slug }}{% endif %}" class="list-group-item{% if not eventtype %} active{% endif %}">
+        <span style="color: {{ event_type.color }}" class="glyphicon glyphicon-filter" aria-hidden="true"></span> All
+      </a>
+      {% for event_type in camp.event_types %}
         {% if not urlyear %}
-            <a href="{% url 'schedule_index' camp_slug=camp.slug %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %};" class="btn">
-                {% if eventtype and eventtype == event_type %}<b>{{ event_type.name }}</b>{% else %}{{ event_type.name }}{% endif %}
-            </a>
+          {% url 'schedule_index' camp_slug=camp.slug as baseurl %}
         {% else %}
-            <a href="{% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday %}?type={{ event_type.slug }}" style="background-color: {{ event_type.color }}; border: 0; color: {% if event_type.light_text %}white{% else %}black{% endif %};" class="btn">
-                {% if eventtype and eventtype == event_type %}<b>{{ event_type.name }}</b>{% else %}{{ event_type.name }}{% endif %}
-            </a>
+          {% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday as baseurl %}
         {% endif %}
-    {% endfor %}
+        <a href="{{ baseurl }}?type={{ event_type.slug }}{% if location %}&location={{ location.slug }}{% endif %}" class="list-group-item{% if eventtype and eventtype == event_type %} active{% endif %}">
+            <span style="color: {{ event_type.color }}" class="glyphicon glyphicon-filter" aria-hidden="true"></span> {{ event_type.name }}
+        </a>
+      {% endfor %}
+    </ul>
   </div>
-</div>
+
+  <div class="btn-group">
+    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Location: {% if location %}{{ location.name }}{% else %}All{% endif %} <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu list-group">
+      {% if not urlyear %}
+      <a href="{% url 'schedule_index' camp_slug=camp.slug %}{% if eventtype %}?type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if not location %} active{% endif %}">All</a>
+      {% else %}
+        <a href="{% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday %}{% if eventtype %}?type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if not location %} active{% endif %}">All</a>
+      {% endif %}
+      {% for loc in camp.event_locations %}
+        {% if not urlyear %}
+          <a href="{% url 'schedule_index' camp_slug=camp.slug %}?location={{ loc.slug }}{% if eventtype %}&type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if location and location == loc%} active{% endif %}">{{ loc.name }}</a>
+        {% else %}
+          <a href="{% url 'schedule_day' camp_slug=camp.slug year=urlyear month=urlmonth day=urlday %}?location={{ loc.slug }}{% if eventtype %}&type={{ eventtype.slug }}{% endif %}" class="list-group-item{% if location and location == loc%} active{% endif %}">{{ loc.name }}</a>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
 
 <hr />
 

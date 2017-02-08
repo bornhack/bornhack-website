@@ -4,22 +4,17 @@
 {% for day in camp.camp_days %}
   {{ day.lower.date|date:"D d/m" }} <br />
   <div style="display: flex; flex-wrap: wrap;">
-  {% for event in camp.events.all %}
-    {% for eventinstance in event.instances.all %}
+    {% for eventinstance in eventinstances %}
     {% if eventinstance.schedule_date == day.lower.date %}
-    {% if not eventtype or eventtype == eventinstance.event.event_type %}
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
        style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eveninstance.event.event_type.light_text %}white{% else %}black{% endif %};">
       <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
       <br />
-      {{ event.title }}
+      {{ eventinstance.event.title }}
       <br />
-      {% if event.speakers.exists %}<i>by {{ event.speakers_list }}{% endif %}</i>
     </a>
     {% endif %}
-    {% endif %}
- {% endfor %}
   {% endfor %}
   </div>
 <hr />

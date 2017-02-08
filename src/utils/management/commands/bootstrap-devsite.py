@@ -6,7 +6,7 @@ from news.models import NewsItem
 from shop.models import ProductCategory, Product
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
-from program.models import EventType, Event, EventInstance, Speaker
+from program.models import EventType, Event, EventInstance, Speaker, EventLocation
 from django.contrib.auth.models import User
 
 
@@ -133,7 +133,7 @@ class Command(BaseCommand):
             name='Slacking Off',
             slug='slacking-off',
             color='#0000ff',
-            light_text=False
+            light_text=True
         )
 
         self.output("creating productcategories...")
@@ -153,6 +153,32 @@ class Command(BaseCommand):
 
         for camp in [camp1, camp2, camp3]:
             year = camp.camp.lower.year
+
+            self.output('Creating eventlocations for {}...'.format(year))
+            loc1 = EventLocation.objects.create(
+                name='Speakers Tent',
+                slug='speakers-tent',
+                icon='speakertent.png',
+                camp=camp
+            )
+            loc2 = EventLocation.objects.create(
+                name='Workshop rooms',
+                slug='workshop-rooms',
+                icon='workshop.png',
+                camp=camp
+            )
+            loc3 = EventLocation.objects.create(
+                name='Bar Area',
+                slug='bar-area',
+                icon='bararea.png',
+                camp=camp
+            )
+            loc4 = EventLocation.objects.create(
+                name='Food Area',
+                slug='food-area',
+                icon='foodarea.png',
+                camp=camp
+            )
 
             self.output('Creating news for {}...'.format(year))
             NewsItem.objects.create(
@@ -648,6 +674,7 @@ programming for a danish startup.
             self.output("creating eventinstances for {}...".format(year))
             EventInstance.objects.create(
                 event=ev3,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 27, 13, 0, tzinfo=timezone.utc),
@@ -655,6 +682,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev1,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -662,6 +690,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev2,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
@@ -669,6 +698,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 5, 0, tzinfo=timezone.utc),
@@ -676,6 +706,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 5, 0, tzinfo=timezone.utc),
@@ -683,6 +714,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 5, 0, tzinfo=timezone.utc),
@@ -690,6 +722,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 5, 0, tzinfo=timezone.utc),
@@ -697,6 +730,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 8, 31, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 5, 0, tzinfo=timezone.utc),
@@ -704,6 +738,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 9, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 5, 0, tzinfo=timezone.utc),
@@ -711,6 +746,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
+                location=loc3,
                 when=(
                     timezone.datetime(year, 9, 2, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 3, 5, 0, tzinfo=timezone.utc),
@@ -718,6 +754,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev5,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -725,6 +762,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev6,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
@@ -732,6 +770,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev9,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
@@ -739,6 +778,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev10,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 13, 0, tzinfo=timezone.utc),
@@ -746,6 +786,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev12,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 30, 9, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
@@ -753,6 +794,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev11,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 31, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 16, 0, tzinfo=timezone.utc),
@@ -760,6 +802,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev18,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 2, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 15, 0, tzinfo=timezone.utc),
@@ -767,6 +810,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev17,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 2, 16, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 17, 0, tzinfo=timezone.utc),
@@ -774,6 +818,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev15,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 16, 0, tzinfo=timezone.utc),
@@ -781,6 +826,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev14,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 31, 21, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
@@ -788,6 +834,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev16,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 1, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
@@ -795,6 +842,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev13,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 31, 17, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 18, 0, tzinfo=timezone.utc),
@@ -802,6 +850,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 30, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 23, 0, tzinfo=timezone.utc),
@@ -809,6 +858,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 23, 0, tzinfo=timezone.utc),
@@ -816,6 +866,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 28, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 23, 0, tzinfo=timezone.utc),
@@ -823,6 +874,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 23, 0, tzinfo=timezone.utc),
@@ -830,6 +882,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 1, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 23, 0, tzinfo=timezone.utc),
@@ -837,6 +890,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev20,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 2, 20, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 22, 0, tzinfo=timezone.utc),
@@ -844,6 +898,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev21,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -851,6 +906,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev22,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 28, 18, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 19, 0, tzinfo=timezone.utc),
@@ -858,6 +914,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev23,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 29, 9, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 11, 30, tzinfo=timezone.utc),
@@ -865,6 +922,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev24,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 29, 20, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
@@ -872,6 +930,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev25,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 1, 17, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 18, 0, tzinfo=timezone.utc),
@@ -879,6 +938,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev26,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
@@ -886,6 +946,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev26,
+                location=loc1,
                 when=(
                     timezone.datetime(year, 9, 1, 11, 45, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 12, 30, tzinfo=timezone.utc),

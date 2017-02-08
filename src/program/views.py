@@ -30,8 +30,7 @@ class ProgramOverviewView(CampViewMixin, ListView):
     model = models.Event
     template_name = 'program_overview.html'
 
-    def dispatch(self, *args, **kwargs):
-        """ If an event type has been supplied check if it is valid """
+    def get_context_data(self, *args, **kwargs):
         if 'type' in self.request.GET:
             try:
                 eventtype = models.EventType.objects.get(
@@ -39,12 +38,27 @@ class ProgramOverviewView(CampViewMixin, ListView):
                 )
             except models.EventType.DoesNotExist:
                 raise Http404
-        return super(ProgramOverviewView, self).dispatch(*args, **kwargs)
 
-    def get_context_data(self, *args, **kwargs):
+        if 'location' in self.request.GET:
+            try:
+                eventlocation = models.EventLocation.objects.get(
+                    slug=self.request.GET['location'],
+                    camp=self.camp,
+                )
+            except models.EventLocation.DoesNotExist:
+                raise Http404
+
         context = super(ProgramOverviewView, self).get_context_data(**kwargs)
+        eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
+
         if 'type' in self.request.GET:
-            context['eventtype'] = models.EventType.objects.get(slug=self.request.GET['type'])
+            context['eventtype'] = eventtype
+            eventinstances = eventinstances.filter(event__event_type=eventtype)
+
+        if 'location' in self.request.GET:
+            context['location'] = eventlocation
+            eventinstances = eventinstances.filter(location=eventlocation)
+        context['eventinstances'] = eventinstances
         return context
 
 
@@ -76,7 +90,15 @@ class ProgramDayView(CampViewMixin, TemplateView):
                     )
                     if ei.event.event_type != eventtype:
                         skip.append(ei.id)
-        context['eventinstances'] = eventinstances.exclude(id__in=skip).order_by('event__event_type')
+        eventinstances = eventinstances.exclude(id__in=skip).order_by('event__event_type')
+        if 'location' in self.request.GET:
+            eventlocation = models.EventLocation.objects.get(
+                camp=self.camp,
+                slug=self.request.GET['location']
+            )
+            eventinstances = eventinstances.filter(location=eventlocation)
+
+        context['eventinstances'] = eventinstances
 
         start = when + datetime.timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
         timeslots = []
@@ -94,6 +116,8 @@ class ProgramDayView(CampViewMixin, TemplateView):
 
         if 'type' in self.request.GET:
             context['eventtype'] = models.EventType.objects.get(slug=self.request.GET['type'])
+        if 'location' in self.request.GET:
+            context['location'] = models.EventLocation.objects.get(camp=self.camp, slug=self.request.GET['location'])
 
         return context
 
