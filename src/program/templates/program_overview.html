@@ -8,7 +8,7 @@
     {% if eventinstance.schedule_date == day.lower.date %}
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
-       style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eveninstance.event.event_type.light_text %}white{% else %}black{% endif %};">
+       style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};">
       <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
       <br />
       {{ eventinstance.event.title }}
