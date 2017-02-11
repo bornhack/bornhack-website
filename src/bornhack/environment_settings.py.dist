@@ -20,11 +20,11 @@ DATABASES = {
 # email settings
 EMAIL_HOST='{{ django_email_host }}'
 EMAIL_PORT={{ django_email_port }}
-EMAIL_HOST_USER={{ django_email_user }}
-EMAIL_HOST_PASSWORD={{ django_email_password }}
+EMAIL_HOST_USER='{{ django_email_user }}'
+EMAIL_HOST_PASSWORD='{{ django_email_password }}'
 EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL={{ django_email_from }}
-ARCHIVE_EMAIL={{ django_archive_email }}
+DEFAULT_FROM_EMAIL='{{ django_email_from }}'
+ARCHIVE_EMAIL='{{ django_archive_email }}'
 
 ADMINS={{ django_admins }}
 
