@@ -155,30 +155,32 @@ class Command(BaseCommand):
             year = camp.camp.lower.year
 
             self.output('Creating eventlocations for {}...'.format(year))
-            loc1 = EventLocation.objects.create(
+            speakers_tent = EventLocation.objects.create(
                 name='Speakers Tent',
                 slug='speakers-tent',
                 icon='speakertent.png',
                 camp=camp
             )
-            loc2 = EventLocation.objects.create(
+            workshop_room = EventLocation.objects.create(
                 name='Workshop rooms',
                 slug='workshop-rooms',
                 icon='workshop.png',
                 camp=camp
             )
-            loc3 = EventLocation.objects.create(
+            bar_area = EventLocation.objects.create(
                 name='Bar Area',
                 slug='bar-area',
                 icon='bararea.png',
                 camp=camp
             )
-            loc4 = EventLocation.objects.create(
+            food_area = EventLocation.objects.create(
                 name='Food Area',
                 slug='food-area',
                 icon='foodarea.png',
                 camp=camp
             )
+            # local food event
+            # taste each others food
 
             self.output('Creating news for {}...'.format(year))
             NewsItem.objects.create(
@@ -498,6 +500,18 @@ Towards the end we will open up to debate about how to use these resources or if
                 event_type=workshop,
                 camp=camp
             )
+            ev28 = Event.objects.create(
+                title='Local delicacies',
+                abstract='Come taste delicacies from bornholm',
+                event_type=facility,
+                camp=camp
+            )
+            ev29 = Event.objects.create(
+                title='Local delicacies from the world',
+                abstract='An attempt to create an event where we all prepare local delicacies for each other',
+                event_type=facility,
+                camp=camp
+            )
 
             self.output("creating speakers for {}...".format(year))
             sp1 = Speaker.objects.create(
@@ -674,7 +688,7 @@ programming for a danish startup.
             self.output("creating eventinstances for {}...".format(year))
             EventInstance.objects.create(
                 event=ev3,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 27, 13, 0, tzinfo=timezone.utc),
@@ -682,7 +696,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev1,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -690,7 +704,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev2,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
@@ -698,7 +712,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 5, 0, tzinfo=timezone.utc),
@@ -706,7 +720,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 5, 0, tzinfo=timezone.utc),
@@ -714,7 +728,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 5, 0, tzinfo=timezone.utc),
@@ -722,7 +736,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 5, 0, tzinfo=timezone.utc),
@@ -730,7 +744,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 8, 31, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 5, 0, tzinfo=timezone.utc),
@@ -738,7 +752,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 9, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 5, 0, tzinfo=timezone.utc),
@@ -746,7 +760,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev4,
-                location=loc3,
+                location=bar_area,
                 when=(
                     timezone.datetime(year, 9, 2, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 3, 5, 0, tzinfo=timezone.utc),
@@ -754,7 +768,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev5,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -762,7 +776,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev6,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
@@ -770,7 +784,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev9,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
@@ -778,7 +792,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev10,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 13, 0, tzinfo=timezone.utc),
@@ -786,7 +800,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev12,
-                location=loc1,
+                location=workshop_room,
                 when=(
                     timezone.datetime(year, 8, 30, 9, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
@@ -794,7 +808,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev11,
-                location=loc1,
+                location=workshop_room,
                 when=(
                     timezone.datetime(year, 8, 31, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 16, 0, tzinfo=timezone.utc),
@@ -802,7 +816,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev18,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 2, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 15, 0, tzinfo=timezone.utc),
@@ -810,7 +824,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev17,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 2, 16, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 17, 0, tzinfo=timezone.utc),
@@ -818,7 +832,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev15,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 16, 0, tzinfo=timezone.utc),
@@ -826,7 +840,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev14,
-                location=loc1,
+                location=workshop_room,
                 when=(
                     timezone.datetime(year, 8, 31, 21, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
@@ -834,7 +848,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev16,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 1, 14, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
@@ -842,7 +856,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev13,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 31, 17, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 18, 0, tzinfo=timezone.utc),
@@ -850,7 +864,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 30, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 23, 0, tzinfo=timezone.utc),
@@ -858,7 +872,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 23, 0, tzinfo=timezone.utc),
@@ -866,7 +880,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 28, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 23, 0, tzinfo=timezone.utc),
@@ -874,7 +888,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 31, 23, 0, tzinfo=timezone.utc),
@@ -882,7 +896,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev19,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 1, 22, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 23, 0, tzinfo=timezone.utc),
@@ -890,7 +904,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev20,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 2, 20, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 2, 22, 0, tzinfo=timezone.utc),
@@ -898,7 +912,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev21,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
@@ -906,7 +920,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev22,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 28, 18, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 28, 19, 0, tzinfo=timezone.utc),
@@ -914,7 +928,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev23,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 29, 9, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 11, 30, tzinfo=timezone.utc),
@@ -922,7 +936,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev24,
-                location=loc1,
+                location=workshop_room,
                 when=(
                     timezone.datetime(year, 8, 29, 20, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
@@ -930,7 +944,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev25,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 1, 17, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 18, 0, tzinfo=timezone.utc),
@@ -938,7 +952,7 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev26,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
@@ -946,10 +960,26 @@ programming for a danish startup.
             )
             EventInstance.objects.create(
                 event=ev26,
-                location=loc1,
+                location=speakers_tent,
                 when=(
                     timezone.datetime(year, 9, 1, 11, 45, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 1, 12, 30, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev28,
+                location=food_area,
+                when=(
+                    timezone.datetime(year, 9, 1, 18, 30, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 1, 21, 30, tzinfo=timezone.utc),
+                )
+            )
+            EventInstance.objects.create(
+                event=ev29,
+                location=food_area,
+                when=(
+                    timezone.datetime(year, 8, 29, 18, 30, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 29, 23, 30, tzinfo=timezone.utc),
                 )
             )
 
@@ -1030,9 +1060,9 @@ There are several ways to get to Bornholm from Copenhagen. A domestic plane depa
 Plane (very fast, most expensive)
     You can check plane departures and book tickets at dat.dk. There are multiple departures daily. The flight takes approximately 25 minutes.
 Via Ystad (quick, cheap and easy, crosses Sweden border)
-    You can drive over Øresundsbroen to Ystad or you can take the train/bus from Copenhagen Central Station. You can buy train and ferry ticket at dsb.dk (Type in "København H" and "Rønne Havn"). More information about the crossing. The crossing takes 1 hour 20 minutes. In total about 3 hours 15 minutes. Due to recent developments an ID (passport, drivers license or similar) is required when crossing the Denmark/Sweden border. 
+    You can drive over Øresundsbroen to Ystad or you can take the train/bus from Copenhagen Central Station. You can buy train and ferry ticket at dsb.dk (Type in "København H" and "Rønne Havn"). More information about the crossing. The crossing takes 1 hour 20 minutes. In total about 3 hours 15 minutes. Due to recent developments an ID (passport, drivers license or similar) is required when crossing the Denmark/Sweden border.
 Via Køge (cheap, slow)
-    Take the S-train to Køge Station (you need an "all zones" ticket) or travel by car. The ferry terminal is within walking distance from the station. You can check out prices here. It takes approximately 1 hour to get to Køge. The crossing takes 5 hours 30 minutes. 
+    Take the S-train to Køge Station (you need an "all zones" ticket) or travel by car. The ferry terminal is within walking distance from the station. You can check out prices here. It takes approximately 1 hour to get to Køge. The crossing takes 5 hours 30 minutes.
 
 From Sweden/Malmö
 
