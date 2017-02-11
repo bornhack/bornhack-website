@@ -1,55 +1,51 @@
 # make this a long 100+ chars random string
-SECRET_KEY = 'secret'
+SECRET_KEY = '{{ django_secret_key }}'
 
-# debug settings - remember to set allowed_hosts if debug is disabled
-DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = {{ django_allowed_hostnames }}
 
 # Database settings
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bornhackdb',
-        'USER': 'bornhack',
-        'PASSWORD': 'bornhack',
-        'HOST': '127.0.0.1',
+        'NAME': '{{ django_postgres_dbname }}',
+        'USER': '{{ django_postgres_user }}',
+        'PASSWORD': '{{ django_postgres_password }}',
+        'HOST': '{{ django_postgres_host }}',
     },
 }
 
 ### changes below here are only needed for production
 
 # email settings
-EMAIL_HOST='mailhost.example.com'
-EMAIL_PORT=587
-EMAIL_HOST_USER='mymailuser'
-EMAIL_HOST_PASSWORD='mymailpassword'
+EMAIL_HOST='{{ django_email_host }}'
+EMAIL_PORT={{ django_email_port }}
+EMAIL_HOST_USER={{ django_email_user }}
+EMAIL_HOST_PASSWORD={{ django_email_password }}
 EMAIL_USE_TLS=True
-DEFAULT_FROM_EMAIL='noreply@example.com'
-ARCHIVE_EMAIL='archive@example.com'
+DEFAULT_FROM_EMAIL={{ django_email_from }}
+ARCHIVE_EMAIL={{ django_archive_email }}
 
-ADMINS=(
-    ('sysadm', 'sysadm@example.com')
-)
+ADMINS={{ django_admins }}
 
 # misc settings
-TIME_ZONE='Europe/Copenhagen'
-MEDIA_ROOT='/path/to/media/root/outside/django/root/'
-PDF_ARCHIVE_PATH='/usr/local/www/pdf_archive/'
+TIME_ZONE='{{ django_timezone }}'
+MEDIA_ROOT='{{ django_media_root }}'
+PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 
 # PSP settings
-EPAY_MERCHANT_NUMBER=123
-EPAY_MD5_SECRET='abc'
-COINIFY_API_KEY='123'
-COINIFY_API_SECRET='123'
-COINIFY_IPN_SECRET='123'
+EPAY_MERCHANT_NUMBER='{{ epay_merchant_number }}'
+EPAY_MD5_SECRET='{{ epay_md5_secret }}'
+COINIFY_API_KEY='{{ coinify_api_key }}'
+COINIFY_API_SECRET='{{ coinify_api_secret }}'
+COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
 
 # shop settings
-PDF_LETTERHEAD_FILENAME='letterhead.pdf'
-BANKACCOUNT_IBAN='123'
-BANKACCOUNT_SWIFTBIC='123'
-BANKACCOUNT_REG='123'
-BANKACCOUNT_ACCOUNT='123'
+PDF_LETTERHEAD_FILENAME='{{ django_pdf_letterhead_filename }}'
+BANKACCOUNT_IBAN='{{ iban }}'
+BANKACCOUNT_SWIFTBIC='{{ swiftbic }}'
+BANKACCOUNT_REG='{{ regno }}'
+BANKACCOUNT_ACCOUNT='{{ accountno }}'
 TICKET_CATEGORY_NAME='Tickets'
 
 # schedule settings
