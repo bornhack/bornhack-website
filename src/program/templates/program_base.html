@@ -3,7 +3,7 @@
 
 {% block schedule_content %}
   <div class="btn-group">
-    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Day: {% if urlyear %}{% get_weekday urlyear urlmonth urlday %}{% else %}All{% endif %} <span class="caret"></span>
     </button>
     <ul class="dropdown-menu list-group">
@@ -22,7 +22,7 @@
   </div>
 
    <div class="btn-group">
-    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Type: {% if eventtype %}<span style="color: {{ eventtype.color }};" class="glyphicon glyphicon-filter" aria-hidden="true"></span> {% endif %}{% if eventtype %}{{ eventtype.name }}{% else %}All{% endif %} <span class="caret"></span>
     </button>
     <ul class="dropdown-menu list-group">
@@ -48,7 +48,7 @@
   </div>
 
   <div class="btn-group">
-    <button type="button" class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Location: {% if location %}{{ location.name }}{% else %}All{% endif %} <span class="caret"></span>
     </button>
     <ul class="dropdown-menu list-group">
