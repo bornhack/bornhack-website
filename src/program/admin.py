@@ -1,11 +1,17 @@
 from django.contrib import admin
 
-from .models import Event, Speaker, EventType, EventInstance
+from .models import Event, Speaker, EventType, EventInstance, EventLocation
+
+
+@admin.register(EventLocation)
+class EventInstanceAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
     pass
+
 
 @admin.register(EventType)
 class EventTypeAdmin(admin.ModelAdmin):
