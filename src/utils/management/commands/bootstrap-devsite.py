@@ -73,7 +73,7 @@ class Command(BaseCommand):
             ),
         )
 
-        self.output("creating users...")
+        self.output("Creating users...")
         user1 = User.objects.create_user(
             username='user1',
             email='user1@example.com',
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             password='admin',
         )
 
-        self.output("creating event types...")
+        self.output("Creating event types...")
         workshop = EventType.objects.create(
             name='Workshops',
             slug='workshops',
@@ -136,7 +136,7 @@ class Command(BaseCommand):
             light_text=True
         )
 
-        self.output("creating productcategories...")
+        self.output("Creating productcategories...")
         transportation = ProductCategory.objects.create(
             name='Transportation',
             slug='transportation'
@@ -194,7 +194,7 @@ class Command(BaseCommand):
                 published_at=timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc)
             )
 
-            self.output("creating events for {}...".format(year))
+            self.output("Creating events for {}...".format(year))
             ev1 = Event.objects.create(
                 title='Developing the BornHack website',
                 abstract='abstract here, bla bla bla',
@@ -513,7 +513,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 camp=camp
             )
 
-            self.output("creating speakers for {}...".format(year))
+            self.output("Creating speakers for {}...".format(year))
             sp1 = Speaker.objects.create(
                 name='Henrik Kramse',
                 biography='Henrik is an internet samurai working in internet and security around the world.',
@@ -685,7 +685,7 @@ programming for a danish startup.
             )
             sp17.events.add(ev25, ev26)
 
-            self.output("creating eventinstances for {}...".format(year))
+            self.output("Creating eventinstances for {}...".format(year))
             EventInstance.objects.create(
                 event=ev3,
                 location=speakers_tent,
@@ -983,7 +983,7 @@ programming for a danish startup.
                 )
             )
 
-            self.output("creating products for {}...".format(year))
+            self.output("Creating products for {}...".format(year))
             Product.objects.create(
                 category=transportation,
                 name='PROSA bus transport (open for everyone)',
@@ -1018,7 +1018,7 @@ programming for a danish startup.
                 )
             )
 
-            self.output("creating infocategories for {}...".format(year))
+            self.output("Creating infocategories for {}...".format(year))
             info_cat1 = InfoCategory.objects.create(
                 camp=camp,
                 headline='When is BornHack happening?',
@@ -1035,7 +1035,7 @@ programming for a danish startup.
                 anchor='sleep'
             )
 
-            self.output("creating infoitems for {}...".format(year))
+            self.output("Creating infoitems for {}...".format(year))
             InfoItem.objects.create(
                 category=info_cat1,
                 headline='Opening',
@@ -1121,7 +1121,7 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 body='We rent out a few cabins at the venue with 8 beds each for people who don\'t want to sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), but the cabins are there if you want them.'
             )
 
-            self.output("creating villages for {}...".format(year))
+            self.output("Creating villages for {}...".format(year))
             Village.objects.create(
                 contact=user1,
                 camp=camp,
