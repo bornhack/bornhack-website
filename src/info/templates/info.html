@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
+{% load commonmark %}$
 
 {% block title %}
 Info | {{ block.super }}
@@ -48,14 +49,14 @@ Info | {{ block.super }}
               <div class="panel panel-default">
                 <div class="panel-heading">
                   <span class="sub-anchor" id="{{ item.anchor }}"></span>
-		  <h4 class="panel-title">{{ item.headline }}
+                  <h4 class="panel-title">{{ item.headline }}
                     <a href="#{{ item.anchor }}">
                       <i class="glyphicon glyphicon-link"></i>
                     </a>
                   </h4>
                 </div>
                 <div class="panel-body">
-                  <p>{{ item.body }}</p>
+                  <p>{{ item.body|commonmark }}</p>
                 </div>
               </div>
             {% endfor %}
