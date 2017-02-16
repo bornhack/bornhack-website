@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 class InfoCategory(CreatedUpdatedModel):
     class Meta:
-        ordering = ['-weight', 'headline']
+        ordering = ['weight', 'headline']
         unique_together = (('anchor', 'camp'), ('headline', 'camp'))
         verbose_name_plural = "Info Categories"
 
@@ -42,7 +42,7 @@ class InfoCategory(CreatedUpdatedModel):
 
 class InfoItem(CreatedUpdatedModel):
     class Meta:
-        ordering = ['-weight', 'headline']
+        ordering = ['weight', 'headline']
         unique_together = (('anchor', 'category'), ('headline', 'category'))
 
     category = models.ForeignKey(
