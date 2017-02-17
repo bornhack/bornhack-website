@@ -1,17 +1,76 @@
-{% extends 'base.html' %}
+{% extends 'program_base.html' %}
+{% load dateutils %}
 
-{% block content %}
+{% block program_content %}
 
-<div class="row">
-  <div class="btn-group btn-group-justified">
-  <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-default{% endif %}">Schedule</a>
-  <a href="{% url 'event_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "event_index" %}btn-primary{% else %}btn-default{% endif %}">Events</a>
-  <a href="{% url 'speaker_index' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "speaker_index" %}btn-primary{% else %}btn-default{% endif %}">Speakers</a>
-  <a href="{% url 'call_for_speakers' camp_slug=camp.slug %}" class="btn {% if request.resolver_match.url_name == "call_for_speakers" %}btn-primary{% else %}btn-default{% endif %}"><span {% if not camp.call_for_speakers_open %}style="text-decoration: line-through;"{% endif %}>Call for Speakers</span></a>
+<div class="btn-group btn-group-justified">
+
+<form method="get" id="filter" class="form-inline">
+
+  <div class="form-group">
+    <select id="day" name="day" class="form-control filter-control">
+      <option value="">All Days</option>
+      {% for day in camp.camp_days %}
+        {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
+        <option
+          value="{{ day.lower.date|date:"Y-m-d" }}"
+          {% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}
+          selected
+          {% endif %}>
+              {{ day.lower.date|date:"l" }}
+        </option>
+        {% endwith %}
+      {% endfor %}
+    </select>
+
+    <select id="event_type" name="event_type" class="form-control filter-control">
+      <option value="">All Types</option>
+      {% for type in camp.event_types %}
+      <option value="{{ type.slug }}"{% if eventtype and eventtype == type %}selected{% endif %}>{{ type.name }}</option>
+      {% endfor %}
+    </select>
+
+    <select id="location" name="location" class="form-control filter-control">
+      <option value="">All Locations</option>
+      {% for loc in camp.event_locations %}
+      <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>{{ loc.name }}</option>
+      {% endfor %}
+    </select>
   </div>
+</form>
 </div>
-<p>
+
+<hr />
+
 {% block schedule_content %}
 {% endblock schedule_content %}
 
-{% endblock content %}
+{% url 'schedule_index' camp_slug=camp.slug as baseurl %}
+
+<script>
+    $('.filter-control').on('change', function() {
+        var day = $('#day').val();
+        var type = $('#event_type').val();
+        var loc = $('#location').val();
+        var url = "{{baseurl}}";
+
+        if(day) {
+          url = url + day + '/';
+        }
+
+        if(type != '' || loc != '') {
+          url = url + '?';
+          if(type != '') {
+              url = url + 'type=' + type;
+              if(loc != '') { url = url + '&'; }
+          }
+          if(loc != '') {
+              url = url + 'location=' + loc;
+          }
+        }
+
+        window.location.href = url;
+    });
+</script>
+
+{% endblock program_content %}

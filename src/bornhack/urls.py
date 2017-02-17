@@ -11,7 +11,7 @@ from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.core.urlresolvers import reverse_lazy
 from camps.views import *
-from info.views import * 
+from info.views import *
 from villages.views import *
 from program.views import *
 from sponsors.views import *
@@ -90,15 +90,15 @@ urlpatterns = [
             ),
 
             url(
-                r'^schedule/', include([
+                r'^program/', include([
                     url(
                         r'^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/$',
-                        ProgramDayView.as_view(),
+                        ScheduleView.as_view(),
                         name='schedule_day'
                     ),
                     url(
                         r'^$',
-                        ProgramOverviewView.as_view(),
+                        ScheduleView.as_view(),
                         name='schedule_index'
                     ),
                     url(

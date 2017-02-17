@@ -1,10 +1,10 @@
-{% extends 'schedule_base.html' %}
+{% extends 'program_base.html' %}
 
 {% block title %}
 Call for Speakers | {{ block.super }}
 {% endblock %}
 
-{% block schedule_content %}
+{% block program_content %}
 
 {% if not camp.call_for_speakers_open %}
 <div class="alert alert-danger">

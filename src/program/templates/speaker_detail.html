@@ -1,7 +1,7 @@
-{% extends 'schedule_base.html' %}
+{% extends 'program_base.html' %}
 {% load commonmark %}
 
-{% block schedule_content %}
+{% block program_content %}
 
 <h3>{{ speaker.name }}</h3>
 
@@ -32,4 +32,4 @@
       No events registered for this speaker yet
     {% endfor %}
 {% endif %}
-{% endblock schedule_content %}
+{% endblock program_content %}

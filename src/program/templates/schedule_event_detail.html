@@ -1,7 +1,7 @@
-{% extends 'schedule_base.html' %}
+{% extends 'program_base.html' %}
 {% load commonmark %}
 
-{% block schedule_content %}
+{% block program_content %}
 <div class="panel panel-default">
     <div class="panel-heading" ><span style="font-size: x-large"><span style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">{{ event.event_type.name }}</span> {{ event.title }}</span></div>
   <div class="panel-body">
@@ -29,5 +29,5 @@
     </h4>
   </div>
 </div>
-{% endblock schedule_content %}
+{% endblock program_content %}
 

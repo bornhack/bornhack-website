@@ -1,6 +1,6 @@
-{% extends 'program_base.html' %}
+{% extends 'schedule_base.html' %}
 
-{% block program_content %}
+{% block schedule_content %}
 {% for day in camp.camp_days %}
   {{ day.lower.date|date:"D d/m" }} <br />
   <div style="display: flex; flex-wrap: wrap;">
@@ -20,4 +20,4 @@
 <hr />
  {% endfor %}
 
-{% endblock program_content %}
+{% endblock schedule_content %}
