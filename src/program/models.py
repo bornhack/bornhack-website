@@ -106,7 +106,8 @@ class Speaker(CreatedUpdatedModel):
     """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
     biography = models.TextField()
-    picture = models.ImageField(null=True, blank=True)
+    picture_small = models.ImageField(null=True, blank=True)
+    picture_large = models.ImageField(null=True, blank=True)
     slug = models.SlugField(blank=True, max_length=255)
     camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
     events = models.ManyToManyField(
@@ -118,7 +119,7 @@ class Speaker(CreatedUpdatedModel):
         ordering = ['name']
         unique_together = (('camp', 'name'), ('camp', 'slug'))
 
-    def __str___(self):
+    def __str__(self):
         return '%s (%s)' % (self.name, self.camp)
 
     def save(self, **kwargs):
