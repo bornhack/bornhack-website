@@ -102,12 +102,17 @@ class EventInstance(CreatedUpdatedModel):
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
 
 
+def get_speaker_picture_upload_path(instance, filename):
+    """ We want speaker pictures are saved as MEDIA_ROOT/speakers/bornhack-2016/filename """
+    return 'speakers/%s/%s' % (instance.camp.slug, filename)
+
+
 class Speaker(CreatedUpdatedModel):
     """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
     biography = models.TextField()
-    picture_small = models.ImageField(null=True, blank=True)
-    picture_large = models.ImageField(null=True, blank=True)
+    picture_small = models.ImageField(null=True, blank=True, upload_to=get_speaker_picture_upload_path)
+    picture_large = models.ImageField(null=True, blank=True, upload_to=get_speaker_picture_upload_path)
     slug = models.SlugField(blank=True, max_length=255)
     camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
     events = models.ManyToManyField(
@@ -126,4 +131,5 @@ class Speaker(CreatedUpdatedModel):
         if not self.slug:
             self.slug = slugify(self.name)
         super(Speaker, self).save(**kwargs)
+
 
