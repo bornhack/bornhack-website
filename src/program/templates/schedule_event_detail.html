@@ -7,14 +7,7 @@
   <div class="panel-body">
     <p>
     {{ event.abstract|commonmark }}
-    {% if event.speakers.exists %}
-        <hr>
-        {% for speaker in event.speakers.all %}
-          <h4><a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker }}</a></h4>
-          {{ speaker.biography|commonmark }}
-        {% endfor %}
-    {% endif %}
-    </p>
+   </p>
 
     <hr>
 
@@ -26,7 +19,17 @@
       No instances scheduled yet
     {% endfor %}
     </ul>
-    </h4>
+
+    <hr>
+
+    {% if event.speaker_set.exists %}
+      <h4>Speakers</h4>
+      <div class="list-group">
+      {% for speaker in event.speaker_set.all %}
+      <h4><a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">{{ speaker.name }}</a></h4>
+      {% endfor %}
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endblock program_content %}
