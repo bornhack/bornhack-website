@@ -12,7 +12,6 @@ from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
 
-
 @method_decorator(require_safe, name='dispatch')
 class SpeakerPictureView(CampViewMixin, DetailView):
     model = models.Speaker
@@ -25,8 +24,8 @@ class SpeakerPictureView(CampViewMixin, DetailView):
             else:
                 raise Http404()
         elif kwargs['picture'] == 'large':
-            if self.get_object().picture_small:
-                picture = self.get_object().picture_small
+            if self.get_object().picture_large:
+                picture = self.get_object().picture_large
             else:
                 raise Http404()
         else:
@@ -39,8 +38,9 @@ class SpeakerPictureView(CampViewMixin, DetailView):
         response['X-Accel-Redirect'] = '/public/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
             'campslug': self.camp.slug,
             'speakerslug': self.get_object().slug,
-            'filename': picture.name
+            'filename': os.path.basename(picture.name),
         }
+        response['Content-Type'] = ''
         return response
 
 
