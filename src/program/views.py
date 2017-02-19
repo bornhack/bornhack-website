@@ -4,7 +4,7 @@ from django.views.generic import ListView, TemplateView, DetailView
 from camps.mixins import CampViewMixin
 from . import models
 from django.http import Http404
-import datetime
+import datetime, os
 from django.conf import settings
 from django.views import View
 from django.views.decorators.http import require_safe
