@@ -9,7 +9,7 @@ def camp(request):
     Return it after adding the slug to request.session along with a "camps"
     queryset containing all camps (used to build the menu and such)
     """
-    if 'camp_slug' in request.resolver_match.kwargs:
+    if request.resolver_match and 'camp_slug' in request.resolver_match.kwargs:
         try:
             camp = Camp.objects.get(slug=request.resolver_match.kwargs['camp_slug'])
             request.session['campslug'] = camp.slug
