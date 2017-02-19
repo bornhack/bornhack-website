@@ -35,7 +35,7 @@
             <span class="icon-bar"></span>
           </button>
           <a class="navbar-brand" href="/">
-            {% if request.resolver_match.kwargs.camp_slug %}
+            {% if request.resolver_match.kwargs.camp_slug and camp %}
               <img src="{% static camp.logo_small %}" class="img-responsive" />
             {% else %}
               <img src="{% static 'img/logo-small.png' %}" class="img-responsive" />
