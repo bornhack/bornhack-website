@@ -34,11 +34,14 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">
-            {% if request.resolver_match.kwargs.camp_slug and camp %}
+          {% if request.resolver_match.kwargs.camp_slug and camp %}
+            <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
               <img src="{% static camp.logo_small %}" class="img-responsive" />
-            {% else %}
+            </a>
+          {% else %}
+            <a class="navbar-brand" href="/">
               <img src="{% static 'img/logo-small.png' %}" class="img-responsive" />
+            </a>
             {% endif %}
           </a>
         </div>
