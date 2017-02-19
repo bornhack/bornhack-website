@@ -5,7 +5,21 @@
 
 <h3>{{ speaker.name }}</h3>
 
+{% if speaker.picture_large and speaker.picture_small %}
+<div class="row">
+  <div class="col-md-8 text-container">
 {{ speaker.biography|commonmark }}
+  </div>
+  <div class="col-md-4">
+    <a href="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='large' %}" >
+      <img src="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speaker.name }}">
+    </a>
+  </div>
+</div>
+{% else %}
+{{ speaker.biography|commonmark }}
+{% endif %}
+
 <hr />
 
 {% if speaker.events.exists %}
