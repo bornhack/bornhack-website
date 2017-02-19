@@ -103,8 +103,8 @@ class EventInstance(CreatedUpdatedModel):
 
 
 def get_speaker_picture_upload_path(instance, filename):
-    """ We want speaker pictures are saved as MEDIA_ROOT/speakers/camp-slug/speaker-slug/filename """
-    return 'speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
+    """ We want speaker pictures are saved as MEDIA_ROOT/public/speakers/camp-slug/speaker-slug/filename """
+    return 'public/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
         'campslug': instance.camp.slug,
         'speakerslug': instance.slug,
         'filename': filename
