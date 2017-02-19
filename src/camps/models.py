@@ -7,6 +7,7 @@ from psycopg2.extras import DateTimeTZRange
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.utils import timezone
+from django.urls import reverse
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -45,6 +46,9 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         verbose_name='Teardown period',
         help_text='The camp teardown period.',
     )
+
+    def get_absolute_url(self):
+        return reverse('camp_detail', kwargs={'camp_slug': self.slug})
 
     def clean(self):
         ''' Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown '''

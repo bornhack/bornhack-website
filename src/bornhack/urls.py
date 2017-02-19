@@ -30,11 +30,6 @@ urlpatterns = [
         include('news.urls', namespace='news')
     ),
     url(
-        r'^$',
-        TemplateView.as_view(template_name='frontpage.html'),
-        name='frontpage'
-    ),
-    url(
         r'^contact/',
         TemplateView.as_view(template_name='contact.html'),
         name='contact'
@@ -71,6 +66,40 @@ urlpatterns = [
         r'^camps/$',
         CampListView.as_view(),
         name='camp_list'
+    ),
+
+    # camp redirect views here
+
+    url(
+        r'^$',
+        CampRedirectView.as_view(),
+        kwargs={'page': 'camp_detail'}
+    ),
+
+    url(
+        r'^program/$',
+        CampRedirectView.as_view(),
+        kwargs={'page': 'schedule_index'}
+    ),
+
+    url(
+        r'^info/$',
+        CampRedirectView.as_view(),
+        kwargs={'page': 'info'}
+    ),
+
+
+    url(
+        r'^sponsors/$',
+        CampRedirectView.as_view(),
+        kwargs={'page': 'sponsors'}
+    ),
+
+
+    url(
+        r'^villages/$',
+        CampRedirectView.as_view(),
+        kwargs={'page': 'village_list'}
     ),
 
     # camp specific urls below here
