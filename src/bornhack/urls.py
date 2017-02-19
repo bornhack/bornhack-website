@@ -112,6 +112,11 @@ urlpatterns = [
                         name='speaker_detail'
                     ),
                     url(
+                        r'^speakers/(?P<slug>[-_\w+]+)/pictures/(?P<picture>[-_\w+]+)/$',
+                        SpeakerPictureView.as_view(),
+                        name='speaker_picture',
+                    ),
+                    url(
                         r'^events/$',
                         EventListView.as_view(),
                         name='event_index'

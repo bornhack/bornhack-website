@@ -6,6 +6,40 @@ from . import models
 from django.http import Http404
 import datetime
 from django.conf import settings
+from django.views import View
+from django.views.decorators.http import require_safe
+from django.http import Http404
+from django.utils.decorators import method_decorator
+
+@method_decorator(require_safe, name='dispatch')
+class SpeakerPictureView(CampViewMixin, DetailView):
+    model = models.Speaker
+
+    def get(self, request, *args, **kwargs):
+        # do we have the requested picture?
+        if kwargs['picture'] == 'thumbnail':
+            if self.get_object().picture_small:
+                picture = self.get_object().picture_small
+            else:
+                raise Http404()
+        elif kwargs['picture'] == 'large':
+            if self.get_object().picture_small:
+                picture = self.get_object().picture_small
+            else:
+                raise Http404()
+        else:
+            raise Http404()
+
+        # make nginx return the picture using X-Accel-Redirect
+        # (this works for nginx only, other webservers use x-sendfile),
+        # TODO: what about runserver mode here?
+        response = HttpResponse()
+        response['X-Accel-Redirect'] = '/_media/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
+            'campslug': self.camp.slug,
+            'speakerslug': self.get_object().slug,
+            'filename': picture.name
+        }
+        return response
 
 
 class SpeakerDetailView(CampViewMixin, DetailView):
