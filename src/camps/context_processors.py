@@ -10,8 +10,12 @@ def camp(request):
     queryset containing all camps (used to build the menu and such)
     """
     if 'camp_slug' in request.resolver_match.kwargs:
-        camp = Camp.objects.get(slug=request.resolver_match.kwargs['camp_slug'])
-        request.session['campslug'] = camp.slug
+        try:
+            camp = Camp.objects.get(slug=request.resolver_match.kwargs['camp_slug'])
+            request.session['campslug'] = camp.slug
+        except Camp.DoesNotExist:
+            request.session['campslug'] = None
+            camp = None
     else:
         request.session['campslug'] = None
         camp = None
