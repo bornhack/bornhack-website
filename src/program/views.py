@@ -10,6 +10,8 @@ from django.views import View
 from django.views.decorators.http import require_safe
 from django.http import Http404
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse
+
 
 @method_decorator(require_safe, name='dispatch')
 class SpeakerPictureView(CampViewMixin, DetailView):
@@ -34,7 +36,7 @@ class SpeakerPictureView(CampViewMixin, DetailView):
         # (this works for nginx only, other webservers use x-sendfile),
         # TODO: what about runserver mode here?
         response = HttpResponse()
-        response['X-Accel-Redirect'] = '/_media/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
+        response['X-Accel-Redirect'] = '/public/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
             'campslug': self.camp.slug,
             'speakerslug': self.get_object().slug,
             'filename': picture.name
