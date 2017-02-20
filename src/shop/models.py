@@ -109,6 +109,7 @@ class Order(CreatedUpdatedModel):
         verbose_name=_('Customer comment'),
         help_text=_('If you have any comments about the order please enter them here.'),
         default='',
+        blank=True,
     )
 
 
