@@ -165,8 +165,7 @@ class Order(CreatedUpdatedModel):
         self.paid = True
         self.open = None
         for order_product in self.orderproductrelation_set.all():
-            category_pk = str(order_product.product.category.pk)
-            if category_pk == settings.TICKET_CATEGORY_ID:
+            if order_product.product.category.name == "Tickets":
                 for _ in range(0, order_product.quantity):
                     ticket = Ticket(
                         order=self,
