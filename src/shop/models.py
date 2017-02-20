@@ -456,7 +456,7 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
                 ticket_id=self.pk,
                 user_id=self.order.user.pk,
                 secret_key=settings.SECRET_KEY,
-            )
+            ).encode('utf-8')
         ).hexdigest()
 
     def get_qr_code(self):
