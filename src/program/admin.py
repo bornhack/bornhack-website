@@ -4,7 +4,7 @@ from .models import Event, Speaker, EventType, EventInstance, EventLocation
 
 
 @admin.register(EventLocation)
-class EventInstanceAdmin(admin.ModelAdmin):
+class EventLocationAdmin(admin.ModelAdmin):
     pass
 
 
@@ -37,6 +37,3 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
-
-
-
