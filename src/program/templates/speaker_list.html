@@ -1,6 +1,7 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
+{% if speaker_list %}
 <p class="lead">
   An alphabetical list of all speakers, workshop hosts and other
   event anchors at BornHack 2016.
@@ -13,4 +14,7 @@
   </a>
   {% endfor %}
 </div>
+{% else %}
+  <h2>Speakers for {{ camp.title }} coming soon!</h2>
+{% endif %}
 {% endblock program_content %}

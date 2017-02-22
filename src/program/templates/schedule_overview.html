@@ -1,6 +1,7 @@
 {% extends 'schedule_base.html' %}
 
 {% block schedule_content %}
+{% if eventinstances %}
 {% for day in camp.camp_days %}
   {{ day.lower.date|date:"D d/m" }} <br />
   <div style="display: flex; flex-wrap: wrap;">
@@ -18,6 +19,9 @@
   {% endfor %}
   </div>
 <hr />
- {% endfor %}
+{% endfor %}
+{% else %}
+  <h2>Schedule for {{ camp.title }} coming soon!</h2>
+{% endif %}
 
 {% endblock schedule_content %}

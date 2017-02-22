@@ -1,6 +1,7 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
+{% if event_list %}
 <p class="lead">
   An alphabetical list of all talks, workshops, keynotes and other events
   at {{ camp.title }}.
@@ -21,4 +22,7 @@
   {% endif %}
   {% endfor %}
 </div>
+{% else %}
+  <h2>Events for {{ camp.title }} coming soon!</h2>
+{% endif %}
 {% endblock program_content %}
