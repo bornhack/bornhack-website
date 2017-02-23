@@ -2,6 +2,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 from utils.models import CreatedUpdatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
@@ -40,6 +41,17 @@ class Event(CreatedUpdatedModel):
     abstract = models.TextField()
     event_type = models.ForeignKey(EventType)
     camp = models.ForeignKey('camps.Camp', null=True, related_name="events")
+
+    video_url = models.URLField(
+        max_length=1000,
+        null=True,
+        blank=True,
+        help_text=_('URL to the recording.')
+    )
+    video_recording = models.BooleanField(
+        default=True,
+        help_text=_('Whether the event will be video recorded or not.')
+    )
 
     class Meta:
         ordering = ['title']
