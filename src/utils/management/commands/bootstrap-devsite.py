@@ -8,6 +8,7 @@ from info.models import InfoCategory, InfoItem
 from villages.models import Village
 from program.models import EventType, Event, EventInstance, Speaker, EventLocation
 from django.contrib.auth.models import User
+from allauth.account.models import EmailAddress
 
 
 class Command(BaseCommand):
@@ -76,24 +77,48 @@ class Command(BaseCommand):
         self.output("Creating users...")
         user1 = User.objects.create_user(
             username='user1',
-            email='user1@example.com',
             password='user1',
         )
+        email = EmailAddress.objects.create(
+            user=user1,
+            email='user1@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
         user2 = User.objects.create_user(
             username='user2',
-            email='user2@example.com',
             password='user2',
         )
+        email = EmailAddress.objects.create(
+            user=user2,
+            email='user2@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
         user3 = User.objects.create_user(
             username='user3',
-            email='user3@example.com',
             password='user3',
         )
+        email = EmailAddress.objects.create(
+            user=user3,
+            email='user3@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
         user4 = User.objects.create_user(
             username='user4',
-            email='user4@example.com',
             password='user4',
         )
+        email = EmailAddress.objects.create(
+            user=user4,
+            email='user4@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
         admin = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
