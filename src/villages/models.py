@@ -1,15 +1,13 @@
-
-
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
 
-from utils.models import CreatedUpdatedModel, UUIDModel
+from utils.models import CreatedUpdatedModel, UUIDModel, CampRelatedModel
 
 from .managers import VillageQuerySet
 
 
-class Village(CreatedUpdatedModel, UUIDModel):
+class Village(CreatedUpdatedModel, UUIDModel, CampRelatedModel):
 
     class Meta:
         ordering = ['name']

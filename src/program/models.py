@@ -3,12 +3,12 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from utils.models import CreatedUpdatedModel
+from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 
 
-class EventLocation(CreatedUpdatedModel):
+class EventLocation(CreatedUpdatedModel, CampRelatedModel):
     """ The places where stuff happens """
     name = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -34,7 +34,7 @@ class EventType(CreatedUpdatedModel):
         return self.name
 
 
-class Event(CreatedUpdatedModel):
+class Event(CreatedUpdatedModel, CampRelatedModel):
     """ Something that is on the program one or more times. """
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, max_length=255)
@@ -72,7 +72,7 @@ class Event(CreatedUpdatedModel):
         return False
 
 
-class EventInstance(CreatedUpdatedModel):
+class EventInstance(CreatedUpdatedModel, CampRelatedModel):
     """ An instance of an event """
     event = models.ForeignKey('program.event', related_name='instances')
     when = DateTimeRangeField()
@@ -92,6 +92,10 @@ class EventInstance(CreatedUpdatedModel):
 
         if errors:
             raise ValidationError(errors)
+
+    @property
+    def camp(self):
+        return self.event.camp
 
     @property
     def schedule_date(self):
@@ -123,7 +127,7 @@ def get_speaker_picture_upload_path(instance, filename):
     }
 
 
-class Speaker(CreatedUpdatedModel):
+class Speaker(CreatedUpdatedModel, CampRelatedModel):
     """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
     biography = models.TextField()

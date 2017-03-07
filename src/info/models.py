@@ -1,11 +1,9 @@
-
-from django.contrib import messages
 from django.db import models
-from utils.models import CreatedUpdatedModel
+from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 
 
-class InfoCategory(CreatedUpdatedModel):
+class InfoCategory(CreatedUpdatedModel, CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
         unique_together = (('anchor', 'camp'), ('headline', 'camp'))
@@ -40,7 +38,7 @@ class InfoCategory(CreatedUpdatedModel):
         return '%s (%s)' % (self.headline, self.camp)
 
 
-class InfoItem(CreatedUpdatedModel):
+class InfoItem(CreatedUpdatedModel, CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
         unique_together = (('anchor', 'category'), ('headline', 'category'))
@@ -68,6 +66,10 @@ class InfoItem(CreatedUpdatedModel):
         help_text = 'Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.',
         default = 100,
     )
+
+    @property
+    def camp(self):
+        return self.category.camp
 
     def clean(self):
         if InfoCategory.objects.filter(camp=self.category.camp, anchor=self.anchor).exists():
