@@ -1,4 +1,3 @@
-import datetime
 from django.db import models
 from utils.models import UUIDModel, CreatedUpdatedModel
 from program.models import EventType, EventLocation
@@ -45,6 +44,11 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     teardown = DateTimeRangeField(
         verbose_name='Teardown period',
         help_text='The camp teardown period.',
+    )
+
+    read_only = models.BooleanField(
+        help_text='Whether the camp is read only (i.e. in the past)',
+        default=False
     )
 
     def get_absolute_url(self):
@@ -110,7 +114,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
                 # on the first day use actual start time instead of midnight
                 days.append(
                     DateTimeTZRange(
-                        field.lower, 
+                        field.lower,
                         (field.lower+timedelta(days=i+1)).replace(hour=0)
                     )
                 )

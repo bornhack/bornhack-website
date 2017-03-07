@@ -3,13 +3,13 @@ from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from utils.models import CreatedUpdatedModel
+from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.core.urlresolvers import reverse_lazy
 
 
-class UserSubmittedModel(CreatedUpdatedModel):
+class UserSubmittedModel(CampRelatedModel):
     class Meta:
         abstract = True
 
@@ -39,7 +39,7 @@ class UserSubmittedModel(CreatedUpdatedModel):
     )
 
 
-class EventLocation(CreatedUpdatedModel):
+class EventLocation(CreatedUpdatedModel, CampRelatedModel):
     """ The places where stuff happens """
     name = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -106,7 +106,7 @@ class Event(UserSubmittedModel):
         return reverse_lazy('event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
 
-class EventInstance(CreatedUpdatedModel):
+class EventInstance(CreatedUpdatedModel, CampRelatedModel):
     """ An instance of an event """
     event = models.ForeignKey('program.event', related_name='instances')
     when = DateTimeRangeField()
@@ -126,6 +126,10 @@ class EventInstance(CreatedUpdatedModel):
 
         if errors:
             raise ValidationError(errors)
+
+    @property
+    def camp(self):
+        return self.event.camp
 
     @property
     def schedule_date(self):
