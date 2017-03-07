@@ -3,7 +3,7 @@ from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 
 
-class InfoCategory(CreatedUpdatedModel, CampRelatedModel):
+class InfoCategory(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
         unique_together = (('anchor', 'camp'), ('headline', 'camp'))
@@ -38,7 +38,7 @@ class InfoCategory(CreatedUpdatedModel, CampRelatedModel):
         return '%s (%s)' % (self.headline, self.camp)
 
 
-class InfoItem(CreatedUpdatedModel, CampRelatedModel):
+class InfoItem(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
         unique_together = (('anchor', 'category'), ('headline', 'category'))

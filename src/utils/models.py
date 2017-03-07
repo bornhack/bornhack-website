@@ -47,7 +47,7 @@ class CreatedUpdatedModel(CleanedModel):
     updated = models.DateTimeField(auto_now=True)
 
 
-class CampRelatedModel(CleanedModel):
+class CampRelatedModel(CreatedUpdatedModel):
     class Meta:
         abstract = True
 

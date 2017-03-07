@@ -39,7 +39,7 @@ class UserSubmittedModel(CampRelatedModel):
     )
 
 
-class EventLocation(CreatedUpdatedModel, CampRelatedModel):
+class EventLocation(CampRelatedModel):
     """ The places where stuff happens """
     name = models.CharField(max_length=100)
     slug = models.SlugField()
@@ -106,7 +106,7 @@ class Event(UserSubmittedModel):
         return reverse_lazy('event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
 
-class EventInstance(CreatedUpdatedModel, CampRelatedModel):
+class EventInstance(CampRelatedModel):
     """ An instance of an event """
     event = models.ForeignKey('program.event', related_name='instances')
     when = DateTimeRangeField()

@@ -5,7 +5,7 @@ from utils.models import CreatedUpdatedModel, UUIDModel, CampRelatedModel
 from .managers import VillageQuerySet
 
 
-class Village(CreatedUpdatedModel, UUIDModel, CampRelatedModel):
+class Village(UUIDModel, CampRelatedModel):
 
     class Meta:
         ordering = ['name']
