@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import datetime
 from django.views.generic import ListView, TemplateView, DetailView
+from django.views.generic.edit import CreateView, UpdateView
 from camps.mixins import CampViewMixin
 from . import models
 from django.http import Http404
@@ -11,6 +12,75 @@ from django.views.decorators.http import require_safe
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.urls import reverse
+
+
+class SpeakerCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
+    model = models.Speaker
+    fields = ['name', 'biography', 'picture_small', 'picture_large']
+    template_name = 'speaker_form.html'
+
+    def get(self, request, *args, **kwargs):
+        # first make sure we don't already have a speaker for this user for this camp
+        try:
+            speaker = models.Speaker.objects.get(user=request.user, camp=self.camp)
+        except models.Speaker.DoesNotExist:
+            # no speaker exists, just show the create speaker form
+            return super(SpeakerCreateView, self).get(request, *args, **kwargs)
+
+        # speaker already exists, where do we want to redirect?
+        if speaker.submission_status == models.Speaker.SUBMISSION_DRAFT:
+            messages.info(request, "You already have a draft speaker profile for %s, you can modify and submit it here" % self.camp.title)
+            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
+        elif speaker.submission_status == models.Speaker.SUBMISSION_PENDING:
+            messages.info(request, "You already have a pending speaker profile for %s, you can modify and resubmit it here" % self.camp.title)
+            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
+        elif speaker.submission_status == models.Speaker.SUBMISSION_REJECTED:
+            messages.info(request, "You already have a rejected speaker profile for %s, you can modify and resubmit it here" % self.camp.title)
+            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
+        elif speaker.submission_status == models.Speaker.SUBMISSION_APPROVED:
+            messages.info(request, "You already have an accepted speaker profile for %s, please contact the organisers if you want to modify it." % self.camp.title)
+            return redirect('speaker_detail', camp_slug=self.camp.slug, slug=speaker.slug)
+        else:
+            # unknown submission status!
+            return
+
+    def form_valid(self, form):
+        # set camp before saving
+        form.instance.camp = self.camp
+        form.instance.user = self.request.user
+        speaker = form.save()
+        return redirect(reverse('speaker_detail', kwargs={'camp_slug': speaker.camp.slug, 'slug': speaker.slug}))
+
+
+class SpeakerEditView(LoginRequiredMixin, CampViewMixin, UpdateView):
+    model = models.Speaker
+    fields = ['name', 'biography', 'picture_small', 'picture_large']
+    template_name = 'speaker_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # call super dispatch now because it ets self.camp which is needed below
+        response = super(SpeakerEditView, self).dispatch(request, *args, **kwargs)
+
+        # first make sure that this speaker belongs to the logged in user
+        if self.get_object().user.username != request.user.username:
+            messages.error(request, "No thanks")
+            return redirect(reverse('speaker_detail', kwargs={'camp_slug': self.get_object().camp.slug, 'slug': self.get_object().slug}))
+
+        if self.get_object().submission_status == models.Speaker.SUBMISSION_PENDING:
+            messages.info(request, "Your speaker profile for %s has already been submitted. If you modify it you will have to resubmit it." % self.get_object().camp.title)
+        elif self.get_object().submission_status == models.Speaker.SUBMISSION_REJECTED:
+            messages.info(request, "When you are done editing you will have to resubmit your speaker profile." % self.get_object().camp.title)
+        elif self.get_object().submission_status == models.Speaker.SUBMISSION_APPROVED:
+            messages.error(request, "Your speaker profile for %s has already been approved. Please contact the organisers if you want to modify it." % self.get_object().camp.title)
+            return redirect(reverse('speaker_detail', kwargs={'camp_slug': self.get_object().camp.slug, 'slug': self.get_object().slug}))
+
+        # alright, render the form
+        return super(SpeakerEditView, self).dispatch(request, *args, **kwargs)
+
 
 @method_decorator(require_safe, name='dispatch')
 class SpeakerPictureView(CampViewMixin, DetailView):

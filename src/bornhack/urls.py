@@ -136,6 +136,16 @@ urlpatterns = [
                         name='speaker_index'
                     ),
                     url(
+                        r'^speakers/create/$',
+                        SpeakerCreateView.as_view(),
+                        name='speaker_create'
+                    ),
+                    url(
+                        r'^speakers/(?P<slug>[-_\w+]+)/edit/$',
+                        SpeakerEditView.as_view(),
+                        name='speaker_edit'
+                    ),
+                    url(
                         r'^speakers/(?P<slug>[-_\w+]+)/$',
                         SpeakerDetailView.as_view(),
                         name='speaker_detail'

@@ -6,6 +6,37 @@ from django.utils.translation import ugettext_lazy as _
 from utils.models import CreatedUpdatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
+from django.core.urlresolvers import reverse_lazy
+
+
+class UserSubmittedModel(CreatedUpdatedModel):
+    class Meta:
+        abstract = True
+
+    SUBMISSION_DRAFT = 'draft'
+    SUBMISSION_PENDING = 'pending'
+    SUBMISSION_APPROVED = 'approved'
+    SUBMISSION_REJECTED = 'rejected'
+
+    SUBMISSION_STATUSES = [
+        SUBMISSION_DRAFT,
+        SUBMISSION_PENDING,
+        SUBMISSION_APPROVED,
+        SUBMISSION_REJECTED
+    ]
+
+    SUBMISSION_STATUS_CHOICES = [
+        (SUBMISSION_DRAFT, 'Draft'),
+        (SUBMISSION_PENDING, 'Pending approval'),
+        (SUBMISSION_APPROVED, 'Approved'),
+        (SUBMISSION_REJECTED, 'Rejected'),
+    ]
+
+    submission_status = models.CharField(
+        max_length=50,
+        choices=SUBMISSION_STATUS_CHOICES,
+        default=SUBMISSION_DRAFT,
+    )
 
 
 class EventLocation(CreatedUpdatedModel):
@@ -34,7 +65,7 @@ class EventType(CreatedUpdatedModel):
         return self.name
 
 
-class Event(CreatedUpdatedModel):
+class Event(UserSubmittedModel):
     """ Something that is on the program one or more times. """
     title = models.CharField(max_length=255)
     slug = models.SlugField(blank=True, max_length=255)
@@ -70,6 +101,9 @@ class Event(CreatedUpdatedModel):
         if self.speakers.exists():
             return ", ".join(self.speakers.all().values_list('name', flat=True))
         return False
+
+    def get_absolute_url(self):
+        return reverse_lazy('event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
 
 class EventInstance(CreatedUpdatedModel):
@@ -123,7 +157,7 @@ def get_speaker_picture_upload_path(instance, filename):
     }
 
 
-class Speaker(CreatedUpdatedModel):
+class Speaker(UserSubmittedModel):
     """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
     biography = models.TextField()
@@ -136,9 +170,16 @@ class Speaker(CreatedUpdatedModel):
         blank=True,
     )
 
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+
     class Meta:
         ordering = ['name']
-        unique_together = (('camp', 'name'), ('camp', 'slug'))
+        unique_together = (('camp', 'name'), ('camp', 'slug'), ('camp', 'user'))
 
     def __str__(self):
         return '%s (%s)' % (self.name, self.camp)
@@ -147,5 +188,8 @@ class Speaker(CreatedUpdatedModel):
         if not self.slug:
             self.slug = slugify(self.name)
         super(Speaker, self).save(**kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
 
