@@ -196,4 +196,8 @@ class Speaker(UserSubmittedModel):
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
+    def clean(self):
+        if self.slug == "create":
+            # this is a reserved word used in urls.py
+            raise ValidationError({'name': 'This name is reserved, please choose another'})
 
