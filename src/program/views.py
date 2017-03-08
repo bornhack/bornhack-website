@@ -124,7 +124,10 @@ class SpeakerListView(CampViewMixin, ListView):
     template_name = 'speaker_list.html'
 
     def get_queryset(self, *args, **kwargs):
-        return models.Speaker.objects.filter(camp=self.camp)
+        return models.Speaker.objects.filter(
+            camp=self.camp,
+            submission_status=models.Speaker.SUBMISSION_APPROVED
+        )
 
 
 class EventListView(CampViewMixin, ListView):
