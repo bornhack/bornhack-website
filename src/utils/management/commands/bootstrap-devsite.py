@@ -124,6 +124,12 @@ class Command(BaseCommand):
             email='admin@example.com',
             password='admin',
         )
+        email = EmailAddress.objects.create(
+            user=admin,
+            email='admin@example.com',
+            verified=True
+        )
+        email.set_as_primary()
 
         self.output("Creating event types...")
         workshop = EventType.objects.create(
