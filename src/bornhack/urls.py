@@ -131,29 +131,33 @@ urlpatterns = [
                         name='schedule_index'
                     ),
                     url(
-                        r'^speakers/$',
-                        SpeakerListView.as_view(),
-                        name='speaker_index'
-                    ),
-                    url(
-                        r'^speakers/create/$',
-                        SpeakerCreateView.as_view(),
-                        name='speaker_create'
-                    ),
-                    url(
-                        r'^speakers/(?P<slug>[-_\w+]+)/edit/$',
-                        SpeakerEditView.as_view(),
-                        name='speaker_edit'
-                    ),
-                    url(
-                        r'^speakers/(?P<slug>[-_\w+]+)/$',
-                        SpeakerDetailView.as_view(),
-                        name='speaker_detail'
-                    ),
-                    url(
-                        r'^speakers/(?P<slug>[-_\w+]+)/pictures/(?P<picture>[-_\w+]+)/$',
-                        SpeakerPictureView.as_view(),
-                        name='speaker_picture',
+                        r'^speakers/', include([
+                            url(
+                                r'^$',
+                                SpeakerListView.as_view(),
+                                name='speaker_index'
+                            ),
+                            url(
+                                r'^create/$',
+                                SpeakerCreateView.as_view(),
+                                name='speaker_create'
+                            ),
+                            url(
+                                r'^(?P<slug>[-_\w+]+)/$',
+                                SpeakerDetailView.as_view(),
+                                name='speaker_detail'
+                            ),
+                            url(
+                                r'^(?P<slug>[-_\w+]+)/edit/$',
+                                SpeakerEditView.as_view(),
+                                name='speaker_edit'
+                            ),
+                            url(
+                                r'^(?P<slug>[-_\w+]+)/pictures/(?P<picture>[-_\w+]+)/$',
+                                SpeakerPictureView.as_view(),
+                                name='speaker_picture',
+                            ),
+                        ]),
                     ),
                     url(
                         r'^events/$',
