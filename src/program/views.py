@@ -118,16 +118,30 @@ class SpeakerDetailView(CampViewMixin, DetailView):
     model = models.Speaker
     template_name = 'speaker_detail.html'
 
+    def get(self, request, *args, **kwargs):
+        if not self.get_object().is_public and self.get_object().user != request.user:
+            raise Http404()
+        else:
+            return super().get(request, *args, **kwargs)
+
 
 class SpeakerListView(CampViewMixin, ListView):
     model = models.Speaker
     template_name = 'speaker_list.html'
 
     def get_queryset(self, *args, **kwargs):
-        return models.Speaker.objects.filter(
+        # get all approved speakers
+        speakers = models.Speaker.objects.filter(
             camp=self.camp,
             submission_status=models.Speaker.SUBMISSION_APPROVED
         )
+        # also get the users own speaker, in case he has an unapproved
+        userspeakers = models.Speaker.objects.filter(
+            camp=self.camp,
+            user=self.request.user
+        ).exclude(submission_status=models.Speaker.SUBMISSION_APPROVED)
+
+        return speakers | userspeakers
 
 
 class EventListView(CampViewMixin, ListView):

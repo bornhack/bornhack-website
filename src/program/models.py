@@ -38,6 +38,13 @@ class UserSubmittedModel(CampRelatedModel):
         default=SUBMISSION_DRAFT,
     )
 
+    @property
+    def is_public(self):
+        if self.submission_status == self.SUBMISSION_APPROVED:
+            return True
+        else:
+            return False
+
 
 class EventLocation(CampRelatedModel):
     """ The places where stuff happens """
