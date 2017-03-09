@@ -73,33 +73,36 @@ urlpatterns = [
     url(
         r'^$',
         CampRedirectView.as_view(),
-        kwargs={'page': 'camp_detail'}
+        kwargs={'page': 'camp_detail'},
+        name='camp_detail_redirect',
     ),
 
     url(
         r'^program/$',
         CampRedirectView.as_view(),
-        kwargs={'page': 'schedule_index'}
+        kwargs={'page': 'schedule_index'},
+        name='schedule_index_redirect',
     ),
 
     url(
         r'^info/$',
         CampRedirectView.as_view(),
-        kwargs={'page': 'info'}
+        kwargs={'page': 'info'},
+        name='info_redirect',
     ),
-
 
     url(
         r'^sponsors/$',
         CampRedirectView.as_view(),
-        kwargs={'page': 'sponsors'}
+        kwargs={'page': 'sponsors'},
+        name='sponsors_redirect',
     ),
-
 
     url(
         r'^villages/$',
         CampRedirectView.as_view(),
-        kwargs={'page': 'village_list'}
+        kwargs={'page': 'village_list'},
+        name='village_list_redirect',
     ),
 
     # camp specific urls below here
