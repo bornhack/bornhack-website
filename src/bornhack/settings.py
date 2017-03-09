@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'bootstrap3',
+    'django_extensions',
 ]
 
 STATIC_URL = '/static/'
