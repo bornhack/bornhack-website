@@ -75,8 +75,6 @@ TEMPLATES = [
     },
 ]
 
-LOGIN_REDIRECT_URL = 'profiles:detail'
-
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # Handles login to admin with username
     'allauth.account.auth_backends.AuthenticationBackend', # Handles regular logins
@@ -87,7 +85,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[bornhack] '
 ACCOUNT_USERNAME_REQUIRED = False
-LOGIN_REDIRECT_URL='/shop/'
+LOGIN_REDIRECT_URL='/'
 LOGIN_URL = '/login/'
 
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
