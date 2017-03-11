@@ -171,9 +171,21 @@ def get_speaker_picture_upload_path(instance, filename):
 class Speaker(UserSubmittedModel):
     """ A Person anchoring an event. """
     name = models.CharField(max_length=150)
-    biography = models.TextField()
-    picture_small = models.ImageField(null=True, blank=True, upload_to=get_speaker_picture_upload_path)
-    picture_large = models.ImageField(null=True, blank=True, upload_to=get_speaker_picture_upload_path)
+    biography = models.TextField(
+        help_text='Markdown is supported.'
+    )
+    picture_small = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=get_speaker_picture_upload_path,
+        help_text='A thumbnail of your picture'
+    )
+    picture_large = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=get_speaker_picture_upload_path,
+        help_text='A picture of you'
+    )
     slug = models.SlugField(blank=True, max_length=255)
     camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
     events = models.ManyToManyField(
