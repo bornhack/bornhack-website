@@ -94,6 +94,7 @@ class EventSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSub
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'].fields['speakers'].queryset = models.SpeakerSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        context['form'].fields['event_type'].queryset = models.EventType.objects.filter(public=True)
         return context
 
 
@@ -101,6 +102,12 @@ class EventSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
     model = models.EventSubmission
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventsubmission_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['speakers'].queryset = models.SpeakerSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        context['form'].fields['event_type'].queryset = models.EventType.objects.filter(public=True)
+        return context
 
 
 class EventSubmissionDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):

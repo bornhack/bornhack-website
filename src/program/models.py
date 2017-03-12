@@ -174,21 +174,30 @@ class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
     name = models.CharField(
         max_length=100,
-        unique=True
+        unique=True,
+        help_text='The name of this event type',
     )
 
     slug = models.SlugField()
 
     color = models.CharField(
-        max_length=50
+        max_length=50,
+        help_text='The background color of this event type',
     )
 
     light_text = models.BooleanField(
-        default=False
+        default=False,
+        help_text='Check if this event type should use white text color',
     )
 
     notifications = models.BooleanField(
-        default=False
+        default=False,
+        help_text='Check to send notifications for this event type',
+    )
+
+    public = models.BooleanField(
+        default=False,
+        help_text='Check to permit users to submit events of this type',
     )
 
     def __str__(self):
