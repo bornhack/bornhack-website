@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from camps.mixins import CampViewMixin
-from .mixins import CreateUserProposalMixin, EnsureUnpprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
+from .mixins import CreateProposalMixin, EnsureUnpprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
 from . import models
 import datetime, os
 
@@ -33,7 +33,7 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
 
-class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateUserProposalMixin, EnsureWritableCampMixin, CreateView):
+class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, CreateView):
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
@@ -89,7 +89,7 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
         return response
 
 
-class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateUserProposalMixin, EnsureWritableCampMixin, CreateView):
+class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, CreateView):
     model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventproposal_form.html'

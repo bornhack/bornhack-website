@@ -5,7 +5,7 @@ from . import models
 from django.contrib import messages
 
 
-class CreateUserProposalMixin(SingleObjectMixin):
+class CreateProposalMixin(SingleObjectMixin):
     def form_valid(self, form):
         # set camp and user before saving
         form.instance.camp = self.camp
