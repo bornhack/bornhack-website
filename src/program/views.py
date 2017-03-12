@@ -99,7 +99,7 @@ class EventSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSub
 
 class EventSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, EnsureUnpprovedSubmissionMixin, UpdateView):
     model = models.EventSubmission
-    fields = ['title', 'abstract', 'event_tyoe', 'speakers']
+    fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventsubmission_form.html'
 
 
