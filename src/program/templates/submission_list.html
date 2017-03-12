@@ -24,7 +24,7 @@ Proposals | {{ block.super }}
             <td>
                 <a href="{% url 'speakersubmission_detail' camp_slug=camp.slug pk=speakersubmission.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 <a href="{% url 'speakersubmission_update' camp_slug=camp.slug pk=speakersubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
-                <a href="#" class="btn btn-danger btn-xs">Delete</a>
+                <a href="#" class="btn btn-danger btn-xs btn-disables" disabled>Delete</a>
             </td>
         </tr>
         {% endfor %}
@@ -56,7 +56,7 @@ Proposals | {{ block.super }}
             <td>
                 <a href="{% url 'eventsubmission_detail' camp_slug=camp.slug pk=eventsubmission.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 <a href="{% url 'eventsubmission_update' camp_slug=camp.slug pk=eventsubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
-                <a href="#" class="btn btn-danger btn-xs">Delete</a>
+                <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
             </td>
         </tr>
         {% endfor %}
