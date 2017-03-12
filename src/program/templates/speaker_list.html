@@ -11,7 +11,6 @@
   {% for speaker in speaker_list %}
   <a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
     {{ speaker.name }} ({{ speaker.events.all.count }} event{{ speaker.events.all.count|pluralize }})
-    {% if not speaker.is_public %}(unpublished, {{ speaker.submission_status }}){% endif %}
   </a>
   {% endfor %}
 </div>

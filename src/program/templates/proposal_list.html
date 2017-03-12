@@ -1,0 +1,83 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+Proposals | {{ block.super }}
+{% endblock %}
+
+{% block program_content %}
+
+<h3>Your {{ camp.title }} Speaker Proposals</h3>
+{% if speakerproposal_list %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for speakerproposal in speakerproposal_list %}
+        <tr>
+            <td><b>{{ speakerproposal.name }}</b></td>
+            <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>
+            <td>
+                <a href="{% url 'speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
+                {% if not camp.read_only %}
+                    <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                    <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h4>No speaker proposals found</h4>
+{% endif %}
+
+{% if not camp.read_only %}
+<a href="{% url 'speakerproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Speaker</a>
+{% endif %}
+
+<p>
+<br>
+</p>
+
+<h3>Your {{ camp.title }} Event Proposals</h3>
+{% if eventproposal_list %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for eventproposal in eventproposal_list %}
+        <tr>
+            <td><b>{{ eventproposal.title }}</b></td>
+            <td><b>{{ eventproposal.event_type }}</b></td>
+            <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>
+            <td>
+                <a href="{% url 'eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
+                {% if not camp.read_only %}
+                    <a href="{% url 'eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                    <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h4>No event proposals found</h4>
+{% endif %}
+
+{% if not camp.read_only %}
+    <a href="{% url 'eventproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Event</a>
+{% endif %}
+
+{% endblock %}

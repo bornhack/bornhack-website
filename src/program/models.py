@@ -13,7 +13,7 @@ import uuid
 class UserSubmittedModel(CampRelatedModel):
     """
         An abstract model containing the stuff that is shared
-        between the SpeakerSubmission and EventSubmission models.
+        between the SpeakerProposal and EventProposal models.
     """
 
     class Meta:
@@ -29,50 +29,59 @@ class UserSubmittedModel(CampRelatedModel):
         'auth.User',
     )
 
-    SUBMISSION_DRAFT = 'draft'
-    SUBMISSION_PENDING = 'pending'
-    SUBMISSION_APPROVED = 'approved'
-    SUBMISSION_REJECTED = 'rejected'
+    PROPOSAL_DRAFT = 'draft'
+    PROPOSAL_PENDING = 'pending'
+    PROPOSAL_APPROVED = 'approved'
+    PROPOSAL_REJECTED = 'rejected'
 
-    SUBMISSION_STATUSES = [
-        SUBMISSION_DRAFT,
-        SUBMISSION_PENDING,
-        SUBMISSION_APPROVED,
-        SUBMISSION_REJECTED
+    PROPOSAL_STATUSES = [
+        PROPOSAL_DRAFT,
+        PROPOSAL_PENDING,
+        PROPOSAL_APPROVED,
+        PROPOSAL_REJECTED
     ]
 
-    SUBMISSION_STATUS_CHOICES = [
-        (SUBMISSION_DRAFT, 'Draft'),
-        (SUBMISSION_PENDING, 'Pending approval'),
-        (SUBMISSION_APPROVED, 'Approved'),
-        (SUBMISSION_REJECTED, 'Rejected'),
+    PROPOSAL_STATUS_CHOICES = [
+        (PROPOSAL_DRAFT, 'Draft'),
+        (PROPOSAL_PENDING, 'Pending approval'),
+        (PROPOSAL_APPROVED, 'Approved'),
+        (PROPOSAL_REJECTED, 'Rejected'),
     ]
 
-    submission_status = models.CharField(
+    proposal_status = models.CharField(
         max_length=50,
-        choices=SUBMISSION_STATUS_CHOICES,
-        default=SUBMISSION_DRAFT,
+        choices=PROPOSAL_STATUS_CHOICES,
+        default=PROPOSAL_DRAFT,
     )
 
     def __str__(self):
-        return '%s (submitted by: %s, status: %s)' % (self.headline, self.user, self.submission_status)
+        return '%s (submitted by: %s, status: %s)' % (self.headline, self.user, self.proposal_status)
 
+
+def get_speakerproposal_picture_upload_path(instance, filename):
+    """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
+    return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
+        'campslug': instance.camp.slug,
+        'proposaluuidd': instance.uuid,
+        'filename': filename
+    }
 
 def get_speakersubmission_picture_upload_path(instance, filename):
-    """ We want speakersubmission pictures saved as MEDIA_ROOT/public/speakersubmissions/camp-slug/submission-uuid/filename """
-    return 'public/speakersubmissions/%(campslug)s/%(submissionuuid)s/%(filename)s' % {
+    """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
+    return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
         'campslug': instance.camp.slug,
-        'submissionuuidd': instance.uuid,
+        'proposaluuidd': instance.uuid,
         'filename': filename
     }
 
 
-class SpeakerSubmission(UserSubmittedModel):
-    """ A speaker submission """
+
+class SpeakerProposal(UserSubmittedModel):
+    """ A speaker proposal """
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name='speakersubmissions'
+        related_name='speakerproposals'
     )
 
     name = models.CharField(
@@ -87,14 +96,14 @@ class SpeakerSubmission(UserSubmittedModel):
     picture_large = models.ImageField(
         null=True,
         blank=True,
-        upload_to=get_speakersubmission_picture_upload_path,
+        upload_to=get_speakerproposal_picture_upload_path,
         help_text='A picture of the speaker'
     )
 
     picture_small = models.ImageField(
         null=True,
         blank=True,
-        upload_to=get_speakersubmission_picture_upload_path,
+        upload_to=get_speakerproposal_picture_upload_path,
         help_text='A thumbnail of the speaker picture'
     )
 
@@ -103,15 +112,15 @@ class SpeakerSubmission(UserSubmittedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('speakersubmission_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+        return reverse_lazy('speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
 
-class EventSubmission(UserSubmittedModel):
-    """ An event submission """
+class EventProposal(UserSubmittedModel):
+    """ An event proposal """
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name='eventsubmissions'
+        related_name='eventproposals'
     )
 
     title = models.CharField(
@@ -129,7 +138,7 @@ class EventSubmission(UserSubmittedModel):
     )
 
     speakers = models.ManyToManyField(
-        'program.SpeakerSubmission',
+        'program.SpeakerProposal',
         blank=True,
         help_text='Pick the speaker(s) for this event',
     )
@@ -139,7 +148,7 @@ class EventSubmission(UserSubmittedModel):
         return self.title
 
     def get_absolute_url(self):
-        return reverse_lazy('eventsubmission_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+        return reverse_lazy('eventproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
 
 #############################################################################################
@@ -379,11 +388,11 @@ class Speaker(CampRelatedModel):
         help_text='The event(s) this speaker is anchoring',
     )
 
-    submission = models.OneToOneField(
-        'program.SpeakerSubmission',
+    proposal = models.OneToOneField(
+        'program.SpeakerProposal',
         null=True,
         blank=True,
-        help_text='The speaker submission object this speaker was created from',
+        help_text='The speaker proposal object this speaker was created from',
     )
 
     class Meta:

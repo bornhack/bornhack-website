@@ -38,7 +38,7 @@
     </select>
 
     {% if request.user.is_authenticated %}
-    <a href="{% url 'submission_list' camp_slug=camp.slug %}" class="btn btn-default">Manage My Proposals</a>
+    <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn btn-default">Manage My Proposals</a>
     {% endif %}
 
   </div>

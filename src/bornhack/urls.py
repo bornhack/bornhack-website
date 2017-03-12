@@ -134,33 +134,33 @@ urlpatterns = [
                         name='schedule_index'
                     ),
                     url(
-                        r'^submissions/', include([
+                        r'^proposals/', include([
                             url(
                                 r'^$',
-                                SubmissionListView.as_view(),
-                                name='submission_list',
+                                ProposalListView.as_view(),
+                                name='proposal_list',
                             ),
                             url(
                                 r'^speakers/', include([
                                    url(
                                         r'^create/$',
-                                        SpeakerSubmissionCreateView.as_view(),
-                                        name='speakersubmission_create'
+                                        SpeakerProposalCreateView.as_view(),
+                                        name='speakerproposal_create'
                                     ),
                                     url(
                                         r'^(?P<pk>[a-f0-9-]+)/$',
-                                        SpeakerSubmissionDetailView.as_view(),
-                                        name='speakersubmission_detail'
+                                        SpeakerProposalDetailView.as_view(),
+                                        name='speakerproposal_detail'
                                     ),
                                     url(
                                         r'^(?P<pk>[a-f0-9-]+)/edit/$',
-                                        SpeakerSubmissionUpdateView.as_view(),
-                                        name='speakersubmission_update'
+                                        SpeakerProposalUpdateView.as_view(),
+                                        name='speakerproposal_update'
                                     ),
                                     url(
                                         r'^(?P<pk>[a-f0-9-]+)/pictures/(?P<picture>[-_\w+]+)/$',
-                                        SpeakerSubmissionPictureView.as_view(),
-                                        name='speakersubmission_picture',
+                                        SpeakerProposalPictureView.as_view(),
+                                        name='speakerproposal_picture',
                                     ),
                                 ])
                             ),
@@ -168,18 +168,18 @@ urlpatterns = [
                                 r'^events/', include([
                                     url(
                                         r'^create/$',
-                                        EventSubmissionCreateView.as_view(),
-                                        name='eventsubmission_create'
+                                        EventProposalCreateView.as_view(),
+                                        name='eventproposal_create'
                                     ),
                                     url(
                                         r'^(?P<pk>[a-f0-9-]+)/$',
-                                        EventSubmissionDetailView.as_view(),
-                                        name='eventsubmission_detail'
+                                        EventProposalDetailView.as_view(),
+                                        name='eventproposal_detail'
                                     ),
                                     url(
                                         r'^(?P<pk>[a-f0-9-]+)/edit/$',
-                                        EventSubmissionUpdateView.as_view(),
-                                        name='eventsubmission_update'
+                                        EventProposalUpdateView.as_view(),
+                                        name='eventproposal_update'
                                     ),
                                 ])
                             ),

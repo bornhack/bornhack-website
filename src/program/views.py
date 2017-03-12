@@ -9,50 +9,53 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from camps.mixins import CampViewMixin
-from .mixins import CreateUserSubmissionMixin, EnsureUnpprovedSubmissionMixin, EnsureUserOwnsSubmissionMixin
+from .mixins import CreateUserProposalMixin, EnsureUnpprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
 from . import models
 import datetime, os
 
 
-############## submissions ########################################################
+############## proposals ########################################################
 
 
-class SubmissionListView(LoginRequiredMixin, CampViewMixin, ListView):
-    model = models.SpeakerSubmission
-    template_name = 'submission_list.html'
-    context_object_name = 'speakersubmission_list'
+class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
+    model = models.SpeakerProposal
+    template_name = 'proposal_list.html'
+    context_object_name = 'speakerproposal_list'
 
     def get_queryset(self, **kwargs):
-        # only show speaker submissions for the current user
+        # only show speaker proposals for the current user
         return super().get_queryset().filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # add eventsubmissions to the context
-        context['eventsubmission_list'] = models.EventSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        # add eventproposals to the context
+        context['eventproposal_list'] = models.EventProposal.objects.filter(camp=self.camp, user=self.request.user)
         return context
 
 
-class SpeakerSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSubmissionMixin, CreateView):
-    model = models.SpeakerSubmission
+class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateUserProposalMixin, EnsureWritableCampMixin, CreateView):
+    model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
-    template_name = 'speakersubmission_form.html'
+    template_name = 'speakerproposal_form.html'
 
 
-class SpeakerSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, EnsureUnpprovedSubmissionMixin, UpdateView):
-    model = models.SpeakerSubmission
+class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnpprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+    model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
-    template_name = 'speakersubmission_form.html'
+    template_name = 'speakerproposal_form.html'
+
+    def get_success_url(self):
+        return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
-class SpeakerSubmissionDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
-    model = models.SpeakerSubmission
-    template_name = 'speakersubmission_detail.html'
+class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
+    model = models.SpeakerProposal
+    template_name = 'speakerproposal_detail.html'
 
 
 @method_decorator(require_safe, name='dispatch')
-class SpeakerSubmissionPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
-    model = models.SpeakerSubmission
+class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
+    model = models.SpeakerProposal
 
     def get(self, request, *args, **kwargs):
         # is the speaker public, or owned by current user?
@@ -77,42 +80,39 @@ class SpeakerSubmissionPictureView(LoginRequiredMixin, CampViewMixin, EnsureUser
         # (this works for nginx only, other webservers use x-sendfile),
         # TODO: what about runserver mode here?
         response = HttpResponse()
-        response['X-Accel-Redirect'] = '/public/speakersubmissions/%(campslug)s/%(submissionuuid)s/%(filename)s' % {
+        response['X-Accel-Redirect'] = '/public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
             'campslug': self.camp.slug,
-            'submissionuuid': self.get_object().uuid,
+            'proposaluuid': self.get_object().uuid,
             'filename': os.path.basename(picture.name),
         }
         response['Content-Type'] = ''
         return response
 
 
-class EventSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSubmissionMixin, CreateView):
-    model = models.EventSubmission
+class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateUserProposalMixin, EnsureWritableCampMixin, CreateView):
+    model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
-    template_name = 'eventsubmission_form.html'
+    template_name = 'eventproposal_form.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'].fields['speakers'].queryset = models.SpeakerSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        context['form'].fields['speakers'].queryset = models.SpeakerProposal.objects.filter(camp=self.camp, user=self.request.user)
         context['form'].fields['event_type'].queryset = models.EventType.objects.filter(public=True)
         return context
 
 
-class EventSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, EnsureUnpprovedSubmissionMixin, UpdateView):
-    model = models.EventSubmission
+class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnpprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+    model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
-    template_name = 'eventsubmission_form.html'
+    template_name = 'eventproposal_form.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'].fields['speakers'].queryset = models.SpeakerSubmission.objects.filter(camp=self.camp, user=self.request.user)
-        context['form'].fields['event_type'].queryset = models.EventType.objects.filter(public=True)
-        return context
+    def get_success_url(self):
+        return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
-class EventSubmissionDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
-    model = models.EventSubmission
-    template_name = 'eventsubmission_detail.html'
+class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
+    model = models.EventProposal
+    template_name = 'eventproposal_detail.html'
 
 
 ################## speakers ###############################################

@@ -6,8 +6,7 @@
 <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
-    {% bootstrap_button "Save as draft" button_type="submit" button_class="btn-primary" %}
-    {% bootstrap_button "Save and submit for approval" button_type="submit" button_class="btn-primary" %}
+    {% bootstrap_button "Save draft" button_type="submit" button_class="btn-primary" %}
 </form>
 
 {% endblock program_content %}
