@@ -158,6 +158,11 @@ urlpatterns = [
                                         name='speakerproposal_update'
                                     ),
                                     url(
+                                        r'^(?P<pk>[a-f0-9-]+)/submit/$',
+                                        SpeakerProposalSubmitView.as_view(),
+                                        name='speakerproposal_submit'
+                                    ),
+                                    url(
                                         r'^(?P<pk>[a-f0-9-]+)/pictures/(?P<picture>[-_\w+]+)/$',
                                         SpeakerProposalPictureView.as_view(),
                                         name='speakerproposal_picture',
@@ -180,6 +185,11 @@ urlpatterns = [
                                         r'^(?P<pk>[a-f0-9-]+)/edit/$',
                                         EventProposalUpdateView.as_view(),
                                         name='eventproposal_update'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/submit/$',
+                                        EventProposalSubmitView.as_view(),
+                                        name='eventproposal_submit'
                                     ),
                                 ])
                             ),

@@ -25,6 +25,11 @@ Proposals | {{ block.super }}
                 <a href="{% url 'speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 {% if not camp.read_only %}
                     <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                    {% if speakerproposal.proposal_status == "pending" %}
+                        <a href="{% url 'speakerproposal_submit' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Submit</a>
+                    {% else %}
+                        <a href="{% url 'speakerproposal_submit' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Submit</a>
+                    {% endif %}
                     <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
                 {% endif %}
             </td>
@@ -65,6 +70,11 @@ Proposals | {{ block.super }}
                 <a href="{% url 'eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 {% if not camp.read_only %}
                     <a href="{% url 'eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                    {% if eventproposal.proposal_status == "pending" %}
+                        <a href="{% url 'eventproposal_submit' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Submit</a>
+                    {% else %}
+                        <a href="{% url 'eventproposal_submit' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Submit</a>
+                    {% endif %}
                     <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
                 {% endif %}
             </td>

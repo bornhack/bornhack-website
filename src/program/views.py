@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from camps.mixins import CampViewMixin
-from .mixins import CreateProposalMixin, EnsureUnpprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
+from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
 from . import models
 import datetime, os
 
@@ -39,13 +39,33 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
     template_name = 'speakerproposal_form.html'
 
 
-class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnpprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):
         return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+
+    def form_valid(self, form):
+        if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
+            messages.info(self.request, "Your speaker proposal has been reverted to status draft. Please submit it again when you are ready.")
+            form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
+        return super().form_valid(form)
+
+
+class SpeakerProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+    model = models.SpeakerProposal
+    fields = []
+    template_name = 'speakerproposal_submit.html'
+
+    def get_success_url(self):
+        return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+
+    def form_valid(self, form):
+        form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_PENDING
+        messages.info(self.request, "Your proposal has been submitted and is now pending approval")
+        return super().form_valid(form)
 
 
 class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
@@ -101,13 +121,33 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalM
         return context
 
 
-class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnpprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
     model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventproposal_form.html'
 
     def get_success_url(self):
         return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+
+    def form_valid(self, form):
+        if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
+            messages.info(self.request, "Your event proposal has been reverted to status draft. Please submit it again when you are ready.")
+            form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
+        return super().form_valid(form)
+
+
+class EventProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+    model = models.EventProposal
+    fields = []
+    template_name = 'eventproposal_submit.html'
+
+    def get_success_url(self):
+        return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+
+    def form_valid(self, form):
+        form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_PENDING
+        messages.info(self.request, "Your proposal has been submitted and is now pending approval")
+        return super().form_valid(form)
 
 
 class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):

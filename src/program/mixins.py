@@ -14,7 +14,7 @@ class CreateProposalMixin(SingleObjectMixin):
         return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
 
-class EnsureUnpprovedProposalMixin(SingleObjectMixin):
+class EnsureUnapprovedProposalMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # do not permit editing if the proposal is already approved
         if self.get_object().proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
