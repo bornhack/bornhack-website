@@ -22,6 +22,7 @@ Proposals | {{ block.super }}
             <td><b>{{ speakersubmission.name }}</b></td>
             <td><span class="badge">{{ speakersubmission.submission_status }}</span></td>
             <td>
+                <a href="{% url 'speakersubmission_detail' camp_slug=camp.slug pk=speakersubmission.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 <a href="{% url 'speakersubmission_update' camp_slug=camp.slug pk=speakersubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
                 <a href="#" class="btn btn-danger btn-xs">Delete</a>
             </td>
@@ -53,6 +54,7 @@ Proposals | {{ block.super }}
             <td><b>{{ eventsubmission.title }}</b></td>
             <td><span class="badge">{{ eventsubmission.submission_status }}</span></td>
             <td>
+                <a href="{% url 'eventsubmission_detail' camp_slug=camp.slug pk=eventsubmission.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 <a href="{% url 'eventsubmission_update' camp_slug=camp.slug pk=eventsubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
                 <a href="#" class="btn btn-danger btn-xs">Delete</a>
             </td>

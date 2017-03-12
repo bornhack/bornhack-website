@@ -1,0 +1,24 @@
+{% extends 'program_base.html' %}
+{% load commonmark %}
+
+{% block program_content %}
+
+<h2>{{ camp.title }} Event Proposal Details</h2>
+
+<ul>
+    <li class="list">Status: <span class="badge">{{ eventsubmission.submission_status }}</span></li>
+    <li class="list">ID: <span class="badge">{{ eventsubmission.uuid }}</span></li>
+</ul>
+
+<div class="panel panel-default">
+    <div class="panel-heading">{{ eventsubmission.title }}</div>
+    <div class="panel-body">
+       {{ eventsubmission.abstract|commonmark }}
+    </div>
+</div>
+
+<p>
+    <a href="{% url 'submission_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+</p>
+
+{% endblock program_content %}
