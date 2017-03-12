@@ -20,7 +20,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.output('Creating camps...')
-        camp1 = Camp.objects.create(
+        camp2016 = Camp.objects.create(
             title='BornHack 2016',
             tagline='Initial Commit',
             slug='bornhack-2016',
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             ),
         )
 
-        camp2 = Camp.objects.create(
+        camp2017 = Camp.objects.create(
             title='BornHack 2017',
             tagline='Make Tradition',
             slug='bornhack-2017',
@@ -56,7 +56,7 @@ class Command(BaseCommand):
             ),
         )
 
-        camp3 = Camp.objects.create(
+        camp2018 = Camp.objects.create(
             title='BornHack 2018',
             tagline='Undecided',
             slug='bornhack-2018',
@@ -136,14 +136,16 @@ class Command(BaseCommand):
             name='Workshops',
             slug='workshops',
             color='#ff9900',
-            light_text=False
+            light_text=False,
+            public=True
         )
 
         talk = EventType.objects.create(
             name='Talks',
             slug='talks',
             color='#2D9595',
-            light_text=True
+            light_text=True,
+            public=True
         )
 
         keynote = EventType.objects.create(
@@ -182,7 +184,7 @@ class Command(BaseCommand):
             content='unpublished news body here',
         )
 
-        for camp in [camp1, camp2, camp3]:
+        for camp in [camp2016, camp2017, camp2018]:
             year = camp.camp.lower.year
 
             self.output('Creating eventlocations for {}...'.format(year))
@@ -1175,5 +1177,7 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
             )
 
+        camp2016.read_only = True
+        camp2016.save()
         self.output("done!")
 
