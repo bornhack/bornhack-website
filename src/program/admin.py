@@ -1,6 +1,16 @@
 from django.contrib import admin
 
-from .models import Event, Speaker, EventType, EventInstance, EventLocation
+from .models import Event, Speaker, EventType, EventInstance, EventLocation, SpeakerSubmission, EventSubmission
+
+
+@admin.register(SpeakerSubmission)
+class SpeakerSubmissionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(EventSubmission)
+class EventSubmissionAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(EventLocation)

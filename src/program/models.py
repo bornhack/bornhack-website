@@ -7,11 +7,27 @@ from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.core.urlresolvers import reverse_lazy
+import uuid
 
 
 class UserSubmittedModel(CampRelatedModel):
+    """
+        An abstract model containing the stuff that is shared
+        between the SpeakerSubmission and EventSubmission models.
+    """
+
     class Meta:
         abstract = True
+
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    user = models.ForeignKey(
+        'auth.User',
+    )
 
     SUBMISSION_DRAFT = 'draft'
     SUBMISSION_PENDING = 'pending'
@@ -38,20 +54,114 @@ class UserSubmittedModel(CampRelatedModel):
         default=SUBMISSION_DRAFT,
     )
 
+    def __str__(self):
+        return '%s (submitted by: %s, status: %s)' % (self.headline, self.user, self.submission_status)
+
+
+def get_speakersubmission_picture_upload_path(instance, filename):
+    """ We want speakersubmission pictures saved as MEDIA_ROOT/public/speakersubmissions/camp-slug/submission-uuid/filename """
+    return 'public/speakersubmissions/%(campslug)s/%(submissionuuid)s/%(filename)s' % {
+        'campslug': instance.camp.slug,
+        'submissionuuidd': instance.uuid,
+        'filename': filename
+    }
+
+
+class SpeakerSubmission(UserSubmittedModel):
+    """ A speaker submission """
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name='speakersubmissions'
+    )
+
+    name = models.CharField(
+        max_length=150,
+        help_text='Name or alias of the speaker',
+    )
+
+    biography = models.TextField(
+        help_text='Markdown is supported.'
+    )
+
+    picture_large = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=get_speakersubmission_picture_upload_path,
+        help_text='A picture of the speaker'
+    )
+
+    picture_small = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=get_speakersubmission_picture_upload_path,
+        help_text='A thumbnail of the speaker picture'
+    )
+
     @property
-    def is_public(self):
-        if self.submission_status == self.SUBMISSION_APPROVED:
-            return True
-        else:
-            return False
+    def headline(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse_lazy('speakersubmission_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+
+
+class EventSubmission(UserSubmittedModel):
+    """ An event submission """
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name='eventsubmissions'
+    )
+
+    title = models.CharField(
+        max_length=255,
+        help_text='The title of this event',
+    )
+
+    abstract = models.TextField(
+        help_text='The abstract for this event'
+    )
+
+    event_type = models.ForeignKey(
+        'program.EventType',
+        help_text='The type of event',
+    )
+
+    speakers = models.ManyToManyField(
+        'program.SpeakerSubmission',
+        blank=True,
+        help_text='Pick the speaker(s) for this event',
+    )
+
+    @property
+    def headline(self):
+        return self.title
+
+    def get_absolute_url(self):
+        return reverse_lazy('eventsubmission_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+
+
+#############################################################################################
 
 
 class EventLocation(CampRelatedModel):
     """ The places where stuff happens """
-    name = models.CharField(max_length=100)
+
+    name = models.CharField(
+        max_length=100
+    )
+
     slug = models.SlugField()
-    icon = models.CharField(max_length=100)
-    camp = models.ForeignKey('camps.Camp', null=True, related_name="eventlocations")
+
+    icon = models.CharField(
+        max_length=100
+    )
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name='eventlocations'
+    )
 
     def __str__(self):
         return self.name
@@ -62,33 +172,68 @@ class EventLocation(CampRelatedModel):
 
 class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(
+        max_length=100,
+        unique=True
+    )
+
     slug = models.SlugField()
-    color = models.CharField(max_length=50)
-    light_text = models.BooleanField(default=False)
-    notifications = models.BooleanField(default=False)
+
+    color = models.CharField(
+        max_length=50
+    )
+
+    light_text = models.BooleanField(
+        default=False
+    )
+
+    notifications = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         return self.name
 
 
-class Event(UserSubmittedModel):
+class Event(CampRelatedModel):
     """ Something that is on the program one or more times. """
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(blank=True, max_length=255)
-    abstract = models.TextField()
-    event_type = models.ForeignKey(EventType)
-    camp = models.ForeignKey('camps.Camp', null=True, related_name="events")
+
+    title = models.CharField(
+        max_length=255,
+        help_text='The title of this event',
+    )
+
+    abstract = models.TextField(
+        help_text='The abstract for this event'
+    )
+
+    event_type = models.ForeignKey(
+        'program.EventType',
+        help_text='The type of this event',
+    )
+
+    slug = models.SlugField(
+        blank=True,
+        max_length=255,
+        help_text='The slug for this event, created automatically',
+    )
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name='events',
+        help_text='The camp this event belongs to',
+    )
 
     video_url = models.URLField(
         max_length=1000,
         null=True,
         blank=True,
-        help_text=_('URL to the recording.')
+        help_text='URL to the recording'
     )
+
     video_recording = models.BooleanField(
         default=True,
-        help_text=_('Whether the event will be video recorded or not.')
+        help_text='Do we intend to record video of this event?'
     )
 
     class Meta:
@@ -115,10 +260,22 @@ class Event(UserSubmittedModel):
 
 class EventInstance(CampRelatedModel):
     """ An instance of an event """
-    event = models.ForeignKey('program.event', related_name='instances')
+
+    event = models.ForeignKey(
+        'program.event',
+        related_name='instances'
+    )
+
     when = DateTimeRangeField()
-    notifications_sent = models.BooleanField(default=False)
-    location = models.ForeignKey('program.EventLocation', related_name='eventinstances')
+
+    notifications_sent = models.BooleanField(
+        default=False
+    )
+
+    location = models.ForeignKey(
+        'program.EventLocation',
+        related_name='eventinstances'
+    )
 
     class Meta:
         ordering = ['when']
@@ -168,41 +325,61 @@ def get_speaker_picture_upload_path(instance, filename):
     }
 
 
-class Speaker(UserSubmittedModel):
-    """ A Person anchoring an event. """
-    name = models.CharField(max_length=150)
+class Speaker(CampRelatedModel):
+    """ A Person (co)anchoring one or more events on a camp. """
+
+    name = models.CharField(
+        max_length=150,
+        help_text='Name or alias of the speaker',
+    )
+
     biography = models.TextField(
         help_text='Markdown is supported.'
     )
+
     picture_small = models.ImageField(
         null=True,
         blank=True,
         upload_to=get_speaker_picture_upload_path,
-        help_text='A thumbnail of your picture'
+        help_text='A thumbnail of the speaker picture'
     )
+
     picture_large = models.ImageField(
         null=True,
         blank=True,
         upload_to=get_speaker_picture_upload_path,
-        help_text='A picture of you'
+        help_text='A picture of the speaker'
     )
-    slug = models.SlugField(blank=True, max_length=255)
-    camp = models.ForeignKey('camps.Camp', null=True, related_name="speakers")
+
+    slug = models.SlugField(
+        blank=True,
+        max_length=255,
+        help_text='The slug for this speaker, will be autocreated',
+    )
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        null=True,
+        related_name='speakers',
+        help_text='The camp this speaker belongs to',
+    )
+
     events = models.ManyToManyField(
         Event,
         blank=True,
+        help_text='The event(s) this speaker is anchoring',
     )
 
-    user = models.ForeignKey(
-        'auth.User',
-        on_delete=models.PROTECT,
+    submission = models.OneToOneField(
+        'program.SpeakerSubmission',
         null=True,
-        blank=True
+        blank=True,
+        help_text='The speaker submission object this speaker was created from',
     )
 
     class Meta:
         ordering = ['name']
-        unique_together = (('camp', 'name'), ('camp', 'slug'), ('camp', 'user'))
+        unique_together = (('camp', 'name'), ('camp', 'slug'))
 
     def __str__(self):
         return '%s (%s)' % (self.name, self.camp)
@@ -215,8 +392,4 @@ class Speaker(UserSubmittedModel):
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
-    def clean(self):
-        if self.slug == "create":
-            # this is a reserved word used in urls.py
-            raise ValidationError({'name': 'This name is reserved, please choose another'})
 

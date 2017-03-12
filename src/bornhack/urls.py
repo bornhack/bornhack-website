@@ -134,6 +134,58 @@ urlpatterns = [
                         name='schedule_index'
                     ),
                     url(
+                        r'^submissions/', include([
+                            url(
+                                r'^$',
+                                SubmissionListView.as_view(),
+                                name='submission_list',
+                            ),
+                            url(
+                                r'^speakers/', include([
+                                   url(
+                                        r'^create/$',
+                                        SpeakerSubmissionCreateView.as_view(),
+                                        name='speakersubmission_create'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/$',
+                                        SpeakerSubmissionDetailView.as_view(),
+                                        name='speakersubmission_detail'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/edit/$',
+                                        SpeakerSubmissionUpdateView.as_view(),
+                                        name='speakersubmission_update'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/pictures/(?P<picture>[-_\w+]+)/$',
+                                        SpeakerSubmissionPictureView.as_view(),
+                                        name='speakersubmission_picture',
+                                    ),
+                                ])
+                            ),
+                            url(
+                                r'^events/', include([
+                                    url(
+                                        r'^create/$',
+                                        EventSubmissionCreateView.as_view(),
+                                        name='eventsubmission_create'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/$',
+                                        EventSubmissionDetailView.as_view(),
+                                        name='eventsubmission_detail'
+                                    ),
+                                    url(
+                                        r'^(?P<pk>[a-f0-9-]+)/edit/$',
+                                        EventSubmissionUpdateView.as_view(),
+                                        name='eventsubmission_update'
+                                    ),
+                                ])
+                            ),
+                        ])
+                    ),
+                    url(
                         r'^speakers/', include([
                             url(
                                 r'^$',
@@ -141,19 +193,9 @@ urlpatterns = [
                                 name='speaker_index'
                             ),
                             url(
-                                r'^create/$',
-                                SpeakerCreateView.as_view(),
-                                name='speaker_create'
-                            ),
-                            url(
                                 r'^(?P<slug>[-_\w+]+)/$',
                                 SpeakerDetailView.as_view(),
                                 name='speaker_detail'
-                            ),
-                            url(
-                                r'^(?P<slug>[-_\w+]+)/edit/$',
-                                SpeakerEditView.as_view(),
-                                name='speaker_edit'
                             ),
                             url(
                                 r'^(?P<slug>[-_\w+]+)/pictures/(?P<picture>[-_\w+]+)/$',

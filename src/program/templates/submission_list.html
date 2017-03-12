@@ -1,0 +1,69 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+Proposals | {{ block.super }}
+{% endblock %}
+
+{% block program_content %}
+
+<h3>Your {{ camp.title }} Speaker Proposals</h3>
+{% if speakersubmission_list %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for speakersubmission in speakersubmission_list %}
+        <tr>
+            <td><b>{{ speakersubmission.name }}</b></td>
+            <td><span class="badge">{{ speakersubmission.submission_status }}</span></td>
+            <td>
+                <a href="{% url 'speakersubmission_update' camp_slug=camp.slug pk=speakersubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                <a href="#" class="btn btn-danger btn-xs">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h3>No speaker proposals found</h3>
+{% endif %}
+
+<a href="{% url 'speakersubmission_create' camp_slug=camp.slug %}" class="btn btn-primary">Propose New Speaker</a>
+
+<p>
+
+<h3>Your {{ camp.title }} Event Proposals</h3>
+{% if eventsubmission_list %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for eventsubmission in eventsubmission_list %}
+        <tr>
+            <td><b>{{ eventsubmission.title }}</b></td>
+            <td><span class="badge">{{ eventsubmission.submission_status }}</span></td>
+            <td>
+                <a href="{% url 'eventsubmission_update' camp_slug=camp.slug pk=eventsubmission.uuid %}" class="btn btn-primary btn-xs">Modify</a>
+                <a href="#" class="btn btn-danger btn-xs">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<h3>No event proposals found</h3>
+{% endif %}
+
+<a href="{% url 'eventsubmission_create' camp_slug=camp.slug %}" class="btn btn-primary">Propose New Event</a>
+
+{% endblock %}

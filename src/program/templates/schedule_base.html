@@ -36,6 +36,11 @@
       <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>{{ loc.name }}</option>
       {% endfor %}
     </select>
+
+    {% if request.user.is_authenticated %}
+    <a href="{% url 'submission_list' camp_slug=camp.slug %}" class="btn btn-default">Manage My Proposals</a>
+    {% endif %}
+
   </div>
 </form>
 </div>

@@ -1,0 +1,37 @@
+{% extends 'program_base.html' %}
+{% load commonmark %}
+
+{% block program_content %}
+
+<h2>{{ camp.title }} Speaker Proposal Details</h2>
+
+<ul>
+    <li class="list">Status: <span class="badge">{{ speakersubmission.submission_status }}</span></li>
+    <li class="list">ID: <span class="badge">{{ speakersubmission.uuid }}</span></li>
+</ul>
+
+<p>
+    <a href="{% url 'submission_list' camp_slug=camp.slug %}" class="btn btn-primary">Proposal List</a>
+</p>
+
+<div class="panel panel-default">
+    <div class="panel-heading">{{ speakersubmission.name }}</div>
+    <div class="panel-body">
+        {% if speakersubmission.picture_large and speakersubmission.picture_small %}
+        <div class="row">
+          <div class="col-md-8 text-container">
+        {{ speakersubmission.biography|commonmark }}
+          </div>
+          <div class="col-md-4">
+            <a href="{% url 'speakersubmission_picture' camp_slug=camp.slug pk=speakersubmission.pk picture='large' %}" >
+              <img src="{% url 'speakersubmission_picture' camp_slug=camp.slug pk=speakersubmission.pk picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speakersubmission.name }}">
+            </a>
+          </div>
+        </div>
+        {% else %}
+        {{ speakersubmission.biography|commonmark }}
+        {% endif %}
+    </div>
+</div>
+
+{% endblock program_content %}

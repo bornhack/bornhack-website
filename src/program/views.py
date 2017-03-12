@@ -1,85 +1,114 @@
-from collections import OrderedDict
-import datetime
 from django.views.generic import ListView, TemplateView, DetailView
 from django.views.generic.edit import CreateView, UpdateView
-from camps.mixins import CampViewMixin
-from . import models
-from django.http import Http404
-import datetime, os
 from django.conf import settings
-from django.views import View
 from django.views.decorators.http import require_safe
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from camps.mixins import CampViewMixin
+from .mixins import CreateUserSubmissionMixin, EnsureUnpprovedSubmissionMixin, EnsureUserOwnsSubmissionMixin
+from . import models
+import datetime, os
 
 
-class SpeakerCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
-    model = models.Speaker
+############## submissions ########################################################
+
+
+class SubmissionListView(LoginRequiredMixin, CampViewMixin, ListView):
+    model = models.SpeakerSubmission
+    template_name = 'submission_list.html'
+    context_object_name = 'speakersubmission_list'
+
+    def get_queryset(self, **kwargs):
+        # only show speaker submissions for the current user
+        return super().get_queryset().filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # add eventsubmissions to the context
+        context['eventsubmission_list'] = models.EventSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        return context
+
+
+class SpeakerSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSubmissionMixin, CreateView):
+    model = models.SpeakerSubmission
     fields = ['name', 'biography', 'picture_small', 'picture_large']
-    template_name = 'speaker_form.html'
+    template_name = 'speakersubmission_form.html'
+
+
+class SpeakerSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, EnsureUnpprovedSubmissionMixin, UpdateView):
+    model = models.SpeakerSubmission
+    fields = ['name', 'biography', 'picture_small', 'picture_large']
+    template_name = 'speakersubmission_form.html'
+
+
+class SpeakerSubmissionDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
+    model = models.SpeakerSubmission
+    template_name = 'speakersubmission_detail.html'
+
+
+@method_decorator(require_safe, name='dispatch')
+class SpeakerSubmissionPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
+    model = models.SpeakerSubmission
 
     def get(self, request, *args, **kwargs):
-        # first make sure we don't already have a speaker for this user for this camp
-        try:
-            speaker = models.Speaker.objects.get(user=request.user, camp=self.camp)
-        except models.Speaker.DoesNotExist:
-            # no speaker exists, just show the create speaker form
-            return super(SpeakerCreateView, self).get(request, *args, **kwargs)
+        # is the speaker public, or owned by current user?
+        if not self.get_object().user != request.user:
+            raise Http404()
 
-        # speaker already exists, where do we want to redirect?
-        if speaker.submission_status == models.Speaker.SUBMISSION_DRAFT:
-            messages.info(request, "You already have a draft speaker profile for %s, you can modify and submit it here" % self.camp.title)
-            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
-        elif speaker.submission_status == models.Speaker.SUBMISSION_PENDING:
-            messages.info(request, "You already have a pending speaker profile for %s, you can modify and resubmit it here" % self.camp.title)
-            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
-        elif speaker.submission_status == models.Speaker.SUBMISSION_REJECTED:
-            messages.info(request, "You already have a rejected speaker profile for %s, you can modify and resubmit it here" % self.camp.title)
-            return redirect('speaker_edit', camp_slug=self.camp.slug, slug=speaker.slug)
-        elif speaker.submission_status == models.Speaker.SUBMISSION_APPROVED:
-            messages.info(request, "You already have an accepted speaker profile for %s, please contact the organisers if you want to modify it." % self.camp.title)
-            return redirect('speaker_detail', camp_slug=self.camp.slug, slug=speaker.slug)
+        # do we have the requested picture?
+        if kwargs['picture'] == 'thumbnail':
+            if self.get_object().picture_small:
+                picture = self.get_object().picture_small
+            else:
+                raise Http404()
+        elif kwargs['picture'] == 'large':
+            if self.get_object().picture_large:
+                picture = self.get_object().picture_large
+            else:
+                raise Http404()
         else:
-            # unknown submission status!
-            return
+            raise Http404()
 
-    def form_valid(self, form):
-        # set camp before saving
-        form.instance.camp = self.camp
-        form.instance.user = self.request.user
-        speaker = form.save()
-        return redirect(reverse('speaker_detail', kwargs={'camp_slug': speaker.camp.slug, 'slug': speaker.slug}))
+        # make nginx return the picture using X-Accel-Redirect
+        # (this works for nginx only, other webservers use x-sendfile),
+        # TODO: what about runserver mode here?
+        response = HttpResponse()
+        response['X-Accel-Redirect'] = '/public/speakersubmissions/%(campslug)s/%(submissionuuid)s/%(filename)s' % {
+            'campslug': self.camp.slug,
+            'submissionuuid': self.get_object().uuid,
+            'filename': os.path.basename(picture.name),
+        }
+        response['Content-Type'] = ''
+        return response
 
 
-class SpeakerEditView(LoginRequiredMixin, CampViewMixin, UpdateView):
-    model = models.Speaker
-    fields = ['name', 'biography', 'picture_small', 'picture_large']
-    template_name = 'speaker_form.html'
+class EventSubmissionCreateView(LoginRequiredMixin, CampViewMixin, CreateUserSubmissionMixin, CreateView):
+    model = models.EventSubmission
+    fields = ['title', 'abstract', 'event_type', 'speakers']
+    template_name = 'eventsubmission_form.html'
 
-    def dispatch(self, request, *args, **kwargs):
-        # call super dispatch now because it ets self.camp which is needed below
-        response = super(SpeakerEditView, self).dispatch(request, *args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['speakers'].queryset = models.SpeakerSubmission.objects.filter(camp=self.camp, user=self.request.user)
+        return context
 
-        # first make sure that this speaker belongs to the logged in user
-        if self.get_object().user.username != request.user.username:
-            messages.error(request, "No thanks")
-            return redirect(reverse('speaker_detail', kwargs={'camp_slug': self.get_object().camp.slug, 'slug': self.get_object().slug}))
 
-        if self.get_object().submission_status == models.Speaker.SUBMISSION_PENDING:
-            messages.info(request, "Your speaker profile for %s has already been submitted. If you modify it you will have to resubmit it." % self.get_object().camp.title)
-        elif self.get_object().submission_status == models.Speaker.SUBMISSION_REJECTED:
-            messages.info(request, "When you are done editing you will have to resubmit your speaker profile." % self.get_object().camp.title)
-        elif self.get_object().submission_status == models.Speaker.SUBMISSION_APPROVED:
-            messages.error(request, "Your speaker profile for %s has already been approved. Please contact the organisers if you want to modify it." % self.get_object().camp.title)
-            return redirect(reverse('speaker_detail', kwargs={'camp_slug': self.get_object().camp.slug, 'slug': self.get_object().slug}))
+class EventSubmissionUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, EnsureUnpprovedSubmissionMixin, UpdateView):
+    model = models.EventSubmission
+    fields = ['title', 'abstract', 'event_tyoe', 'speakers']
+    template_name = 'eventsubmission_form.html'
 
-        # alright, render the form
-        return super(SpeakerEditView, self).dispatch(request, *args, **kwargs)
+
+class EventSubmissionDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsSubmissionMixin, DetailView):
+    model = models.EventSubmission
+    template_name = 'eventsubmission_detail.html'
+
+
+################## speakers ###############################################
 
 
 @method_decorator(require_safe, name='dispatch')
@@ -87,6 +116,10 @@ class SpeakerPictureView(CampViewMixin, DetailView):
     model = models.Speaker
 
     def get(self, request, *args, **kwargs):
+        # is the speaker public, or owned by current user?
+        if not self.get_object().is_public and self.get_object().user != request.user:
+            raise Http404()
+
         # do we have the requested picture?
         if kwargs['picture'] == 'thumbnail':
             if self.get_object().picture_small:
@@ -118,35 +151,26 @@ class SpeakerDetailView(CampViewMixin, DetailView):
     model = models.Speaker
     template_name = 'speaker_detail.html'
 
-    def get(self, request, *args, **kwargs):
-        if not self.get_object().is_public and self.get_object().user != request.user:
-            raise Http404()
-        else:
-            return super().get(request, *args, **kwargs)
-
 
 class SpeakerListView(CampViewMixin, ListView):
     model = models.Speaker
     template_name = 'speaker_list.html'
 
-    def get_queryset(self, *args, **kwargs):
-        # get all approved speakers
-        speakers = models.Speaker.objects.filter(
-            camp=self.camp,
-            submission_status=models.Speaker.SUBMISSION_APPROVED
-        )
-        # also get the users own speaker, in case he has an unapproved
-        userspeakers = models.Speaker.objects.filter(
-            camp=self.camp,
-            user=self.request.user
-        ).exclude(submission_status=models.Speaker.SUBMISSION_APPROVED)
 
-        return speakers | userspeakers
+################## events ##############################################
 
 
 class EventListView(CampViewMixin, ListView):
     model = models.Event
     template_name = 'event_list.html'
+
+
+class EventDetailView(CampViewMixin, DetailView):
+    model = models.Event
+    template_name = 'schedule_event_detail.html'
+
+
+################## schedule #############################################
 
 
 class ScheduleView(CampViewMixin, TemplateView):
@@ -225,11 +249,6 @@ class ScheduleView(CampViewMixin, TemplateView):
             context['urlday'] = self.kwargs['day']
 
         return context
-
-
-class EventDetailView(CampViewMixin, DetailView):
-    model = models.Event
-    template_name = 'schedule_event_detail.html'
 
 
 class CallForSpeakersView(CampViewMixin, TemplateView):
