@@ -205,7 +205,8 @@ class EventLocation(CampRelatedModel):
     slug = models.SlugField()
 
     icon = models.CharField(
-        max_length=100
+        max_length=100,
+        help_text="hex for the unicode character in the fontawesome icon set to use, like 'f000' for 'fa-glass'"
     )
 
     camp = models.ForeignKey(
