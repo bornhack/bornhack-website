@@ -28,7 +28,7 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # add eventproposals to the context
+        # also add eventproposals to the context
         context['eventproposal_list'] = models.EventProposal.objects.filter(camp=self.camp, user=self.request.user)
         return context
 
@@ -37,6 +37,9 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
+
+    def get_success_url(self):
+        return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
 class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
@@ -78,8 +81,8 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
     model = models.SpeakerProposal
 
     def get(self, request, *args, **kwargs):
-        # is the speaker public, or owned by current user?
-        if not self.get_object().user != request.user:
+        # is the proposal owned by current user?
+        if self.get_object().user != request.user:
             raise Http404()
 
         # do we have the requested picture?
@@ -94,6 +97,7 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
             else:
                 raise Http404()
         else:
+            # only 'thumbnail' and 'large' pictures supported
             raise Http404()
 
         # make nginx return the picture using X-Accel-Redirect
