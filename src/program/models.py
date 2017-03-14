@@ -8,6 +8,45 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.core.urlresolvers import reverse_lazy
 import uuid
+from django.core.files.storage import FileSystemStorage
+from django.urls import reverse
+from django.apps import apps
+
+
+class CustomUrlStorage(FileSystemStorage):
+    def __init__(self, location=None):
+        super(CustomUrlStorage, self).__init__(location)
+
+    def url(self, name):
+        url = super(CustomUrlStorage, self).url(name)
+        parts = url.split("/")
+        if parts[0] != "public":
+            # first bit should always be "public"
+            return False
+
+        if parts[1] == "speakerproposals":
+            # find speakerproposal
+            speakerproposal_model = apps.get_model('program', 'speakerproposal')
+            try:
+                speakerproposal = speakerproposal_model.objects.get(picture_small=name)
+                picture = "small"
+            except speakerproposal_model.DoesNotExist:
+                try:
+                    speakerproposal = speakerproposal_model.objects.get(picture_large=name)
+                    picture = "large"
+                except speakerproposal_model.DoesNotExist:
+                    return False
+            url = reverse('speakerproposal_picture', kwargs={
+                'camp_slug': speakerproposal.camp.slug,
+                'pk': speakerproposal.pk,
+                'picture': picture,
+            })
+        else:
+            return False
+
+        return url
+
+storage = CustomUrlStorage()
 
 
 class UserSubmittedModel(CampRelatedModel):
@@ -97,14 +136,16 @@ class SpeakerProposal(UserSubmittedModel):
         null=True,
         blank=True,
         upload_to=get_speakerproposal_picture_upload_path,
-        help_text='A picture of the speaker'
+        help_text='A picture of the speaker',
+        storage=storage,
     )
 
     picture_small = models.ImageField(
         null=True,
         blank=True,
         upload_to=get_speakerproposal_picture_upload_path,
-        help_text='A thumbnail of the speaker picture'
+        help_text='A thumbnail of the speaker picture',
+        storage=storage,
     )
 
     @property
