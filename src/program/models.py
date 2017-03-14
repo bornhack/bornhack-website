@@ -62,7 +62,7 @@ def get_speakerproposal_picture_upload_path(instance, filename):
     """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
     return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
         'campslug': instance.camp.slug,
-        'proposaluuidd': instance.uuid,
+        'proposaluuid': instance.uuid,
         'filename': filename
     }
 
