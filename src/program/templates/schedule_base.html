@@ -37,7 +37,7 @@
     </select>
 
     <select id="location" name="location" class="fa-select form-control filter-control">
-      <option value="">All Locations</option>
+      <option value="">&#xf0ac; All Locations</option>
       {% for loc in camp.event_locations %}
         <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>&#x{{ loc.icon }}; {{ loc.name }}</option>
       {% endfor %}
