@@ -3,6 +3,12 @@
 
 {% block program_content %}
 
+<style>
+  .fa-select {
+      font-family: sans-serif, 'FontAwesome';
+  }
+</style>
+
 <div class="btn-group btn-group-justified">
 
 <form method="get" id="filter" class="form-inline">
@@ -30,10 +36,10 @@
       {% endfor %}
     </select>
 
-    <select id="location" name="location" class="form-control filter-control">
+    <select id="location" name="location" class="fa-select form-control filter-control">
       <option value="">All Locations</option>
       {% for loc in camp.event_locations %}
-      <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>{{ loc.name }}</option>
+        <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>{{ loc.icon }} {{ loc.name }}</option>
       {% endfor %}
     </select>
 
