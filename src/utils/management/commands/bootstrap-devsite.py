@@ -191,29 +191,27 @@ class Command(BaseCommand):
             speakers_tent = EventLocation.objects.create(
                 name='Speakers Tent',
                 slug='speakers-tent',
-                icon='speakertent.png',
+                icon='f075',
                 camp=camp
             )
             workshop_room = EventLocation.objects.create(
                 name='Workshop rooms',
                 slug='workshop-rooms',
-                icon='workshop.png',
+                icon='f0b1',
                 camp=camp
             )
             bar_area = EventLocation.objects.create(
                 name='Bar Area',
                 slug='bar-area',
-                icon='bararea.png',
+                icon='f000',
                 camp=camp
             )
             food_area = EventLocation.objects.create(
                 name='Food Area',
                 slug='food-area',
-                icon='foodarea.png',
+                icon='f0f5',
                 camp=camp
             )
-            # local food event
-            # taste each others food
 
             self.output('Creating news for {}...'.format(year))
             NewsItem.objects.create(
