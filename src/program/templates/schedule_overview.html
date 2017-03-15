@@ -10,7 +10,8 @@
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
        style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};">
-      <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
+        <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
+        <span class="pull-right" style="font-family: 'FontAwesome';">&#x{{ eventinstance.location.icon }};</span>
       <br />
       {{ eventinstance.event.title }}
       <br />
