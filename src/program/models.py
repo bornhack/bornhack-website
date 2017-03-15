@@ -7,10 +7,11 @@ from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.core.urlresolvers import reverse_lazy
-import uuid
+import uuid, os
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
+from django.core.files.base import ContentFile
 
 
 class CustomUrlStorage(FileSystemStorage):
@@ -138,6 +139,7 @@ class SpeakerProposal(UserSubmittedModel):
         upload_to=get_speakerproposal_picture_upload_path,
         help_text='A picture of the speaker',
         storage=storage,
+        max_length=255
     )
 
     picture_small = models.ImageField(
@@ -146,6 +148,7 @@ class SpeakerProposal(UserSubmittedModel):
         upload_to=get_speakerproposal_picture_upload_path,
         help_text='A thumbnail of the speaker picture',
         storage=storage,
+        max_length=255
     )
 
     @property
@@ -154,6 +157,26 @@ class SpeakerProposal(UserSubmittedModel):
 
     def get_absolute_url(self):
         return reverse_lazy('speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+
+    def mark_as_approved(self):
+        speakermodel = apps.get_model('program', 'speaker')
+        speakerproposalmodel = apps.get_model('program', 'speakerproposal')
+        speaker = speakermodel()
+        speaker.camp = self.camp
+        speaker.name = self.name
+        speaker.biography = self.biography
+        if self.picture_small and self.picture_large:
+            temp = ContentFile(self.picture_small.read())
+            temp.name = os.path.basename(self.picture_small.name)
+            speaker.picture_small = temp
+            temp = ContentFile(self.picture_large.read())
+            temp.name = os.path.basename(self.picture_large.name)
+            speaker.picture_large = temp
+        speaker.proposal = self
+        speaker.save()
+
+        self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
+        self.save()
 
 
 class EventProposal(UserSubmittedModel):
@@ -190,6 +213,24 @@ class EventProposal(UserSubmittedModel):
 
     def get_absolute_url(self):
         return reverse_lazy('eventproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+
+    def mark_as_approved(self):
+        eventmodel = apps.get_model('program', 'event')
+        eventproposalmodel = apps.get_model('program', 'eventproposal')
+        event = eventmodel()
+        event.camp = self.camp
+        event.title = self.title
+        event.abstract = self.abstract
+        event.event_type = self.event_type
+        event.proposal = self
+        event.save()
+        # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
+        for sp in self.speakers.all():
+            if sp.speaker:
+                event.speaker_set.add(sp.speaker)
+
+        self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
+        self.save()
 
 
 #############################################################################################

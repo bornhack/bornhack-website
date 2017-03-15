@@ -5,12 +5,22 @@ from .models import Event, Speaker, EventType, EventInstance, EventLocation, Spe
 
 @admin.register(SpeakerProposal)
 class SpeakerProposalAdmin(admin.ModelAdmin):
-    pass
+    def mark_speakerproposal_as_approved(self, request, queryset):
+        for sp in queryset:
+            sp.mark_as_approved()
+    mark_speakerproposal_as_approved.description = 'Approve and create Speaker object(s)'
+
+    actions = ['mark_speakerproposal_as_approved']
 
 
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
-    pass
+    def mark_eventproposal_as_approved(self, request, queryset):
+        for ep in queryset:
+            ep.mark_as_approved()
+    mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
+
+    actions = ['mark_eventproposal_as_approved']
 
 
 @admin.register(EventLocation)

@@ -18,7 +18,7 @@ class EnsureUnapprovedProposalMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # do not permit editing if the proposal is already approved
         if self.get_object().proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
-            messages.error(request, "This proposal has already been approved. Please contact the organisers if you need to modify something." % self.camp.title)
+            messages.error(request, "This proposal has already been approved. Please contact the organisers if you need to modify something.")
             return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
         # alright, continue with the request
