@@ -6,6 +6,7 @@
 {% block content %}
   <div class="row">
     <div class="col-md-12">
+      <h3>Logged in as {{ request.user.email }}</h3>
       <p>
         <a href="{% url 'account_change_password' %}" class="btn btn-black">
           Change password
