@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from camps.mixins import CampViewMixin
-from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin
+from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, PictureViewMixin
 from . import models
 import datetime, os
 
@@ -77,7 +77,7 @@ class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
 
 
 @method_decorator(require_safe, name='dispatch')
-class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
+class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, PictureViewMixin, DetailView):
     model = models.SpeakerProposal
 
     def get(self, request, *args, **kwargs):
@@ -85,31 +85,8 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
         if self.get_object().user != request.user:
             raise Http404()
 
-        # do we have the requested picture?
-        if kwargs['picture'] == 'thumbnail':
-            if self.get_object().picture_small:
-                picture = self.get_object().picture_small
-            else:
-                raise Http404()
-        elif kwargs['picture'] == 'large':
-            if self.get_object().picture_large:
-                picture = self.get_object().picture_large
-            else:
-                raise Http404()
-        else:
-            # only 'thumbnail' and 'large' pictures supported
-            raise Http404()
-
-        # make nginx return the picture using X-Accel-Redirect
-        # (this works for nginx only, other webservers use x-sendfile),
-        # TODO: what about runserver mode here?
-        response = HttpResponse()
-        response['X-Accel-Redirect'] = '/public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
-            'campslug': self.camp.slug,
-            'proposaluuid': self.get_object().uuid,
-            'filename': os.path.basename(picture.name),
-        }
-        response['Content-Type'] = ''
+        # get and return the response
+        response = self.get_picture_response()
         return response
 
 
@@ -163,38 +140,11 @@ class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
 
 
 @method_decorator(require_safe, name='dispatch')
-class SpeakerPictureView(CampViewMixin, DetailView):
+class SpeakerPictureView(CampViewMixin, PictureViewMixin, DetailView):
     model = models.Speaker
 
     def get(self, request, *args, **kwargs):
-        # is the speaker public, or owned by current user?
-        if not self.get_object().is_public and self.get_object().user != request.user:
-            raise Http404()
-
-        # do we have the requested picture?
-        if kwargs['picture'] == 'thumbnail':
-            if self.get_object().picture_small:
-                picture = self.get_object().picture_small
-            else:
-                raise Http404()
-        elif kwargs['picture'] == 'large':
-            if self.get_object().picture_large:
-                picture = self.get_object().picture_large
-            else:
-                raise Http404()
-        else:
-            raise Http404()
-
-        # make nginx return the picture using X-Accel-Redirect
-        # (this works for nginx only, other webservers use x-sendfile),
-        # TODO: what about runserver mode here?
-        response = HttpResponse()
-        response['X-Accel-Redirect'] = '/public/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
-            'campslug': self.camp.slug,
-            'speakerslug': self.get_object().slug,
-            'filename': os.path.basename(picture.name),
-        }
-        response['Content-Type'] = ''
+        response = self.get_picture_response()
         return response
 
 
