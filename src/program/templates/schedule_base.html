@@ -8,47 +8,46 @@
       font-family: 'FontAwesome';
   }
 </style>
+<div class="row">
+    <div class="col-sm-8">
+        <form method="get" id="filter" class="form-inline">
+            <div class="form-group">
+                <select id="day" name="day" class="form-control filter-control">
+                  <option value="">All Days</option>
+                  {% for day in camp.camp_days %}
+                    {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
+                    <option
+                      value="{{ day.lower.date|date:"Y-m-d" }}"
+                      {% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}
+                      selected
+                      {% endif %}>
+                          {{ day.lower.date|date:"l" }}
+                    </option>
+                    {% endwith %}
+                  {% endfor %}
+                </select>
 
-<div class="btn-group btn-group-justified">
+                <select id="event_type" name="event_type" class="form-control filter-control">
+                  <option value="">All Types</option>
+                  {% for type in camp.event_types %}
+                  <option value="{{ type.slug }}"{% if eventtype and eventtype == type %}selected{% endif %}>{{ type.name }}</option>
+                  {% endfor %}
+                </select>
 
-<form method="get" id="filter" class="form-inline">
-
-  <div class="form-group">
-    <select id="day" name="day" class="form-control filter-control">
-      <option value="">All Days</option>
-      {% for day in camp.camp_days %}
-        {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
-        <option
-          value="{{ day.lower.date|date:"Y-m-d" }}"
-          {% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}
-          selected
-          {% endif %}>
-              {{ day.lower.date|date:"l" }}
-        </option>
-        {% endwith %}
-      {% endfor %}
-    </select>
-
-    <select id="event_type" name="event_type" class="form-control filter-control">
-      <option value="">All Types</option>
-      {% for type in camp.event_types %}
-      <option value="{{ type.slug }}"{% if eventtype and eventtype == type %}selected{% endif %}>{{ type.name }}</option>
-      {% endfor %}
-    </select>
-
-    <select id="location" name="location" class="fa-select form-control filter-control">
-      <option value="">&#xf0ac; All Locations</option>
-      {% for loc in camp.event_locations %}
-        <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>&#x{{ loc.icon }}; {{ loc.name }}</option>
-      {% endfor %}
-    </select>
-
+                <select id="location" name="location" class="fa-select form-control filter-control">
+                  <option value="">&#xf0ac; All Locations</option>
+                  {% for loc in camp.event_locations %}
+                    <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>&#x{{ loc.icon }}; {{ loc.name }}</option>
+                  {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
     {% if request.user.is_authenticated %}
-    <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn btn-default">Manage My Proposals</a>
+    <div class="col-sm-4">
+        <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn btn-default pull-right">Manage Proposals</a>
+    </div>
     {% endif %}
-
-  </div>
-</form>
 </div>
 
 <hr />
