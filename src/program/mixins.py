@@ -7,6 +7,17 @@ import sys, mimetypes
 from django.http import Http404, HttpResponse
 
 
+class EnsureCFSOpenMixin(SingleObjectMixin):
+    def dispatch(self, request, *args, **kwargs):
+        # do not permit editing if call for speakers is not open
+        if not self.get_object().camp.call_for_speakers_open:
+            messages.error(request, "The Call for Speakers is not open.")
+            return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
+
+        # alright, continue with the request
+        return super().dispatch(request, *args, **kwargs)
+
+
 class CreateProposalMixin(SingleObjectMixin):
     def form_valid(self, form):
         # set camp and user before saving

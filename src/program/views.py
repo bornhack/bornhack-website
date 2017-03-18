@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from camps.mixins import CampViewMixin
-from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, PictureViewMixin
+from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, PictureViewMixin, EnsureCFSOpenMixin
 from . import models
 import datetime, os
 
@@ -33,7 +33,7 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
 
-class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, CreateView):
+class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
@@ -42,7 +42,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
         return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
-class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
@@ -57,7 +57,7 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
         return super().form_valid(form)
 
 
-class SpeakerProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class SpeakerProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
     fields = []
     template_name = 'speakerproposal_submit.html'
@@ -90,7 +90,7 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
         return response
 
 
-class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, CreateView):
+class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventproposal_form.html'
@@ -102,7 +102,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalM
         return context
 
 
-class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventproposal_form.html'
@@ -117,7 +117,7 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
         return super().form_valid(form)
 
 
-class EventProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, UpdateView):
+class EventProposalSubmitView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.EventProposal
     fields = []
     template_name = 'eventproposal_submit.html'
