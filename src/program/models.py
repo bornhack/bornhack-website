@@ -49,7 +49,6 @@ class CustomUrlStorage(FileSystemStorage):
 
 storage = CustomUrlStorage()
 
-
 class UserSubmittedModel(CampRelatedModel):
     """
         An abstract model containing the stuff that is shared
@@ -96,6 +95,22 @@ class UserSubmittedModel(CampRelatedModel):
 
     def __str__(self):
         return '%s (submitted by: %s, status: %s)' % (self.headline, self.user, self.proposal_status)
+
+    def save(self, **kwargs):
+        if not self.camp.call_for_speakers_open:
+            message = 'Call for speakers is not open'
+            if hasattr(self, 'request'):
+                messages.error(self.request, message)
+            raise ValidationError(message)
+        super().save(**kwargs)
+
+    def delete(self, **kwargs):
+        if not self.camp.call_for_speakers_open:
+            message = 'Call for speakers is not open'
+            if hasattr(self, 'request'):
+                messages.error(self.request, message)
+            raise ValidationError(message)
+        super().delete(**kwargs)
 
 
 def get_speakerproposal_picture_upload_path(instance, filename):
