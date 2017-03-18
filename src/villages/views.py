@@ -7,6 +7,8 @@ from django.views.generic.detail import SingleObjectMixin
 from .models import Village
 from camps.models import Camp
 from camps.mixins import CampViewMixin
+from .mixins import EnsureWritableCampMixin
+from django.contrib import messages
 
 
 class VillageListView(CampViewMixin, ListView):
@@ -21,7 +23,7 @@ class VillageDetailView(CampViewMixin, DetailView):
     context_object_name = 'village'
 
 
-class VillageCreateView(LoginRequiredMixin, CreateView):
+class VillageCreateView(CampViewMixin, LoginRequiredMixin, EnsureWritableCampMixin, CreateView):
     model = Village
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
@@ -51,7 +53,7 @@ class EnsureUserOwnsVillageMixin(SingleObjectMixin):
         )
 
 
-class VillageUpdateView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, UpdateView):
+class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, UpdateView):
     model = Village
     queryset = Village.objects.not_deleted()
     template_name = 'village_form.html'
@@ -61,7 +63,7 @@ class VillageUpdateView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, UpdateVi
         return self.get_object().get_absolute_url()
 
 
-class VillageDeleteView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, DeleteView):
+class VillageDeleteView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, DeleteView):
     model = Village
     template_name = 'village_confirm_delete.html'
     context_object_name = 'village'
