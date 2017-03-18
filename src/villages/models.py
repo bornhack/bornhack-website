@@ -9,6 +9,7 @@ class Village(UUIDModel, CampRelatedModel):
 
     class Meta:
         ordering = ['name']
+        unique_together = ('slug', 'camp')
 
     contact = models.ForeignKey('auth.User')
     camp = models.ForeignKey('camps.Camp')

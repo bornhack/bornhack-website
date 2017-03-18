@@ -25,7 +25,6 @@ class VillageCreateView(LoginRequiredMixin, CreateView):
     model = Village
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
-    success_url = reverse_lazy('villages:list')
 
     def form_valid(self, form):
         village = form.save(commit=False)
@@ -33,6 +32,9 @@ class VillageCreateView(LoginRequiredMixin, CreateView):
         village.camp = Camp.objects.get(slug=self.request.session['campslug'])
         village.save()
         return HttpResponseRedirect(village.get_absolute_url())
+
+    def get_success_url(self):
+        return reverse_lazy('village_list', kwargs={"camp_slug": self.object.camp.slug})
 
 
 class EnsureUserOwnsVillageMixin(SingleObjectMixin):
@@ -61,7 +63,9 @@ class VillageUpdateView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, UpdateVi
 
 class VillageDeleteView(EnsureUserOwnsVillageMixin, LoginRequiredMixin, DeleteView):
     model = Village
-    success_url = reverse_lazy('villages:list')
     template_name = 'village_confirm_delete.html'
     context_object_name = 'village'
+
+    def get_success_url(self):
+        return reverse_lazy('village_list', kwargs={"camp_slug": self.object.camp.slug})
 
