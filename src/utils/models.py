@@ -57,7 +57,7 @@ class CampRelatedModel(CreatedUpdatedModel):
                 messages.error(self.request, 'Camp is in read only mode.')
             raise ValidationError('This camp is in read only mode.')
 
-        super(CampRelatedModel, self).save(**kwargs)
+        super().save(**kwargs)
 
     def delete(self, **kwargs):
         if self.camp.read_only:
@@ -65,4 +65,4 @@ class CampRelatedModel(CreatedUpdatedModel):
                 messages.error(self.request, 'Camp is in read only mode.')
             raise ValidationError('This camp is in read only mode.')
 
-        super(CampRelatedModel, self).save(**kwargs)
+        super().delete(**kwargs)
