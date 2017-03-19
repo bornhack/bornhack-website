@@ -253,7 +253,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     )
 
     name = models.CharField(max_length=150)
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True, max_length=100)
 
     price = models.IntegerField(
         help_text=_('Price of the product (in DKK, including VAT).')
