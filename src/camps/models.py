@@ -7,6 +7,9 @@ from django.core.exceptions import ValidationError
 from datetime import timedelta
 from django.utils import timezone
 from django.urls import reverse
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 
 class Camp(CreatedUpdatedModel, UUIDModel):
@@ -98,13 +101,13 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
         '''
         if not hasattr(self, camppart):
-            print("nonexistant field/attribute")
+            logger.error("nonexistant field/attribute")
             return False
 
         field = getattr(self, camppart)
 
         if not hasattr(field, '__class__') or not hasattr(field.__class__, '__name__') or not field.__class__.__name__ == 'DateTimeTZRange':
-            print("this attribute is not a datetimetzrange field: %s" % field)
+            logger.error("this attribute is not a datetimetzrange field: %s" % field)
             return False
 
         daycount = (field.upper - field.lower).days

@@ -1,3 +1,7 @@
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
+
+
 ### epay callback function
 @require_safe
 def api_epay_callback(request):
@@ -15,27 +19,24 @@ def api_epay_callback(request):
             try:
                 order = EpayOrder.objects.get(id=request.GET['orderid'][1:])
             except EpayOrder.DoesNotExist:
-                print("epay callback - epayorder %s not found" % request.GET['orderid'])
+                logger.error("epay callback - epayorder %s not found" % request.GET['orderid'])
                 return HttpResponse("Not OK")
 
             ### check hash here
             if 'hash' not in request.GET:
-                print("epay callback - missing epay hash")
+                logger.error("epay callback - missing epay hash")
                 return HttpResponse("Not OK")
 
             ### this does not work sometimes, ordering is off maybe?
             hashstring = ''
             qs = request.META['QUERY_STRING']
-            print("querystring is %s" % qs)
             for kv in qs.split("&"):
-                print("hashstring is now %s" % hashstring)
                 if kv.split("=")[0] != "hash":
                     hashstring += kv.split("=")[1]
-            print("hashstring is now %s" % hashstring)
             hashstring += settings.EPAY_MD5_SECRET
             epayhash = hashlib.md5(hashstring).hexdigest()
             if epayhash != request.GET['hash']:
-                print("epay callback - wrong epay hash")
+                logger.error("epay callback - wrong epay hash")
                 return HttpResponse("Not OK")
 
             ### save callback in epayorder
@@ -61,7 +62,7 @@ def api_epay_callback(request):
             ### save
             order.save()
         else:
-            print("epay callback - order %s not recognized" % request.GET['orderid'])
+            logger.error("epay callback - order %s not recognized" % request.GET['orderid'])
             return HttpResponse("Not OK")
     return HttpResponse("OK")
 
@@ -103,7 +104,7 @@ def epay_order(request):
             ### save epay order with commit=False
             epayorder = form.save(commit=False)
         except Exception as E:
-            print("unable to save epay order with commit=false")
+            logger.error("unable to save epay order with commit=false")
             return render(request, 'epay_order_fail.html', {
                 'message': _('Unable to save epay order. Please try again, and please contact us if the problem persists.')
             })

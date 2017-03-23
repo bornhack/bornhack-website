@@ -8,6 +8,9 @@ from camps.utils import get_current_camp
 from django.utils import timezone
 from program.models import EventInstance
 from datetime import timedelta
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 
 class Command(BaseCommand):
@@ -36,7 +39,7 @@ class Command(BaseCommand):
                         message="starting soon: %s" % ei,
                         timeout=ei.when.lower
                     )
-                    print("added irc message id %s for eventinstance %s" % (oim.id, ei))
+                    logger.info("added irc message id %s for eventinstance %s" % (oim.id, ei))
                     ei.notifications_sent=True
                     ei.save()
 

@@ -38,6 +38,9 @@ from collections import OrderedDict
 from vendor.coinify_api import CoinifyAPI
 from vendor.coinify_callback import CoinifyCallback
 import json, time
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 
 #################################################################################
@@ -451,16 +454,16 @@ class EpayCallbackView(SingleObjectMixin, View):
             )
             order = get_object_or_404(Order, pk=query.get('orderid'))
             if order.pk != self.get_object().pk:
-                print("bad epay callback, orders do not match!")
+                logger.error("bad epay callback, orders do not match!")
                 return HttpResponse(status=400)
 
             if validate_epay_callback(query):
                 callback.md5valid=True
                 callback.save()
             else:
-                print("bad epay callback!")
+                logger.error("bad epay callback!")
                 return HttpResponse(status=400)
-            
+
             if order.paid:
                 ### this order is already paid, perhaps we are seeing a double callback?
                 return HttpResponse('OK')
@@ -476,7 +479,7 @@ class EpayCallbackView(SingleObjectMixin, View):
                 ### and mark order as paid (this will create tickets)
                 order.mark_as_paid()
             else:
-                print("valid epay callback with wrong amount detected")
+                logger.error("valid epay callback with wrong amount detected")
         else:
             return HttpResponse(status=400)
 
@@ -538,7 +541,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # check if it expired
             if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
                 # this coinifyinvoice expired, delete it
-                print("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id'])
+                logger.warning("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id'])
                 order.coinifyapiinvoice.delete()
                 order = self.get_object()
 
@@ -565,7 +568,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             # Parse response
             if not response['success']:
                 api_error = response['error']
-                print("API error: %s (%s)" % (
+                logger.error("API error: %s (%s)" % (
                     api_error['message'],
                     api_error['code']
                 ))
@@ -577,7 +580,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                     invoicejson = response['data'],
                     order = order,
                 )
-                print("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id'])
+                logger.info("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id'])
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
@@ -622,7 +625,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
                 try:
                     coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=callbackjson['data']['id'])
                 except CoinifyAPIInvoice.DoesNotExist:
-                    print("unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id'])
+                    logger.error("unable to find CoinifyAPIInvoice with id %s" % callbackjson['data']['id'])
                     return HttpResponseBadRequest('bad coinifyinvoice id')
 
                 # save new coinifyinvoice payload
@@ -638,7 +641,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             else:
                 return HttpResponseBadRequest('unsupported event')
         else:
-            print("invalid coinify callback detected")
+            logger.error("invalid coinify callback detected")
             return HttpResponseBadRequest('something is fucky')
 
 

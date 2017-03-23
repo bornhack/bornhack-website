@@ -113,22 +113,30 @@ if DEBUG:
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler',
+    'formatters': {
+        'syslog': {
+            'format': '%(levelname)s %(name)s.%(funcName)s(): %(message)s'
         },
         'console': {
-            'level':'DEBUG',
-            'class':'logging.StreamHandler',
+            'format': '[%(asctime)s] %(name)s.%(funcName)s() %(levelname)s %(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'console'
         },
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
+        # send bornhack logger to both console and syslog at DEBUG level, and
+        # do not propagate bornhack.* messages up to the root logger
+        'bornhack': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
         },
-    }
+    },
 }
 

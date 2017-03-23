@@ -2,6 +2,8 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db import models
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CleanedModel(models.Model):
@@ -22,7 +24,7 @@ class CleanedModel(models.Model):
             message = "Got ValidationError while saving: %s" % e
             if hasattr(self, 'request'):
                 messages.error(self.request, message)
-            print(message)
+            logger.error(message)
             # dont save, re-raise the exception
             raise
         super(CleanedModel, self).save(**kwargs)
