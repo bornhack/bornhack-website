@@ -95,6 +95,7 @@ class Order(CreatedUpdatedModel):
         max_length=50,
         choices=PAYMENT_METHOD_CHOICES,
         default='',
+        blank=True
     )
 
     cancelled = models.BooleanField(default=False)
