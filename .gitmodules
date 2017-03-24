@@ -1,0 +1,3 @@
+[submodule "src/vendor/coinify"]
+	path = src/vendor/coinify
+	url = https://github.com/CoinifySoftware/python-sdk
