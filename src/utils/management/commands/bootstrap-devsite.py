@@ -1031,33 +1031,33 @@ programming for a danish startup.
                 price=125,
                 description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
                 available_in=(
-                    timezone.datetime(year, 4, 30, 11, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
             )
 
-            name='PROSA bus transport (open for everyone)',
+            name='PROSA bus transport (open for everyone)'
             Product.objects.create(
                 name=name,
                 category=transportation,
                 price=125,
                 description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
                 available_in=(
-                    timezone.datetime(year, 4, 30, 11, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
             )
 
-            name='T-shirt (large)',
+            name='T-shirt (large)'
             Product.objects.create(
                 name=name,
                 category=merchandise,
                 price=160,
                 description='Get a nice t-shirt',
                 available_in=(
-                    timezone.datetime(year, 4, 30, 11, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
@@ -1070,7 +1070,7 @@ programming for a danish startup.
                 price=3325,
                 category=villages,
                 available_in=(
-                    timezone.datetime(year, 6, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
@@ -1083,7 +1083,7 @@ programming for a danish startup.
                 price=3675,
                 category=villages,
                 available_in=(
-                    timezone.datetime(year, 6, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
@@ -1096,7 +1096,7 @@ programming for a danish startup.
                 price=1200,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(year, 6, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
@@ -1109,7 +1109,7 @@ programming for a danish startup.
                 price=1337,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(year, 6, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='%s-%s' % (camp.slug, slugify(name)),
