@@ -13,7 +13,7 @@
             <form method="POST" class="form-inline">
               {% csrf_token %}
             {% endif %}
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered {% if not order.open == None %}table-hover{% endif %}">
 
               <thead>
                 <tr>
@@ -66,18 +66,20 @@
 
             </table>
 
-            {% if order.open == None and order.customer_comment or order.open %}
-            <h4>Comment:</h4>
-            <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments here..." value="{{ order.customer_comment }}" {% if order.open == None %}readonly{% endif %}></p>
-            {% endif %}
-
             {% if not order.open == None %}
-                {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+              <h4>Comment:</h4>
+              <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments here..." value="{{ order.customer_comment }}"></p>
+            {% elif order.open == None and order.comment %}
+              <div class="alert alert-info">{{ order.comment }}</div>
             {% endif %}
 
+            {% if order.open %}
+              {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
+            {% endif %}
             {% if not order.paid %}
               {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
             {% endif %}
+
         </div>
         {% if order.paid %}
         <div class="panel panel-footer">
