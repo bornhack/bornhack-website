@@ -35,8 +35,8 @@ from shop.models import (
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
-from vendor.coinify_api import CoinifyAPI
-from vendor.coinify_callback import CoinifyCallback
+from vendor.coinify.coinify_api import CoinifyAPI
+from vendor.coinify.coinify_callback import CoinifyCallback
 import json, time
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
