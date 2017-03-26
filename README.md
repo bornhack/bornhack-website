@@ -4,6 +4,12 @@ Django project to power Bornhack. Features include news, villages, webshop, and 
 
 ## Quickstart
 
+### Clone the repo
+Clone with --recursive to include submodules:
+
+    git clone --recursive https://github.com/bornhack/bornhack-website
+
+
 ### Virtualenv
 Create a Python 3 virtual environment and activate it:
 ```
