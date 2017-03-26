@@ -307,6 +307,11 @@ class EventType(CreatedUpdatedModel):
         help_text='Check to permit users to submit events of this type',
     )
 
+    include_in_event_list = models.BooleanField(
+        default=True,
+        help_text='Include events of this type in the event list?',
+    )
+
     def __str__(self):
         return self.name
 
@@ -366,8 +371,8 @@ class Event(CampRelatedModel):
 
     @property
     def speakers_list(self):
-        if self.speakers.exists():
-            return ", ".join(self.speakers.all().values_list('name', flat=True))
+        if self.speaker_set.exists():
+            return ", ".join(self.speaker_set.all().values_list('name', flat=True))
         return False
 
     def get_absolute_url(self):

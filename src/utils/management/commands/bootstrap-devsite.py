@@ -160,7 +160,8 @@ class Command(BaseCommand):
             name='Facilities',
             slug='facilities',
             color='#cccccc',
-            light_text=False
+            light_text=False,
+            include_in_event_list=False,
         )
 
         slack = EventType.objects.create(
