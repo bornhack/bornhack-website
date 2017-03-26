@@ -62,7 +62,8 @@
                 <td>
                   <strong>Total</strong>
                 <td>
-                  {{ order.total|currency }}
+                  {{ order.total|currency }}<br />
+                  (~{{ order.total|approxeur }})
 
             </table>
 
