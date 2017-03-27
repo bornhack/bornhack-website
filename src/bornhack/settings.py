@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'info',
     'sponsors',
     'ircbot',
+    'volunteers',
 
     'allauth',
     'allauth.account',
