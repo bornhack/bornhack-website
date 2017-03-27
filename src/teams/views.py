@@ -1,11 +1,17 @@
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 
 from camps.mixins import CampViewMixin
 
 from .models import Team
 
 
-class TeamsView(CampViewMixin, ListView):
-    template_name = "teams_list.html"
+class TeamListView(CampViewMixin, ListView):
+    template_name = "team_list.html"
     model = Team
     context_object_name = 'teams'
+
+
+class TeamDetailView(CampViewMixin, DetailView):
+    template_name = "team_detail.html"
+    model = Team
+    context_object_name = 'team'

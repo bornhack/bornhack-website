@@ -276,9 +276,18 @@ urlpatterns = [
             ),
 
             url(
-                r'^teams/$',
-                TeamsView.as_view(),
-                name='teams'
+                r'^teams/', include([
+                    url(
+                        r'^$',
+                        TeamListView.as_view(),
+                        name='team_list'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/$',
+                        TeamDetailView.as_view(),
+                        name='team_detail'
+                    ),
+                ])
             ),
         ])
     )

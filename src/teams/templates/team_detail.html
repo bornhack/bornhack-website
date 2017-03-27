@@ -2,16 +2,13 @@
 {% load commonmark %}
 
 {% block title %}
-Teams | {{ block.super }}
+Team: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-{% for team in teams %}
-
 <h3>{{ team.name }}</h3>
-{{ team.description|unsafecommonmark|truncatewords:50 }}
 
-{% endfor %}
+{{ team.description|unsafecommonmark }}
 
 {% endblock %}

@@ -85,7 +85,7 @@
             <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
             {% if not camp.read_only %}
                 <a class="btn {% menubuttonclass 'teams' %}"
-                   href="{% url 'teams' camp_slug=camp.slug %}">Teams</a>
+                   href="{% url 'team_list' camp_slug=camp.slug %}">Teams</a>
             {% endif %}
           </div>
           <div class="btn-group-vertical visible-xs">
@@ -96,7 +96,7 @@
             <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
             {% if not camp.read_only %}
                 <a class="btn {% menubuttonclass 'teams' %}"
-                   href="{% url 'teams' camp_slug=camp.slug %}">Teams</a>
+                   href="{% url 'team_list' camp_slug=camp.slug %}">Teams</a>
             {% endif %}
           </div>
         <p>
