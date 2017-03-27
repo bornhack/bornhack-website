@@ -83,6 +83,10 @@
             <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
             <a class="btn {% menubuttonclass 'program' %}" href="{% url 'schedule_index' camp_slug=camp.slug %}">Program</a>
             <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+            {% if not camp.read_only %}
+                <a class="btn {% menubuttonclass 'teams' %}"
+                   href="{% url 'teams' camp_slug=camp.slug %}">Teams</a>
+            {% endif %}
           </div>
           <div class="btn-group-vertical visible-xs">
             <a class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
@@ -90,6 +94,10 @@
             <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
             <a class="btn {% menubuttonclass 'program' %}" href="{% url 'schedule_index' camp_slug=camp.slug %}">Program</a>
             <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+            {% if not camp.read_only %}
+                <a class="btn {% menubuttonclass 'teams' %}"
+                   href="{% url 'teams' camp_slug=camp.slug %}">Teams</a>
+            {% endif %}
           </div>
         <p>
       </div>

@@ -7,7 +7,7 @@ from shop.models import ProductCategory, Product
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
 from program.models import EventType, Event, EventInstance, Speaker, EventLocation
-from volunteers.models import Team, TeamMember
+from teams.models import Team, TeamMember
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
