@@ -109,6 +109,13 @@ footer {
     padding: 5px;
 }
 
+@media (max-width: 520px) {
+  .event {
+      width: 50%;
+      padding: 5px;
+  }
+}
+
 .event:hover {
     background-color: black !important;
     color: white !important;
