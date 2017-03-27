@@ -15,7 +15,6 @@ def currency(value):
 
 @register.filter
 def approxeur(value):
-    print(type(value))
     try:
         return "{0:.2f} EUR".format(value / Decimal(7.5))
     except ValueError:
