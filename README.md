@@ -25,6 +25,9 @@ Install system dependencies (method depends on OS):
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
+- wkhtmltopdf (also for pdf generation):
+  - Debian: wkhtmltopdf
+  - FreeBSD: converters/wkhtmltopdf
 
 ### Python packages
 Install pip packages:

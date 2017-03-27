@@ -1,16 +1,21 @@
+from django.contrib.auth.models import AnonymousUser
 from wkhtmltopdf.views import PDFTemplateResponse
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from django.test.client import RequestFactory
 from django.conf import settings
-import io
-import logging
+import io, logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def generate_pdf_letter(filename, template, formatdict):
+    # conjure up a fake request for PDFTemplateResponse
+    request = RequestFactory().get('/')
+    request.user = AnonymousUser()
+    request.session = {}
+
     ### produce text-only PDF from template
     pdfgenerator = PDFTemplateResponse(
-        request=RequestFactory().get('/'),
+        request=request,
         template=template, 
         context=formatdict,
         cmd_options={
@@ -18,7 +23,7 @@ def generate_pdf_letter(filename, template, formatdict):
             'margin-bottom': 50,
         },
     )
-    textonlypdf = io.StringIO()
+    textonlypdf = io.BytesIO()
     textonlypdf.write(pdfgenerator.rendered_content)
 
     ### create a blank pdf to work with
@@ -28,7 +33,7 @@ def generate_pdf_letter(filename, template, formatdict):
     pdfreader = PdfFileReader(textonlypdf)
 
     ### get watermark from watermark file
-    watermark = PdfFileReader(open(settings.LETTERHEAD_PDF_PATH, 'rb'))
+    watermark = PdfFileReader(open("%s/pdf/%s" % (settings.STATICFILES_DIRS[0], settings.PDF_LETTERHEAD_FILENAME), 'rb'))
 
     ### add the watermark to all pages
     for pagenum in range(pdfreader.getNumPages()):
@@ -42,12 +47,13 @@ def generate_pdf_letter(filename, template, formatdict):
         finalpdf.addPage(page)
 
     ### save the generated pdf to the archive
-    with open(settings.PDF_ARCHIVE_PATH+filename, 'wb') as fh:
+    fullpath = settings.PDF_ARCHIVE_PATH+filename
+    with open(fullpath, 'wb') as fh:
         finalpdf.write(fh)
-        logger.info('Saved pdf to archive: %s' % settings.PDF_ARCHIVE_PATH+filename)
+        logger.info('Saved pdf to archive: %s' % fullpath)
 
     ### return a file object with the data
-    returnfile = io.StringIO()
+    returnfile = io.BytesIO()
     finalpdf.write(returnfile)
     return returnfile
 

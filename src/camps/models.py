@@ -11,7 +11,6 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-
 class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Camp'
