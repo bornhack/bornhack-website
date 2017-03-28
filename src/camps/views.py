@@ -10,6 +10,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CampRedirectView(CampViewMixin, View):
+    logger = logging.getLogger("bornhack.%s" % __name__)
     def dispatch(self, request, *args, **kwargs):
         # find the closest camp in the past
         prevcamp = Camp.objects.filter(camp__endswith__lt=timezone.now()).order_by('-camp')[0]
