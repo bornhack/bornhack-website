@@ -18,7 +18,7 @@ DATABASES = {
 DEBUG={{ django_debug }}
 
 # the path to the wkhtmltopdf binary
-WKHTMLTOPDF_CMD={{ wkhtmltopdf_path }}
+WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
 
 ### changes below here are only needed for production
 
