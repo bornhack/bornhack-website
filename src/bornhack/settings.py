@@ -130,7 +130,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        # send bornhack logger to both console and syslog at DEBUG level, and
+        # send the bornhack logger to console at DEBUG level,
         # do not propagate bornhack.* messages up to the root logger
         'bornhack': {
             'handlers': ['console'],
