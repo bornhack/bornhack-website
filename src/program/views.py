@@ -86,7 +86,12 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
             raise Http404()
 
         # get and return the response
-        response = self.get_picture_response()
+        response = self.get_picture_response('/public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
+            'campslug': self.camp.slug,
+            'proposaluuid': self.get_object().uuid,
+            'filename': os.path.basename(self.picture.name),
+        })
+
         return response
 
 
@@ -144,7 +149,12 @@ class SpeakerPictureView(CampViewMixin, PictureViewMixin, DetailView):
     model = models.Speaker
 
     def get(self, request, *args, **kwargs):
-        response = self.get_picture_response()
+        # get and return the response
+        response = self.get_picture_response(path='/public/speakers/%(campslug)s/%(slug)s/%(filename)s' % {
+            'campslug': self.camp.slug,
+            'slug': self.get_object().slug,
+            'filename': os.path.basename(self.picture.name),
+        })
         return response
 
 

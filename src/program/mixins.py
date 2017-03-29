@@ -80,20 +80,16 @@ class PictureViewMixin(SingleObjectMixin):
         # alright, continue with the request
         return super().dispatch(request, *args, **kwargs)
 
-    def get_picture_response(self):
+    def get_picture_response(self, path):
         if 'runserver' in sys.argv or 'runserver_plus' in sys.argv:
             # this is a local devserver situation, guess mimetype from extension and return picture directly
             response = HttpResponse(self.picture, content_type=mimetypes.types_map[".%s" % self.picture.name.split(".")[-1]])
         else:
             # make nginx serve the picture using X-Accel-Redirect
             # (this works for nginx only, other webservers use x-sendfile)
-            # maybe make the header name configurable
+            # TODO: maybe make the header name configurable
             response = HttpResponse()
-            response['X-Accel-Redirect'] = '/public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
-                'campslug': self.camp.slug,
-                'proposaluuid': self.get_object().uuid,
-                'filename': os.path.basename(self.picture.name),
-            }
+            response['X-Accel-Redirect'] = path
             response['Content-Type'] = ''
         return response
 
