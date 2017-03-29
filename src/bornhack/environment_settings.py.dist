@@ -50,7 +50,7 @@ COINIFY_API_SECRET='{{ coinify_api_secret }}'
 COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
 
 # shop settings
-PDF_LETTERHEAD_FILENAME='bornhack-2017_test_letterhead.pdf'
+PDF_LETTERHEAD_FILENAME='{{ pdf_letterhead_filename }}'
 BANKACCOUNT_IBAN='{{ iban }}'
 BANKACCOUNT_SWIFTBIC='{{ swiftbic }}'
 BANKACCOUNT_REG='{{ regno }}'
