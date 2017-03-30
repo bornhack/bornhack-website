@@ -28,6 +28,9 @@ Install system dependencies (method depends on OS):
 - wkhtmltopdf (also for pdf generation):
   - Debian: wkhtmltopdf
   - FreeBSD: converters/wkhtmltopdf
+- fonts
+  - Debian: ?
+  - FreeBSD: x11-fonts/webfonts
 
 ### Python packages
 Install pip packages:
