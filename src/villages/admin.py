@@ -7,11 +7,13 @@ from .models import Village
 class VillageAdmin(admin.ModelAdmin):
     list_display = [
         'name',
+        'camp',
         'private',
         'deleted',
     ]
 
     list_filter = [
+        'camp',
         'private',
         'deleted',
     ]

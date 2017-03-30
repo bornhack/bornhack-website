@@ -31,7 +31,7 @@ class Village(UUIDModel, CampRelatedModel):
     objects = VillageQuerySet.as_manager()
 
     def __str__(self):
-        return self.name
+        return "%s (%s)" % (self.name, self.camp.title)
 
     def get_absolute_url(self):
         return reverse_lazy('village_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
