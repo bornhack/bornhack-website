@@ -231,6 +231,11 @@ urlpatterns = [
                         EventDetailView.as_view(),
                         name='event_detail'
                     ),
+                    url(
+                        r'^calendar/',
+                        ICSView.as_view(),
+                        name='ics_calendar'
+                    ),
                ])
             ),
 
