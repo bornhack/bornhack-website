@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+
+{% block title %}
+Teams | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+{% if teams %}
+<table class="table table-hover table-condensed table-striped">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for team in teams %}
+    <tr>
+      <td>
+        <a href="{% url 'team_detail' camp_slug=camp.slug slug=team.slug %}">
+          {{ team.name }}
+        </a>
+      </td>
+      <td>
+        {{ team.description|unsafecommonmark|truncatewords:50 }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<h4>No teams for <b>{{ camp.title }}</b> yet!</h4>
+{% endif %}
+
+{% endblock %}

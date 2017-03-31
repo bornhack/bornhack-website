@@ -7,6 +7,7 @@ from shop.models import ProductCategory, Product
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
 from program.models import EventType, Event, EventInstance, Speaker, EventLocation
+from teams.models import Team, TeamMember
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
@@ -1241,6 +1242,39 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 slug='the-camp',
                 description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
             )
+
+            self.output("Creating teams for {}...".format(year))
+            noc_team = Team.objects.create(
+                name="NOC",
+                description="The NOC team is in charge of establishing and running a network onsite.".format(year),
+                camp=camp
+            )
+            bar_team = Team.objects.create(
+                name="Bar",
+                description="The Bar team plans, builds and run the IRL bar!",
+                camp=camp
+            )
+
+            TeamMember.objects.create(
+                user=user2,
+                team=bar_team,
+                leader=True
+            )
+            TeamMember.objects.create(
+                user=user4,
+                team=noc_team,
+                leader=True
+            )
+            TeamMember.objects.create(
+                user=user1,
+                team=noc_team,
+                leader=True
+            )
+            TeamMember.objects.create(
+                user=user3,
+                team=noc_team,
+            )
+
 
         self.output("marking 2016 as read_only...")
         camp2016.read_only = True

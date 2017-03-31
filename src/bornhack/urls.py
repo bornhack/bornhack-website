@@ -6,6 +6,7 @@ from allauth.account.views import (
     EmailVerificationSentView,
     PasswordResetView
 )
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
@@ -15,6 +16,7 @@ from info.views import *
 from villages.views import *
 from program.views import *
 from sponsors.views import *
+from teams.views import *
 
 urlpatterns = [
     url(
@@ -272,7 +274,27 @@ urlpatterns = [
                     ),
                 ])
             ),
+
+            url(
+                r'^teams/', include([
+                    url(
+                        r'^$',
+                        TeamListView.as_view(),
+                        name='team_list'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/$',
+                        TeamDetailView.as_view(),
+                        name='team_detail'
+                    ),
+                ])
+            ),
         ])
     )
 ]
 
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

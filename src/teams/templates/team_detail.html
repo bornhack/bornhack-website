@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+
+{% block title %}
+Team: {{ team.name }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<h3>{{ team.name }}</h3>
+
+{{ team.description|unsafecommonmark }}
+
+{% endblock %}
