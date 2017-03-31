@@ -1,25 +1,13 @@
 import icalendar
-from icalendar import vDatetime
 
-
-def gen_icalevents(event):
-    for i in event.days.all():
-        ievent = icalendar.Event()
-        ievent['summary'] = event.title
-
-        newdate = datetime.datetime.combine(i.date, datetime.time(event.start.hour, event.start.minute, event.start.second))
-        ievent['dtstart'] = vDatetime(newdate).to_ical()
-
-        newdate = datetime.datetime.combine(i.date, datetime.time(event.end.hour, event.end.minute, event.end.second))
-        ievent['dtend'] = vDatetime(newdate).to_ical()
-
-        yield ievent
-
-def gen_ics(events):
+def gen_ics(eventinstances):
     cal = icalendar.Calendar()
-    for event in events:
-        for ical_event in gen_icalevents(event):
-            cal.add_component(ical_event)
+    for eventinstance in eventinstances:
+        ievent = icalendar.Event()
+        ievent['summary'] = eventinstance.event.title
+        ievent['dtstart'] = icalendar.vDatetime(eventinstance.when.lower).to_ical()
+        ievent['dtend'] = icalendar.vDatetime(eventinstance.when.upper).to_ical()
+        cal.add_component(ievent)
     return cal.to_ical()
 
 

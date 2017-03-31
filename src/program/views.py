@@ -18,9 +18,9 @@ from .ics import gen_ics
 ############## ical calendar ########################################################
 
 
-class ICSView(View):
+class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
-        return HttpResponse(gen_ics(models.Event.objects.all()))
+        return HttpResponse(gen_ics(models.EventInstance.objects.all()))
 
 
 ############## proposals ########################################################
