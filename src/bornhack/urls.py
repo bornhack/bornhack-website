@@ -227,14 +227,15 @@ urlpatterns = [
                         name='call_for_speakers'
                     ),
                     url(
-                        r'^(?P<slug>[-_\w+]+)/$',
-                        EventDetailView.as_view(),
-                        name='event_detail'
-                    ),
-                    url(
                         r'^calendar/',
                         ICSView.as_view(),
                         name='ics_calendar'
+                    ),
+                    # this has to be the last URL here
+                    url(
+                        r'^(?P<slug>[-_\w+]+)/$',
+                        EventDetailView.as_view(),
+                        name='event_detail'
                     ),
                ])
             ),
