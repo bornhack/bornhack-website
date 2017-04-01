@@ -61,7 +61,7 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
 
     def form_valid(self, form):
         if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
-            messages.info(self.request, "Your speaker proposal has been reverted to status draft. Please submit it again when you are ready.")
+            messages.warning(self.request, "Your speaker proposal has been reverted to status draft. Please submit it again when you are ready.")
             form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
         return super().form_valid(form)
 
@@ -126,7 +126,7 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
 
     def form_valid(self, form):
         if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
-            messages.info(self.request, "Your event proposal has been reverted to status draft. Please submit it again when you are ready.")
+            messages.warning(self.request, "Your event proposal has been reverted to status draft. Please submit it again when you are ready.")
             form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
         return super().form_valid(form)
 
