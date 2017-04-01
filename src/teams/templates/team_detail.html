@@ -11,4 +11,15 @@ Team: {{ team.name }} | {{ block.super }}
 
 {{ team.description|unsafecommonmark }}
 
+
+{% if team.sub_teams.exists %}
+    <hr />
+    <h3>Subteams:</h3>
+    <ul>
+      {% for sub_team in team.sub_teams.all %}
+      <li>{{ sub_team.name }}</li>
+      {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock %}

@@ -15,6 +15,7 @@ class Team(CampRelatedModel):
     camp = models.ForeignKey('camps.Camp')
     description = models.TextField()
     members = models.ManyToManyField('auth.User', through='teams.TeamMember')
+    sub_team_of = models.ForeignKey('self', null=True, blank=True, related_name="sub_teams")
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
@@ -32,7 +33,7 @@ class Team(CampRelatedModel):
 class TeamMember(models.Model):
     user = models.ForeignKey('auth.User')
     team = models.ForeignKey('teams.Team')
-    leader = models.BooleanField(default=False)
+    responsible = models.BooleanField(default=False)
 
     def __str__(self):
         return '{} ({})'.format(self.user, self.team)

@@ -8,7 +8,7 @@ Teams | {{ block.super }}
 {% block content %}
 
 {% if teams %}
-<table class="table table-hover table-condensed table-striped">
+<table class="table table-hover">
   <thead>
   <tr>
     <th>Name</th>
@@ -24,7 +24,27 @@ Teams | {{ block.super }}
         </a>
       </td>
       <td>
+        {% if team.sub_teams.exists %}
+        <div class="pull-left">
+        {% endif %}
         {{ team.description|unsafecommonmark|truncatewords:50 }}
+
+        {% if team.sub_teams.exists %}
+        <div class="collapse" id="{{ team.slug }}-sub-teams">
+          <strong>Subteams:</strong>
+          <ul>
+          {% for sub_team in team.sub_teams.all %}
+          <li>{{ sub_team.name }}</li>
+          {% endfor %}
+          </ul>
+        </div>
+
+        </div>
+
+        <button class="btn btn-default pull-right" type="button" data-toggle="collapse" data-target="#{{ team.slug }}-sub-teams" aria-expanded="false" aria-controls="collapseExample">
+              Subteams
+        </button>
+        {% endif %}
       </td>
     </tr>
     {% endfor %}
