@@ -14,6 +14,8 @@
         Product name
       <th>
         Price
+      <th>
+        Checked in
 
   <tbody>
     {% for ticket in tickets %}
@@ -33,6 +35,12 @@
         </a>
       <td>
         {{ ticket.product.price|currency }}
+      <td>
+        {% if ticket.checked_in %}
+        Yes
+        {% else %}
+        Not yet
+        {% endif %}
     {% endfor %}
 </table>
 

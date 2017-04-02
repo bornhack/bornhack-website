@@ -14,7 +14,7 @@
 
     <div class="col-md-7">
       <div class="pull-right">
-        <h2>{{ ticket.order.camp }}</h2>
+          <h2>{% if ticket.checked_in %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
         <form method="POST" class="form">
           {% csrf_token %}
           {% bootstrap_field form.name %}
