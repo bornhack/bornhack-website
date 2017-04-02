@@ -17,7 +17,7 @@ Team: {{ team.name }} | {{ block.super }}
 <p>This team is under the <b>{{ team.area.name }} area</b>. The following users are responsible for the <b>{{ team.area.name }} area</b>:</p>
 <ul>
     {% for resp in team.area.responsible.all %}
-    <li>{{ resp.name|default:"Unnamed" }}</li>
+    <li>{{ resp.get_full_name|default:"Unnamed" }}</li>
     {% endfor %}
 </ul>
 {% endblock %}

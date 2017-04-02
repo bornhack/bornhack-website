@@ -37,7 +37,7 @@ Teams | {{ block.super }}
       </td>
       <td>
         {% for resp in team.area.responsible.all %}
-        {{ resp.name|default:"Unnamed" }}<br>
+        {{ resp.get_full_name|default:"Unnamed" }}<br>
         {% endfor %}
       </td>
       {% if request.user.is_authenticated %}
