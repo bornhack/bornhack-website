@@ -10,7 +10,15 @@ Team: {{ team.name }} | {{ block.super }}
 <h3>{{ team.name }} Team</h3>
 
 {{ team.description|unsafecommonmark }}
+<p>Currently {{ team.members.count }} people are members of this team{% if request.user in team.members.all %} (including you){% endif %}.</p>
 
+{% if request.user in team.members.all %}
+    <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger">Leave Team</a>
+{% else %}
+    {% if team.needs_members %}
+      <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success">Join Team</a>
+    {% endif %}
+{% endif %}
 
 <hr />
 <h3>{{ team.area.name }} Area:</h3>

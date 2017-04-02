@@ -17,7 +17,7 @@ Teams | {{ block.super }}
     <th>Responsible</th>
     <th>Members</th>
     {% if request.user.is_authenticated %}
-    <th>Membership</th>
+    <th>Member?</th>
     <th>Action</th>
     {% endif %}
   </tr>
@@ -45,11 +45,11 @@ Teams | {{ block.super }}
         <span class="badge">{{ team.members.count }}</span>
       </td>
       {% if request.user.is_authenticated %}
-      <td>
+      <td class="text-center">
         {% if request.user in team.members.all %}
-          Member
+          <span class="text-success"><i class="fa fa-check"></i></span>
         {% else %}
-          Not member
+          <span class="text-danger"><i class="fa fa-remove"></i></span>
         {% endif %}
       </td>
       <td>
