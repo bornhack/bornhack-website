@@ -15,6 +15,7 @@ Teams | {{ block.super }}
     <th>Description</th>
     <th>Area</th>
     <th>Responsible</th>
+    <th>Members</th>
     {% if request.user.is_authenticated %}
     <th>Membership</th>
     <th>Action</th>
@@ -26,7 +27,7 @@ Teams | {{ block.super }}
     <tr>
       <td>
         <a href="{% url 'team_detail' camp_slug=camp.slug slug=team.slug %}">
-          {{ team.name }}
+          {{ team.name }} Team
         </a>
       </td>
       <td>
@@ -40,6 +41,9 @@ Teams | {{ block.super }}
         {{ resp.get_full_name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
         {% endfor %}
       </td>
+      <td class="text-center">
+        <span class="badge">{{ team.members.count }}</span>
+      </td>
       {% if request.user.is_authenticated %}
       <td>
         {% if request.user in team.members.all %}
@@ -52,7 +56,9 @@ Teams | {{ block.super }}
         {% if request.user in team.members.all %}
         <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
+        {% if team.needs_members %}
         <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</button>
+        {% endif %}
         {% endif %}
       </td>
       {% endif %}
