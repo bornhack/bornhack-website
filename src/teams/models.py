@@ -1,21 +1,35 @@
 from django.db import models
 from django.utils.text import slugify
-
 from utils.models import CampRelatedModel
+from django.core.exceptions import ValidationError
+
+
+class TeamArea(CampRelatedModel):
+    class Meta:
+        ordering = ['name']
+        unique_together = ('name', 'camp')
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(default='')
+    camp = models.ForeignKey('camps.Camp')
+    responsible = models.ManyToManyField('auth.User', related_name='responsible_team_areas')
+
+    def __str__(self):
+        return '{} ({})'.format(self.name, self.camp)
 
 
 class Team(CampRelatedModel):
-
     class Meta:
         ordering = ['name']
-        unique_together = ('slug', 'camp')
+        unique_together = (('name', 'camp'), ('slug', 'camp'))
 
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
     camp = models.ForeignKey('camps.Camp')
+    area = models.ForeignKey('teams.TeamArea', related_name='teams', on_delete=models.PROTECT)
     description = models.TextField()
-    members = models.ManyToManyField('auth.User', through='teams.TeamMember')
-    sub_team_of = models.ForeignKey('self', null=True, blank=True, related_name="sub_teams")
+    needs_members = models.BooleanField(default=True)
+    members = models.ManyToManyField('auth.User', related_name='teams', through='teams.TeamMember')
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
@@ -30,10 +44,25 @@ class Team(CampRelatedModel):
 
         super().save(**kwargs)
 
+    def clean(self):
+        if self.camp != self.area.camp:
+            raise ValidationError({'camp': 'camp is different from area.camp'})
+
+    def memberstatus(self, member):
+        if member not in self.members.all():
+            return "Not member"
+        else:
+            if TeamMember.objects.get(team=self, user=member).approved:
+                return "Member"
+            else:
+                return "Membership Pending"
+
+
 class TeamMember(models.Model):
     user = models.ForeignKey('auth.User')
     team = models.ForeignKey('teams.Team')
-    responsible = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{} ({})'.format(self.user, self.team)
+        return '{} is {} member of team {}'.format(self.user, '' if self.approved else 'an unapproved', self.team)
+

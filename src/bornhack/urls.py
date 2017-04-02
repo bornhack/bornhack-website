@@ -257,8 +257,8 @@ urlpatterns = [
                         r'^$',
                         VillageListView.as_view(),
                         name='village_list'
-                   ),
-                   url(
+                    ),
+                    url(
                         r'create/$',
                         VillageCreateView.as_view(),
                         name='village_create'
@@ -288,6 +288,17 @@ urlpatterns = [
                         TeamListView.as_view(),
                         name='team_list'
                     ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/join/$',
+                        TeamJoinView.as_view(),
+                        name='team_join'
+                    ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/leave/$',
+                        TeamLeaveView.as_view(),
+                        name='team_leave'
+                    ),
+                    # this has to be the last url in the list
                     url(
                         r'(?P<slug>[-_\w+]+)/$',
                         TeamDetailView.as_view(),

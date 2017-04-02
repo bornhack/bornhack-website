@@ -13,6 +13,11 @@ Teams | {{ block.super }}
   <tr>
     <th>Name</th>
     <th>Description</th>
+    <th>Area</th>
+    {% if request.user.is_authenticated %}
+    <th>Membership</th>
+    <th>Action</th>
+    {% endif %}
   </tr>
   </thead>
   <tbody>
@@ -24,28 +29,27 @@ Teams | {{ block.super }}
         </a>
       </td>
       <td>
-        {% if team.sub_teams.exists %}
-        <div class="pull-left">
-        {% endif %}
         {{ team.description|unsafecommonmark|truncatewords:50 }}
-
-        {% if team.sub_teams.exists %}
-        <div class="collapse" id="{{ team.slug }}-sub-teams">
-          <strong>Subteams:</strong>
-          <ul>
-          {% for sub_team in team.sub_teams.all %}
-          <li>{{ sub_team.name }}</li>
-          {% endfor %}
-          </ul>
-        </div>
-
-        </div>
-
-        <button class="btn btn-default pull-right" type="button" data-toggle="collapse" data-target="#{{ team.slug }}-sub-teams" aria-expanded="false" aria-controls="collapseExample">
-              Subteams
-        </button>
+      </td>
+      <td>
+        {{ team.area.name }}
+      </td>
+      {% if request.user.is_authenticated %}
+      <td>
+        {% if request.user in team.members.all %}
+          Member
+        {% else %}
+          Not member
         {% endif %}
       </td>
+      <td>
+        {% if request.user in team.members.all %}
+        <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
+        {% else %}
+        <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</button>
+        {% endif %}
+      </td>
+      {% endif %}
     </tr>
     {% endfor %}
   </tbody>

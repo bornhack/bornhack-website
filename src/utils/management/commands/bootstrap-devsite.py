@@ -7,7 +7,7 @@ from shop.models import ProductCategory, Product
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
 from program.models import EventType, Event, EventInstance, Speaker, EventLocation
-from teams.models import Team, TeamMember
+from teams.models import Team, TeamArea, TeamMember
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
@@ -1243,38 +1243,72 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
             )
 
+            self.output("Creating team areas for {}...".format(year))
+            pr_area = TeamArea.objects.create(
+                name='PR',
+                description="The Public Relations area covers website, social media and marketing related tasks.",
+                camp=camp
+            )
+            content_area = TeamArea.objects.create(
+                name='Content',
+                description="The Content area handles talks, A/V and photos.",
+                camp=camp
+            )
+            infrastructure_area = TeamArea.objects.create(
+                name='Infrastructure',
+                description="The Infrastructure area covers network/NOC, power, villages, CERT, logistics.",
+                camp=camp
+            )
+            bar_area = TeamArea.objects.create(
+                name='Bar',
+                description="The Bar area covers building and running the IRL bar, DJ booth and related tasks.",
+                camp=camp
+            )
+
+            self.output("Setting teamarea responsibles for {}...".format(year))
+            pr_area.responsible.add(user1, user2)
+            content_area.responsible.add(user2, user3)
+            infrastructure_area.responsible.add(user3, user4)
+            bar_area.responsible.add(user4)
+
             self.output("Creating teams for {}...".format(year))
             noc_team = Team.objects.create(
                 name="NOC",
                 description="The NOC team is in charge of establishing and running a network onsite.".format(year),
-                camp=camp
+                camp=camp,
+                area=infrastructure_area,
             )
             bar_team = Team.objects.create(
                 name="Bar",
                 description="The Bar team plans, builds and run the IRL bar!",
-                camp=camp
+                camp=camp,
+                area=bar_area
             )
 
+            self.output("Setting team members for {}...".format(year))
             TeamMember.objects.create(
-                user=user2,
-                team=bar_team,
-                responsible=True
-            )
-            TeamMember.objects.create(
+                team=noc_team,
                 user=user4,
-                team=noc_team,
-                responsible=True
+                approved=True
             )
             TeamMember.objects.create(
+                team=noc_team,
+                user=user1
+            )
+            TeamMember.objects.create(
+                team=bar_team,
                 user=user1,
-                team=noc_team,
-                responsible=True
+                approved=True
             )
             TeamMember.objects.create(
+                team=bar_team,
                 user=user3,
-                team=noc_team,
+                approved=True
             )
-
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user2
+            )
 
         self.output("marking 2016 as read_only...")
         camp2016.read_only = True
