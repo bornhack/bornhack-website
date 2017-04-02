@@ -57,11 +57,19 @@ class Team(CampRelatedModel):
             else:
                 return "Membership Pending"
 
+    @property
+    def responsible(self):
+        if TeamMember.objects.filter(team=self, responsible=True).exists():
+            return TeamMember.objects.filter(team=self, responsible=True)
+        else:
+            return self.area.responsible.all()
+
 
 class TeamMember(models.Model):
     user = models.ForeignKey('auth.User')
     team = models.ForeignKey('teams.Team')
     approved = models.BooleanField(default=False)
+    responsible = models.BooleanField(default=False)
 
     def __str__(self):
         return '{} is {} member of team {}'.format(self.user, '' if self.approved else 'an unapproved', self.team)

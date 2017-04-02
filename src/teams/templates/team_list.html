@@ -37,7 +37,7 @@ Teams | {{ block.super }}
         {{ team.area.name }} Area
       </td>
       <td>
-        {% for resp in team.area.responsible.all %}
+        {% for resp in team.responsible.all %}
         {{ resp.get_full_name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
         {% endfor %}
       </td>
