@@ -1258,17 +1258,17 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             TeamMember.objects.create(
                 user=user2,
                 team=bar_team,
-                leader=True
+                responsible=True
             )
             TeamMember.objects.create(
                 user=user4,
                 team=noc_team,
-                leader=True
+                responsible=True
             )
             TeamMember.objects.create(
                 user=user1,
                 team=noc_team,
-                leader=True
+                responsible=True
             )
             TeamMember.objects.create(
                 user=user3,
