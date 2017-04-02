@@ -7,19 +7,17 @@ Team: {{ team.name }} | {{ block.super }}
 
 {% block content %}
 
-<h3>{{ team.name }}</h3>
+<h3>{{ team.name }} Team</h3>
 
 {{ team.description|unsafecommonmark }}
 
 
-{% if team.sub_teams.exists %}
-    <hr />
-    <h3>Subteams:</h3>
-    <ul>
-      {% for sub_team in team.sub_teams.all %}
-      <li>{{ sub_team.name }}</li>
-      {% endfor %}
-    </ul>
-{% endif %}
-
+<hr />
+<h3>{{ team.area.name }} Area:</h3>
+<p>This team is under the <b>{{ team.area.name }} area</b>. The following users are responsible for the <b>{{ team.area.name }} area</b>:</p>
+<ul>
+    {% for resp in team.area.responsible.all %}
+    <li>{{ resp.name|default:"Unnamed" }}</li>
+    {% endfor %}
+</ul>
 {% endblock %}

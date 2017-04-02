@@ -14,6 +14,7 @@ Teams | {{ block.super }}
     <th>Name</th>
     <th>Description</th>
     <th>Area</th>
+    <th>Responsible</th>
     {% if request.user.is_authenticated %}
     <th>Membership</th>
     <th>Action</th>
@@ -32,7 +33,12 @@ Teams | {{ block.super }}
         {{ team.description|unsafecommonmark|truncatewords:50 }}
       </td>
       <td>
-        {{ team.area.name }}
+        {{ team.area.name }} Area
+      </td>
+      <td>
+        {% for resp in team.area.responsible.all %}
+        {{ resp.name|default:"Unnamed" }}<br>
+        {% endfor %}
       </td>
       {% if request.user.is_authenticated %}
       <td>
