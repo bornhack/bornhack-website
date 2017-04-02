@@ -604,7 +604,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
         # save callback to db
         callbackobject = CoinifyAPICallback.objects.create(
             headers=headerdict,
-            payload=json.loads(request.body),
+            payload=json.loads(str(request.body)),
             order=self.get_object()
         )
         if sdk.validate_callback(request.body, signature):
@@ -613,7 +613,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             callbackobject.save()
 
             # parse json
-            callbackjson = json.loads(request.body)
+            callbackjson = json.loads(str(request.body))
             if callbackjson['event'] == 'invoice_state_change' or callbackjson['event'] == 'invoice_manual_resend':
                 # find coinify invoice in db
                 try:
