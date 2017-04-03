@@ -410,7 +410,8 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
 class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
-    payload = JSONField()
+    payload = JSONField(null=True)
+    body = models.TextField(default='')
     order = models.ForeignKey('shop.Order')
     valid = models.BooleanField(default=False)
 
