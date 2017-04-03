@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.text import slugify
 from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 
 class TeamArea(CampRelatedModel):
@@ -60,7 +61,7 @@ class Team(CampRelatedModel):
     @property
     def responsible(self):
         if TeamMember.objects.filter(team=self, responsible=True).exists():
-            return TeamMember.objects.filter(team=self, responsible=True)
+            return User.objects.filter(teammember__team=self, teammember__responsible=True)
         else:
             return self.area.responsible.all()
 
