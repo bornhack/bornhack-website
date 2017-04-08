@@ -603,7 +603,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # attempt to parse json
         try:
-            parsed = json.loads(request.body)
+            parsed = json.loads(request.body.decode('utf-8'))
         except Exception as E:
             parsed = ''
 
@@ -622,7 +622,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             return HttpResponseBadRequest('unable to parse json')
 
         # attemt to validate the callbackc
-        if sdk.validate_callback(request.body, signature):
+        if sdk.validate_callback(request.body.decode('utf-8'), signature):
             # mark callback as valid in db
             callbackobject.valid=True
             callbackobject.save()
