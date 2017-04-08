@@ -16,9 +16,7 @@ Teams | {{ block.super }}
     <th>Area</th>
     <th>Responsible</th>
     <th>Members</th>
-    {% if request.user.is_authenticated %}
-    <th>Action</th>
-    {% endif %}
+    <th>Actions</th>
   </tr>
   </thead>
   <tbody>
@@ -55,6 +53,8 @@ Teams | {{ block.super }}
         {% endif %}
         {% endif %}
       </td>
+      {% else %}
+      <td>Login to join!</td>
       {% endif %}
     </tr>
     {% endfor %}
