@@ -605,7 +605,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
         try:
             parsed = json.loads(str(request.body))
         except Exception as E:
-            parsed = None
+            parsed = ''
 
         # save callback to db
         callbackobject = CoinifyAPICallback.objects.create(

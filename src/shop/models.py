@@ -309,7 +309,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Epay Callbacks'
         ordering = ['-created']
 
-    payload = JSONField(blank=True)
+    payload = JSONField()
     md5valid = models.BooleanField(default=False)
 
     def __str__(self):
@@ -410,7 +410,7 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
 class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
-    payload = JSONField(null=True)
+    payload = JSONField(blank=True)
     body = models.TextField(default='')
     order = models.ForeignKey('shop.Order')
     valid = models.BooleanField(default=False)
