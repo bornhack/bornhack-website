@@ -551,9 +551,9 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             response = coinifyapi.invoice_create(
                 float(order.total),
                 'DKK',
-                plugin_name='BornHack 2016 webshop',
+                plugin_name='BornHack webshop',
                 plugin_version='1.0',
-                description='BornHack 2016 order id #%s' % order.id,
+                description='BornHack order id #%s' % order.id,
                 callback_url=order.get_coinify_callback_url(request),
                 return_url=order.get_coinify_thanks_url(request),
                 cancel_url=order.get_cancel_url(request),
