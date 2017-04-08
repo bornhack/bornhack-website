@@ -17,7 +17,6 @@ Teams | {{ block.super }}
     <th>Responsible</th>
     <th>Members</th>
     {% if request.user.is_authenticated %}
-    <th>Member?</th>
     <th>Action</th>
     {% endif %}
   </tr>
@@ -45,13 +44,6 @@ Teams | {{ block.super }}
         <span class="badge">{{ team.members.count }}</span>
       </td>
       {% if request.user.is_authenticated %}
-      <td class="text-center">
-        {% if request.user in team.members.all %}
-          <span class="text-success"><i class="fa fa-check"></i></span>
-        {% else %}
-          <span class="text-danger"><i class="fa fa-remove"></i></span>
-        {% endif %}
-      </td>
       <td>
         {% if request.user in team.members.all %}
         <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
