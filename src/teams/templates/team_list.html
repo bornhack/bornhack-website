@@ -7,6 +7,10 @@ Teams | {{ block.super }}
 
 {% block content %}
 
+<h3>{{ camp.title }} Teams</h3>
+<p>This is a list of the teams for {{ camp.title }}. To join a team just press the Join button. You can also leave a team if you are already a member (please let the team responsible know why!).</p>
+<p>Team memberships need to be approved by a team responsible. You will receive a message when your membership has been approved.</p>
+<p>We currently have {{ teams.count }} teams for {{ camp.title }}:</p>
 {% if teams %}
 <table class="table table-hover">
   <thead>
