@@ -57,7 +57,9 @@ Teams | {{ block.super }}
         <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
         {% if team.needs_members %}
-        <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</button>
+          <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</button>
+        {% else %}
+          <i>Team does not need members</i>
         {% endif %}
         {% endif %}
       </td>
