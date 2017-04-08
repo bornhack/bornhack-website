@@ -309,7 +309,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Epay Callbacks'
         ordering = ['-created']
 
-    payload = JSONField()
+    payload = JSONField(blank=True)
     md5valid = models.BooleanField(default=False)
 
     def __str__(self):
