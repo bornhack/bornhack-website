@@ -603,7 +603,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # attempt to parse json
         try:
-            parsed = json.loads(str(request.body))
+            parsed = json.loads(request.body)
         except Exception as E:
             parsed = ''
 
