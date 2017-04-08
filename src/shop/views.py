@@ -593,7 +593,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
     def post(self, request, *args, **kwargs):
         # Get the signature from the HTTP headers
         signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
-        sdk = CoinifyCallback(settings.COINIFY_IPN_SECRET)
+        sdk = CoinifyCallback(settings.COINIFY_IPN_SECRET.encode('utf-8'))
 
         # make a dict with all HTTP_ headers
         headerdict = {}
@@ -622,7 +622,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             return HttpResponseBadRequest('unable to parse json')
 
         # attemt to validate the callbackc
-        if sdk.validate_callback(request.body.decode('utf-8'), signature):
+        if sdk.validate_callback(request.body, signature):
             # mark callback as valid in db
             callbackobject.valid=True
             callbackobject.save()
