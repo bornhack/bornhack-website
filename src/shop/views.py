@@ -601,10 +601,10 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             if key[:5] == 'HTTP_':
                 headerdict[key[5:]] = value
 
-        # parse json
+        # attempt to parse json
         try:
             parsed = json.loads(str(request.body))
-        except JSONDecodeError:
+        except Exception as E:
             parsed = None
 
         # save callback to db
