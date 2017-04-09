@@ -1,13 +1,13 @@
 {% extends 'program_base.html' %}
 
 {% block program_content %}
+
 {% if speaker_list %}
 <p class="lead">
   An alphabetical list of all speakers, workshop hosts and other
   event anchors at {{ camp.title }}.
 </p>
 
-<a href="{% url 'call_for_speakers' camp_slug=camp.slug %}" class="btn btn-primary"><span {% if not camp.call_for_speakers_open %}style="text-decoration: line-through;"{% endif %}>"Call for Speakers" for {{ camp.title }}</span></a>
 
 <hr />
 
@@ -21,4 +21,6 @@
 {% else %}
   <h2>Speakers for {{ camp.title }} coming soon!</h2>
 {% endif %}
+
+<p><a href="{% url 'call_for_speakers' camp_slug=camp.slug %}" class="btn btn-primary"><span {% if not camp.call_for_speakers_open %}style="text-decoration: line-through;"{% endif %}>Call for Speakers</span></a></p>
 {% endblock program_content %}
