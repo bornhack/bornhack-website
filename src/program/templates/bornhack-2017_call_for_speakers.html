@@ -42,8 +42,8 @@ Call for Speakers | {{ block.super }}
 <p>Please submit content for BornHack 2017 as early as possible. You can submit content via our website:</p>
 
 <ol>
-    <li>Create a user account on <a href="/">https://bornhack.dk/</a></li>
-    <li>Visit <a href="https://bornhack.dk/bornhack-2017/program/proposals/">https://bornhack.dk/bornhack-2017/program/proposals/</a></li>
+    <li>Create a <a href="{% url 'account_signup' %}">user account</a> on the BornHack website</li>
+    <li>Visit <a href="{% url 'proposal_list' camp_slug='bornhack-2017' %}">the proposals page</a></li>
     <li>Propose a new speaker</li>
     <li>Propose a new event</li>
 </ol>
@@ -53,8 +53,6 @@ Call for Speakers | {{ block.super }}
 <h3>Contact Information</h3>
 <p>The BornHack content team can be reached at content@bornhack.dk - for general questions regarding the event please reach out to the info team at info@bornhack.dk</p>
 
-<p>We are reachable via IRC in #BornHack on irc.baconsvin.org (6nbtgccn5nbcodn3.onion) on port 6697 with TLS.</p>
-
-<p>For more information, news, and other event updates, please have a look at <a href="/">https://bornhack.dk/</a> or follow us on Twitter at @bornhax.</p>
+<p>We are reachable via IRC in #BornHack on irc.baconsvin.org (6nbtgccn5nbcodn3.onion) on port 6697 with TLS, you can also follow us on Twitter at @bornhax.</p>
 
 {% endblock %}
