@@ -15,7 +15,7 @@ def calculate_epay_hash(order, request):
         callback_url = order.get_epay_callback_url(request),
         md5_secret=settings.EPAY_MD5_SECRET,
     )
-    epay_hash = hashlib.md5(hashstring).hexdigest()
+    epay_hash = hashlib.md5(hashstring.encode('utf-8')).hexdigest()
     return epay_hash
 
 
