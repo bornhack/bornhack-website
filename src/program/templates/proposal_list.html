@@ -45,7 +45,7 @@ Proposals | {{ block.super }}
 <h4>No speaker proposals found</h4>
 {% endif %}
 
-{% if not camp.read_only %}
+{% if not camp.read_only and camp.call_for_speakers_open %}
 <a href="{% url 'speakerproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Speaker</a>
 {% endif %}
 
@@ -90,7 +90,7 @@ Proposals | {{ block.super }}
 <h4>No event proposals found</h4>
 {% endif %}
 
-{% if not camp.read_only %}
+{% if not camp.read_only and camp.call_for_speakers_open %}
     <a href="{% url 'eventproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Event</a>
 {% endif %}
 
