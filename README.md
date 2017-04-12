@@ -39,9 +39,9 @@ Install pip packages:
 ```
 
 ### Configuration file
-Copy environment file template and change settings as needed:
+Copy environment settings file and change settings as needed:
 ```
-    (venv) $ cp bornhack/settings/env.dist bornhack/settings/.env
+    (venv) $ cp bornhack/settings/environment_settings.py.dist bornhack/settings/environment_settings.py
 ```
 
 ### Database
