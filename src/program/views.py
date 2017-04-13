@@ -230,33 +230,41 @@ class ScheduleView(CampViewMixin, TemplateView):
         return 'schedule_overview.html'
 
     def get_context_data(self, *args, **kwargs):
-        if 'type' in self.request.GET:
+        context = super(ScheduleView, self).get_context_data(**kwargs)
+        eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
+        type_slug = self.request.GET.get('type', None)
+        location_slug = self.request.GET.get('location', None)
+
+        if type_slug:
             try:
                 eventtype = models.EventType.objects.get(
-                    slug=self.request.GET['type']
+                    slug=type_slug
                 )
             except models.EventType.DoesNotExist:
                 raise Http404
 
-        if 'location' in self.request.GET:
+            context['eventtype'] = eventtype
+            context['get_string'] = '?type={}'.format(type_slug)
+            eventinstances = eventinstances.filter(event__event_type=eventtype)
+
+        if location_slug:
             try:
                 eventlocation = models.EventLocation.objects.get(
-                    slug=self.request.GET['location'],
+                    slug=location_slug,
                     camp=self.camp,
                 )
             except models.EventLocation.DoesNotExist:
                 raise Http404
 
-        context = super(ScheduleView, self).get_context_data(**kwargs)
-        eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
-
-        if 'type' in self.request.GET:
-            context['eventtype'] = eventtype
-            eventinstances = eventinstances.filter(event__event_type=eventtype)
-
-        if 'location' in self.request.GET:
             context['location'] = eventlocation
+            get_part = 'location={}'.format(location_slug)
+            if 'get_string' in context:
+                context['get_string'] = context['get_string'] + '&{}'.format(get_part)
+            else:
+                context['get_string'] = '?{}'.format(get_part)
+
             eventinstances = eventinstances.filter(location=eventlocation)
+
         context['eventinstances'] = eventinstances
 
         # Do stuff if we are dealing with a day schedule

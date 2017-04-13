@@ -4,7 +4,7 @@
 {% block program_content %}
 
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-12">
         <form method="get" id="filter" class="form-inline">
             <div class="form-group">
                 <select id="day" name="day" class="form-control filter-control">
@@ -35,6 +35,10 @@
                     <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>&#x{{ loc.icon }}; {{ loc.name }}</option>
                   {% endfor %}
                 </select>
+
+                <a href="{% url 'ics_view' camp_slug=camp.slug %}{{ get_string }}" class="btn btn-default form-control filter-control">
+                    <i class="fa fa-calendar"></i> ICS file for this filter
+                </a>
             </div>
         </form>
     </div>
