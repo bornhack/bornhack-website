@@ -107,6 +107,7 @@ footer {
 .event {
     width: 200px;
     padding: 5px;
+    vertical-align: top;
 }
 
 @media (max-width: 520px) {
