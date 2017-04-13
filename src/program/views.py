@@ -50,7 +50,10 @@ class ICSView(CampViewMixin, View):
         for event_instance in eventinstances:
             cal.add_component(event_instance.get_ics_event())
 
-        return HttpResponse(cal.to_ical())
+        response = HttpResponse(cal.to_ical())
+        response['Content-Type'] = 'text/calendar'
+        response['Content-Disposition'] = 'inline; filename={}.ics'.format(self.camp.slug)
+        return response
 
 
 ############## proposals ########################################################
