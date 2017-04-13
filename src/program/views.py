@@ -23,7 +23,7 @@ from . import models
 
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
-        eventinstances = models.EventInstance.objects.all()
+        eventinstances = models.EventInstance.objects.filter(event__camp=self.camp)
         type_ = request.GET.get('type', None)
         location = request.GET.get('location', None)
 
