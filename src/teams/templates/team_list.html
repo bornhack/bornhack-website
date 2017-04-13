@@ -19,7 +19,6 @@ Teams | {{ block.super }}
   <tr>
     <th>Name</th>
     <th>Description</th>
-    <th>Area</th>
     <th>Responsible</th>
     <th>Members</th>
     <th>Actions</th>
@@ -35,9 +34,6 @@ Teams | {{ block.super }}
       </td>
       <td>
         {{ team.description|unsafecommonmark|truncatewords:50 }}
-      </td>
-      <td>
-        {{ team.area.name }} Area
       </td>
       <td>
         {% for resp in team.responsible.all %}
