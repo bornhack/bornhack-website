@@ -1,0 +1,12 @@
+{% extends 'profile_base.html' %}
+{% load bootstrap3 %}
+
+{% block profile_content %}
+<h4>Update Profile</h4>
+<form method="POST">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <button type="submit" class="btn btn-black"><i class="fa fa-save"></i> Submit</button>
+  <a href="{% url 'profiles:detail' %}" class="btn btn-black"><i class="fa fa-remove"></i> Cancel</a>
+</form>
+{% endblock profile_content %}

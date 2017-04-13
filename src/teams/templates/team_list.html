@@ -8,7 +8,8 @@ Teams | {{ block.super }}
 {% block content %}
 
 <h3>{{ camp.title }} Teams</h3>
-<p>This is a list of the teams for {{ camp.title }}. To join a team just press the Join button. You can also leave a team if you are already a member (please let the team responsible know why!).</p>
+<p>This is a list of the teams for {{ camp.title }}. To join a team just press the Join button, but please put some info in your <a href="{% url 'profiles:detail' %}">profile</a> first, so the team responsible has some idea who you are.</p>
+<p>You can also leave a team of course, but please let the team responsible know why :)</p>
 <p>Team memberships need to be approved by a team responsible. You will receive a message when your membership has been approved.</p>
 <p>At {{ camp.title }} all organisers and volunteers buy full tickets like everyone else. In the future our budget may allow for discounts or free tickets for volunteers, but not this year. However: Please let us know if you can't afford a ticket - we will figure something out!</p>
 <p>We currently have {{ teams.count }} teams for {{ camp.title }}:</p>

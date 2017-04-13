@@ -18,6 +18,19 @@ class Profile(CreatedUpdatedModel, UUIDModel):
         help_text=_('The django user this profile belongs to.'),
     )
 
+    name = models.CharField(
+        max_length=200,
+        default='',
+        blank=True,
+        help_text='Your name or handle'
+    )
+
+    description = models.TextField(
+        default='',
+        blank=True,
+        help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.',
+    )
+
     @property
     def email(self):
         return self.user.email

@@ -1,0 +1,15 @@
+{% extends 'profile_base.html' %}
+
+{% block profile_content %}
+<p class="lead">The information in your profile is only visible to team responsible and organisers.</p>
+<p class="lead">If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer.</p>
+<hr>
+<h3>Your Profile</h3>
+<dl>
+  <dt>Name</dt>
+  <dd>{{ profile.name|default:"N/A" }}</dd>
+  <dt>Description</dt>
+  <dd>{{ profile.description|default:"N/A" }}</dd>
+</dl>
+<a href="{% url 'profiles:update' %}" class="btn btn-black"><i class="fa fa-edit"></i> Edit Profile</a>
+{% endblock profile_content %}

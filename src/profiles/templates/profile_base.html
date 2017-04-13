@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% load account %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="row">
+  <div class="btn-group btn-group-justified hidden-xs">
+    {% include 'profile_base_buttons.html' %}
+  </div>
+  <div class="btn-group-vertical visible-xs">
+    {% include 'profile_base_buttons.html' %}
+  </div>
+</div>
+
+<br>
+
+  <p><i><b>You are logged in as {{ request.user.email }}</b></i></p>
+
+<hr />
+{% block profile_content %}{% endblock %}
+
+{% endblock %}
