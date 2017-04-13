@@ -1,0 +1,2 @@
+{% load account %}
+Successfully signed in as {{ user.email }}
