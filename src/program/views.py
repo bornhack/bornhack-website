@@ -1,3 +1,5 @@
+import datetime, os
+
 from django.views.generic import ListView, TemplateView, DetailView, View
 from django.views.generic.edit import CreateView, UpdateView
 from django.conf import settings
@@ -8,11 +10,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+
+import icalendar
+
 from camps.mixins import CampViewMixin
 from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, PictureViewMixin, EnsureCFSOpenMixin
 from . import models
-import datetime, os
-from .ics import gen_ics
 
 
 ############## ical calendar ########################################################
@@ -20,7 +23,34 @@ from .ics import gen_ics
 
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
-        return HttpResponse(gen_ics(models.EventInstance.objects.all()))
+        eventinstances = models.EventInstance.objects.all()
+        type_ = request.GET.get('type', None)
+        location = request.GET.get('location', None)
+
+        if type_:
+            try:
+                eventtype = models.EventType.objects.get(
+                    slug=type_
+                )
+                eventinstances = eventinstances.filter(event__event_type=eventtype)
+            except models.EventType.DoesNotExist:
+                raise Http404
+
+        if location:
+            try:
+                eventlocation = models.EventLocation.objects.get(
+                    slug=location,
+                    camp=self.camp,
+                )
+                eventinstances = eventinstances.filter(location__slug=location)
+            except models.EventLocation.DoesNotExist:
+                raise Http404
+
+        cal = icalendar.Calendar()
+        for event_instance in eventinstances:
+            cal.add_component(event_instance.get_ics_event())
+
+        return HttpResponse(cal.to_ical())
 
 
 ############## proposals ########################################################

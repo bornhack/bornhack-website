@@ -1,17 +1,21 @@
+import uuid, os
+from datetime import timedelta
+
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.core.exceptions import ValidationError
-from datetime import timedelta
 from django.core.urlresolvers import reverse_lazy
-import uuid, os
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
 from django.core.files.base import ContentFile
+
+import icalendar
+
+from utils.models import CreatedUpdatedModel, CampRelatedModel
 
 
 class CustomUrlStorage(FileSystemStorage):
@@ -435,6 +439,14 @@ class EventInstance(CampRelatedModel):
         seconds = (self.when.upper-self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
+
+    def get_ics_event(self):
+        ievent = icalendar.Event()
+        ievent['summary'] = self.event.title
+        ievent['dtstart'] = icalendar.vDatetime(self.when.lower).to_ical()
+        ievent['dtend'] = icalendar.vDatetime(self.when.upper).to_ical()
+        ievent['location'] = icalendar.vText(self.location.name)
+        return ievent
 
 
 def get_speaker_picture_upload_path(instance, filename):

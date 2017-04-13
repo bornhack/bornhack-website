@@ -136,6 +136,9 @@ urlpatterns = [
                         name='schedule_index'
                     ),
                     url(
+                        r'^ics/', ICSView.as_view(), name="ics_view"
+                    ),
+                    url(
                         r'^proposals/', include([
                             url(
                                 r'^$',
