@@ -1,5 +1,7 @@
 {% extends 'schedule_base.html' %}
 
+{% load commonmark %}
+
 {% block schedule_content %}
 {% if eventinstances %}
 {% for day in camp.camp_days %}
@@ -9,7 +11,10 @@
     {% if eventinstance.schedule_date == day.lower.date %}
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
-       style="background-color: {{ eventinstance.event.event_type.color }}; border: 0; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};">
+       style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};"
+       data-toggle="modal"
+       data-target="#{{ eventinstance.event.slug }}"
+       data-remote=false>
         <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
         <span class="pull-right" style="font-family: 'FontAwesome';">&#x{{ eventinstance.location.icon }};</span>
       <br />
@@ -17,6 +22,26 @@
       <br />
     </a>
     {% endif %}
+
+    <div class="modal" id="{{ eventinstance.event.slug }}" tabindex="-1" role="dialog" aria-labelledby="{{ eventinstance.event.slug }}-label">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="{{ eventinstance.event.slug }}-label">{{ eventinstance.event.title }}</h4>
+          </div>
+          <div class="modal-body">
+              {{ eventinstance.event.abstract|commonmark}}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            <a class="btn btn-success"><i class="fa fa-star"></i> Favorite</a>
+            <a class="btn btn-info" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"><i class="fa fa-info"></i> More</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   {% endfor %}
   </div>
 <hr />

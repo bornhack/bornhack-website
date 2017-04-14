@@ -93,9 +93,13 @@ footer {
 }
 
 .event {
-    width: 200px;
     padding: 5px;
     vertical-align: top;
+    margin: 5px;
+    max-width: 200px;
+    min-height: 100px;
+    flex-grow: 1;
+    border: 1px solid black;
 }
 
 @media (max-width: 520px) {
