@@ -359,6 +359,10 @@ class CreditNoteListView(LoginRequiredMixin, ListView):
     template_name = "creditnote_list.html"
     context_object_name = 'creditnotes'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(user=self.request.user)
+
 
 class DownloadCreditNoteView(LoginRequiredMixin, EnsureUserOwnsCreditNoteMixin, EnsureCreditNoteHasPDFMixin, SingleObjectMixin, View):
     model = CreditNote
