@@ -11,12 +11,6 @@ a, a:active, a:focus {
    outline: none;
 }
 
-@media (max-width: 768px) {
-  #main {
-    width: 500px;
-  }
-}
-
 @media (max-width: 520px) {
   #main {
     width: 100%;
