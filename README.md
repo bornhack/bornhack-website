@@ -21,7 +21,7 @@ $ source venv/bin/activate
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev
-  - FreeBSD: databases/postgresql93-client 
+  - FreeBSD: databases/postgresql93-client
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
@@ -41,7 +41,7 @@ Install pip packages:
 ### Configuration file
 Copy environment settings file and change settings as needed:
 ```
-    (venv) $ cp bornhack/settings/environment_settings.py.dist bornhack/settings/environment_settings.py
+    (venv) $ cp bornhack/environment_settings.py.dist bornhack/environment_settings.py
 ```
 
 ### Database
@@ -89,4 +89,3 @@ or go through the manuel process below:
 * when villages.0008 migration fails go add camp_id to all existing villages
 * go to admin interface and add bornhack 2017, and set slug for bornhack 2016
 * convert events to the new format (somehow)
-
