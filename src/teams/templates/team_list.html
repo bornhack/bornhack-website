@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load commonmark %}
+{% load teams_tags %}
 
 {% block title %}
 Teams | {{ block.super }}
@@ -21,6 +22,7 @@ Teams | {{ block.super }}
     <th>Description</th>
     <th>Responsible</th>
     <th>Members</th>
+    <th>Member</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -44,9 +46,21 @@ Teams | {{ block.super }}
         <span class="badge">{{ team.members.count }}</span>
       </td>
       {% if request.user.is_authenticated %}
+      {% membershipstatus request.user team as membership_status %}
+      <td class="text-center">
+        {% if membership_status == 'Membership Pending' %}
+          <i class='fa fa-clock-o' title='Pending'></i>
+        {% else %}
+        {% if membership_status == 'Member' %}
+          <i class='fa fa-thumbs-o-up' title='Member'></i>
+        {% else %}
+          <i class='fa fa-times' title='Not a member'></i>
+        {% endif %}
+        {% endif %}
+      </td>
       <td>
         {% if request.user in team.members.all %}
-        <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
+          <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
         {% if team.needs_members %}
           <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</button>

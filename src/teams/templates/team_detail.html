@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load commonmark %}
+{% load teams_tags %}
 
 {% block title %}
 Team: {{ team.name }} | {{ block.super }}
@@ -11,6 +12,10 @@ Team: {{ team.name }} | {{ block.super }}
 
 {{ team.description|unsafecommonmark }}
 <p>Currently {{ team.members.count }} people are members of this team{% if request.user in team.members.all %} (including you){% endif %}.</p>
+
+{% if request.user in team.members.all %}
+<p>Your team status: {% membershipstatus request.user team %}</p>
+{% endif %}
 
 {% if request.user in team.members.all %}
     <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger">Leave Team</a>
