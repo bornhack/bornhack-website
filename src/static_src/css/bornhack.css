@@ -26,7 +26,7 @@ a, a:active, a:focus {
 .navbar {
   margin: auto;
   background-color: rgb(255, 255, 255);
-  border-bottom: 1px solid rgb(250, 250, 250);
+  border-bottom: 1px solid rgb(230, 230, 230);
 }
 
 .navbar .navbar-brand {
@@ -45,6 +45,23 @@ a, a:active, a:focus {
 
 .navbar-toggle .icon-bar+.icon-bar {
   margin-top: 6px;
+}
+
+.nav li a {
+   padding: 30px 7px;
+}
+
+.nav .dropdown-menu  {
+  padding: 0;
+}
+
+.nav .dropdown-menu .divider {
+  margin: 0;
+}
+
+.nav .dropdown-menu > li > a {
+  padding-top: 15px;
+  padding-bottom: 15px;
 }
 
 @media (max-width: 767px) {
@@ -128,10 +145,6 @@ footer {
 
 .breadcrumb > li.no-before::before {
     content: "";
-}
-
-.nav li a {
-   padding: 30px 7px;
 }
 
 .text-container {
