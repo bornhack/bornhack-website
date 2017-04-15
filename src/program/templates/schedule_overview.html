@@ -80,12 +80,18 @@
     function openModal(e) {
         e.preventDefault();
         event_instance_id = e.target.dataset['eventinstanceId'];
-        template = document.getElementById('event-template');
-        modal = template.cloneNode(true);
-        body = document.getElementsByTagName('body')[0];
-        body.appendChild(modal);
-        modal.setAttribute('id', 'event-modal-' + event_instance_id)
-        modals[event_instance_id] = modal;
+
+        modal = modals[event_instance_id];
+
+        if(modal == undefined) {
+            template = document.getElementById('event-template');
+            modal = template.cloneNode(true);
+            body = document.getElementsByTagName('body')[0];
+            body.appendChild(modal);
+            modal.setAttribute('id', 'event-modal-' + event_instance_id)
+            modals[event_instance_id] = modal;
+        }
+
         $('#event-modal-' + event_instance_id).modal();
         webSocketBridge.send({action: 'get_event_instance', event_instance_id: event_instance_id})
     }
