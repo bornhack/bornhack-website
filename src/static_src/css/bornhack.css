@@ -43,6 +43,30 @@ a, a:active, a:focus {
   margin-top: 6px;
 }
 
+@media (max-width: 480px) {
+  .navbar-fixed-top .navbar-collapse {
+    max-height: 450px;
+  }
+  
+  .navbar .navbar-collapse {
+    border-bottom: 1px solid #ccc;
+    -webkit-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
+    -moz-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
+  }
+  .navbar .navbar-nav {
+    margin: 0 -15px;
+  }
+
+  .navbar .nav > li {
+    border-top: 1px solid #ccc;
+  }
+  .navbar .nav li a {
+    padding: 15px;
+  }
+}
+
+
 /* btn-group */
 .btn-group .btn {
   border-right: 0;
