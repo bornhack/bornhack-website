@@ -14,6 +14,7 @@ from django.apps import apps
 from django.core.files.base import ContentFile
 
 import icalendar
+import CommonMark
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
 
@@ -447,6 +448,22 @@ class EventInstance(CampRelatedModel):
         ievent['dtend'] = icalendar.vDatetime(self.when.upper).to_ical()
         ievent['location'] = icalendar.vText(self.location.name)
         return ievent
+
+    def to_json(self):
+        parser = CommonMark.Parser()
+        renderer = CommonMark.HtmlRenderer()
+        ast = parser.parse(self.event.abstract)
+        abstract = renderer.render(ast)
+        return {
+            'title': self.event.title,
+            'event_slug': self.event.slug,
+            'abstract': abstract,
+            'from': self.when.lower.isoformat(),
+            'to': self.when.lower.isoformat(),
+            'url': str(self.event.get_absolute_url()),
+            'id': self.id,
+        }
+
 
 
 def get_speaker_picture_upload_path(instance, filename):

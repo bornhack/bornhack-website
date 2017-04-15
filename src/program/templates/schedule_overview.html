@@ -1,6 +1,11 @@
 {% extends 'schedule_base.html' %}
 
 {% load commonmark %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script src="{% static "channels/js/websocketbridge.js" %}"></script>
+{% endblock %}
 
 {% block schedule_content %}
 {% if eventinstances %}
@@ -12,9 +17,8 @@
     <a class="event"
        href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
        style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};"
-       data-toggle="modal"
-       data-target="#{{ eventinstance.event.slug }}"
-       data-remote=false>
+       data-eventinstance-id="{{ eventinstance.id }}"
+       >
         <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
         <span class="pull-right" style="font-family: 'FontAwesome';">&#x{{ eventinstance.location.icon }};</span>
       <br />
@@ -23,20 +27,19 @@
     </a>
     {% endif %}
 
-    <div class="modal" id="{{ eventinstance.event.slug }}" tabindex="-1" role="dialog" aria-labelledby="{{ eventinstance.event.slug }}-label">
+    <div class="modal" id="event-template" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title" id="{{ eventinstance.event.slug }}-label">{{ eventinstance.event.title }}</h4>
+            <h4 class="modal-title"></h4>
           </div>
           <div class="modal-body">
-              {{ eventinstance.event.abstract|commonmark}}
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
             <a class="btn btn-success"><i class="fa fa-star"></i> Favorite</a>
-            <a class="btn btn-info" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"><i class="fa fa-info"></i> More</a>
+            <a class="more-button btn btn-info" href=""><i class="fa fa-info"></i> More</a>
           </div>
         </div>
       </div>
@@ -49,5 +52,49 @@
 {% else %}
   <h2>No scheduled events for {{ camp.title }} yet!</h2>
 {% endif %}
+
+<script>
+    const webSocketBridge = new channels.WebSocketBridge();
+
+    var event_elements = document.getElementsByClassName("event");
+    var modals = {};
+    var events = {};
+
+    webSocketBridge.connect('/schedule/');
+    webSocketBridge.socket.addEventListener('open', function() {
+        webSocketBridge.send({action: 'init', camp_slug: '{{ camp.slug }}'});
+    });
+    webSocketBridge.listen(function(payload, stream) {
+        if(payload['action'] == 'event_instance') {
+            event_instance_id = payload['event_instance']['id'];
+            modal = modals[event_instance_id];
+            modal_title = modal.getElementsByClassName('modal-title')[0];
+            modal_title.innerHTML = payload['event_instance']['title']
+            modal_body = modal.getElementsByClassName('modal-body')[0];
+            modal_body.innerHTML = payload['event_instance']['abstract'];
+            more_button = modal.getElementsByClassName('more-button')[0];
+            more_button.setAttribute('href', payload['event_instance']['url']);
+        }
+    });
+
+    function openModal(e) {
+        e.preventDefault();
+        event_instance_id = e.target.dataset['eventinstanceId'];
+        template = document.getElementById('event-template');
+        modal = template.cloneNode(true);
+        body = document.getElementsByTagName('body')[0];
+        body.appendChild(modal);
+        modal.setAttribute('id', 'event-modal-' + event_instance_id)
+        modals[event_instance_id] = modal;
+        $('#event-modal-' + event_instance_id).modal();
+        webSocketBridge.send({action: 'get_event_instance', event_instance_id: event_instance_id})
+    }
+
+    for (var event_id in event_elements) {
+        event_element = event_elements.item(event_id);
+        event_element.onclick = openModal
+    }
+
+</script>
 
 {% endblock schedule_content %}
