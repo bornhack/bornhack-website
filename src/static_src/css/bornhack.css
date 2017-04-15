@@ -112,6 +112,8 @@ footer {
     background-color: white;
     bottom: 0px;
     padding: 5px;
+    left: 50%;
+    transform: translate(-50%);
 }
 
 @media (max-width: 767px) {
