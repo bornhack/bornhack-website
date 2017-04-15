@@ -114,6 +114,12 @@ footer {
     padding: 5px;
 }
 
+@media (max-width: 767px) {
+  footer {
+    max-width: 100%;
+  }
+}
+
 .breadcrumb > li.no-before::before {
     content: "";
 }
