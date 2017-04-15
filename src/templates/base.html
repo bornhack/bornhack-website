@@ -49,11 +49,15 @@
           </button>
           {% if request.resolver_match.kwargs.camp_slug and camp %}
             <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-              <img src="{% static camp.logo_small %}" class="img-responsive" />
+              <object type="image/svg+xml" data="{% static camp.logo_small_svg %}">
+                <img src="{% static camp.logo_small %}" alt="bornhack" class="img-responsive">
+              </object>
             </a>
           {% else %}
             <a class="navbar-brand" href="/">
-              <img src="{% static 'img/logo-small.png' %}" class="img-responsive" />
+              <object type="image/svg+xml" data="{% static 'img/logo-small.svg' %}">
+                <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive">
+              </object>
             </a>
             {% endif %}
           </a>
@@ -119,4 +123,3 @@
     </footer>
   </body>
 </html>
-

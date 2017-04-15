@@ -92,6 +92,10 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return 'img/%(slug)s/logo/%(slug)s-logo-small.png' % {'slug': self.slug}
 
     @property
+    def logo_small_svg(self):
+        return 'img/%(slug)s/logo/%(slug)s-logo-small.svg' % {'slug': self.slug}
+
+    @property
     def logo_large(self):
         return 'img/%(slug)s/logo/%(slug)s-logo-large.png' % {'slug': self.slug}
 
@@ -173,4 +177,3 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             return False
         else:
             return True
-
