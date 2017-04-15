@@ -43,6 +43,18 @@ a, a:active, a:focus {
   margin-top: 6px;
 }
 
+/* btn-group */
+.btn-group .btn {
+  border-right: 0;
+}
+
+.btn-group .btn:last-of-type {
+  border-right: 1px solid #ccc;
+}
+
+.btn-group .btn.btn-primary:last-of-type {
+  border-color: #2e6da4;
+}
 
 /* Form stuff */
 
