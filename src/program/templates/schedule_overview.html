@@ -38,7 +38,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-            <a class="btn btn-success"><i class="fa fa-star"></i> Favorite</a>
+            <a class="favorite-button btn btn-success"><i class="fa fa-star"></i> Favorite</a>
             <a class="more-button btn btn-info" href=""><i class="fa fa-info"></i> More</a>
           </div>
         </div>
@@ -58,7 +58,31 @@
 
     var event_elements = document.getElementsByClassName("event");
     var modals = {};
-    var events = {};
+
+    function toggleFavoriteButton(button) {
+        if(button.getAttribute('data-state') == 'true') {
+            favorite_button.classList.remove('btn-success');
+            favorite_button.classList.add('btn-danger');
+            favorite_button.innerHTML = '<i class="fa fa-minus"></i> Remove favorite';
+
+            favorite_button.onclick = function(e) {
+                button.setAttribute('data-state', 'false')
+                webSocketBridge.send({action: 'unfavorite', event_instance_id: event_instance_id});
+                toggleFavoriteButton(button)
+            }
+        } else {
+            favorite_button.classList.remove('btn-danger');
+            favorite_button.classList.add('btn-success');
+            favorite_button.innerHTML = '<i class="fa fa-star"></i> Favorite';
+
+            favorite_button.onclick = function(e) {
+                button.setAttribute('data-state', 'true')
+                webSocketBridge.send({action: 'favorite', event_instance_id: event_instance_id});
+                toggleFavoriteButton(button)
+            }
+
+        }
+    }
 
     webSocketBridge.connect('/schedule/');
     webSocketBridge.socket.addEventListener('open', function() {
@@ -74,12 +98,22 @@
             modal_body.innerHTML = payload['event_instance']['abstract'];
             more_button = modal.getElementsByClassName('more-button')[0];
             more_button.setAttribute('href', payload['event_instance']['url']);
+            favorite_button = modal.getElementsByClassName('favorite-button')[0];
+            favorite_button.setAttribute('data-state', payload['event_instance']['is_favorited'])
+            toggleFavoriteButton(favorite_button)
         }
     });
 
     function openModal(e) {
         e.preventDefault();
-        event_instance_id = e.target.dataset['eventinstanceId'];
+
+        // Avoid that clicking the text in the event will bring up an empty modal
+        target = e.target;
+        if (e.target !== this) {
+            target = e.target.parentElement
+        }
+
+        event_instance_id = target.dataset['eventinstanceId'];
 
         modal = modals[event_instance_id];
 

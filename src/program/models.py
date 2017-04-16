@@ -449,12 +449,13 @@ class EventInstance(CampRelatedModel):
         ievent['location'] = icalendar.vText(self.location.name)
         return ievent
 
-    def to_json(self):
+    def to_json(self, user=None):
         parser = CommonMark.Parser()
         renderer = CommonMark.HtmlRenderer()
         ast = parser.parse(self.event.abstract)
         abstract = renderer.render(ast)
-        return {
+
+        data = {
             'title': self.event.title,
             'event_slug': self.event.slug,
             'abstract': abstract,
@@ -463,6 +464,12 @@ class EventInstance(CampRelatedModel):
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
         }
+
+        if user:
+            is_favorited = user.favorites.filter(event_instance=self).exists()
+            data['is_favorited'] = is_favorited
+
+        return data
 
 
 
@@ -542,4 +549,11 @@ class Speaker(CampRelatedModel):
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
+
+class Favorite(models.Model):
+    user = models.ForeignKey('auth.User', related_name='favorites')
+    event_instance = models.ForeignKey('program.EventInstance')
+
+    class Meta:
+        unique_together = ['user', 'event_instance']
 

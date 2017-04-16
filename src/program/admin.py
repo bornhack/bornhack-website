@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Event, Speaker, EventType, EventInstance, EventLocation, SpeakerProposal, EventProposal
+from .models import Event, Speaker, EventType, EventInstance, EventLocation, SpeakerProposal, EventProposal, Favorite
 
 
 @admin.register(SpeakerProposal)
@@ -41,6 +41,11 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(Favorite)
+class FavoriteAdmin(admin.ModelAdmin):
+    raw_id_fields = ('event_instance',)
 
 
 class SpeakerInline(admin.StackedInline):
