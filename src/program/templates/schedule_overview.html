@@ -34,7 +34,12 @@
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title"></h4>
           </div>
+          <div class="modal-body modal-body-content">
+          </div>
           <div class="modal-body">
+              <h4>Speaker(s):</h4>
+              <ul class="speakers">
+              </ul>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
@@ -94,13 +99,29 @@
             modal = modals[event_instance_id];
             modal_title = modal.getElementsByClassName('modal-title')[0];
             modal_title.innerHTML = payload['event_instance']['title']
-            modal_body = modal.getElementsByClassName('modal-body')[0];
-            modal_body.innerHTML = payload['event_instance']['abstract'];
+            modal_body_content = modal.getElementsByClassName('modal-body-content')[0];
+            modal_body_content.innerHTML = payload['event_instance']['abstract'];
             more_button = modal.getElementsByClassName('more-button')[0];
             more_button.setAttribute('href', payload['event_instance']['url']);
             favorite_button = modal.getElementsByClassName('favorite-button')[0];
-            favorite_button.setAttribute('data-state', payload['event_instance']['is_favorited'])
-            toggleFavoriteButton(favorite_button)
+            if(payload['event_instance']['is_favorited'] !== undefined) {
+                favorite_button.setAttribute('data-state', payload['event_instance']['is_favorited'])
+                toggleFavoriteButton(favorite_button);
+            } else {
+                favorite_button.remove();
+            }
+
+            speakers_div = modal.getElementsByClassName('speakers')[0];
+            speakers = payload['event_instance']['speakers'];
+            for(speaker_id in speakers) {
+                var speaker = speakers[speaker_id];
+                var speaker_li = document.createElement('li');
+                var speaker_a = document.createElement('a');
+                speaker_a.setAttribute('href', speaker['url']);
+                speaker_a.appendChild(document.createTextNode(speaker['name']));
+                speaker_li.appendChild(speaker_a);
+                speakers_div.appendChild(speaker_li);
+            }
         }
     });
 

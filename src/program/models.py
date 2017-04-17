@@ -247,7 +247,7 @@ class EventProposal(UserSubmittedModel):
         # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
             if sp.speaker:
-                event.speaker_set.add(sp.speaker)
+                event.speakers.add(sp.speaker)
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
@@ -376,8 +376,8 @@ class Event(CampRelatedModel):
 
     @property
     def speakers_list(self):
-        if self.speaker_set.exists():
-            return ", ".join(self.speaker_set.all().values_list('name', flat=True))
+        if self.speakers.exists():
+            return ", ".join(self.speakers.all().values_list('name', flat=True))
         return False
 
     def get_absolute_url(self):
@@ -463,9 +463,13 @@ class EventInstance(CampRelatedModel):
             'to': self.when.lower.isoformat(),
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
+            'speakers': [
+                { 'name': speaker.name
+                , 'url': str(speaker.get_absolute_url())
+                } for speaker in self.event.speakers.all()]
         }
 
-        if user:
+        if user and user.is_authenticated:
             is_favorited = user.favorites.filter(event_instance=self).exists()
             data['is_favorited'] = is_favorited
 
@@ -525,6 +529,7 @@ class Speaker(CampRelatedModel):
         Event,
         blank=True,
         help_text='The event(s) this speaker is anchoring',
+        related_name='speakers'
     )
 
     proposal = models.OneToOneField(
