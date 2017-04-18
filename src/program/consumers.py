@@ -1,0 +1,43 @@
+from channels.generic.websockets import JsonWebsocketConsumer
+
+from .models import EventInstance, Favorite
+
+
+class ScheduleConsumer(JsonWebsocketConsumer):
+    http_user = True
+
+    def connection_groups(self, **kwargs):
+        return ['schedule_users']
+
+    def connect(self, message, **kwargs):
+        self.send({"accept": True})
+
+    def raw_receive(self, message, **kwargs):
+        content = self.decode_json(message['text'])
+        action = content.get('action')
+        data = {}
+
+        if action == 'get_event_instance':
+            event_instance_id = content.get('event_instance_id')
+            event_instance = EventInstance.objects.get(id=event_instance_id)
+            data['action'] = 'event_instance'
+            data['event_instance'] = event_instance.to_json(user=message.user)
+
+        if action == 'favorite':
+            event_instance_id = content.get('event_instance_id')
+            event_instance = EventInstance.objects.get(id=event_instance_id)
+            Favorite.objects.create(
+                user=message.user,
+                event_instance=event_instance
+            )
+
+        if action == 'unfavorite':
+            event_instance_id = content.get('event_instance_id')
+            event_instance = EventInstance.objects.get(id=event_instance_id)
+            favorite = Favorite.objects.get(event_instance=event_instance, user=message.user)
+            favorite.delete()
+
+        self.send(data)
+
+    def disconnect(self, message, **kwargs):
+        pass

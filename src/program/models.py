@@ -14,6 +14,7 @@ from django.apps import apps
 from django.core.files.base import ContentFile
 
 import icalendar
+import CommonMark
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
 
@@ -246,7 +247,7 @@ class EventProposal(UserSubmittedModel):
         # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
             if sp.speaker:
-                event.speaker_set.add(sp.speaker)
+                event.speakers.add(sp.speaker)
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
@@ -375,8 +376,8 @@ class Event(CampRelatedModel):
 
     @property
     def speakers_list(self):
-        if self.speaker_set.exists():
-            return ", ".join(self.speaker_set.all().values_list('name', flat=True))
+        if self.speakers.exists():
+            return ", ".join(self.speakers.all().values_list('name', flat=True))
         return False
 
     def get_absolute_url(self):
@@ -448,6 +449,33 @@ class EventInstance(CampRelatedModel):
         ievent['location'] = icalendar.vText(self.location.name)
         return ievent
 
+    def to_json(self, user=None):
+        parser = CommonMark.Parser()
+        renderer = CommonMark.HtmlRenderer()
+        ast = parser.parse(self.event.abstract)
+        abstract = renderer.render(ast)
+
+        data = {
+            'title': self.event.title,
+            'event_slug': self.event.slug,
+            'abstract': abstract,
+            'from': self.when.lower.isoformat(),
+            'to': self.when.lower.isoformat(),
+            'url': str(self.event.get_absolute_url()),
+            'id': self.id,
+            'speakers': [
+                { 'name': speaker.name
+                , 'url': str(speaker.get_absolute_url())
+                } for speaker in self.event.speakers.all()]
+        }
+
+        if user and user.is_authenticated:
+            is_favorited = user.favorites.filter(event_instance=self).exists()
+            data['is_favorited'] = is_favorited
+
+        return data
+
+
 
 def get_speaker_picture_upload_path(instance, filename):
     """ We want speaker pictures are saved as MEDIA_ROOT/public/speakers/camp-slug/speaker-slug/filename """
@@ -501,6 +529,7 @@ class Speaker(CampRelatedModel):
         Event,
         blank=True,
         help_text='The event(s) this speaker is anchoring',
+        related_name='speakers'
     )
 
     proposal = models.OneToOneField(
@@ -525,4 +554,11 @@ class Speaker(CampRelatedModel):
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
+
+class Favorite(models.Model):
+    user = models.ForeignKey('auth.User', related_name='favorites')
+    event_instance = models.ForeignKey('program.EventInstance')
+
+    class Meta:
+        unique_together = ['user', 'event_instance']
 

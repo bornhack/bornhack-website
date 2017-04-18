@@ -28,7 +28,7 @@
               <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
           </td>
           <td>
-            {% for speaker in event.speaker_set.all %}
+            {% for speaker in event.speakers.all %}
               <a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
             {% empty %}
               N/A

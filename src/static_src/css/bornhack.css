@@ -71,7 +71,7 @@ a, a:active, a:focus {
 /* Footer */
 footer {
     position: fixed;
-    width: 700px;
+    width: 100%;
     text-align: center;
     background-color: white;
     bottom: 0px;
