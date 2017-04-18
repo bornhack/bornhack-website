@@ -1,0 +1,10 @@
+Hello!
+
+You're now a member of the {{ team }} team at {{ camp }}.
+
+Thank you for helping out!
+
+
+Best regards,
+
+The BornHack Team

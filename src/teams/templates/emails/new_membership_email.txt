@@ -1,0 +1,8 @@
+Hello!
+
+There's a new membership request for the {{ team }} team at {{ camp }}.
+
+
+Best regards,
+
+The BornHack Team

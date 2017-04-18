@@ -1,50 +1,6 @@
-from django.core.mail import EmailMultiAlternatives
-from django.conf import settings
-from django.template.loader import render_to_string
+from utils.email import _send_email
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
-
-
-
-def send_email(emailtype, recipient, formatdict, subject, sender='BornHack <info@bornhack.dk>', attachment=None):
-    ### determine email type, set template and attachment vars
-    html_template=None
-
-    if emailtype == 'invoice':
-        text_template = 'emails/invoice_email.txt'
-        html_template = 'emails/invoice_email.html'
-        attachment_filename = formatdict['filename']
-    elif emailtype == 'creditnote':
-        text_template = 'emails/creditnote_email.txt'
-        html_template = 'emails/creditnote_email.html'
-        attachment_filename = formatdict['creditnote'].filename
-    elif emailtype == 'testmail':
-        text_template = 'emails/testmail.txt'
-    else:
-        logger.error('Unknown email type: %s' % emailtype)
-        return False
-
-    try:
-        ### put the basic email together
-        msg = EmailMultiAlternatives(subject, render_to_string(text_template, formatdict), sender, [recipient], [settings.ARCHIVE_EMAIL])
-
-        ### is there a html version of this email?
-        if html_template:
-            msg.attach_alternative(render_to_string(html_template, formatdict), 'text/html')
-
-        ### is there a pdf attachment to this mail?
-        if attachment:
-            msg.attach(attachment_filename, attachment, 'application/pdf')
-
-    except Exception as E:
-        logger.exception('exception while rendering email: %s' % E)
-        return False
-
-    ### send the email
-    msg.send()
-
-    ### all good
-    return True
 
 
 def send_creditnote_email(creditnote):
@@ -56,14 +12,16 @@ def send_creditnote_email(creditnote):
     subject = 'BornHack creditnote %s' % creditnote.pk
 
     # send mail
-    return send_email(
-        emailtype='creditnote',
+    return _send_email(
+        text_template='emails/creditnote_email.txt',
+        html_template='emails/creditnote_email.html',
         recipient=creditnote.user.email,
         formatdict=formatdict,
         subject=subject,
-        sender='info@bornhack.dk',
         attachment=creditnote.pdf.read(),
+        attachment_filename=creditnote.filename
     )
+
 
 def send_invoice_email(invoice):
     # put formatdict together
@@ -76,20 +34,20 @@ def send_invoice_email(invoice):
     subject = 'BornHack invoice %s' % invoice.pk
 
     # send mail
-    return send_email(
-        emailtype='invoice',
+    return _send_email(
+        text_template='emails/invoice_email.txt',
+        html_template='emails/invoice_email.html',
         recipient=invoice.order.user.email,
         formatdict=formatdict,
         subject=subject,
-        sender='info@bornhack.dk',
         attachment=invoice.pdf.read(),
+        attachment_filename=invoice.filename
     )
 
 
 def send_test_email(recipient):
-    return send_email(
-        emailtype='testmail',
+    return _send_email(
+        text_template='emails/testmail.txt',
         recipient=recipient,
-        subject='testmail from bornhack website',
+        subject='testmail from bornhack website'
     )
-

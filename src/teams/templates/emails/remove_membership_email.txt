@@ -1,0 +1,8 @@
+Hello!
+
+You've been removed from the {{ team }} team at {{ camp }}.
+
+
+Best regards,
+
+The BornHack Team

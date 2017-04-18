@@ -1,6 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils.text import slugify
 from utils.models import CampRelatedModel
+from .email import send_new_membership_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 
@@ -13,7 +16,10 @@ class TeamArea(CampRelatedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(default='')
     camp = models.ForeignKey('camps.Camp')
-    responsible = models.ManyToManyField('auth.User', related_name='responsible_team_areas')
+    responsible = models.ManyToManyField(
+        'auth.User',
+        related_name='responsible_team_areas'
+    )
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
@@ -27,10 +33,18 @@ class Team(CampRelatedModel):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
     camp = models.ForeignKey('camps.Camp')
-    area = models.ForeignKey('teams.TeamArea', related_name='teams', on_delete=models.PROTECT)
+    area = models.ForeignKey(
+        'teams.TeamArea',
+        related_name='teams',
+        on_delete=models.PROTECT
+    )
     description = models.TextField()
     needs_members = models.BooleanField(default=True)
-    members = models.ManyToManyField('auth.User', related_name='teams', through='teams.TeamMember')
+    members = models.ManyToManyField(
+        'auth.User',
+        related_name='teams',
+        through='teams.TeamMember'
+    )
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
@@ -61,7 +75,10 @@ class Team(CampRelatedModel):
     @property
     def responsible(self):
         if TeamMember.objects.filter(team=self, responsible=True).exists():
-            return User.objects.filter(teammember__team=self, teammember__responsible=True)
+            return User.objects.filter(
+                teammember__team=self,
+                teammember__responsible=True
+            )
         else:
             return self.area.responsible.all()
 
@@ -73,5 +90,12 @@ class TeamMember(models.Model):
     responsible = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{} is {} member of team {}'.format(self.user, '' if self.approved else 'an unapproved', self.team)
+        return '{} is {} member of team {}'.format(
+            self.user, '' if self.approved else 'an unapproved', self.team
+        )
 
+
+@receiver(post_save, sender=TeamMember)
+def send_responsible_email(sender, instance, created, **kwargs):
+    if created:
+        send_new_membership_email(instance)

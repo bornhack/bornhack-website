@@ -1,0 +1,8 @@
+Hello!
+
+Your membership of {{ team }} team at {{ camp }} was not approved.
+
+
+Best regards,
+
+The BornHack Team

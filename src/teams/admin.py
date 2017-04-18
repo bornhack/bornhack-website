@@ -1,6 +1,6 @@
 from django.contrib import admin
-
 from .models import Team, TeamArea, TeamMember
+from .email import send_add_membership_email, send_remove_membership_email
 
 admin.site.register(TeamArea)
 
@@ -35,11 +35,18 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     def add_member(self, request, queryset):
         teams_count = queryset.values('team').distinct().count()
-        rows_updated = queryset.update(approved=True)
+        updated = 0
+
+        for membership in queryset:
+            membership.approved = True
+            membership.save()
+            updated += 1
+            send_add_membership_email(membership)
+
         self.message_user(
             request,
             'Added {} user(s) to {} team(s).'.format(
-                rows_updated,
+                updated,
                 teams_count
             )
         )
@@ -47,11 +54,17 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     def remove_member(self, request, queryset):
         teams_count = queryset.values('team').distinct().count()
-        users_removed = queryset.delete()[0]
+        updated = 0
+
+        for membership in queryset:
+            send_remove_membership_email(membership)
+            membership.delete()
+            updated += 1
+
         self.message_user(
             request,
             'Removed {} user(s) from {} team(s).'.format(
-                users_removed,
+                updated,
                 teams_count
             )
         )
