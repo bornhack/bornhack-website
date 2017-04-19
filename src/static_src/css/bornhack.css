@@ -163,6 +163,15 @@ footer {
     border: 1px solid black;
 }
 
+.event-td {
+    padding: 5px;
+    vertical-align: top;
+    max-width: 200px;
+    min-width: 200px;
+    flex-grow: 1;
+    cursor: pointer;
+}
+
 @media (max-width: 520px) {
   .event {
       width: 50%;
@@ -178,4 +187,14 @@ footer {
 
 .fa-select {
     font-family: 'FontAwesome','Helvetica Neue',Helvetica,Arial,sans-serif;
+}
+
+.day-table {
+  border-collapse: separate;
+  border-spacing: 1px;
+}
+
+.day-table > tbody > tr > td {
+  padding: 5px !important;
+  border: 0 !important;
 }

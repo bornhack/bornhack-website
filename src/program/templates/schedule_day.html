@@ -1,25 +1,29 @@
 {% extends 'schedule_base.html' %}
+{% load staticfiles %}
 
 {% block schedule_content %}
-<table>
-    <tbody>
-        <table>
-            {% for timeslot in timeslots %}
-            <tr>
-                <td style="height: 50px; padding: 5px;">{{ timeslot.time }}</td>
-                {% for eventinstance in eventinstances %}
-                    {% if eventinstance.when.lower.time == timeslot.time %}
-                    <td style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};" class="event" rowspan={{ eventinstance.timeslots }}>
-                        <a style="color:inherit;" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}">
-                            {{ eventinstance.event.title }}<br>
-                            {{ eventinstance.when.lower.time }}-{{ eventinstance.when.upper.time }}
-                        </a>
-                    </td>
-                    {% endif %}
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </table>
-    </tbody>
+<table class="table day-table">
+    {% for timeslot in timeslots %}
+    <tr>
+        <td>{% if timeslot.time.minute == 0 %}{{ timeslot.time }}{% endif %}</td>
+    {% for eventinstance in eventinstances %}
+        {% if eventinstance.when.lower.time == timeslot.time %}
+        <td style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};" class="event-td" rowspan={{ eventinstance.timeslots }} data-eventinstance-id="{{ eventinstance.id }}">
+            <a style="color:inherit;" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}">
+                {{ eventinstance.event.title }}<br>
+                {{ eventinstance.when.lower.time }}-{{ eventinstance.when.upper.time }}
+            </a>
+        </td>
+        {% endif %}
+    {% endfor %}
+    </tr>
+    {% endfor %}
 </table>
+
+    {% include "event_modal.html" %}
+    <script src="{% static "channels/js/websocketbridge.js" %}"></script>
+    <script src="{% static "js/event_instance_websocket.js" %}"></script>
+    <script>
+        init_modals('event-td');
+    </script>
 {% endblock %}
