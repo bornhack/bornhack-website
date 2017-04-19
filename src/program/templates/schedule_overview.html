@@ -22,14 +22,6 @@
       <br />
     </a>
     {% endif %}
-
-    {% include "event_modal.html" %}
-    <script src="{% static "channels/js/websocketbridge.js" %}"></script>
-    <script src="{% static "js/event_instance_websocket.js" %}"></script>
-    <script>
-        init_modals('event');
-    </script>
-
   {% endfor %}
   </div>
 <hr />
@@ -38,8 +30,12 @@
   <h2>No scheduled events for {{ camp.title }} yet!</h2>
 {% endif %}
 
+{% include "event_modal.html" %}
+<script src="{% static "channels/js/websocketbridge.js" %}"></script>
+<script src="{% static "js/event_instance_websocket.js" %}"></script>
 <script>
-
+    init_modals('event');
 </script>
+
 
 {% endblock schedule_content %}
