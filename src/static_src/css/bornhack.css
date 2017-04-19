@@ -172,6 +172,11 @@ footer {
     cursor: pointer;
 }
 
+.event-td a {
+  display: block;
+}
+
+
 @media (max-width: 520px) {
   .event {
       width: 50%;
@@ -179,10 +184,14 @@ footer {
   }
 }
 
-.event:hover {
+.event:hover, .event-td:hover {
     background-color: black !important;
     color: white !important;
-    text-decoration: none;
+    text-decoration: none !important;
+}
+
+.event-td a:hover {
+    text-decoration: none !important;
 }
 
 .fa-select {
