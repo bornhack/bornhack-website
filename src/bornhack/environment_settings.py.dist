@@ -20,6 +20,15 @@ DEBUG={{ django_debug }}
 # the path to the wkhtmltopdf binary
 WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
 
+# set BACKEND to "asgiref.inmemory.ChannelLayer" and CONFIG to "" for local development
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "{{ django_channels_backend }}",
+        "ROUTING": "bornhack.routing.channel_routing",
+        "CONFIG": {{ django_channels_config }}
+    },
+}
+
 ### changes below here are only needed for production
 
 # email settings
