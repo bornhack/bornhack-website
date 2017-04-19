@@ -162,9 +162,4 @@ LOGGING = {
     },
 }
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "bornhack.routing.channel_routing",
-    },
-}
+
