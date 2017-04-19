@@ -31,9 +31,9 @@ class TeamMemberAdmin(admin.ModelAdmin):
         'approved',
     ]
 
-    actions = ['add_member', 'remove_member']
+    actions = ['approve_membership', 'remove_member']
 
-    def add_member(self, request, queryset):
+    def approve_membership(self, request, queryset):
         teams_count = queryset.values('team').distinct().count()
         updated = 0
 
@@ -45,12 +45,12 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            'Added {} user(s) to {} team(s).'.format(
+            'Membership(s) approved: Added {} user(s) to {} team(s).'.format(
                 updated,
                 teams_count
             )
         )
-    add_member.description = 'Add a user to the team.'
+    add_member.description = 'Approve membership.'
 
     def remove_member(self, request, queryset):
         teams_count = queryset.values('team').distinct().count()
@@ -69,3 +69,4 @@ class TeamMemberAdmin(admin.ModelAdmin):
             )
         )
     remove_member.description = 'Remove a user from the team.'
+
