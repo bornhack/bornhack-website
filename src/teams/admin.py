@@ -50,7 +50,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
                 teams_count
             )
         )
-    add_member.description = 'Approve membership.'
+    approve_membership.description = 'Approve membership.'
 
     def remove_member(self, request, queryset):
         teams_count = queryset.values('team').distinct().count()
