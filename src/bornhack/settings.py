@@ -112,7 +112,6 @@ if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     INSTALLED_APPS += [
         'debug_toolbar',
-        'channels_panel'
     ]
     MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
     INTERNAL_IPS = "127.0.0.1"
@@ -129,7 +128,6 @@ if DEBUG:
         'debug_toolbar.panels.signals.SignalsPanel',
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
-        'channels_panel.panel.ChannelsDebugPanel',
     ]
 
 LOGGING = {
