@@ -62,7 +62,6 @@ webSocketBridge.listen(function(payload, stream) {
     }
     if(payload['action'] == 'init') {
       EVENT_INSTANCES = payload['event_instances'];
-      console.log(EVENT_INSTANCES);
       DAYS = payload['days'];
       render_schedule([], []);
     }
@@ -139,9 +138,6 @@ function get_instances(types, locations) {
   if(types.length != 0) {
     event_instances = event_instances.filter(
       function(event_instance) {
-        console.log(event_instance['event_type']);
-        console.log(types);
-        console.log(event_instance['event_type'] in types);
         return types.includes(event_instance['event_type']);
       }
     );
