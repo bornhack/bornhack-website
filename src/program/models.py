@@ -460,13 +460,18 @@ class EventInstance(CampRelatedModel):
             'event_slug': self.event.slug,
             'abstract': abstract,
             'from': self.when.lower.isoformat(),
-            'to': self.when.lower.isoformat(),
+            'to': self.when.upper.isoformat(),
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'speakers': [
                 { 'name': speaker.name
                 , 'url': str(speaker.get_absolute_url())
-                } for speaker in self.event.speakers.all()]
+                } for speaker in self.event.speakers.all()
+            ],
+            'bg-color': self.event.event_type.color,
+            'fg-color': '#fff' if self.event.event_type.light_text else '#000',
+            'event_type': self.event.event_type.slug,
+            'location': self.location.slug,
         }
 
         if user and user.is_authenticated:

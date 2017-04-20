@@ -4,6 +4,10 @@
 {% load staticfiles %}
 
 {% block schedule_content %}
+
+<div id="schedule-container"></div>
+
+{% comment %}
 {% if eventinstances %}
 {% for day in camp.camp_days %}
   {{ day.lower.date|date:"D d/m" }} <br />
@@ -29,13 +33,10 @@
 {% else %}
   <h2>No scheduled events for {{ camp.title }} yet!</h2>
 {% endif %}
+{% endcomment %}
 
 {% include "event_modal.html" %}
 <script src="{% static "channels/js/websocketbridge.js" %}"></script>
 <script src="{% static "js/event_instance_websocket.js" %}"></script>
-<script>
-    init_modals('event');
-</script>
-
 
 {% endblock schedule_content %}

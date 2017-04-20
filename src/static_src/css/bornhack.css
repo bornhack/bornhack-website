@@ -89,10 +89,6 @@ a, a:active, a:focus {
 
 
 /* btn-group */
-.btn-group .btn {
-  border-right: 0;
-}
-
 .btn-group .btn:last-of-type {
   border-right: 1px solid #ccc;
 }
@@ -161,6 +157,7 @@ footer {
     min-height: 100px;
     flex-grow: 1;
     border: 1px solid black;
+    cursor: pointer;
 }
 
 .event-td {
@@ -206,4 +203,32 @@ footer {
 .day-table > tbody > tr > td {
   padding: 5px !important;
   border: 0 !important;
+}
+
+.schedule-filter ul {
+  list-style: none;
+  padding: 0;
+}
+
+
+@media (min-width: 520px) {
+  .schedule-filter {
+    border-left: 1px solid #eee;
+  }
+}
+
+.schedule-days {
+  list-style: none;
+  padding: 0;
+  display: flex;
+}
+
+.schedule-days a {
+  display: inline;
+  flex-grow: 1;
+}
+
+.schedule-day-row {
+  display: flex;
+  flex-wrap: wrap;
 }

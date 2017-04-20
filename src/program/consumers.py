@@ -1,5 +1,6 @@
 from channels.generic.websockets import JsonWebsocketConsumer
 
+from camps.models import Camp
 from .models import EventInstance, Favorite
 
 
@@ -10,7 +11,17 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         return ['schedule_users']
 
     def connect(self, message, **kwargs):
-        self.send({"accept": True})
+        camp_slug = message.http_session['campslug']
+        camp = Camp.objects.get(slug=camp_slug)
+        days = list(map(lambda x: {'repr': x.lower.strftime('%A %Y-%m-%d'), 'iso': x.lower.strftime('%Y-%m-%d')}, camp.get_days('camp')))
+        event_instances_query_set = EventInstance.objects.filter(event__camp=camp)
+        event_instances = list(map(lambda x: x.to_json(), event_instances_query_set))
+        self.send({
+            "accept": True,
+            "event_instances": event_instances,
+            "days": days,
+            "action": "init"
+        })
 
     def raw_receive(self, message, **kwargs):
         content = self.decode_json(message['text'])

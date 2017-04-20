@@ -1,5 +1,6 @@
 const webSocketBridge = new channels.WebSocketBridge();
 var modals = {};
+var EVENT_INSTANCES, DAYS;
 
 function toggleFavoriteButton(button) {
     if(button.getAttribute('data-state') == 'true') {
@@ -27,9 +28,8 @@ function toggleFavoriteButton(button) {
 }
 
 webSocketBridge.connect('/schedule/');
-webSocketBridge.socket.addEventListener('open', function() {
-    webSocketBridge.send({action: 'init', camp_slug: '{{ camp.slug }}'});
-});
+//webSocketBridge.socket.addEventListener('open', function() {
+//});
 webSocketBridge.listen(function(payload, stream) {
     if(payload['action'] == 'event_instance') {
         event_instance_id = payload['event_instance']['id'];
@@ -60,7 +60,94 @@ webSocketBridge.listen(function(payload, stream) {
             speakers_div.appendChild(speaker_li);
         }
     }
+    if(payload['action'] == 'init') {
+      EVENT_INSTANCES = payload['event_instances'];
+      console.log(EVENT_INSTANCES);
+      DAYS = payload['days'];
+      render_schedule([], []);
+    }
 });
+
+function render_schedule(types, locations) {
+  var event_instances = get_instances(types, locations);
+  var schedule_container = document.getElementById('schedule-container');
+  schedule_container.innerHTML = "";
+
+  var cloned_days = DAYS.slice(0);
+
+  var rendered_days = cloned_days.map(function(day) {
+    day_event_instances = event_instances.slice(0).filter(
+      function(event_instance) {
+        var event_day = event_instance['from'].slice(0, 10);
+        return event_day == day['iso'];
+      }
+    );
+    return render_day(day, day_event_instances);
+  });
+
+  for(day_id in rendered_days) {
+    schedule_container.appendChild(rendered_days[day_id]['label']);
+    schedule_container.appendChild(rendered_days[day_id]['element']);
+  }
+}
+
+function render_day(day, event_instances) {
+    var element = document.createElement('div');
+    element.classList.add('schedule-day-row');
+    var day_label = document.createElement('h4');
+    day_label.innerHTML = day['repr'];
+    element.appendChild(day_label);
+    for(event_instance_id in event_instances) {
+      var event_instance = event_instances[event_instance_id];
+      var rendered_event_instance = render_event_instance(event_instance);
+      element.appendChild(rendered_event_instance);
+    }
+    return {"label": day_label, "element": element};
+}
+
+function render_event_instance(event_instance) {
+    var element = document.createElement('a');
+    element.setAttribute(
+        'style',
+        'background-color: ' + event_instance['bg-color'] +
+        '; color: ' + event_instance['fg-color']);
+    element.classList.add('event');
+    element.dataset.eventInstanceId = event_instance['id'];
+
+    time_element = document.createElement('small');
+    time_element.innerHTML = event_instance.from.slice(11, 16) + " - " + event_instance.to.slice(11, 16);
+
+    title_element = document.createElement('p');
+    title_element.innerHTML = event_instance['title'];
+
+    element.appendChild(time_element);
+    element.appendChild(title_element);
+    element.onclick = openModal
+
+    return element
+}
+
+function get_instances(types, locations) {
+  var event_instances = EVENT_INSTANCES.slice(0);
+  if(locations.length != 0) {
+    event_instances = event_instances.filter(
+      function(event_instance) {
+        return locations.includes(event_instance['location']);
+      }
+    );
+  }
+  if(types.length != 0) {
+    event_instances = event_instances.filter(
+      function(event_instance) {
+        console.log(event_instance['event_type']);
+        console.log(types);
+        console.log(event_instance['event_type'] in types);
+        return types.includes(event_instance['event_type']);
+      }
+    );
+  }
+  return event_instances
+}
 
 function openModal(e) {
     e.preventDefault();
@@ -71,7 +158,7 @@ function openModal(e) {
         target = e.target.parentElement
     }
 
-    event_instance_id = target.dataset['eventinstanceId'];
+    event_instance_id = target.dataset.eventInstanceId;
 
     modal = modals[event_instance_id];
 
@@ -88,12 +175,27 @@ function openModal(e) {
     webSocketBridge.send({action: 'get_event_instance', event_instance_id: event_instance_id})
 }
 
-
 function init_modals(event_class_name) {
   var event_elements = document.getElementsByClassName(event_class_name);
 
   for (var event_id in event_elements) {
       event_element = event_elements.item(event_id);
-      event_element.onclick = openModal
+      if(event_element != null) {
+        event_element.onclick = openModal
+      }
   }
 }
+
+var filter = document.getElementById('filter')
+filter.addEventListener('change', function(e) {
+  var type_input = Array.prototype.slice.call(document.querySelectorAll('.event-type-checkbox:checked'));
+  var types = type_input.map(function(box) {
+    return box.value
+  })
+  var location_input = Array.prototype.slice.call(document.querySelectorAll('.location-checkbox:checked'));
+  var event_locations = location_input.map(function(box) {
+    return box.value
+  })
+
+  render_schedule(types, event_locations);
+});

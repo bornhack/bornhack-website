@@ -4,37 +4,53 @@
 {% block program_content %}
 
 <div class="row">
-    <div class="col-sm-12">
-        <form method="get" id="filter" class="form-inline">
+        <div class="schedule-days btn-group">
+            <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn btn-default">
+            <li>All days</li>
+            </a>
+            {% for day in camp.camp_days %}
+            {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
+            <a href="{% url 'schedule_day' camp_slug=camp.slug year=day.lower.date.year month=day.lower.date|date:'m' day=day.lower.date|date:'d' %}" class="btn btn-{% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}primary{% else %}default{% endif %}">
+                {{ day.lower.date|date:"l" }}
+            </a>
+            {% endwith %}
+            {% endfor %}
+        </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-sm-3 col-sm-push-9 schedule-filter">
+        <form id="filter" class="form-inline">
             <div class="form-group">
-                <select id="day" name="day" class="form-control filter-control">
-                  <option value="">All Days</option>
-                  {% for day in camp.camp_days %}
-                    {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
-                    <option
-                      value="{{ day.lower.date|date:"Y-m-d" }}"
-                      {% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}
-                      selected
-                      {% endif %}>
-                          {{ day.lower.date|date:"l" }}
-                    </option>
-                    {% endwith %}
-                  {% endfor %}
-                </select>
+                <div>
+                    <h4>Type:</h4>
+                    <ul>
+                    {% for type in camp.event_types %}
+                    <li>
+                        <input type="checkbox"
+                               name="event_type"
+                               value="{{ type.slug }}"
+                               class="form-control event-type-checkbox"/> {{ type.name }}
+                    </li>
+                    {% endfor %}
+                    </ul>
+                </div>
 
-                <select id="event_type" name="event_type" class="form-control filter-control">
-                  <option value="">All Types</option>
-                  {% for type in camp.event_types %}
-                  <option value="{{ type.slug }}"{% if eventtype and eventtype == type %}selected{% endif %}>{{ type.name }}</option>
-                  {% endfor %}
-                </select>
-
-                <select id="location" name="location" class="fa-select form-control filter-control">
-                  <option value="">&#xf0ac; All Locations</option>
-                  {% for loc in camp.event_locations %}
-                    <option value="{{ loc.slug }}" {% if location and location == loc %}selected{% endif %}>&#x{{ loc.icon }}; {{ loc.name }}</option>
-                  {% endfor %}
-                </select>
+                <div>
+                    <h4>Location:</h4>
+                    <ul>
+                    {% for location in camp.event_locations %}
+                    <li>
+                        <input type="checkbox"
+                               name="locations"
+                               value="{{ location.slug }}"
+                               class="form-control location-checkbox"/> {{ location.name }}
+                    </li>
+                    {% endfor %}
+                    </ul>
+                </div>
 
                 <a href="{% url 'ics_view' camp_slug=camp.slug %}{{ get_string }}" class="btn btn-default form-control filter-control">
                     <i class="fa fa-calendar"></i> ICS
@@ -42,25 +58,22 @@
             </div>
         </form>
     </div>
+    <div class="col-sm-9 col-sm-pull-3">
+      {% block schedule_content %}
+      {% endblock schedule_content %}
+    </div>
 </div>
 
 <hr />
 
-{% block schedule_content %}
-{% endblock schedule_content %}
 
 {% url 'schedule_index' camp_slug=camp.slug as baseurl %}
 
 <script>
     $('.filter-control').on('change', function() {
-        var day = $('#day').val();
         var type = $('#event_type').val();
         var loc = $('#location').val();
         var url = "{{baseurl}}";
-
-        if(day) {
-          url = url + day + '/';
-        }
 
         if(type != '' || loc != '') {
           url = url + '?';
