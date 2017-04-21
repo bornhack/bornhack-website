@@ -49,7 +49,7 @@ def send_new_membership_email(membership):
     return _send_email(
         text_template='emails/new_membership_email.txt',
         html_template='emails/new_membership_email.html',
-        recipient=membership.user.email,
+        recipient=[resp.email for resp in membership.team.responsible],
         formatdict=formatdict,
         subject='New membership request for {} at {}'.format(
             membership.team.name,

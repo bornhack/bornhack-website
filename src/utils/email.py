@@ -15,13 +15,16 @@ def _send_email(
     attachment=None,
     attachment_filename=None
 ):
+    if not isinstance(recipient, list):
+        recipient = [recipient]
+
     try:
         # put the basic email together
         msg = EmailMultiAlternatives(
             subject,
             render_to_string(text_template, formatdict),
             sender,
-            [recipient],
+            recipient,
             [settings.ARCHIVE_EMAIL]
         )
 
