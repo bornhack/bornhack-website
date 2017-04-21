@@ -82,6 +82,7 @@ webSocketBridge.listen(function(payload, stream) {
       var location_parameter = findGetParameter('location')
       var locations =  location_parameter != null ? location_parameter.split(',') : [];
 
+      toggleFilterBoxes(types, locations);
       render_schedule(types, locations);
     }
 });
@@ -219,4 +220,21 @@ filter.addEventListener('change', function(e) {
 
   render_schedule(types, event_locations);
 });
+
+function toggleFilterBoxes(types, locations) {
+  var type_input = Array.prototype.slice.call(document.querySelectorAll('.event-type-checkbox'));
+  type_input.map(function(box) {
+    if(types.includes(box.value)) {
+      box.checked = !box.checked;
+    }
+    return box;
+  });
+  var location_input = Array.prototype.slice.call(document.querySelectorAll('.location-checkbox'));
+  location_input.map(function(box) {
+    if(locations.includes(box.value)) {
+      box.checked = !box.checked;
+    }
+    return box;
+  });
+}
 

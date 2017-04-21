@@ -234,41 +234,6 @@ class ScheduleView(CampViewMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
-        eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all()).select_related()
-        type_slug = self.request.GET.get('type', None)
-        location_slug = self.request.GET.get('location', None)
-
-        if type_slug:
-            try:
-                eventtype = models.EventType.objects.get(
-                    slug=type_slug
-                )
-            except models.EventType.DoesNotExist:
-                raise Http404
-
-            context['eventtype'] = eventtype
-            context['get_string'] = '?type={}'.format(type_slug)
-            eventinstances = eventinstances.filter(event__event_type=eventtype)
-
-        if location_slug:
-            try:
-                eventlocation = models.EventLocation.objects.get(
-                    slug=location_slug,
-                    camp=self.camp,
-                )
-            except models.EventLocation.DoesNotExist:
-                raise Http404
-
-            context['location'] = eventlocation
-            get_part = 'location={}'.format(location_slug)
-            if 'get_string' in context:
-                context['get_string'] = context['get_string'] + '&{}'.format(get_part)
-            else:
-                context['get_string'] = '?{}'.format(get_part)
-
-            eventinstances = eventinstances.filter(location=eventlocation)
-
-        context['eventinstances'] = eventinstances
 
         # Do stuff if we are dealing with a day schedule
         if 'day' in kwargs:
