@@ -22,10 +22,11 @@
 
 <div class="row">
     <div class="col-sm-3 col-sm-push-9 schedule-filter">
+        <h4>Filter</h4>
         <form id="filter" class="form-inline">
             <div class="form-group">
                 <div>
-                    <h4>Type:</h4>
+                    <h5>Type:</h5>
                     <ul>
                     {% for type in camp.event_types %}
                     <li>
@@ -50,7 +51,7 @@
                 </div>
 
                 <div>
-                    <h4>Location:</h4>
+                    <h5>Location:</h5>
                     <ul>
                     {% for location in camp.event_locations %}
                     <li>
