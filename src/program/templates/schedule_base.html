@@ -30,10 +30,21 @@
                     {% for type in camp.event_types %}
                     <li>
                         <input type="checkbox"
-                               name="event_type"
+                               name="event-type-{{ type.slug }}"
+                               id="event-type-{{ type.slug }}"
                                value="{{ type.slug }}"
                                class="form-control event-type-checkbox"
-                               checked /> {{ type.name }}
+                               checked />
+
+                        <div class="btn-group">
+                            <label for="event-type-{{ type.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
+                                <i class="fa fa-minus"></i>
+                                <i class="fa fa-plus"></i>
+                                &nbsp;&nbsp;
+                                {{ type.name }}
+                            </label>
+                        </div>
+
                     </li>
                     {% endfor %}
                     </ul>
@@ -45,10 +56,22 @@
                     {% for location in camp.event_locations %}
                     <li>
                         <input type="checkbox"
+                               name="location-{{ location.slug }}"
+                               id="location-{{ location.slug }}"
                                name="locations"
                                value="{{ location.slug }}"
                                class="form-control location-checkbox"
-                               checked /> {{ location.name }}
+                               checked />
+
+                        <div class="btn-group">
+                            <label for="location-{{ location.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
+                                <i class="fa fa-minus"></i>
+                                <i class="fa fa-plus"></i>
+                                &nbsp;&nbsp;
+                                {{ location.name }}
+                            </label>
+                        </div>
+
                     </li>
                     {% endfor %}
                     </ul>
