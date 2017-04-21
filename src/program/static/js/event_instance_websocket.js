@@ -28,8 +28,6 @@ function toggleFavoriteButton(button) {
 }
 
 webSocketBridge.connect('/schedule/');
-//webSocketBridge.socket.addEventListener('open', function() {
-//});
 webSocketBridge.listen(function(payload, stream) {
     if(payload['action'] == 'event_instance') {
         event_instance_id = payload['event_instance']['id'];
@@ -63,7 +61,28 @@ webSocketBridge.listen(function(payload, stream) {
     if(payload['action'] == 'init') {
       EVENT_INSTANCES = payload['event_instances'];
       DAYS = payload['days'];
-      render_schedule([], []);
+
+      function findGetParameter(parameterName) {
+          var result = null,
+              tmp = [];
+          location.search
+            .substr(1)
+            .split("&")
+            .forEach(function (item) {
+              tmp = item.split("=");
+              if (tmp[0] === parameterName) {
+                 result = decodeURIComponent(tmp[1]);
+              }
+            });
+          return result;
+      }
+
+      var type_parameter = findGetParameter('type');
+      var types = type_parameter != null ? type_parameter.split(',') : [];
+      var location_parameter = findGetParameter('location')
+      var locations =  location_parameter != null ? location_parameter.split(',') : [];
+
+      render_schedule(types, locations);
     }
 });
 
@@ -193,5 +212,11 @@ filter.addEventListener('change', function(e) {
     return box.value
   })
 
+  var type_part = (types.length == 0) ? [] : ['type='] + types.join(',');
+  var location_part = (event_locations.length == 0) ? [] : ['location='] + event_locations.join(',');
+
+  history.pushState({}, '', "?" + type_part + "&" + location_part);
+
   render_schedule(types, event_locations);
 });
+
