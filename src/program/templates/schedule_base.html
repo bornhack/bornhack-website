@@ -32,7 +32,8 @@
                         <input type="checkbox"
                                name="event_type"
                                value="{{ type.slug }}"
-                               class="form-control event-type-checkbox"/> {{ type.name }}
+                               class="form-control event-type-checkbox"
+                               checked /> {{ type.name }}
                     </li>
                     {% endfor %}
                     </ul>
@@ -46,7 +47,8 @@
                         <input type="checkbox"
                                name="locations"
                                value="{{ location.slug }}"
-                               class="form-control location-checkbox"/> {{ location.name }}
+                               class="form-control location-checkbox"
+                               checked /> {{ location.name }}
                     </li>
                     {% endfor %}
                     </ul>
