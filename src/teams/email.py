@@ -1,4 +1,4 @@
-from utils.email import _send_email
+from utils.email import add_outgoing_email
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -9,7 +9,7 @@ def send_add_membership_email(membership):
         'camp': membership.team.camp.title
     }
 
-    return _send_email(
+    return add_outgoing_email(
         text_template='emails/add_membership_email.txt',
         html_template='emails/add_membership_email.html',
         recipient=membership.user.email,
@@ -31,7 +31,7 @@ def send_remove_membership_email(membership):
         text_template = 'emails/unapproved_membership_email.txt',
         html_template = 'emails/unapproved_membership_email.html'
 
-    return _send_email(
+    return add_outgoing_email(
         text_template=text_template,
         html_template=html_template,
         recipient=membership.user.email,
@@ -46,10 +46,12 @@ def send_new_membership_email(membership):
         'camp': membership.team.camp.title
     }
 
-    return _send_email(
+    return add_outgoing_email(
         text_template='emails/new_membership_email.txt',
         html_template='emails/new_membership_email.html',
-        recipient=[resp.email for resp in membership.team.responsible],
+        recipients=', '.join(
+            [resp.email for resp in membership.team.responsible]
+        ),
         formatdict=formatdict,
         subject='New membership request for {} at {}'.format(
             membership.team.name,

@@ -68,3 +68,14 @@ class CampRelatedModel(CreatedUpdatedModel):
             raise ValidationError('This camp is in read only mode.')
 
         super().delete(**kwargs)
+
+
+class OutgoingEmail(CreatedUpdatedModel):
+    subject = models.CharField(max_length=500)
+    text_template = models.TextField()
+    html_template = models.TextField(blank=True)
+    recipient = models.CharField(max_length=500)
+    sender = models.CharField(max_length=500)
+    attachment = models.CharField(max_length=500, blank=True)
+    attachment_filename = models.CharField(max_length=500, blank=True)
+    processed = models.BooleanField(default=False)
