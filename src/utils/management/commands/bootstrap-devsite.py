@@ -3,10 +3,21 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from camps.models import Camp
 from news.models import NewsItem
-from shop.models import ProductCategory, Product
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
-from program.models import EventType, Event, EventInstance, Speaker, EventLocation
+from shop.models import (
+    ProductCategory,
+    Product,
+    Order,
+    OrderProductRelation
+)
+from program.models import (
+    EventType,
+    Event,
+    EventInstance,
+    Speaker,
+    EventLocation
+)
 from teams.models import Team, TeamArea, TeamMember
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
@@ -193,6 +204,159 @@ class Command(BaseCommand):
         NewsItem.objects.create(
             title='unpublished news item',
             content='unpublished news body here',
+        )
+
+        self.output('Creating products...')
+        name = 'PROSA bus transport (PROSA members only)'
+        product0 = Product.objects.create(
+            name=name,
+            category=transportation,
+            price=125,
+            description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
+            available_in=(
+                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'PROSA bus transport (open for everyone)'
+        product1 = Product.objects.create(
+            name=name,
+            category=transportation,
+            price=125,
+            description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
+            available_in=(
+                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'T-shirt (large)'
+        product2 = Product.objects.create(
+            name=name,
+            category=merchandise,
+            price=160,
+            description='Get a nice t-shirt',
+            available_in=(
+                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'Village tent 3x3 meters, no floor'
+        tent1 = Product.objects.create(
+            name=name,
+            description='A description of the tent goes here',
+            price=3325,
+            category=villages,
+            available_in=(
+                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'Village tent 3x3 meters, with floor'
+        tent2 = Product.objects.create(
+            name=name,
+            description='A description of the tent goes here',
+            price=3675,
+            category=villages,
+            available_in=(
+                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'Standard ticket'
+        ticket1 = Product.objects.create(
+            name=name,
+            description='A ticket',
+            price=1200,
+            category=tickets,
+            available_in=(
+                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        name = 'Hacker ticket'
+        ticket2 = Product.objects.create(
+            name=name,
+            description='Another ticket',
+            price=1337,
+            category=tickets,
+            available_in=(
+                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+            ),
+            slug='{}'.format(slugify(name)),
+        )
+
+        self.output('Creating orders...')
+        order0 = Order.objects.create(
+            user=user1,
+            payment_method='cash',
+            open=None,
+            paid=True
+        )
+        order0.orderproductrelation_set.create(
+            product=ticket1,
+            quantity=1,
+        )
+        order0.orderproductrelation_set.create(
+            product=tent1,
+            quantity=1,
+        )
+
+        order1 = Order.objects.create(
+            user=user2,
+            payment_method='cash'
+        )
+        order1.orderproductrelation_set.create(
+            product=ticket1,
+            quantity=1,
+        )
+        order1.orderproductrelation_set.create(
+            product=tent2,
+            quantity=1,
+        )
+        order2 = Order.objects.create(
+            user=user3,
+            payment_method='cash'
+        )
+        order2.orderproductrelation_set.create(
+            product=ticket2,
+            quantity=1,
+        )
+        order2.orderproductrelation_set.create(
+            product=ticket1,
+            quantity=1,
+        )
+        order2.orderproductrelation_set.create(
+            product=tent2,
+            quantity=1,
+        )
+        order3 = Order.objects.create(
+            user=user4,
+            payment_method='cash'
+        )
+        order3.orderproductrelation_set.create(
+            product=product0,
+            quantity=1,
+        )
+        order3.orderproductrelation_set.create(
+            product=ticket2,
+            quantity=1,
+        )
+        order3.orderproductrelation_set.create(
+            product=tent1,
+            quantity=1,
         )
 
         for camp in [camp2016, camp2017, camp2018]:
@@ -1025,97 +1189,6 @@ programming for a danish startup.
                 )
             )
 
-            self.output("Creating products for {}...".format(year))
-            name='PROSA bus transport (PROSA members only)'
-            Product.objects.create(
-                name=name,
-                category=transportation,
-                price=125,
-                description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
-                available_in=(
-                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
-
-            name='PROSA bus transport (open for everyone)'
-            Product.objects.create(
-                name=name,
-                category=transportation,
-                price=125,
-                description='PROSA is sponsoring a bustrip from Copenhagen to the venue and back.',
-                available_in=(
-                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
-
-            name='T-shirt (large)'
-            Product.objects.create(
-                name=name,
-                category=merchandise,
-                price=160,
-                description='Get a nice t-shirt',
-                available_in=(
-                    timezone.datetime(year, 3, 1, 11, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 10, 30, 11, 30, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
-
-            name='Village tent 3x3 meters, no floor'
-            tent1 = Product.objects.create(
-                name=name,
-                description='A description of the tent goes here',
-                price=3325,
-                category=villages,
-                available_in=(
-                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            ),
-
-            name='Village tent 3x3 meters, with floor'
-            tent2 = Product.objects.create(
-                name=name,
-                description='A description of the tent goes here',
-                price=3675,
-                category=villages,
-                available_in=(
-                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
-
-            name='Standard ticket'
-            ticket1 = Product.objects.create(
-                name=name,
-                description='A ticket',
-                price=1200,
-                category=tickets,
-                available_in=(
-                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
-
-            name='Hacker ticket'
-            ticket2 = Product.objects.create(
-                name=name,
-                description='Another ticket',
-                price=1337,
-                category=tickets,
-                available_in=(
-                    timezone.datetime(year, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(year, 8, 20, 12, 0, tzinfo=timezone.utc),
-                ),
-                slug='%s-%s' % (camp.slug, slugify(name)),
-            )
 
             self.output("Creating infocategories for {}...".format(year))
             info_cat1 = InfoCategory.objects.create(
@@ -1309,6 +1382,7 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 team=bar_team,
                 user=user2
             )
+
 
         self.output("marking 2016 as read_only...")
         camp2016.read_only = True
