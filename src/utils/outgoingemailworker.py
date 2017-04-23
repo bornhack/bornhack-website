@@ -26,3 +26,5 @@ def do_work():
             attachment=email.attachment,
             attachment_filename=email.attachment_filename
         )
+        email.processed = True
+        email.save()
