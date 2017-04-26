@@ -4,18 +4,8 @@
 {% block program_content %}
 
 <div class="row">
-        <div class="schedule-days btn-group">
-            <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn btn-{% if request.resolver_match.url_name == 'schedule_index' %}primary{% else %}default{% endif %}">
-            <li>All days</li>
-            </a>
-            {% for day in camp.camp_days %}
-            {% with month_padded=day.lower.date|date:"m" day_padded=day.lower.date|date:"d" %}
-            <a href="{% url 'schedule_day' camp_slug=camp.slug year=day.lower.date.year month=month_padded day=day_padded %}" class="btn btn-{% if urlyear and urlyear|add:"0" == day.lower.date.year and urlmonth == month_padded and urlday == day_padded %}primary{% else %}default{% endif %}">
-                {{ day.lower.date|date:"l" }}
-            </a>
-            {% endwith %}
-            {% endfor %}
-        </div>
+    <div id="schedule-days" class="btn-group schedule-days">
+    </div>
 </div>
 
 <hr />

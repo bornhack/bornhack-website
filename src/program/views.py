@@ -274,6 +274,9 @@ class ScheduleView(CampViewMixin, TemplateView):
             context['urlmonth'] = self.kwargs['month']
             context['urlday'] = self.kwargs['day']
 
+        context['schedule_timeslot_length_minutes'] = settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES;
+        context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS;
+
         return context
 
 

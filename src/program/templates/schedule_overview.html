@@ -7,36 +7,15 @@
 
 <div id="schedule-container"></div>
 
-{% comment %}
-{% if eventinstances %}
-{% for day in camp.camp_days %}
-  {{ day.lower.date|date:"D d/m" }} <br />
-  <div style="display: flex; flex-wrap: wrap;">
-    {% for eventinstance in eventinstances %}
-    {% if eventinstance.schedule_date == day.lower.date %}
-    <a class="event"
-       href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}"
-       style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};"
-       data-eventinstance-id="{{ eventinstance.id }}"
-       >
-        <small>{{ eventinstance.when.lower|date:"H:i" }} - {{ eventinstance.when.upper|date:"H:i" }}</small>
-        <span class="pull-right" style="font-family: 'FontAwesome';">&#x{{ eventinstance.location.icon }};</span>
-      <br />
-      {{ eventinstance.event.title }}
-      <br />
-    </a>
-    {% endif %}
-  {% endfor %}
-  </div>
-<hr />
-{% endfor %}
-{% else %}
-  <h2>No scheduled events for {{ camp.title }} yet!</h2>
-{% endif %}
-{% endcomment %}
-
-{% include "event_modal.html" %}
 <script src="{% static "channels/js/websocketbridge.js" %}"></script>
 <script src="{% static "js/event_instance_websocket.js" %}"></script>
+
+<script>
+init(
+    { 'schedule_timeslot_length_minutes': Number('{{ schedule_timeslot_length_minutes }}')
+    , 'schedule_midnight_offset_hours': Number('{{ schedule_midnight_offset_hours }}')
+    }
+);
+</script>
 
 {% endblock schedule_content %}
