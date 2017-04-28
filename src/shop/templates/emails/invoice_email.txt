@@ -6,7 +6,7 @@ Your order number is {{ ordernumber }} and your invoice number is {{ invoicenumb
 Your order has been paid in full. The invoice is attached in PDF 
 format with the filename {{ filename }}.
 
-Thank your for your purchase!
+Thank you for your purchase!
 
 
 Best regards,
