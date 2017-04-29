@@ -219,13 +219,13 @@ footer {
   }
 }
 
-.schedule-days {
+#schedule-days {
   list-style: none;
   padding: 0;
   display: flex;
 }
 
-.schedule-days a {
+#schedule-days a {
   display: inline;
   flex-grow: 1;
 }

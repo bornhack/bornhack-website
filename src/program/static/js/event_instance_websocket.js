@@ -120,6 +120,9 @@ function render_day_menu(active_iso) {
   var container = document.getElementById('schedule-days');
   container.innerHTML = '';
 
+  var mobile_container = document.getElementById('schedule-days-mobile');
+  mobile_container.innerHTML = '';
+
   function set_btn_type(classList, primary) {
     if(primary == true) {
       classList.add('btn-primary');
@@ -128,15 +131,24 @@ function render_day_menu(active_iso) {
     }
   }
 
+  function dayEvent(e) {
+    setHistoryState({
+      'day': this.dataset.iso
+    });
+    render();
+  }
+
   var all_days = document.createElement('a');
   all_days.classList.add('btn');
   set_btn_type(all_days.classList, active_iso == null);
   all_days.innerHTML = 'All days';
-  all_days.addEventListener('click', function(e) {
-    setHistoryState({'day': 'all-days'});
-    render();
-  });
+  all_days.dataset.iso = 'all-days';
+  all_days.addEventListener('click', dayEvent);
   container.appendChild(all_days);
+
+  all_days_mobile = all_days.cloneNode(true);
+  all_days_mobile.addEventListener('click', dayEvent);
+  mobile_container.appendChild(all_days_mobile);
 
   for(var day_id in DAYS) {
     var day_link = document.createElement('a');
@@ -145,14 +157,12 @@ function render_day_menu(active_iso) {
     day_link.dataset.iso = DAYS[day_id]['iso'];
     day_link.innerHTML = DAYS[day_id]['day_name'];
 
-    day_link.addEventListener('click', function(e) {
-      setHistoryState({
-        'day': this.dataset.iso
-      });
-      render();
-    });
-
+    day_link.addEventListener('click', dayEvent);
     container.appendChild(day_link);
+
+    day_link_mobile = day_link.cloneNode(true);
+    day_link_mobile.addEventListener('click', dayEvent);
+    mobile_container.appendChild(day_link_mobile);
   }
 }
 
@@ -463,7 +473,6 @@ function setHistoryState(parts) {
   }
 
   history.replaceState({}, '', query);
-
 }
 
 function toggleFilterBoxes(types, locations) {
