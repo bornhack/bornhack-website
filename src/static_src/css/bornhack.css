@@ -243,17 +243,17 @@ footer {
     width: 20px;
 }
 
-.form-group input[type="checkbox"] + .btn-group > label i:first-child {
+.form-group input[type="checkbox"] + .btn-group > label span i:first-child {
     display: none;
 }
-.form-group input[type="checkbox"] + .btn-group > label i:last-child {
+.form-group input[type="checkbox"] + .btn-group > label span i:last-child {
     display: inline-block;
 }
 
-.form-group input[type="checkbox"]:checked + .btn-group > label i:first-child {
+.form-group input[type="checkbox"]:checked + .btn-group > label span i:first-child {
     display: inline-block;
 }
-.form-group input[type="checkbox"]:checked + .btn-group > label i:last-child {
+.form-group input[type="checkbox"]:checked + .btn-group > label span i:last-child {
     display: none;
 }
 .form-group input[type="checkbox"]:checked + .btn-group > label {
