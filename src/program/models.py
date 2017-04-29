@@ -472,6 +472,7 @@ class EventInstance(CampRelatedModel):
             'fg-color': '#fff' if self.event.event_type.light_text else '#000',
             'event_type': self.event.event_type.slug,
             'location': self.location.slug,
+            'location_icon': self.location.icon,
             'timeslots': self.timeslots,
         }
 

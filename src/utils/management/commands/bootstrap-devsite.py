@@ -366,25 +366,25 @@ class Command(BaseCommand):
             speakers_tent = EventLocation.objects.create(
                 name='Speakers Tent',
                 slug='speakers-tent',
-                icon='f075',
+                icon='comment',
                 camp=camp
             )
             workshop_room = EventLocation.objects.create(
                 name='Workshop rooms',
                 slug='workshop-rooms',
-                icon='f0b1',
+                icon='briefcase',
                 camp=camp
             )
             bar_area = EventLocation.objects.create(
                 name='Bar Area',
                 slug='bar-area',
-                icon='f000',
+                icon='glass',
                 camp=camp
             )
             food_area = EventLocation.objects.create(
                 name='Food Area',
                 slug='food-area',
-                icon='f0f5',
+                icon='cutlery',
                 camp=camp
             )
 

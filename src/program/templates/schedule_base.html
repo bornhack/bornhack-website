@@ -54,10 +54,13 @@
 
                         <div class="btn-group">
                             <label for="location-{{ location.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
-                                <i class="fa fa-minus"></i>
-                                <i class="fa fa-plus"></i>
-                                &nbsp;&nbsp;
-                                {{ location.name }}
+                                <span class="pull-left">
+                                    <i class="fa fa-minus"></i>
+                                    <i class="fa fa-plus"></i>
+                                    &nbsp;&nbsp;
+                                    {{ location.name }}
+                                </span>
+                                <i class="pull-right fa fa-{{ location.icon }}"></i>
                             </label>
                         </div>
 

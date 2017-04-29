@@ -273,8 +273,15 @@ function render_event_instance(event_instance) {
     title_element = document.createElement('p');
     title_element.innerHTML = event_instance['title'];
 
+    icon_element = document.createElement('i');
+    icon_element.classList.add('fa-' + event_instance['location_icon']);
+    icon_element.classList.add('fa');
+    icon_element.classList.add('pull-right');
+
     element.appendChild(time_element);
+    element.appendChild(icon_element);
     element.appendChild(title_element);
+
     element.onclick = openModal
 
     return element
@@ -475,4 +482,3 @@ function toggleFilterBoxes(types, locations) {
     return box;
   });
 }
-
