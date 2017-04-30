@@ -1,10 +1,8 @@
 from django.core.files import File
-from django.utils import timezone
 from shop.pdf import generate_pdf_letter
 from shop.email import send_invoice_email, send_creditnote_email
 from shop.models import Order, CustomOrder, Invoice, CreditNote
-from decimal import Decimal
-import logging, importlib
+import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('bornhack.%s' % __name__)
 
@@ -16,31 +14,26 @@ def do_work():
         that have no PDF. It also emails invoices for shop orders.
     """
 
-    ###############################################################
     # check if we need to generate any invoices for shop orders
     for order in Order.objects.filter(paid=True, invoice__isnull=True):
         # generate invoice for this Order
         Invoice.objects.create(order=order)
         logger.info('Generated Invoice object for %s' % order)
 
-
-    ###############################################################
     # check if we need to generate any invoices for custom orders
     for customorder in CustomOrder.objects.filter(invoice__isnull=True):
         # generate invoice for this CustomOrder
         Invoice.objects.create(customorder=customorder)
         logger.info('Generated Invoice object for %s' % customorder)
 
-
-    ###############################################################
     # check if we need to generate any pdf invoices
     for invoice in Invoice.objects.filter(pdf=''):
         # generate the pdf
         try:
             if invoice.customorder:
-                template='pdf/custominvoice.html'
+                template = 'pdf/custominvoice.html'
             else:
-                template='pdf/invoice.html'
+                template = 'pdf/invoice.html'
             pdffile = generate_pdf_letter(
                 filename=invoice.filename,
                 template=template,
@@ -57,21 +50,15 @@ def do_work():
         invoice.pdf.save(invoice.filename, File(pdffile))
         invoice.save()
 
-
-    ###############################################################
     # check if we need to send out any invoices (only for shop orders, and only where pdf has been generated)
     for invoice in Invoice.objects.filter(order__isnull=False, sent_to_customer=False).exclude(pdf=''):
         logger.info("found unmailed Invoice object: %s" % invoice)
-        # send the email
-        if send_invoice_email(invoice=invoice):
-            invoice.sent_to_customer=True
-            invoice.save()
-            logger.info('OK: Invoice email sent to %s' % invoice.order.user.email)
-        else:
-            logger.error('Unable to send invoice email for order %s to %s' % (invoice.order.pk, invoice.order.user.email))
+        # add email to the outgoing email queue
+        send_invoice_email(invoice=invoice)
+        invoice.sent_to_customer = True
+        invoice.save()
+        logger.info('OK: Invoice email added to queue.')
 
-
-    ###############################################################
     # check if we need to generate any pdf creditnotes?
     for creditnote in CreditNote.objects.filter(pdf=''):
         # generate the pdf
@@ -92,14 +79,12 @@ def do_work():
         creditnote.pdf.save(creditnote.filename, File(pdffile))
         creditnote.save()
 
-
-    ###############################################################
     # check if we need to send out any creditnotes (only where pdf has been generated)
     for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf=''):
         # send the email
         if send_creditnote_email(creditnote=creditnote):
             logger.info('OK: Creditnote email sent to %s' % creditnote.user.email)
-            creditnote.sent_to_customer=True
+            creditnote.sent_to_customer = True
             creditnote.save()
         else:
             logger.error('Unable to send creditnote email for creditnote %s to %s' % (creditnote.pk, creditnote.user.email))
