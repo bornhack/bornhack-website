@@ -1,4 +1,4 @@
-from utils.email import _send_email
+from utils.email import add_outgoing_email
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -11,11 +11,11 @@ def send_creditnote_email(creditnote):
 
     subject = 'BornHack creditnote %s' % creditnote.pk
 
-    # send mail
-    return _send_email(
+    # add email to outgoing email queue
+    return add_outgoing_email(
         text_template='emails/creditnote_email.txt',
         html_template='emails/creditnote_email.html',
-        recipient=creditnote.user.email,
+        recipients=creditnote.user.email,
         formatdict=formatdict,
         subject=subject,
         attachment=creditnote.pdf.read(),
@@ -33,11 +33,11 @@ def send_invoice_email(invoice):
 
     subject = 'BornHack invoice %s' % invoice.pk
 
-    # send mail
-    return _send_email(
+    # add email to outgoing email queue
+    return add_outgoing_email(
         text_template='emails/invoice_email.txt',
         html_template='emails/invoice_email.html',
-        recipient=invoice.order.user.email,
+        recipients=invoice.order.user.email,
         formatdict=formatdict,
         subject=subject,
         attachment=invoice.pdf.read(),
@@ -46,8 +46,8 @@ def send_invoice_email(invoice):
 
 
 def send_test_email(recipient):
-    return _send_email(
+    return add_outgoing_email(
         text_template='emails/testmail.txt',
-        recipient=recipient,
+        recipients=recipient,
         subject='testmail from bornhack website'
     )

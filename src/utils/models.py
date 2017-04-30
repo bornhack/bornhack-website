@@ -76,6 +76,8 @@ class OutgoingEmail(CreatedUpdatedModel):
     html_template = models.TextField(blank=True)
     recipient = models.CharField(max_length=500)
     sender = models.CharField(max_length=500)
-    attachment = models.CharField(max_length=500, blank=True)
-    attachment_filename = models.CharField(max_length=500, blank=True)
+    attachment = models.FileField(blank=True)
     processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Email {} for {}'.format(self.subject, self.recipient)
