@@ -1,10 +1,12 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from camps.mixins import CampViewMixin
 from .models import Team, TeamMember
+from .forms import ManageTeamForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.http import Http404
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -58,3 +60,14 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         messages.success(self.request, "You are no longer a member of the team %s" % self.get_object().name)
         return redirect('team_list', camp_slug=self.get_object().camp.slug)
 
+
+class TeamManageView(LoginRequiredMixin, CampViewMixin, UpdateView, FormView):
+    template_name = 'team_manage.html'
+    model = Team
+    form_class = ManageTeamForm
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404()
+
+        return super().get(request, *args, **kwargs)
