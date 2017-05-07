@@ -5,6 +5,7 @@ from camps.models import Camp
 from news.models import NewsItem
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
+from profiles.models import Profile
 from shop.models import (
     ProductCategory,
     Product,
@@ -92,6 +93,9 @@ class Command(BaseCommand):
             username='user1',
             password='user1',
         )
+        user1.profile.name = 'John Doe'
+        user1.profile.description = 'one that once was'
+        user1.profile.save()
         email = EmailAddress.objects.create(
             user=user1,
             email='user1@example.com',
@@ -103,6 +107,9 @@ class Command(BaseCommand):
             username='user2',
             password='user2',
         )
+        user2.profile.name = 'Jane Doe'
+        user2.profile.description = 'one that once was'
+        user2.profile.save()
         email = EmailAddress.objects.create(
             user=user2,
             email='user2@example.com',
@@ -114,6 +121,9 @@ class Command(BaseCommand):
             username='user3',
             password='user3',
         )
+        user3.profile.name = 'Lorem Ipsum'
+        user3.profile.description = 'just a user'
+        user3.profile.save()
         email = EmailAddress.objects.create(
             user=user3,
             email='user3@example.com',
@@ -125,6 +135,9 @@ class Command(BaseCommand):
             username='user4',
             password='user4',
         )
+        user4.profile.name = 'Ethe Reum'
+        user4.profile.description = 'I prefer doge'
+        user4.profile.save()
         email = EmailAddress.objects.create(
             user=user4,
             email='user4@example.com',
@@ -137,6 +150,9 @@ class Command(BaseCommand):
             email='admin@example.com',
             password='admin',
         )
+        admin.profile.name = "Ad min"
+        admin.profile.description = 'I can administer the admin rights'
+        admin.profile.save()
         email = EmailAddress.objects.create(
             user=admin,
             email='admin@example.com',
