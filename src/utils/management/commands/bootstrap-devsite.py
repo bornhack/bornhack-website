@@ -5,12 +5,10 @@ from camps.models import Camp
 from news.models import NewsItem
 from info.models import InfoCategory, InfoItem
 from villages.models import Village
-from profiles.models import Profile
 from shop.models import (
     ProductCategory,
     Product,
-    Order,
-    OrderProductRelation
+    Order
 )
 from program.models import (
     EventType,
@@ -106,6 +104,7 @@ class Command(BaseCommand):
         user2 = User.objects.create_user(
             username='user2',
             password='user2',
+            is_staff=True
         )
         user2.profile.name = 'Jane Doe'
         user2.profile.description = 'one that once was'
@@ -120,6 +119,7 @@ class Command(BaseCommand):
         user3 = User.objects.create_user(
             username='user3',
             password='user3',
+            is_staff=True
         )
         user3.profile.name = 'Lorem Ipsum'
         user3.profile.description = 'just a user'
@@ -134,6 +134,7 @@ class Command(BaseCommand):
         user4 = User.objects.create_user(
             username='user4',
             password='user4',
+            is_staff=True
         )
         user4.profile.name = 'Ethe Reum'
         user4.profile.description = 'I prefer doge'
@@ -1355,7 +1356,7 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             )
 
             self.output("Setting teamarea responsibles for {}...".format(year))
-            pr_area.responsible.add(user1, user2)
+            pr_area.responsible.add(user2)
             content_area.responsible.add(user2, user3)
             infrastructure_area.responsible.add(user3, user4)
             bar_area.responsible.add(user4)
