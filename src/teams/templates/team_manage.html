@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load teams_tags %}
+{% load bootstrap3 %}
+
+{% block title %}
+Team: {{ team.name }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<h3>Manage {{ team.name }} Team</h3>
+
+{% if request.user in team.responsible or team.area.responsible %}
+<form method="post">
+  {% csrf_token %}
+
+  {% bootstrap_form form %}
+
+  <hr />
+
+  {% buttons %}
+    <button class="btn btn-primary pull-right" type="submit">Save</button>
+  {% endbuttons %}
+</form>
+
+<br />
+<br />
+{% endif %}
+
+<h2>Memberships of the {{ team.name }} team</h2>
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>
+        Profile
+      <th >
+        Name
+      <th>
+        Status
+      <th>
+        Email
+      <th>
+        Description
+
+  <tbody>
+  {% for member in team.teammember_set.all %}
+  <tr>
+    <td>
+      {{ member.user }}
+    <td>
+      {{ member.user.profile.name }}
+    <td>
+      <!-- TODO: idea is to make the opposite thumps capable of changing the status -->
+      {% if member.approved %}
+        <i class="fa fa-thumbs-o-up"></i> <!--(<i class="fa fa-thumbs-o-down"></i>)-->
+      {% else %}
+        <i class="fa fa-thumbs-o-down"></i> <!--(<i class="fa fa-thumbs-o-up"></i>)-->
+      {% endif %}
+    <td>
+      {{ member.user.profile.email }}
+    <td>
+      {{ member.user.profile.description }}
+
+  {% endfor %}
+
+{% endblock %}

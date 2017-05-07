@@ -301,6 +301,11 @@ urlpatterns = [
                         TeamLeaveView.as_view(),
                         name='team_leave'
                     ),
+                    url(
+                        r'(?P<slug>[-_\w+]+)/manage/$',
+                        TeamManageView.as_view(),
+                        name='team_manage'
+                    ),
                     # this has to be the last url in the list
                     url(
                         r'(?P<slug>[-_\w+]+)/$',
