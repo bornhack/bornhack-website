@@ -3,9 +3,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 from utils.models import CampRelatedModel
-from .email import send_new_membership_email
+from .email import add_new_membership_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class TeamArea(CampRelatedModel):
@@ -96,6 +98,7 @@ class TeamMember(models.Model):
 
 
 @receiver(post_save, sender=TeamMember)
-def send_responsible_email(sender, instance, created, **kwargs):
+def add_responsible_email(sender, instance, created, **kwargs):
     if created:
-        send_new_membership_email(instance)
+        if not add_new_membership_email(instance):
+            logger.error('Error adding email to outgoing queue')

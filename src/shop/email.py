@@ -15,7 +15,7 @@ def send_creditnote_email(creditnote):
     return add_outgoing_email(
         text_template='emails/creditnote_email.txt',
         html_template='emails/creditnote_email.html',
-        recipients=creditnote.user.email,
+        to_recipients=creditnote.user.email,
         formatdict=formatdict,
         subject=subject,
         attachment=creditnote.pdf.read(),
@@ -37,7 +37,7 @@ def send_invoice_email(invoice):
     return add_outgoing_email(
         text_template='emails/invoice_email.txt',
         html_template='emails/invoice_email.html',
-        recipients=invoice.order.user.email,
+        to_recipients=invoice.order.user.email,
         formatdict=formatdict,
         subject=subject,
         attachment=invoice.pdf.read(),
@@ -48,6 +48,6 @@ def send_invoice_email(invoice):
 def send_test_email(recipient):
     return add_outgoing_email(
         text_template='emails/testmail.txt',
-        recipients=recipient,
+        to_recipients=recipient,
         subject='testmail from bornhack website'
     )
