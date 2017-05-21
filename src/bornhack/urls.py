@@ -1,16 +1,10 @@
 from allauth.account.views import (
-    SignupView,
     LoginView,
     LogoutView,
-    ConfirmEmailView,
-    EmailVerificationSentView,
-    PasswordResetView
 )
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.views.generic import TemplateView, RedirectView
-from django.core.urlresolvers import reverse_lazy
 from camps.views import *
 from info.views import *
 from villages.views import *
@@ -300,11 +294,6 @@ urlpatterns = [
                         r'(?P<slug>[-_\w+]+)/leave/$',
                         TeamLeaveView.as_view(),
                         name='team_leave'
-                    ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/manage/$',
-                        TeamManageView.as_view(),
-                        name='team_manage'
                     ),
                     # this has to be the last url in the list
                     url(

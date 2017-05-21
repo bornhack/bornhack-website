@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 {% load teams_tags %}
+{% load bootstrap3 %}
 
 {% block title %}
 Team: {{ team.name }} | {{ block.super }}
@@ -33,4 +34,58 @@ Team: {{ team.name }} | {{ block.super }}
     <li><b>{{ resp.get_full_name|default:"Unnamed" }}</b></li>
     {% endfor %}
 </ul>
+
+{% if request.user in team.responsible %}
+
+<h3>Manage {{ team.name }} Team</h3>
+<form method="post">
+  {% csrf_token %}
+
+  {% bootstrap_form form %}
+
+  <hr />
+
+  {% buttons %}
+    <button class="btn btn-primary pull-right" type="submit">Save</button>
+  {% endbuttons %}
+</form>
+
+<br />
+<br />
+
+<table class="table table-bordered table-hover">
+  <thead>
+    <tr>
+      <th>
+        Profile
+      <th >
+        Name
+      <th>
+        Status
+      <th>
+        Email
+      <th>
+        Description
+      <th>
+        Action
+
+  <tbody>
+  {% for member in team.teammember_set.all %}
+  <tr>
+    <td>
+      {{ member.user }}
+    <td>
+      {{ member.user.profile.name }}
+    <td>
+      {{ member.approved }}
+    <td>
+      {{ member.user.profile.email }}
+    <td>
+      {{ member.user.profile.description }}
+    <td>
+      TBD
+  {% endfor %}
+
+{% endif %}
+
 {% endblock %}
