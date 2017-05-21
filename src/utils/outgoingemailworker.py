@@ -12,7 +12,7 @@ def do_work():
     """
     not_processed_email = OutgoingEmail.objects.filter(processed=False)
 
-    logger.info('about to process {} emails'.format(len(not_processed_email)))
+    logger.debug('about to process {} emails'.format(len(not_processed_email)))
     for email in not_processed_email:
         if ',' in email.recipient:
             recipient = email.recipient.split(',')
@@ -36,6 +36,6 @@ def do_work():
         if mail_send_success:
             email.processed = True
             email.save()
-            logger.info('successfully sent {}'.format(email))
+            logger.debug('successfully sent {}'.format(email))
         else:
             logger.error('unable to sent {}'.format(email))
