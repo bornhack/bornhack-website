@@ -11,8 +11,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def _send_email(
     text_template,
-    to_recipients,
     subject,
+    to_recipients=[],
     cc_recipients=[],
     bcc_recipients=[],
     html_template='',
@@ -60,9 +60,9 @@ def _send_email(
 
 def add_outgoing_email(
     text_template,
-    to_recipients,
     formatdict,
     subject,
+    to_recipients=[],
     cc_recipients=[],
     bcc_recipients=[],
     html_template='',
