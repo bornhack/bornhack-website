@@ -6,6 +6,7 @@ from .forms import ManageTeamForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.http import Http404
 
 
 class TeamListView(CampViewMixin, ListView):
