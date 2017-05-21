@@ -1,5 +1,6 @@
 from django.core.mail import EmailMultiAlternatives
 from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -65,7 +66,7 @@ def add_outgoing_email(
     attachment_filename=''
 ):
     """ adds an email to the outgoing queue
-        recipients is either just a str email or a str commaseperated emails
+        recipients is a string, if theres multiple emails seperate with a comma
     """
     text_template = render_to_string(text_template, formatdict)
 
@@ -74,9 +75,15 @@ def add_outgoing_email(
 
     if ',' in recipients:
         for recipient in recipients.split(','):
-            validate_email(recipient.strip())
+            try:
+                validate_email(recipient.strip())
+            except ValidationError:
+                return False
     else:
-        validate_email(recipients)
+        try:
+            validate_email(recipients)
+        except ValidationError:
+            return False
 
     email = OutgoingEmail.objects.create(
         text_template=text_template,
