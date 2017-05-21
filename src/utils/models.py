@@ -76,8 +76,28 @@ class OutgoingEmail(CreatedUpdatedModel):
     text_template = models.TextField()
     html_template = models.TextField(blank=True)
     sender = models.CharField(max_length=500)
+    to_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
+    cc_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
+    bcc_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
     attachment = models.FileField(blank=True)
     processed = models.BooleanField(default=False)
 
-    def __str__(self):
-        return 'Email {} for {}'.format(self.subject, self.recipient)
+    def clean(self):
+        if not self.to_recipients \
+           and not self.bcc_recipients \
+           and not self.cc_recipients:
+            raise ValidationError(
+                {'recipient': 'either to_recipient, bcc_recipient or cc_recipient required.'}
+            )

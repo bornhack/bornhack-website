@@ -18,10 +18,6 @@ def do_work():
         )
 
     for email in not_processed_email:
-        if ',' in email.recipient:
-            recipient = email.recipient.split(',')
-        else:
-            recipient = [email.recipient]
 
         attachment = None
         attachment_filename = ''
@@ -31,8 +27,10 @@ def do_work():
 
         mail_send_success = _send_email(
             text_template=email.text_template,
-            recipient=recipient,
+            to_recipients=email.to_recipients,
             subject=email.subject,
+            cc_recipients=email.cc_recipients,
+            bcc_recipients=email.bcc_recipients,
             html_template=email.html_template,
             attachment=attachment,
             attachment_filename=attachment_filename

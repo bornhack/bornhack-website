@@ -11,15 +11,17 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def _send_email(
     text_template,
-    recipient,
+    to_recipients,
     subject,
+    cc_recipients=[],
+    bcc_recipients=[],
     html_template='',
     sender='BornHack <info@bornhack.dk>',
     attachment=None,
     attachment_filename=''
 ):
-    if not isinstance(recipient, list):
-        recipient = [recipient]
+    if not isinstance(to_recipients, list):
+        to_recipients = [to_recipients]
 
     try:
         # put the basic email together
@@ -27,8 +29,9 @@ def _send_email(
             subject,
             text_template,
             sender,
-            recipient,
-            [settings.ARCHIVE_EMAIL]
+            to_recipients,
+            bcc_recipients + [settings.ARCHIVE_EMAIL],
+            cc_recipients
         )
 
         # is there a html version of this email?
@@ -57,9 +60,11 @@ def _send_email(
 
 def add_outgoing_email(
     text_template,
-    recipients,
+    to_recipients,
     formatdict,
     subject,
+    cc_recipients=[],
+    bcc_recipients=[],
     html_template='',
     sender='BornHack <info@bornhack.dk>',
     attachment=None,
@@ -73,10 +78,10 @@ def add_outgoing_email(
     if html_template:
         html_template = render_to_string(html_template, formatdict)
 
-    if not isinstance(recipients, list):
-        recipients = [recipients]
+    if not isinstance(to_recipients, list):
+        to_recipients = [to_recipients]
 
-    for recipient in recipients:
+    for recipient in to_recipients:
         try:
             validate_email(recipient)
         except ValidationError:
@@ -87,7 +92,9 @@ def add_outgoing_email(
         html_template=html_template,
         subject=subject,
         sender=sender,
-        recipient=recipients
+        to_recipients=to_recipients,
+        cc_recipients=cc_recipients,
+        bcc_recipients=bcc_recipients
     )
 
     if attachment:
