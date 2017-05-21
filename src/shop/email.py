@@ -3,7 +3,7 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def send_creditnote_email(creditnote):
+def add_creditnote_email(creditnote):
     # put formatdict together
     formatdict = {
         'creditnote': creditnote,
@@ -23,7 +23,7 @@ def send_creditnote_email(creditnote):
     )
 
 
-def send_invoice_email(invoice):
+def add_invoice_email(invoice):
     # put formatdict together
     formatdict = {
         'ordernumber': invoice.order.pk,
@@ -45,7 +45,7 @@ def send_invoice_email(invoice):
     )
 
 
-def send_test_email(recipient):
+def add_test_email(recipient):
     return add_outgoing_email(
         text_template='emails/testmail.txt',
         to_recipients=recipient,

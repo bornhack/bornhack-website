@@ -1,6 +1,6 @@
 from django.core.files import File
 from shop.pdf import generate_pdf_letter
-from shop.email import send_invoice_email, send_creditnote_email
+from shop.email import add_invoice_email, add_creditnote_email
 from shop.models import Order, CustomOrder, Invoice, CreditNote
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -54,10 +54,18 @@ def do_work():
     for invoice in Invoice.objects.filter(order__isnull=False, sent_to_customer=False).exclude(pdf=''):
         logger.info("found unmailed Invoice object: %s" % invoice)
         # add email to the outgoing email queue
-        send_invoice_email(invoice=invoice)
-        invoice.sent_to_customer = True
-        invoice.save()
-        logger.info('OK: Invoice email added to queue.')
+        if add_invoice_email(invoice=invoice):
+            invoice.sent_to_customer = True
+            invoice.save()
+            logger.info('OK: Invoice email to {} added to queue.'.format(
+                invoice.order.user.email)
+            )
+        else:
+            logger.error('Unable to add email for invoice {} to {}'.format(
+                    invoice.pk,
+                    invoice.order.user.email
+                )
+            )
 
     # check if we need to generate any pdf creditnotes?
     for creditnote in CreditNote.objects.filter(pdf=''):
@@ -82,10 +90,10 @@ def do_work():
     # check if we need to send out any creditnotes (only where pdf has been generated)
     for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf=''):
         # send the email
-        if send_creditnote_email(creditnote=creditnote):
-            logger.info('OK: Creditnote email sent to %s' % creditnote.user.email)
+        if add_creditnote_email(creditnote=creditnote):
+            logger.info('OK: Creditnote email to %s added' % creditnote.user.email)
             creditnote.sent_to_customer = True
             creditnote.save()
         else:
-            logger.error('Unable to send creditnote email for creditnote %s to %s' % (creditnote.pk, creditnote.user.email))
+            logger.error('Unable to add creditnote email for creditnote %s to %s' % (creditnote.pk, creditnote.user.email))
 
