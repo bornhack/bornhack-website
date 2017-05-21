@@ -1,4 +1,5 @@
 import uuid
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db import models
@@ -68,3 +69,38 @@ class CampRelatedModel(CreatedUpdatedModel):
             raise ValidationError('This camp is in read only mode.')
 
         super().delete(**kwargs)
+
+
+class OutgoingEmail(CreatedUpdatedModel):
+    subject = models.CharField(max_length=500)
+    text_template = models.TextField()
+    html_template = models.TextField(blank=True)
+    sender = models.CharField(max_length=500)
+    to_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
+    cc_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
+    bcc_recipients = ArrayField(
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True
+    )
+    attachment = models.FileField(blank=True)
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'OutgoingEmail Object id: {} '.format(self.id)
+
+    def clean(self):
+        if not self.to_recipients \
+           and not self.bcc_recipients \
+           and not self.cc_recipients:
+            raise ValidationError(
+                {'recipient': 'either to_recipient, bcc_recipient or cc_recipient required.'}
+            )
