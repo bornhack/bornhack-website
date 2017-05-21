@@ -12,7 +12,11 @@ def do_work():
     """
     not_processed_email = OutgoingEmail.objects.filter(processed=False)
 
-    logger.debug('about to process {} emails'.format(len(not_processed_email)))
+    if len(not_processed_email) > 0:
+        logger.debug('about to process {} emails'.format(
+            len(not_processed_email))
+        )
+
     for email in not_processed_email:
         if ',' in email.recipient:
             recipient = email.recipient.split(',')
