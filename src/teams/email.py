@@ -49,9 +49,7 @@ def send_new_membership_email(membership):
     return add_outgoing_email(
         text_template='emails/new_membership_email.txt',
         html_template='emails/new_membership_email.html',
-        recipients=', '.join(
-            [resp.email for resp in membership.team.responsible]
-        ),
+        recipients=membership.team.responsible,
         formatdict=formatdict,
         subject='New membership request for {} at {}'.format(
             membership.team.name,

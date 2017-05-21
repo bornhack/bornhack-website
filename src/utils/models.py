@@ -1,4 +1,5 @@
 import uuid
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db import models
@@ -74,7 +75,6 @@ class OutgoingEmail(CreatedUpdatedModel):
     subject = models.CharField(max_length=500)
     text_template = models.TextField()
     html_template = models.TextField(blank=True)
-    recipient = models.CharField(max_length=500)
     sender = models.CharField(max_length=500)
     attachment = models.FileField(blank=True)
     processed = models.BooleanField(default=False)
