@@ -94,6 +94,9 @@ class OutgoingEmail(CreatedUpdatedModel):
     attachment = models.FileField(blank=True)
     processed = models.BooleanField(default=False)
 
+    def __str__(self):
+        return 'OutgoingEmail Object id: {} '.format(self.id)
+
     def clean(self):
         if not self.to_recipients \
            and not self.bcc_recipients \
