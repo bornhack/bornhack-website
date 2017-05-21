@@ -66,22 +66,19 @@ def add_outgoing_email(
     attachment_filename=''
 ):
     """ adds an email to the outgoing queue
-        recipients is a string, if theres multiple emails seperate with a comma
+        recipients is a list of to recipients
     """
     text_template = render_to_string(text_template, formatdict)
 
     if html_template:
         html_template = render_to_string(html_template, formatdict)
 
-    if ',' in recipients:
-        for recipient in recipients.split(','):
-            try:
-                validate_email(recipient.strip())
-            except ValidationError:
-                return False
-    else:
+    if not isinstance(recipients, list):
+        recipients = [recipients]
+
+    for recipient in recipients:
         try:
-            validate_email(recipients)
+            validate_email(recipient)
         except ValidationError:
             return False
 
