@@ -534,52 +534,22 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
     def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
+        # check if we already have a coinifyinvoice for this order
         if hasattr(order, 'coinifyapiinvoice'):
-            # we already have a coinifyinvoice for this order,
-            # check if it expired
-            if parse_datetime(order.coinifyapiinvoice.invoicejson['expire_time']) < timezone.now():
-                # this coinifyinvoice expired, delete it
-                logger.warning("deleting expired coinifyinvoice id %s" % order.coinifyapiinvoice.invoicejson['id'])
-                order.coinifyapiinvoice.delete()
-                order.refresh_from_db()
+            # we already have a coinifyinvoice for this order, check if it expired
+            if order.coinifyapiinvoice.expired:
+                # this coinifyinvoice expired, we need a new one
+                logger.warning("coinifyinvoice id %s expired" % order.coinifyapiinvoice.invoicejson['id'])
+                order.coinifyapiinvoice = None
 
         # create a new coinify invoice if needed
         if not hasattr(order, 'coinifyapiinvoice'):
-            # Initiate coinify API
-            coinifyapi = CoinifyAPI(
-                settings.COINIFY_API_KEY,
-                settings.COINIFY_API_SECRET
-            )
-
-            # create coinify API
-            response = coinifyapi.invoice_create(
-                float(order.total),
-                'DKK',
-                plugin_name='BornHack webshop',
-                plugin_version='1.0',
-                description='BornHack order id #%s' % order.id,
-                callback_url=order.get_coinify_callback_url(request),
-                return_url=order.get_coinify_thanks_url(request),
-                cancel_url=order.get_cancel_url(request),
-            )
-
-            # Parse response
-            if not response['success']:
-                api_error = response['error']
-                logger.error("API error: %s (%s)" % (
-                    api_error['message'],
-                    api_error['code']
-                ))
+            coinifyinvoice = create_coinify_invoice(order)
+            if not coinifyinvoice:
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
-            else:
-                # save this coinify invoice
-                coinifyinvoice = CoinifyAPIInvoice.objects.create(
-                    invoicejson = response['data'],
-                    order = order,
-                )
-                logger.info("created new coinifyinvoice id %s" % coinifyinvoice.invoicejson['id'])
-        return super(CoinifyRedirectView, self).dispatch(
+
+       return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
 
@@ -595,66 +565,33 @@ class CoinifyCallbackView(SingleObjectMixin, View):
         return super(CoinifyCallbackView, self).dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # Get the signature from the HTTP headers
-        signature = request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']
-        sdk = CoinifyCallback(settings.COINIFY_IPN_SECRET.encode('utf-8'))
-
-        # make a dict with all HTTP_ headers
-        headerdict = {}
-        for key, value in list(request.META.items()):
-            if key[:5] == 'HTTP_':
-                headerdict[key[5:]] = value
-
-        # attempt to parse json
-        try:
-            parsed = json.loads(request.body.decode('utf-8'))
-        except Exception as E:
-            parsed = ''
-
-        # save callback to db
-        callbackobject = CoinifyAPICallback.objects.create(
-            headers=headerdict,
-            body=request.body,
-            payload=parsed,
-            order=self.get_object()
-        )
+        # save callback and parse json payload
+        callbackobject = save_coinify_callback(request)
 
         # do we have a json body?
-        if not parsed:
+        if not callbackobject.payload:
             # no, return an error
             logger.error("unable to parse JSON body in callback for order %s" % callbackobject.order.id)
             return HttpResponseBadRequest('unable to parse json')
 
+        # initiate SDK
+        sdk = CoinifyCallback(settings.COINIFY_IPN_SECRET.encode('utf-8'))
+
         # attemt to validate the callbackc
-        if sdk.validate_callback(request.body, signature):
+        if sdk.validate_callback(request.body, request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']):
             # mark callback as valid in db
             callbackobject.valid=True
             callbackobject.save()
-
-            if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
-                # find coinify invoice in db
-                try:
-                    coinifyinvoice = CoinifyAPIInvoice.objects.get(invoicejson__id=callbackobject.payload['data']['id'])
-                except CoinifyAPIInvoice.DoesNotExist:
-                    logger.error("unable to find CoinifyAPIInvoice with id %s" % callbackobject.payload['data']['id'])
-                    return HttpResponseBadRequest('bad coinifyinvoice id')
-
-                # save new coinifyinvoice payload
-                coinifyinvoice.invoicejson = callbackobject.payload['data']
-                coinifyinvoice.save()
-
-                # so, is the order paid in full now?
-                if callbackobject.payload['data']['state'] == 'complete':
-                    coinifyinvoice.order.mark_as_paid()
-
-                # return 200 OK
-                return HttpResponse('OK')
-            else:
-                logger.error("unsupported callback event %s" % callbackobject.payload['event'])
-                return HttpResponseBadRequest('unsupported event')
         else:
             logger.error("invalid coinify callback detected")
             return HttpResponseBadRequest('something is fucky')
+
+        if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
+            coinifyinvoice = process_coinify_invoice_json(invoicejson, self.get_object())
+            return HttpResponse('OK')
+        else:
+            logger.error("unsupported callback event %s" % callbackobject.payload['event'])
+            return HttpResponseBadRequest('unsupported event')
 
 
 class CoinifyThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView):

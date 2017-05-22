@@ -14,6 +14,7 @@ import hashlib, io, base64, qrcode
 from decimal import Decimal
 from datetime import timedelta
 from unidecode import unidecode
+from django.utils.dateparse import parse_datetime, timezone
 
 
 class CustomOrder(CreatedUpdatedModel):
@@ -406,6 +407,10 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
     def __str__(self):
         return "coinifyinvoice for order #%s" % self.order.id
+
+    @property
+    def expired(self):
+         return parse_datetime(self.invoicejson['expire_time']) < timezone.now()
 
 
 class CoinifyAPICallback(CreatedUpdatedModel):
