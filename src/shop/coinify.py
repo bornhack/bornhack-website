@@ -76,7 +76,7 @@ def coinify_api_request(api_method, order, **kwargs):
         order=order,
         method=api_method,
         payload=kwargs,
-        response=json.loads(response),
+        response=response,
     )
     logger.debug("saved coinify api request %s in db" % req.id)
 
