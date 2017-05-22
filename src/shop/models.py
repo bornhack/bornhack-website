@@ -430,7 +430,7 @@ class CoinifyAPIRequest(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order', related_name="coinify_api_requests", on_delete=models.PROTECT)
     method = models.CharField(max_length=100)
     payload = JSONField()
-    response = models.TextField()
+    response = JSONField()
 
     def __str__(self):
         return 'order %s api request %s' % (self.order.id, self.method)
