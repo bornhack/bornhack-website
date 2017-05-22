@@ -13,7 +13,7 @@ def process_coinify_invoice_json(invoicejson, order):
         coinify_id=invoicejson['id'],
         order=order,
         defaults={
-            invoicejson: invoicejson
+            'invoicejson': invoicejson
         },
     )
 
