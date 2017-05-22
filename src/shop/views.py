@@ -549,7 +549,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
 
-       return super(CoinifyRedirectView, self).dispatch(
+        return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
         )
 
