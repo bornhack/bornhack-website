@@ -14,7 +14,8 @@ import hashlib, io, base64, qrcode
 from decimal import Decimal
 from datetime import timedelta
 from unidecode import unidecode
-from django.utils.dateparse import parse_datetime, timezone
+from django.utils.dateparse import parse_datetime
+from django.utils import timezone
 
 
 class CustomOrder(CreatedUpdatedModel):
