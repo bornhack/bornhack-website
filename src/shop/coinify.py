@@ -116,6 +116,7 @@ def get_coinify_invoice(coinify_invoiceid, order):
     # perform the api request
     req = coinify_api_request(
         api_method='invoice_get',
+        order=order,
         **invoicedict
     )
 
