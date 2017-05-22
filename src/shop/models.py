@@ -403,8 +403,9 @@ class Invoice(CreatedUpdatedModel):
 
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
+    coinify_id = models.IntegerField(null=True)
     invoicejson = JSONField()
-    order = models.OneToOneField('shop.Order')
+    order = models.ForeignKey('shop.Order', related_name="coinify_api_invoices", on_delete=models.PROTECT)
 
     def __str__(self):
         return "coinifyinvoice for order #%s" % self.order.id
@@ -418,11 +419,21 @@ class CoinifyAPICallback(CreatedUpdatedModel):
     headers = JSONField()
     payload = JSONField(blank=True)
     body = models.TextField(default='')
-    order = models.ForeignKey('shop.Order')
-    valid = models.BooleanField(default=False)
+    order = models.ForeignKey('shop.Order', related_name="coinify_api_callbacks", on_delete=models.PROTECT)
+    authenticated = models.BooleanField(default=False)
 
     def __str__(self):
         return 'order #%s callback at %s' % (self.order.id, self.created)
+
+
+class CoinifyAPIRequest(CreatedUpdatedModel):
+    order = models.ForeignKey('shop.Order', related_name="coinify_api_requests", on_delete=models.PROTECT)
+    method = models.CharField(max_length=100)
+    payload = JSONField()
+    response = models.TextField()
+
+    def __str__(self):
+        return 'order %s api request %s' % (self.order.id, self.method)
 
 
 class Ticket(CreatedUpdatedModel, UUIDModel):
