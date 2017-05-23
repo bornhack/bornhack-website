@@ -6,7 +6,7 @@ from .forms import ManageTeamForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 
 
@@ -85,5 +85,3 @@ class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Updat
         form.instance.delete()
         messages.success(self.request, "Team member removed")
         return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
-
-
