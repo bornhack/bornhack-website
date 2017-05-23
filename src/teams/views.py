@@ -3,12 +3,14 @@ from django.views.generic.edit import UpdateView, FormView
 from camps.mixins import CampViewMixin
 from .models import Team, TeamMember
 from .forms import ManageTeamForm
+from .email import add_added_membership_email, add_removed_membership_email
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -84,7 +86,13 @@ class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Updat
 
     def form_valid(self, form):
         form.instance.delete()
-        messages.success(self.request, "Team member removed")
+        if add_removed_membership_email(form.instance):
+            messages.success(self.request, "Team member removed")
+        else:
+            messages.success(self.request, "Team member removed (unable to add email to outgoing queue).")
+            logger.error(
+                'Unable to add removed email to outgoing queue for teammember: {}'.format(form.instance)
+            )
         return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
 
 
@@ -96,5 +104,11 @@ class TeamMemberApproveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Upda
     def form_valid(self, form):
         form.instance.approved = True
         form.instance.save()
-        messages.success(self.request, "Team member approved")
+        if add_added_membership_email(form.instance):
+            messages.success(self.request, "Team member approved")
+        else:
+            messages.success(self.request, "Team member removed (unable to add email to outgoing queue).")
+            logger.error(
+                'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
+            )
         return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
