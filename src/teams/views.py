@@ -1,10 +1,14 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from camps.mixins import CampViewMixin
 from .models import Team, TeamMember
+from .forms import ManageTeamForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
+from django.http import Http404, HttpResponseRedirect
+from django.views.generic.detail import SingleObjectMixin
+from django.core.urlresolvers import reverse_lazy
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -13,9 +17,10 @@ class TeamListView(CampViewMixin, ListView):
     context_object_name = 'teams'
 
 
-class TeamDetailView(CampViewMixin, DetailView):
+class TeamDetailView(CampViewMixin, DetailView, UpdateView, FormView):
     template_name = "team_detail.html"
     model = Team
+    form_class = ManageTeamForm
     context_object_name = 'team'
 
 
@@ -58,3 +63,38 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         messages.success(self.request, "You are no longer a member of the team %s" % self.get_object().name)
         return redirect('team_list', camp_slug=self.get_object().camp.slug)
 
+
+class EnsureTeamResponsibleMixin(SingleObjectMixin):
+    model = TeamMember
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user not in self.get_object().team.responsible.all():
+            messages.error(request, 'No thanks')
+            return HttpResponseRedirect(reverse_lazy('team_detail', slug=self.get_object().team.slug))
+
+        return super().dispatch(
+            request, *args, **kwargs
+        )
+
+
+class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+    template_name = "teammember_remove.html"
+    model = TeamMember
+    fields = []
+
+    def form_valid(self, form):
+        form.instance.delete()
+        messages.success(self.request, "Team member removed")
+        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
+
+
+class TeamMemberApproveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+    template_name = "teammember_approve.html"
+    model = TeamMember
+    fields = []
+
+    def form_valid(self, form):
+        form.instance.approved = True
+        form.instance.save()
+        messages.success(self.request, "Team member approved")
+        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
