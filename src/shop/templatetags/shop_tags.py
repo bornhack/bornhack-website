@@ -13,14 +13,6 @@ def currency(value):
         return False
 
 
-@register.filter
-def approxeur(value):
-    try:
-        return "{0:.2f} EUR".format(value / Decimal(7.5))
-    except ValueError:
-        return False
-
-
 @register.filter()
 def truefalseicon(value):
     if value:
