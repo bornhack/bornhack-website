@@ -291,6 +291,11 @@ urlpatterns = [
                         name='teammember_remove',
                     ),
                     url(
+                        r'^members/(?P<pk>[0-9]+)/approve/$',
+                        TeamMemberApproveView.as_view(),
+                        name='teammember_approve',
+                    ),
+                    url(
                         r'(?P<slug>[-_\w+]+)/join/$',
                         TeamJoinView.as_view(),
                         name='team_join'

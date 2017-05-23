@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
+from django.core.urlresolvers import reverse_lazy
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -67,7 +68,7 @@ class EnsureTeamResponsibleMixin(SingleObjectMixin):
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user in self.get_object().team.responsible.all():
+        if request.user not in self.get_object().team.responsible.all():
             messages.error(request, 'No thanks')
             return HttpResponseRedirect(reverse_lazy('team_detail', slug=self.get_object().team.slug))
 
@@ -84,4 +85,16 @@ class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Updat
     def form_valid(self, form):
         form.instance.delete()
         messages.success(self.request, "Team member removed")
+        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
+
+
+class TeamMemberApproveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+    template_name = "teammember_approve.html"
+    model = TeamMember
+    fields = []
+
+    def form_valid(self, form):
+        form.instance.approved = True
+        form.instance.save()
+        messages.success(self.request, "Team member approved")
         return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
