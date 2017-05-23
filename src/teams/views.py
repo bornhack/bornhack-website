@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import Http404
+from django.views.generic.detail import SingleObjectMixin
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -60,3 +61,29 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         TeamMember.objects.filter(team=self.get_object(), user=self.request.user).delete()
         messages.success(self.request, "You are no longer a member of the team %s" % self.get_object().name)
         return redirect('team_list', camp_slug=self.get_object().camp.slug)
+
+
+class EnsureTeamResponsibleMixin(SingleObjectMixin):
+    model = TeamMember
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user in self.get_object().team.responsible.all():
+            messages.error(request, 'No thanks')
+            return HttpResponseRedirect(reverse_lazy('team_detail', slug=self.get_object().team.slug))
+
+        return super().dispatch(
+            request, *args, **kwargs
+        )
+
+
+class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+    template_name = "teammember_remove.html"
+    model = TeamMember
+    fields = []
+
+    def form_valid(self, form):
+        form.instance.delete()
+        messages.success(self.request, "Team member removed")
+        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
+
+

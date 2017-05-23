@@ -35,6 +35,8 @@ Team: {{ team.name }} | {{ block.super }}
     {% endfor %}
 </ul>
 
+<hr>
+
 {% if request.user in team.responsible %}
 
 <h3>Manage {{ team.name }} Team</h3>
@@ -61,29 +63,31 @@ Team: {{ team.name }} | {{ block.super }}
       <th >
         Name
       <th>
-        Status
-      <th>
         Email
       <th>
         Description
       <th>
+        Membership Status
+      <th>
         Action
 
   <tbody>
-  {% for member in team.teammember_set.all %}
+  {% for membership in team.teammember_set.all %}
   <tr>
     <td>
-      {{ member.user }}
+      {{ membership.user }}
     <td>
-      {{ member.user.profile.name }}
+      {{ membership.user.profile.name }}
     <td>
-      {{ member.approved }}
+      {{ membership.user.profile.email }}
     <td>
-      {{ member.user.profile.email }}
+      {{ membership.user.profile.description }}
     <td>
-      {{ member.user.profile.description }}
+      {% if membership.approved %}member{% else %}pending{% endif %}
     <td>
-      TBD
+        {% if membership.approved %}
+        <a class="btn btn-danger" href="{% url 'teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
+        {% endif %}
   {% endfor %}
 
 {% endif %}

@@ -83,7 +83,7 @@ class Team(CampRelatedModel):
             return self.area.responsible.all()
 
 
-class TeamMember(models.Model):
+class TeamMember(CampRelatedModel):
     user = models.ForeignKey('auth.User')
     team = models.ForeignKey('teams.Team')
     approved = models.BooleanField(default=False)
@@ -93,6 +93,10 @@ class TeamMember(models.Model):
         return '{} is {} member of team {}'.format(
             self.user, '' if self.approved else 'an unapproved', self.team
         )
+
+    @property
+    def camp(self):
+        return self.team.camp
 
 
 @receiver(post_save, sender=TeamMember)

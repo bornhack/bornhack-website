@@ -286,6 +286,11 @@ urlpatterns = [
                         name='team_list'
                     ),
                     url(
+                        r'^members/(?P<pk>[0-9]+)/remove/$',
+                        TeamMemberRemoveView.as_view(),
+                        name='teammember_remove',
+                    ),
+                    url(
                         r'(?P<slug>[-_\w+]+)/join/$',
                         TeamJoinView.as_view(),
                         name='team_join'
