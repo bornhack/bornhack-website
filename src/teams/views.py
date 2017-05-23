@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
+import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
