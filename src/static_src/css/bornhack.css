@@ -235,7 +235,7 @@ footer {
   flex-wrap: wrap;
 }
 
-.form-group input[type="checkbox"] {
+.form-group .schedule-checkbox {
     display: none;
   }
 
