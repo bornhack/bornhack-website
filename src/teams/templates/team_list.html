@@ -22,8 +22,10 @@ Teams | {{ block.super }}
     <th>Description</th>
     <th>Responsible</th>
     <th>Members</th>
-    <th>Member</th>
-    <th>Actions</th>
+    <th>Member?</th>
+    {% if request.user in team.members.all or request.user in team.responsible.all %}
+      <th>Actions</th>
+    {% endif %}
   </tr>
   </thead>
   <tbody>
@@ -51,11 +53,11 @@ Teams | {{ block.super }}
         {% if membership_status == 'Membership Pending' %}
           <i class='fa fa-clock-o' title='Pending'></i>
         {% else %}
-        {% if membership_status == 'Member' %}
-          <i class='fa fa-thumbs-o-up' title='Member'></i>
-        {% else %}
-          <i class='fa fa-times' title='Not a member'></i>
-        {% endif %}
+          {% if membership_status == 'Member' %}
+            <i class='fa fa-thumbs-o-up' title='Member'></i>
+          {% else %}
+            <i class='fa fa-times' title='Not a member'></i>
+          {% endif %}
         {% endif %}
       </td>
       <td>
