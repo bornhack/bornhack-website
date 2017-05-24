@@ -14,17 +14,38 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
+class EnsureTeamResponsibleMixin(SingleObjectMixin):
+    model = Team
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user not in self.get_object().responsible.all():
+            messages.error(request, 'No thanks')
+            return redirect('team_detail', camp_slug=self.camp.slug, slug=self.get_object().slug)
+
+        return super().dispatch(
+            request, *args, **kwargs
+        )
+
+
 class TeamListView(CampViewMixin, ListView):
     template_name = "team_list.html"
     model = Team
     context_object_name = 'teams'
 
 
-class TeamDetailView(CampViewMixin, DetailView, UpdateView, FormView):
+class TeamDetailView(CampViewMixin, DetailView):
     template_name = "team_detail.html"
-    model = Team
-    form_class = ManageTeamForm
     context_object_name = 'team'
+    model = Team
+
+
+class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
+    model = Team
+    template_name = "team_manage.html"
+    fields = ['description', 'needs_members']
+
+    def get_success_url(self):
+        return reverse_lazy('team_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.get_object().slug})
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
@@ -67,20 +88,20 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         return redirect('team_list', camp_slug=self.get_object().camp.slug)
 
 
-class EnsureTeamResponsibleMixin(SingleObjectMixin):
+class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
         if request.user not in self.get_object().team.responsible.all():
             messages.error(request, 'No thanks')
-            return HttpResponseRedirect(reverse_lazy('team_detail', slug=self.get_object().team.slug))
+            return redirect('team_detail', camp_slug=self.get_object().team.camp.slug, slug=self.get_object().team.slug)
 
         return super().dispatch(
             request, *args, **kwargs
         )
 
 
-class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = []
@@ -94,10 +115,10 @@ class TeamMemberRemoveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Updat
             logger.error(
                 'Unable to add removed email to outgoing queue for teammember: {}'.format(form.instance)
             )
-        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
+        return redirect('team_detail', camp_slug=self.camp.slug, slug=form.instance.team.slug)
 
 
-class TeamMemberApproveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, UpdateView):
+class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = []
@@ -112,4 +133,5 @@ class TeamMemberApproveView(LoginRequiredMixin, EnsureTeamResponsibleMixin, Upda
             logger.error(
                 'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
             )
-        return redirect('team_detail', camp_slug=form.instance.team.camp.slug, slug=form.instance.team.slug)
+        return redirect('team_detail', camp_slug=self.camp.slug, slug=form.instance.team.slug)
+
