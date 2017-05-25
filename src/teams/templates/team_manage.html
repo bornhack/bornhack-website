@@ -21,35 +21,48 @@ Manage Team: {{ team.name }} | {{ block.super }}
 </form>
 
 <h3>{{ team.name }} Team Members</h3>
+{% if team.teammember_set.exists %}
 <table class="table table-bordered table-hover">
   <thead>
     <tr>
       <th>
         Profile
+      </th>
       <th>
         Name
+      </th>
       <th>
         Email
+      </th>
       <th>
         Description
+      </th>
       <th>
         Membership
+      </th>
       <th>
         Action
-
+      </th>
+    </tr>
+  </thead>
   <tbody>
   {% for membership in team.teammember_set.all %}
   <tr>
     <td>
       {{ membership.user }}
+    </td>
     <td>
       {{ membership.user.profile.name }}
+    </td>
     <td>
       {{ membership.user.profile.email }}
+    </td>
     <td>
       {{ membership.user.profile.description }}
+    </td>
     <td>
       {% if membership.approved %}member{% else %}pending{% endif %}
+    </td>
     <td>
         {% if membership.approved %}
         <a class="btn btn-danger" href="{% url 'teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
@@ -57,5 +70,13 @@ Manage Team: {{ team.name }} | {{ block.super }}
         <a class="btn btn-danger" href="{% url 'teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
         <a class="btn btn-success" href="{% url 'teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-check"></i> Approve</a>
         {% endif %}
+    </td>
+  </tr>
   {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No members found!</p>
+{% endif %}
 {% endblock %}
+

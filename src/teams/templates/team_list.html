@@ -21,10 +21,10 @@ Teams | {{ block.super }}
     <th>Name</th>
     <th>Description</th>
     <th>Responsible</th>
-    <th>Members</th>
+    <th class="text-center">Members</th>
+    {% if request.user.is_authenticated %}
     <th>Member?</th>
-    {% if request.user in team.members.all or request.user in team.responsible.all %}
-      <th>Actions</th>
+    <th>Actions</th>
     {% endif %}
   </tr>
   </thead>
@@ -39,17 +39,21 @@ Teams | {{ block.super }}
       <td>
         {{ team.description|unsafecommonmark|truncatewords:50 }}
       </td>
+
       <td>
         {% for resp in team.responsible.all %}
         {{ resp.profile.name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
         {% endfor %}
       </td>
+
       <td class="text-center">
-        <span class="badge">{{ team.members.count }}</span>
+          <span class="badge">{{ team.members.count }}</span><br>
+          {% if team.needs_members %}(more needed){% endif %}
       </td>
+
       {% if request.user.is_authenticated %}
-      {% membershipstatus request.user team as membership_status %}
       <td class="text-center">
+        {% membershipstatus request.user team as membership_status %}
         {% if membership_status == 'Membership Pending' %}
           <i class='fa fa-clock-o' title='Pending'></i>
         {% else %}
@@ -60,24 +64,21 @@ Teams | {{ block.super }}
           {% endif %}
         {% endif %}
       </td>
+
       <td>
-        {% if request.user in team.members.all %}
+      {% if request.user in team.members.all %}
           <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
             {% if team.needs_members %}
               <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
-            {% else %}
-              <i>Team does not need members</i>
             {% endif %}
         {% endif %}
 
         {% if request.user in team.responsible.all %}
-        <a href="{% url 'team_manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
+          <a href="{% url 'team_manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
         {% endif %}
-      </td>
-      {% else %}
-      <td>Login to join!</td>
       {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </tbody>
