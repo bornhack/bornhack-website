@@ -99,6 +99,10 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     def logo_large(self):
         return 'img/%(slug)s/logo/%(slug)s-logo-large.png' % {'slug': self.slug}
 
+    @property
+    def logo_large_svg(self):
+        return 'img/%(slug)s/logo/%(slug)s-logo-large.svg' % {'slug': self.slug}
+
     def get_days(self, camppart):
         '''
         Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
