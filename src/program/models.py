@@ -1,11 +1,12 @@
-import uuid, os
+import uuid
+import os
 from datetime import timedelta
 
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib import messages
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse_lazy
 from django.core.files.storage import FileSystemStorage
@@ -52,7 +53,9 @@ class CustomUrlStorage(FileSystemStorage):
 
         return url
 
+
 storage = CustomUrlStorage()
+
 
 class UserSubmittedModel(CampRelatedModel):
     """
@@ -126,6 +129,7 @@ def get_speakerproposal_picture_upload_path(instance, filename):
         'filename': filename
     }
 
+
 def get_speakersubmission_picture_upload_path(instance, filename):
     """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
     return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
@@ -133,7 +137,6 @@ def get_speakersubmission_picture_upload_path(instance, filename):
         'proposaluuidd': instance.uuid,
         'filename': filename
     }
-
 
 
 class SpeakerProposal(UserSubmittedModel):
@@ -232,7 +235,10 @@ class EventProposal(UserSubmittedModel):
         return self.title
 
     def get_absolute_url(self):
-        return reverse_lazy('eventproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+        return reverse_lazy(
+            'eventproposal_detail',
+            kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid}
+        )
 
     def mark_as_approved(self):
         eventmodel = apps.get_model('program', 'event')
@@ -253,7 +259,7 @@ class EventProposal(UserSubmittedModel):
         self.save()
 
 
-#############################################################################################
+###############################################################################
 
 
 class EventLocation(CampRelatedModel):
@@ -464,9 +470,8 @@ class EventInstance(CampRelatedModel):
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'speakers': [
-                { 'name': speaker.name
-                , 'url': str(speaker.get_absolute_url())
-                } for speaker in self.event.speakers.all()
+                {'name': speaker.name, 'url': str(speaker.get_absolute_url())}
+                for speaker in self.event.speakers.all()
             ],
             'bg-color': self.event.event_type.color,
             'fg-color': '#fff' if self.event.event_type.light_text else '#000',
@@ -481,7 +486,6 @@ class EventInstance(CampRelatedModel):
             data['is_favorited'] = is_favorited
 
         return data
-
 
 
 def get_speaker_picture_upload_path(instance, filename):
