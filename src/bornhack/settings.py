@@ -129,6 +129,9 @@ if DEBUG:
         'debug_toolbar.panels.logging.LoggingPanel',
         'debug_toolbar.panels.redirects.RedirectsPanel',
     ]
+else:
+    SESSION_COOKIE_SECURE=True
+    CSRF_COOKIE_SECURE=True
 
 LOGGING = {
     'version': 1,
