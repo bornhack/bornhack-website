@@ -545,7 +545,7 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
 
         # create a new coinify invoice if needed
         if not hasattr(order, 'coinifyapiinvoice'):
-            coinifyinvoice = create_coinify_invoice(order)
+            coinifyinvoice = create_coinify_invoice(order, request)
             if not coinifyinvoice:
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
                 return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))

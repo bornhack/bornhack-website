@@ -125,7 +125,7 @@ def get_coinify_invoice(coinify_invoiceid, order):
     return coinifyinvoice
 
 
-def create_coinify_invoice(order):
+def create_coinify_invoice(order, request):
     # put args for API request together
     invoicedict = {
         'amount': float(order.total),
