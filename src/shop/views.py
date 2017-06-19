@@ -540,7 +540,8 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             coinifyinvoice = None
             for tempinvoice in order.coinify_api_invoices.all():
                 # we already have a coinifyinvoice for this order, check if it expired
-                if not coinifyinvoice.expired:
+                if not tempinvoice.expired:
+                    # this invoice is not expired, we are good to go
                     coinifyinvoice = tempinvoice
                     break
 
