@@ -226,6 +226,21 @@ class Order(CreatedUpdatedModel):
         self.open = None
         self.save()
 
+    @property
+    def coinifyapiinvoice(self):
+        if not self.coinify_api_invoices.exists():
+            return False
+
+        coinifyinvoice = None
+        for tempinvoice in self.coinify_api_invoices.all():
+            # we already have a coinifyinvoice for this order, check if it expired
+            if not tempinvoice.expired:
+                # this invoice is not expired, we are good to go
+                return tempinvoice
+
+        # nope
+        return False
+
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):
     class Meta:

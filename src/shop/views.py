@@ -535,18 +535,8 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
     def dispatch(self, request, *args, **kwargs):
         order = self.get_object()
 
-        # check if we already have a coinifyinvoice for this order
-        if order.coinify_api_invoices.exists():
-            coinifyinvoice = None
-            for tempinvoice in order.coinify_api_invoices.all():
-                # we already have a coinifyinvoice for this order, check if it expired
-                if not tempinvoice.expired:
-                    # this invoice is not expired, we are good to go
-                    coinifyinvoice = tempinvoice
-                    break
-
         # create a new coinify invoice if needed
-        if not coinifyinvoice:
+        if not order.coinifyapiinvoice:
             coinifyinvoice = create_coinify_invoice(order, request)
             if not coinifyinvoice:
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
