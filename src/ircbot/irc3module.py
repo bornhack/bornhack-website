@@ -59,6 +59,14 @@ class Plugin(object):
     def on_kick(self, **kwargs):
         logger.debug("inside on_kick(), kwargs: %s" % kwargs)
 
+
+    @irc3.event(r'(@(?P<tags>\S+) )?:(?P<ns>NickServ)!NickServ@services.baconsvin.org' r' NOTICE (?P<nick>irc3) :This nickname is registered.*')
+    def needs_nickserv_identify(self, **kwargs):
+        """Triggered when we need to identify with nickserv after connecting"""
+        logger.info("Nickserv identify needed, fixing...")
+        bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
+
+
     ###############################################################################################
     ### custom irc3 methods
 
