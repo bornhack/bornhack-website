@@ -73,9 +73,13 @@ SCHEDULE_EVENT_NOTIFICATION_MINUTES=10
 
 # irc bot settings
 IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS=60
-IRCBOT_NICK='mybot'
-IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL='#something'
-IRCBOT_SERVER_HOSTNAME='irc.example.com'
+IRCBOT_NICK='{{ django_ircbot_nickname }}'
+IRCBOT_SERVER_HOSTNAME='{{ django_ircbot_server }}'
 IRCBOT_SERVER_PORT=6697
 IRCBOT_SERVER_USETLS=True
+IRCBOT_CHANNELS={
+    'default': '{{ django_ircbot_default_channel }}',
+    'orga': '{{ django_ircbot_orga_channel }}',
+    'public': '{{ django_ircbot_public_channel }}'
+}
 
