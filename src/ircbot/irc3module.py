@@ -53,18 +53,14 @@ class Plugin(object):
     def on_privmsg(self, **kwargs):
         """triggered when a privmsg is sent to the bot or to a channel the bot is in"""
         logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
+        if kwargs['mask'] == "NickServ!NickServ@services.baconsvin.org" and kwargs['event'] == "NOTICE" and kwargs['data'] == "This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02.":
+            logger.info("Nickserv identify needed, fixing...")
+            bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
 
 
     @irc3.event(irc3.rfc.KICK)
     def on_kick(self, **kwargs):
         logger.debug("inside on_kick(), kwargs: %s" % kwargs)
-
-
-    @irc3.event(r'(@(?P<tags>\S+) )?:(?P<ns>NickServ)!NickServ@services.baconsvin.org' r' NOTICE (?P<nick>irc3) :This nickname is registered.*')
-    def needs_nickserv_identify(self, **kwargs):
-        """Triggered when we need to identify with nickserv after connecting"""
-        logger.info("Nickserv identify needed, fixing...")
-        bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
 
 
     ###############################################################################################
