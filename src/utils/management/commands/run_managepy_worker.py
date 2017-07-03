@@ -53,8 +53,12 @@ class Command(BaseCommand):
 
         logger.info("Entering main loop...")
         while True:
-            # run worker code
-            getattr(self.workermodule, 'do_work')()
+            try:
+                # run worker code
+                getattr(self.workermodule, 'do_work')()
+            except Exception as E:
+                logger.exception("Got exception inside do_work for %s" % self.workermodule)
+                sys.exit(1)
 
             # sleep for N seconds before calling worker code again
             i = 0

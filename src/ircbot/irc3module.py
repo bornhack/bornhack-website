@@ -18,7 +18,6 @@ class Plugin(object):
 
     def __init__(self, bot):
         self.bot = bot
-        self.log = self.bot.log
 
 
     ###############################################################################################
@@ -69,7 +68,7 @@ class Plugin(object):
             This method gets unprocessed OutgoingIrcMessage objects and attempts to send them to
             the target channel. Messages are skipped if the bot is not in the channel.
         """
-        logger.debug("inside get_outgoing_messages()")
+        #logger.debug("inside get_outgoing_messages()")
         for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by('created'):
             # if this message expired mark it as expired and processed without doing anything
             if msg.timeout < timezone.now():
@@ -92,7 +91,7 @@ class Plugin(object):
             else:
                 logger.warning("skipping message to %s" % msg.target)
 
-        # call this function again in 60 seconds
+        # call this function again in X seconds
         self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
 
 
