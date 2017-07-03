@@ -55,7 +55,7 @@ class Plugin(object):
         logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
         if kwargs['mask'] == "NickServ!NickServ@services.baconsvin.org" and kwargs['event'] == "NOTICE" and kwargs['data'] == "This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02.":
             logger.info("Nickserv identify needed, fixing...")
-            bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
+            self.bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
 
 
     @irc3.event(irc3.rfc.KICK)
