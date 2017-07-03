@@ -37,6 +37,9 @@ class Plugin(object):
         """triggered when connection is up"""
         logger.debug("inside connection_made(), kwargs: %s" % kwargs)
 
+        # wait 5 secs before starting the loop to check for outgoing messages
+        self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
+
 
     ###############################################################################################
     ### decorated irc3 event methods
@@ -45,14 +48,14 @@ class Plugin(object):
     def on_join_part_quit(self, **kwargs):
         """triggered when there is a join part or quit on a channel the bot is in"""
         logger.debug("inside on_join_part_quit(), kwargs: %s" % kwargs)
-        if self.bot.nick == kwargs['mask'].split("!")[0] and kwargs['channel'] == "#tirsdagsfilm":
-            self.bot.loop.call_later(1, self.bot.get_outgoing_messages)
 
 
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, **kwargs):
         """triggered when a privmsg is sent to the bot or to a channel the bot is in"""
         logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
+
+        # nickserv
         if kwargs['mask'] == "NickServ!NickServ@services.baconsvin.org" and kwargs['event'] == "NOTICE" and kwargs['data'] == "This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02.":
             logger.info("Nickserv identify needed, fixing...")
             self.bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
