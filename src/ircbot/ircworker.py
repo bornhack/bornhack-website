@@ -11,7 +11,7 @@ def do_work():
     """
     config = {
         'nick': settings.IRCBOT_NICK,
-        'autojoins': [settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL],
+        'autojoins': [set(settings.IRCBOT_CHANNELS.values())],
         'host': settings.IRCBOT_SERVER_HOSTNAME,
         'port': settings.IRCBOT_SERVER_PORT,
         'ssl': settings.IRCBOT_SERVER_USETLS,
