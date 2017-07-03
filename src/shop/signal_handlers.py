@@ -16,13 +16,21 @@ def ticket_created(sender, instance, created, **kwargs):
 
     # get ticket stats, FIXME: Camp name is hardcoded here for now
     from shop.models import Ticket
-    stats = ", ".join(["%s: %s" % (tickettype['product__name'], tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017").values('product__name').annotate(total=Count('product__name')).order_by('product__name')])
+    stats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017").exclude(product__name__startswith="BornHack 2017 One day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
 
-    # queue the message
+    # 1day ticket stats disabled for now
+    #onedaystats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017 One day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
+
+    # queue the messages
     from ircbot.models import OutgoingIrcMessage
     OutgoingIrcMessage.objects.create(
         target=target,
-        message="%s sold! Totals: %s" % (instance.product.name, stats),
+        message="%s sold!" % instance.product.name,
+        timeout=timezone.now()+timedelta(minutes=10)
+    )
+    OutgoingIrcMessage.objects.create(
+        target=target,
+        message="Totals: %s" % stats,
         timeout=timezone.now()+timedelta(minutes=10)
     )
 
