@@ -5,8 +5,8 @@
 {% block shop_content %}
 
 <h2>Pay by Bank Transfer</h2>
-<p>To pay order #{{ orderid }} you need to make a bank transfer 
-of the full amount of <b>{{ total|currency }}</b> using the following information:</p>
+<p>To pay order #{{ orderid }} you need to make a bank transfer
+of the <strong>full</strong> amount of <b>{{ total|currency }}</b> using the following information:</p>
 
 <ul class="lead">
   <li><strong>Swift/BIC</strong>: {{ swiftbic }} (Danish reg. no. {{ regno }})</li>
@@ -14,6 +14,7 @@ of the full amount of <b>{{ total|currency }}</b> using the following informatio
   <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
 </ul>
 
+<div class="alert alert-danger" role="alert">
 <p class="lead">
   <strong>
     Remember:
@@ -21,6 +22,7 @@ of the full amount of <b>{{ total|currency }}</b> using the following informatio
     If you transfer from outside of Denmark you <strong>MUST</strong> make sure that
     all transfers fees are <strong>paid by you</strong>.
 </p>
+</div>
 
 <p>Also note: Please allow for up to a week before we register your bank
 transfer, especially if you are outside of the SEPA region.</p>
