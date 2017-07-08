@@ -42,7 +42,9 @@ Shop | {{ block.super }}
         <tr style="background-color: #cccccc">
           <td colspan="2">
             <strong>
-              {{ product.category }}
+              <a href="{% url 'shop:index' %}?category={{product.category.slug}}">
+                {{ product.category }}
+              </a>
             </strong>
           </td>
           </td>
