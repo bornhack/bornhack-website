@@ -49,7 +49,7 @@
           </button>
           {% if request.resolver_match.kwargs.camp_slug and camp %}
             <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small_svg %}" alt="bornhack" class="img-responsive">
+                <img src="{% static camp.logo_small %}" height="50" width="190px" alt="bornhack" class="img-responsive">
             </a>
           {% else %}
             <a class="navbar-brand" href="/">
