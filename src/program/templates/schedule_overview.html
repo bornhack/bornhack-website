@@ -14,6 +14,7 @@
 init(
     { 'schedule_timeslot_length_minutes': Number('{{ schedule_timeslot_length_minutes }}')
     , 'schedule_midnight_offset_hours': Number('{{ schedule_midnight_offset_hours }}')
+    , 'ics_button_href': "{% url 'ics_view' camp_slug=camp.slug %}"
     }
 );
 </script>

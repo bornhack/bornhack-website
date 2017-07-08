@@ -108,6 +108,7 @@ function render() {
     parameters = get_parameters();
     toggleFilterBoxes(parameters['types'], parameters['locations']);
     render_day_menu(parameters['day']);
+    setICSButtonHref(location.search);
 
     if(parameters['day'] != null) {
       render_day(parameters['types'], parameters['locations'], parameters['day']);
@@ -473,6 +474,13 @@ function setHistoryState(parts) {
   }
 
   history.replaceState({}, '', query);
+  setICSButtonHref(query);
+}
+
+function setICSButtonHref(query) {
+  // Update ICS button as well
+  var ics_button = document.querySelector('#ics-button');
+  ics_button.setAttribute('href', CONFIG['ics_button_href'] + query);
 }
 
 function toggleFilterBoxes(types, locations) {
