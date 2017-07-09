@@ -39,6 +39,7 @@ function setup_websocket() {
           modal_body_content.innerHTML = payload['event_instance']['abstract'];
           more_button = modal.getElementsByClassName('more-button')[0];
           more_button.setAttribute('href', payload['event_instance']['url']);
+
           favorite_button = modal.getElementsByClassName('favorite-button')[0];
           if(payload['event_instance']['is_favorited'] !== undefined) {
               favorite_button.setAttribute('data-state', payload['event_instance']['is_favorited'])
@@ -58,6 +59,14 @@ function setup_websocket() {
               speaker_li.appendChild(speaker_a);
               speakers_div.appendChild(speaker_li);
           }
+
+          video_recording_element = modal.getElementsByClassName('video-recording')[0];
+          if(payload['event_instance']['video_recording'] == true) {
+            video_recording_element.innerHTML = 'This event will be recorded!';
+          } else {
+            video_recording_element.remove();
+          }
+
       }
       if(payload['action'] == 'init') {
         EVENT_INSTANCES = payload['event_instances'];
@@ -289,6 +298,14 @@ function render_event_instance(event_instance) {
     icon_element.classList.add('fa');
     icon_element.classList.add('pull-right');
 
+    if(event_instance['video_recording'] == true) {
+      video_recording_element = document.createElement('i');
+      video_recording_element.classList.add('fa-video-camera');
+      video_recording_element.classList.add('fa');
+      video_recording_element.classList.add('pull-right');
+      element.appendChild(video_recording_element);
+    }
+
     element.appendChild(time_element);
     element.appendChild(icon_element);
     element.appendChild(title_element);
@@ -369,7 +386,6 @@ function openModal(e) {
         modal_header.appendChild(modal_close_button);
         modal_header.appendChild(modal_title);
 
-
         modal_body_content = document.createElement('div');
         modal_body_content.classList.add('modal-body');
         modal_body_content.classList.add('modal-body-content');
@@ -378,7 +394,7 @@ function openModal(e) {
         modal_body = document.createElement('div');
         modal_body.classList.add('modal-body');
         modal_content.appendChild(modal_body);
-        modal_body.innerHTML = '<h4>Speaker(s):</h4><ul class="speakers"></ul>';
+        modal_body.innerHTML = '<h4>Speaker(s):</h4><ul class="speakers"></ul><div class="alert alert-info" role="alert"><i class="fa fa-video-camera"></i>  <span class="video-recording"></span></div>';
 
         modal_footer = document.createElement('div');
         modal_footer.classList.add('modal-footer');
