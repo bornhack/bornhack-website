@@ -49,6 +49,7 @@ function setup_websocket() {
           }
 
           speakers_div = modal.getElementsByClassName('speakers')[0];
+          speakers_div.innerHTML = "";
           speakers = payload['event_instance']['speakers'];
           for(speaker_id in speakers) {
               var speaker = speakers[speaker_id];
