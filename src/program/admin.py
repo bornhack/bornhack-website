@@ -40,7 +40,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
-    pass
+    list_filter = ('camp',)
 
 
 @admin.register(Favorite)
@@ -54,6 +54,7 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
+    list_filter = ('camp', 'speakers')
     list_display = [
         'title',
         'event_type',
