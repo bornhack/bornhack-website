@@ -12,23 +12,26 @@ class ScheduleConsumer(JsonWebsocketConsumer):
 
     def connect(self, message, **kwargs):
         camp_slug = message.http_session['campslug']
-        camp = Camp.objects.get(slug=camp_slug)
-        days = list(map(
-            lambda day:
-                { 'repr': day.lower.strftime('%A %Y-%m-%d')
-                , 'iso': day.lower.strftime('%Y-%m-%d')
-                , 'day_name': day.lower.strftime('%A')
-                },
-            camp.get_days('camp')
-        ))
-        event_instances_query_set = EventInstance.objects.filter(event__camp=camp)
-        event_instances = list(map(lambda x: x.to_json(), event_instances_query_set))
-        self.send({
-            "accept": True,
-            "event_instances": event_instances,
-            "days": days,
-            "action": "init"
-        })
+        try:
+            camp = Camp.objects.get(slug=camp_slug)
+            days = list(map(
+                lambda day:
+                    { 'repr': day.lower.strftime('%A %Y-%m-%d')
+                    , 'iso': day.lower.strftime('%Y-%m-%d')
+                    , 'day_name': day.lower.strftime('%A')
+                    },
+                camp.get_days('camp')
+            ))
+            event_instances_query_set = EventInstance.objects.filter(event__camp=camp)
+            event_instances = list(map(lambda x: x.to_json(), event_instances_query_set))
+            self.send({
+                "accept": True,
+                "event_instances": event_instances,
+                "days": days,
+                "action": "init"
+            })
+        except Camp.DoesNotExist:
+            pass
 
     def raw_receive(self, message, **kwargs):
         content = self.decode_json(message['text'])

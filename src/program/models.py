@@ -485,6 +485,7 @@ class EventInstance(CampRelatedModel):
             'location': self.location.slug,
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,
+            'video_recording': self.event.video_recording
         }
 
         if user and user.is_authenticated:

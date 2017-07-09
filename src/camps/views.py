@@ -48,4 +48,5 @@ class CampDetailView(DetailView):
 class CampListView(ListView):
     model = Camp
     template_name = 'camp_list.html'
+    queryset = Camp.objects.all().order_by('camp')
 

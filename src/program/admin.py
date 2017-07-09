@@ -11,6 +11,7 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
     mark_speakerproposal_as_approved.description = 'Approve and create Speaker object(s)'
 
     actions = ['mark_speakerproposal_as_approved']
+    list_filter = ('camp', 'proposal_status', 'user')
 
 
 @admin.register(EventProposal)
@@ -21,6 +22,7 @@ class EventProposalAdmin(admin.ModelAdmin):
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
     actions = ['mark_eventproposal_as_approved']
+    list_filter = ('camp', 'proposal_status', 'user')
 
 
 @admin.register(EventLocation)
@@ -40,7 +42,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
-    pass
+    list_filter = ('camp',)
 
 
 @admin.register(Favorite)
@@ -54,6 +56,7 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
+    list_filter = ('camp', 'speakers')
     list_display = [
         'title',
         'event_type',
