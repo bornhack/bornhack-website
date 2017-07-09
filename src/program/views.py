@@ -139,7 +139,7 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
 
 class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.EventProposal
-    fields = ['title', 'abstract', 'event_type', 'speakers']
+    fields = ['title', 'abstract', 'event_type', 'speakers', 'allow_video_recording']
     template_name = 'eventproposal_form.html'
 
     def get_context_data(self, **kwargs):
