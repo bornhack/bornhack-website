@@ -1,13 +1,16 @@
 from django.core.exceptions import ValidationError
 
-def check_speaker_event_camp_consistency(sender, instance, **kwargs):
+
+def check_speaker_event_camp_consistency(sender, event, **kwargs):
     if kwargs['action'] == 'pre_add':
+        # loop over speakers being added to this event
         for pk in kwargs['pk_set']:
-            # check if this event belongs to a different event than the speaker does
-            from program.models import Event
-            event = Event.objects.get(id=pk)
-            if event.camp != instance.camp:
-                raise ValidationError({'events': 'One or more events belong to a different camp (%s) than the speaker (%s) does' % (event.camp, instance.camp)})
+            # check if this speaker belongs to a different event than the event does
+            from program.models import Speaker
+            speaker = Speaker.objects.get(id=pk)
+            if speaker.camp != event.camp:
+                raise ValidationError({'speakers': 'The speaker (%s) belongs to a different camp (%s) than the event does (%s)' % (speaker, speaker.camp, event.camp)})
+
 
 def check_speaker_camp_change(sender, instance, **kwargs):
     if instance.pk:
