@@ -65,7 +65,7 @@ function setup_websocket() {
           if(payload['event_instance']['video_recording'] == true) {
             video_recording_element.innerHTML = 'This event will be recorded!';
           } else {
-            video_recording_element.remove();
+            video_recording_element.parentElement.remove();
           }
 
       }
