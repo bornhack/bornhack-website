@@ -471,8 +471,8 @@ class EventInstance(CampRelatedModel):
             'title': self.event.title,
             'event_slug': self.event.slug,
             'abstract': abstract,
-            'from': self.when.lower.isoformat(),
-            'to': self.when.upper.isoformat(),
+            'from': self.when.lower.astimezone().isoformat(),
+            'to': self.when.upper.astimezone().isoformat(),
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'speakers': [
