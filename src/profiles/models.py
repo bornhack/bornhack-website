@@ -31,6 +31,17 @@ class Profile(CreatedUpdatedModel, UUIDModel):
         help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.',
     )
 
+    public_credits = models.BooleanField(
+        default=False,
+        help_text='Check this box if you want your name to appear in the list of volunteers for this event. Please inform your team responsible what you would like to be credited as.'
+    )
+
+    public_credit_name = models.CharField(
+        blank=True,
+        max_length=100,
+        help_text='The name used on the public list of volunteers for this event. Only used if public_credits is True. Not editable by users (to avoid getting junk on the website).'
+    )
+
     @property
     def email(self):
         return self.user.email
