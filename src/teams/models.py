@@ -34,7 +34,7 @@ class Team(CampRelatedModel):
 
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
-    camp = models.ForeignKey('camps.Camp')
+    camp = models.ForeignKey('camps.Camp', related_name="teams")
     area = models.ForeignKey(
         'teams.TeamArea',
         related_name='teams',
@@ -84,6 +84,14 @@ class Team(CampRelatedModel):
             )
         else:
             return self.area.responsible.all()
+
+    @property
+    def anoncount(self):
+        return self.approvedmembers.filter(user__profile__public_credit_name_approved=False).count()
+
+    @property
+    def approvedmembers(self):
+        return TeamMember.objects.filter(team=self, approved=True)
 
 
 class TeamMember(CampRelatedModel):

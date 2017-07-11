@@ -1,15 +1,22 @@
 {% extends 'profile_base.html' %}
 
 {% block profile_content %}
-<p class="lead">The information in your profile is only visible to team responsible and organisers.</p>
-<p class="lead">If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer.</p>
-<hr>
+<p class="lead">Apart from Public Credit Name the information in your profile is only visible to team responsible and organisers.</p>
+<p class="lead">If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer. Please also include availability if you are not joining us for the entire week.</p>
 <h3>Your Profile</h3>
-<dl>
-  <dt>Name</dt>
-  <dd>{{ profile.name|default:"N/A" }}</dd>
-  <dt>Description</dt>
-  <dd>{{ profile.description|default:"N/A" }}</dd>
-</dl>
+<table class="table table-horisontal">
+  <tr>
+    <td><b>Name (not visible to the public)</b></td>
+    <td>{{ profile.name|default:"N/A" }}</td>
+  </tr>
+  <tr>
+    <td><b>Description (not visible to the public)</b></td>
+    <td>{{ profile.description|default:"N/A" }}</td>
+  </tr>
+  <tr>
+    <td><b>Public Credit Name (visible to the public, leave empty if you want no credits)</b></td>
+    <td>{{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
+  </tr>
+</table>
 <a href="{% url 'profiles:update' %}" class="btn btn-black"><i class="fa fa-edit"></i> Edit Profile</a>
 {% endblock profile_content %}

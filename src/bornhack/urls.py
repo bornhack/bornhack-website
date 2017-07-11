@@ -11,6 +11,7 @@ from villages.views import *
 from program.views import *
 from sponsors.views import *
 from teams.views import *
+from people.views import *
 
 urlpatterns = [
     url(
@@ -99,6 +100,11 @@ urlpatterns = [
         CampRedirectView.as_view(),
         kwargs={'page': 'village_list'},
         name='village_list_redirect',
+    ),
+
+    url(
+        r'^people/$',
+        PeopleView.as_view(),
     ),
 
     # camp specific urls below here

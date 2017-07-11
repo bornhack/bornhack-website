@@ -27,6 +27,7 @@ class EnsureTeamResponsibleMixin(SingleObjectMixin):
         )
 
 
+
 class TeamListView(CampViewMixin, ListView):
     template_name = "team_list.html"
     model = Team

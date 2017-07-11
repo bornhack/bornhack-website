@@ -12,7 +12,7 @@ Team: {{ team.name }} | {{ block.super }}
 <h3>{{ team.name }} Team ({{ team.area.name }} area)</h3>
 
 {{ team.description|unsafecommonmark }}
-<p>Currently {{ team.members.count }} people are members of this team{% if request.user in team.members.all %} (including you){% endif %}.</p>
+<p>Currently {{ team.approvedmembers.count }} people are members of this team{% if request.user in team.members.all %} (including you){% endif %}.</p>
 
 {% if request.user in team.members.all %}
 <p>Your team status: {% membershipstatus request.user team %}</p>
@@ -30,12 +30,35 @@ Team: {{ team.name }} | {{ block.super }}
       <a href="{% url 'team_manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success">Manage Team</a>
 {% endif %}
 <hr />
-<h3>Team Responsible</h3>
-<p>The following people are responsible for the <b>{{ team.name }} team</b>:</p>
-<ul>
-    {% for resp in team.responsible.all %}
-    <li><b>{{ resp.profile.name }}</b></li>
+<h3>Team Members</h3>
+<p>The following people are members of the <b>{{ team.name }} team</b>:</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>
+        Name
+      </th>
+      <th>
+        Status
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for teammember in team.approvedmembers.all %}
+      {% if teammember.user.profile.public_credit_name and teammember.approved or teammember.responsible %}
+      <tr>
+        <td>
+          {{ teammember.user.profile.public_credit_name }}
+        </td>
+        <td>
+            {% if teammember.responsible %}Team Responsible{% else %}Team Member{% endif %}
+        </td>
+      </tr>
+      {% endif %}
     {% endfor %}
-</ul>
-
+  </tbody>
+</table>
+{% if team.anoncount %}
+<p>Plus <b>{{ team.anoncount }}</b> member(s) who prefer to remain anonymous.</p>
+{% endif %}
 {% endblock %}

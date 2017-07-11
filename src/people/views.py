@@ -1,0 +1,9 @@
+from django.shortcuts import render
+from django.views.generic import ListView
+from camps.models import Camp
+
+
+class PeopleView(ListView):
+    template_name = 'people.html'
+    model = Camp
+

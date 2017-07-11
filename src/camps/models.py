@@ -15,6 +15,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Camp'
         verbose_name_plural = 'Camps'
+        ordering = ['-title']
 
     title = models.CharField(
         verbose_name='Title',

@@ -47,7 +47,7 @@ Teams | {{ block.super }}
       </td>
 
       <td class="text-center">
-          <span class="badge">{{ team.members.count }}</span><br>
+          <span class="badge">{{ team.approvedmembers.count }}</span><br>
           {% if team.needs_members %}(more needed){% endif %}
       </td>
 

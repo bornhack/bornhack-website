@@ -16,7 +16,7 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
 
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = models.Profile
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'public_credit_name']
     success_url = reverse_lazy('profiles:detail')
     template_name = 'profile_form.html'
 
@@ -24,6 +24,12 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         return models.Profile.objects.get(user=self.request.user)
 
     def form_valid(self, form, **kwargs):
+        print(form.cleaned_data['public_credit_name'])
+        print(form.instance.public_credit_name)
+        if 'public_credit_name' in form.changed_data and form.cleaned_data['public_credit_name']:
+            # user changed the name (to something non blank)
+            form.instance.public_credit_name_approved = False
+            form.instance.save()
         messages.info(self.request, 'Your profile has been updated.')
-        return super(ProfileUpdate, self).form_valid(form, **kwargs)
+        return super().form_valid(form, **kwargs)
 

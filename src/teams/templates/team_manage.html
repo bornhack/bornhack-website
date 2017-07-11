@@ -38,6 +38,9 @@ Manage Team: {{ team.name }} | {{ block.super }}
         Description
       </th>
       <th>
+        Public Credit Name
+      </th>
+      <th>
         Membership
       </th>
       <th>
@@ -59,6 +62,9 @@ Manage Team: {{ team.name }} | {{ block.super }}
     </td>
     <td>
       {{ membership.user.profile.description }}
+    </td>
+    <td>
+      {{ membership.user.profile.public_credit_name|default:"N/A" }}
     </td>
     <td>
       {% if membership.approved %}member{% else %}pending{% endif %}

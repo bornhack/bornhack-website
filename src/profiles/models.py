@@ -22,7 +22,7 @@ class Profile(CreatedUpdatedModel, UUIDModel):
         max_length=200,
         default='',
         blank=True,
-        help_text='Your name or handle'
+        help_text='Your name or handle (only visible to team responsible and organisers)'
     )
 
     description = models.TextField(
@@ -31,15 +31,15 @@ class Profile(CreatedUpdatedModel, UUIDModel):
         help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.',
     )
 
-    public_credits = models.BooleanField(
-        default=False,
-        help_text='Check this box if you want your name to appear in the list of volunteers for this event. Please inform your team responsible what you would like to be credited as.'
-    )
-
     public_credit_name = models.CharField(
         blank=True,
         max_length=100,
-        help_text='The name used on the public list of volunteers for this event. Only used if public_credits is True. Not editable by users (to avoid getting junk on the website).'
+        help_text='The name you want to appear on in the credits section of the public website (the People pages). Leave empty if you want no public credit.'
+    )
+
+    public_credit_name_approved = models.BooleanField(
+        default=False,
+        help_text='Check this box to approve this users public_credit_name. This will be unchecked automatically when the user edits public_credit_name'
     )
 
     @property
@@ -48,6 +48,17 @@ class Profile(CreatedUpdatedModel, UUIDModel):
 
     def __str__(self):
         return self.user.username
+
+    def approve_public_credit_name(self):
+        self.public_credit_name_approved = True
+        self.save()
+
+    @property
+    def approved_public_credit_name(self):
+        if self.public_credit_name_approved:
+            return self.public_credit_name
+        else:
+            return False
 
 
 @receiver(post_save, sender=User)

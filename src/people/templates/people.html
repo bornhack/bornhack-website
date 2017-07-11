@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load teams_tags %}
+
+{% block title %}
+People | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<h3>The People of BornHack</h3>
+<p class="lead">The following is a list of the volunteers that have helped make BornHack happen. It goes without saying that an event like BornHack would not be possible to pull off without our volunteers. We are forever grateful, and we leave your names here as a recognition of the work you put in. Thank you!
+{% for camp in camp_list %}
+    {% if camp.teams.exists %}
+    <h3>{{ camp.title }} Teams</h3>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Members</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for team in camp.teams.all %}
+        <tr>
+          <td>
+              {{ team.name }} Team
+          </td>
+          <td>
+            {{ team.description|unsafecommonmark }}
+          </td>
+
+          <td>
+            {% if team.approvedmembers.count == team.anoncount %}
+            {{ team.anoncount }} anonymous member(s)
+            {% endif %}
+
+            {% for member in team.approvedmembers.all %}
+            {% if member.user.profile.approved_public_credit_name %}
+            {{ member.user.profile.approved_public_credit_name }}{% if member.responsible %} (responsible){% endif %}<br>
+            {% endif %}
+            {% endfor %}
+            {% if team.anoncount and team.anoncount != team.approvedmembers.count %}
+            plus {{ team.anoncount }} anonymous member(s).
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+{% endfor %}
+{% endblock %}
