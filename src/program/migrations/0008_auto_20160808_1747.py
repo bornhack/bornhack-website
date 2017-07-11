@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0007_populate_public_credit_names_for_team_responsibles'),
+        ('program', '0007_auto_20160807_1333'),
     ]
 
     operations = [
