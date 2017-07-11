@@ -18,7 +18,7 @@ def process_coinify_invoice_json(invoicejson, order):
     )
 
     # if the order is paid in full call the mark as paid method now
-    if invoicejson['state'] == 'complete':
+    if invoicejson['state'] == 'complete' and not coinifyinvoice.order.paid:
         coinifyinvoice.order.mark_as_paid()
 
     return coinifyinvoice
