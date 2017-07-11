@@ -254,7 +254,7 @@ class EventProposal(UserSubmittedModel):
         event.abstract = self.abstract
         event.event_type = self.event_type
         event.proposal = self
-        event.video_recording = self.video_recording
+        event.video_recording = self.allow_video_recording
         event.save()
         # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
