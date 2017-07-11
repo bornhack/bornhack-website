@@ -47,6 +47,7 @@ class Team(CampRelatedModel):
         related_name='teams',
         through='teams.TeamMember'
     )
+    mailing_list = models.EmailField(blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
