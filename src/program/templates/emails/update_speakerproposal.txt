@@ -1,0 +1,10 @@
+Hello!
+
+Speaker {{ proposal.name }} was just submitted as a new speaker proposal for {{ proposal.camp }}.
+
+More info: https://bornhack.dk/admin/program/speakerproposal/{{ proposal.uuid }}/change/
+
+
+Best regards,
+
+The BornHack Team

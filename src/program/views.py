@@ -1,4 +1,6 @@
-import datetime, os
+import datetime
+import logging
+import os
 
 from django.views.generic import ListView, TemplateView, DetailView, View
 from django.views.generic.edit import CreateView, UpdateView
@@ -8,14 +10,26 @@ from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.shortcuts import redirect
 from django.urls import reverse
 
 import icalendar
 
 from camps.mixins import CampViewMixin
-from .mixins import CreateProposalMixin, EnsureUnapprovedProposalMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, PictureViewMixin, EnsureCFSOpenMixin
+from .mixins import (
+    CreateProposalMixin,
+    EnsureUnapprovedProposalMixin,
+    EnsureUserOwnsProposalMixin,
+    EnsureWritableCampMixin,
+    PictureViewMixin,
+    EnsureCFSOpenMixin
+)
+from .email import (
+    add_speakerproposal_updated_email,
+    add_eventproposal_updated_email
+)
 from . import models
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 ############## ical calendar ########################################################
@@ -84,7 +98,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
         return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
-class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
+class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
     fields = ['name', 'biography', 'picture_small', 'picture_large']
     template_name = 'speakerproposal_form.html'
@@ -96,6 +110,15 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
         if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
             messages.warning(self.request, "Your speaker proposal has been reverted to status draft. Please submit it again when you are ready.")
             form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
+
+        if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
+            messages.warning(self.request, "Your speaker proposal has been set to modified after approval. Please await approval of the changes.")
+            form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_MODIFIED_AFTER_APPROVAL
+            if not add_speakerproposal_updated_email(form.instance):
+                logger.error(
+                    'Unable to add update email to queue for speaker: {}'.format(form.instance)
+                )
+
         return super().form_valid(form)
 
 
@@ -149,7 +172,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalM
         return context
 
 
-class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureUnapprovedProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
+class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.EventProposal
     fields = ['title', 'abstract', 'event_type', 'speakers']
     template_name = 'eventproposal_form.html'
@@ -161,6 +184,15 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
         if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
             messages.warning(self.request, "Your event proposal has been reverted to status draft. Please submit it again when you are ready.")
             form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_DRAFT
+
+        if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
+            messages.warning(self.request, "Your event proposal has been set to status modified after approval. Please await approval of the changes.")
+            form.instance.proposal_status = models.UserSubmittedModel.PROPOSAL_MODIFIED_AFTER_APPROVAL
+            if not add_eventproposal_updated_email(form.instance):
+                logger.error(
+                    'Unable to add update email to queue for event: {}'.format(form.instance)
+                )
+
         return super().form_valid(form)
 
 

@@ -24,11 +24,7 @@ Proposals | {{ block.super }}
             <td>
                 <a href="{% url 'speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
                 {% if not camp.read_only %}
-                    {% if speakerproposal.proposal_status == "approved" %}
-                        <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Modify</a>
-                    {% else %}
-                        <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
-                    {% endif %}
+                    <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
                     {% if speakerproposal.proposal_status == "pending" or speakerproposal.proposal_status == "approved" %}
                         <a href="{% url 'speakerproposal_submit' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Submit</a>
                     {% else %}

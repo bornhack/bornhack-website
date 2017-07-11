@@ -1,10 +1,15 @@
 import uuid
 import os
+import icalendar
+import CommonMark
+import logging
+
 from datetime import timedelta
 
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib import messages
 from django.db import models
+from django.dispatch import receiver
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -13,11 +18,11 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
 from django.core.files.base import ContentFile
-
-import icalendar
-import CommonMark
+from django.db.models.signals import post_save
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
+from .email import add_new_speakerproposal_email, add_new_eventproposal_email
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CustomUrlStorage(FileSystemStorage):
@@ -80,12 +85,14 @@ class UserSubmittedModel(CampRelatedModel):
     PROPOSAL_PENDING = 'pending'
     PROPOSAL_APPROVED = 'approved'
     PROPOSAL_REJECTED = 'rejected'
+    PROPOSAL_MODIFIED_AFTER_APPROVAL = 'modified after approval'
 
     PROPOSAL_STATUSES = [
         PROPOSAL_DRAFT,
         PROPOSAL_PENDING,
         PROPOSAL_APPROVED,
-        PROPOSAL_REJECTED
+        PROPOSAL_REJECTED,
+        PROPOSAL_MODIFIED_AFTER_APPROVAL
     ]
 
     PROPOSAL_STATUS_CHOICES = [
@@ -93,6 +100,7 @@ class UserSubmittedModel(CampRelatedModel):
         (PROPOSAL_PENDING, 'Pending approval'),
         (PROPOSAL_APPROVED, 'Approved'),
         (PROPOSAL_REJECTED, 'Rejected'),
+        (PROPOSAL_MODIFIED_AFTER_APPROVAL, 'Modified after approval'),
     ]
 
     proposal_status = models.CharField(
@@ -264,6 +272,21 @@ class EventProposal(UserSubmittedModel):
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
+
+@receiver(post_save, sender=EventProposal)
+@receiver(post_save, sender=SpeakerProposal)
+def notify_content_team(sender, created, instance, **kwargs):
+    if created and isinstance(instance, SpeakerProposal):
+        if not add_new_speakerproposal_email(instance):
+            logger.error(
+                'Error adding speaker proposal email to outgoing queue for {}'.format(instance)
+            )
+
+    if created and isinstance(instance, EventProposal):
+        if not add_new_eventproposal_email(instance):
+            logger.error(
+                'Error adding event proposal email to outgoing queue for {}'.format(instance)
+            )
 
 ###############################################################################
 
