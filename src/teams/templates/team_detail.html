@@ -45,10 +45,10 @@ Team: {{ team.name }} | {{ block.super }}
   </thead>
   <tbody>
    {% for teammember in team.approvedmembers.all %}
-      {% if teammember.user.profile.public_credit_name and teammember.approved or teammember.responsible %}
+      {% if teammember.user.profile.approved_public_credit_name and teammember.approved or teammember.responsible %}
       <tr>
         <td>
-          {{ teammember.user.profile.public_credit_name }}
+          {{ teammember.user.profile.approved_public_credit_name }}
         </td>
         <td>
             {% if teammember.responsible %}Team Responsible{% else %}Team Member{% endif %}

@@ -42,7 +42,7 @@ Teams | {{ block.super }}
 
       <td>
         {% for resp in team.responsible.all %}
-        {{ resp.profile.name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
+        {{ resp.profile.approved_public_credit_name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
         {% endfor %}
       </td>
 
