@@ -144,7 +144,12 @@ class Order(CreatedUpdatedModel):
             return False
 
     def get_coinify_callback_url(self, request):
-        return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))
+        """ Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request """
+        if 'COINIFY_CALLBACK_HOSTNAME' in settings and settings['COINIFY_CALLBACK_HOSTNAME']:
+            host = settings['COINIFY_CALLBACK_HOSTNAME']
+        else:
+            host = request.get_host()
+        return 'https://' + host + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))
 
     def get_coinify_thanks_url(self, request):
         return 'https://' + request.get_host() + str(reverse_lazy('shop:coinify_thanks', kwargs={'pk': self.pk}))

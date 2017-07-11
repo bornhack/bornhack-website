@@ -57,6 +57,7 @@ EPAY_MD5_SECRET='{{ epay_md5_secret }}'
 COINIFY_API_KEY='{{ coinify_api_key }}'
 COINIFY_API_SECRET='{{ coinify_api_secret }}'
 COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
+COINIFY_CALLBACK_HOSTNAME='{{ coinify_callback_hostname }}' # leave empty or comment out to use hostname from request
 
 # shop settings
 PDF_LETTERHEAD_FILENAME='{{ pdf_letterhead_filename }}'
