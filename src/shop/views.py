@@ -559,7 +559,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
     def post(self, request, *args, **kwargs):
         # save callback and parse json payload
-        callbackobject = save_coinify_callback(request)
+        callbackobject = save_coinify_callback(request, self.get_object())
 
         # do we have a json body?
         if not callbackobject.payload:

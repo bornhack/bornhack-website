@@ -24,7 +24,7 @@ def process_coinify_invoice_json(invoicejson, order):
     return coinifyinvoice
 
 
-def save_coinify_callback(request):
+def save_coinify_callback(request, order):
     # first make a dict with all HTTP_ headers
     headerdict = {}
     for key, value in list(request.META.items()):
@@ -42,7 +42,7 @@ def save_coinify_callback(request):
         headers=headerdict,
         body=request.body,
         payload=parsed,
-        order=self.get_object(),
+        order=order,
     )
 
     return callbackobject
