@@ -37,7 +37,7 @@ from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
 from vendor.coinify.coinify_api import CoinifyAPI
 from vendor.coinify.coinify_callback import CoinifyCallback
-from .coinify import create_coinify_invoice, save_coinify_callback
+from .coinify import create_coinify_invoice, save_coinify_callback, process_coinify_invoice_json
 import json, time
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
