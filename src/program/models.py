@@ -287,7 +287,7 @@ def notify_proposals(sender, created, instance, **kwargs):
             )
         OutgoingIrcMessage.objects.create(
             target=target,
-            message="New speaker proposal: {} (https://bornhack.dk/admin/program/speakerproposal/{}/change/)".format(
+            message="New speaker proposal: {} - https://bornhack.dk/admin/program/speakerproposal/{}/change/".format(
                 instance.name,
                 instance.uuid
             ),
@@ -301,7 +301,7 @@ def notify_proposals(sender, created, instance, **kwargs):
             )
         OutgoingIrcMessage.objects.create(
             target=target,
-            message="New event proposal: {} (https://bornhack.dk/admin/program/eventproposal/{{ proposal.uuid }}/change/)".format(
+            message="New event proposal: {} - https://bornhack.dk/admin/program/eventproposal/{{ proposal.uuid }}/change/".format(
                 instance.title,
                 instance.uuid
             ),
