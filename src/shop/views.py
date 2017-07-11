@@ -580,7 +580,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             return HttpResponseBadRequest('something is fucky')
 
         if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
-            coinifyinvoice = process_coinify_invoice_json(callbackobject.payload, self.get_object())
+            coinifyinvoice = process_coinify_invoice_json(callbackobject.payload['data'], self.get_object())
             return HttpResponse('OK')
         else:
             logger.error("unsupported callback event %s" % callbackobject.payload['event'])
