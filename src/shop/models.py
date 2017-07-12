@@ -145,8 +145,8 @@ class Order(CreatedUpdatedModel):
 
     def get_coinify_callback_url(self, request):
         """ Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request """
-        if 'COINIFY_CALLBACK_HOSTNAME' in settings and settings['COINIFY_CALLBACK_HOSTNAME']:
-            host = settings['COINIFY_CALLBACK_HOSTNAME']
+        if hasattr(settings, 'COINIFY_CALLBACK_HOSTNAME') and settings.COINIFY_CALLBACK_HOSTNAME:
+            host = settings.COINIFY_CALLBACK_HOSTNAME
         else:
             host = request.get_host()
         return 'https://' + host + str(reverse_lazy('shop:coinify_callback', kwargs={'pk': self.pk}))
