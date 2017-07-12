@@ -12,7 +12,7 @@
   </div>
   <div class="col-md-4">
     <a href="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='large' %}" >
-      <img src="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speaker.name }}">
+      <img src="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speaker.name }}" width="200px">
     </a>
   </div>
 </div>
