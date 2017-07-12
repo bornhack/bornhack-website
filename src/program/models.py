@@ -331,7 +331,7 @@ class EventLocation(CampRelatedModel):
     )
 
     def __str__(self):
-        return self.name
+        return '{} ({})'.format(self.name, self.camp)
 
     class Meta:
         unique_together = (('camp', 'slug'), ('camp', 'name'))
