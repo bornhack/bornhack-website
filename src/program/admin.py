@@ -27,7 +27,8 @@ class EventProposalAdmin(admin.ModelAdmin):
 
 @admin.register(EventLocation)
 class EventLocationAdmin(admin.ModelAdmin):
-    pass
+    list_filter = ('camp',)
+    list_display = ('name', 'camp')
 
 
 @admin.register(EventInstance)
