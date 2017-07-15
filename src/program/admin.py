@@ -1,6 +1,20 @@
-from django.contrib import admin
+from django.contrib import (
+    admin,
+    messages
+)
+from django.core.exceptions import ValidationError
 
-from .models import Event, Speaker, EventType, EventInstance, EventLocation, SpeakerProposal, EventProposal, Favorite
+
+from .models import (
+    Event,
+    Speaker,
+    EventType,
+    EventInstance,
+    EventLocation,
+    SpeakerProposal,
+    EventProposal,
+    Favorite
+)
 
 
 @admin.register(SpeakerProposal)
@@ -18,7 +32,18 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
 class EventProposalAdmin(admin.ModelAdmin):
     def mark_eventproposal_as_approved(self, request, queryset):
         for ep in queryset:
-            ep.mark_as_approved()
+            if not ep.speakers.all():
+                messages.error(
+                    request,
+                    'Event cant be approved as it has no speaker(s).'
+                )
+                return False
+            else:
+                try:
+                    ep.mark_as_approved()
+                except ValidationError as e:
+                    messages.error(request, e)
+                    return False
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
     actions = ['mark_eventproposal_as_approved']

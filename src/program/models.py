@@ -9,6 +9,7 @@ from datetime import timedelta
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib import messages
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import receiver
 from django.utils.text import slugify
 from django.utils import timezone
@@ -278,8 +279,10 @@ class EventProposal(UserSubmittedModel):
         event.save()
         # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
-            if sp.speaker:
+            try:
                 event.speakers.add(sp.speaker)
+            except ObjectDoesNotExist:
+                raise ValidationError('Not all speakers are approved or created yet.')
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
