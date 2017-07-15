@@ -184,6 +184,11 @@ class SpeakerProposal(UserSubmittedModel):
         max_length=255
     )
 
+    submission_notes = models.TextField(
+        help_text='Private notes for the event. Only visible to the submitting user and the BornHack organisers.',
+        blank=True
+    )
+
     @property
     def headline(self):
         return self.name
@@ -243,6 +248,11 @@ class EventProposal(UserSubmittedModel):
     allow_video_recording = models.BooleanField(
         default=False,
         help_text='If we can video record the event or not'
+    )
+
+    submission_notes = models.TextField(
+        help_text='Private notes for the event. Only visible to the submitting user and the BornHack organisers.',
+        blank=True
     )
 
     @property
