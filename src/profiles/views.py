@@ -24,8 +24,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         return models.Profile.objects.get(user=self.request.user)
 
     def form_valid(self, form, **kwargs):
-        print(form.cleaned_data['public_credit_name'])
-        print(form.instance.public_credit_name)
         if 'public_credit_name' in form.changed_data and form.cleaned_data['public_credit_name']:
             # user changed the name (to something non blank)
             form.instance.public_credit_name_approved = False
