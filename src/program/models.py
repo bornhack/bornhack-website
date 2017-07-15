@@ -9,12 +9,11 @@ from datetime import timedelta
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib import messages
 from django.db import models
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.dispatch import receiver
 from django.utils.text import slugify
 from django.utils import timezone
 from django.conf import settings
-from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse_lazy
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
@@ -478,13 +477,9 @@ class EventInstance(CampRelatedModel):
     def __str__(self):
         return '%s (%s)' % (self.event, self.when)
 
-    def __clean__(self):
-        errors = []
+    def clean(self):
         if self.location.camp != self.event.camp:
-            errors.append(ValidationError({'location', "Error: This location belongs to a different camp"}))
-
-        if errors:
-            raise ValidationError(errors)
+            raise ValidationError({'location': 'Error: This location belongs to a different camp'})
 
     @property
     def camp(self):
