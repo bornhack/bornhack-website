@@ -25,15 +25,15 @@ class Sponsor(CreatedUpdatedModel):
         help_text='A short description of the sponsorship'
     )
 
-    logo = models.ImageField(
-        upload_to=get_sponsor_upload_path,
-        help_text='A logo for the sponsor'
+    logo = models.URLField(
+        max_length=255,
+        help_text='A URL to the logo'
     )
 
     url = models.URLField(
         null=True,
         blank=True,
-        help_text="A URL to the sponsor."
+        help_text="An URL to the sponsor."
     )
 
     def __str__(self):

@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     'django_extensions',
 ]
 
-MEDIA_URL = '/media/'
+#MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]

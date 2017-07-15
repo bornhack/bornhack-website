@@ -25,7 +25,7 @@ Sponsors | {{ block.super }}
         </section>
         {% endif %}
         <div class="page-header">
-            <h1>{{ sponsor.tier.name}} <small>{{ sponsor.tier.description}}</small></h1>
+            <h1>{{ sponsor.tier.name}}</h1>
         </div>
         <section>
 
@@ -35,7 +35,7 @@ Sponsors | {{ block.super }}
         {% if sponsor.url %}
         <a href="{{ sponsor.url }}">
         {% endif %}
-        <img src="{{ sponsor.logo.url }}" />
+        <img src="{{ sponsor.logo }}" />
 
         <div class="caption">
             {{ sponsor.description }}
