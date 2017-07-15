@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django_extensions',
 ]
 
+MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 STATIC_ROOT = local_dir('static')
 STATICFILES_DIRS = [local_dir('static_src')]
@@ -70,6 +71,7 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.media',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'shop.context_processors.current_order',

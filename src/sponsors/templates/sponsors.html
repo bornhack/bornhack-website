@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+
+{% block title %}
+Sponsors | {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+
+<h2>{{ view.camp.title }} Sponsors</h2>
+
+<p class="lead">
+  This is a list of the {{ view.camp.title }}  sponsors. An event like BornHack
+  can not be built on hard work and good intentions alone - it would simply not
+  have been possible without the financial help from these organisations. Thank
+  you, we are immensely grateful!
+</p>
+
+
+{% for sponsor in sponsors %}
+
+    {% ifchanged sponsor.tier %}
+        {% if forloop.first != True %}
+        </section>
+        {% endif %}
+        <div class="page-header">
+            <h1>{{ sponsor.tier.name}} <small>{{ sponsor.tier.description}}</small></h1>
+        </div>
+        <section>
+
+    {% endifchanged %}
+
+    <div class="sponsor thumbnail">
+        {% if sponsor.url %}
+        <a href="{{ sponsor.url }}">
+        {% endif %}
+        <img src="{{ sponsor.logo.url }}" />
+
+        <div class="caption">
+            {{ sponsor.description }}
+        </div>
+
+        {% if sponsor.url %}
+        </a>
+        {% endif %}
+    </div>
+
+    {% if forloop.last == True %}
+        </section>
+    {% endif %}
+{% endfor %}
+
+{% endblock %}

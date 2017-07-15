@@ -117,10 +117,6 @@ a, a:active, a:focus {
   height: 500px;
 }
 
-.thumbnail {
-  height: 350px;
-}
-
 /* Footer */
 footer {
     position: fixed;
@@ -262,4 +258,12 @@ footer {
     border-color: #adadad;
     -webkit-box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
     box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+}
+
+.sponsor {
+  padding: 10px;
+}
+
+.sponsor .caption {
+  text-align: center;
 }
