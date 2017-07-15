@@ -28,7 +28,6 @@ from .email import (
     add_eventproposal_updated_email
 )
 from . import models
-import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -91,7 +90,7 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
 
 class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.SpeakerProposal
-    fields = ['name', 'biography', 'picture_small', 'picture_large']
+    fields = ['name', 'biography', 'picture_small', 'picture_large', 'submission_notes']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):
@@ -100,7 +99,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
 
 class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
-    fields = ['name', 'biography', 'picture_small', 'picture_large']
+    fields = ['name', 'biography', 'picture_small', 'picture_large', 'submission_notes']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):
@@ -162,7 +161,7 @@ class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOw
 
 class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.EventProposal
-    fields = ['title', 'abstract', 'event_type', 'speakers', 'allow_video_recording']
+    fields = ['title', 'abstract', 'event_type', 'speakers', 'allow_video_recording', 'submission_notes']
     template_name = 'eventproposal_form.html'
 
     def get_context_data(self, **kwargs):
@@ -174,7 +173,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalM
 
 class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.EventProposal
-    fields = ['title', 'abstract', 'event_type', 'speakers']
+    fields = ['title', 'abstract', 'event_type', 'speakers', 'submission_notes']
     template_name = 'eventproposal_form.html'
 
     def get_success_url(self):
