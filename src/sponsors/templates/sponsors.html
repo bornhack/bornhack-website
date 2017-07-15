@@ -27,24 +27,20 @@ Sponsors | {{ block.super }}
         <div class="page-header">
             <h1>{{ sponsor.tier.name}}</h1>
         </div>
-        <section>
+        <section class="text-center">
 
     {% endifchanged %}
 
-    <div class="sponsor thumbnail">
+    <p class="lead">
         {% if sponsor.url %}
         <a href="{{ sponsor.url }}">
         {% endif %}
-        <img src="{{ sponsor.logo }}" />
-
-        <div class="caption">
-            {{ sponsor.description }}
-        </div>
-
+        <img class="img-responsive center-block" src="{{ sponsor.logo }}" />
         {% if sponsor.url %}
         </a>
         {% endif %}
-    </div>
+        {{ sponsor.description }}
+    </p>
 
     {% if forloop.last == True %}
         </section>
