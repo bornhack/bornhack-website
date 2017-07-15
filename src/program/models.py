@@ -282,6 +282,7 @@ class EventProposal(UserSubmittedModel):
             try:
                 event.speakers.add(sp.speaker)
             except ObjectDoesNotExist:
+                event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
