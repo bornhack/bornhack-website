@@ -208,6 +208,11 @@ footer {
   padding: 0;
 }
 
+.schedule-filter .btn {
+  min-width: 200px;
+  text-align: left;
+}
+
 
 @media (min-width: 520px) {
   .schedule-filter {
@@ -231,28 +236,7 @@ footer {
   flex-wrap: wrap;
 }
 
-.form-group .schedule-checkbox {
-    display: none;
-  }
-
-.form-group input[type="checkbox"] + .btn-group > label span {
-    width: 20px;
-}
-
-.form-group input[type="checkbox"] + .btn-group > label span i:first-child {
-    display: none;
-}
-.form-group input[type="checkbox"] + .btn-group > label span i:last-child {
-    display: inline-block;
-}
-
-.form-group input[type="checkbox"]:checked + .btn-group > label span i:first-child {
-    display: inline-block;
-}
-.form-group input[type="checkbox"]:checked + .btn-group > label span i:last-child {
-    display: none;
-}
-.form-group input[type="checkbox"]:checked + .btn-group > label {
+.filter-choice-active {
     color: #333;
     background-color: #e6e6e6;
     border-color: #adadad;

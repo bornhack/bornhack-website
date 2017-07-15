@@ -264,10 +264,7 @@ class EventDetailView(CampViewMixin, DetailView):
 
 
 class ScheduleView(CampViewMixin, TemplateView):
-    def get_template_names(self):
-        if 'day' in self.kwargs:
-            return 'schedule_day.html'
-        return 'schedule_overview.html'
+    template_name = 'schedule_overview_elm.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)

@@ -311,6 +311,13 @@ class EventLocation(CampRelatedModel):
     class Meta:
         unique_together = (('camp', 'slug'), ('camp', 'name'))
 
+    def to_json(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "icon": self.icon,
+        }
+
 
 class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
@@ -349,6 +356,14 @@ class EventType(CreatedUpdatedModel):
 
     def __str__(self):
         return self.name
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "color": self.color,
+            "light_text": self.light_text,
+        }
 
 
 class Event(CampRelatedModel):
