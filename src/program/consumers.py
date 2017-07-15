@@ -23,7 +23,7 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                 camp.get_days('camp')
             ))
             event_instances_query_set = EventInstance.objects.filter(event__camp=camp)
-            event_instances = list(map(lambda x: x.to_json(), event_instances_query_set))
+            event_instances = list(map(lambda x: x.to_json(user=message.user), event_instances_query_set))
             self.send({
                 "accept": True,
                 "event_instances": event_instances,
@@ -37,12 +37,6 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         content = self.decode_json(message['text'])
         action = content.get('action')
         data = {}
-
-        if action == 'get_event_instance':
-            event_instance_id = content.get('event_instance_id')
-            event_instance = EventInstance.objects.get(id=event_instance_id)
-            data['action'] = 'event_instance'
-            data['event_instance'] = event_instance.to_json(user=message.user)
 
         if action == 'favorite':
             event_instance_id = content.get('event_instance_id')

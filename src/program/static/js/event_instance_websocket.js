@@ -30,45 +30,6 @@ function toggleFavoriteButton(button) {
 function setup_websocket() {
   webSocketBridge.connect('/schedule/');
   webSocketBridge.listen(function(payload, stream) {
-      if(payload['action'] == 'event_instance') {
-          event_instance_id = payload['event_instance']['id'];
-          modal = modals[event_instance_id];
-          modal_title = modal.getElementsByClassName('modal-title')[0];
-          modal_title.innerHTML = payload['event_instance']['title']
-          modal_body_content = modal.getElementsByClassName('modal-body-content')[0];
-          modal_body_content.innerHTML = payload['event_instance']['abstract'];
-          more_button = modal.getElementsByClassName('more-button')[0];
-          more_button.setAttribute('href', payload['event_instance']['url']);
-
-          favorite_button = modal.getElementsByClassName('favorite-button')[0];
-          if(payload['event_instance']['is_favorited'] !== undefined) {
-              favorite_button.setAttribute('data-state', payload['event_instance']['is_favorited'])
-              toggleFavoriteButton(favorite_button);
-          } else {
-              favorite_button.remove();
-          }
-
-          speakers_div = modal.getElementsByClassName('speakers')[0];
-          speakers_div.innerHTML = "";
-          speakers = payload['event_instance']['speakers'];
-          for(speaker_id in speakers) {
-              var speaker = speakers[speaker_id];
-              var speaker_li = document.createElement('li');
-              var speaker_a = document.createElement('a');
-              speaker_a.setAttribute('href', speaker['url']);
-              speaker_a.appendChild(document.createTextNode(speaker['name']));
-              speaker_li.appendChild(speaker_a);
-              speakers_div.appendChild(speaker_li);
-          }
-
-          video_recording_element = modal.getElementsByClassName('video-recording')[0];
-          if(payload['event_instance']['video_recording'] == true) {
-            video_recording_element.innerHTML = 'This event will be recorded!';
-          } else {
-            video_recording_element.parentElement.remove();
-          }
-
-      }
       if(payload['action'] == 'init') {
         EVENT_INSTANCES = payload['event_instances'];
         DAYS = payload['days'];
@@ -299,7 +260,13 @@ function render_event_instance(event_instance) {
     icon_element.classList.add('fa');
     icon_element.classList.add('pull-right');
 
-    if(event_instance['video_recording'] == true) {
+    if(event_instance['video_url'] != undefined) {
+      video_url_element = document.createElement('i');
+      video_url_element.classList.add('fa-film');
+      video_url_element.classList.add('fa');
+      video_url_element.classList.add('pull-right');
+      element.appendChild(video_url_element);
+    } else if(event_instance['video_recording'] == true) {
       video_recording_element = document.createElement('i');
       video_recording_element.classList.add('fa-video-camera');
       video_recording_element.classList.add('fa');
@@ -352,6 +319,11 @@ function openModal(e) {
     }
 
     event_instance_id = target.dataset.eventInstanceId;
+    event_instance = EVENT_INSTANCES.filter(
+        function(event_instance) {
+            return event_instance.id == event_instance_id
+        }
+    )[0];
 
     modal = modals[event_instance_id];
 
@@ -383,6 +355,7 @@ function openModal(e) {
 
         modal_title = document.createElement('h4');
         modal_title.classList.add('modal-title')
+        modal_title.innerHTML = event_instance['title'];
 
         modal_header.appendChild(modal_close_button);
         modal_header.appendChild(modal_title);
@@ -390,12 +363,65 @@ function openModal(e) {
         modal_body_content = document.createElement('div');
         modal_body_content.classList.add('modal-body');
         modal_body_content.classList.add('modal-body-content');
+        modal_body_content.innerHTML = event_instance['abstract'];
         modal_content.appendChild(modal_body_content);
 
         modal_body = document.createElement('div');
         modal_body.classList.add('modal-body');
+        speakers_h4 = document.createElement('h4');
+        speakers_h4.innerHTML = 'Speaker(s):';
+        speakers_ul = document.createElement('ul');
+        speakers_ul.classList.add('speakers');
+
+        speakers = event_instance['speakers'];
+        for(speaker_id in speakers) {
+            var speaker = speakers[speaker_id];
+            var speaker_li = document.createElement('li');
+            var speaker_a = document.createElement('a');
+            speaker_a.setAttribute('href', speaker['url']);
+            speaker_a.appendChild(document.createTextNode(speaker['name']));
+            speaker_li.appendChild(speaker_a);
+            speakers_ul.appendChild(speaker_li);
+        }
+
+        video_recording_div = document.createElement('div');
+        video_recording_div.classList.add('alert');
+        video_recording_div.classList.add('alert-info');
+        video_recording_div.classList.add('video-recording');
+
+        if(event_instance['video_url'] != undefined) {
+          // We have an URL to the video
+          video_url_icon = document.createElement('i');
+          video_url_icon.classList.add('fa');
+          video_url_icon.classList.add('fa-film');
+          video_url_link = document.createElement('a');
+          video_url_link.setAttribute('href', event_instance['video_url']);
+          video_url_link.setAttribute('target', '_blank');
+          video_url_link.innerHTML = " Watch the video recording here!";
+
+          video_recording_div.appendChild(video_url_icon);
+          video_recording_div.appendChild(video_url_link);
+
+        } else if(event_instance['video_recording'] == true) {
+          // This instance will be recorded
+          video_notice_icon = document.createElement('i');
+          video_notice_icon.classList.add('fa');
+          video_notice_icon.classList.add('fa-camera');
+          video_notice_span = document.createElement('span');
+          video_notice_span.innerHTML = " This event will be recorded!";
+
+          video_recording_div.appendChild(video_notice_icon);
+          video_recording_div.appendChild(video_notice_span);
+        } else {
+          // This instance will NOT be recorded!
+          video_recording_element.remove();
+        }
+
+        modal_body.appendChild(speakers_h4);
+        modal_body.appendChild(speakers_ul);
+        modal_body.appendChild(video_recording_div);
+
         modal_content.appendChild(modal_body);
-        modal_body.innerHTML = '<h4>Speaker(s):</h4><ul class="speakers"></ul><div class="alert alert-info" role="alert"><i class="fa fa-video-camera"></i>  <span class="video-recording"></span></div>';
 
         modal_footer = document.createElement('div');
         modal_footer.classList.add('modal-footer');
@@ -415,12 +441,20 @@ function openModal(e) {
         favorite_button.classList.add('btn-success');
         favorite_button.classList.add('favorite-button');
         favorite_button.innerHTML = '<i class="fa fa-star"></i> Favorite</a>';
+        if(event_instance['is_favorited'] !== undefined) {
+            favorite_button.setAttribute('data-state', event_instance['is_favorited'])
+            toggleFavoriteButton(favorite_button);
+        } else {
+            favorite_button.remove();
+        }
+
         modal_footer.appendChild(favorite_button);
 
         more_button = document.createElement('a');
         more_button.classList.add('btn');
         more_button.classList.add('btn-info');
         more_button.classList.add('more-button');
+        more_button.setAttribute('href', event_instance['url']);
         more_button.innerHTML = '<i class="fa fa-info"></i> More</a>';
         modal_footer.appendChild(more_button);
 
@@ -431,7 +465,6 @@ function openModal(e) {
     }
 
     $('#event-modal-' + event_instance_id).modal();
-    webSocketBridge.send({action: 'get_event_instance', event_instance_id: event_instance_id})
 }
 
 function init_modals(event_class_name) {
