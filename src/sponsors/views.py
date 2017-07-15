@@ -11,7 +11,12 @@ class SponsorsView(CampViewMixin, ListView):
 
     def get_queryset(self, **kwargs):
         queryset = super().get_queryset()
-        return queryset.filter(tier__camp=self.camp).order_by('tier__weight')
+        return queryset.filter(
+            tier__camp=self.camp
+        ).order_by(
+            'tier__weight',
+            'name',
+        )
 
 
 class CallForSponsorsView(CampViewMixin, TemplateView):
