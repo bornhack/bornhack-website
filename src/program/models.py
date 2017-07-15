@@ -543,8 +543,10 @@ class EventInstance(CampRelatedModel):
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,
             'video_recording': self.event.video_recording,
-            'video_url': self.event.video_url,
         }
+
+        if self.event.video_url:
+            data['video_url'] = self.event.video_url
 
         if user and user.is_authenticated:
             is_favorited = user.favorites.filter(event_instance=self).exists()
