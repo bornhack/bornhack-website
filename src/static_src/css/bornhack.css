@@ -1,6 +1,7 @@
 body {
   margin-top: 85px;
   margin-bottom: 35px;
+  overflow: scroll;
 }
 
 * {
@@ -215,7 +216,7 @@ footer {
 
 
 @media (min-width: 520px) {
-  .schedule-filter {
+  .schedule-sidebar {
     border-left: 1px solid #eee;
   }
 }

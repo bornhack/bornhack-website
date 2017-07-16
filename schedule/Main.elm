@@ -7,6 +7,7 @@ import WebSocket exposing (listen)
 import Json.Decode exposing (int, string, float, list, bool, Decoder)
 import Json.Encode
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
+import Markdown
 
 
 main : Program Flags Model Msg
@@ -36,6 +37,7 @@ type alias Model =
     , flags : Flags
     , activeDay : Day
     , filter : Filter
+    , activeEventInstance : Maybe EventInstance
     }
 
 
@@ -108,7 +110,7 @@ allDaysDay =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( Model [] [] [] [] flags allDaysDay (Filter [] []), sendInitMessage flags.camp_slug )
+    ( Model [] [] [] [] flags allDaysDay (Filter [] []) Nothing, sendInitMessage flags.camp_slug )
 
 
 sendInitMessage : String -> Cmd Msg
@@ -133,6 +135,8 @@ type Msg
     | MakeActiveday Day
     | ToggleEventTypeFilter EventType
     | ToggleEventLocationFilter EventLocation
+    | OpenEventInstanceDetail EventInstance
+    | CloseEventInstanceDetail
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -146,7 +150,7 @@ update msg model =
                 newModel =
                     case Json.Decode.decodeString initDataDecoder str of
                         Ok m ->
-                            m model.flags allDaysDay (Filter [] [])
+                            m model.flags allDaysDay (Filter [] []) Nothing
 
                         Err error ->
                             model
@@ -187,6 +191,12 @@ update msg model =
                     { currentFilter | eventLocations = eventLocationsFilter }
             in
                 { model | filter = newFilter } ! []
+
+        OpenEventInstanceDetail eventInstance ->
+            { model | activeEventInstance = Just eventInstance } ! []
+
+        CloseEventInstanceDetail ->
+            { model | activeEventInstance = Nothing } ! []
 
 
 
@@ -255,7 +265,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Day -> Filter -> Model)
+initDataDecoder : Decoder (Flags -> Day -> Filter -> Maybe EventInstance -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)
@@ -290,28 +300,60 @@ view model =
                 (List.map (\day -> dayButton day model.activeDay) (allDaysDay :: model.days))
             ]
         , hr [] []
-        , div [ class "row" ]
-            [ div
-                [ classList
-                    [ ( "col-sm-3", True )
-                    , ( "col-sm-push-9", True )
-                    , ( "schedule-filter", True )
-                    ]
+        , case model.activeEventInstance of
+            Just eventInstance ->
+                eventInstanceDetailView eventInstance
+
+            Nothing ->
+                scheduleOverviewView model
+        ]
+
+
+eventInstanceDetailView : EventInstance -> Html Msg
+eventInstanceDetailView eventInstance =
+    div [ class "row" ]
+        [ div [ class "col-sm-9" ]
+            [ div [ onClick CloseEventInstanceDetail ]
+                [ text "Back"
                 ]
-                [ h4 [] [ text "Filter" ]
-                , div [ class "form-group" ]
-                    [ filterView "Type" model.eventTypes model.filter.eventTypes ToggleEventTypeFilter
-                    , filterView "Location" model.eventLocations model.filter.eventLocations ToggleEventLocationFilter
-                    ]
-                ]
-            , div
-                [ classList
-                    [ ( "col-sm-9", True )
-                    , ( "col-sm-pull-3", True )
-                    ]
-                ]
-                (List.map (\day -> dayRowView day model) model.days)
+            , h4 [] [ text eventInstance.title ]
+            , p [] [ Markdown.toHtml [] eventInstance.abstract ]
             ]
+        , div
+            [ classList
+                [ ( "col-sm-3", True )
+                , ( "schedule-sidebar", True )
+                ]
+            ]
+            [ h4 [] [ text "Speakers" ]
+            ]
+        ]
+
+
+scheduleOverviewView : Model -> Html Msg
+scheduleOverviewView model =
+    div [ class "row" ]
+        [ div
+            [ classList
+                [ ( "col-sm-3", True )
+                , ( "col-sm-push-9", True )
+                , ( "schedule-sidebar", True )
+                , ( "schedule-filter", True )
+                ]
+            ]
+            [ h4 [] [ text "Filter" ]
+            , div [ class "form-group" ]
+                [ filterView "Type" model.eventTypes model.filter.eventTypes ToggleEventTypeFilter
+                , filterView "Location" model.eventLocations model.filter.eventLocations ToggleEventLocationFilter
+                ]
+            ]
+        , div
+            [ classList
+                [ ( "col-sm-9", True )
+                , ( "col-sm-pull-3", True )
+                ]
+            ]
+            (List.map (\day -> dayRowView day model) model.days)
         ]
 
 
@@ -353,7 +395,14 @@ dayRowView day model =
 
 dayEventInstanceView : EventInstance -> Html Msg
 dayEventInstanceView eventInstance =
-    a [ class "event", style [ ( "background-color", eventInstance.backgroundColor ), ( "color", eventInstance.forgroundColor ) ] ]
+    a
+        [ class "event"
+        , onClick (OpenEventInstanceDetail eventInstance)
+        , style
+            [ ( "background-color", eventInstance.backgroundColor )
+            , ( "color", eventInstance.forgroundColor )
+            ]
+        ]
         [ small []
             [ text ((String.slice 11 16 eventInstance.from) ++ " - " ++ (String.slice 11 16 eventInstance.to)) ]
         , i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
