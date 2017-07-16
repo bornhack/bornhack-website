@@ -1,18 +1,21 @@
 module Main exposing (..)
 
 import Html exposing (Html, Attribute, div, input, text, li, ul, a, h4, label, i, span, hr, small, p)
-import Html.Attributes exposing (class, classList, id, type_, for, style)
+import Html.Attributes exposing (class, classList, id, type_, for, style, href)
 import Html.Events exposing (onClick)
 import WebSocket exposing (listen)
 import Json.Decode exposing (int, string, float, list, bool, Decoder)
 import Json.Encode
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 import Markdown
+import Navigation exposing (Location)
+import UrlParser exposing ((</>))
 
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+    Navigation.programWithFlags
+        OnLocationChange
         { init = init
         , view = view
         , update = update
@@ -23,6 +26,34 @@ main =
 scheduleServer : String
 scheduleServer =
     "ws://localhost:8000/schedule/"
+
+
+
+-- ROUTING
+
+
+type Route
+    = OverviewRoute
+    | EventInstanceRoute EventInstanceId
+    | NotFoundRoute
+
+
+matchers : UrlParser.Parser (Route -> a) a
+matchers =
+    UrlParser.oneOf
+        [ UrlParser.map OverviewRoute UrlParser.top
+        , UrlParser.map EventInstanceRoute (UrlParser.s "event" </> UrlParser.int)
+        ]
+
+
+parseLocation : Location -> Route
+parseLocation location =
+    case UrlParser.parseHash matchers location of
+        Just route ->
+            route
+
+        Nothing ->
+            NotFoundRoute
 
 
 
@@ -37,7 +68,7 @@ type alias Model =
     , flags : Flags
     , activeDay : Day
     , filter : Filter
-    , activeEventInstance : Maybe EventInstance
+    , route : Route
     }
 
 
@@ -60,9 +91,13 @@ type alias Speaker =
     }
 
 
+type alias EventInstanceId =
+    Int
+
+
 type alias EventInstance =
     { title : String
-    , id : Int
+    , id : EventInstanceId
     , url : String
     , abstract : String
     , eventSlug : String
@@ -77,6 +112,26 @@ type alias EventInstance =
     , speakers : List Speaker
     , videoRecording : Bool
     , videoUrl : String
+    }
+
+
+emptyEventInstance =
+    { title = "This should not happen!"
+    , id = 0
+    , url = ""
+    , abstract = ""
+    , eventSlug = ""
+    , eventType = ""
+    , backgroundColor = ""
+    , forgroundColor = ""
+    , from = ""
+    , to = ""
+    , timeslots = 0.0
+    , location = ""
+    , locationIcon = ""
+    , speakers = []
+    , videoRecording = False
+    , videoUrl = ""
     }
 
 
@@ -108,9 +163,9 @@ allDaysDay =
     Day "All Days" "" ""
 
 
-init : Flags -> ( Model, Cmd Msg )
-init flags =
-    ( Model [] [] [] [] flags allDaysDay (Filter [] []) Nothing, sendInitMessage flags.camp_slug )
+init : Flags -> Location -> ( Model, Cmd Msg )
+init flags location =
+    ( Model [] [] [] [] flags allDaysDay (Filter [] []) (parseLocation location), sendInitMessage flags.camp_slug )
 
 
 sendInitMessage : String -> Cmd Msg
@@ -135,8 +190,7 @@ type Msg
     | MakeActiveday Day
     | ToggleEventTypeFilter EventType
     | ToggleEventLocationFilter EventLocation
-    | OpenEventInstanceDetail EventInstance
-    | CloseEventInstanceDetail
+    | OnLocationChange Location
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -150,7 +204,7 @@ update msg model =
                 newModel =
                     case Json.Decode.decodeString initDataDecoder str of
                         Ok m ->
-                            m model.flags allDaysDay (Filter [] []) Nothing
+                            m model.flags allDaysDay (Filter [] []) model.route
 
                         Err error ->
                             model
@@ -192,11 +246,12 @@ update msg model =
             in
                 { model | filter = newFilter } ! []
 
-        OpenEventInstanceDetail eventInstance ->
-            { model | activeEventInstance = Just eventInstance } ! []
-
-        CloseEventInstanceDetail ->
-            { model | activeEventInstance = Nothing } ! []
+        OnLocationChange location ->
+            let
+                newRoute =
+                    parseLocation location
+            in
+                { model | route = newRoute } ! []
 
 
 
@@ -265,7 +320,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Day -> Filter -> Maybe EventInstance -> Model)
+initDataDecoder : Decoder (Flags -> Day -> Filter -> Route -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)
@@ -300,34 +355,46 @@ view model =
                 (List.map (\day -> dayButton day model.activeDay) (allDaysDay :: model.days))
             ]
         , hr [] []
-        , case model.activeEventInstance of
-            Just eventInstance ->
-                eventInstanceDetailView eventInstance
-
-            Nothing ->
+        , case model.route of
+            OverviewRoute ->
                 scheduleOverviewView model
+
+            EventInstanceRoute eventInstanceId ->
+                eventInstanceDetailView eventInstanceId model.eventInstances
+
+            NotFoundRoute ->
+                div [] [ text "Not found!" ]
         ]
 
 
-eventInstanceDetailView : EventInstance -> Html Msg
-eventInstanceDetailView eventInstance =
-    div [ class "row" ]
-        [ div [ class "col-sm-9" ]
-            [ div [ onClick CloseEventInstanceDetail ]
-                [ text "Back"
+eventInstanceDetailView : EventInstanceId -> List EventInstance -> Html Msg
+eventInstanceDetailView eventInstanceId eventInstances =
+    let
+        eventInstance =
+            case List.head (List.filter (\e -> e.id == eventInstanceId) eventInstances) of
+                Just eventInstance ->
+                    eventInstance
+
+                Nothing ->
+                    emptyEventInstance
+    in
+        div [ class "row" ]
+            [ div [ class "col-sm-9" ]
+                [ a [ href "#" ]
+                    [ text "Back"
+                    ]
+                , h4 [] [ text eventInstance.title ]
+                , p [] [ Markdown.toHtml [] eventInstance.abstract ]
                 ]
-            , h4 [] [ text eventInstance.title ]
-            , p [] [ Markdown.toHtml [] eventInstance.abstract ]
-            ]
-        , div
-            [ classList
-                [ ( "col-sm-3", True )
-                , ( "schedule-sidebar", True )
+            , div
+                [ classList
+                    [ ( "col-sm-3", True )
+                    , ( "schedule-sidebar", True )
+                    ]
+                ]
+                [ h4 [] [ text "Speakers" ]
                 ]
             ]
-            [ h4 [] [ text "Speakers" ]
-            ]
-        ]
 
 
 scheduleOverviewView : Model -> Html Msg
@@ -397,7 +464,7 @@ dayEventInstanceView : EventInstance -> Html Msg
 dayEventInstanceView eventInstance =
     a
         [ class "event"
-        , onClick (OpenEventInstanceDetail eventInstance)
+        , href ("#event/" ++ (toString eventInstance.id))
         , style
             [ ( "background-color", eventInstance.backgroundColor )
             , ( "color", eventInstance.forgroundColor )
