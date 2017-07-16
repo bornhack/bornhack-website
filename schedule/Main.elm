@@ -34,7 +34,7 @@ scheduleServer =
 
 type Route
     = OverviewRoute
-    | EventInstanceRoute EventInstanceId
+    | EventInstanceRoute EventInstanceSlug
     | NotFoundRoute
 
 
@@ -42,7 +42,7 @@ matchers : UrlParser.Parser (Route -> a) a
 matchers =
     UrlParser.oneOf
         [ UrlParser.map OverviewRoute UrlParser.top
-        , UrlParser.map EventInstanceRoute (UrlParser.s "event" </> UrlParser.int)
+        , UrlParser.map EventInstanceRoute (UrlParser.s "event" </> UrlParser.string)
         ]
 
 
@@ -91,16 +91,16 @@ type alias Speaker =
     }
 
 
-type alias EventInstanceId =
-    Int
+type alias EventInstanceSlug =
+    String
 
 
 type alias EventInstance =
     { title : String
-    , id : EventInstanceId
+    , id : Int
     , url : String
     , abstract : String
-    , eventSlug : String
+    , eventSlug : EventInstanceSlug
     , eventType : String
     , backgroundColor : String
     , forgroundColor : String
@@ -115,6 +115,7 @@ type alias EventInstance =
     }
 
 
+emptyEventInstance : EventInstance
 emptyEventInstance =
     { title = "This should not happen!"
     , id = 0
@@ -367,11 +368,11 @@ view model =
         ]
 
 
-eventInstanceDetailView : EventInstanceId -> List EventInstance -> Html Msg
+eventInstanceDetailView : EventInstanceSlug -> List EventInstance -> Html Msg
 eventInstanceDetailView eventInstanceId eventInstances =
     let
         eventInstance =
-            case List.head (List.filter (\e -> e.id == eventInstanceId) eventInstances) of
+            case List.head (List.filter (\e -> e.eventSlug == eventInstanceId) eventInstances) of
                 Just eventInstance ->
                     eventInstance
 
@@ -464,7 +465,7 @@ dayEventInstanceView : EventInstance -> Html Msg
 dayEventInstanceView eventInstance =
     a
         [ class "event"
-        , href ("#event/" ++ (toString eventInstance.id))
+        , href ("#event/" ++ eventInstance.eventSlug)
         , style
             [ ( "background-color", eventInstance.backgroundColor )
             , ( "color", eventInstance.forgroundColor )
