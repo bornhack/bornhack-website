@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, Attribute, div, input, text, li, ul, a, h4, label, i, span)
-import Html.Attributes exposing (class, classList, id, type_, for)
+import Html exposing (Html, Attribute, div, input, text, li, ul, a, h4, label, i, span, hr, small, p)
+import Html.Attributes exposing (class, classList, id, type_, for, style)
 import Html.Events exposing (onClick)
 import WebSocket exposing (listen)
 import Json.Decode exposing (int, string, float, list, bool, Decoder)
@@ -101,6 +101,7 @@ type alias Flags =
     }
 
 
+allDaysDay : Day
 allDaysDay =
     Day "All Days" "" ""
 
@@ -288,11 +289,12 @@ view model =
             [ div [ id "schedule-days", class "btn-group" ]
                 (List.map (\day -> dayButton day model.activeDay) (allDaysDay :: model.days))
             ]
+        , hr [] []
         , div [ class "row" ]
             [ div
                 [ classList
                     [ ( "col-sm-3", True )
-                    , ( "col-sm-9", True )
+                    , ( "col-sm-push-9", True )
                     , ( "schedule-filter", True )
                     ]
                 ]
@@ -302,8 +304,62 @@ view model =
                     , filterView "Location" model.eventLocations model.filter.eventLocations ToggleEventLocationFilter
                     ]
                 ]
-            , div [] []
+            , div
+                [ classList
+                    [ ( "col-sm-9", True )
+                    , ( "col-sm-pull-3", True )
+                    ]
+                ]
+                (List.map (\day -> dayRowView day model) model.days)
             ]
+        ]
+
+
+dayRowView : Day -> Model -> Html Msg
+dayRowView day model =
+    let
+        types =
+            List.map (\eventType -> eventType.slug)
+                (if List.isEmpty model.filter.eventTypes then
+                    model.eventTypes
+                 else
+                    model.filter.eventTypes
+                )
+
+        locations =
+            List.map (\eventLocation -> eventLocation.slug)
+                (if List.isEmpty model.filter.eventLocations then
+                    model.eventLocations
+                 else
+                    model.filter.eventLocations
+                )
+
+        filteredEventInstances =
+            List.filter
+                (\eventInstance ->
+                    ((String.slice 0 10 eventInstance.from) == day.iso)
+                        && List.member eventInstance.location locations
+                        && List.member eventInstance.eventType types
+                )
+                model.eventInstances
+    in
+        div []
+            [ h4 []
+                [ text day.repr ]
+            , div [ class "schedule-day-row" ]
+                (List.map dayEventInstanceView filteredEventInstances)
+            ]
+
+
+dayEventInstanceView : EventInstance -> Html Msg
+dayEventInstanceView eventInstance =
+    a [ class "event", style [ ( "background-color", eventInstance.backgroundColor ), ( "color", eventInstance.forgroundColor ) ] ]
+        [ small []
+            [ text ((String.slice 11 16 eventInstance.from) ++ " - " ++ (String.slice 11 16 eventInstance.to)) ]
+        , i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
+        , p
+            []
+            [ text eventInstance.title ]
         ]
 
 
@@ -348,8 +404,3 @@ filterChoiceView filter currentFilters action =
                     ]
                 ]
             ]
-
-
-locationFilter : List EventLocation -> Html Msg
-locationFilter eventLocations =
-    div [] [ text "Location:" ]
