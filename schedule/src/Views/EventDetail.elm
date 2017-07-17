@@ -32,7 +32,7 @@ eventDetailView eventSlug model =
                 , h4 [] [ text event.title ]
                 , p [] [ Markdown.toHtml [] event.abstract ]
                 , hr [] []
-                , h4 [] [ text "TODO: Show all instances here!" ]
+                , eventInstancesList eventSlug model.eventInstances
                 ]
             , div
                 [ classList
@@ -40,6 +40,39 @@ eventDetailView eventSlug model =
                     , ( "schedule-sidebar", True )
                     ]
                 ]
-                [ h4 [] [ text "Speakers" ]
+                [ h4 []
+                    [ text "Speakers" ]
+                , ul
+                    []
+                    (List.map speakerDetail event.speakers)
                 ]
             ]
+
+
+speakerDetail : Speaker -> Html Msg
+speakerDetail speaker =
+    li []
+        [ text speaker.name
+        ]
+
+
+eventInstancesList : String -> List EventInstance -> Html Msg
+eventInstancesList eventSlug eventInstances =
+    let
+        instances =
+            List.filter (\instance -> instance.eventSlug == eventSlug) eventInstances
+    in
+        div []
+            [ h4 []
+                [ text "This event will occur at:" ]
+            , ul
+                []
+                (List.map eventInstanceItem instances)
+            ]
+
+
+eventInstanceItem : EventInstance -> Html Msg
+eventInstanceItem eventInstance =
+    li []
+        [ text (eventInstance.from ++ " to " ++ eventInstance.to)
+        ]

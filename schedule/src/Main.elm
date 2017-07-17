@@ -12,6 +12,7 @@ import Views exposing (view)
 
 -- External modules
 
+import Html.Lazy exposing (lazy)
 import WebSocket exposing (listen)
 import Navigation exposing (Location)
 
@@ -21,7 +22,7 @@ main =
     Navigation.programWithFlags
         OnLocationChange
         { init = init
-        , view = view
+        , view = lazy view
         , update = update
         , subscriptions = subscriptions
         }

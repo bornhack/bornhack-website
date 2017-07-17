@@ -10,6 +10,7 @@ import Views.FilterView exposing (filterSidebar)
 -- External modules
 
 import Html exposing (Html, text, div, ul, li, span, i, h4, p, small, a)
+import Html.Lazy exposing (lazy, lazy2)
 import Html.Attributes exposing (class, classList, href, style)
 
 
@@ -23,7 +24,7 @@ scheduleOverviewView model =
                 , ( "col-sm-pull-3", True )
                 ]
             ]
-            (List.map (\day -> dayRowView day model) model.days)
+            (List.map (\day -> lazy2 dayRowView day model) model.days)
         ]
 
 
@@ -59,7 +60,7 @@ dayRowView day model =
             [ h4 []
                 [ text day.repr ]
             , div [ class "schedule-day-row" ]
-                (List.map dayEventInstanceView filteredEventInstances)
+                (List.map (lazy dayEventInstanceView) filteredEventInstances)
             ]
 
 
