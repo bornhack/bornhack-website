@@ -41,7 +41,6 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                     "action": "init",
                     "event_locations": event_locations,
                     "event_types": event_types,
-                    "accept": True,
                     "event_instances": event_instances,
                     "days": days,
                 }
@@ -51,8 +50,6 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         if action == 'get_event_content':
             camp_slug = content.get('camp_slug')
             event_slug = content.get('event_slug')
-            print(camp_slug)
-            print(event_slug)
             event = Event.objects.get(
                 slug=event_slug,
                 camp__slug=camp_slug

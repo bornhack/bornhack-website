@@ -10,8 +10,6 @@ import Views.FilterView exposing (filterSidebar)
 -- External modules
 
 import Html exposing (Html, text, div, ul, li, span, i, h4)
-import Html.Attributes exposing (class, classList, href)
-import Html.Events exposing (onClick)
 
 
 dayView : DayIso -> Model -> Html Msg

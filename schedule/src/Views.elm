@@ -6,7 +6,7 @@ import Models exposing (..)
 import Messages exposing (Msg(..))
 import Views.DayPicker exposing (dayPicker)
 import Views.DayView exposing (dayView)
-import Views.EventDetail exposing (eventInstanceDetailView)
+import Views.EventDetail exposing (eventDetailView)
 import Views.ScheduleOverview exposing (scheduleOverviewView)
 
 
@@ -27,8 +27,8 @@ view model =
             DayRoute dayIso ->
                 dayView dayIso model
 
-            EventInstanceRoute eventInstanceSlug ->
-                eventInstanceDetailView eventInstanceSlug model
+            EventRoute eventSlug ->
+                eventDetailView eventSlug model
 
             NotFoundRoute ->
                 div [] [ text "Not found!" ]

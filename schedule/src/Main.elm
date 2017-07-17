@@ -29,7 +29,22 @@ main =
 
 init : Flags -> Location -> ( Model, Cmd Msg )
 init flags location =
-    ( Model [] [] [] [] [] flags allDaysDay (Filter [] []) (parseLocation location), sendInitMessage flags.camp_slug )
+    let
+        currentRoute =
+            parseLocation location
+
+        emptyFilter =
+            Filter [] []
+
+        initModel =
+            (Model [] [] [] [] [] flags allDaysDay emptyFilter currentRoute)
+
+        -- To ensure we load data on right momens we call update with the
+        -- OnLocationChange message which is in charge of all that
+        ( model, cmd ) =
+            update (OnLocationChange location) initModel
+    in
+        model ! [ cmd ]
 
 
 

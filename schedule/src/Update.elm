@@ -2,11 +2,11 @@ module Update exposing (update)
 
 -- Local modules
 
-import Models exposing (Model, Route(EventInstanceRoute), emptyEventInstance, allDaysDay, Filter)
+import Models exposing (Model, Route(OverviewRoute, EventRoute), emptyEventInstance, allDaysDay, Filter)
 import Messages exposing (Msg(..))
 import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
 import Routing exposing (parseLocation)
-import WebSocketCalls exposing (sendGetEventContent)
+import WebSocketCalls exposing (sendGetEventContent, sendInitMessage)
 
 
 -- Core modules
@@ -29,7 +29,16 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            m model.flags allDaysDay (Filter [] []) model.route
+                                            let
+                                                newModel_ =
+                                                    m model.flags allDaysDay (Filter [] []) model.route
+                                            in
+                                                { model
+                                                    | days = newModel_.days
+                                                    , eventInstances = newModel_.eventInstances
+                                                    , eventLocations = newModel_.eventLocations
+                                                    , eventTypes = newModel_.eventTypes
+                                                }
 
                                         Err error ->
                                             model
@@ -88,21 +97,25 @@ update msg model =
         OnLocationChange location ->
             let
                 newRoute =
-                    parseLocation (Debug.log "location" location)
+                    parseLocation location
 
                 onLoadCmd =
                     case newRoute of
-                        EventInstanceRoute eventInstanceSlug ->
-                            let
-                                eventInstance =
-                                    case List.head (List.filter (\x -> x.slug == eventInstanceSlug) model.eventInstances) of
-                                        Just eventInstance ->
-                                            eventInstance
+                        EventRoute eventSlug ->
+                            case List.head (List.filter (\x -> x.slug == eventSlug) model.events) of
+                                Just event ->
+                                    Cmd.none
 
-                                        Nothing ->
-                                            emptyEventInstance
-                            in
-                                sendGetEventContent model.flags.camp_slug eventInstance.eventSlug
+                                Nothing ->
+                                    sendGetEventContent model.flags.camp_slug (Debug.log "eventSlug" eventSlug)
+
+                        OverviewRoute ->
+                            case List.head model.days of
+                                Just day ->
+                                    Cmd.none
+
+                                Nothing ->
+                                    sendInitMessage model.flags.camp_slug
 
                         _ ->
                             Cmd.none

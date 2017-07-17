@@ -67,7 +67,7 @@ dayEventInstanceView : EventInstance -> Html Msg
 dayEventInstanceView eventInstance =
     a
         [ class "event"
-        , href ("#event/" ++ eventInstance.slug)
+        , href ("#event/" ++ eventInstance.eventSlug)
         , style
             [ ( "background-color", eventInstance.backgroundColor )
             , ( "color", eventInstance.forgroundColor )

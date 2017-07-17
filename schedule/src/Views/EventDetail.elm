@@ -1,4 +1,4 @@
-module Views.EventDetail exposing (eventInstanceDetailView)
+module Views.EventDetail exposing (eventDetailView)
 
 -- Local modules
 
@@ -13,19 +13,11 @@ import Html.Attributes exposing (class, classList, href)
 import Markdown
 
 
-eventInstanceDetailView : EventInstanceSlug -> Model -> Html Msg
-eventInstanceDetailView eventInstanceSlug model =
+eventDetailView : EventSlug -> Model -> Html Msg
+eventDetailView eventSlug model =
     let
-        eventInstance =
-            case List.head (List.filter (\e -> e.slug == eventInstanceSlug) model.eventInstances) of
-                Just eventInstance ->
-                    eventInstance
-
-                Nothing ->
-                    emptyEventInstance
-
         event =
-            case List.head (List.filter (\e -> e.slug == eventInstance.eventSlug) model.events) of
+            case List.head (List.filter (\e -> e.slug == eventSlug) model.events) of
                 Just event ->
                     event
 
@@ -37,7 +29,7 @@ eventInstanceDetailView eventInstanceSlug model =
                 [ a [ href "#" ]
                     [ text "Back"
                     ]
-                , h4 [] [ text eventInstance.title ]
+                , h4 [] [ text event.title ]
                 , p [] [ Markdown.toHtml [] event.abstract ]
                 , hr [] []
                 , h4 [] [ text "TODO: Show all instances here!" ]

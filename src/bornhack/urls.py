@@ -128,11 +128,6 @@ urlpatterns = [
             url(
                 r'^program/', include([
                     url(
-                        r'^(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/$',
-                        ScheduleView.as_view(),
-                        name='schedule_day'
-                    ),
-                    url(
                         r'^$',
                         ScheduleView.as_view(),
                         name='schedule_index'

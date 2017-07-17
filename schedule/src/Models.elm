@@ -4,7 +4,7 @@ module Models exposing (..)
 type Route
     = OverviewRoute
     | DayRoute DayIso
-    | EventInstanceRoute EventInstanceSlug
+    | EventRoute EventSlug
     | NotFoundRoute
 
 
