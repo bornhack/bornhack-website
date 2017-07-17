@@ -11,7 +11,7 @@
 
 <script>
 var container = document.getElementById('schedule-container');
-Elm.Main.embed(
+var elm_app = Elm.Main.embed(
     container,
     { 'schedule_timeslot_length_minutes': Number('{{ schedule_timeslot_length_minutes }}')
     , 'schedule_midnight_offset_hours': Number('{{ schedule_midnight_offset_hours }}')
