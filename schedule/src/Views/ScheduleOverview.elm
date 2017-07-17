@@ -12,6 +12,7 @@ import Views.FilterView exposing (filterSidebar)
 import Html exposing (Html, text, div, ul, li, span, i, h4, p, small, a)
 import Html.Lazy exposing (lazy, lazy2)
 import Html.Attributes exposing (class, classList, href, style)
+import Date.Extra as Date exposing (Interval(..), equalBy)
 
 
 scheduleOverviewView : Model -> Html Msg
@@ -50,7 +51,8 @@ dayRowView day model =
         filteredEventInstances =
             List.filter
                 (\eventInstance ->
-                    ((String.slice 0 10 eventInstance.from) == day.iso)
+                    (Date.equalBy Month eventInstance.from day.date)
+                        && (Date.equalBy Date.Day eventInstance.from day.date)
                         && List.member eventInstance.location locations
                         && List.member eventInstance.eventType types
                 )
@@ -75,7 +77,12 @@ dayEventInstanceView eventInstance =
             ]
         ]
         [ small []
-            [ text ((String.slice 11 16 eventInstance.from) ++ " - " ++ (String.slice 11 16 eventInstance.to)) ]
+            [ text
+                ((Date.toFormattedString "H:m" eventInstance.from)
+                    ++ " - "
+                    ++ (Date.toFormattedString "H:m" eventInstance.to)
+                )
+            ]
         , i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
         , p
             []

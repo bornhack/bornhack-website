@@ -1,9 +1,11 @@
 module Models exposing (..)
 
+import Date exposing (Date, now)
+
 
 type Route
     = OverviewRoute
-    | DayRoute DayIso
+    | DayRoute String
     | EventRoute EventSlug
     | NotFoundRoute
 
@@ -15,7 +17,7 @@ type alias Model =
     , eventTypes : List EventType
     , events : List Event
     , flags : Flags
-    , activeDay : Day
+    , activeDay : Maybe Day
     , filter : Filter
     , route : Route
     }
@@ -27,13 +29,9 @@ type alias Filter =
     }
 
 
-type alias DayIso =
-    String
-
-
 type alias Day =
     { day_name : String
-    , iso : DayIso
+    , date : Date
     , repr : String
     }
 
@@ -60,8 +58,8 @@ type alias EventInstance =
     , eventType : String
     , backgroundColor : String
     , forgroundColor : String
-    , from : String
-    , to : String
+    , from : Date
+    , to : Date
     , timeslots : Float
     , location : String
     , locationIcon : String
@@ -75,26 +73,6 @@ type alias Event =
     , slug : EventSlug
     , abstract : String
     , speakers : List Speaker
-    }
-
-
-emptyEventInstance : EventInstance
-emptyEventInstance =
-    { title = "This should not happen!"
-    , slug = "this-should-not-happen"
-    , id = 0
-    , url = ""
-    , eventSlug = ""
-    , eventType = ""
-    , backgroundColor = ""
-    , forgroundColor = ""
-    , from = ""
-    , to = ""
-    , timeslots = 0.0
-    , location = ""
-    , locationIcon = ""
-    , videoRecording = False
-    , videoUrl = ""
     }
 
 
@@ -119,8 +97,3 @@ type alias Flags =
     , ics_button_href : String
     , camp_slug : String
     }
-
-
-allDaysDay : Day
-allDaysDay =
-    Day "All Days" "" ""

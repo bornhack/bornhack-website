@@ -11,34 +11,57 @@ import Messages exposing (Msg(..))
 import Html exposing (Html, text, a, div)
 import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
+import Date.Extra as Date
 
 
 dayPicker : Model -> Html Msg
 dayPicker model =
-    div [ class "row" ]
-        [ div [ id "schedule-days", class "btn-group" ]
-            (List.map (\day -> dayButton day model.activeDay) (allDaysDay :: model.days))
-        ]
+    let
+        isAllDaysActive =
+            case model.activeDay of
+                Just activeDay ->
+                    False
 
-
-dayButton : Day -> Day -> Html Msg
-dayButton day activeDay =
-    a
-        [ classList
-            [ ( "btn", True )
-            , ( "btn-default", day /= activeDay )
-            , ( "btn-primary", day == activeDay )
+                Nothing ->
+                    True
+    in
+        div [ class "row" ]
+            [ div [ id "schedule-days", class "btn-group" ]
+                ([ a
+                    [ classList
+                        [ ( "btn", True )
+                        , ( "btn-default", not isAllDaysActive )
+                        , ( "btn-primary", isAllDaysActive )
+                        ]
+                    , href ("#")
+                    ]
+                    [ text "All Days"
+                    ]
+                 ]
+                    ++ (List.map (\day -> dayButton day model.activeDay) model.days)
+                )
             ]
-        , onClick (MakeActiveday day)
-        , href
-            ("#"
-                ++ case day.iso of
-                    "" ->
-                        ""
 
-                    iso ->
-                        "day/" ++ iso
-            )
-        ]
-        [ text day.day_name
-        ]
+
+dayButton : Day -> Maybe Day -> Html Msg
+dayButton day activeDay =
+    let
+        isActive =
+            case activeDay of
+                Just activeDay ->
+                    day == activeDay
+
+                Nothing ->
+                    False
+    in
+        a
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-default", not isActive )
+                , ( "btn-primary", isActive )
+                ]
+            , href ("#day/" ++ (Date.toFormattedString "y-M-d" day.date))
+            , onClick (MakeActiveday day)
+            ]
+            [ text day.day_name
+            ]

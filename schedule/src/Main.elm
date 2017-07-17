@@ -38,7 +38,7 @@ init flags location =
             Filter [] []
 
         initModel =
-            (Model [] [] [] [] [] flags allDaysDay emptyFilter currentRoute)
+            (Model [] [] [] [] [] flags Nothing emptyFilter currentRoute)
 
         -- To ensure we load data on right momens we call update with the
         -- OnLocationChange message which is in charge of all that

@@ -9,6 +9,12 @@ import Models exposing (Day, Speaker, Event, EventInstance, EventLocation, Event
 
 import Json.Decode exposing (int, string, float, list, bool, dict, Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
+import Date exposing (Month(..))
+
+
+-- External modules
+
+import Date.Extra as Date
 
 
 -- DECODERS
@@ -29,7 +35,7 @@ dayDecoder : Decoder Day
 dayDecoder =
     decode Day
         |> required "day_name" string
-        |> required "iso" string
+        |> required "iso" dateDecoder
         |> required "repr" string
 
 
@@ -48,6 +54,19 @@ eventDecoder =
         |> required "speakers" (list speakerDecoder)
 
 
+dateDecoder =
+    let
+        unpacked x =
+            case Date.fromIsoString x of
+                Just value ->
+                    value
+
+                Nothing ->
+                    Date.fromParts 1970 Jan 1 0 0 0 0
+    in
+        Json.Decode.map unpacked string
+
+
 eventInstanceDecoder : Decoder EventInstance
 eventInstanceDecoder =
     decode EventInstance
@@ -59,8 +78,8 @@ eventInstanceDecoder =
         |> required "event_type" string
         |> required "bg-color" string
         |> required "fg-color" string
-        |> required "from" string
-        |> required "to" string
+        |> required "from" dateDecoder
+        |> required "to" dateDecoder
         |> required "timeslots" float
         |> required "location" string
         |> required "location_icon" string
@@ -85,7 +104,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Day -> Filter -> Route -> Model)
+initDataDecoder : Decoder (Flags -> Maybe Day -> Filter -> Route -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)

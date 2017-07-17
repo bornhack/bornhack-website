@@ -2,7 +2,7 @@ module Update exposing (update)
 
 -- Local modules
 
-import Models exposing (Model, Route(OverviewRoute, EventRoute), emptyEventInstance, allDaysDay, Filter)
+import Models exposing (Model, Route(OverviewRoute, EventRoute), Filter)
 import Messages exposing (Msg(..))
 import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
 import Routing exposing (parseLocation)
@@ -31,7 +31,7 @@ update msg model =
                                         Ok m ->
                                             let
                                                 newModel_ =
-                                                    m model.flags allDaysDay (Filter [] []) model.route
+                                                    m model.flags Nothing (Filter [] []) model.route
                                             in
                                                 { model
                                                     | days = newModel_.days
@@ -60,7 +60,7 @@ update msg model =
                 newModel ! []
 
         MakeActiveday day ->
-            { model | activeDay = day } ! []
+            { model | activeDay = Just day } ! []
 
         ToggleEventTypeFilter eventType ->
             let
