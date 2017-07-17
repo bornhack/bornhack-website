@@ -62,6 +62,9 @@ update msg model =
         MakeActiveday day ->
             { model | activeDay = Just day } ! []
 
+        RemoveActiveDay ->
+            { model | activeDay = Nothing } ! []
+
         ToggleEventTypeFilter eventType ->
             let
                 eventTypesFilter =

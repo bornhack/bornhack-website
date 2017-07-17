@@ -34,6 +34,7 @@ dayPicker model =
                         , ( "btn-primary", isAllDaysActive )
                         ]
                     , href ("#")
+                    , onClick (RemoveActiveDay)
                     ]
                     [ text "All Days"
                     ]
