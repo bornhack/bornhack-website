@@ -12,10 +12,10 @@ type Route
 
 type alias Model =
     { days : List Day
+    , events : List Event
     , eventInstances : List EventInstance
     , eventLocations : List EventLocation
     , eventTypes : List EventType
-    , events : List Event
     , flags : Flags
     , activeDay : Maybe Day
     , filter : Filter

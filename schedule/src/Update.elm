@@ -6,7 +6,6 @@ import Models exposing (Model, Route(OverviewRoute, EventRoute), Filter)
 import Messages exposing (Msg(..))
 import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
 import Routing exposing (parseLocation)
-import WebSocketCalls exposing (sendGetEventContent, sendInitMessage)
 
 
 -- Core modules
@@ -29,24 +28,7 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            let
-                                                newModel_ =
-                                                    m model.flags Nothing (Filter [] []) model.route
-                                            in
-                                                { model
-                                                    | days = newModel_.days
-                                                    , eventInstances = newModel_.eventInstances
-                                                    , eventLocations = newModel_.eventLocations
-                                                    , eventTypes = newModel_.eventTypes
-                                                }
-
-                                        Err error ->
-                                            model
-
-                                "get_event_content" ->
-                                    case Json.Decode.decodeString eventDecoder str of
-                                        Ok event ->
-                                            { model | events = event :: model.events }
+                                            m model.flags Nothing (Filter [] []) model.route
 
                                         Err error ->
                                             model
@@ -101,26 +83,5 @@ update msg model =
             let
                 newRoute =
                     parseLocation location
-
-                onLoadCmd =
-                    case newRoute of
-                        EventRoute eventSlug ->
-                            case List.head (List.filter (\x -> x.slug == eventSlug) model.events) of
-                                Just event ->
-                                    Cmd.none
-
-                                Nothing ->
-                                    sendGetEventContent model.flags.camp_slug (Debug.log "eventSlug" eventSlug)
-
-                        OverviewRoute ->
-                            case List.head model.days of
-                                Just day ->
-                                    Cmd.none
-
-                                Nothing ->
-                                    sendInitMessage model.flags.camp_slug
-
-                        _ ->
-                            Cmd.none
             in
-                { model | route = newRoute } ! [ onLoadCmd ]
+                { model | route = newRoute } ! []

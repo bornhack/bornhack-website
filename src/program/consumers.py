@@ -28,6 +28,10 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                         },
                     camp.get_days('camp')
                 ))
+
+                events_query_set = Event.objects.filter(camp=camp)
+                events = list([x.serialize() for x in events_query_set])
+
                 event_instances_query_set = EventInstance.objects.filter(event__camp=camp)
                 event_instances = list([x.serialize(user=message.user) for x in event_instances_query_set])
 
@@ -39,23 +43,14 @@ class ScheduleConsumer(JsonWebsocketConsumer):
 
                 data = {
                     "action": "init",
+                    "events": events,
+                    "event_instances": event_instances,
                     "event_locations": event_locations,
                     "event_types": event_types,
-                    "event_instances": event_instances,
                     "days": days,
                 }
             except Camp.DoesNotExist:
                 pass
-
-        if action == 'get_event_content':
-            camp_slug = content.get('camp_slug')
-            event_slug = content.get('event_slug')
-            event = Event.objects.get(
-                slug=event_slug,
-                camp__slug=camp_slug
-            )
-            data = event.serialize()
-            data['action'] = "get_event_content"
 
         if action == 'favorite':
             event_instance_id = content.get('event_instance_id')
