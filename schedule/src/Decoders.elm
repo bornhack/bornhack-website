@@ -52,6 +52,8 @@ eventDecoder =
         |> required "slug" string
         |> required "abstract" string
         |> required "speakers" (list speakerDecoder)
+        |> required "video_recording" bool
+        |> optional "video_url" string ""
 
 
 dateDecoder : Decoder Date

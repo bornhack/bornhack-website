@@ -2,7 +2,7 @@ module Messages exposing (Msg(..))
 
 -- Local modules
 
-import Models exposing (Day, EventType, EventLocation)
+import Models exposing (Day, EventType, EventLocation, EventInstance)
 
 
 -- External modules
@@ -17,4 +17,5 @@ type Msg
     | RemoveActiveDay
     | ToggleEventTypeFilter EventType
     | ToggleEventLocationFilter EventLocation
+    | ToggleVideoRecordingFilter { name : String, filter : EventInstance -> Bool }
     | OnLocationChange Location

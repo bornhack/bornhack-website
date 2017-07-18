@@ -35,7 +35,7 @@ init flags location =
             parseLocation location
 
         emptyFilter =
-            Filter [] []
+            Filter [] [] []
 
         initModel =
             (Model [] [] [] [] [] flags Nothing emptyFilter currentRoute)

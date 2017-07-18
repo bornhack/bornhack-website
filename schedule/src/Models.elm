@@ -26,6 +26,7 @@ type alias Model =
 type alias Filter =
     { eventTypes : List EventType
     , eventLocations : List EventLocation
+    , videoRecording : List { name : String, filter : EventInstance -> Bool }
     }
 
 
@@ -73,6 +74,8 @@ type alias Event =
     , slug : EventSlug
     , abstract : String
     , speakers : List Speaker
+    , videoRecording : Bool
+    , videoUrl : String
     }
 
 

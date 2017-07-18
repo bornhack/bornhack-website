@@ -4,7 +4,7 @@ module Views.ScheduleOverview exposing (scheduleOverviewView)
 
 import Messages exposing (Msg(..))
 import Models exposing (Model, Day, EventInstance)
-import Views.FilterView exposing (filterSidebar)
+import Views.FilterView exposing (filterSidebar, videoRecordingFilters, applyVideoRecordingFilters)
 
 
 -- External modules
@@ -48,6 +48,14 @@ dayRowView day model =
                     model.filter.eventLocations
                 )
 
+        videoFilters =
+            List.map (\filter -> filter.filter)
+                (if List.isEmpty model.filter.videoRecording then
+                    videoRecordingFilters
+                 else
+                    model.filter.videoRecording
+                )
+
         filteredEventInstances =
             List.filter
                 (\eventInstance ->
@@ -55,6 +63,7 @@ dayRowView day model =
                         && (Date.equalBy Date.Day eventInstance.from day.date)
                         && List.member eventInstance.location locations
                         && List.member eventInstance.eventType types
+                        && applyVideoRecordingFilters videoFilters eventInstance
                 )
                 model.eventInstances
     in
@@ -76,15 +85,33 @@ dayEventInstanceView eventInstance =
             , ( "color", eventInstance.forgroundColor )
             ]
         ]
-        [ small []
+        ([ small []
             [ text
                 ((Date.toFormattedString "H:m" eventInstance.from)
                     ++ " - "
                     ++ (Date.toFormattedString "H:m" eventInstance.to)
                 )
             ]
-        , i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
-        , p
-            []
-            [ text eventInstance.title ]
+         ]
+            ++ (dayEventInstanceIcons eventInstance)
+            ++ [ p
+                    []
+                    [ text eventInstance.title ]
+               ]
+        )
+
+
+dayEventInstanceIcons : EventInstance -> List (Html Msg)
+dayEventInstanceIcons eventInstance =
+    let
+        videoIcon =
+            if eventInstance.videoUrl /= "" then
+                [ i [ classList [ ( "fa", True ), ( "fa-film", True ), ( "pull-right", True ) ] ] [] ]
+            else if eventInstance.videoRecording then
+                [ i [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ) ] ] [] ]
+            else
+                []
+    in
+        [ i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
         ]
+            ++ videoIcon

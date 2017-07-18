@@ -1,9 +1,9 @@
-module Views.FilterView exposing (filterSidebar)
+module Views.FilterView exposing (filterSidebar, videoRecordingFilters, applyVideoRecordingFilters)
 
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model)
+import Models exposing (Model, EventInstance)
 
 
 -- External modules
@@ -27,8 +27,41 @@ filterSidebar model =
         , div [ class "form-group" ]
             [ filterView "Type" model.eventTypes model.filter.eventTypes ToggleEventTypeFilter
             , filterView "Location" model.eventLocations model.filter.eventLocations ToggleEventLocationFilter
+            , filterView "Video" videoRecordingFilters model.filter.videoRecording ToggleVideoRecordingFilter
             ]
         ]
+
+
+notRecordedFilter : EventInstance -> Bool
+notRecordedFilter eventInstance =
+    eventInstance.videoRecording == False
+
+
+recordedFilter : EventInstance -> Bool
+recordedFilter eventInstance =
+    eventInstance.videoRecording == True
+
+
+hasRecordingFilter : EventInstance -> Bool
+hasRecordingFilter eventInstance =
+    eventInstance.videoUrl /= ""
+
+
+videoRecordingFilters : List { name : String, filter : EventInstance -> Bool }
+videoRecordingFilters =
+    [ { name = "Will not be recorded", filter = notRecordedFilter }
+    , { name = "Will recorded", filter = recordedFilter }
+    , { name = "Has recording", filter = hasRecordingFilter }
+    ]
+
+
+applyVideoRecordingFilters : List (EventInstance -> Bool) -> EventInstance -> Bool
+applyVideoRecordingFilters filters eventInstance =
+    let
+        results =
+            List.map (\filter -> filter eventInstance) filters
+    in
+        List.member True (Debug.log "results" results)
 
 
 filterView :

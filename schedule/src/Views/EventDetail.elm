@@ -11,7 +11,7 @@ import Models exposing (..)
 import Html exposing (Html, text, div, ul, li, span, i, h4, a, p, hr)
 import Html.Attributes exposing (class, classList, href)
 import Markdown
-import Date.Extra as Date
+import Date.Extra as DateExtra
 
 
 eventDetailView : EventSlug -> Model -> Html Msg
@@ -23,7 +23,7 @@ eventDetailView eventSlug model =
                     event
 
                 Nothing ->
-                    { title = "", slug = "", abstract = "", speakers = [] }
+                    { title = "", slug = "", abstract = "", speakers = [], videoRecording = False, videoUrl = "" }
     in
         div [ class "row" ]
             [ div [ class "col-sm-9" ]
@@ -41,13 +41,36 @@ eventDetailView eventSlug model =
                     , ( "schedule-sidebar", True )
                     ]
                 ]
-                [ h4 []
-                    [ text "Speakers" ]
-                , ul
-                    []
-                    (List.map speakerDetail event.speakers)
+                [ videoRecordingSidebar event
+                , speakerSidebar event.speakers
                 ]
             ]
+
+
+videoRecordingSidebar : Event -> Html Msg
+videoRecordingSidebar event =
+    let
+        ( video, willBeRecorded ) =
+            if event.videoUrl /= "" then
+                ( h4 [] [ text "Watch the video here!" ], True )
+            else if event.videoRecording == True then
+                ( h4 [] [ text "This event will be recorded!" ], True )
+            else
+                ( h4 [] [ text "This event will NOT be recorded!" ], False )
+    in
+        div [ classList [ ( "alert", True ), ( "alert-danger", not willBeRecorded ), ( "alert-info", willBeRecorded ) ] ]
+            [ video ]
+
+
+speakerSidebar : List Speaker -> Html Msg
+speakerSidebar speakers =
+    div []
+        [ h4 []
+            [ text "Speakers" ]
+        , ul
+            []
+            (List.map speakerDetail speakers)
+        ]
 
 
 speakerDetail : Speaker -> Html Msg
@@ -76,8 +99,8 @@ eventInstanceItem : EventInstance -> Html Msg
 eventInstanceItem eventInstance =
     li []
         [ text
-            ((Date.toFormattedString "y-MM-dd HH:mm" eventInstance.from)
+            ((DateExtra.toFormattedString "y-MM-dd HH:mm" eventInstance.from)
                 ++ " to "
-                ++ (Date.toFormattedString "y-MM-d HH:mm" eventInstance.to)
+                ++ (DateExtra.toFormattedString "y-MM-d HH:mm" eventInstance.to)
             )
         ]

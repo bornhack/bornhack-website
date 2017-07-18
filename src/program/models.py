@@ -437,7 +437,12 @@ class Event(CampRelatedModel):
                 speaker.serialize()
                 for speaker in self.speakers.all()
             ],
+            'video_recording': self.video_recording,
         }
+
+        if self.video_url:
+            data['video_url'] = self.video_url
+
         return data
 
 

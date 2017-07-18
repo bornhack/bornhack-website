@@ -28,7 +28,7 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            m model.flags Nothing (Filter [] []) model.route
+                                            m model.flags Nothing (Filter [] [] []) model.route
 
                                         Err error ->
                                             model
@@ -76,6 +76,22 @@ update msg model =
 
                 newFilter =
                     { currentFilter | eventLocations = eventLocationsFilter }
+            in
+                { model | filter = newFilter } ! []
+
+        ToggleVideoRecordingFilter videoRecording ->
+            let
+                videoRecordingFilter =
+                    if List.member videoRecording model.filter.videoRecording then
+                        List.filter (\x -> x /= videoRecording) model.filter.videoRecording
+                    else
+                        videoRecording :: model.filter.videoRecording
+
+                currentFilter =
+                    model.filter
+
+                newFilter =
+                    { currentFilter | videoRecording = videoRecordingFilter }
             in
                 { model | filter = newFilter } ! []
 
