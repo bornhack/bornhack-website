@@ -65,6 +65,9 @@ locationColumns minutes eventInstances eventLocations =
                 [ ( "display", "flex" )
                 , ( "justify-content", "space-around" )
                 ]
+            , classList
+                [ ( "col-sm-11", True )
+                ]
             ]
             (List.map (\x -> locationColumn columnWidth minutes eventInstances x) eventLocations)
 
