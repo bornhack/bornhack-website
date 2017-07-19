@@ -16,6 +16,7 @@ import Date exposing (Date)
 import Html exposing (Html, text, div, ul, li, span, i, h4, table, p, a)
 import Html.Attributes exposing (classList, style, href)
 import Date.Extra
+import List.Extra
 
 
 blockHeight : Int
@@ -51,11 +52,11 @@ dayView day model =
         div
             [ classList [ ( "row", True ) ] ]
             [ gutter minutes
-            , locationColumns minutes filteredEventInstances model.eventLocations
+            , locationColumns filteredEventInstances model.eventLocations model.flags.schedule_midnight_offset_hours
             ]
 
 
-locationColumns minutes eventInstances eventLocations =
+locationColumns eventInstances eventLocations offset =
     let
         columnWidth =
             100.0 / toFloat (List.length eventLocations)
@@ -69,13 +70,18 @@ locationColumns minutes eventInstances eventLocations =
                 [ ( "col-sm-11", True )
                 ]
             ]
-            (List.map (\x -> locationColumn columnWidth minutes eventInstances x) eventLocations)
+            (List.map (\location -> locationColumn columnWidth eventInstances offset location) eventLocations)
 
 
-locationColumn columnWidth minutes eventInstances location =
+locationColumn columnWidth eventInstances offset location =
     let
         locationInstances =
-            List.filter (\x -> x.location == location.slug) eventInstances
+            List.filter (\instance -> instance.location == location.slug) eventInstances
+
+        overlappingGroups =
+            List.Extra.groupWhile
+                (\instanceA instanceB -> Date.Extra.isBetween instanceA.from instanceA.to instanceB.from)
+                locationInstances
     in
         div
             [ style
@@ -94,35 +100,115 @@ locationColumn columnWidth minutes eventInstances location =
                 ]
                 [ text location.name ]
              ]
-                ++ (List.map (\x -> hourBlock locationInstances x) minutes)
+                ++ (List.map (\group -> renderGroup offset group) overlappingGroups)
             )
 
 
-hourBlock eventInstances minutes =
+renderGroup offset group =
     let
-        filteredEventInstances =
-            List.filter (\x -> Date.Extra.equalBy Date.Extra.Minute minutes x.from) eventInstances
+        sortedGroup =
+            List.sortWith
+                (\x y ->
+                    case Date.Extra.compare x.from y.from of
+                        z ->
+                            z
+                )
+                group
+
+        findLefts instanceA =
+            ( instanceA
+            , List.foldl
+                (+)
+                0
+                (List.map
+                    (\instanceB ->
+                        if instanceA == instanceB then
+                            0
+                        else if (Date.Extra.equal instanceB.from instanceA.from) && (Date.Extra.equal instanceB.to instanceA.to) then
+                            -- Set to 0 and then fix it further down in the code
+                            0
+                        else if (Date.Extra.equal instanceB.from instanceA.from) && not (Date.Extra.equal instanceB.to instanceA.to) then
+                            -- Set to 0 and then fix it further down in the code
+                            0
+                        else if Date.Extra.isBetween instanceB.from instanceB.to instanceA.from then
+                            1
+                        else
+                            0
+                    )
+                    sortedGroup
+                )
+            )
+
+        lefts =
+            List.map findLefts sortedGroup
+
+        numberInGroup =
+            case List.maximum (List.map (\( _, left ) -> left) lefts) of
+                Just num ->
+                    num
+
+                Nothing ->
+                    1
+
+        fixedLefts =
+            if numberInGroup == 0 then
+                List.map
+                    (\( instance, x ) ->
+                        ( instance
+                        , case List.Extra.elemIndex ( instance, x ) lefts of
+                            Just index ->
+                                index
+
+                            Nothing ->
+                                0
+                        )
+                    )
+                    lefts
+            else
+                lefts
+
+        fixedNumberInGroup =
+            case List.maximum (List.map (\( _, left ) -> left) fixedLefts) of
+                Just num ->
+                    num
+
+                Nothing ->
+                    1
     in
         div
             [ style
                 [ ( "display", "flex" )
-                , ( "height", px blockHeight )
-                ]
-            , classList
-                [ ( "location-column-slot", True )
                 ]
             ]
-            (List.map eventInstanceBlock filteredEventInstances)
+            (List.map (\instance -> eventInstanceBlock offset fixedNumberInGroup instance) fixedLefts)
 
 
-eventInstanceBlock : EventInstance -> Html Msg
-eventInstanceBlock eventInstance =
+eventInstanceBlock : Int -> Int -> ( EventInstance, Int ) -> Html Msg
+eventInstanceBlock offset numberInGroup ( eventInstance, lefts ) =
     let
         length =
             (toFloat (Date.Extra.diff Date.Extra.Minute eventInstance.from eventInstance.to)) / 15
 
         height =
             (toString (length * toFloat blockHeight)) ++ "px"
+
+        hourInMinutes =
+            (Date.hour eventInstance.from) * 60
+
+        minutes =
+            Date.minute eventInstance.from
+
+        topOffset =
+            ((((toFloat (hourInMinutes + minutes)) / 60)
+                - (toFloat offset)
+             )
+                * 4.0
+                * (toFloat blockHeight)
+            )
+                + (toFloat headerHeight)
+
+        width =
+            100 / (toFloat (numberInGroup + 1))
     in
         a
             [ classList
@@ -131,6 +217,9 @@ eventInstanceBlock eventInstance =
                 ]
             , style
                 [ ( "height", height )
+                , ( "width", (toString width) ++ "%" )
+                , ( "top", (toString topOffset) ++ "px" )
+                , ( "left", (toString (toFloat (lefts) * width)) ++ "%" )
                 , ( "background-color", eventInstance.backgroundColor )
                 , ( "color", eventInstance.forgroundColor )
                 ]
