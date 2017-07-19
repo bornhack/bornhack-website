@@ -17,7 +17,6 @@ type alias Model =
     , eventLocations : List EventLocation
     , eventTypes : List EventType
     , flags : Flags
-    , activeDay : Maybe Day
     , filter : Filter
     , route : Route
     }

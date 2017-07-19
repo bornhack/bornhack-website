@@ -6,20 +6,33 @@ import Models exposing (..)
 import Messages exposing (Msg(..))
 
 
+-- Core modules
+
+import Date exposing (Date)
+
+
 -- External modules
 
 import Html exposing (Html, text, a, div)
 import Html.Attributes exposing (class, classList, href, id)
 import Html.Events exposing (onClick)
-import Date.Extra as Date
+import Date.Extra
 
 
 dayPicker : Model -> Html Msg
 dayPicker model =
     let
+        activeDate =
+            case model.route of
+                DayRoute iso ->
+                    Date.Extra.fromIsoString iso
+
+                _ ->
+                    Nothing
+
         isAllDaysActive =
-            case model.activeDay of
-                Just activeDay ->
+            case activeDate of
+                Just _ ->
                     False
 
                 Nothing ->
@@ -34,23 +47,22 @@ dayPicker model =
                         , ( "btn-primary", isAllDaysActive )
                         ]
                     , href ("#")
-                    , onClick (RemoveActiveDay)
                     ]
                     [ text "All Days"
                     ]
                  ]
-                    ++ (List.map (\day -> dayButton day model.activeDay) model.days)
+                    ++ (List.map (\day -> dayButton day activeDate) model.days)
                 )
             ]
 
 
-dayButton : Day -> Maybe Day -> Html Msg
-dayButton day activeDay =
+dayButton : Day -> Maybe Date -> Html Msg
+dayButton day activeDate =
     let
         isActive =
-            case activeDay of
-                Just activeDay ->
-                    day == activeDay
+            case activeDate of
+                Just activeDate ->
+                    day.date == activeDate
 
                 Nothing ->
                     False
@@ -61,8 +73,7 @@ dayButton day activeDay =
                 , ( "btn-default", not isActive )
                 , ( "btn-primary", isActive )
                 ]
-            , href ("#day/" ++ (Date.toFormattedString "y-MM-dd" day.date))
-            , onClick (MakeActiveday day)
+            , href ("#day/" ++ (Date.Extra.toFormattedString "y-MM-dd" day.date))
             ]
             [ text day.day_name
             ]

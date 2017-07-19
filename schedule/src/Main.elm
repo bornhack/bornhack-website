@@ -38,7 +38,7 @@ init flags location =
             Filter [] [] []
 
         initModel =
-            (Model [] [] [] [] [] flags Nothing emptyFilter currentRoute)
+            Model [] [] [] [] [] flags emptyFilter currentRoute
     in
         initModel ! [ sendInitMessage flags.camp_slug ]
 

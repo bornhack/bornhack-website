@@ -107,7 +107,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Maybe Day -> Filter -> Route -> Model)
+initDataDecoder : Decoder (Flags -> Filter -> Route -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)

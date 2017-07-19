@@ -10,6 +10,7 @@ import Models exposing (..)
 
 import Html exposing (Html, text, div, ul, li, span, i, h4, a, p, hr)
 import Html.Attributes exposing (class, classList, href)
+import Html.Events exposing (onClick)
 import Markdown
 import Date.Extra
 
@@ -27,8 +28,9 @@ eventDetailView eventSlug model =
     in
         div [ class "row" ]
             [ div [ class "col-sm-9" ]
-                [ a [ href "#" ]
-                    [ text "Back"
+                [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
+                    [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
+                    , text " Back"
                     ]
                 , h4 [] [ text event.title ]
                 , p [] [ Markdown.toHtml [] event.abstract ]

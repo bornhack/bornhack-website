@@ -13,8 +13,8 @@ import Date exposing (Date)
 
 -- External modules
 
-import Html exposing (Html, text, div, ul, li, span, i, h4, table, p)
-import Html.Attributes exposing (classList, style)
+import Html exposing (Html, text, div, ul, li, span, i, h4, table, p, a)
+import Html.Attributes exposing (classList, style, href)
 import Date.Extra
 
 
@@ -121,7 +121,7 @@ eventInstanceBlock eventInstance =
         height =
             (toString (length * toFloat blockHeight)) ++ "px"
     in
-        div
+        a
             [ classList
                 [ ( "event", True )
                 , ( "event-in-dayview", True )
@@ -129,7 +129,9 @@ eventInstanceBlock eventInstance =
             , style
                 [ ( "height", height )
                 , ( "background-color", eventInstance.backgroundColor )
+                , ( "color", eventInstance.forgroundColor )
                 ]
+            , href ("#event/" ++ eventInstance.eventSlug)
             ]
             [ p [] [ text ((Date.Extra.toFormattedString "HH:mm" eventInstance.from) ++ " " ++ eventInstance.title) ]
             ]

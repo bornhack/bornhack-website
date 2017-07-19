@@ -13,6 +13,11 @@ import Routing exposing (parseLocation)
 import Json.Decode
 
 
+-- External modules
+
+import Navigation
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -28,7 +33,7 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            m model.flags Nothing (Filter [] [] []) model.route
+                                            m model.flags (Filter [] [] []) model.route
 
                                         Err error ->
                                             model
@@ -40,12 +45,6 @@ update msg model =
                             model
             in
                 newModel ! []
-
-        MakeActiveday day ->
-            { model | activeDay = Just day } ! []
-
-        RemoveActiveDay ->
-            { model | activeDay = Nothing } ! []
 
         ToggleEventTypeFilter eventType ->
             let
@@ -101,3 +100,6 @@ update msg model =
                     parseLocation location
             in
                 { model | route = newRoute } ! []
+
+        BackInHistory ->
+            model ! [ Navigation.back 1 ]
