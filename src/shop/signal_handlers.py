@@ -30,7 +30,7 @@ def ticket_created(sender, instance, created, **kwargs):
     )
     OutgoingIrcMessage.objects.create(
         target=target,
-        message="Totals: %s 1d: %s 1d child: %s" % (stats, onedaystats, onedaychildstats)[:200],
+        message="Totals: %s, 1day: %s, 1day child: %s" % (stats, onedaystats, onedaychildstats)[:200],
         timeout=timezone.now()+timedelta(minutes=10)
     )
 
