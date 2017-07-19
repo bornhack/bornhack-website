@@ -149,27 +149,43 @@ footer {
 .event {
     padding: 5px;
     vertical-align: top;
-    margin: 5px;
-    width: 200px;
-    max-width: 200px;
-    min-width: 200px;
-    min-height: 100px;
     flex-grow: 1;
     border: 1px solid black;
     cursor: pointer;
 }
 
-.event-td {
-    padding: 5px;
-    vertical-align: top;
+.event-in-overview {
+    min-height: 100px;
+    margin: 5px;
+    width: 200px;
     max-width: 200px;
     min-width: 200px;
-    flex-grow: 1;
-    cursor: pointer;
 }
 
-.event-td a {
-  display: block;
+.location-column {
+    margin: 0 2px;
+    background-color: #eee;
+}
+
+.location-column-header {
+  text-align: center;
+  font-weight: bold;
+  line-height: 50px;
+  font-size: 20px;
+  border-bottom: 1px solid #fff;
+}
+
+.location-column-slot {
+  border-bottom: 1px solid #fff;
+}
+
+.day-view-gutter {
+  text-align: right;
+}
+
+.event-in-dayview {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
@@ -180,13 +196,9 @@ footer {
   }
 }
 
-.event:hover, .event-td:hover {
+.event:hover {
     background-color: black !important;
     color: white !important;
-    text-decoration: none !important;
-}
-
-.event-td a:hover {
     text-decoration: none !important;
 }
 

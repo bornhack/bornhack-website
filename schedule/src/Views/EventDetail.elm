@@ -11,7 +11,7 @@ import Models exposing (..)
 import Html exposing (Html, text, div, ul, li, span, i, h4, a, p, hr)
 import Html.Attributes exposing (class, classList, href)
 import Markdown
-import Date.Extra as DateExtra
+import Date.Extra
 
 
 eventDetailView : EventSlug -> Model -> Html Msg
@@ -99,8 +99,8 @@ eventInstanceItem : EventInstance -> Html Msg
 eventInstanceItem eventInstance =
     li []
         [ text
-            ((DateExtra.toFormattedString "y-MM-dd HH:mm" eventInstance.from)
+            ((Date.Extra.toFormattedString "y-MM-dd HH:mm" eventInstance.from)
                 ++ " to "
-                ++ (DateExtra.toFormattedString "y-MM-d HH:mm" eventInstance.to)
+                ++ (Date.Extra.toFormattedString "y-MM-d HH:mm" eventInstance.to)
             )
         ]

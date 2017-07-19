@@ -4,7 +4,7 @@ module Views.ScheduleOverview exposing (scheduleOverviewView)
 
 import Messages exposing (Msg(..))
 import Models exposing (Model, Day, EventInstance)
-import Views.FilterView exposing (filterSidebar, videoRecordingFilters, applyVideoRecordingFilters)
+import Views.FilterView exposing (filterSidebar, applyFilters)
 
 
 -- External modules
@@ -12,7 +12,7 @@ import Views.FilterView exposing (filterSidebar, videoRecordingFilters, applyVid
 import Html exposing (Html, text, div, ul, li, span, i, h4, p, small, a)
 import Html.Lazy exposing (lazy, lazy2)
 import Html.Attributes exposing (class, classList, href, style)
-import Date.Extra as Date exposing (Interval(..), equalBy)
+import Date.Extra
 
 
 scheduleOverviewView : Model -> Html Msg
@@ -32,40 +32,8 @@ scheduleOverviewView model =
 dayRowView : Day -> Model -> Html Msg
 dayRowView day model =
     let
-        types =
-            List.map (\eventType -> eventType.slug)
-                (if List.isEmpty model.filter.eventTypes then
-                    model.eventTypes
-                 else
-                    model.filter.eventTypes
-                )
-
-        locations =
-            List.map (\eventLocation -> eventLocation.slug)
-                (if List.isEmpty model.filter.eventLocations then
-                    model.eventLocations
-                 else
-                    model.filter.eventLocations
-                )
-
-        videoFilters =
-            List.map (\filter -> filter.filter)
-                (if List.isEmpty model.filter.videoRecording then
-                    videoRecordingFilters
-                 else
-                    model.filter.videoRecording
-                )
-
         filteredEventInstances =
-            List.filter
-                (\eventInstance ->
-                    (Date.equalBy Month eventInstance.from day.date)
-                        && (Date.equalBy Date.Day eventInstance.from day.date)
-                        && List.member eventInstance.location locations
-                        && List.member eventInstance.eventType types
-                        && applyVideoRecordingFilters videoFilters eventInstance
-                )
-                model.eventInstances
+            applyFilters day model
     in
         div []
             [ h4 []
@@ -78,7 +46,10 @@ dayRowView day model =
 dayEventInstanceView : EventInstance -> Html Msg
 dayEventInstanceView eventInstance =
     a
-        [ class "event"
+        [ classList
+            [ ( "event", True )
+            , ( "event-in-overview", True )
+            ]
         , href ("#event/" ++ eventInstance.eventSlug)
         , style
             [ ( "background-color", eventInstance.backgroundColor )
@@ -87,9 +58,9 @@ dayEventInstanceView eventInstance =
         ]
         ([ small []
             [ text
-                ((Date.toFormattedString "H:m" eventInstance.from)
+                ((Date.Extra.toFormattedString "HH:mm" eventInstance.from)
                     ++ " - "
-                    ++ (Date.toFormattedString "H:m" eventInstance.to)
+                    ++ (Date.Extra.toFormattedString "HH:mm" eventInstance.to)
                 )
             ]
          ]

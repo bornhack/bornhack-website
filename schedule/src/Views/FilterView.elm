@@ -1,4 +1,4 @@
-module Views.FilterView exposing (filterSidebar, videoRecordingFilters, applyVideoRecordingFilters)
+module Views.FilterView exposing (filterSidebar, applyFilters)
 
 -- Local modules
 
@@ -11,6 +11,47 @@ import Models exposing (Model, EventInstance)
 import Html exposing (Html, text, div, ul, li, span, i, h4)
 import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick)
+import Date.Extra exposing (Interval(..), equalBy)
+
+
+applyFilters day model =
+    let
+        types =
+            List.map (\eventType -> eventType.slug)
+                (if List.isEmpty model.filter.eventTypes then
+                    model.eventTypes
+                 else
+                    model.filter.eventTypes
+                )
+
+        locations =
+            List.map (\eventLocation -> eventLocation.slug)
+                (if List.isEmpty model.filter.eventLocations then
+                    model.eventLocations
+                 else
+                    model.filter.eventLocations
+                )
+
+        videoFilters =
+            List.map (\filter -> filter.filter)
+                (if List.isEmpty model.filter.videoRecording then
+                    videoRecordingFilters
+                 else
+                    model.filter.videoRecording
+                )
+
+        filteredEventInstances =
+            List.filter
+                (\eventInstance ->
+                    (Date.Extra.equalBy Month eventInstance.from day.date)
+                        && (Date.Extra.equalBy Date.Extra.Day eventInstance.from day.date)
+                        && List.member eventInstance.location locations
+                        && List.member eventInstance.eventType types
+                        && applyVideoRecordingFilters videoFilters eventInstance
+                )
+                model.eventInstances
+    in
+        filteredEventInstances
 
 
 filterSidebar : Model -> Html Msg
@@ -61,7 +102,7 @@ applyVideoRecordingFilters filters eventInstance =
         results =
             List.map (\filter -> filter eventInstance) filters
     in
-        List.member True (Debug.log "results" results)
+        List.member True results
 
 
 filterView :

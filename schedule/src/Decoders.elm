@@ -14,7 +14,7 @@ import Date exposing (Date, Month(..))
 
 -- External modules
 
-import Date.Extra as DateExtra
+import Date.Extra
 
 
 -- DECODERS
@@ -60,12 +60,12 @@ dateDecoder : Decoder Date
 dateDecoder =
     let
         unpacked x =
-            case DateExtra.fromIsoString x of
+            case Date.Extra.fromIsoString x of
                 Just value ->
                     value
 
                 Nothing ->
-                    DateExtra.fromParts 1970 Jan 1 0 0 0 0
+                    Date.Extra.fromParts 1970 Jan 1 0 0 0 0
     in
         Json.Decode.map unpacked string
 

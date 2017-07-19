@@ -61,7 +61,7 @@ dayButton day activeDay =
                 , ( "btn-default", not isActive )
                 , ( "btn-primary", isActive )
                 ]
-            , href ("#day/" ++ (Date.toFormattedString "y-M-d" day.date))
+            , href ("#day/" ++ (Date.toFormattedString "y-MM-dd" day.date))
             , onClick (MakeActiveday day)
             ]
             [ text day.day_name
