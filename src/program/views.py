@@ -173,7 +173,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalM
 
 class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.EventProposal
-    fields = ['title', 'abstract', 'event_type', 'speakers', 'submission_notes']
+    fields = ['title', 'abstract', 'event_type', 'speakers', 'allow_video_recording', 'submission_notes']
     template_name = 'eventproposal_form.html'
 
     def get_success_url(self):
