@@ -16,10 +16,10 @@ def ticket_created(sender, instance, created, **kwargs):
 
     # get ticket stats, FIXME: Camp name is hardcoded here for now
     from shop.models import Ticket
-    stats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017").exclude(product__name__startswith="BornHack 2017 One day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
+    stats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017").exclude(product__name__startswith="BornHack 2017 One Day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
 
-    # 1day ticket stats disabled for now
-    #onedaystats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017 One day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
+    onedaystats = Ticket.objects.filter(product__name__startswith="BornHack 2017 One Day Ticket").count()
+    onedaychildstats = Ticket.objects.filter(product__name__startswith="BornHack 2017 One Day Children").count()
 
     # queue the messages
     from ircbot.models import OutgoingIrcMessage
@@ -30,7 +30,7 @@ def ticket_created(sender, instance, created, **kwargs):
     )
     OutgoingIrcMessage.objects.create(
         target=target,
-        message="Totals: %s" % stats,
+        message="Totals: %s 1d: %s 1d child: %s" % (stats, onedaystats, onedaychildstats)[:200],
         timeout=timezone.now()+timedelta(minutes=10)
     )
 
