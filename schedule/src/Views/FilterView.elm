@@ -62,6 +62,7 @@ filterSidebar model =
             , ( "col-sm-push-9", True )
             , ( "schedule-sidebar", True )
             , ( "schedule-filter", True )
+            , ( "sticky", True )
             ]
         ]
         [ h4 [] [ text "Filter" ]

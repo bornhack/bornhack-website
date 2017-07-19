@@ -15,7 +15,6 @@ import Date exposing (Date)
 
 import Html exposing (Html, text, a, div)
 import Html.Attributes exposing (class, classList, href, id)
-import Html.Events exposing (onClick)
 import Date.Extra
 
 
@@ -38,7 +37,13 @@ dayPicker model =
                 Nothing ->
                     True
     in
-        div [ class "row" ]
+        div
+            [ classList
+                [ ( "row", True )
+                , ( "sticky", True )
+                ]
+            , id "daypicker"
+            ]
             [ div [ id "schedule-days", class "btn-group" ]
                 ([ a
                     [ classList

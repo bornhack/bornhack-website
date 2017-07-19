@@ -157,8 +157,8 @@ footer {
 .event-in-overview {
     min-height: 100px;
     margin: 5px;
-    width: 200px;
-    max-width: 200px;
+    width: 220px;
+    max-width: 225px;
     min-width: 200px;
 }
 
@@ -232,6 +232,20 @@ footer {
   .schedule-sidebar {
     border-left: 1px solid #eee;
   }
+}
+
+.schedule-sidebar {
+  top: 120px;
+}
+
+.sticky {
+  position: sticky;
+  background-color: #fff;
+  z-index: 9999;
+}
+
+#daypicker {
+  top: 80px;
 }
 
 #schedule-days {
