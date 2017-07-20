@@ -41,6 +41,7 @@ eventDetailView eventSlug model =
                 [ classList
                     [ ( "col-sm-3", True )
                     , ( "schedule-sidebar", True )
+                    , ( "sticky", True )
                     ]
                 ]
                 [ videoRecordingSidebar event
