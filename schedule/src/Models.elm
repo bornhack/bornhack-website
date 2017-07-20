@@ -98,4 +98,5 @@ type alias Flags =
     , schedule_midnight_offset_hours : Int
     , ics_button_href : String
     , camp_slug : String
+    , websocket_server : String
     }

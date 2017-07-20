@@ -1,4 +1,4 @@
-module WebSocketCalls exposing (scheduleServer, sendInitMessage)
+module WebSocketCalls exposing (sendInitMessage)
 
 -- Internal modules
 
@@ -11,13 +11,8 @@ import WebSocket
 import Json.Encode
 
 
-scheduleServer : String
-scheduleServer =
-    "ws://localhost:8000/schedule/"
-
-
-sendInitMessage : String -> Cmd Msg
-sendInitMessage camp_slug =
+sendInitMessage : String -> String -> Cmd Msg
+sendInitMessage camp_slug scheduleServer =
     WebSocket.send scheduleServer
         (Json.Encode.encode 0
             (Json.Encode.object

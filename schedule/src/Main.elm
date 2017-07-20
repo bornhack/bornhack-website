@@ -6,7 +6,7 @@ import Models exposing (..)
 import Routing exposing (parseLocation)
 import Update exposing (update)
 import Messages exposing (Msg(..))
-import WebSocketCalls exposing (scheduleServer, sendInitMessage)
+import WebSocketCalls exposing (sendInitMessage)
 import Views exposing (view)
 
 
@@ -40,7 +40,7 @@ init flags location =
         initModel =
             Model [] [] [] [] [] flags emptyFilter currentRoute
     in
-        initModel ! [ sendInitMessage flags.camp_slug ]
+        initModel ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
 
 
 
@@ -49,4 +49,4 @@ init flags location =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    WebSocket.listen scheduleServer WebSocketPayload
+    WebSocket.listen model.flags.websocket_server WebSocketPayload
