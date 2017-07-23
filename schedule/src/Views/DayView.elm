@@ -3,7 +3,7 @@ module Views.DayView exposing (dayView)
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, Day, EventInstance)
+import Models exposing (Model, Day, EventInstance, EventLocation)
 
 
 -- Core modules
@@ -56,6 +56,7 @@ dayView day model =
             ]
 
 
+locationColumns : List EventInstance -> List EventLocation -> Int -> Html Msg
 locationColumns eventInstances eventLocations offset =
     let
         columnWidth =
@@ -73,6 +74,7 @@ locationColumns eventInstances eventLocations offset =
             (List.map (\location -> locationColumn columnWidth eventInstances offset location) eventLocations)
 
 
+locationColumn : Float -> List EventInstance -> Int -> EventLocation -> Html Msg
 locationColumn columnWidth eventInstances offset location =
     let
         locationInstances =
@@ -104,6 +106,7 @@ locationColumn columnWidth eventInstances offset location =
             )
 
 
+renderGroup : Int -> List EventInstance -> Html Msg
 renderGroup offset group =
     let
         sortedGroup =
