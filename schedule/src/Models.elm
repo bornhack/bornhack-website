@@ -1,10 +1,18 @@
 module Models exposing (..)
 
+-- Core modules
+
 import Date exposing (Date, now)
+
+
+-- External modules
+
+import Navigation exposing (Location)
 
 
 type Route
     = OverviewRoute
+    | OverviewFilteredRoute String
     | DayRoute String
     | EventRoute EventSlug
     | NotFoundRoute
@@ -18,6 +26,7 @@ type alias Model =
     , eventTypes : List EventType
     , flags : Flags
     , filter : Filter
+    , location : Location
     , route : Route
     }
 
@@ -25,7 +34,7 @@ type alias Model =
 type alias Filter =
     { eventTypes : List EventType
     , eventLocations : List EventLocation
-    , videoRecording : List { name : String, filter : EventInstance -> Bool }
+    , videoRecording : List { name : String, slug : String, filter : EventInstance -> Bool }
     }
 
 

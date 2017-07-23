@@ -32,15 +32,15 @@ init : Flags -> Location -> ( Model, Cmd Msg )
 init flags location =
     let
         currentRoute =
-            parseLocation location
+            parseLocation (Debug.log "location" location)
 
         emptyFilter =
             Filter [] [] []
 
-        initModel =
-            Model [] [] [] [] [] flags emptyFilter currentRoute
+        model =
+            Model [] [] [] [] [] flags emptyFilter location currentRoute
     in
-        initModel ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
+        model ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
 
 
 

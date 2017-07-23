@@ -1,9 +1,14 @@
-module Views.FilterView exposing (filterSidebar, applyFilters)
+module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery, filterToQuery)
 
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance)
+import Models exposing (Model, EventInstance, Filter, Day)
+
+
+-- Core modules
+
+import Regex
 
 
 -- External modules
@@ -14,6 +19,7 @@ import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
 
 
+applyFilters : Day -> Model -> List EventInstance
 applyFilters day model =
     let
         types =
@@ -89,11 +95,11 @@ hasRecordingFilter eventInstance =
     eventInstance.videoUrl /= ""
 
 
-videoRecordingFilters : List { name : String, filter : EventInstance -> Bool }
+videoRecordingFilters : List { name : String, slug : String, filter : EventInstance -> Bool }
 videoRecordingFilters =
-    [ { name = "Will not be recorded", filter = notRecordedFilter }
-    , { name = "Will recorded", filter = recordedFilter }
-    , { name = "Has recording", filter = hasRecordingFilter }
+    [ { name = "Will not be recorded", slug = "not-to-be-recorded", filter = notRecordedFilter }
+    , { name = "Will recorded", slug = "to-be-recorded", filter = recordedFilter }
+    , { name = "Has recording", slug = "has-recording", filter = hasRecordingFilter }
     ]
 
 
@@ -147,3 +153,76 @@ filterChoiceView filter currentFilters action =
                     ]
                 ]
             ]
+
+
+findFilter : List { a | slug : String } -> String -> Maybe { a | slug : String }
+findFilter modelItems filterSlug =
+    List.head (List.filter (\x -> x.slug == filterSlug) modelItems)
+
+
+getFilter : String -> List { a | slug : String } -> String -> List { a | slug : String }
+getFilter filterType modelItems query =
+    let
+        filterMatch =
+            query
+                |> Regex.find (Regex.AtMost 1) (Regex.regex (filterType ++ "=([\\w,_-]+)&*"))
+                |> List.concatMap .submatches
+                |> List.head
+                |> Maybe.withDefault Nothing
+                |> Maybe.withDefault ""
+
+        filterSlugs =
+            String.split "," filterMatch
+    in
+        List.filterMap (\x -> findFilter modelItems x) filterSlugs
+
+
+parseFilterFromQuery : String -> Model -> Filter
+parseFilterFromQuery query model =
+    let
+        types =
+            getFilter "type" model.eventTypes query
+
+        locations =
+            getFilter "location" model.eventLocations query
+
+        videoFilters =
+            getFilter "video" videoRecordingFilters query
+    in
+        { eventTypes = types
+        , eventLocations = locations
+        , videoRecording = videoFilters
+        }
+
+
+filterToQuery : Filter -> String
+filterToQuery filter =
+    let
+        typePart =
+            case String.join "," (List.map .slug filter.eventTypes) of
+                "" ->
+                    ""
+
+                types ->
+                    "type=" ++ types
+
+        locationPart =
+            case String.join "," (List.map .slug filter.eventLocations) of
+                "" ->
+                    ""
+
+                locations ->
+                    "location=" ++ locations
+
+        videoPart =
+            case String.join "," (List.map .slug filter.videoRecording) of
+                "" ->
+                    ""
+
+                video ->
+                    "video=" ++ video
+
+        result =
+            String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
+    in
+        "#" ++ result

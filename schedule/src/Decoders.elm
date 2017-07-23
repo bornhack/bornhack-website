@@ -15,6 +15,7 @@ import Date exposing (Date, Month(..))
 -- External modules
 
 import Date.Extra
+import Navigation exposing (Location)
 
 
 -- DECODERS
@@ -107,7 +108,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Filter -> Route -> Model)
+initDataDecoder : Decoder (Flags -> Filter -> Location -> Route -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)

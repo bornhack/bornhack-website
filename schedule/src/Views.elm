@@ -30,6 +30,9 @@ view model =
             OverviewRoute ->
                 scheduleOverviewView model
 
+            OverviewFilteredRoute _ ->
+                scheduleOverviewView model
+
             DayRoute dayIso ->
                 let
                     day =

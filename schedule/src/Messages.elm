@@ -15,6 +15,6 @@ type Msg
     | WebSocketPayload String
     | ToggleEventTypeFilter EventType
     | ToggleEventLocationFilter EventLocation
-    | ToggleVideoRecordingFilter { name : String, filter : EventInstance -> Bool }
+    | ToggleVideoRecordingFilter { name : String, slug : String, filter : EventInstance -> Bool }
     | OnLocationChange Location
     | BackInHistory

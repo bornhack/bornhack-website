@@ -3,8 +3,8 @@ module Views.ScheduleOverview exposing (scheduleOverviewView)
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, Day, EventInstance)
-import Views.FilterView exposing (filterSidebar, applyFilters)
+import Models exposing (Model, Day, EventInstance, Filter)
+import Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery)
 
 
 -- External modules

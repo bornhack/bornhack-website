@@ -2,10 +2,11 @@ module Update exposing (update)
 
 -- Local modules
 
-import Models exposing (Model, Route(OverviewRoute, EventRoute), Filter)
+import Models exposing (Model, Route(..), Filter)
 import Messages exposing (Msg(..))
 import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
 import Routing exposing (parseLocation)
+import Views.FilterView exposing (parseFilterFromQuery, filterToQuery)
 
 
 -- Core modules
@@ -33,7 +34,7 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            m model.flags (Filter [] [] []) model.route
+                                            m model.flags model.filter model.location model.route
 
                                         Err error ->
                                             model
@@ -43,8 +44,11 @@ update msg model =
 
                         Err error ->
                             model
+
+                ( newModel_, _ ) =
+                    update (OnLocationChange model.location) newModel
             in
-                newModel ! []
+                newModel_ ! []
 
         ToggleEventTypeFilter eventType ->
             let
@@ -59,8 +63,14 @@ update msg model =
 
                 newFilter =
                     { currentFilter | eventTypes = eventTypesFilter }
+
+                query =
+                    filterToQuery newFilter
+
+                cmd =
+                    Navigation.newUrl query
             in
-                { model | filter = newFilter } ! []
+                { model | filter = newFilter } ! [ cmd ]
 
         ToggleEventLocationFilter eventLocation ->
             let
@@ -75,8 +85,14 @@ update msg model =
 
                 newFilter =
                     { currentFilter | eventLocations = eventLocationsFilter }
+
+                query =
+                    filterToQuery newFilter
+
+                cmd =
+                    Navigation.newUrl query
             in
-                { model | filter = newFilter } ! []
+                { model | filter = newFilter } ! [ cmd ]
 
         ToggleVideoRecordingFilter videoRecording ->
             let
@@ -91,15 +107,29 @@ update msg model =
 
                 newFilter =
                     { currentFilter | videoRecording = videoRecordingFilter }
+
+                query =
+                    filterToQuery newFilter
+
+                cmd =
+                    Navigation.newUrl query
             in
-                { model | filter = newFilter } ! []
+                { model | filter = newFilter } ! [ cmd ]
 
         OnLocationChange location ->
             let
                 newRoute =
                     parseLocation location
+
+                newFilter =
+                    case newRoute of
+                        OverviewFilteredRoute query ->
+                            parseFilterFromQuery query model
+
+                        _ ->
+                            model.filter
             in
-                { model | route = newRoute } ! []
+                { model | filter = newFilter, route = newRoute, location = location } ! []
 
         BackInHistory ->
             model ! [ Navigation.back 1 ]
