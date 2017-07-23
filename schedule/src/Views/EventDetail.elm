@@ -19,35 +19,46 @@ eventDetailView : EventSlug -> Model -> Html Msg
 eventDetailView eventSlug model =
     let
         event =
-            case List.head (List.filter (\e -> e.slug == eventSlug) model.events) of
-                Just event ->
-                    event
-
-                Nothing ->
-                    { title = "", slug = "", abstract = "", speakers = [], videoRecording = False, videoUrl = "" }
+            model.events
+                |> List.filter (\e -> e.slug == eventSlug)
+                |> List.head
     in
-        div [ class "row" ]
-            [ div [ class "col-sm-9" ]
-                [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
-                    [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
-                    , text " Back"
+        case event of
+            Just event ->
+                div [ class "row" ]
+                    [ div [ class "col-sm-9" ]
+                        [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
+                            [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
+                            , text " Back"
+                            ]
+                        , h4 [] [ text event.title ]
+                        , p [] [ Markdown.toHtml [] event.abstract ]
+                        , hr [] []
+                        , eventInstancesList eventSlug model.eventInstances
+                        ]
+                    , div
+                        [ classList
+                            [ ( "col-sm-3", True )
+                            , ( "schedule-sidebar", True )
+                            , ( "sticky", True )
+                            ]
+                        ]
+                        [ videoRecordingSidebar event
+                        , speakerSidebar event.speakers
+                        ]
                     ]
-                , h4 [] [ text event.title ]
-                , p [] [ Markdown.toHtml [] event.abstract ]
-                , hr [] []
-                , eventInstancesList eventSlug model.eventInstances
-                ]
-            , div
-                [ classList
-                    [ ( "col-sm-3", True )
-                    , ( "schedule-sidebar", True )
-                    , ( "sticky", True )
+
+            Nothing ->
+                div [ class "row" ]
+                    [ text
+                        (case model.dataLoaded of
+                            True ->
+                                "Event not found."
+
+                            False ->
+                                "Loading..."
+                        )
                     ]
-                ]
-                [ videoRecordingSidebar event
-                , speakerSidebar event.speakers
-                ]
-            ]
 
 
 videoRecordingSidebar : Event -> Html Msg

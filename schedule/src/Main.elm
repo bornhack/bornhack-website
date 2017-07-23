@@ -12,7 +12,6 @@ import Views exposing (view)
 
 -- External modules
 
-import Html.Lazy exposing (lazy)
 import WebSocket exposing (listen)
 import Navigation exposing (Location)
 
@@ -22,7 +21,7 @@ main =
     Navigation.programWithFlags
         OnLocationChange
         { init = init
-        , view = lazy view
+        , view = view
         , update = update
         , subscriptions = subscriptions
         }
@@ -32,13 +31,13 @@ init : Flags -> Location -> ( Model, Cmd Msg )
 init flags location =
     let
         currentRoute =
-            parseLocation (Debug.log "location" location)
+            parseLocation location
 
         emptyFilter =
             Filter [] [] []
 
         model =
-            Model [] [] [] [] [] flags emptyFilter location currentRoute
+            Model [] [] [] [] [] flags emptyFilter location currentRoute False
     in
         model ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
 

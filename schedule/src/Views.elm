@@ -23,31 +23,34 @@ import Date.Extra
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ dayPicker model
-        , hr [] []
-        , case model.route of
-            OverviewRoute ->
-                scheduleOverviewView model
+    case model.dataLoaded of
+        True ->
+            div []
+                [ dayPicker model
+                , hr [] []
+                , case model.route of
+                    OverviewRoute ->
+                        scheduleOverviewView model
 
-            OverviewFilteredRoute _ ->
-                scheduleOverviewView model
+                    OverviewFilteredRoute _ ->
+                        scheduleOverviewView model
 
-            DayRoute dayIso ->
-                let
-                    day =
-                        case (List.head (List.filter (\x -> (Date.Extra.toFormattedString "y-MM-dd" x.date) == dayIso) model.days)) of
-                            Just day ->
-                                day
+                    DayRoute dayIso ->
+                        let
+                            day =
+                                model.days
+                                    |> List.filter (\x -> (Date.Extra.toFormattedString "y-MM-dd" x.date) == dayIso)
+                                    |> List.head
+                                    |> Maybe.withDefault (Day "" (Date.Extra.fromParts 1970 Jan 1 0 0 0 0) "")
+                        in
+                            dayView day model
 
-                            Nothing ->
-                                Day "" (Date.Extra.fromParts 1970 Jan 1 0 0 0 0) ""
-                in
-                    dayView day model
+                    EventRoute eventSlug ->
+                        eventDetailView eventSlug model
 
-            EventRoute eventSlug ->
-                eventDetailView eventSlug model
+                    NotFoundRoute ->
+                        div [] [ text "Not found!" ]
+                ]
 
-            NotFoundRoute ->
-                div [] [ text "Not found!" ]
-        ]
+        False ->
+            h4 [] [ text "Loading schedule..." ]

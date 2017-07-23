@@ -41,9 +41,5 @@ matchers =
 
 parseLocation : Location -> Route
 parseLocation location =
-    case parseHash matchers location of
-        Just route ->
-            route
-
-        Nothing ->
-            NotFoundRoute
+    parseHash matchers location
+        |> Maybe.withDefault NotFoundRoute

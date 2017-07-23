@@ -28,6 +28,7 @@ type alias Model =
     , filter : Filter
     , location : Location
     , route : Route
+    , dataLoaded : Bool
     }
 
 

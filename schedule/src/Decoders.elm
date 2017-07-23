@@ -60,13 +60,10 @@ eventDecoder =
 dateDecoder : Decoder Date
 dateDecoder =
     let
-        unpacked x =
-            case Date.Extra.fromIsoString x of
-                Just value ->
-                    value
-
-                Nothing ->
-                    Date.Extra.fromParts 1970 Jan 1 0 0 0 0
+        unpacked isoString =
+            isoString
+                |> Date.Extra.fromIsoString
+                |> Maybe.withDefault (Date.Extra.fromParts 1970 Jan 1 0 0 0 0)
     in
         Json.Decode.map unpacked string
 
@@ -108,7 +105,7 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
-initDataDecoder : Decoder (Flags -> Filter -> Location -> Route -> Model)
+initDataDecoder : Decoder (Flags -> Filter -> Location -> Route -> Bool -> Model)
 initDataDecoder =
     decode Model
         |> required "days" (list dayDecoder)

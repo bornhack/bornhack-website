@@ -146,24 +146,19 @@ renderGroup offset group =
             List.map findLefts sortedGroup
 
         numberInGroup =
-            case List.maximum (List.map (\( _, left ) -> left) lefts) of
-                Just num ->
-                    num
-
-                Nothing ->
-                    1
+            lefts
+                |> List.map (\( _, left ) -> left)
+                |> List.maximum
+                |> Maybe.withDefault 1
 
         fixedLefts =
             if numberInGroup == 0 then
                 List.map
                     (\( instance, x ) ->
                         ( instance
-                        , case List.Extra.elemIndex ( instance, x ) lefts of
-                            Just index ->
-                                index
-
-                            Nothing ->
-                                0
+                        , lefts
+                            |> List.Extra.elemIndex ( instance, x )
+                            |> Maybe.withDefault 0
                         )
                     )
                     lefts
@@ -171,12 +166,10 @@ renderGroup offset group =
                 lefts
 
         fixedNumberInGroup =
-            case List.maximum (List.map (\( _, left ) -> left) fixedLefts) of
-                Just num ->
-                    num
-
-                Nothing ->
-                    1
+            fixedLefts
+                |> List.map (\( _, left ) -> left)
+                |> List.maximum
+                |> Maybe.withDefault 1
     in
         div
             [ style

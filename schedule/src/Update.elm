@@ -34,7 +34,7 @@ update msg model =
                                 "init" ->
                                     case Json.Decode.decodeString initDataDecoder str of
                                         Ok m ->
-                                            m model.flags model.filter model.location model.route
+                                            m model.flags model.filter model.location model.route True
 
                                         Err error ->
                                             model
