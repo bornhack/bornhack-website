@@ -133,6 +133,11 @@ urlpatterns = [
                         name='schedule_index'
                     ),
                     url(
+                        r'^noscript/$',
+                        NoScriptScheduleView.as_view(),
+                        name='noscript_schedule_index'
+                    ),
+                    url(
                         r'^ics/', ICSView.as_view(), name="ics_view"
                     ),
                     url(

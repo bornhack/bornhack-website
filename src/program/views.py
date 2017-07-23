@@ -263,54 +263,22 @@ class EventDetailView(CampViewMixin, DetailView):
 ################## schedule #############################################
 
 
+class NoScriptScheduleView(CampViewMixin, TemplateView):
+    template_name = "noscript_schedule_view.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['eventinstances'] = models.EventInstance.objects.filter(event__camp=self.camp).order_by('when')
+        return context
+
+
+
 class ScheduleView(CampViewMixin, TemplateView):
     template_name = 'schedule_overview.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
-
-        # Do stuff if we are dealing with a day schedule
-        if 'day' in kwargs:
-            when = datetime.datetime(year=int(self.kwargs['year']), month=int(self.kwargs['month']), day=int(self.kwargs['day']))
-            eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
-            skip = []
-            for ei in eventinstances:
-                if ei.schedule_date != when.date():
-                    skip.append(ei.id)
-                else:
-                    if 'type' in self.request.GET:
-                        eventtype = models.EventType.objects.get(
-                            slug=self.request.GET['type']
-                        )
-                        if ei.event.event_type != eventtype:
-                            skip.append(ei.id)
-            eventinstances = eventinstances.exclude(id__in=skip).order_by('event__event_type')
-            if 'location' in self.request.GET:
-                eventlocation = models.EventLocation.objects.get(
-                    camp=self.camp,
-                    slug=self.request.GET['location']
-                )
-                eventinstances = eventinstances.filter(location=eventlocation)
-
-            context['eventinstances'] = eventinstances
-
-            start = when + datetime.timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
-            timeslots = []
-            # calculate how many timeslots we have in the schedule based on the lenght of the timeslots in minutes,
-            # and the number of minutes in 24 hours
-            for i in range(0,int((24*60)/settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)):
-                timeslot = start + datetime.timedelta(minutes=i*settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)
-                timeslots.append(timeslot)
-            context['timeslots'] = timeslots
-
-            # include the components to make the urls
-            context['urlyear'] = self.kwargs['year']
-            context['urlmonth'] = self.kwargs['month']
-            context['urlday'] = self.kwargs['day']
-
-        context['schedule_timeslot_length_minutes'] = settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES;
         context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS;
-
         return context
 
 

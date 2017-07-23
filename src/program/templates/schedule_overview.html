@@ -3,7 +3,26 @@
 {% load commonmark %}
 {% load staticfiles %}
 
+{% block extra_head %}
+<noscript>
+    <meta http-equiv="refresh" content="3; url={% url "noscript_schedule_index" camp_slug=camp.slug %}" />
+</noscript>
+{% endblock %}
+
 {% block program_content %}
+
+<noscript>
+    <div class="row">
+        <p>
+        No javascript? Don't worry, we have a HTML only version of the schedule! Redirecting you there now.
+        </p>
+        <p>
+        <a href="{% url "noscript_schedule_index" camp_slug=camp.slug %}">
+            Click here if you are not redirected.
+        </a>
+        </p>
+    </div>
+</noscript>
 
 <div id="schedule-container"></div>
 
