@@ -17831,9 +17831,9 @@ var _justinmimbs$elm_date_extra$Date_Extra$equalBy = F3(
 var _justinmimbs$elm_date_extra$Date_Extra$Second = {ctor: 'Second'};
 var _justinmimbs$elm_date_extra$Date_Extra$Millisecond = {ctor: 'Millisecond'};
 
-var _user$project$Models$Model = F8(
-	function (a, b, c, d, e, f, g, h) {
-		return {days: a, events: b, eventInstances: c, eventLocations: d, eventTypes: e, flags: f, filter: g, route: h};
+var _user$project$Models$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {days: a, events: b, eventInstances: c, eventLocations: d, eventTypes: e, flags: f, filter: g, location: h, route: i};
 	});
 var _user$project$Models$Filter = F3(
 	function (a, b, c) {
@@ -17899,6 +17899,9 @@ var _user$project$Models$EventRoute = function (a) {
 };
 var _user$project$Models$DayRoute = function (a) {
 	return {ctor: 'DayRoute', _0: a};
+};
+var _user$project$Models$OverviewFilteredRoute = function (a) {
+	return {ctor: 'OverviewFilteredRoute', _0: a};
 };
 var _user$project$Models$OverviewRoute = {ctor: 'OverviewRoute'};
 
@@ -18087,21 +18090,28 @@ var _user$project$Routing$matchers = _evancz$url_parser$UrlParser$oneOf(
 			ctor: '::',
 			_0: A2(
 				_evancz$url_parser$UrlParser$map,
-				_user$project$Models$DayRoute,
-				A2(
-					_evancz$url_parser$UrlParser_ops['</>'],
-					_evancz$url_parser$UrlParser$s('day'),
-					_evancz$url_parser$UrlParser$string)),
+				_user$project$Models$OverviewFilteredRoute,
+				A2(_evancz$url_parser$UrlParser_ops['</>'], _evancz$url_parser$UrlParser$top, _evancz$url_parser$UrlParser$string)),
 			_1: {
 				ctor: '::',
 				_0: A2(
 					_evancz$url_parser$UrlParser$map,
-					_user$project$Models$EventRoute,
+					_user$project$Models$DayRoute,
 					A2(
 						_evancz$url_parser$UrlParser_ops['</>'],
-						_evancz$url_parser$UrlParser$s('event'),
+						_evancz$url_parser$UrlParser$s('day'),
 						_evancz$url_parser$UrlParser$string)),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_evancz$url_parser$UrlParser$map,
+						_user$project$Models$EventRoute,
+						A2(
+							_evancz$url_parser$UrlParser_ops['</>'],
+							_evancz$url_parser$UrlParser$s('event'),
+							_evancz$url_parser$UrlParser$string)),
+					_1: {ctor: '[]'}
+				}
 			}
 		}
 	});
@@ -18132,6 +18142,347 @@ var _user$project$Messages$WebSocketPayload = function (a) {
 };
 var _user$project$Messages$NoOp = {ctor: 'NoOp'};
 
+var _user$project$Views_FilterView$filterToQuery = function (filter) {
+	var videoPart = function () {
+		var _p0 = A2(
+			_elm_lang$core$String$join,
+			',',
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.slug;
+				},
+				filter.videoRecording));
+		if (_p0 === '') {
+			return '';
+		} else {
+			return A2(_elm_lang$core$Basics_ops['++'], 'video=', _p0);
+		}
+	}();
+	var locationPart = function () {
+		var _p1 = A2(
+			_elm_lang$core$String$join,
+			',',
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.slug;
+				},
+				filter.eventLocations));
+		if (_p1 === '') {
+			return '';
+		} else {
+			return A2(_elm_lang$core$Basics_ops['++'], 'location=', _p1);
+		}
+	}();
+	var typePart = function () {
+		var _p2 = A2(
+			_elm_lang$core$String$join,
+			',',
+			A2(
+				_elm_lang$core$List$map,
+				function (_) {
+					return _.slug;
+				},
+				filter.eventTypes));
+		if (_p2 === '') {
+			return '';
+		} else {
+			return A2(_elm_lang$core$Basics_ops['++'], 'type=', _p2);
+		}
+	}();
+	var result = A2(
+		_elm_lang$core$String$join,
+		'&',
+		A2(
+			_elm_lang$core$List$filter,
+			function (x) {
+				return !_elm_lang$core$Native_Utils.eq(x, '');
+			},
+			{
+				ctor: '::',
+				_0: typePart,
+				_1: {
+					ctor: '::',
+					_0: locationPart,
+					_1: {
+						ctor: '::',
+						_0: videoPart,
+						_1: {ctor: '[]'}
+					}
+				}
+			}));
+	return A2(_elm_lang$core$Basics_ops['++'], '#', result);
+};
+var _user$project$Views_FilterView$findFilter = F2(
+	function (modelItems, filterSlug) {
+		return _elm_lang$core$List$head(
+			A2(
+				_elm_lang$core$List$filter,
+				function (x) {
+					return _elm_lang$core$Native_Utils.eq(x.slug, filterSlug);
+				},
+				modelItems));
+	});
+var _user$project$Views_FilterView$getFilter = F3(
+	function (filterType, modelItems, query) {
+		var filterMatch = A2(
+			_elm_lang$core$Maybe$withDefault,
+			'',
+			A2(
+				_elm_lang$core$Maybe$withDefault,
+				_elm_lang$core$Maybe$Nothing,
+				_elm_lang$core$List$head(
+					A2(
+						_elm_lang$core$List$concatMap,
+						function (_) {
+							return _.submatches;
+						},
+						A3(
+							_elm_lang$core$Regex$find,
+							_elm_lang$core$Regex$AtMost(1),
+							_elm_lang$core$Regex$regex(
+								A2(_elm_lang$core$Basics_ops['++'], filterType, '=([\\w,_-]+)&*')),
+							query)))));
+		var filterSlugs = A2(_elm_lang$core$String$split, ',', filterMatch);
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (x) {
+				return A2(_user$project$Views_FilterView$findFilter, modelItems, x);
+			},
+			filterSlugs);
+	});
+var _user$project$Views_FilterView$filterChoiceView = F3(
+	function (filter, currentFilters, action) {
+		var active = A2(_elm_lang$core$List$member, filter, currentFilters);
+		var notActive = !active;
+		return A2(
+			_elm_lang$html$Html$li,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'btn-default', _1: true},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'filter-choice-active', _1: active},
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								action(filter)),
+							_1: {ctor: '[]'}
+						}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$span,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$i,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$classList(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'fa-minus', _1: active},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'fa-plus', _1: notActive},
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(_elm_lang$core$Basics_ops['++'], ' ', filter.name)),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Views_FilterView$filterView = F4(
+	function (name, possibleFilters, currentFilters, action) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(
+					A2(_elm_lang$core$Basics_ops['++'], name, ':')),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$ul,
+						{ctor: '[]'},
+						A2(
+							_elm_lang$core$List$map,
+							function (filter) {
+								return A3(_user$project$Views_FilterView$filterChoiceView, filter, currentFilters, action);
+							},
+							possibleFilters)),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _user$project$Views_FilterView$applyVideoRecordingFilters = F2(
+	function (filters, eventInstance) {
+		var results = A2(
+			_elm_lang$core$List$map,
+			function (filter) {
+				return filter(eventInstance);
+			},
+			filters);
+		return A2(_elm_lang$core$List$member, true, results);
+	});
+var _user$project$Views_FilterView$hasRecordingFilter = function (eventInstance) {
+	return !_elm_lang$core$Native_Utils.eq(eventInstance.videoUrl, '');
+};
+var _user$project$Views_FilterView$recordedFilter = function (eventInstance) {
+	return _elm_lang$core$Native_Utils.eq(eventInstance.videoRecording, true);
+};
+var _user$project$Views_FilterView$notRecordedFilter = function (eventInstance) {
+	return _elm_lang$core$Native_Utils.eq(eventInstance.videoRecording, false);
+};
+var _user$project$Views_FilterView$videoRecordingFilters = {
+	ctor: '::',
+	_0: {name: 'Will not be recorded', slug: 'not-to-be-recorded', filter: _user$project$Views_FilterView$notRecordedFilter},
+	_1: {
+		ctor: '::',
+		_0: {name: 'Will recorded', slug: 'to-be-recorded', filter: _user$project$Views_FilterView$recordedFilter},
+		_1: {
+			ctor: '::',
+			_0: {name: 'Has recording', slug: 'has-recording', filter: _user$project$Views_FilterView$hasRecordingFilter},
+			_1: {ctor: '[]'}
+		}
+	}
+};
+var _user$project$Views_FilterView$parseFilterFromQuery = F2(
+	function (query, model) {
+		var videoFilters = A3(_user$project$Views_FilterView$getFilter, 'video', _user$project$Views_FilterView$videoRecordingFilters, query);
+		var locations = A3(_user$project$Views_FilterView$getFilter, 'location', model.eventLocations, query);
+		var types = A3(_user$project$Views_FilterView$getFilter, 'type', model.eventTypes, query);
+		return {eventTypes: types, eventLocations: locations, videoRecording: videoFilters};
+	});
+var _user$project$Views_FilterView$filterSidebar = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'col-sm-3', _1: true},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'col-sm-push-9', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'schedule-sidebar', _1: true},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'schedule-filter', _1: true},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'sticky', _1: true},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$h4,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Filter'),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('form-group'),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A4(_user$project$Views_FilterView$filterView, 'Type', model.eventTypes, model.filter.eventTypes, _user$project$Messages$ToggleEventTypeFilter),
+						_1: {
+							ctor: '::',
+							_0: A4(_user$project$Views_FilterView$filterView, 'Location', model.eventLocations, model.filter.eventLocations, _user$project$Messages$ToggleEventLocationFilter),
+							_1: {
+								ctor: '::',
+								_0: A4(_user$project$Views_FilterView$filterView, 'Video', _user$project$Views_FilterView$videoRecordingFilters, model.filter.videoRecording, _user$project$Messages$ToggleVideoRecordingFilter),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$Views_FilterView$applyFilters = F2(
+	function (day, model) {
+		var videoFilters = A2(
+			_elm_lang$core$List$map,
+			function (filter) {
+				return filter.filter;
+			},
+			_elm_lang$core$List$isEmpty(model.filter.videoRecording) ? _user$project$Views_FilterView$videoRecordingFilters : model.filter.videoRecording);
+		var locations = A2(
+			_elm_lang$core$List$map,
+			function (eventLocation) {
+				return eventLocation.slug;
+			},
+			_elm_lang$core$List$isEmpty(model.filter.eventLocations) ? model.eventLocations : model.filter.eventLocations);
+		var types = A2(
+			_elm_lang$core$List$map,
+			function (eventType) {
+				return eventType.slug;
+			},
+			_elm_lang$core$List$isEmpty(model.filter.eventTypes) ? model.eventTypes : model.filter.eventTypes);
+		var filteredEventInstances = A2(
+			_elm_lang$core$List$filter,
+			function (eventInstance) {
+				return A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Month, eventInstance.from, day.date) && (A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Day, eventInstance.from, day.date) && (A2(_elm_lang$core$List$member, eventInstance.location, locations) && (A2(_elm_lang$core$List$member, eventInstance.eventType, types) && A2(_user$project$Views_FilterView$applyVideoRecordingFilters, videoFilters, eventInstance))));
+			},
+			model.eventInstances);
+		return filteredEventInstances;
+	});
+
 var _user$project$Update$update = F2(
 	function (msg, model) {
 		var _p0 = msg;
@@ -18139,23 +18490,15 @@ var _user$project$Update$update = F2(
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'WebSocketPayload':
-				var _p4 = _p0._0;
+				var _p5 = _p0._0;
 				var newModel = function () {
-					var _p1 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Decoders$webSocketActionDecoder, _p4);
+					var _p1 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Decoders$webSocketActionDecoder, _p5);
 					if (_p1.ctor === 'Ok') {
 						var _p2 = _p1._0.action;
 						if (_p2 === 'init') {
-							var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Decoders$initDataDecoder, _p4);
+							var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Decoders$initDataDecoder, _p5);
 							if (_p3.ctor === 'Ok') {
-								return A3(
-									_p3._0,
-									model.flags,
-									A3(
-										_user$project$Models$Filter,
-										{ctor: '[]'},
-										{ctor: '[]'},
-										{ctor: '[]'}),
-									model.route);
+								return A4(_p3._0, model.flags, model.filter, model.location, model.route);
 							} else {
 								return model;
 							}
@@ -18166,71 +18509,103 @@ var _user$project$Update$update = F2(
 						return model;
 					}
 				}();
+				var _p4 = A2(
+					_user$project$Update$update,
+					_user$project$Messages$OnLocationChange(model.location),
+					newModel);
+				var newModel_ = _p4._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
-					newModel,
+					newModel_,
 					{ctor: '[]'});
 			case 'ToggleEventTypeFilter':
-				var _p5 = _p0._0;
-				var currentFilter = model.filter;
-				var eventTypesFilter = A2(_elm_lang$core$List$member, _p5, model.filter.eventTypes) ? A2(
-					_elm_lang$core$List$filter,
-					function (x) {
-						return !_elm_lang$core$Native_Utils.eq(x, _p5);
-					},
-					model.filter.eventTypes) : {ctor: '::', _0: _p5, _1: model.filter.eventTypes};
-				var newFilter = _elm_lang$core$Native_Utils.update(
-					currentFilter,
-					{eventTypes: eventTypesFilter});
-				return A2(
-					_elm_lang$core$Platform_Cmd_ops['!'],
-					_elm_lang$core$Native_Utils.update(
-						model,
-						{filter: newFilter}),
-					{ctor: '[]'});
-			case 'ToggleEventLocationFilter':
 				var _p6 = _p0._0;
 				var currentFilter = model.filter;
-				var eventLocationsFilter = A2(_elm_lang$core$List$member, _p6, model.filter.eventLocations) ? A2(
+				var eventTypesFilter = A2(_elm_lang$core$List$member, _p6, model.filter.eventTypes) ? A2(
 					_elm_lang$core$List$filter,
 					function (x) {
 						return !_elm_lang$core$Native_Utils.eq(x, _p6);
 					},
-					model.filter.eventLocations) : {ctor: '::', _0: _p6, _1: model.filter.eventLocations};
+					model.filter.eventTypes) : {ctor: '::', _0: _p6, _1: model.filter.eventTypes};
 				var newFilter = _elm_lang$core$Native_Utils.update(
 					currentFilter,
-					{eventLocations: eventLocationsFilter});
+					{eventTypes: eventTypesFilter});
+				var query = _user$project$Views_FilterView$filterToQuery(newFilter);
+				var cmd = _elm_lang$navigation$Navigation$newUrl(query);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{filter: newFilter}),
-					{ctor: '[]'});
-			case 'ToggleVideoRecordingFilter':
+					{
+						ctor: '::',
+						_0: cmd,
+						_1: {ctor: '[]'}
+					});
+			case 'ToggleEventLocationFilter':
 				var _p7 = _p0._0;
 				var currentFilter = model.filter;
-				var videoRecordingFilter = A2(_elm_lang$core$List$member, _p7, model.filter.videoRecording) ? A2(
+				var eventLocationsFilter = A2(_elm_lang$core$List$member, _p7, model.filter.eventLocations) ? A2(
 					_elm_lang$core$List$filter,
 					function (x) {
 						return !_elm_lang$core$Native_Utils.eq(x, _p7);
 					},
-					model.filter.videoRecording) : {ctor: '::', _0: _p7, _1: model.filter.videoRecording};
+					model.filter.eventLocations) : {ctor: '::', _0: _p7, _1: model.filter.eventLocations};
 				var newFilter = _elm_lang$core$Native_Utils.update(
 					currentFilter,
-					{videoRecording: videoRecordingFilter});
+					{eventLocations: eventLocationsFilter});
+				var query = _user$project$Views_FilterView$filterToQuery(newFilter);
+				var cmd = _elm_lang$navigation$Navigation$newUrl(query);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{filter: newFilter}),
-					{ctor: '[]'});
-			case 'OnLocationChange':
-				var newRoute = _user$project$Routing$parseLocation(_p0._0);
+					{
+						ctor: '::',
+						_0: cmd,
+						_1: {ctor: '[]'}
+					});
+			case 'ToggleVideoRecordingFilter':
+				var _p8 = _p0._0;
+				var currentFilter = model.filter;
+				var videoRecordingFilter = A2(_elm_lang$core$List$member, _p8, model.filter.videoRecording) ? A2(
+					_elm_lang$core$List$filter,
+					function (x) {
+						return !_elm_lang$core$Native_Utils.eq(x, _p8);
+					},
+					model.filter.videoRecording) : {ctor: '::', _0: _p8, _1: model.filter.videoRecording};
+				var newFilter = _elm_lang$core$Native_Utils.update(
+					currentFilter,
+					{videoRecording: videoRecordingFilter});
+				var query = _user$project$Views_FilterView$filterToQuery(newFilter);
+				var cmd = _elm_lang$navigation$Navigation$newUrl(query);
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{route: newRoute}),
+						{filter: newFilter}),
+					{
+						ctor: '::',
+						_0: cmd,
+						_1: {ctor: '[]'}
+					});
+			case 'OnLocationChange':
+				var _p10 = _p0._0;
+				var newRoute = _user$project$Routing$parseLocation(_p10);
+				var newFilter = function () {
+					var _p9 = newRoute;
+					if (_p9.ctor === 'OverviewFilteredRoute') {
+						return A2(_user$project$Views_FilterView$parseFilterFromQuery, _p9._0, model);
+					} else {
+						return model.filter;
+					}
+				}();
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{filter: newFilter, route: newRoute, location: _p10}),
 					{ctor: '[]'});
 			default:
 				return A2(
@@ -19142,7 +19517,11 @@ var _user$project$Views_EventDetail$eventDetailView = F2(
 									_1: {
 										ctor: '::',
 										_0: {ctor: '_Tuple2', _0: 'schedule-sidebar', _1: true},
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'sticky', _1: true},
+											_1: {ctor: '[]'}
+										}
 									}
 								}),
 							_1: {ctor: '[]'}
@@ -19159,230 +19538,6 @@ var _user$project$Views_EventDetail$eventDetailView = F2(
 					_1: {ctor: '[]'}
 				}
 			});
-	});
-
-var _user$project$Views_FilterView$filterChoiceView = F3(
-	function (filter, currentFilters, action) {
-		var active = A2(_elm_lang$core$List$member, filter, currentFilters);
-		var notActive = !active;
-		return A2(
-			_elm_lang$html$Html$li,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$classList(
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'btn-default', _1: true},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'filter-choice-active', _1: active},
-										_1: {ctor: '[]'}
-									}
-								}
-							}),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								action(filter)),
-							_1: {ctor: '[]'}
-						}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$span,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$i,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$classList(
-											{
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'fa-minus', _1: active},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'fa-plus', _1: notActive},
-														_1: {ctor: '[]'}
-													}
-												}
-											}),
-										_1: {ctor: '[]'}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(_elm_lang$core$Basics_ops['++'], ' ', filter.name)),
-									_1: {ctor: '[]'}
-								}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			});
-	});
-var _user$project$Views_FilterView$filterView = F4(
-	function (name, possibleFilters, currentFilters, action) {
-		return A2(
-			_elm_lang$html$Html$div,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(
-					A2(_elm_lang$core$Basics_ops['++'], name, ':')),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$ul,
-						{ctor: '[]'},
-						A2(
-							_elm_lang$core$List$map,
-							function (filter) {
-								return A3(_user$project$Views_FilterView$filterChoiceView, filter, currentFilters, action);
-							},
-							possibleFilters)),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _user$project$Views_FilterView$applyVideoRecordingFilters = F2(
-	function (filters, eventInstance) {
-		var results = A2(
-			_elm_lang$core$List$map,
-			function (filter) {
-				return filter(eventInstance);
-			},
-			filters);
-		return A2(_elm_lang$core$List$member, true, results);
-	});
-var _user$project$Views_FilterView$hasRecordingFilter = function (eventInstance) {
-	return !_elm_lang$core$Native_Utils.eq(eventInstance.videoUrl, '');
-};
-var _user$project$Views_FilterView$recordedFilter = function (eventInstance) {
-	return _elm_lang$core$Native_Utils.eq(eventInstance.videoRecording, true);
-};
-var _user$project$Views_FilterView$notRecordedFilter = function (eventInstance) {
-	return _elm_lang$core$Native_Utils.eq(eventInstance.videoRecording, false);
-};
-var _user$project$Views_FilterView$videoRecordingFilters = {
-	ctor: '::',
-	_0: {name: 'Will not be recorded', filter: _user$project$Views_FilterView$notRecordedFilter},
-	_1: {
-		ctor: '::',
-		_0: {name: 'Will recorded', filter: _user$project$Views_FilterView$recordedFilter},
-		_1: {
-			ctor: '::',
-			_0: {name: 'Has recording', filter: _user$project$Views_FilterView$hasRecordingFilter},
-			_1: {ctor: '[]'}
-		}
-	}
-};
-var _user$project$Views_FilterView$filterSidebar = function (model) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'col-sm-3', _1: true},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'col-sm-push-9', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'schedule-sidebar', _1: true},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'schedule-filter', _1: true},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'sticky', _1: true},
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h4,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('Filter'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('form-group'),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A4(_user$project$Views_FilterView$filterView, 'Type', model.eventTypes, model.filter.eventTypes, _user$project$Messages$ToggleEventTypeFilter),
-						_1: {
-							ctor: '::',
-							_0: A4(_user$project$Views_FilterView$filterView, 'Location', model.eventLocations, model.filter.eventLocations, _user$project$Messages$ToggleEventLocationFilter),
-							_1: {
-								ctor: '::',
-								_0: A4(_user$project$Views_FilterView$filterView, 'Video', _user$project$Views_FilterView$videoRecordingFilters, model.filter.videoRecording, _user$project$Messages$ToggleVideoRecordingFilter),
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		});
-};
-var _user$project$Views_FilterView$applyFilters = F2(
-	function (day, model) {
-		var videoFilters = A2(
-			_elm_lang$core$List$map,
-			function (filter) {
-				return filter.filter;
-			},
-			_elm_lang$core$List$isEmpty(model.filter.videoRecording) ? _user$project$Views_FilterView$videoRecordingFilters : model.filter.videoRecording);
-		var locations = A2(
-			_elm_lang$core$List$map,
-			function (eventLocation) {
-				return eventLocation.slug;
-			},
-			_elm_lang$core$List$isEmpty(model.filter.eventLocations) ? model.eventLocations : model.filter.eventLocations);
-		var types = A2(
-			_elm_lang$core$List$map,
-			function (eventType) {
-				return eventType.slug;
-			},
-			_elm_lang$core$List$isEmpty(model.filter.eventTypes) ? model.eventTypes : model.filter.eventTypes);
-		var filteredEventInstances = A2(
-			_elm_lang$core$List$filter,
-			function (eventInstance) {
-				return A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Month, eventInstance.from, day.date) && (A3(_justinmimbs$elm_date_extra$Date_Extra$equalBy, _justinmimbs$elm_date_extra$Date_Extra$Day, eventInstance.from, day.date) && (A2(_elm_lang$core$List$member, eventInstance.location, locations) && (A2(_elm_lang$core$List$member, eventInstance.eventType, types) && A2(_user$project$Views_FilterView$applyVideoRecordingFilters, videoFilters, eventInstance))));
-			},
-			model.eventInstances);
-		return filteredEventInstances;
 	});
 
 var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (eventInstance) {
@@ -19633,6 +19788,8 @@ var _user$project$Views$view = function (model) {
 						switch (_p0.ctor) {
 							case 'OverviewRoute':
 								return _user$project$Views_ScheduleOverview$scheduleOverviewView(model);
+							case 'OverviewFilteredRoute':
+								return _user$project$Views_ScheduleOverview$scheduleOverviewView(model);
 							case 'DayRoute':
 								var day = function () {
 									var _p1 = _elm_lang$core$List$head(
@@ -19684,8 +19841,9 @@ var _user$project$Main$init = F2(
 			{ctor: '[]'},
 			{ctor: '[]'},
 			{ctor: '[]'});
-		var currentRoute = _user$project$Routing$parseLocation(location);
-		var initModel = A8(
+		var currentRoute = _user$project$Routing$parseLocation(
+			A2(_elm_lang$core$Debug$log, 'location', location));
+		var model = A9(
 			_user$project$Models$Model,
 			{ctor: '[]'},
 			{ctor: '[]'},
@@ -19694,10 +19852,11 @@ var _user$project$Main$init = F2(
 			{ctor: '[]'},
 			flags,
 			emptyFilter,
+			location,
 			currentRoute);
 		return A2(
 			_elm_lang$core$Platform_Cmd_ops['!'],
-			initModel,
+			model,
 			{
 				ctor: '::',
 				_0: A2(_user$project$WebSocketCalls$sendInitMessage, flags.camp_slug, flags.websocket_server),
@@ -19744,7 +19903,7 @@ var _user$project$Main$main = A2(
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
 if (typeof _user$project$Main$main !== 'undefined') {
-    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Messages.Msg":{"args":[],"tags":{"OnLocationChange":["Navigation.Location"],"WebSocketPayload":["String"],"ToggleEventLocationFilter":["Models.EventLocation"],"NoOp":[],"ToggleVideoRecordingFilter":["{ name : String, filter : Models.EventInstance -> Bool }"],"ToggleEventTypeFilter":["Models.EventType"],"BackInHistory":[]}},"Date.Date":{"args":[],"tags":{"Date":[]}}},"aliases":{"Models.EventLocation":{"args":[],"type":"{ name : String, slug : String, icon : String }"},"Models.EventSlug":{"args":[],"type":"String"},"Models.EventType":{"args":[],"type":"{ name : String, slug : String, color : String, lightText : Bool }"},"Models.EventInstance":{"args":[],"type":"{ title : String , slug : Models.EventInstanceSlug , id : Int , url : String , eventSlug : Models.EventSlug , eventType : String , backgroundColor : String , forgroundColor : String , from : Date.Date , to : Date.Date , timeslots : Float , location : String , locationIcon : String , videoRecording : Bool , videoUrl : String }"},"Models.EventInstanceSlug":{"args":[],"type":"String"},"Navigation.Location":{"args":[],"type":"{ href : String , host : String , hostname : String , protocol : String , origin : String , port_ : String , pathname : String , search : String , hash : String , username : String , password : String }"}},"message":"Messages.Msg"},"versions":{"elm":"0.18.0"}});
+    _user$project$Main$main(Elm['Main'], 'Main', {"types":{"unions":{"Messages.Msg":{"args":[],"tags":{"OnLocationChange":["Navigation.Location"],"WebSocketPayload":["String"],"ToggleEventLocationFilter":["Models.EventLocation"],"NoOp":[],"ToggleVideoRecordingFilter":["{ name : String , slug : String , filter : Models.EventInstance -> Bool }"],"ToggleEventTypeFilter":["Models.EventType"],"BackInHistory":[]}},"Date.Date":{"args":[],"tags":{"Date":[]}}},"aliases":{"Models.EventLocation":{"args":[],"type":"{ name : String, slug : String, icon : String }"},"Models.EventSlug":{"args":[],"type":"String"},"Models.EventType":{"args":[],"type":"{ name : String, slug : String, color : String, lightText : Bool }"},"Models.EventInstance":{"args":[],"type":"{ title : String , slug : Models.EventInstanceSlug , id : Int , url : String , eventSlug : Models.EventSlug , eventType : String , backgroundColor : String , forgroundColor : String , from : Date.Date , to : Date.Date , timeslots : Float , location : String , locationIcon : String , videoRecording : Bool , videoUrl : String }"},"Models.EventInstanceSlug":{"args":[],"type":"String"},"Navigation.Location":{"args":[],"type":"{ href : String , host : String , hostname : String , protocol : String , origin : String , port_ : String , pathname : String , search : String , hash : String , username : String , password : String }"}},"message":"Messages.Msg"},"versions":{"elm":"0.18.0"}});
 }
 
 if (typeof define === "function" && define['amd'])
