@@ -220,10 +220,16 @@ footer {
 .schedule-filter ul {
   list-style: none;
   padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.schedule-filter ul li {
+  flex: 1;
 }
 
 .schedule-filter .btn {
-  min-width: 200px;
+  width: 100%;
   text-align: left;
 }
 

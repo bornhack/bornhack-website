@@ -75,6 +75,7 @@ type alias EventInstance =
     , locationIcon : String
     , videoRecording : Bool
     , videoUrl : String
+    , isFavorited : Maybe Bool
     }
 
 
@@ -85,6 +86,7 @@ type alias Event =
     , speakers : List Speaker
     , videoRecording : Bool
     , videoUrl : String
+    , eventType : String
     }
 
 

@@ -438,6 +438,7 @@ class Event(CampRelatedModel):
                 for speaker in self.speakers.all()
             ],
             'video_recording': self.video_recording,
+            'event_type': self.event_type.name,
         }
 
         if self.video_url:

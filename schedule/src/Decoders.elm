@@ -7,7 +7,7 @@ import Models exposing (Day, Speaker, Event, EventInstance, EventLocation, Event
 
 -- Core modules
 
-import Json.Decode exposing (int, string, float, list, bool, dict, Decoder)
+import Json.Decode exposing (int, string, float, list, bool, dict, Decoder, nullable)
 import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
 import Date exposing (Date, Month(..))
 
@@ -55,6 +55,7 @@ eventDecoder =
         |> required "speakers" (list speakerDecoder)
         |> required "video_recording" bool
         |> optional "video_url" string ""
+        |> required "event_type" string
 
 
 dateDecoder : Decoder Date
@@ -86,6 +87,7 @@ eventInstanceDecoder =
         |> required "location_icon" string
         |> required "video_recording" bool
         |> optional "video_url" string ""
+        |> optional "is_favorited" (nullable bool) Nothing
 
 
 eventLocationDecoder : Decoder EventLocation

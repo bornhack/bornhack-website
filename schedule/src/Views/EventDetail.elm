@@ -6,9 +6,14 @@ import Messages exposing (Msg(..))
 import Models exposing (..)
 
 
+-- Core modules
+
+import Date
+
+
 -- External modules
 
-import Html exposing (Html, text, div, ul, li, span, i, h4, a, p, hr)
+import Html exposing (Html, text, div, ul, li, span, i, h3, h4, a, p, hr, strong)
 import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick)
 import Markdown
@@ -22,58 +27,84 @@ eventDetailView eventSlug model =
             model.events
                 |> List.filter (\e -> e.slug == eventSlug)
                 |> List.head
+
+        eventInstances =
+            List.filter (\instance -> instance.eventSlug == eventSlug) model.eventInstances
     in
         case event of
             Just event ->
                 div [ class "row" ]
-                    [ div [ class "col-sm-9" ]
-                        [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
-                            [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
-                            , text " Back"
-                            ]
-                        , h4 [] [ text event.title ]
-                        , p [] [ Markdown.toHtml [] event.abstract ]
-                        , hr [] []
-                        , eventInstancesList eventSlug model.eventInstances
-                        ]
-                    , div
-                        [ classList
-                            [ ( "col-sm-3", True )
-                            , ( "schedule-sidebar", True )
-                            , ( "sticky", True )
-                            ]
-                        ]
-                        [ videoRecordingSidebar event
-                        , speakerSidebar event.speakers
-                        ]
+                    [ eventDetailContent event
+                    , eventDetailSidebar event eventInstances
                     ]
 
             Nothing ->
                 div [ class "row" ]
-                    [ text
-                        (case model.dataLoaded of
-                            True ->
-                                "Event not found."
-
-                            False ->
-                                "Loading..."
-                        )
+                    [ h4 [] [ text "Event not found." ]
+                    , a [ href "#" ] [ text "Click here to go the schedule overview." ]
                     ]
 
 
-videoRecordingSidebar : Event -> Html Msg
-videoRecordingSidebar event =
+eventDetailContent : Event -> Html Msg
+eventDetailContent event =
+    div [ class "col-sm-9" ]
+        [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
+            [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
+            , text " Back"
+            ]
+        , h3 [] [ text event.title ]
+        , p [] [ Markdown.toHtml [] event.abstract ]
+        ]
+
+
+eventDetailSidebar : Event -> List EventInstance -> Html Msg
+eventDetailSidebar event eventInstances =
     let
-        ( video, willBeRecorded ) =
-            if event.videoUrl /= "" then
-                ( h4 [] [ text "Watch the video here!" ], True )
-            else if event.videoRecording == True then
-                ( h4 [] [ text "This event will be recorded!" ], True )
-            else
-                ( h4 [] [ text "This event will NOT be recorded!" ], False )
+        videoRecordingLink =
+            case event.videoUrl of
+                "" ->
+                    []
+
+                _ ->
+                    [ a [ href event.videoUrl, classList [ ( "btn", True ), ( "btn-success", True ) ] ]
+                        [ i [ classList [ ( "fa", True ), ( "fa-film", True ) ] ] []
+                        , text " Watch recording here!"
+                        ]
+                    ]
     in
-        div [ classList [ ( "alert", True ), ( "alert-danger", not willBeRecorded ), ( "alert-info", willBeRecorded ) ] ]
-            [ video ]
+        div
+            [ classList
+                [ ( "col-sm-3", True )
+                , ( "schedule-sidebar", True )
+                , ( "sticky", True )
+                ]
+            ]
+            (videoRecordingLink
+                ++ [ speakerSidebar event.speakers
+                   , eventMetaDataSidebar event
+                   , eventInstancesSidebar eventInstances
+                   ]
+            )
+
+
+eventMetaDataSidebar : Event -> Html Msg
+eventMetaDataSidebar event =
+    let
+        videoRecording =
+            case event.videoRecording of
+                True ->
+                    "Yes"
+
+                False ->
+                    "No"
+    in
+        div []
+            [ h4 [] [ text "Metadata" ]
+            , ul []
+                [ li [] [ strong [] [ text "Type: " ], text event.eventType ]
+                , li [] [ strong [] [ text "Recording: " ], text videoRecording ]
+                ]
+            ]
 
 
 speakerSidebar : List Speaker -> Html Msg
@@ -94,27 +125,30 @@ speakerDetail speaker =
         ]
 
 
-eventInstancesList : String -> List EventInstance -> Html Msg
-eventInstancesList eventSlug eventInstances =
-    let
-        instances =
-            List.filter (\instance -> instance.eventSlug == eventSlug) eventInstances
-    in
-        div []
-            [ h4 []
-                [ text "This event will occur at:" ]
-            , ul
-                []
-                (List.map eventInstanceItem instances)
-            ]
+eventInstancesSidebar : List EventInstance -> Html Msg
+eventInstancesSidebar eventInstances =
+    div []
+        [ h4 []
+            [ text "This event will occur at:" ]
+        , ul
+            []
+            (List.map eventInstanceItem eventInstances)
+        ]
 
 
 eventInstanceItem : EventInstance -> Html Msg
 eventInstanceItem eventInstance =
-    li []
-        [ text
-            ((Date.Extra.toFormattedString "y-MM-dd HH:mm" eventInstance.from)
-                ++ " to "
-                ++ (Date.Extra.toFormattedString "y-MM-d HH:mm" eventInstance.to)
-            )
-        ]
+    let
+        toFormat =
+            if Date.day eventInstance.from == Date.day eventInstance.to then
+                "HH:mm"
+            else
+                "E HH:mm"
+    in
+        li []
+            [ text
+                ((Date.Extra.toFormattedString "E HH:mm" eventInstance.from)
+                    ++ " to "
+                    ++ (Date.Extra.toFormattedString toFormat eventInstance.to)
+                )
+            ]

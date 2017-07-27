@@ -52,12 +52,12 @@ dayView day model =
         div
             [ classList [ ( "row", True ) ] ]
             [ gutter minutes
-            , locationColumns filteredEventInstances model.eventLocations model.flags.schedule_midnight_offset_hours
+            , locationColumns filteredEventInstances model.eventLocations model.flags.schedule_midnight_offset_hours minutes
             ]
 
 
-locationColumns : List EventInstance -> List EventLocation -> Int -> Html Msg
-locationColumns eventInstances eventLocations offset =
+locationColumns : List EventInstance -> List EventLocation -> Int -> List Date -> Html Msg
+locationColumns eventInstances eventLocations offset minutes =
     let
         columnWidth =
             100.0 / toFloat (List.length eventLocations)
@@ -71,11 +71,11 @@ locationColumns eventInstances eventLocations offset =
                 [ ( "col-sm-11", True )
                 ]
             ]
-            (List.map (\location -> locationColumn columnWidth eventInstances offset location) eventLocations)
+            (List.map (\location -> locationColumn columnWidth eventInstances offset minutes location) eventLocations)
 
 
-locationColumn : Float -> List EventInstance -> Int -> EventLocation -> Html Msg
-locationColumn columnWidth eventInstances offset location =
+locationColumn : Float -> List EventInstance -> Int -> List Date -> EventLocation -> Html Msg
+locationColumn columnWidth eventInstances offset minutes location =
     let
         locationInstances =
             List.filter (\instance -> instance.location == location.slug) eventInstances
@@ -102,6 +102,23 @@ locationColumn columnWidth eventInstances offset location =
                 ]
                 [ text location.name ]
              ]
+                ++ (List.map
+                        (\x ->
+                            div
+                                [ style
+                                    [ ( "backgroundColor"
+                                      , if Date.minute x == 30 || Date.minute x == 45 then
+                                            "#f8f8f8"
+                                        else
+                                            "#fff"
+                                      )
+                                    , ( "height", px blockHeight )
+                                    ]
+                                ]
+                                []
+                        )
+                        minutes
+                   )
                 ++ (List.map (\group -> renderGroup offset group) overlappingGroups)
             )
 
