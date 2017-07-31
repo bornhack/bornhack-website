@@ -179,6 +179,12 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
     def get_success_url(self):
         return reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['speakers'].queryset = models.SpeakerProposal.objects.filter(camp=self.camp, user=self.request.user)
+        context['form'].fields['event_type'].queryset = models.EventType.objects.filter(public=True)
+        return context
+
     def form_valid(self, form):
         if form.instance.proposal_status == models.UserSubmittedModel.PROPOSAL_PENDING:
             messages.warning(self.request, "Your event proposal has been reverted to status draft. Please submit it again when you are ready.")
