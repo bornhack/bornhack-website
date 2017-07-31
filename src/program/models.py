@@ -185,7 +185,7 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     submission_notes = models.TextField(
-        help_text='Private notes for the event. Only visible to the submitting user and the BornHack organisers.',
+        help_text='Private notes for this speaker. Only visible to the submitting user and the BornHack organisers.',
         blank=True
     )
 
@@ -251,7 +251,7 @@ class EventProposal(UserSubmittedModel):
     )
 
     submission_notes = models.TextField(
-        help_text='Private notes for the event. Only visible to the submitting user and the BornHack organisers.',
+        help_text='Private notes for this event. Only visible to the submitting user and the BornHack organisers.',
         blank=True
     )
 
