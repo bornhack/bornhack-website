@@ -242,7 +242,7 @@ class EventProposal(UserSubmittedModel):
     speakers = models.ManyToManyField(
         'program.SpeakerProposal',
         blank=True,
-        help_text='Pick the speaker(s) for this event',
+        help_text='Pick the speaker(s) for this event. If you cannot see anything here you need to go back and create Speaker Proposal(s) first.',
     )
 
     allow_video_recording = models.BooleanField(
