@@ -7,6 +7,7 @@ import Messages exposing (Msg(..))
 import Views.DayPicker exposing (dayPicker)
 import Views.DayView exposing (dayView)
 import Views.EventDetail exposing (eventDetailView)
+import Views.SpeakerDetail exposing (speakerDetailView)
 import Views.ScheduleOverview exposing (scheduleOverviewView)
 
 
@@ -47,6 +48,9 @@ view model =
 
                     EventRoute eventSlug ->
                         eventDetailView eventSlug model
+
+                    SpeakerRoute speakerSlug ->
+                        speakerDetailView speakerSlug model
 
                     NotFoundRoute ->
                         div [] [ text "Not found!" ]

@@ -44,6 +44,10 @@ speakerDecoder : Decoder Speaker
 speakerDecoder =
     decode Speaker
         |> required "name" string
+        |> required "slug" string
+        |> required "biography" string
+        |> optional "large_picture_url" (nullable string) Nothing
+        |> optional "small_picture_url" (nullable string) Nothing
 
 
 eventDecoder : Decoder Event
@@ -52,7 +56,7 @@ eventDecoder =
         |> required "title" string
         |> required "slug" string
         |> required "abstract" string
-        |> required "speakers" (list speakerDecoder)
+        |> required "speaker_slugs" (list string)
         |> required "video_recording" bool
         |> optional "video_url" string ""
         |> required "event_type" string
@@ -115,3 +119,4 @@ initDataDecoder =
         |> required "event_instances" (list eventInstanceDecoder)
         |> required "event_locations" (list eventLocationDecoder)
         |> required "event_types" (list eventTypeDecoder)
+        |> required "speakers" (list speakerDecoder)

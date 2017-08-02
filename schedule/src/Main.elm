@@ -37,7 +37,7 @@ init flags location =
             Filter [] [] []
 
         model =
-            Model [] [] [] [] [] flags emptyFilter location currentRoute False
+            Model [] [] [] [] [] [] flags emptyFilter location currentRoute False
     in
         model ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
 

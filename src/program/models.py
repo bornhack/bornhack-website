@@ -14,6 +14,8 @@ from django.dispatch import receiver
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
@@ -433,8 +435,8 @@ class Event(CampRelatedModel):
             'title': self.title,
             'slug': self.slug,
             'abstract': self.abstract,
-            'speakers': [
-                speaker.serialize()
+            'speaker_slugs': [
+                speaker.slug
                 for speaker in self.speakers.all()
             ],
             'video_recording': self.video_recording,
@@ -613,10 +615,27 @@ class Speaker(CampRelatedModel):
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
+    def get_picture_url(self, size):
+        return reverse('speaker_picture', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug, 'picture': size})
+
+    def get_small_picture_url(self):
+        return self.get_picture_url('thumbnail')
+
+    def get_large_picture_url(self):
+        return self.get_picture_url('large')
+
+
     def serialize(self):
         data = {
             'name': self.name,
+            'slug': self.slug,
+            'biography': self.biography,
         }
+
+        if self.picture_small and self.picture_large:
+            data['large_picture_url'] = self.get_large_picture_url()
+            data['small_picture_url'] = self.get_small_picture_url()
+
         return data
 
 

@@ -3,7 +3,8 @@ module Views.DayView exposing (dayView)
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, Day, EventInstance, EventLocation)
+import Models exposing (Model, Day, EventInstance, EventLocation, Route(EventRoute))
+import Routing exposing (routeToString)
 
 
 -- Core modules
@@ -236,7 +237,7 @@ eventInstanceBlock offset numberInGroup ( eventInstance, lefts ) =
                 , ( "background-color", eventInstance.backgroundColor )
                 , ( "color", eventInstance.forgroundColor )
                 ]
-            , href ("#event/" ++ eventInstance.eventSlug)
+            , href <| routeToString <| EventRoute eventInstance.eventSlug
             ]
             [ p [] [ text ((Date.Extra.toFormattedString "HH:mm" eventInstance.from) ++ " " ++ eventInstance.title) ]
             ]

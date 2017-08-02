@@ -10,11 +10,36 @@ import Date exposing (Date, now)
 import Navigation exposing (Location)
 
 
+type alias EventSlug =
+    String
+
+
+type alias EventInstanceSlug =
+    String
+
+
+type alias SpeakerSlug =
+    String
+
+
+type alias DaySlug =
+    String
+
+
+type alias FilterQuery =
+    String
+
+
+
+-- Route is defined here rather than in Routing.elm due to it being used in Model. If it were in Routing.elm we would have a circular dependency.
+
+
 type Route
     = OverviewRoute
-    | OverviewFilteredRoute String
-    | DayRoute String
+    | OverviewFilteredRoute FilterQuery
+    | DayRoute DaySlug
     | EventRoute EventSlug
+    | SpeakerRoute SpeakerSlug
     | NotFoundRoute
 
 
@@ -24,6 +49,7 @@ type alias Model =
     , eventInstances : List EventInstance
     , eventLocations : List EventLocation
     , eventTypes : List EventType
+    , speakers : List Speaker
     , flags : Flags
     , filter : Filter
     , location : Location
@@ -35,8 +61,12 @@ type alias Model =
 type alias Filter =
     { eventTypes : List EventType
     , eventLocations : List EventLocation
-    , videoRecording : List { name : String, slug : String, filter : EventInstance -> Bool }
+    , videoRecording : List VideoRecordingFilter
     }
+
+
+type alias VideoRecordingFilter =
+    { name : String, slug : String, filter : EventInstance -> Bool }
 
 
 type alias Day =
@@ -48,15 +78,11 @@ type alias Day =
 
 type alias Speaker =
     { name : String
+    , slug : SpeakerSlug
+    , biography : String
+    , largePictureUrl : Maybe String
+    , smallPictureUrl : Maybe String
     }
-
-
-type alias EventSlug =
-    String
-
-
-type alias EventInstanceSlug =
-    String
 
 
 type alias EventInstance =
@@ -83,7 +109,7 @@ type alias Event =
     { title : String
     , slug : EventSlug
     , abstract : String
-    , speakers : List Speaker
+    , speakerSlugs : List SpeakerSlug
     , videoRecording : Bool
     , videoUrl : String
     , eventType : String

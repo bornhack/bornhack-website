@@ -3,8 +3,9 @@ module Views.ScheduleOverview exposing (scheduleOverviewView)
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, Day, EventInstance, Filter)
+import Models exposing (Model, Day, EventInstance, Filter, Route(EventRoute))
 import Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery)
+import Routing exposing (routeToString)
 
 
 -- External modules
@@ -50,7 +51,7 @@ dayEventInstanceView eventInstance =
             [ ( "event", True )
             , ( "event-in-overview", True )
             ]
-        , href ("#event/" ++ eventInstance.eventSlug)
+        , href <| routeToString <| EventRoute eventInstance.eventSlug
         , style
             [ ( "background-color", eventInstance.backgroundColor )
             , ( "color", eventInstance.forgroundColor )

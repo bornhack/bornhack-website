@@ -4,6 +4,7 @@ module Views.DayPicker exposing (..)
 
 import Models exposing (..)
 import Messages exposing (Msg(..))
+import Routing exposing (routeToString)
 
 
 -- Core modules
@@ -51,7 +52,7 @@ dayPicker model =
                         , ( "btn-default", not isAllDaysActive )
                         , ( "btn-primary", isAllDaysActive )
                         ]
-                    , href ("#")
+                    , href <| routeToString OverviewRoute
                     ]
                     [ text "All Days"
                     ]
@@ -78,7 +79,7 @@ dayButton day activeDate =
                 , ( "btn-default", not isActive )
                 , ( "btn-primary", isActive )
                 ]
-            , href ("#day/" ++ (Date.Extra.toFormattedString "y-MM-dd" day.date))
+            , href <| routeToString <| DayRoute <| Date.Extra.toFormattedString "y-MM-dd" day.date
             ]
             [ text day.day_name
             ]

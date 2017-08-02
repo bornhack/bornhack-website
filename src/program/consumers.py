@@ -1,7 +1,7 @@
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from camps.models import Camp
-from .models import Event, EventInstance, Favorite, EventLocation, EventType
+from .models import Event, EventInstance, Favorite, EventLocation, EventType, Speaker
 
 
 class ScheduleConsumer(JsonWebsocketConsumer):
@@ -41,12 +41,16 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                 event_types_query_set = EventType.objects.filter()
                 event_types = list([x.serialize() for x in event_types_query_set])
 
+                speakers_query_set = Speaker.objects.filter(camp=camp)
+                speakers = list([x.serialize() for x in speakers_query_set])
+
                 data = {
                     "action": "init",
                     "events": events,
                     "event_instances": event_instances,
                     "event_locations": event_locations,
                     "event_types": event_types,
+                    "speakers": speakers,
                     "days": days,
                 }
             except Camp.DoesNotExist:

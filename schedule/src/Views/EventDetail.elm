@@ -4,6 +4,7 @@ module Views.EventDetail exposing (eventDetailView)
 
 import Messages exposing (Msg(..))
 import Models exposing (..)
+import Routing exposing (routeToString)
 
 
 -- Core modules
@@ -27,15 +28,12 @@ eventDetailView eventSlug model =
             model.events
                 |> List.filter (\e -> e.slug == eventSlug)
                 |> List.head
-
-        eventInstances =
-            List.filter (\instance -> instance.eventSlug == eventSlug) model.eventInstances
     in
         case event of
             Just event ->
                 div [ class "row" ]
                     [ eventDetailContent event
-                    , eventDetailSidebar event eventInstances
+                    , eventDetailSidebar event model
                     ]
 
             Nothing ->
@@ -53,12 +51,52 @@ eventDetailContent event =
             , text " Back"
             ]
         , h3 [] [ text event.title ]
-        , p [] [ Markdown.toHtml [] event.abstract ]
+        , div [] [ Markdown.toHtml [] event.abstract ]
         ]
 
 
-eventDetailSidebar : Event -> List EventInstance -> Html Msg
-eventDetailSidebar event eventInstances =
+getSpeakersFromSlugs : List Speaker -> List SpeakerSlug -> List Speaker -> List Speaker
+getSpeakersFromSlugs speakers slugs collectedSpeakers =
+    case speakers of
+        [] ->
+            collectedSpeakers
+
+        speaker :: rest ->
+            let
+                foundSlug =
+                    slugs
+                        |> List.filter (\slug -> slug == speaker.slug)
+                        |> List.head
+
+                foundSpeaker =
+                    case foundSlug of
+                        Just slug ->
+                            [ speaker ]
+
+                        Nothing ->
+                            []
+
+                newSlugs =
+                    case foundSlug of
+                        Just slug ->
+                            List.filter (\x -> x /= slug) slugs
+
+                        Nothing ->
+                            slugs
+
+                newCollectedSpeakers =
+                    collectedSpeakers ++ foundSpeaker
+            in
+                case slugs of
+                    [] ->
+                        collectedSpeakers
+
+                    _ ->
+                        getSpeakersFromSlugs rest newSlugs newCollectedSpeakers
+
+
+eventDetailSidebar : Event -> Model -> Html Msg
+eventDetailSidebar event model =
     let
         videoRecordingLink =
             case event.videoUrl of
@@ -71,6 +109,12 @@ eventDetailSidebar event eventInstances =
                         , text " Watch recording here!"
                         ]
                     ]
+
+        eventInstances =
+            List.filter (\instance -> instance.eventSlug == event.slug) model.eventInstances
+
+        speakers =
+            getSpeakersFromSlugs model.speakers event.speakerSlugs []
     in
         div
             [ classList
@@ -80,7 +124,7 @@ eventDetailSidebar event eventInstances =
                 ]
             ]
             (videoRecordingLink
-                ++ [ speakerSidebar event.speakers
+                ++ [ speakerSidebar speakers
                    , eventMetaDataSidebar event
                    , eventInstancesSidebar eventInstances
                    ]
@@ -121,7 +165,7 @@ speakerSidebar speakers =
 speakerDetail : Speaker -> Html Msg
 speakerDetail speaker =
     li []
-        [ text speaker.name
+        [ a [ href <| routeToString <| SpeakerRoute speaker.slug ] [ text speaker.name ]
         ]
 
 

@@ -3,7 +3,8 @@ module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQu
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance, Filter, Day)
+import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewFilteredRoute), VideoRecordingFilter)
+import Routing exposing (routeToString)
 
 
 -- Core modules
@@ -14,7 +15,7 @@ import Regex
 -- External modules
 
 import Html exposing (Html, text, div, ul, li, span, i, h4)
-import Html.Attributes exposing (class, classList, href)
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
 
@@ -95,7 +96,7 @@ hasRecordingFilter eventInstance =
     eventInstance.videoUrl /= ""
 
 
-videoRecordingFilters : List { name : String, slug : String, filter : EventInstance -> Bool }
+videoRecordingFilters : List VideoRecordingFilter
 videoRecordingFilters =
     [ { name = "Will not be recorded", slug = "not-to-be-recorded", filter = notRecordedFilter }
     , { name = "Will recorded", slug = "to-be-recorded", filter = recordedFilter }
@@ -177,7 +178,7 @@ getFilter filterType modelItems query =
         List.filterMap (\x -> findFilter modelItems x) filterSlugs
 
 
-parseFilterFromQuery : String -> Model -> Filter
+parseFilterFromQuery : FilterQuery -> Model -> Filter
 parseFilterFromQuery query model =
     let
         types =
@@ -195,7 +196,7 @@ parseFilterFromQuery query model =
         }
 
 
-filterToQuery : Filter -> String
+filterToQuery : Filter -> FilterQuery
 filterToQuery filter =
     let
         typePart =
@@ -225,4 +226,4 @@ filterToQuery filter =
         result =
             String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
     in
-        "#" ++ result
+        routeToString <| OverviewFilteredRoute result
