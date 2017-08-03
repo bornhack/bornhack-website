@@ -3,7 +3,7 @@ module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQu
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewFilteredRoute), VideoRecordingFilter)
+import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewFilteredRoute), VideoRecordingFilter, EventType, EventLocation)
 import Routing exposing (routeToString)
 
 
@@ -14,7 +14,7 @@ import Regex
 
 -- External modules
 
-import Html exposing (Html, text, div, ul, li, span, i, h4)
+import Html exposing (Html, text, div, ul, li, span, i, h4, small)
 import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
@@ -23,29 +23,22 @@ import Date.Extra exposing (Interval(..), equalBy)
 applyFilters : Day -> Model -> List EventInstance
 applyFilters day model =
     let
-        types =
-            List.map (\eventType -> eventType.slug)
-                (if List.isEmpty model.filter.eventTypes then
-                    model.eventTypes
+        slugs default filters =
+            List.map .slug
+                (if List.isEmpty filters then
+                    default
                  else
-                    model.filter.eventTypes
+                    filters
                 )
+
+        types =
+            slugs model.eventTypes model.filter.eventTypes
 
         locations =
-            List.map (\eventLocation -> eventLocation.slug)
-                (if List.isEmpty model.filter.eventLocations then
-                    model.eventLocations
-                 else
-                    model.filter.eventLocations
-                )
+            slugs model.eventLocations model.filter.eventLocations
 
         videoFilters =
-            List.map (\filter -> filter.filter)
-                (if List.isEmpty model.filter.videoRecording then
-                    videoRecordingFilters
-                 else
-                    model.filter.videoRecording
-                )
+            slugs videoRecordingFilters model.filter.videoRecording
 
         filteredEventInstances =
             List.filter
@@ -54,7 +47,7 @@ applyFilters day model =
                         && (Date.Extra.equalBy Date.Extra.Day eventInstance.from day.date)
                         && List.member eventInstance.location locations
                         && List.member eventInstance.eventType types
-                        && applyVideoRecordingFilters videoFilters eventInstance
+                        && List.member eventInstance.videoState videoFilters
                 )
                 model.eventInstances
     in
@@ -74,70 +67,84 @@ filterSidebar model =
         ]
         [ h4 [] [ text "Filter" ]
         , div [ class "form-group" ]
-            [ filterView "Type" model.eventTypes model.filter.eventTypes ToggleEventTypeFilter
-            , filterView "Location" model.eventLocations model.filter.eventLocations ToggleEventLocationFilter
-            , filterView "Video" videoRecordingFilters model.filter.videoRecording ToggleVideoRecordingFilter
+            [ filterView
+                "Type"
+                model.eventTypes
+                model.filter.eventTypes
+                ToggleEventTypeFilter
+                model.eventInstances
+                .eventType
+            , filterView
+                "Location"
+                model.eventLocations
+                model.filter.eventLocations
+                ToggleEventLocationFilter
+                model.eventInstances
+                .location
+            , filterView
+                "Video"
+                videoRecordingFilters
+                model.filter.videoRecording
+                ToggleVideoRecordingFilter
+                model.eventInstances
+                .videoState
             ]
         ]
 
 
-notRecordedFilter : EventInstance -> Bool
-notRecordedFilter eventInstance =
-    eventInstance.videoRecording == False
-
-
-recordedFilter : EventInstance -> Bool
-recordedFilter eventInstance =
-    eventInstance.videoRecording == True
-
-
-hasRecordingFilter : EventInstance -> Bool
-hasRecordingFilter eventInstance =
-    eventInstance.videoUrl /= ""
-
-
 videoRecordingFilters : List VideoRecordingFilter
 videoRecordingFilters =
-    [ { name = "Will not be recorded", slug = "not-to-be-recorded", filter = notRecordedFilter }
-    , { name = "Will recorded", slug = "to-be-recorded", filter = recordedFilter }
-    , { name = "Has recording", slug = "has-recording", filter = hasRecordingFilter }
+    [ { name = "Will not be recorded", slug = "not-to-be-recorded" }
+    , { name = "Will recorded", slug = "to-be-recorded" }
+    , { name = "Has recording", slug = "has-recording" }
     ]
-
-
-applyVideoRecordingFilters : List (EventInstance -> Bool) -> EventInstance -> Bool
-applyVideoRecordingFilters filters eventInstance =
-    let
-        results =
-            List.map (\filter -> filter eventInstance) filters
-    in
-        List.member True results
 
 
 filterView :
     String
-    -> List { a | name : String }
-    -> List { a | name : String }
-    -> ({ a | name : String } -> Msg)
+    -> List { a | name : String, slug : String }
+    -> List { a | name : String, slug : String }
+    -> ({ a | name : String, slug : String } -> Msg)
+    -> List EventInstance
+    -> (EventInstance -> String)
     -> Html Msg
-filterView name possibleFilters currentFilters action =
+filterView name possibleFilters currentFilters action eventInstances slugLike =
     div []
         [ text (name ++ ":")
-        , ul [] (List.map (\filter -> filterChoiceView filter currentFilters action) possibleFilters)
+        , ul []
+            (possibleFilters
+                |> List.map
+                    (\filter ->
+                        filterChoiceView
+                            filter
+                            currentFilters
+                            action
+                            eventInstances
+                            slugLike
+                    )
+            )
         ]
 
 
 filterChoiceView :
-    { a | name : String }
-    -> List { a | name : String }
-    -> ({ a | name : String } -> Msg)
+    { a | name : String, slug : String }
+    -> List { a | name : String, slug : String }
+    -> ({ a | name : String, slug : String } -> Msg)
+    -> List EventInstance
+    -> (EventInstance -> String)
     -> Html Msg
-filterChoiceView filter currentFilters action =
+filterChoiceView filter currentFilters action eventInstances slugLike =
     let
         active =
             List.member filter currentFilters
 
         notActive =
             not active
+
+        eventInstanceCount =
+            eventInstances
+                |> List.filter (\eventInstance -> slugLike eventInstance == filter.slug)
+                |> List.length
     in
         li []
             [ div
@@ -151,6 +158,7 @@ filterChoiceView filter currentFilters action =
                 [ span []
                     [ i [ classList [ ( "fa", True ), ( "fa-minus", active ), ( "fa-plus", notActive ) ] ] []
                     , text (" " ++ filter.name)
+                    , small [] [ text <| " (" ++ (toString eventInstanceCount) ++ ")" ]
                     ]
                 ]
             ]

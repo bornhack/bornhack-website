@@ -57,8 +57,8 @@ eventDecoder =
         |> required "slug" string
         |> required "abstract" string
         |> required "speaker_slugs" (list string)
-        |> required "video_recording" bool
-        |> optional "video_url" string ""
+        |> required "video_state" string
+        |> optional "video_url" (nullable string) Nothing
         |> required "event_type" string
 
 
@@ -89,8 +89,8 @@ eventInstanceDecoder =
         |> required "timeslots" float
         |> required "location" string
         |> required "location_icon" string
-        |> required "video_recording" bool
-        |> optional "video_url" string ""
+        |> required "video_state" string
+        |> optional "video_url" (nullable string) Nothing
         |> optional "is_favorited" (nullable bool) Nothing
 
 

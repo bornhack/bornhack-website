@@ -100,11 +100,11 @@ eventDetailSidebar event model =
     let
         videoRecordingLink =
             case event.videoUrl of
-                "" ->
+                Nothing ->
                     []
 
-                _ ->
-                    [ a [ href event.videoUrl, classList [ ( "btn", True ), ( "btn-success", True ) ] ]
+                Just url ->
+                    [ a [ href url, classList [ ( "btn", True ), ( "btn-success", True ) ] ]
                         [ i [ classList [ ( "fa", True ), ( "fa-film", True ) ] ] []
                         , text " Watch recording here!"
                         ]
@@ -134,20 +134,30 @@ eventDetailSidebar event model =
 eventMetaDataSidebar : Event -> Html Msg
 eventMetaDataSidebar event =
     let
-        videoRecording =
-            case event.videoRecording of
-                True ->
-                    "Yes"
+        ( showVideoRecoring, videoRecording ) =
+            case event.videoState of
+                "to-be-recorded" ->
+                    ( True, "Yes" )
 
-                False ->
-                    "No"
+                "not-to-be-recorded" ->
+                    ( True, "No" )
+
+                _ ->
+                    ( False, "" )
     in
         div []
             [ h4 [] [ text "Metadata" ]
             , ul []
-                [ li [] [ strong [] [ text "Type: " ], text event.eventType ]
-                , li [] [ strong [] [ text "Recording: " ], text videoRecording ]
-                ]
+                ([ li [] [ strong [] [ text "Type: " ], text event.eventType ]
+                 ]
+                    ++ (case showVideoRecoring of
+                            True ->
+                                [ li [] [ strong [] [ text "Recording: " ], text videoRecording ] ]
+
+                            False ->
+                                []
+                       )
+                )
             ]
 
 

@@ -439,12 +439,18 @@ class Event(CampRelatedModel):
                 speaker.slug
                 for speaker in self.speakers.all()
             ],
-            'video_recording': self.video_recording,
             'event_type': self.event_type.name,
         }
 
         if self.video_url:
+            video_state = 'has-recording'
             data['video_url'] = self.video_url
+        elif self.video_recording:
+            video_state = 'to-be-recorded'
+        elif not self.video_recording:
+            video_state = 'not-to-be-recorded'
+
+        data['video_state'] = video_state
 
         return data
 
@@ -525,11 +531,17 @@ class EventInstance(CampRelatedModel):
             'location': self.location.slug,
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,
-            'video_recording': self.event.video_recording,
         }
 
         if self.event.video_url:
+            video_state = 'has-recording'
             data['video_url'] = self.event.video_url
+        elif self.event.video_recording:
+            video_state = 'to-be-recorded'
+        elif not self.event.video_recording:
+            video_state = 'not-to-be-recorded'
+
+        data['video_state'] = video_state
 
         if user and user.is_authenticated:
             is_favorited = user.favorites.filter(event_instance=self).exists()

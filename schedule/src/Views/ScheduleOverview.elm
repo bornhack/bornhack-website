@@ -77,12 +77,21 @@ dayEventInstanceIcons : EventInstance -> List (Html Msg)
 dayEventInstanceIcons eventInstance =
     let
         videoIcon =
-            if eventInstance.videoUrl /= "" then
-                [ i [ classList [ ( "fa", True ), ( "fa-film", True ), ( "pull-right", True ) ] ] [] ]
-            else if eventInstance.videoRecording then
-                [ i [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ) ] ] [] ]
-            else
-                []
+            case eventInstance.videoState of
+                "has-recording" ->
+                    [ i
+                        [ classList [ ( "fa", True ), ( "fa-film", True ), ( "pull-right", True ) ] ]
+                        []
+                    ]
+
+                "to-be-recorded" ->
+                    [ i
+                        [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ) ] ]
+                        []
+                    ]
+
+                _ ->
+                    []
     in
         [ i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
         ]

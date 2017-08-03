@@ -66,7 +66,9 @@ type alias Filter =
 
 
 type alias VideoRecordingFilter =
-    { name : String, slug : String, filter : EventInstance -> Bool }
+    { name : String
+    , slug : String
+    }
 
 
 type alias Day =
@@ -99,8 +101,8 @@ type alias EventInstance =
     , timeslots : Float
     , location : String
     , locationIcon : String
-    , videoRecording : Bool
-    , videoUrl : String
+    , videoState : String
+    , videoUrl : Maybe String
     , isFavorited : Maybe Bool
     }
 
@@ -110,8 +112,8 @@ type alias Event =
     , slug : EventSlug
     , abstract : String
     , speakerSlugs : List SpeakerSlug
-    , videoRecording : Bool
-    , videoUrl : String
+    , videoState : String
+    , videoUrl : Maybe String
     , eventType : String
     }
 
