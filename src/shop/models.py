@@ -42,7 +42,7 @@ class CustomOrder(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return Decimal(self.amount*Decimal(0.2))
+        return Decimal(round(self.amount*Decimal(0.2), 2))
 
 
 class Order(CreatedUpdatedModel):
