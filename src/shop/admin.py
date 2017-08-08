@@ -9,8 +9,21 @@ admin.site.register(models.CoinifyAPICallback)
 admin.site.register(models.CoinifyAPIRequest)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
-admin.site.register(models.CustomOrder)
 
+@admin.register(models.CustomOrder)
+class CustomOrderAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'customer',
+        'text',
+        'amount',
+        'vat',
+        'paid',
+    ]
+
+    list_filter = [
+        'paid',
+    ]
 
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
