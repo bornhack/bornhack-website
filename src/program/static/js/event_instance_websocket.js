@@ -247,6 +247,7 @@ function render_event_instance(event_instance) {
         'background-color: ' + event_instance['bg-color'] +
         '; color: ' + event_instance['fg-color']);
     element.classList.add('event');
+    element.setAttribute('href', event_instance['url']);
     element.dataset.eventInstanceId = event_instance['id'];
 
     time_element = document.createElement('small');
