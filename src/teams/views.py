@@ -10,6 +10,9 @@ from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
+
+from profiles.models import Profile
+
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -25,7 +28,6 @@ class EnsureTeamResponsibleMixin(SingleObjectMixin):
         return super().dispatch(
             request, *args, **kwargs
         )
-
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -55,6 +57,13 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     fields = []
 
     def get(self, request, *args, **kwargs):
+        if not Profile.objects.get(user=request.user).description:
+            messages.warning(
+                request,
+                "Please fill the description in your profile before joining a team"
+            )
+            return redirect('team_list', camp_slug=self.camp.slug)
+
         if request.user in self.get_object().members.all():
             messages.warning(request, "You are already a member of this team")
             return redirect('team_list', camp_slug=self.camp.slug)
