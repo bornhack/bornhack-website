@@ -5,6 +5,7 @@ module Views.DayPicker exposing (..)
 import Models exposing (..)
 import Messages exposing (Msg(..))
 import Routing exposing (routeToString)
+import Views.FilterView exposing (maybeFilteredOverviewRoute)
 
 
 -- Core modules
@@ -52,7 +53,7 @@ dayPicker model =
                         , ( "btn-default", not isAllDaysActive )
                         , ( "btn-primary", isAllDaysActive )
                         ]
-                    , href <| routeToString OverviewRoute
+                    , href <| routeToString <| maybeFilteredOverviewRoute model
                     ]
                     [ text "All Days"
                     ]

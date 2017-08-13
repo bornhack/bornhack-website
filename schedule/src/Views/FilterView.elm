@@ -1,9 +1,9 @@
-module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery, filterToQuery)
+module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery, filterToQuery, maybeFilteredOverviewRoute)
 
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewFilteredRoute), VideoRecordingFilter, EventType, EventLocation)
+import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewRoute, OverviewFilteredRoute), VideoRecordingFilter, EventType, EventLocation)
 import Routing exposing (routeToString)
 
 
@@ -204,8 +204,8 @@ parseFilterFromQuery query model =
         }
 
 
-filterToQuery : Filter -> FilterQuery
-filterToQuery filter =
+filterToString : Filter -> String
+filterToString filter =
     let
         typePart =
             case String.join "," (List.map .slug filter.eventTypes) of
@@ -230,8 +230,24 @@ filterToQuery filter =
 
                 video ->
                     "video=" ++ video
+    in
+        String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
 
+
+filterToQuery : Filter -> FilterQuery
+filterToQuery filter =
+    let
         result =
-            String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
+            filterToString filter
     in
         routeToString <| OverviewFilteredRoute result
+
+
+maybeFilteredOverviewRoute : Model -> Route
+maybeFilteredOverviewRoute model =
+    case filterToString model.filter of
+        "" ->
+            OverviewRoute
+
+        query ->
+            OverviewFilteredRoute query
