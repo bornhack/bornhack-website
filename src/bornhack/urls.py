@@ -106,6 +106,7 @@ urlpatterns = [
     url(
         r'^people/$',
         PeopleView.as_view(),
+        name='people',
     ),
 
     # camp specific urls below here
