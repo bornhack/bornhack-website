@@ -1,9 +1,17 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import (
+    post_save,
+    pre_save
+)
+from django.conf import settings
+from django.utils import timezone
 from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 
+from datetime import timedelta
+
+from ircbot.models import OutgoingIrcMessage
 from utils.models import UUIDModel, CreatedUpdatedModel
 
 
@@ -66,3 +74,21 @@ def create_profile(sender, created, instance, **kwargs):
     if created:
         Profile.objects.create(user=instance)
 
+
+@receiver(pre_save, sender=Profile)
+def changed_public_credit_name(sender, instance, **kwargs):
+    try:
+        original = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        # newly created object, just pass
+        pass
+    else:
+        if not original.public_credit_name == instance.public_credit_name:
+            OutgoingIrcMessage.objects.create(
+                target=settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default'],
+                message='User {username} changed public credit name. please review and act accordingly: https://bornhack.dk/admin/profiles/profile/{uuid}/change/'.format(
+                    username=instance.name,
+                    uuid=instance.uuid
+                ),
+                timeout=timezone.now()+timedelta(minutes=60)
+            )
