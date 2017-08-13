@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
+from django.db.models import Q
 
 import icalendar
 
@@ -37,27 +38,45 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
         eventinstances = models.EventInstance.objects.filter(event__camp=self.camp)
-        type_ = request.GET.get('type', None)
-        location = request.GET.get('location', None)
 
-        if type_:
-            try:
-                eventtype = models.EventType.objects.get(
-                    slug=type_
-                )
-                eventinstances = eventinstances.filter(event__event_type=eventtype)
-            except models.EventType.DoesNotExist:
-                raise Http404
+        # Type query
+        type_query = request.GET.get('type', None)
+        if type_query:
+            type_slugs = type_query.split(',')
+            types = models.EventType.objects.filter(
+                slug__in=type_slugs
+            )
+            eventinstances = eventinstances.filter(event__event_type__in=types)
 
-        if location:
-            try:
-                eventlocation = models.EventLocation.objects.get(
-                    slug=location,
-                    camp=self.camp,
-                )
-                eventinstances = eventinstances.filter(location__slug=location)
-            except models.EventLocation.DoesNotExist:
-                raise Http404
+        # Location query
+        location_query = request.GET.get('location', None)
+        if location_query:
+            location_slugs = location_query.split(',')
+            locations = models.EventLocation.objects.filter(
+                slug__in=location_slugs,
+                camp=self.camp,
+            )
+            eventinstances = eventinstances.filter(location__in=locations)
+
+        # Video recording query
+        video_query = request.GET.get('video', None)
+        if video_query:
+            video_states = video_query.split(',')
+            query_kwargs = {}
+
+            if 'has-recording' in video_states:
+                query_kwargs['event__video_url__isnull'] = False
+
+            if 'to-be-recorded' in video_states:
+                query_kwargs['event__video_recording'] = True
+
+            if 'not-to-be-recorded' in video_states:
+                if 'event__video_recording' in query_kwargs:
+                    del query_kwargs['event__video_recording']
+                else:
+                    query_kwargs['event__video_recording'] = False
+
+            eventinstances = eventinstances.filter(**query_kwargs)
 
         cal = icalendar.Calendar()
         for event_instance in eventinstances:
