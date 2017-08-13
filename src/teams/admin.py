@@ -2,8 +2,6 @@ from django.contrib import admin
 from .models import Team, TeamArea, TeamMember
 from .email import add_added_membership_email, add_removed_membership_email
 
-admin.site.register(TeamArea)
-
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
@@ -69,3 +67,10 @@ class TeamMemberAdmin(admin.ModelAdmin):
             )
         )
     remove_member.description = 'Remove a user from the team.'
+
+
+@admin.register(TeamArea)
+class TeamAreaAdmin(admin.ModelAdmin):
+    list_filter = [
+        'camp'
+    ]
