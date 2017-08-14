@@ -54,6 +54,12 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         default=False
     )
 
+    colour = models.CharField(
+        verbose_name='Colour',
+        help_text='The primary colour for the camp in hex',
+        max_length=7
+    )
+
     def get_absolute_url(self):
         return reverse('camp_detail', kwargs={'camp_slug': self.slug})
 
