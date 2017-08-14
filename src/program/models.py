@@ -12,18 +12,14 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.dispatch import receiver
 from django.utils.text import slugify
-from django.utils import timezone
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
 from django.core.files.base import ContentFile
-from django.db.models.signals import post_save
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
-from .email import add_new_speakerproposal_email, add_new_eventproposal_email
-from ircbot.models import OutgoingIrcMessage
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -286,40 +282,6 @@ class EventProposal(UserSubmittedModel):
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
-
-
-@receiver(post_save, sender=EventProposal)
-@receiver(post_save, sender=SpeakerProposal)
-def notify_proposals(sender, created, instance, **kwargs):
-    target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
-
-    if created and isinstance(instance, SpeakerProposal):
-        if not add_new_speakerproposal_email(instance):
-            logger.error(
-                'Error adding speaker proposal email to outgoing queue for {}'.format(instance)
-            )
-        OutgoingIrcMessage.objects.create(
-            target=target,
-            message="New speaker proposal: {} - https://bornhack.dk/admin/program/speakerproposal/{}/change/".format(
-                instance.name,
-                instance.uuid
-            ),
-            timeout=timezone.now()+timedelta(minutes=10)
-        )
-
-    if created and isinstance(instance, EventProposal):
-        if not add_new_eventproposal_email(instance):
-            logger.error(
-                'Error adding event proposal email to outgoing queue for {}'.format(instance)
-            )
-        OutgoingIrcMessage.objects.create(
-            target=target,
-            message="New event proposal: {} - https://bornhack.dk/admin/program/eventproposal/{}/change/".format(
-                instance.title,
-                instance.uuid
-            ),
-            timeout=timezone.now()+timedelta(minutes=10)
-        )
 
 ###############################################################################
 
