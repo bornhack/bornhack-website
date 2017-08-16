@@ -2,7 +2,7 @@ module Update exposing (update)
 
 -- Local modules
 
-import Models exposing (Model, Route(..), Filter)
+import Models exposing (Model, Route(..), Filter, FilterType(..))
 import Messages exposing (Msg(..))
 import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
 import Routing exposing (parseLocation)
@@ -50,63 +50,51 @@ update msg model =
             in
                 newModel_ ! []
 
-        ToggleEventTypeFilter eventType ->
+        ToggleFilter filter ->
             let
-                eventTypesFilter =
-                    if List.member eventType model.filter.eventTypes then
-                        List.filter (\x -> x /= eventType) model.filter.eventTypes
-                    else
-                        eventType :: model.filter.eventTypes
-
                 currentFilter =
                     model.filter
 
                 newFilter =
-                    { currentFilter | eventTypes = eventTypesFilter }
+                    case filter of
+                        TypeFilter name slug color lightText ->
+                            let
+                                eventType =
+                                    TypeFilter name slug color lightText
+                            in
+                                { currentFilter
+                                    | eventTypes =
+                                        if List.member eventType model.filter.eventTypes then
+                                            List.filter (\x -> x /= eventType) model.filter.eventTypes
+                                        else
+                                            eventType :: model.filter.eventTypes
+                                }
 
-                query =
-                    filterToQuery newFilter
+                        LocationFilter name slug icon ->
+                            let
+                                eventLocation =
+                                    LocationFilter name slug icon
+                            in
+                                { currentFilter
+                                    | eventLocations =
+                                        if List.member eventLocation model.filter.eventLocations then
+                                            List.filter (\x -> x /= eventLocation) model.filter.eventLocations
+                                        else
+                                            eventLocation :: model.filter.eventLocations
+                                }
 
-                cmd =
-                    Navigation.newUrl query
-            in
-                { model | filter = newFilter } ! [ cmd ]
-
-        ToggleEventLocationFilter eventLocation ->
-            let
-                eventLocationsFilter =
-                    if List.member eventLocation model.filter.eventLocations then
-                        List.filter (\x -> x /= eventLocation) model.filter.eventLocations
-                    else
-                        eventLocation :: model.filter.eventLocations
-
-                currentFilter =
-                    model.filter
-
-                newFilter =
-                    { currentFilter | eventLocations = eventLocationsFilter }
-
-                query =
-                    filterToQuery newFilter
-
-                cmd =
-                    Navigation.newUrl query
-            in
-                { model | filter = newFilter } ! [ cmd ]
-
-        ToggleVideoRecordingFilter videoRecording ->
-            let
-                videoRecordingFilter =
-                    if List.member videoRecording model.filter.videoRecording then
-                        List.filter (\x -> x /= videoRecording) model.filter.videoRecording
-                    else
-                        videoRecording :: model.filter.videoRecording
-
-                currentFilter =
-                    model.filter
-
-                newFilter =
-                    { currentFilter | videoRecording = videoRecordingFilter }
+                        VideoFilter name slug ->
+                            let
+                                videoRecording =
+                                    VideoFilter name slug
+                            in
+                                { currentFilter
+                                    | videoRecording =
+                                        if List.member videoRecording model.filter.videoRecording then
+                                            List.filter (\x -> x /= videoRecording) model.filter.videoRecording
+                                        else
+                                            videoRecording :: model.filter.videoRecording
+                                }
 
                 query =
                     filterToQuery newFilter

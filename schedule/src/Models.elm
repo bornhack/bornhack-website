@@ -47,27 +47,14 @@ type alias Model =
     { days : List Day
     , events : List Event
     , eventInstances : List EventInstance
-    , eventLocations : List EventLocation
-    , eventTypes : List EventType
+    , eventLocations : List FilterType
+    , eventTypes : List FilterType
     , speakers : List Speaker
     , flags : Flags
     , filter : Filter
     , location : Location
     , route : Route
     , dataLoaded : Bool
-    }
-
-
-type alias Filter =
-    { eventTypes : List EventType
-    , eventLocations : List EventLocation
-    , videoRecording : List VideoRecordingFilter
-    }
-
-
-type alias VideoRecordingFilter =
-    { name : String
-    , slug : String
     }
 
 
@@ -118,21 +105,6 @@ type alias Event =
     }
 
 
-type alias EventLocation =
-    { name : String
-    , slug : String
-    , icon : String
-    }
-
-
-type alias EventType =
-    { name : String
-    , slug : String
-    , color : String
-    , lightText : Bool
-    }
-
-
 type alias Flags =
     { schedule_timeslot_length_minutes : Int
     , schedule_midnight_offset_hours : Int
@@ -140,3 +112,68 @@ type alias Flags =
     , camp_slug : String
     , websocket_server : String
     }
+
+
+
+-- FILTERS
+
+
+type alias FilterName =
+    String
+
+
+type alias FilterSlug =
+    String
+
+
+type alias LocationIcon =
+    String
+
+
+type alias TypeColor =
+    String
+
+
+type alias TypeLightText =
+    Bool
+
+
+type FilterType
+    = TypeFilter FilterName FilterSlug TypeColor TypeLightText
+    | LocationFilter FilterName FilterSlug LocationIcon
+    | VideoFilter FilterName FilterSlug
+
+
+type alias Filter =
+    { eventTypes : List FilterType
+    , eventLocations : List FilterType
+    , videoRecording : List FilterType
+    }
+
+
+unpackFilterType filter =
+    case filter of
+        TypeFilter name slug _ _ ->
+            ( name, slug )
+
+        LocationFilter name slug _ ->
+            ( name, slug )
+
+        VideoFilter name slug ->
+            ( name, slug )
+
+
+getSlugFromFilterType filter =
+    let
+        ( _, slug ) =
+            unpackFilterType filter
+    in
+        slug
+
+
+getNameFromFilterType filter =
+    let
+        ( name, slug ) =
+            unpackFilterType filter
+    in
+        name

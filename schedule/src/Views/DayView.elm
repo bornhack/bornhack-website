@@ -3,7 +3,7 @@ module Views.DayView exposing (dayView)
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, Day, EventInstance, EventLocation, Route(EventRoute))
+import Models exposing (Model, Day, EventInstance, Route(EventRoute), FilterType(..), getSlugFromFilterType, getNameFromFilterType)
 import Routing exposing (routeToString)
 
 
@@ -57,7 +57,7 @@ dayView day model =
             ]
 
 
-locationColumns : List EventInstance -> List EventLocation -> Int -> List Date -> Html Msg
+locationColumns : List EventInstance -> List FilterType -> Int -> List Date -> Html Msg
 locationColumns eventInstances eventLocations offset minutes =
     let
         columnWidth =
@@ -75,11 +75,11 @@ locationColumns eventInstances eventLocations offset minutes =
             (List.map (\location -> locationColumn columnWidth eventInstances offset minutes location) eventLocations)
 
 
-locationColumn : Float -> List EventInstance -> Int -> List Date -> EventLocation -> Html Msg
+locationColumn : Float -> List EventInstance -> Int -> List Date -> FilterType -> Html Msg
 locationColumn columnWidth eventInstances offset minutes location =
     let
         locationInstances =
-            List.filter (\instance -> instance.location == location.slug) eventInstances
+            List.filter (\instance -> instance.location == getSlugFromFilterType location) eventInstances
 
         overlappingGroups =
             List.Extra.groupWhile
@@ -101,7 +101,7 @@ locationColumn columnWidth eventInstances offset minutes location =
                     [ ( "location-column-header", True )
                     ]
                 ]
-                [ text location.name ]
+                [ text <| getNameFromFilterType location ]
              ]
                 ++ (List.map
                         (\x ->

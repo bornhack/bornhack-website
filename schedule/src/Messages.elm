@@ -2,7 +2,7 @@ module Messages exposing (Msg(..))
 
 -- Local modules
 
-import Models exposing (Day, EventType, EventLocation, EventInstance, VideoRecordingFilter)
+import Models exposing (Day, EventInstance, FilterType)
 
 
 -- External modules
@@ -13,8 +13,6 @@ import Navigation exposing (Location)
 type Msg
     = NoOp
     | WebSocketPayload String
-    | ToggleEventTypeFilter EventType
-    | ToggleEventLocationFilter EventLocation
-    | ToggleVideoRecordingFilter VideoRecordingFilter
+    | ToggleFilter FilterType
     | OnLocationChange Location
     | BackInHistory

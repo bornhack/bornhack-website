@@ -3,7 +3,7 @@ module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQu
 -- Local modules
 
 import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewRoute, OverviewFilteredRoute), VideoRecordingFilter, EventType, EventLocation)
+import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewRoute, OverviewFilteredRoute), FilterType(..), unpackFilterType, getSlugFromFilterType)
 import Routing exposing (routeToString)
 
 
@@ -15,7 +15,7 @@ import Regex
 -- External modules
 
 import Html exposing (Html, text, div, ul, li, span, i, h4, small)
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class, classList, style)
 import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
 
@@ -24,7 +24,7 @@ applyFilters : Day -> Model -> List EventInstance
 applyFilters day model =
     let
         slugs default filters =
-            List.map .slug
+            List.map getSlugFromFilterType
                 (if List.isEmpty filters then
                     default
                  else
@@ -71,44 +71,40 @@ filterSidebar model =
                 "Type"
                 model.eventTypes
                 model.filter.eventTypes
-                ToggleEventTypeFilter
                 model.eventInstances
                 .eventType
             , filterView
                 "Location"
                 model.eventLocations
                 model.filter.eventLocations
-                ToggleEventLocationFilter
                 model.eventInstances
                 .location
             , filterView
                 "Video"
                 videoRecordingFilters
                 model.filter.videoRecording
-                ToggleVideoRecordingFilter
                 model.eventInstances
                 .videoState
             ]
         ]
 
 
-videoRecordingFilters : List VideoRecordingFilter
+videoRecordingFilters : List FilterType
 videoRecordingFilters =
-    [ { name = "Will not be recorded", slug = "not-to-be-recorded" }
-    , { name = "Will recorded", slug = "to-be-recorded" }
-    , { name = "Has recording", slug = "has-recording" }
+    [ VideoFilter "Will not be recorded" "not-to-be-recorded"
+    , VideoFilter "Will recorded" "to-be-recorded"
+    , VideoFilter "Has recording" "has-recording"
     ]
 
 
 filterView :
     String
-    -> List { a | name : String, slug : String }
-    -> List { a | name : String, slug : String }
-    -> ({ a | name : String, slug : String } -> Msg)
+    -> List FilterType
+    -> List FilterType
     -> List EventInstance
     -> (EventInstance -> String)
     -> Html Msg
-filterView name possibleFilters currentFilters action eventInstances slugLike =
+filterView name possibleFilters currentFilters eventInstances slugLike =
     div []
         [ text (name ++ ":")
         , ul []
@@ -118,7 +114,6 @@ filterView name possibleFilters currentFilters action eventInstances slugLike =
                         filterChoiceView
                             filter
                             currentFilters
-                            action
                             eventInstances
                             slugLike
                     )
@@ -127,13 +122,12 @@ filterView name possibleFilters currentFilters action eventInstances slugLike =
 
 
 filterChoiceView :
-    { a | name : String, slug : String }
-    -> List { a | name : String, slug : String }
-    -> ({ a | name : String, slug : String } -> Msg)
+    FilterType
+    -> List FilterType
     -> List EventInstance
     -> (EventInstance -> String)
     -> Html Msg
-filterChoiceView filter currentFilters action eventInstances slugLike =
+filterChoiceView filter currentFilters eventInstances slugLike =
     let
         active =
             List.member filter currentFilters
@@ -141,35 +135,97 @@ filterChoiceView filter currentFilters action eventInstances slugLike =
         notActive =
             not active
 
+        ( name, slug ) =
+            unpackFilterType filter
+
         eventInstanceCount =
             eventInstances
-                |> List.filter (\eventInstance -> slugLike eventInstance == filter.slug)
+                |> List.filter (\eventInstance -> slugLike eventInstance == slug)
                 |> List.length
+
+        buttonStyle =
+            case filter of
+                TypeFilter _ _ color lightText ->
+                    [ style
+                        [ ( "backgroundColor", color )
+                        , ( "color"
+                          , if lightText then
+                                "#fff"
+                            else
+                                "#000"
+                          )
+                        , ( "border", "1px solid black" )
+                        , ( "margin-bottom", "2px" )
+                        ]
+                    ]
+
+                _ ->
+                    []
+
+        locationIcon =
+            case filter of
+                LocationFilter _ _ icon ->
+                    [ i
+                        [ classList
+                            [ ( "fa", True )
+                            , ( "fa-" ++ icon, True )
+                            , ( "pull-right", True )
+                            ]
+                        ]
+                        []
+                    ]
+
+                _ ->
+                    []
     in
-        li []
+        li
+            []
             [ div
-                [ classList
+                ([ classList
                     [ ( "btn", True )
                     , ( "btn-default", True )
                     , ( "filter-choice-active", active )
                     ]
-                , onClick (action filter)
-                ]
+                 , onClick (ToggleFilter filter)
+                 ]
+                    ++ buttonStyle
+                )
                 [ span []
-                    [ i [ classList [ ( "fa", True ), ( "fa-minus", active ), ( "fa-plus", notActive ) ] ] []
-                    , text (" " ++ filter.name)
-                    , small [] [ text <| " (" ++ (toString eventInstanceCount) ++ ")" ]
-                    ]
+                    ([ span [ classList [ ( "pull-left", True ) ] ]
+                        [ i
+                            [ classList
+                                [ ( "fa", True )
+                                , ( "fa-minus", active )
+                                , ( "fa-plus", notActive )
+                                ]
+                            ]
+                            []
+                        , text (" " ++ name)
+                        , small [] [ text <| " (" ++ (toString eventInstanceCount) ++ ")" ]
+                        ]
+                     ]
+                        ++ locationIcon
+                    )
                 ]
             ]
 
 
-findFilter : List { a | slug : String } -> String -> Maybe { a | slug : String }
+findFilter : List FilterType -> String -> Maybe FilterType
 findFilter modelItems filterSlug =
-    List.head (List.filter (\x -> x.slug == filterSlug) modelItems)
+    List.head
+        (List.filter
+            (\x ->
+                let
+                    ( _, slug ) =
+                        unpackFilterType x
+                in
+                    slug == filterSlug
+            )
+            modelItems
+        )
 
 
-getFilter : String -> List { a | slug : String } -> String -> List { a | slug : String }
+getFilter : String -> List FilterType -> String -> List FilterType
 getFilter filterType modelItems query =
     let
         filterMatch =
@@ -208,7 +264,7 @@ filterToString : Filter -> String
 filterToString filter =
     let
         typePart =
-            case String.join "," (List.map .slug filter.eventTypes) of
+            case String.join "," (List.map getSlugFromFilterType filter.eventTypes) of
                 "" ->
                     ""
 
@@ -216,7 +272,7 @@ filterToString filter =
                     "type=" ++ types
 
         locationPart =
-            case String.join "," (List.map .slug filter.eventLocations) of
+            case String.join "," (List.map getSlugFromFilterType filter.eventLocations) of
                 "" ->
                     ""
 
@@ -224,7 +280,7 @@ filterToString filter =
                     "location=" ++ locations
 
         videoPart =
-            case String.join "," (List.map .slug filter.videoRecording) of
+            case String.join "," (List.map getSlugFromFilterType filter.videoRecording) of
                 "" ->
                     ""
 

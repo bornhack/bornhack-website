@@ -2,7 +2,7 @@ module Decoders exposing (..)
 
 -- Local modules
 
-import Models exposing (Day, Speaker, Event, EventInstance, EventLocation, EventType, Model, Flags, Filter, Route(..))
+import Models exposing (Day, Speaker, Event, EventInstance, Model, Flags, Filter, Route(..), FilterType(..))
 
 
 -- Core modules
@@ -94,17 +94,17 @@ eventInstanceDecoder =
         |> optional "is_favorited" (nullable bool) Nothing
 
 
-eventLocationDecoder : Decoder EventLocation
+eventLocationDecoder : Decoder FilterType
 eventLocationDecoder =
-    decode EventLocation
+    decode LocationFilter
         |> required "name" string
         |> required "slug" string
         |> required "icon" string
 
 
-eventTypeDecoder : Decoder EventType
+eventTypeDecoder : Decoder FilterType
 eventTypeDecoder =
-    decode EventType
+    decode TypeFilter
         |> required "name" string
         |> required "slug" string
         |> required "color" string
