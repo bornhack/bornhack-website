@@ -83,7 +83,9 @@ locationColumn columnWidth eventInstances offset minutes location =
 
         overlappingGroups =
             List.Extra.groupWhile
-                (\instanceA instanceB -> Date.Extra.isBetween instanceA.from instanceA.to instanceB.from)
+                (\instanceA instanceB ->
+                    (Date.Extra.isBetween instanceB.from instanceB.to instanceA.from) && not (Date.Extra.equal instanceA.from instanceB.to)
+                )
                 locationInstances
     in
         div
@@ -151,7 +153,7 @@ renderGroup offset group =
                         else if (Date.Extra.equal instanceB.from instanceA.from) && not (Date.Extra.equal instanceB.to instanceA.to) then
                             -- Set to 0 and then fix it further down in the code
                             0
-                        else if (Date.Extra.isBetween instanceB.from instanceB.to instanceA.from) && not (Date.Extra.equal instanceA.from instanceB.to) then
+                        else if (Date.Extra.isBetween instanceB.from instanceB.to instanceA.from) then
                             1
                         else
                             0

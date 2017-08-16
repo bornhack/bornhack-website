@@ -15299,7 +15299,7 @@ var _user$project$Views_DayView$renderGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						function (instanceB) {
-							return _elm_lang$core$Native_Utils.eq(instanceA, instanceB) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to)) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to))) ? 0 : ((A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceB.from, instanceB.to, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceA.from, instanceB.to))) ? 1 : 0)));
+							return _elm_lang$core$Native_Utils.eq(instanceA, instanceB) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to)) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to))) ? 0 : (A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceB.from, instanceB.to, instanceA.from) ? 1 : 0)));
 						},
 						sortedGroup))
 			};
@@ -15378,7 +15378,7 @@ var _user$project$Views_DayView$locationColumn = F5(
 			_elm_community$list_extra$List_Extra$groupWhile,
 			F2(
 				function (instanceA, instanceB) {
-					return A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceA.from, instanceA.to, instanceB.from);
+					return A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceB.from, instanceB.to, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceA.from, instanceB.to));
 				}),
 			locationInstances);
 		return A2(
