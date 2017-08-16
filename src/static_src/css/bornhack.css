@@ -157,8 +157,7 @@ footer {
 .event-in-overview {
     min-height: 100px;
     margin: 5px;
-    width: 220px;
-    max-width: 225px;
+    max-width: 200px;
     min-width: 200px;
 }
 
@@ -220,12 +219,6 @@ footer {
 .schedule-filter ul {
   list-style: none;
   padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.schedule-filter ul li {
-  flex: 1;
 }
 
 .schedule-filter .btn {
