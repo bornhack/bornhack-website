@@ -14713,6 +14713,62 @@ var _user$project$Views_FilterView$parseFilterFromQuery = F2(
 		var types = A3(_user$project$Views_FilterView$getFilter, 'type', model.eventTypes, query);
 		return {eventTypes: types, eventLocations: locations, videoRecording: videoFilters};
 	});
+var _user$project$Views_FilterView$icsButton = function (model) {
+	var filterString = function () {
+		var _p10 = _user$project$Views_FilterView$filterToString(model.filter);
+		if (_p10 === '') {
+			return '';
+		} else {
+			return A2(_elm_lang$core$Basics_ops['++'], '?', _p10);
+		}
+	}();
+	var icsURL = A2(_elm_lang$core$Basics_ops['++'], model.flags.ics_button_href, filterString);
+	return A2(
+		_elm_lang$html$Html$a,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'btn-default', _1: true},
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$href(icsURL),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$i,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$classList(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'fa-calendar', _1: true},
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{ctor: '[]'}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(' ICS file with these filters'),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Views_FilterView$filterSidebar = function (model) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -14727,16 +14783,8 @@ var _user$project$Views_FilterView$filterSidebar = function (model) {
 						_0: {ctor: '_Tuple2', _0: 'col-sm-push-9', _1: true},
 						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'schedule-sidebar', _1: true},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'schedule-filter', _1: true},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'sticky', _1: true},
-									_1: {ctor: '[]'}
-								}
-							}
+							_0: {ctor: '_Tuple2', _0: 'schedule-filter', _1: true},
+							_1: {ctor: '[]'}
 						}
 					}
 				}),
@@ -14798,7 +14846,11 @@ var _user$project$Views_FilterView$filterSidebar = function (model) {
 							}
 						}
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: _user$project$Views_FilterView$icsButton(model),
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
