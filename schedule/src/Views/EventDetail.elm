@@ -119,8 +119,6 @@ eventDetailSidebar event model =
         div
             [ classList
                 [ ( "col-sm-3", True )
-                , ( "schedule-sidebar", True )
-                , ( "sticky", True )
                 ]
             ]
             (videoRecordingLink

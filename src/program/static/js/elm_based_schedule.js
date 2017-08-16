@@ -15299,7 +15299,7 @@ var _user$project$Views_DayView$renderGroup = F2(
 					A2(
 						_elm_lang$core$List$map,
 						function (instanceB) {
-							return _elm_lang$core$Native_Utils.eq(instanceA, instanceB) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to)) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to))) ? 0 : (A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceB.from, instanceB.to, instanceA.from) ? 1 : 0)));
+							return _elm_lang$core$Native_Utils.eq(instanceA, instanceB) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to)) ? 0 : ((A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.from, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceB.to, instanceA.to))) ? 0 : ((A3(_justinmimbs$elm_date_extra$Date_Extra$isBetween, instanceB.from, instanceB.to, instanceA.from) && (!A2(_justinmimbs$elm_date_extra$Date_Extra$equal, instanceA.from, instanceB.to))) ? 1 : 0)));
 						},
 						sortedGroup))
 			};
@@ -15955,15 +15955,7 @@ var _user$project$Views_EventDetail$eventDetailSidebar = F2(
 					{
 						ctor: '::',
 						_0: {ctor: '_Tuple2', _0: 'col-sm-3', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'schedule-sidebar', _1: true},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'sticky', _1: true},
-								_1: {ctor: '[]'}
-							}
-						}
+						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
 			},
