@@ -90,6 +90,12 @@ dayEventInstanceIcons eventInstance =
                         []
                     ]
 
+                "not-to-be-recorded" ->
+                    [ i
+                        [ classList [ ( "fa", True ), ( "fa-ban", True ), ( "pull-right", True ) ] ]
+                        []
+                    ]
+
                 _ ->
                     []
     in

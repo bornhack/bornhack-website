@@ -92,7 +92,7 @@ filterSidebar model =
 videoRecordingFilters : List FilterType
 videoRecordingFilters =
     [ VideoFilter "Will not be recorded" "not-to-be-recorded"
-    , VideoFilter "Will recorded" "to-be-recorded"
+    , VideoFilter "Will be recorded" "to-be-recorded"
     , VideoFilter "Has recording" "has-recording"
     ]
 
@@ -177,6 +177,37 @@ filterChoiceView filter currentFilters eventInstances slugLike =
 
                 _ ->
                     []
+
+        videoIcon =
+            case filter of
+                VideoFilter _ slug ->
+                    let
+                        icon =
+                            case slug of
+                                "has-recording" ->
+                                    "film"
+
+                                "to-be-recorded" ->
+                                    "video-camera"
+
+                                "not-to-be-recorded" ->
+                                    "ban"
+
+                                _ ->
+                                    ""
+                    in
+                        [ i
+                            [ classList
+                                [ ( "fa", True )
+                                , ( "fa-" ++ icon, True )
+                                , ( "pull-right", True )
+                                ]
+                            ]
+                            []
+                        ]
+
+                _ ->
+                    []
     in
         li
             []
@@ -205,6 +236,7 @@ filterChoiceView filter currentFilters eventInstances slugLike =
                         ]
                      ]
                         ++ locationIcon
+                        ++ videoIcon
                     )
                 ]
             ]
