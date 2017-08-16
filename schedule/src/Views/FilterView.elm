@@ -14,8 +14,8 @@ import Regex
 
 -- External modules
 
-import Html exposing (Html, text, div, ul, li, span, i, h4, small)
-import Html.Attributes exposing (class, classList, style)
+import Html exposing (Html, text, div, ul, li, span, i, h4, small, a)
+import Html.Attributes exposing (class, classList, style, href)
 import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
 
@@ -60,9 +60,7 @@ filterSidebar model =
         [ classList
             [ ( "col-sm-3", True )
             , ( "col-sm-push-9", True )
-            , ( "schedule-sidebar", True )
             , ( "schedule-filter", True )
-            , ( "sticky", True )
             ]
         ]
         [ h4 [] [ text "Filter" ]
@@ -86,7 +84,35 @@ filterSidebar model =
                 model.eventInstances
                 .videoState
             ]
+        , icsButton model
         ]
+
+
+icsButton : Model -> Html Msg
+icsButton model =
+    let
+        filterString =
+            case filterToString model.filter of
+                "" ->
+                    ""
+
+                filter ->
+                    "?" ++ filter
+
+        icsURL =
+            model.flags.ics_button_href ++ filterString
+    in
+        a
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-default", True )
+                ]
+            , href <| icsURL
+            ]
+            [ i [ classList [ ( "fa", True ), ( "fa-calendar", True ) ] ]
+                []
+            , text " ICS file with these filters"
+            ]
 
 
 videoRecordingFilters : List FilterType
