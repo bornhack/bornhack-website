@@ -14,6 +14,8 @@ from django.dispatch import receiver
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
@@ -311,6 +313,13 @@ class EventLocation(CampRelatedModel):
     class Meta:
         unique_together = (('camp', 'slug'), ('camp', 'name'))
 
+    def serialize(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "icon": self.icon,
+        }
+
 
 class EventType(CreatedUpdatedModel):
     """ Every event needs to have a type. """
@@ -349,6 +358,14 @@ class EventType(CreatedUpdatedModel):
 
     def __str__(self):
         return self.name
+
+    def serialize(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "color": self.color,
+            "light_text": self.light_text,
+        }
 
 
 class Event(CampRelatedModel):
@@ -413,6 +430,30 @@ class Event(CampRelatedModel):
     def get_absolute_url(self):
         return reverse_lazy('event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
+    def serialize(self):
+        data = {
+            'title': self.title,
+            'slug': self.slug,
+            'abstract': self.abstract,
+            'speaker_slugs': [
+                speaker.slug
+                for speaker in self.speakers.all()
+            ],
+            'event_type': self.event_type.name,
+        }
+
+        if self.video_url:
+            video_state = 'has-recording'
+            data['video_url'] = self.video_url
+        elif self.video_recording:
+            video_state = 'to-be-recorded'
+        elif not self.video_recording:
+            video_state = 'not-to-be-recorded'
+
+        data['video_state'] = video_state
+
+        return data
+
 
 class EventInstance(CampRelatedModel):
     """ An instance of an event """
@@ -475,35 +516,32 @@ class EventInstance(CampRelatedModel):
         ievent['location'] = icalendar.vText(self.location.name)
         return ievent
 
-    def to_json(self, user=None):
-        parser = CommonMark.Parser()
-        renderer = CommonMark.HtmlRenderer()
-        ast = parser.parse(self.event.abstract)
-        abstract = renderer.render(ast)
-
+    def serialize(self, user=None):
         data = {
             'title': self.event.title,
+            'slug': self.event.slug + '-' + str(self.id),
             'event_slug': self.event.slug,
-            'abstract': abstract,
             'from': self.when.lower.astimezone().isoformat(),
             'to': self.when.upper.astimezone().isoformat(),
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
-            'speakers': [
-                {'name': speaker.name, 'url': str(speaker.get_absolute_url())}
-                for speaker in self.event.speakers.all()
-            ],
             'bg-color': self.event.event_type.color,
             'fg-color': '#fff' if self.event.event_type.light_text else '#000',
             'event_type': self.event.event_type.slug,
             'location': self.location.slug,
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,
-            'video_recording': self.event.video_recording,
         }
 
         if self.event.video_url:
+            video_state = 'has-recording'
             data['video_url'] = self.event.video_url
+        elif self.event.video_recording:
+            video_state = 'to-be-recorded'
+        elif not self.event.video_recording:
+            video_state = 'not-to-be-recorded'
+
+        data['video_state'] = video_state
 
         if user and user.is_authenticated:
             is_favorited = user.favorites.filter(event_instance=self).exists()
@@ -588,6 +626,29 @@ class Speaker(CampRelatedModel):
 
     def get_absolute_url(self):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
+
+    def get_picture_url(self, size):
+        return reverse('speaker_picture', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug, 'picture': size})
+
+    def get_small_picture_url(self):
+        return self.get_picture_url('thumbnail')
+
+    def get_large_picture_url(self):
+        return self.get_picture_url('large')
+
+
+    def serialize(self):
+        data = {
+            'name': self.name,
+            'slug': self.slug,
+            'biography': self.biography,
+        }
+
+        if self.picture_small and self.picture_large:
+            data['large_picture_url'] = self.get_large_picture_url()
+            data['small_picture_url'] = self.get_small_picture_url()
+
+        return data
 
 
 class Favorite(models.Model):

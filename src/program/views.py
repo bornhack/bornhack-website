@@ -11,6 +11,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
+from django.db.models import Q
 
 import icalendar
 
@@ -37,27 +38,45 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
         eventinstances = models.EventInstance.objects.filter(event__camp=self.camp)
-        type_ = request.GET.get('type', None)
-        location = request.GET.get('location', None)
 
-        if type_:
-            try:
-                eventtype = models.EventType.objects.get(
-                    slug=type_
-                )
-                eventinstances = eventinstances.filter(event__event_type=eventtype)
-            except models.EventType.DoesNotExist:
-                raise Http404
+        # Type query
+        type_query = request.GET.get('type', None)
+        if type_query:
+            type_slugs = type_query.split(',')
+            types = models.EventType.objects.filter(
+                slug__in=type_slugs
+            )
+            eventinstances = eventinstances.filter(event__event_type__in=types)
 
-        if location:
-            try:
-                eventlocation = models.EventLocation.objects.get(
-                    slug=location,
-                    camp=self.camp,
-                )
-                eventinstances = eventinstances.filter(location__slug=location)
-            except models.EventLocation.DoesNotExist:
-                raise Http404
+        # Location query
+        location_query = request.GET.get('location', None)
+        if location_query:
+            location_slugs = location_query.split(',')
+            locations = models.EventLocation.objects.filter(
+                slug__in=location_slugs,
+                camp=self.camp,
+            )
+            eventinstances = eventinstances.filter(location__in=locations)
+
+        # Video recording query
+        video_query = request.GET.get('video', None)
+        if video_query:
+            video_states = video_query.split(',')
+            query_kwargs = {}
+
+            if 'has-recording' in video_states:
+                query_kwargs['event__video_url__isnull'] = False
+
+            if 'to-be-recorded' in video_states:
+                query_kwargs['event__video_recording'] = True
+
+            if 'not-to-be-recorded' in video_states:
+                if 'event__video_recording' in query_kwargs:
+                    del query_kwargs['event__video_recording']
+                else:
+                    query_kwargs['event__video_recording'] = False
+
+            eventinstances = eventinstances.filter(**query_kwargs)
 
         cal = icalendar.Calendar()
         for event_instance in eventinstances:
@@ -263,57 +282,22 @@ class EventDetailView(CampViewMixin, DetailView):
 ################## schedule #############################################
 
 
+class NoScriptScheduleView(CampViewMixin, TemplateView):
+    template_name = "noscript_schedule_view.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['eventinstances'] = models.EventInstance.objects.filter(event__camp=self.camp).order_by('when')
+        return context
+
+
+
 class ScheduleView(CampViewMixin, TemplateView):
-    def get_template_names(self):
-        if 'day' in self.kwargs:
-            return 'schedule_day.html'
-        return 'schedule_overview.html'
+    template_name = 'schedule_overview.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
-
-        # Do stuff if we are dealing with a day schedule
-        if 'day' in kwargs:
-            when = datetime.datetime(year=int(self.kwargs['year']), month=int(self.kwargs['month']), day=int(self.kwargs['day']))
-            eventinstances = models.EventInstance.objects.filter(event__in=self.camp.events.all())
-            skip = []
-            for ei in eventinstances:
-                if ei.schedule_date != when.date():
-                    skip.append(ei.id)
-                else:
-                    if 'type' in self.request.GET:
-                        eventtype = models.EventType.objects.get(
-                            slug=self.request.GET['type']
-                        )
-                        if ei.event.event_type != eventtype:
-                            skip.append(ei.id)
-            eventinstances = eventinstances.exclude(id__in=skip).order_by('event__event_type')
-            if 'location' in self.request.GET:
-                eventlocation = models.EventLocation.objects.get(
-                    camp=self.camp,
-                    slug=self.request.GET['location']
-                )
-                eventinstances = eventinstances.filter(location=eventlocation)
-
-            context['eventinstances'] = eventinstances
-
-            start = when + datetime.timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
-            timeslots = []
-            # calculate how many timeslots we have in the schedule based on the lenght of the timeslots in minutes,
-            # and the number of minutes in 24 hours
-            for i in range(0,int((24*60)/settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)):
-                timeslot = start + datetime.timedelta(minutes=i*settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES)
-                timeslots.append(timeslot)
-            context['timeslots'] = timeslots
-
-            # include the components to make the urls
-            context['urlyear'] = self.kwargs['year']
-            context['urlmonth'] = self.kwargs['month']
-            context['urlday'] = self.kwargs['day']
-
-        context['schedule_timeslot_length_minutes'] = settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES;
         context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS;
-
         return context
 
 

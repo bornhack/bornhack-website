@@ -1,6 +1,7 @@
 body {
   margin-top: 85px;
   margin-bottom: 35px;
+  overflow: scroll;
 }
 
 * {
@@ -148,27 +149,43 @@ footer {
 .event {
     padding: 5px;
     vertical-align: top;
-    margin: 5px;
-    width: 200px;
-    max-width: 200px;
-    min-width: 200px;
-    min-height: 100px;
     flex-grow: 1;
     border: 1px solid black;
     cursor: pointer;
 }
 
-.event-td {
-    padding: 5px;
-    vertical-align: top;
+.event-in-overview {
+    min-height: 100px;
+    margin: 5px;
     max-width: 200px;
     min-width: 200px;
-    flex-grow: 1;
-    cursor: pointer;
 }
 
-.event-td a {
-  display: block;
+.location-column {
+    position: relative;
+    margin: 0 2px;
+    background-color: #f5f5f5;
+}
+
+.location-column-header {
+  text-align: center;
+  font-weight: bold;
+  line-height: 50px;
+  font-size: 20px;
+  background-color: #eee;
+  border-bottom: 1px solid #fff;
+}
+
+.location-column-slot {
+  border-bottom: 1px solid #fff;
+}
+
+.day-view-gutter {
+  text-align: right;
+}
+
+.event-in-dayview {
+    position: absolute;
 }
 
 
@@ -179,13 +196,9 @@ footer {
   }
 }
 
-.event:hover, .event-td:hover {
+.event:hover {
     background-color: black !important;
     color: white !important;
-    text-decoration: none !important;
-}
-
-.event-td a:hover {
     text-decoration: none !important;
 }
 
@@ -208,11 +221,26 @@ footer {
   padding: 0;
 }
 
+.schedule-filter .btn {
+  width: 100%;
+  text-align: left;
+}
+
 
 @media (min-width: 520px) {
-  .schedule-filter {
+  .schedule-sidebar {
     border-left: 1px solid #eee;
   }
+}
+
+.sticky {
+  position: sticky;
+  background-color: #fff;
+  z-index: 9999;
+}
+
+#daypicker {
+  top: 80px;
 }
 
 #schedule-days {
@@ -231,28 +259,7 @@ footer {
   flex-wrap: wrap;
 }
 
-.form-group .schedule-checkbox {
-    display: none;
-  }
-
-.form-group input[type="checkbox"] + .btn-group > label span {
-    width: 20px;
-}
-
-.form-group input[type="checkbox"] + .btn-group > label span i:first-child {
-    display: none;
-}
-.form-group input[type="checkbox"] + .btn-group > label span i:last-child {
-    display: inline-block;
-}
-
-.form-group input[type="checkbox"]:checked + .btn-group > label span i:first-child {
-    display: inline-block;
-}
-.form-group input[type="checkbox"]:checked + .btn-group > label span i:last-child {
-    display: none;
-}
-.form-group input[type="checkbox"]:checked + .btn-group > label {
+.filter-choice-active {
     color: #333;
     background-color: #e6e6e6;
     border-color: #adadad;
