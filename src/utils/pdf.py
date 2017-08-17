@@ -1,11 +1,12 @@
+import logging
+import io
+import os
+
 from django.contrib.auth.models import AnonymousUser
 from wkhtmltopdf.views import PDFTemplateResponse
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from django.test.client import RequestFactory
 from django.conf import settings
-import logging
-import io
-import os
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -36,7 +37,14 @@ def generate_pdf_letter(filename, template, formatdict):
 
     # get watermark from watermark file
     watermark = PdfFileReader(
-        open(os.path.join(settings.STATICFILES_DIRS[0], 'pdf', settings.PDF_LETTERHEAD_FILENAME), 'rb')
+        open(
+            os.path.join(
+                settings.STATICFILES_DIRS[0],
+                'pdf',
+                settings.PDF_LETTERHEAD_FILENAME
+            ),
+            'rb'
+        )
     )
 
     # add the watermark to all pages
@@ -60,4 +68,3 @@ def generate_pdf_letter(filename, template, formatdict):
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)
     return returnfile
-

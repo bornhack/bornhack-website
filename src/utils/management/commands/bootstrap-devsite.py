@@ -48,6 +48,7 @@ class Command(BaseCommand):
                 timezone.datetime(2016, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2016, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
+            colour='#000000',
         )
 
         camp2017 = Camp.objects.create(
@@ -66,6 +67,7 @@ class Command(BaseCommand):
                 timezone.datetime(2017, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2017, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
+            colour='#000000',
         )
 
         camp2018 = Camp.objects.create(
@@ -84,6 +86,7 @@ class Command(BaseCommand):
                 timezone.datetime(2018, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2018, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
+            colour='#000000',
         )
 
         self.output("Creating users...")

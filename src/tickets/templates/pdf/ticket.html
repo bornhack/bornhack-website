@@ -1,0 +1,32 @@
+{% load static from staticfiles %}
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 75%;">&nbsp;</td>
+        <td>
+            <h3>
+                {{ ticket.created|date:"b jS, Y" }}<br>
+            </h3>
+        </td>
+    </tr>
+</table>
+<br>
+<h2>{{ ticket.camp.title }} Ticket</h2>
+<h3>Type: {{ ticket.ticket_type }}</h3>
+
+{% if ticket.name %}
+  <h3>Participant: {{ ticket.name }}</h3>
+  <br>
+{% elif ticket.order.user.email %}
+  <h3>Participant: {{ ticket.order.user.email }}</h3>
+  <br>
+{% elif ticket.sponsor %}
+  <h3>Sponsor: {{ ticket.sponsor.name }} </h3>
+  <img src="{{ ticket.sponsor.logo }}"></img>
+{% endif %}
+
+<center>
+  <img src="{{ ticket.get_qr_code_url }}"></img>
+  <p>Ticket #{{ ticket.pk }}</p>
+</center>

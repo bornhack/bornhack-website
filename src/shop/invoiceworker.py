@@ -1,5 +1,5 @@
 from django.core.files import File
-from shop.pdf import generate_pdf_letter
+from utils.pdf import generate_pdf_letter
 from shop.email import add_invoice_email, add_creditnote_email
 from shop.models import Order, CustomOrder, Invoice, CreditNote
 import logging
