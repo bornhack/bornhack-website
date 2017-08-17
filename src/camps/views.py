@@ -13,10 +13,14 @@ class CampRedirectView(CampViewMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         # find the closest camp in the past
-        prevcamp = Camp.objects.filter(camp__endswith__lt=timezone.now()).order_by('-camp')[0]
+        prevcamp = Camp.objects.filter(
+            camp__endswith__lt=timezone.now()
+        ).order_by('-camp')[0]
 
         # find the closest upcoming camp
-        nextcamp = Camp.objects.filter(camp__startswith__gt=timezone.now()).order_by('camp')[0]
+        nextcamp = Camp.objects.filter(
+            camp__startswith__gt=timezone.now()
+            ).order_by('camp')[0]
 
         # find the number of days between the two camps
         daysbetween = (nextcamp.camp.lower - prevcamp.camp.upper).days
