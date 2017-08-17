@@ -17,6 +17,9 @@ from program.models import (
     Speaker,
     EventLocation
 )
+from tickets.models import (
+    TicketType
+)
 from teams.models import Team, TeamArea, TeamMember
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
@@ -198,6 +201,20 @@ class Command(BaseCommand):
             slug='slacking-off',
             color='#0000ff',
             light_text=True
+        )
+
+        self.output('Creating tickettypes...')
+        TicketType.objects.create(
+            name='Adult Full Week'
+        )
+        TicketType.objects.create(
+            name='Adult One Day'
+        )
+        TicketType.objects.create(
+            name='Child Full Week'
+        )
+        TicketType.objects.create(
+            name='Child One Day'
         )
 
         self.output("Creating productcategories...")
