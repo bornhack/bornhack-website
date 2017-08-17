@@ -1,0 +1,39 @@
+{% extends 'program_base.html' %}
+
+{% load commonmark %}
+{% load staticfiles %}
+
+{% block program_content %}
+
+<div class="row">
+
+<table class="table">
+  <thead>
+    <th>When?</th>
+    <th>What?</th>
+    <th>Where?</th>
+  </thead>
+  <tbody>
+
+
+  {% for instance in eventinstances %}
+
+    {% ifchanged instance.when.lower.date %}
+      <tr>
+        <td colspan=3><strong>{{ instance.when.lower.date|date:"l Y-m-d" }}</strong></td>
+      </tr>
+    {% endifchanged %}
+
+    <tr>
+      <td>{{ instance.when.lower|date:"H:i" }}-{{ instance.when.upper|date:"H:i" }}</td>
+      <td><a href="{% url 'event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
+      <td>{{ instance.location.name }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+</div>
+{% endblock %}
+

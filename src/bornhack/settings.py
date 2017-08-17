@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'ircbot',
     'teams',
     'people',
+    'tickets',
 
     'allauth',
     'allauth.account',

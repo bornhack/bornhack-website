@@ -1,21 +1,28 @@
+import io
+import logging
+import hashlib
+import base64
+import qrcode
+
 from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Sum
 from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
-from django.http import HttpResponse
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
-from utils.models import UUIDModel, CreatedUpdatedModel
-from .managers import ProductQuerySet, OrderQuerySet
-import hashlib, io, base64, qrcode
 from decimal import Decimal
 from datetime import timedelta
 from unidecode import unidecode
 from django.utils.dateparse import parse_datetime
-from django.utils import timezone
+
+from utils.models import UUIDModel, CreatedUpdatedModel
+from tickets.models import ShopTicket
+from .managers import ProductQuerySet, OrderQuerySet
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CustomOrder(CreatedUpdatedModel):
@@ -77,7 +84,7 @@ class Order(CreatedUpdatedModel):
     CREDIT_CARD = 'credit_card'
     BLOCKCHAIN = 'blockchain'
     BANK_TRANSFER = 'bank_transfer'
-    CASH  = 'cash'
+    CASH = 'cash'
 
     PAYMENT_METHODS = [
         CREDIT_CARD,
@@ -114,7 +121,6 @@ class Order(CreatedUpdatedModel):
         default='',
         blank=True,
     )
-
 
     objects = OrderQuerySet.as_manager()
 
@@ -176,7 +182,8 @@ class Order(CreatedUpdatedModel):
         for order_product in self.orderproductrelation_set.all():
             if order_product.product.category.name == "Tickets":
                 for _ in range(0, order_product.quantity):
-                    ticket = Ticket(
+                    ticket = ShopTicket(
+                        ticket_type=order_product.product.ticket_type,
                         order=self,
                         product=order_product.product,
                     )
@@ -289,6 +296,12 @@ class Product(CreatedUpdatedModel, UUIDModel):
             'Which period is this product available for purchase? | '
             '(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'
         )
+    )
+
+    ticket_type = models.ForeignKey(
+        'tickets.TicketType',
+        null=True,
+        blank=True
     )
 
     objects = ProductQuerySet.as_manager()
@@ -514,4 +527,3 @@ class Ticket(CreatedUpdatedModel, UUIDModel):
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
-
