@@ -10,6 +10,7 @@ admin.site.register(models.CoinifyAPIRequest)
 admin.site.register(models.Invoice)
 admin.site.register(models.CreditNote)
 
+
 @admin.register(models.CustomOrder)
 class CustomOrderAdmin(admin.ModelAdmin):
     list_display = [
@@ -25,6 +26,7 @@ class CustomOrderAdmin(admin.ModelAdmin):
         'paid',
     ]
 
+
 @admin.register(models.ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = [
@@ -37,6 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'category',
+        'ticket_type',
         'price',
         'available_in',
     ]
@@ -114,7 +117,6 @@ class TicketModelAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ['product', 'checked_in']
-
 
     actions = ['mark_as_arrived']
 

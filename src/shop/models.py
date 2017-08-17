@@ -1,3 +1,9 @@
+import io
+import logging
+import hashlib
+import base64
+import qrcode
+
 from django.conf import settings
 from django.db import models
 from django.db.models.aggregates import Sum
@@ -7,12 +13,16 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
-from utils.models import UUIDModel, CreatedUpdatedModel
-from .managers import ProductQuerySet, OrderQuerySet
 from decimal import Decimal
 from datetime import timedelta
 from unidecode import unidecode
 from django.utils.dateparse import parse_datetime
+
+from utils.models import UUIDModel, CreatedUpdatedModel
+from tickets.models import ShopTicket
+from .managers import ProductQuerySet, OrderQuerySet
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CustomOrder(CreatedUpdatedModel):
@@ -74,7 +84,7 @@ class Order(CreatedUpdatedModel):
     CREDIT_CARD = 'credit_card'
     BLOCKCHAIN = 'blockchain'
     BANK_TRANSFER = 'bank_transfer'
-    CASH  = 'cash'
+    CASH = 'cash'
 
     PAYMENT_METHODS = [
         CREDIT_CARD,
@@ -111,7 +121,6 @@ class Order(CreatedUpdatedModel):
         default='',
         blank=True,
     )
-
 
     objects = OrderQuerySet.as_manager()
 
@@ -173,7 +182,8 @@ class Order(CreatedUpdatedModel):
         for order_product in self.orderproductrelation_set.all():
             if order_product.product.category.name == "Tickets":
                 for _ in range(0, order_product.quantity):
-                    ticket = Ticket(
+                    ticket = ShopTicket(
+                        ticket_type=order_product.product.ticket_type,
                         order=self,
                         product=order_product.product,
                     )
@@ -286,6 +296,12 @@ class Product(CreatedUpdatedModel, UUIDModel):
             'Which period is this product available for purchase? | '
             '(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'
         )
+    )
+
+    ticket_type = models.ForeignKey(
+        'tickets.TicketType',
+        null=True,
+        blank=True
     )
 
     objects = ProductQuerySet.as_manager()
@@ -451,3 +467,63 @@ class CoinifyAPIRequest(CreatedUpdatedModel):
 
     def __str__(self):
         return 'order %s api request %s' % (self.order.id, self.method)
+
+
+class Ticket(CreatedUpdatedModel, UUIDModel):
+    order = models.ForeignKey('shop.Order', related_name='tickets')
+    product = models.ForeignKey('shop.Product', related_name='tickets')
+    qrcode_base64 = models.TextField(null=True, blank=True)
+
+    name = models.CharField(
+        max_length=100,
+        help_text=(
+            'Name of the person this ticket belongs to. '
+            'This can be different from the buying user.'
+        ),
+        null=True,
+        blank=True,
+    )
+
+    email = models.EmailField(
+        null=True,
+        blank=True,
+    )
+
+    checked_in = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'Ticket {user} {product}'.format(
+            user=self.order.user,
+            product=self.product
+        )
+
+    def save(self, **kwargs):
+        super(Ticket, self).save(**kwargs)
+        self.qrcode_base64 = self.get_qr_code()
+        super(Ticket, self).save(**kwargs)
+
+    def get_token(self):
+        return hashlib.sha256(
+            '{ticket_id}{user_id}{secret_key}'.format(
+                ticket_id=self.pk,
+                user_id=self.order.user.pk,
+                secret_key=settings.SECRET_KEY,
+            ).encode('utf-8')
+        ).hexdigest()
+
+    def get_qr_code(self):
+        qr = qrcode.make(
+            self.get_token(),
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H
+        ).resize((250,250))
+        file_like = io.BytesIO()
+        qr.save(file_like, format='png')
+        qrcode_base64 = base64.b64encode(file_like.getvalue())
+        return qrcode_base64
+
+    def get_qr_code_url(self):
+        return 'data:image/png;base64,{}'.format(self.qrcode_base64)
+
+    def get_absolute_url(self):
+        return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
