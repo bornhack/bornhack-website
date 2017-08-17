@@ -21,15 +21,15 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 # TicketType can be full week, one day. etc.
 class TicketType(CreatedUpdatedModel, UUIDModel):
     name = models.TextField()
+    camp = models.ForeignKey('camps.Camp')
 
     def __str__(self):
-        return '{}'.format(self.name)
+        return '{} ({})'.format(self.name, self.camp.title)
 
 
 class BaseTicket(models.Model):
     qrcode_base64 = models.TextField(null=True, blank=True)
     ticket_type = models.ForeignKey('TicketType')
-    camp = models.ForeignKey('camps.Camp')
 
     def save(self, **kwargs):
         super(BaseTicket, self).save(**kwargs)

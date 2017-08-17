@@ -12,8 +12,8 @@
     </tr>
 </table>
 <br>
-<h2>{{ ticket.camp.title }} Ticket</h2>
-<h3>Type: {{ ticket.ticket_type }}</h3>
+<h2>{{ ticket.ticket_type.camp.title }} Ticket</h2>
+<h3>Type: {{ ticket.ticket_type.name }}</h3>
 
 {% if ticket.name %}
   <h3>Participant: {{ ticket.name }}</h3>
