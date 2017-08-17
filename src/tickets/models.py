@@ -13,7 +13,7 @@ from utils.models import (
     UUIDModel,
     CreatedUpdatedModel
 )
-from shop.pdf import generate_pdf_letter
+from utils.pdf import generate_pdf_letter
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
