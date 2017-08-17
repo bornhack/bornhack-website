@@ -206,20 +206,6 @@ class Command(BaseCommand):
             light_text=True
         )
 
-        self.output('Creating tickettypes...')
-        TicketType.objects.create(
-            name='Adult Full Week'
-        )
-        TicketType.objects.create(
-            name='Adult One Day'
-        )
-        TicketType.objects.create(
-            name='Child Full Week'
-        )
-        TicketType.objects.create(
-            name='Child One Day'
-        )
-
         self.output("Creating productcategories...")
         transportation = ProductCategory.objects.create(
             name='Transportation',
@@ -398,6 +384,25 @@ class Command(BaseCommand):
 
         for camp in [camp2016, camp2017, camp2018]:
             year = camp.camp.lower.year
+
+            self.output('Creating tickettypes for {}...'.format(year))
+            TicketType.objects.create(
+                name='Adult Full Week',
+                camp=camp
+            )
+            TicketType.objects.create(
+                name='Adult One Day',
+                camp=camp
+            )
+            TicketType.objects.create(
+                name='Child Full Week',
+                camp=camp
+            )
+            TicketType.objects.create(
+                name='Child One Day',
+                camp=camp
+            )
+
 
             self.output('Creating eventlocations for {}...'.format(year))
             speakers_tent = EventLocation.objects.create(
