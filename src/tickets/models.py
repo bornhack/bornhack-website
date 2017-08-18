@@ -30,6 +30,7 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
 class BaseTicket(models.Model):
     qrcode_base64 = models.TextField(null=True, blank=True)
     ticket_type = models.ForeignKey('TicketType')
+    checked_in = models.BooleanField(default=False)
 
     def save(self, **kwargs):
         super(BaseTicket, self).save(**kwargs)
@@ -100,8 +101,6 @@ class ShopTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
         null=True,
         blank=True,
     )
-
-    checked_in = models.BooleanField(default=False)
 
     # overwrite the _get_token method because old tickets use the user_id
     def _get_token(self):
