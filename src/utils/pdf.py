@@ -64,7 +64,6 @@ def generate_pdf_letter(filename, template, formatdict):
         finalpdf.write(fh)
         logger.info('Saved pdf to archive: %s' % fullpath)
 
-    # return a file object with the data
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)
     return returnfile

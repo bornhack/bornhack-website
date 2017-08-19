@@ -1,0 +1,55 @@
+{% extends 'tickets_base.html' %}
+{% load bootstrap3 %}
+{% load tickets_tags %}
+
+{% block tickets_content %}
+{% if tickets %}
+  <h3>Tickets</h3>
+
+  <table class="table table-bordered table-hover">
+    <thead>
+      <tr>
+        <th>
+          Ticket owner
+        <th>
+          Product name
+        <th>
+          Price
+        <th>
+          Checked in
+        <th>
+          Actions
+
+    <tbody>
+      {% for ticket in tickets %}
+      <tr>
+        <td>
+            {% if ticket.name %}
+              {{ ticket.name }}
+            {% else %}
+              Anonymous
+            {% endif %}
+        <td>
+            {{ ticket.product.name }}
+        <td>
+          {{ ticket.product.price|currency }}
+        <td>
+          {% if ticket.checked_in %}
+          Yes
+          {% else %}
+          Not yet
+          {% endif %}
+        <td>
+          <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-download" aria-hidden="true"></i> Download PDF</a>
+          {% if not ticket.name %}
+            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-edit" aria-hidden="true"></i> Set name</a>
+          {% else %}
+            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-edit" aria-hidden="true"></i> Edit name</a>
+          {% endif %}
+      {% endfor %}
+  </table>
+{% else %}
+  <h3> You dont have any tickets yet. We hope to see you at the next BornHack!</h3>
+{% endif %}
+
+{% endblock %}

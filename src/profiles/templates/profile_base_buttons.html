@@ -11,11 +11,9 @@
       <a href="{% url 'shop:order_list' %}" class="btn btn-black">
         Orders
       </a>
-      {% if has_tickets %}
-      <a href="{% url 'shop:ticket_list' %}" class="btn btn-black">
+      <a href="{% url 'tickets:shopticket_list' %}" class="btn btn-black">
         Tickets
       </a>
-      {% endif %}
       {% if user.creditnotes.exists %}
       <a href="{% url 'shop:creditnote_list' %}" class="btn btn-black">
         Credit Notes

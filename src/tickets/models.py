@@ -8,7 +8,6 @@ from django.db import models
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
 from utils.models import (
     UUIDModel,
     CreatedUpdatedModel
@@ -60,7 +59,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         return 'data:image/png;base64,{}'.format(self.qrcode_base64)
 
     def generate_pdf(self):
-        generate_pdf_letter(
+        return generate_pdf_letter(
             filename='ticket_{}.pdf'.format(self.pk),
             formatdict={'ticket': self},
             template='pdf/ticket.html'
@@ -124,5 +123,6 @@ class ShopTicket(BaseTicket):
         super(ShopTicket, self).save(**kwargs)
 
     def get_absolute_url(self):
-        return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
-
+        return str(
+            reverse_lazy('tickets:shopticket_edit', kwargs={'pk': self.pk})
+        )

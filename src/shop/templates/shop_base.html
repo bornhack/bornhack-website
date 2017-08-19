@@ -17,7 +17,7 @@
           <li class="pull-right"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
         {% endif %}
         {% if has_tickets %}
-          <li class="pull-right"><a href="{% url 'shop:ticket_list' %}">Tickets</a></li>
+          <li class="pull-right"><a href="{% url 'tickets:shopticket_list' %}">Tickets</a></li>
         {% endif %}
         <li class="pull-right"><a href="{% url 'shop:order_list' %}">Orders</a></li>
         <li class="pull-right no-before">

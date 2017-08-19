@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <ol class="breadcrumb">
+      <li><a href="{% url 'tickets:shopticket_list' %}">Tickets</a></li>
+        <li class="pull-right no-before">
+
+        </li>
+    </ol>
+  </div>
+</div>
+
+{% block tickets_content %}
+
+{% endblock %}
+
+{% endblock %}
+

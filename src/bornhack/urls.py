@@ -1,4 +1,3 @@
-from django.conf.urls.static import static
 from allauth.account.views import (
     LoginView,
     LogoutView,
@@ -13,11 +12,16 @@ from program.views import *
 from sponsors.views import *
 from teams.views import *
 from people.views import *
+from tickets.views import ShopTicketListView
 
 urlpatterns = [
     url(
         r'^profile/',
         include('profiles.urls', namespace='profiles')
+    ),
+    url(
+        r'^tickets/',
+        include('tickets.urls', namespace='tickets')
     ),
     url(
         r'^shop/',

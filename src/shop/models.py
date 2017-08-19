@@ -13,6 +13,7 @@ from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse_lazy
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 from datetime import timedelta
 from unidecode import unidecode
@@ -312,6 +313,12 @@ class Product(CreatedUpdatedModel, UUIDModel):
             self.price,
         )
 
+    def clean(self):
+        if self.category.name == 'Tickets' and not self.ticket_type:
+            raise ValidationError(
+                'Products with category Tickets need a ticket_type'
+            )
+
     def is_available(self):
         now = timezone.now()
         return now in self.available_in
@@ -324,7 +331,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
     def is_upcoming(self):
         now = timezone.now()
-        return self.available_in.lower >  now
+        return self.available_in.lower > now
 
 
 class OrderProductRelation(CreatedUpdatedModel):

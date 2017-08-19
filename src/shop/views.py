@@ -375,34 +375,6 @@ class DownloadCreditNoteView(LoginRequiredMixin, EnsureUserOwnsCreditNoteMixin, 
         return response
 
 
-class TicketListView(LoginRequiredMixin, ListView):
-    model = Ticket
-    template_name = 'ticket_list.html'
-    context_object_name = 'tickets'
-
-    def get_queryset(self):
-        tickets = super(TicketListView, self).get_queryset()
-        user = self.request.user
-        return tickets.filter(order__user=user)
-
-
-class TicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
-    model = Ticket
-    template_name = 'ticket_detail.html'
-    context_object_name = 'ticket'
-    fields = ['name', 'email']
-
-    def form_valid(self, form):
-        messages.info(self.request, 'Ticket updated!')
-        return super(TicketDetailView, self).form_valid(form)
-
-    def dispatch(self, request, *args, **kwargs):
-        ticket = self.get_object()
-        if ticket.order.user != request.user:
-            raise Http404
-        return super(TicketDetailView, self).dispatch(request, *args, **kwargs)
-
-
 class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
 
     model = Order
