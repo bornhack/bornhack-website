@@ -28,16 +28,11 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
 
 
 class BaseTicket(CreatedUpdatedModel, UUIDModel):
-    qrcode_base64 = models.TextField(null=True, blank=True)
     ticket_type = models.ForeignKey('TicketType')
     checked_in = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
-
-    def save(self, **kwargs):
-        self.qrcode_base64 = self.get_qr_code()
-        super().save(**kwargs)
 
     def _get_token(self):
         return hashlib.sha256(
@@ -47,7 +42,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
             ).encode('utf-8')
         ).hexdigest()
 
-    def get_qr_code(self):
+    def get_qr_code_base64(self):
         qr = qrcode.make(
             self._get_token(),
             version=1,
@@ -59,7 +54,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         return qrcode_base64
 
     def get_qr_code_url(self):
-        return 'data:image/png;base64,{}'.format(self.qrcode_base64)
+        return 'data:image/png;base64,{}'.format(self.get_qr_code_base64)
 
     def generate_pdf(self):
         generate_pdf_letter(
