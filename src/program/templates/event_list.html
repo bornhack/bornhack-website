@@ -13,6 +13,7 @@
           <th>Type</th>
           <th>Title</th>
           <th>Speakers</th>
+          <th>Scheduled</th>
         </tr>
       </thead>
       <tbody>
@@ -32,6 +33,13 @@
               <a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
             {% empty %}
               N/A
+            {% endfor %}
+          </td>
+          <td>
+            {% for instance in event.instances.all %}
+              {{ instance.when.lower }}<br>
+            {% empty %}
+              <i>No instances scheduled yet</i>
             {% endfor %}
           </td>
         </tr>
