@@ -32,6 +32,9 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
     ticket_type = models.ForeignKey('TicketType')
     checked_in = models.BooleanField(default=False)
 
+    class Meta:
+        abstract = True
+
     def save(self, **kwargs):
         super(BaseTicket, self).save(**kwargs)
         self.qrcode_base64 = self.get_qr_code()
