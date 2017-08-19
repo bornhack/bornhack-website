@@ -4,7 +4,7 @@ import hashlib
 import base64
 import qrcode
 
-from django.db import models
+from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -13,12 +13,13 @@ from utils.models import (
     CreatedUpdatedModel
 )
 from utils.pdf import generate_pdf_letter
+from django.db import models
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 # TicketType can be full week, one day. etc.
-class TicketType(CreatedUpdatedModel, UUIDModel):
+class TicketType(CampRelatedModel, UUIDModel):
     name = models.TextField()
     camp = models.ForeignKey('camps.Camp')
 
