@@ -20,12 +20,31 @@ class BaseTicketAdmin(admin.ModelAdmin):
 
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = [
+        'name',
+        'camp',
+    ]
+
+    list_filter = [
+        'name',
+        'camp',
+    ]
 
 
 @admin.register(SponsorTicket)
 class SponsorTicketAdmin(BaseTicketAdmin):
-    pass
+    list_display = [
+        'pk',
+        'ticket_type',
+        'sponsor',
+        'checked_in',
+    ]
+
+    list_filter = [
+        'ticket_type',
+        'sponsor',
+        'checked_in',
+    ]
 
 
 @admin.register(DiscountTicket)
@@ -35,4 +54,18 @@ class DiscountTicketAdmin(BaseTicketAdmin):
 
 @admin.register(ShopTicket)
 class ShopTicketAdmin(BaseTicketAdmin):
-    pass
+    list_display = [
+        'pk',
+        'ticket_type',
+        'order',
+        'product',
+        'checked_in',
+    ]
+
+    list_filter = [
+        'ticket_type',
+        'order',
+        'product',
+        'checked_in',
+    ]
+
