@@ -40,7 +40,8 @@ class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename="ticket_{pk}.pdf"'.format(
+        response['Content-Disposition'] = 'attachment; filename="{type}_ticket_{pk}.pdf"'.format(
+            type=self.get_object().shortname
             pk=self.get_object().pk
         )
         response.write(self.get_object().generate_pdf().getvalue())
