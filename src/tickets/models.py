@@ -36,7 +36,6 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         abstract = True
 
     def save(self, **kwargs):
-        super(BaseTicket, self).save(**kwargs)
         self.qrcode_base64 = self.get_qr_code()
         super(BaseTicket, self).save(**kwargs)
 
