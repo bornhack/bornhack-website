@@ -57,7 +57,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
 
     def generate_pdf(self):
         return generate_pdf_letter(
-            filename='ticket_{}.pdf'.format(self.pk),
+            filename='{}_ticket_{}.pdf'.format(self.shortname, self.pk),
             formatdict={'ticket': self},
             template='pdf/ticket.html'
         )
@@ -69,6 +69,10 @@ class SponsorTicket(BaseTicket):
     def __str__(self):
         return 'SponsorTicket: {}'.format(self.pk)
 
+    @property
+    def shortname(self):
+        return "sponsor"
+
 
 class DiscountTicket(BaseTicket):
     price = models.IntegerField(
@@ -78,6 +82,9 @@ class DiscountTicket(BaseTicket):
     def __str__(self):
         return 'DiscountTicket: {}'.format(self.pk)
 
+    @property
+    def shortname(self):
+        return "discount"
 
 class ShopTicket(BaseTicket):
     order = models.ForeignKey('shop.Order', related_name='shoptickets')
@@ -118,3 +125,8 @@ class ShopTicket(BaseTicket):
         return str(
             reverse_lazy('tickets:shopticket_edit', kwargs={'pk': self.pk})
         )
+
+    @property
+    def shortname(self):
+        return "shop"
+
