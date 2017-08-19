@@ -27,7 +27,7 @@ class TicketType(CreatedUpdatedModel, UUIDModel):
         return '{} ({})'.format(self.name, self.camp.title)
 
 
-class BaseTicket(models.Model):
+class BaseTicket(CreatedUpdatedModel, UUIDModel):
     qrcode_base64 = models.TextField(null=True, blank=True)
     ticket_type = models.ForeignKey('TicketType')
     checked_in = models.BooleanField(default=False)
@@ -67,14 +67,14 @@ class BaseTicket(models.Model):
         )
 
 
-class SponsorTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
+class SponsorTicket(BaseTicket):
     sponsor = models.ForeignKey('sponsors.Sponsor')
 
     def __str__(self):
         return 'SponsorTicket: {}'.format(self.pk)
 
 
-class DiscountTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
+class DiscountTicket(BaseTicket):
     price = models.IntegerField(
         help_text=_('Price of the discounted ticket (in DKK, including VAT).')
     )
@@ -83,7 +83,7 @@ class DiscountTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
         return 'DiscountTicket: {}'.format(self.pk)
 
 
-class ShopTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
+class ShopTicket(BaseTicket):
     order = models.ForeignKey('shop.Order', related_name='shoptickets')
     product = models.ForeignKey('shop.Product')
 
@@ -125,3 +125,4 @@ class ShopTicket(BaseTicket, CreatedUpdatedModel, UUIDModel):
 
     def get_absolute_url(self):
         return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
+
