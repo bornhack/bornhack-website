@@ -115,11 +115,6 @@ class ShopTicket(BaseTicket):
             product=self.product
         )
 
-    def save(self, **kwargs):
-        super(ShopTicket, self).save(**kwargs)
-        self.qrcode_base64 = self.get_qr_code()
-        super(ShopTicket, self).save(**kwargs)
-
     def get_absolute_url(self):
         return str(reverse_lazy('shop:ticket_detail', kwargs={'pk': self.pk}))
 
