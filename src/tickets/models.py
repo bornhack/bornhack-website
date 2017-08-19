@@ -53,7 +53,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         return qrcode_base64
 
     def get_qr_code_url(self):
-        return 'data:image/png;base64,{}'.format(self.get_qr_code_base64())
+        return 'data:image/png;base64,{}'.format(str(self.get_qr_code_base64()))
 
     def generate_pdf(self):
         return generate_pdf_letter(
