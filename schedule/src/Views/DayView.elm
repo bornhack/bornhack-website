@@ -15,7 +15,7 @@ import Date exposing (Date)
 -- External modules
 
 import Html exposing (Html, text, div, ul, li, span, i, h4, table, p, a)
-import Html.Attributes exposing (classList, style, href)
+import Html.Attributes exposing (classList, style, href, alt, title)
 import Date.Extra
 import List.Extra
 
@@ -225,6 +225,9 @@ eventInstanceBlock offset numberInGroup ( eventInstance, lefts ) =
 
         width =
             100 / (toFloat (numberInGroup + 1))
+
+        timeInString =
+            (Date.Extra.toFormattedString "HH:mm" eventInstance.from)
     in
         a
             [ classList
@@ -241,8 +244,25 @@ eventInstanceBlock offset numberInGroup ( eventInstance, lefts ) =
                 ]
             , href <| routeToString <| EventRoute eventInstance.eventSlug
             ]
-            [ p [] [ text ((Date.Extra.toFormattedString "HH:mm" eventInstance.from) ++ " " ++ eventInstance.title) ]
+            [ p
+                [ title <|
+                    timeInString
+                        ++ " "
+                        ++ eventInstance.title
+                ]
+                [ text <| timeInString ++ " " ++ (ellipsis 20 eventInstance.title) ]
             ]
+
+
+ellipsis : Int -> String -> String
+ellipsis cutOff value =
+    if String.length value > cutOff then
+        (value
+            |> String.dropRight ((String.length value) - cutOff)
+        )
+            ++ "..."
+    else
+        value
 
 
 gutter : List Date -> Html Msg

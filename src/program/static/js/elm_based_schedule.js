@@ -15162,6 +15162,18 @@ var _user$project$Views_DayPicker$dayPicker = function (model) {
 		});
 };
 
+var _user$project$Views_DayView$ellipsis = F2(
+	function (cutOff, value) {
+		return (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$String$length(value),
+			cutOff) > 0) ? A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$String$dropRight,
+				_elm_lang$core$String$length(value) - cutOff,
+				value),
+			'...') : value;
+	});
 var _user$project$Views_DayView$px = function (value) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -15174,6 +15186,7 @@ var _user$project$Views_DayView$eventInstanceBlock = F3(
 	function (offset, numberInGroup, _p0) {
 		var _p1 = _p0;
 		var _p2 = _p1._0;
+		var timeInString = A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'HH:mm', _p2.from);
 		var width = 100 / _elm_lang$core$Basics$toFloat(numberInGroup + 1);
 		var minutes = _elm_lang$core$Date$minute(_p2.from);
 		var hourInMinutes = _elm_lang$core$Date$hour(_p2.from) * 60;
@@ -15262,14 +15275,25 @@ var _user$project$Views_DayView$eventInstanceBlock = F3(
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$p,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$title(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								timeInString,
+								A2(_elm_lang$core$Basics_ops['++'], ' ', _p2.title))),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
 							A2(
 								_elm_lang$core$Basics_ops['++'],
-								A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'HH:mm', _p2.from),
-								A2(_elm_lang$core$Basics_ops['++'], ' ', _p2.title))),
+								timeInString,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									' ',
+									A2(_user$project$Views_DayView$ellipsis, 20, _p2.title)))),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
