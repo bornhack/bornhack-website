@@ -60,9 +60,13 @@ class ShopTicketAdmin(BaseTicketAdmin):
     def user_email(self, obj):
         return obj.order.user.email
 
+    def is_paid(self, obj):
+        return obj.order.paid
+
     list_display = [
         'pk',
         'user_email',
+        'is_paid',
         'ticket_type',
         'order',
         'product',
