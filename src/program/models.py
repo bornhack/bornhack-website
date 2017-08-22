@@ -409,6 +409,13 @@ class Event(CampRelatedModel):
         help_text='Do we intend to record video of this event?'
     )
 
+    proposal = models.OneToOneField(
+        'program.EventProposal',
+        null=True,
+        blank=True,
+        help_text='The event proposal object this event was created from',
+    )
+
     class Meta:
         ordering = ['title']
         unique_together = (('camp', 'slug'), ('camp', 'title'))

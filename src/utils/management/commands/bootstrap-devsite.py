@@ -295,114 +295,120 @@ class Command(BaseCommand):
             slug='{}'.format(slugify(name)),
         )
 
-        name = 'Standard ticket'
-        ticket1 = Product.objects.create(
-            name=name,
-            description='A ticket',
-            price=1200,
-            category=tickets,
-            available_in=(
-                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
-            ),
-            slug='{}'.format(slugify(name)),
-        )
 
-        name = 'Hacker ticket'
-        ticket2 = Product.objects.create(
-            name=name,
-            description='Another ticket',
-            price=1337,
-            category=tickets,
-            available_in=(
-                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
-            ),
-            slug='{}'.format(slugify(name)),
-        )
-
-        self.output('Creating orders...')
-        order0 = Order.objects.create(
-            user=user1,
-            payment_method='cash',
-            open=None,
-            paid=True
-        )
-        order0.orderproductrelation_set.create(
-            product=ticket1,
-            quantity=1,
-        )
-        order0.orderproductrelation_set.create(
-            product=tent1,
-            quantity=1,
-        )
-
-        order1 = Order.objects.create(
-            user=user2,
-            payment_method='cash'
-        )
-        order1.orderproductrelation_set.create(
-            product=ticket1,
-            quantity=1,
-        )
-        order1.orderproductrelation_set.create(
-            product=tent2,
-            quantity=1,
-        )
-        order2 = Order.objects.create(
-            user=user3,
-            payment_method='cash'
-        )
-        order2.orderproductrelation_set.create(
-            product=ticket2,
-            quantity=1,
-        )
-        order2.orderproductrelation_set.create(
-            product=ticket1,
-            quantity=1,
-        )
-        order2.orderproductrelation_set.create(
-            product=tent2,
-            quantity=1,
-        )
-        order3 = Order.objects.create(
-            user=user4,
-            payment_method='cash'
-        )
-        order3.orderproductrelation_set.create(
-            product=product0,
-            quantity=1,
-        )
-        order3.orderproductrelation_set.create(
-            product=ticket2,
-            quantity=1,
-        )
-        order3.orderproductrelation_set.create(
-            product=tent1,
-            quantity=1,
-        )
 
         for camp in [camp2016, camp2017, camp2018]:
             year = camp.camp.lower.year
 
             self.output('Creating tickettypes for {}...'.format(year))
-            TicketType.objects.create(
+            adult_full_week = TicketType.objects.create(
                 name='Adult Full Week',
                 camp=camp
             )
-            TicketType.objects.create(
+            adult_one_day = TicketType.objects.create(
                 name='Adult One Day',
                 camp=camp
             )
-            TicketType.objects.create(
+            child_full_week = TicketType.objects.create(
                 name='Child Full Week',
                 camp=camp
             )
-            TicketType.objects.create(
+            child_one_day = TicketType.objects.create(
                 name='Child One Day',
                 camp=camp
             )
 
+            name = 'Standard ticket {}'.format(year)
+            ticket1 = Product.objects.create(
+                name=name,
+                description='A ticket',
+                price=1200,
+                category=tickets,
+                available_in=(
+                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                ),
+                slug='{}'.format(slugify(name)),
+                ticket_type=adult_full_week
+            )
+
+            name = 'Hacker ticket {}'.format(year)
+            ticket2 = Product.objects.create(
+                name=name,
+                description='Another ticket',
+                price=1337,
+                category=tickets,
+                available_in=(
+                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                ),
+                slug='{}'.format(slugify(name)),
+                ticket_type=adult_full_week
+            )
+
+            self.output('Creating orders...')
+            order0 = Order.objects.create(
+                user=user1,
+                payment_method='cash',
+                open=None,
+                paid=True
+            )
+            order0.orderproductrelation_set.create(
+                product=ticket1,
+                quantity=1,
+            )
+            order0.orderproductrelation_set.create(
+                product=tent1,
+                quantity=1,
+            )
+
+            order1 = Order.objects.create(
+                user=user2,
+                payment_method='cash',
+                open=None,
+            )
+            order1.orderproductrelation_set.create(
+                product=ticket1,
+                quantity=1,
+            )
+            order1.orderproductrelation_set.create(
+                product=tent2,
+                quantity=1,
+            )
+            order2 = Order.objects.create(
+                user=user3,
+                payment_method='cash',
+                open=None,
+            )
+            order2.orderproductrelation_set.create(
+                product=ticket2,
+                quantity=1,
+            )
+            order2.orderproductrelation_set.create(
+                product=ticket1,
+                quantity=1,
+            )
+            order2.orderproductrelation_set.create(
+                product=tent2,
+                quantity=1,
+            )
+            order3 = Order.objects.create(
+                user=user4,
+                payment_method='cash',
+                open=None,
+            )
+            order3.orderproductrelation_set.create(
+                product=product0,
+                quantity=1,
+            )
+            order3.orderproductrelation_set.create(
+                product=ticket2,
+                quantity=1,
+            )
+            order3.orderproductrelation_set.create(
+                product=tent1,
+                quantity=1,
+            )
 
             self.output('Creating eventlocations for {}...'.format(year))
             speakers_tent = EventLocation.objects.create(

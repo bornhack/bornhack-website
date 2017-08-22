@@ -8,6 +8,7 @@ from django.conf import settings
 from django.views.decorators.http import require_safe
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
@@ -304,4 +305,23 @@ class ScheduleView(CampViewMixin, TemplateView):
 class CallForSpeakersView(CampViewMixin, TemplateView):
     def get_template_names(self):
         return '%s_call_for_speakers.html' % self.camp.slug
+
+
+
+################## control center #############################################
+
+class ProgramControlCenter(CampViewMixin, TemplateView):
+    template_name = "control/index.html"
+
+    @method_decorator(staff_member_required)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        proposals = models.EventProposal.objects.filter(
+            camp=self.camp
+        ).select_related('user', 'event')
+        context['proposals'] = proposals
+        return context
 

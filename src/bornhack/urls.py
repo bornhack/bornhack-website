@@ -145,6 +145,9 @@ urlpatterns = [
                         r'^ics/', ICSView.as_view(), name="ics_view"
                     ),
                     url(
+                        r'^control/', ProgramControlCenter.as_view(), name="program_control_center"
+                    ),
+                    url(
                         r'^proposals/', include([
                             url(
                                 r'^$',
