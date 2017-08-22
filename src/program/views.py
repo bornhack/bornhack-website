@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
 from django.db.models import Q
+from django.template import Engine, Context
 
 import icalendar
 
@@ -323,5 +324,10 @@ class ProgramControlCenter(CampViewMixin, TemplateView):
             camp=self.camp
         ).select_related('user', 'event')
         context['proposals'] = proposals
-        return context
 
+        engine = Engine.get_default()
+        template = engine.get_template('control/proposal_overview.csv')
+        csv = template.render(Context(context))
+        context['csv'] = csv
+
+        return context
