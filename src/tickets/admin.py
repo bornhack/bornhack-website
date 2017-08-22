@@ -81,4 +81,4 @@ class ShopTicketAdmin(BaseTicketAdmin):
         'product',
     ]
 
-    search_fields = ['pk', 'order__id', 'name', 'email']
+    search_fields = ['uuid', 'order__id', 'order__user__email', 'name', 'email']
