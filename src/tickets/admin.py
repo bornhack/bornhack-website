@@ -46,6 +46,8 @@ class SponsorTicketAdmin(BaseTicketAdmin):
         'checked_in',
     ]
 
+    search_fields = ['name', 'email', 'sponsor__name']
+
 
 @admin.register(DiscountTicket)
 class DiscountTicketAdmin(BaseTicketAdmin):
@@ -69,3 +71,4 @@ class ShopTicketAdmin(BaseTicketAdmin):
         'checked_in',
     ]
 
+    search_fields = ['order__id', 'name', 'email']
