@@ -41,9 +41,9 @@ class SponsorTicketAdmin(BaseTicketAdmin):
     ]
 
     list_filter = [
+        'checked_in',
         'ticket_type',
         'sponsor',
-        'checked_in',
     ]
 
     search_fields = ['name', 'email', 'sponsor__name']
@@ -65,10 +65,10 @@ class ShopTicketAdmin(BaseTicketAdmin):
     ]
 
     list_filter = [
+        'checked_in',
         'ticket_type',
         'order',
         'product',
-        'checked_in',
     ]
 
     search_fields = ['order__id', 'name', 'email']
