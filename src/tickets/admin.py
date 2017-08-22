@@ -41,6 +41,7 @@ class SponsorTicketAdmin(BaseTicketAdmin):
     ]
 
     list_filter = [
+        'ticket_type__camp',
         'checked_in',
         'ticket_type',
         'sponsor',
@@ -56,8 +57,12 @@ class DiscountTicketAdmin(BaseTicketAdmin):
 
 @admin.register(ShopTicket)
 class ShopTicketAdmin(BaseTicketAdmin):
+    def user_email(self, obj):
+        return obj.order.user.email
+
     list_display = [
         'pk',
+        'user_email',
         'ticket_type',
         'order',
         'product',
@@ -72,4 +77,4 @@ class ShopTicketAdmin(BaseTicketAdmin):
         'product',
     ]
 
-    search_fields = ['order__id', 'name', 'email']
+    search_fields = ['pk', 'order__id', 'name', 'email']
