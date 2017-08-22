@@ -65,6 +65,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
     ]
 
     list_filter = [
+        'ticket_type__camp',
         'checked_in',
         'ticket_type',
         'order',
