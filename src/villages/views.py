@@ -32,6 +32,8 @@ class VillageCreateView(CampViewMixin, LoginRequiredMixin, EnsureWritableCampMix
         village = form.save(commit=False)
         village.contact = self.request.user
         village.camp = Camp.objects.get(slug=self.request.session['campslug'])
+        if not village.name:
+            village.name = "noname"
         village.save()
         return HttpResponseRedirect(village.get_absolute_url())
 
@@ -58,6 +60,12 @@ class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequired
     queryset = Village.objects.not_deleted()
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
+
+     def form_valid(self, form):
+        village = form.save(commit=False)
+        if not village.name:
+            village.name = "noname"
+        return HttpResponseRedirect(village.get_absolute_url())
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
