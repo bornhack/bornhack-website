@@ -31,6 +31,8 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
     ticket_type = models.ForeignKey('TicketType')
     checked_in = models.BooleanField(default=False)
 
+    badge_handed_out = models.BooleanField(default=False)
+
     class Meta:
         abstract = True
 
