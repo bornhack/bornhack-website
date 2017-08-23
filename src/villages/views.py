@@ -61,7 +61,7 @@ class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequired
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
 
-     def form_valid(self, form):
+    def form_valid(self, form):
         village = form.save(commit=False)
         if not village.name:
             village.name = "noname"
