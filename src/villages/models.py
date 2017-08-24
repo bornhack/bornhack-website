@@ -43,6 +43,8 @@ class Village(UUIDModel, CampRelatedModel):
             Village.objects.filter(slug=self.slug).count() > 1
         ):
             slug = slugify(self.name)
+            if not slug:
+                slug = "noname"
             incrementer = 1
 
             # We have to make sure that the slug won't clash with current slugs
