@@ -287,6 +287,10 @@ footer {
   border-bottom: 1px solid lightgrey;
 }
 
+body.bar-menu {
+  margin-top: 0px;
+}
+
 .bar-product .name {
   width: 900px;
 }

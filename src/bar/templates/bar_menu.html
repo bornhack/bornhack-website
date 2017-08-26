@@ -32,19 +32,25 @@
     <meta name="theme-color" content="#ffffff">
   </head>
 
-  <body>
+  <body class="bar-menu">
 
 {% block content %}
+    <h1 class="container">WIP - Work In Progress-Bar</h1>
+    <hr />
 
     <div class="bar-row container container-fluid">
+
+
           {% for category in categories %}
             <h1>{{ category.name }}</h1>
 
           {% for product in category.products.all %}
+            {% if product.in_stock %}
               <div class="bar-product">
-                  <h4 class="name">{{ product.name }}</h4>
-                  <h4 class="pull-right price">{{ product.price }} HAX</h4>
+                <h4 class="name">{{ product.name }}</h4>
+                <h4 class="pull-right price">{{ product.price }} HAX</h4>
               </div>
+            {% endif %}
           {% endfor %}
 
           {% endfor %}
