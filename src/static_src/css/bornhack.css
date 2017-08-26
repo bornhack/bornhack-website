@@ -289,6 +289,8 @@ footer {
 
 body.bar-menu {
   margin-top: 0px;
+  background-color: #000000;
+  color: #00ff00;
 }
 
 .bar-product .name {

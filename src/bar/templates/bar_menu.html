@@ -43,7 +43,7 @@
 
 
           {% for category in categories %}
-            <h3>{{ category.name }}</h3>
+          <h3><strong>{{ category.name }}</strong></h3>
 
           {% for product in category.products.all %}
             {% if product.in_stock %}
