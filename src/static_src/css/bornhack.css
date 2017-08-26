@@ -293,9 +293,11 @@ body.bar-menu {
 
 .bar-product .name {
   width: 900px;
+  font-size: 14pt;
 }
 
 .bar-product .price {
+  font-size: 14pt;
   width: 300px;
 }
 

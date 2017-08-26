@@ -43,13 +43,13 @@
 
 
           {% for category in categories %}
-            <h1>{{ category.name }}</h1>
+            <h3>{{ category.name }}</h3>
 
           {% for product in category.products.all %}
             {% if product.in_stock %}
               <div class="bar-product">
-                <h4 class="name">{{ product.name }}</h4>
-                <h4 class="pull-right price">{{ product.price }} HAX</h4>
+                <span class="name">{{ product.name }}</span>
+                <span class="pull-right price">{{ product.price }} HAX</span>
               </div>
             {% endif %}
           {% endfor %}
