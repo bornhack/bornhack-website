@@ -274,3 +274,25 @@ footer {
 .sponsor .caption {
   text-align: center;
 }
+
+.bar-row {
+  -moz-column-width: 300px;
+  -webkit-column-width: 300px;
+  column-width: 300px;
+}
+
+.bar-product {
+  display: flex;
+  justify-content: flex-start;
+  border-bottom: 1px solid lightgrey;
+}
+
+.bar-product .name {
+  width: 900px;
+}
+
+.bar-product .price {
+  width: 300px;
+}
+
+
