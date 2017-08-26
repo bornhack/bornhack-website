@@ -1,0 +1,54 @@
+{% load static from staticfiles %}
+{% load bootstrap3 %}
+{% load menubutton %}
+{% static "" as baseurl %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <title>{% block title %}BornHack{% endblock %}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- FontAwesome CSS -->
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
+
+    {% bootstrap_javascript jquery=1 %}
+
+    <!-- favicon.ico stuff -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+  </head>
+
+  <body>
+
+{% block content %}
+
+    <div class="bar-row container container-fluid">
+          {% for category in categories %}
+            <h1>{{ category.name }}</h1>
+
+          {% for product in category.products.all %}
+              <div class="bar-product">
+                  <h4 class="name">{{ product.name }}</h4>
+                  <h4 class="pull-right price">{{ product.price }} HAX</h4>
+              </div>
+          {% endfor %}
+
+          {% endfor %}
+    </div>
+{% endblock %}
+  </body>
+</html>

@@ -13,6 +13,7 @@ from sponsors.views import *
 from teams.views import *
 from people.views import *
 from tickets.views import ShopTicketListView
+from bar.views import MenuView
 
 urlpatterns = [
     url(
@@ -261,6 +262,12 @@ urlpatterns = [
                 r'^sponsors/$',
                 SponsorsView.as_view(),
                 name='sponsors'
+            ),
+
+            url(
+                r'^bar/menu$',
+                MenuView.as_view(),
+                name='menu'
             ),
 
             url(

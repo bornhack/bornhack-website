@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'teams',
     'people',
     'tickets',
+    'bar',
 
     'allauth',
     'allauth.account',
