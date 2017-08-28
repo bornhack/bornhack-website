@@ -61,6 +61,27 @@ Is this for local development? Bootstrap the database with dummy data and users:
     (venv) $ src/manage.py bootstrap-devsite
 ```
 
+### Add a camp
+
+Add a new camp by running:
+
+```
+    (venv) $ src/manage.py createcamp {camp-slug}
+```
+
+Then go to the admin interface to edit the camp details, adding the same slug
+that you just used and some current dates.
+
+You can also specify details like:
+
+* A sponsors page, `{camp-slug}_sponsors.html`, to `sponsors/templates`.
+* A frontpage, `{camp-slug}_camp_detail.html`, to `camps/templates`.
+* A call for speakers page, `{camp-slug}_call_for_speakers.html`, to `program/templates`.
+* A `static_src/img/{camp-slug}/logo` and add two logos:
+    * `{camp-slug}-logo-large.png`
+    * `{camp-slug}-logo-small.png`
+
+
 ### Done
 Is this for local development? Start the Django devserver:
 ```
@@ -72,23 +93,6 @@ Otherwise start uwsgi or similar to serve the application.
 Enjoy!
 
 ## Notes
-
-### How to add a camp
-
-Add a new camp in the admin interface and run
-
-```
-    (venv) $ src/manage.py createcamp {camp-slug}
-```
-or go through the manuel process below:
-
-* Add a new camp in the admin interface.
-* Add a sponsers page, `{camp-slug}_sponsors.html`, to `sponsors/templates`.
-* Add a frontpage, `{camp-slug}_camp_detail.html`, to `camps/templates`.
-* Add a call for speakers page, `{camp-slug}_call_for_speakers.html`, to `program/templates`.
-* Create `static_src/img/{camp-slug}/logo` and add two logos:
-    * `{camp-slug}-logo-large.png`
-    * `{camp-slug}-logo-small.png`
 
 ### multicamp prod migration notes
 
