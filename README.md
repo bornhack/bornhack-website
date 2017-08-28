@@ -35,30 +35,33 @@ Install system dependencies (method depends on OS):
 ### Python packages
 Install pip packages:
 ```
-    (venv) $ pip install -r requirements.txt
+    (venv) $ pip install -r src/requirements.txt
 ```
 
 ### Configuration file
 Copy environment settings file and change settings as needed:
 ```
-    (venv) $ cp bornhack/environment_settings.py.dist bornhack/environment_settings.py
+    (venv) $ cp src/bornhack/environment_settings.py.dist src/bornhack/environment_settings.py
 ```
+
+Edit the configuration file, replacing all the ``{{ placeholder }}`` patterns
+(intended for Ansible).
 
 ### Database
 Is this a new installation? Initialize the database:
 ```
-    (venv) $ ./manage.py migrate
+    (venv) $ src/manage.py migrate
 ```
 
 Is this for local development? Bootstrap the database with dummy data and users:
 ```
-    (venv) $ ./manage.py bootstrap-devsite
+    (venv) $ src/manage.py bootstrap-devsite
 ```
 
 ### Done
 Is this for local development? Start the Django devserver:
 ```
-    (venv) $ ./manage.py runserver
+    (venv) $ src/manage.py runserver
 ```
 
 Otherwise start uwsgi or similar to serve the application.
@@ -69,10 +72,10 @@ Enjoy!
 
 ### How to add a camp
 
-Add a new camp in the admin interface and run `
+Add a new camp in the admin interface and run
 
 ```
-    (venv) $ ./manage.py createcamp {camp-slug}
+    (venv) $ src/manage.py createcamp {camp-slug}
 ```
 or go through the manuel process below:
 
