@@ -61,6 +61,27 @@ Is this for local development? Bootstrap the database with dummy data and users:
     (venv) $ src/manage.py bootstrap-devsite
 ```
 
+### Deploy camps+program test data
+
+Run this command to create a bunch of nice test data:
+
+```
+    (venv) $ src/manage.py bootstrap-devsite
+```
+
+
+### Done
+Is this for local development? Start the Django devserver:
+```
+    (venv) $ src/manage.py runserver
+```
+
+Otherwise start uwsgi or similar to serve the application.
+
+Enjoy!
+
+## Notes
+
 ### Add a camp
 
 Add a new camp by running:
@@ -80,19 +101,6 @@ You can also specify details like:
 * A `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
-
-
-### Done
-Is this for local development? Start the Django devserver:
-```
-    (venv) $ src/manage.py runserver
-```
-
-Otherwise start uwsgi or similar to serve the application.
-
-Enjoy!
-
-## Notes
 
 ### multicamp prod migration notes
 
