@@ -9,6 +9,9 @@ Clone with --recursive to include submodules:
 
     git clone --recursive https://github.com/bornhack/bornhack-website
 
+If you already cloned the repository, you can add the submodules like this:
+
+    git submodule update --init --recursive
 
 ### Virtualenv
 Create a Python 3 virtual environment and activate it:
