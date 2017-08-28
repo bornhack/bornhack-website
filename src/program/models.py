@@ -215,6 +215,16 @@ class SpeakerProposal(UserSubmittedModel):
         self.save()
 
 
+def pdf_only(value):
+    if value.file.content_type != 'application/pdf':
+        raise ValidationError('Must be a PDF')
+
+
+def slide_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'slides/{0}/{1}'.format(instance.camp.slug, filename)
+
+
 class EventProposal(UserSubmittedModel):
     """ An event proposal """
 
@@ -251,6 +261,14 @@ class EventProposal(UserSubmittedModel):
     submission_notes = models.TextField(
         help_text='Private notes for this event. Only visible to the submitting user and the BornHack organisers.',
         blank=True
+    )
+    
+    slides = models.FileField(
+        validators=[pdf_only],
+        blank=True,
+        null=False,
+        upload_to=slide_path,
+        help_text="Upload your slides (PDF files only)",
     )
 
     @property
