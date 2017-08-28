@@ -13,7 +13,7 @@ Clone with --recursive to include submodules:
 ### Virtualenv
 Create a Python 3 virtual environment and activate it:
 ```
-$ virtualenv venv
+$ virtualenv venv -p python3
 $ source venv/bin/activate
 ```
 
