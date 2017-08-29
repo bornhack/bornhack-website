@@ -22,6 +22,8 @@ from django.apps import apps
 from django.core.files.base import ContentFile
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
+from django.template.defaultfilters import filesizeformat
+import mimetypes
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -216,12 +218,25 @@ class SpeakerProposal(UserSubmittedModel):
 
 
 def pdf_only(value):
-    if value.file.content_type != 'application/pdf':
+    if not value:
+        return
+    max_size = 1024 * 1024 * 5
+    if value.file.size > max_size:
+        raise ValidationError(
+            'This file size is too damn high, max: {}'.format(
+                filesizeformat(max_size)))
+    # This is set if it's an uploaded file
+    is_pdf = (
+        mimetypes.guess_type(value.file.name) == 'application/pdf' or
+        value.file.name.lower().endswith(".pdf")
+    )
+    if not is_pdf:
         raise ValidationError('Must be a PDF')
 
 
 def slide_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    filename = filename.lower()
     return 'slides/{0}/{1}'.format(instance.camp.slug, filename)
 
 
@@ -266,7 +281,7 @@ class EventProposal(UserSubmittedModel):
     slides = models.FileField(
         validators=[pdf_only],
         blank=True,
-        null=False,
+        null=True,
         upload_to=slide_path,
         help_text="Upload your slides (PDF files only)",
     )
@@ -282,13 +297,17 @@ class EventProposal(UserSubmittedModel):
         )
 
     def mark_as_approved(self):
-        eventmodel = apps.get_model('program', 'event')
-        eventproposalmodel = apps.get_model('program', 'eventproposal')
-        event = eventmodel()
+        EventModel = apps.get_model('program', 'event')
+        EventProposalModel = apps.get_model('program', 'eventproposal')
+        if self.pk and EventModel.objects.filter(proposal=self).exists():
+            event = EventModel.objects.get(proposal=self)
+        else:
+            event = EventModel()
         event.camp = self.camp
         event.title = self.title
         event.abstract = self.abstract
         event.event_type = self.event_type
+        event.slides = self.slides
         event.proposal = self
         event.video_recording = self.allow_video_recording
         event.save()
@@ -300,7 +319,7 @@ class EventProposal(UserSubmittedModel):
                 event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
-        self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
+        self.proposal_status = EventProposalModel.PROPOSAL_APPROVED
         self.save()
 
 ###############################################################################
@@ -432,6 +451,14 @@ class Event(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The event proposal object this event was created from',
+    )
+
+    slides = models.FileField(
+        validators=[pdf_only],
+        blank=True,
+        null=True,
+        upload_to=slide_path,
+        help_text="Upload your slides (PDF files only)",
     )
 
     class Meta:

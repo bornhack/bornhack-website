@@ -48,6 +48,7 @@ class EventProposalAdmin(admin.ModelAdmin):
 
     actions = ['mark_eventproposal_as_approved']
     list_filter = ('camp', 'proposal_status', 'user')
+    list_display = ('title', 'proposal_status', 'user')
 
 
 @admin.register(EventLocation)
