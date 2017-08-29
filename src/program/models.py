@@ -474,6 +474,10 @@ class Event(CampRelatedModel):
         super(Event, self).save(**kwargs)
 
     @property
+    def slides_filename(self):
+        return os.path.split(self.slides.name)[-1] if self.slides else ""
+
+    @property
     def speakers_list(self):
         if self.speakers.exists():
             return ", ".join(self.speakers.all().values_list('name', flat=True))
@@ -556,6 +560,8 @@ class EventInstance(CampRelatedModel):
         """
             Find the number of timeslots this eventinstance takes up
         """
+        if not self.when:
+            return 0
         seconds = (self.when.upper-self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
@@ -574,8 +580,8 @@ class EventInstance(CampRelatedModel):
             'title': self.event.title,
             'slug': self.event.slug + '-' + str(self.id),
             'event_slug': self.event.slug,
-            'from': self.when.lower.astimezone().isoformat(),
-            'to': self.when.upper.astimezone().isoformat(),
+            'from': self.when.lower.astimezone().isoformat() if self.when else None,
+            'to': self.when.upper.astimezone().isoformat() if self.when else None,
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'bg-color': self.event.event_type.color,

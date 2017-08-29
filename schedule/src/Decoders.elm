@@ -59,6 +59,8 @@ eventDecoder =
         |> required "speaker_slugs" (list string)
         |> required "video_state" string
         |> optional "video_url" (nullable string) Nothing
+        |> optional "slides_url" (nullable string) Nothing
+        |> required "slides_filename" string
         |> required "event_type" string
 
 
@@ -91,6 +93,8 @@ eventInstanceDecoder =
         |> required "location_icon" string
         |> required "video_state" string
         |> optional "video_url" (nullable string) Nothing
+        |> optional "slides_url" (nullable string) Nothing
+        |> required "slides_filename" string
         |> optional "is_favorited" (nullable bool) Nothing
 
 
