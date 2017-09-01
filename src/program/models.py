@@ -518,6 +518,7 @@ class EventInstance(CampRelatedModel):
     def get_ics_event(self):
         ievent = icalendar.Event()
         ievent['summary'] = self.event.title
+        ievent['description'] = self.event.abstract
         ievent['dtstart'] = icalendar.vDatetime(self.when.lower).to_ical()
         ievent['dtend'] = icalendar.vDatetime(self.when.upper).to_ical()
         ievent['location'] = icalendar.vText(self.location.name)
