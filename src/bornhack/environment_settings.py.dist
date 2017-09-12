@@ -20,7 +20,7 @@ DEBUG={{ django_debug }}
 # the path to the wkhtmltopdf binary
 WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
 
-# set BACKEND to "asgiref.inmemory.ChannelLayer" and CONFIG to "" for local development
+# set BACKEND to "asgiref.inmemory.ChannelLayer" and CONFIG to {} for local development
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "{{ django_channels_backend }}",
