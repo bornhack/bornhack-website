@@ -41,8 +41,13 @@ class CustomOrder(CreatedUpdatedModel):
 
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
-        help_text=_('Whether this custom order has been paid.'),
+        help_text=_('Check when this custom order has been paid (or if it gets cancelled out by a Credit Note)'),
         default=False,
+    )
+
+    danish_vat = models.BooleanField(
+        help_text="Danish VAT?",
+        default=True
     )
 
     def __str__(self):
@@ -50,7 +55,10 @@ class CustomOrder(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return Decimal(round(self.amount*Decimal(0.2), 2))
+        if self.danish_vat:
+            return Decimal(round(self.amount*Decimal(0.2), 2))
+        else:
+            return 0
 
 
 class Order(CreatedUpdatedModel):
