@@ -57,13 +57,18 @@ class TicketInline(admin.TabularInline):
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_order_form.html'
-    readonly_fields = ('paid',)
+    readonly_fields = (
+        'paid',
+        'created',
+        'updated',
+    )
 
     def get_email(self, obj):
         return obj.user.email
 
     list_display = [
         'id',
+        'created',
         'user',
         'get_email',
         'total',
