@@ -69,6 +69,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = [
         'id',
         'created',
+        'updated',
         'user',
         'get_email',
         'total',
