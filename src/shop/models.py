@@ -444,7 +444,7 @@ class CreditNote(CreatedUpdatedModel):
                 self.user.email,
             )
         else:
-            return 'creditnoote#%s - %s DKK (customer: user %s)' % (
+            return 'creditnoote#%s - %s DKK (customer: %s)' % (
                 self.id,
                 self.amount,
                 self.customer,
