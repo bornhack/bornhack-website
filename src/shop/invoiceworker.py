@@ -87,8 +87,8 @@ def do_work():
         creditnote.pdf.save(creditnote.filename, File(pdffile))
         creditnote.save()
 
-    # check if we need to send out any creditnotes (only where pdf has been generated)
-    for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf=''):
+    # check if we need to send out any creditnotes (only where pdf has been generated and only for creditnotes linked to a user)
+    for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf='').exclude(user=None):
         # send the email
         if add_creditnote_email(creditnote=creditnote):
             logger.info('OK: Creditnote email to %s added' % creditnote.user.email)
