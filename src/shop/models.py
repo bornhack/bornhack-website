@@ -410,6 +410,11 @@ class CreditNote(CreatedUpdatedModel):
         default='',
     )
 
+    danish_vat = models.BooleanField(
+        help_text="Danish VAT?",
+        default=True
+    )
+
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
         help_text=_('Whether the amount in this creditnote has been paid back to the customer.'),
@@ -447,7 +452,10 @@ class CreditNote(CreatedUpdatedModel):
 
     @property
     def vat(self):
-        return Decimal(self.amount*Decimal(0.2))
+        if self.danish_vat:
+            return Decimal(round(self.amount*Decimal(0.2), 2))
+        else:
+            return 0
 
     @property
     def filename(self):

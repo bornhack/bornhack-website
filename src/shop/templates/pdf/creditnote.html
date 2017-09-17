@@ -30,7 +30,11 @@
 
   <tr>
     <td align="right">
+      {% if creditnote.danish_vat %}
       <strong>Danish VAT (25%)</strong>
+      {% else %}
+      <strong>No VAT</strong>
+      {% endif %}
     <td align="right">
       {{ creditnote.vat|currency }}
 
