@@ -380,33 +380,70 @@ class CreditNote(CreatedUpdatedModel):
     class Meta:
         ordering = ['-created']
 
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    text = models.TextField()
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    text = models.TextField(
+        help_text="Description of what this credit note covers"
+    )
+
     pdf = models.FileField(
         null=True,
         blank=True,
         upload_to='creditnotes/'
     )
+
     user = models.ForeignKey(
         'auth.User',
         verbose_name=_('User'),
-        help_text=_('The user this credit note belongs to.'),
+        help_text=_('The user this credit note belongs to, if any.'),
         related_name='creditnotes',
+        null=True,
+        blank=True
     )
+
+    customer = models.TextField(
+        help_text="Customer info if no user is selected",
+        blank=True,
+        default='',
+    )
+
     paid = models.BooleanField(
         verbose_name=_('Paid?'),
         help_text=_('Whether the amount in this creditnote has been paid back to the customer.'),
         default=False,
     )
+
     sent_to_customer = models.BooleanField(default=False)
 
+    def clean(self):
+        errors = []
+        if self.user and self.customer:
+            msg = "Customer info should be blank if a user is selected."
+            errors.append(ValidationError({'user', msg}))
+            errors.append(ValidationError({'customer', msg}))
+        if not self.user and not self.customer:
+            msg = "Either pick a user or fill in Customer info"
+            errors.append(ValidationError({'user', msg}))
+            errors.append(ValidationError({'customer', msg}))
+        if errors:
+            raise ValidationError(errors)
+
     def __str__(self):
-        return 'creditnote#%s - %s DKK (sent to %s: %s)' % (
-            self.id,
-            self.amount,
-            self.user.email,
-            self.sent_to_customer,
-        )
+        if self.user:
+            return 'creditnoote#%s - %s DKK (customer: user %s)' % (
+                self.id,
+                self.amount,
+                self.user.email,
+            )
+        else:
+            return 'creditnoote#%s - %s DKK (customer: user %s)' % (
+                self.id,
+                self.amount,
+                self.customer,
+            )
 
     @property
     def vat(self):
