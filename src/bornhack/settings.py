@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'people',
     'tickets',
     'bar',
+    'backoffice',
 
     'allauth',
     'allauth.account',
