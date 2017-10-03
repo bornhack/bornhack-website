@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+<div class="row">
+  <h2>Infodesk Backoffice</h2>
+  <div class="lead">
+      Orders with one or more Products that are not handed out
+  </div>
+</div>
+<div class="row">
+    <table class="table table-hover">
+      <tr>
+          <th>Order</th>
+          <th>User</th>
+          <th>OPR Id</th>
+          <th>Product</th>
+          <th>Quantity</th>
+          <th>Handed Out?</th>
+       </tr>
+      {% for order in order_list %}
+      {% for productrel in order.orderproductrelation_set.all %}
+      <tr>
+          <td><a href="/admin/shop/order/{{ order.id }}/change/">Order #{{ order.id }}</a></td>
+          <td>{{ order.user }}</td>
+          <td>{{ productrel.id }}</td>
+          <td>{{ productrel.product.name }}</td>
+          <td>{{ productrel.quantity }}</td>
+          <td>{{ productrel.handed_out }}</td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+    </table>
+</div>
+{% endblock content %}
+
+

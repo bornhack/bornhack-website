@@ -114,6 +114,11 @@ urlpatterns = [
         name='people',
     ),
 
+    url(
+        r'^backoffice/',
+        include('backoffice.urls', namespace='backoffice')
+    ),
+
     # camp specific urls below here
 
     url(

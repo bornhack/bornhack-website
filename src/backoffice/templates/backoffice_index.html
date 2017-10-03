@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+<div class="row">
+  <div class="lead">
+    Please select your desired action below.
+  </div>
+</div>
+<div class="row">
+    <p>
+        <ul>
+            <li><a href="{% url 'backoffice:infodesk_index' %}">Infodesk</a></li>
+        </ul>
+    </p>
+</div>
+{% endblock content %}
+
+
