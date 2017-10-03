@@ -97,7 +97,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def mark_order_as_paid(self, request, queryset):
         for order in queryset.filter(paid=False):
-            order.mark_as_paid()
+            order.mark_as_paid(request)
     mark_order_as_paid.description = 'Mark order(s) as paid'
 
     def mark_order_as_refunded(self, request, queryset):

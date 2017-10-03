@@ -185,11 +185,13 @@ class Order(CreatedUpdatedModel):
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
-    def mark_as_paid(self):
+    def mark_as_paid(self, request):
         self.paid = True
         self.open = None
         for order_product in self.orderproductrelation_set.all():
-            if order_product.product.category.name == "Tickets":
+            # if this is a Ticket product?
+            if order_product.product.ticket_type:
+                # create the number of tickets required
                 for _ in range(0, order_product.quantity):
                     ticket = ShopTicket(
                         ticket_type=order_product.product.ticket_type,
@@ -197,6 +199,10 @@ class Order(CreatedUpdatedModel):
                         product=order_product.product,
                     )
                     ticket.save()
+                messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
+                # and mark the OPR as handed_out=True
+                order_product.handed_out=True
+                order_product.save()
         self.save()
 
     def mark_as_refunded(self, request):
