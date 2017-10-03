@@ -29,7 +29,6 @@ from shop.models import (
     EpayPayment,
     CoinifyAPIInvoice,
     CoinifyAPICallback,
-    Ticket,
     CreditNote,
 )
 from .forms import AddToOrderForm

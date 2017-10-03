@@ -49,11 +49,6 @@ class ProductInline(admin.TabularInline):
     model = models.OrderProductRelation
 
 
-class TicketInline(admin.TabularInline):
-    model = models.Ticket
-    exclude = ['qrcode_base64']
-
-
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_order_form.html'
@@ -91,7 +86,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     exclude = ['products']
 
-    inlines = [ProductInline, TicketInline]
+    inlines = [ProductInline]
 
     actions = ['mark_order_as_paid', 'mark_order_as_refunded']
 
@@ -108,25 +103,4 @@ class OrderAdmin(admin.ModelAdmin):
 
 def get_user_email(obj):
     return obj.order.user.email
-
-
-@admin.register(models.Ticket)
-class TicketModelAdmin(admin.ModelAdmin):
-    list_display = [
-        'order',
-        'product',
-        'name',
-        'email',
-        get_user_email,
-        'get_token',
-        'checked_in'
-    ]
-
-    list_filter = ['product', 'checked_in']
-
-    actions = ['mark_as_arrived']
-
-    def mark_as_arrived(self, request, queryset):
-        queryset.update(checked_in=True)
-
 

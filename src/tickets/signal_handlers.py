@@ -15,8 +15,8 @@ def ticket_created(sender, instance, created, **kwargs):
     target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
 
     # get ticket stats, FIXME: Camp name is hardcoded here for now
-    from shop.models import Ticket
-    stats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in Ticket.objects.filter(product__name__startswith="BornHack 2017").exclude(product__name__startswith="BornHack 2017 One Day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
+    from tickets.models import ShopTicket
+    stats = ", ".join(["%s: %s" % (tickettype['product__name'].replace("BornHack 2017 ", ""), tickettype['total']) for tickettype in ShopTicket.objects.filter(product__name__startswith="BornHack 2017").exclude(product__name__startswith="BornHack 2017 One Day").values('product__name').annotate(total=Count('product__name')).order_by('-total')])
 
     onedaystats = Ticket.objects.filter(product__name__startswith="BornHack 2017 One Day Ticket").count()
     onedaychildstats = Ticket.objects.filter(product__name__startswith="BornHack 2017 One Day Children").count()
