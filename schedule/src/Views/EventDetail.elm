@@ -110,6 +110,18 @@ eventDetailSidebar event model =
                         ]
                     ]
 
+        slideshowLink =
+            case event.slidesUrl of
+                Nothing ->
+                    []
+
+                Just url ->
+                    [ a [ href url, classList [ ( "btn", True ), ( "btn-success", True ) ] ]
+                        [ i [ classList [ ( "fa", True ), ( "fa-film", True ) ] ] []
+                        , text "Download slides"
+                        ]
+                    ]
+
         eventInstances =
             List.filter (\instance -> instance.eventSlug == event.slug) model.eventInstances
 
@@ -121,7 +133,7 @@ eventDetailSidebar event model =
                 [ ( "col-sm-3", True )
                 ]
             ]
-            (videoRecordingLink
+            (videoRecordingLink ++ slideshowLink
                 ++ [ speakerSidebar speakers
                    , eventMetaDataSidebar event
                    , eventInstancesSidebar eventInstances
@@ -154,6 +166,13 @@ eventMetaDataSidebar event =
 
                             False ->
                                 []
+                       )
+                    ++ (case event.slidesUrl of
+                            Nothing ->
+                                []
+
+                            Just url ->
+                                [ li [] [ strong [] [ text "Recording: " ], a [ href url ] [ text event.slidesFilename ] ] ]
                        )
                 )
             ]

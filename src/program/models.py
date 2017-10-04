@@ -22,6 +22,8 @@ from django.apps import apps
 from django.core.files.base import ContentFile
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
+from django.template.defaultfilters import filesizeformat
+import mimetypes
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -215,6 +217,29 @@ class SpeakerProposal(UserSubmittedModel):
         self.save()
 
 
+def pdf_only(value):
+    if not value:
+        return
+    max_size = 1024 * 1024 * 5
+    if value.file.size > max_size:
+        raise ValidationError(
+            'This file size is too damn high, max: {}'.format(
+                filesizeformat(max_size)))
+    # This is set if it's an uploaded file
+    is_pdf = (
+        mimetypes.guess_type(value.file.name) == 'application/pdf' or
+        value.file.name.lower().endswith(".pdf")
+    )
+    if not is_pdf:
+        raise ValidationError('Must be a PDF')
+
+
+def slide_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    filename = filename.lower()
+    return 'slides/{0}/{1}'.format(instance.camp.slug, filename)
+
+
 class EventProposal(UserSubmittedModel):
     """ An event proposal """
 
@@ -252,6 +277,14 @@ class EventProposal(UserSubmittedModel):
         help_text='Private notes for this event. Only visible to the submitting user and the BornHack organisers.',
         blank=True
     )
+    
+    slides = models.FileField(
+        validators=[pdf_only],
+        blank=True,
+        null=True,
+        upload_to=slide_path,
+        help_text="Upload your slides (PDF files only)",
+    )
 
     @property
     def headline(self):
@@ -264,13 +297,17 @@ class EventProposal(UserSubmittedModel):
         )
 
     def mark_as_approved(self):
-        eventmodel = apps.get_model('program', 'event')
-        eventproposalmodel = apps.get_model('program', 'eventproposal')
-        event = eventmodel()
+        EventModel = apps.get_model('program', 'event')
+        EventProposalModel = apps.get_model('program', 'eventproposal')
+        if self.pk and EventModel.objects.filter(proposal=self).exists():
+            event = EventModel.objects.get(proposal=self)
+        else:
+            event = EventModel()
         event.camp = self.camp
         event.title = self.title
         event.abstract = self.abstract
         event.event_type = self.event_type
+        event.slides = self.slides
         event.proposal = self
         event.video_recording = self.allow_video_recording
         event.save()
@@ -282,7 +319,7 @@ class EventProposal(UserSubmittedModel):
                 event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
-        self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
+        self.proposal_status = EventProposalModel.PROPOSAL_APPROVED
         self.save()
 
 ###############################################################################
@@ -416,6 +453,14 @@ class Event(CampRelatedModel):
         help_text='The event proposal object this event was created from',
     )
 
+    slides = models.FileField(
+        validators=[pdf_only],
+        blank=True,
+        null=True,
+        upload_to=slide_path,
+        help_text="Upload your slides (PDF files only)",
+    )
+
     class Meta:
         ordering = ['title']
         unique_together = (('camp', 'slug'), ('camp', 'title'))
@@ -427,6 +472,10 @@ class Event(CampRelatedModel):
         if not self.slug:
             self.slug = slugify(self.title)
         super(Event, self).save(**kwargs)
+
+    @property
+    def slides_filename(self):
+        return os.path.split(self.slides.name)[-1] if self.slides else ""
 
     @property
     def speakers_list(self):
@@ -511,6 +560,8 @@ class EventInstance(CampRelatedModel):
         """
             Find the number of timeslots this eventinstance takes up
         """
+        if not self.when:
+            return 0
         seconds = (self.when.upper-self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
@@ -529,8 +580,8 @@ class EventInstance(CampRelatedModel):
             'title': self.event.title,
             'slug': self.event.slug + '-' + str(self.id),
             'event_slug': self.event.slug,
-            'from': self.when.lower.astimezone().isoformat(),
-            'to': self.when.upper.astimezone().isoformat(),
+            'from': self.when.lower.astimezone().isoformat() if self.when else None,
+            'to': self.when.upper.astimezone().isoformat() if self.when else None,
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'bg-color': self.event.event_type.color,

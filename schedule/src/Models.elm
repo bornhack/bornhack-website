@@ -90,6 +90,8 @@ type alias EventInstance =
     , locationIcon : String
     , videoState : String
     , videoUrl : Maybe String
+    , slidesUrl : Maybe String
+    , slidesFilename : String
     , isFavorited : Maybe Bool
     }
 
@@ -101,6 +103,8 @@ type alias Event =
     , speakerSlugs : List SpeakerSlug
     , videoState : String
     , videoUrl : Maybe String
+    , slidesUrl : Maybe String
+    , slidesFilename : String
     , eventType : String
     }
 
