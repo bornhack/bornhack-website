@@ -31,7 +31,9 @@ People | {{ block.super }}
                   {{ team.name }} Team
               </td>
               <td>
-                {% if team.approvedmembers.count == team.anoncount %}
+                {% if team.anoncount == 0 and team.approvedmembers.count == 0 %}
+                <b>No team member(s)
+                {% elif team.approvedmembers.count == team.anoncount %}
                 <b>{{ team.anoncount }}</b> anonymous member(s)
                 {% endif %}
 
