@@ -16,8 +16,6 @@ This will create everything. You can now start the project running:
 
 ### Manual way
 
-
-
 #### Clone the repo
 Clone with --recursive to include submodules:
 
@@ -49,13 +47,13 @@ Install system dependencies (method depends on OS):
   - Debian: ?
   - FreeBSD: x11-fonts/webfonts
 
-### Python packages
+#### Python packages
 Install pip packages:
 ```
     (venv) $ pip install -r src/requirements.txt
 ```
 
-### Configuration file
+#### Configuration file
 Copy environment settings file and change settings as needed:
 ```
     (venv) $ cp src/bornhack/environment_settings.py.dist src/bornhack/environment_settings.py
@@ -64,7 +62,7 @@ Copy environment settings file and change settings as needed:
 Edit the configuration file, replacing all the ``{{ placeholder }}`` patterns
 (intended for Ansible).
 
-### Database
+#### Database
 Is this a new installation? Initialize the database:
 ```
     (venv) $ src/manage.py migrate
@@ -75,7 +73,7 @@ Is this for local development? Bootstrap the database with dummy data and users:
     (venv) $ src/manage.py bootstrap-devsite
 ```
 
-### Deploy camps+program test data
+#### Deploy camps+program test data
 
 Run this command to create a bunch of nice test data:
 
@@ -84,7 +82,7 @@ Run this command to create a bunch of nice test data:
 ```
 
 
-### Done
+#### Done
 Is this for local development? Start the Django devserver:
 ```
     (venv) $ src/manage.py runserver
