@@ -4,7 +4,17 @@ Django project to power Bornhack. Features include news, villages, webshop, and 
 
 ## Quickstart
 
-### Clone the repo
+### Using docker-compose
+
+If you have docker-compose you can use the included make file. Like so:
+
+    $ make
+
+### Manual way
+
+
+
+#### Clone the repo
 Clone with --recursive to include submodules:
 
     git clone --recursive https://github.com/bornhack/bornhack-website
@@ -13,14 +23,14 @@ If you already cloned the repository, you can add the submodules like this:
 
     git submodule update --init --recursive
 
-### Virtualenv
+#### Virtualenv
 Create a Python 3 virtual environment and activate it:
 ```
 $ virtualenv venv -p python3
 $ source venv/bin/activate
 ```
 
-### System libraries
+#### System libraries
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev

@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+        POSTGRES_PASSWORD: bornhack
+        POSTGRES_USER: bornhack
+        POSTGRES_DB: bornhack
+  web:
+    build: .
+    command: python3 src/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
