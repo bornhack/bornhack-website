@@ -1,4 +1,7 @@
-all: build db_up sleep migrate bootstrap web_up
+all: copy_environment_settings build db_up sleep migrate bootstrap web_up
+
+copy_environment_settings:
+	cp src/bornhack/dev_environment_settings.py src/bornhack/environment_settings.py
 
 build:
 	docker-compose build
