@@ -10,6 +10,10 @@ If you have docker-compose you can use the included make file. Like so:
 
     $ make
 
+This will create everything. You can now start the project running:
+
+    $ make run
+
 ### Manual way
 
 
