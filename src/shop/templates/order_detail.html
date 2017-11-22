@@ -68,7 +68,7 @@
 
             {% if not order.open == None %}
               <h4>Comment:</h4>
-              <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments here..." value="{{ order.customer_comment }}"></p>
+              <input type="text" class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments or shipping address here..." value="{{ order.customer_comment }}"></p>
             {% elif order.open == None and order.comment %}
               <div class="alert alert-info">{{ order.comment }}</div>
             {% endif %}
@@ -97,7 +97,7 @@
             <form method="POST" class="form-inline">
               {% csrf_token %}
                 <div class="checkbox" style="margin-top: -10px;">
-                  <label><input type="checkbox" name="accept_terms"> I accept the <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. I understand that merchandise will be available for pickup at the venue during BornHack 2017. Finally I accept to adhere to our <a href="{% url 'conduct' %}">Code of Conduct</a> during events as well as in BornHack online channels.</label>
+                  <label><input type="checkbox" name="accept_terms"> I accept the <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>. Finally I accept to adhere to our <a href="{% url 'conduct' %}">Code of Conduct</a> during events as well as in BornHack online channels.</label>
                 </div>
                 <div class="btn-group btn-group-justified">
                   <div class="btn-group">
