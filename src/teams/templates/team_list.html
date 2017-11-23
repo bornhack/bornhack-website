@@ -22,6 +22,7 @@ Teams | {{ block.super }}
     <th>Description</th>
     <th>Responsible</th>
     <th class="text-center">Members</th>
+    <th class="text-center">Tasks</th>
     {% if request.user.is_authenticated %}
     <th>Member?</th>
     <th>Actions</th>
@@ -32,7 +33,7 @@ Teams | {{ block.super }}
     {% for team in teams %}
     <tr>
       <td>
-        <a href="{% url 'team_detail' camp_slug=camp.slug slug=team.slug %}">
+        <a href="{% url 'teams:detail' camp_slug=camp.slug slug=team.slug %}">
           {{ team.name }} Team
         </a>
       </td>
@@ -51,6 +52,10 @@ Teams | {{ block.super }}
           {% if team.needs_members %}(more needed){% endif %}
       </td>
 
+      <td class="text-center">
+          <span class="badge">{{ team.tasks.count }}</span><br>
+      </td>
+
       {% if request.user.is_authenticated %}
       <td class="text-center">
         {% membershipstatus request.user team as membership_status %}
@@ -67,15 +72,15 @@ Teams | {{ block.super }}
 
       <td>
       {% if request.user in team.members.all %}
-          <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
+          <a href="{% url 'teams:leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
             {% if team.needs_members %}
-              <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
+              <a href="{% url 'teams:join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
             {% endif %}
         {% endif %}
 
         {% if request.user in team.responsible.all %}
-          <a href="{% url 'team_manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
+          <a href="{% url 'teams:manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
         {% endif %}
       {% endif %}
       </td>

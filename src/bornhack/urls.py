@@ -297,6 +297,7 @@ urlpatterns = [
                         VillageUpdateView.as_view(),
                         name='village_update'
                     ),
+                    # this has to be the last url in the list
                     url(
                         r'(?P<slug>[-_\w+]+)/$',
                         VillageDetailView.as_view(),
@@ -306,45 +307,11 @@ urlpatterns = [
             ),
 
             url(
-                r'^teams/', include([
-                    url(
-                        r'^$',
-                        TeamListView.as_view(),
-                        name='team_list'
-                    ),
-                    url(
-                        r'^members/(?P<pk>[0-9]+)/remove/$',
-                        TeamMemberRemoveView.as_view(),
-                        name='teammember_remove',
-                    ),
-                    url(
-                        r'^members/(?P<pk>[0-9]+)/approve/$',
-                        TeamMemberApproveView.as_view(),
-                        name='teammember_approve',
-                    ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/join/$',
-                        TeamJoinView.as_view(),
-                        name='team_join'
-                    ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/leave/$',
-                        TeamLeaveView.as_view(),
-                        name='team_leave'
-                    ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/manage/$',
-                        TeamManageView.as_view(),
-                        name='team_manage'
-                    ),
-                    # this has to be the last url in the list
-                    url(
-                        r'(?P<slug>[-_\w+]+)/$',
-                        TeamDetailView.as_view(),
-                        name='team_detail'
-                    ),
-                ])
+                r'^teams/',
+                include('teams.urls', namespace='teams')
             ),
+
+
         ])
     )
 ]

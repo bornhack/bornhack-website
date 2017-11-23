@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, FormView
 from camps.mixins import CampViewMixin
-from .models import Team, TeamMember
+from .models import Team, TeamMember, TeamTask
 from .forms import ManageTeamForm
 from .email import add_added_membership_email, add_removed_membership_email
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -62,22 +62,22 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
                 request,
                 "Please fill the description in your profile before joining a team"
             )
-            return redirect('team_list', camp_slug=self.camp.slug)
+            return redirect('teams:list', camp_slug=self.camp.slug)
 
         if request.user in self.get_object().members.all():
             messages.warning(request, "You are already a member of this team")
-            return redirect('team_list', camp_slug=self.camp.slug)
+            return redirect('teams:list', camp_slug=self.camp.slug)
 
         if not self.get_object().needs_members:
             messages.warning(request, "This team does not need members right now")
-            return redirect('team_list', camp_slug=self.get_object().camp.slug)
+            return redirect('teams:list', camp_slug=self.get_object().camp.slug)
 
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         TeamMember.objects.create(team=self.get_object(), user=self.request.user)
         messages.success(self.request, "You request to join the team %s has been registered, thank you." % self.get_object().name)
-        return redirect('team_list', camp_slug=self.get_object().camp.slug)
+        return redirect('teams:list', camp_slug=self.get_object().camp.slug)
 
 
 class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
@@ -88,14 +88,14 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     def get(self, request, *args, **kwargs):
         if request.user not in self.get_object().members.all():
             messages.warning(request, "You are not a member of this team")
-            return redirect('team_list', camp_slug=self.get_object().camp.slug)
+            return redirect('teams:list', camp_slug=self.get_object().camp.slug)
 
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
         TeamMember.objects.filter(team=self.get_object(), user=self.request.user).delete()
         messages.success(self.request, "You are no longer a member of the team %s" % self.get_object().name)
-        return redirect('team_list', camp_slug=self.get_object().camp.slug)
+        return redirect('teams:list', camp_slug=self.get_object().camp.slug)
 
 
 class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
@@ -144,4 +144,10 @@ class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberR
                 'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
             )
         return redirect('team_detail', camp_slug=self.camp.slug, slug=form.instance.team.slug)
+
+
+class TaskDetailView(CampViewMixin, DetailView):
+    template_name = "task_detail.html"
+    context_object_name = "task"
+    model = TeamTask
 

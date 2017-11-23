@@ -71,10 +71,10 @@ Manage Team: {{ team.name }} | {{ block.super }}
     </td>
     <td>
         {% if membership.approved %}
-        <a class="btn btn-danger" href="{% url 'teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
+        <a class="btn btn-danger" href="{% url 'teams:teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
         {% else %}
-        <a class="btn btn-danger" href="{% url 'teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
-        <a class="btn btn-success" href="{% url 'teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-check"></i> Approve</a>
+        <a class="btn btn-danger" href="{% url 'teams:teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove</a>
+        <a class="btn btn-success" href="{% url 'teams:teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-check"></i> Approve</a>
         {% endif %}
     </td>
   </tr>

@@ -115,3 +115,38 @@ def add_responsible_email(sender, instance, created, **kwargs):
     if created:
         if not add_new_membership_email(instance):
             logger.error('Error adding email to outgoing queue')
+
+
+class TeamTask(CampRelatedModel):
+    team = models.ForeignKey(
+        'teams.Team',
+        related_name='tasks',
+        help_text='The team this task belongs to',
+    )
+    name = models.CharField(
+        max_length=100,
+        help_text='Short name of this task',
+    )
+    slug = models.SlugField(
+        max_length=255,
+        blank=True,
+        help_text='url slug, leave blank to autogenerate',
+    )
+    description = models.TextField(
+        help_text='Description of the task. Markdown is supported.'
+    )
+
+    class Meta:
+        ordering = ['name']
+        unique_together = (('name', 'team'), ('slug', 'team'))
+
+    @property
+    def camp(self):
+        return self.team.camp
+
+    def save(self, **kwargs):
+        if not self.slug:
+            slug = slugify(self.name)
+            self.slug = slug
+        super().save(**kwargs)
+
