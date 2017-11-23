@@ -1,6 +1,4 @@
-import datetime
 import logging
-import os
 
 from django.views.generic import ListView, TemplateView, DetailView, View
 from django.views.generic.edit import CreateView, UpdateView
@@ -12,7 +10,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
-from django.db.models import Q
 from django.template import Engine, Context
 
 import icalendar
@@ -23,8 +20,8 @@ from .mixins import (
     EnsureUnapprovedProposalMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
-    PictureViewMixin,
-    EnsureCFSOpenMixin
+    EnsureCFSOpenMixin,
+    FileViewMixin,
 )
 from .email import (
     add_speakerproposal_updated_email,
@@ -162,22 +159,11 @@ class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
 
 
 @method_decorator(require_safe, name='dispatch')
-class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, PictureViewMixin, DetailView):
+class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, FileViewMixin, DetailView):
     model = models.SpeakerProposal
-
-    def get(self, request, *args, **kwargs):
-        # is the proposal owned by current user?
-        if self.get_object().user != request.user:
-            raise Http404()
-
-        # get and return the response
-        response = self.get_picture_response('/public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
-            'campslug': self.camp.slug,
-            'proposaluuid': self.get_object().uuid,
-            'filename': os.path.basename(self.picture.name),
-        })
-
-        return response
+    file_field = "picture_large"
+    file_directory_name = "speakerproposals"
+    object_id_field = "uuid"
 
 
 class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
@@ -245,17 +231,11 @@ class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
 
 
 @method_decorator(require_safe, name='dispatch')
-class SpeakerPictureView(CampViewMixin, PictureViewMixin, DetailView):
+class SpeakerPictureView(CampViewMixin, FileViewMixin, DetailView):
     model = models.Speaker
-
-    def get(self, request, *args, **kwargs):
-        # get and return the response
-        response = self.get_picture_response(path='/public/speakers/%(campslug)s/%(slug)s/%(filename)s' % {
-            'campslug': self.camp.slug,
-            'slug': self.get_object().slug,
-            'filename': os.path.basename(self.picture.name),
-        })
-        return response
+    file_field = "picture_large"
+    file_directory_name = "speakers"
+    object_id_field = "uuid"
 
 
 class SpeakerDetailView(CampViewMixin, DetailView):

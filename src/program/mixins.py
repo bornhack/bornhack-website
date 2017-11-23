@@ -1,10 +1,16 @@
+import os
+import logging
 from django.views.generic.detail import SingleObjectMixin
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.conf import settings
 from . import models
 from django.contrib import messages
-import sys, mimetypes
-from django.http import Http404, HttpResponse
+from django.http import Http404
+
+from sendfile import sendfile
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class EnsureCFSOpenMixin(SingleObjectMixin):
@@ -60,37 +66,36 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class PictureViewMixin(SingleObjectMixin):
-    def dispatch(self, request, *args, **kwargs):
-        # do we have the requested picture?
-        if kwargs['picture'] == 'thumbnail':
-            if self.get_object().picture_small:
-                self.picture = self.get_object().picture_small
-            else:
-                raise Http404()
-        elif kwargs['picture'] == 'large':
-            if self.get_object().picture_large:
-                self.picture = self.get_object().picture_large
-            else:
-                raise Http404()
-        else:
-            # only 'thumbnail' and 'large' pictures supported
-            raise Http404()
+class FileViewMixin(SingleObjectMixin):
+    file_field = None
+    file_directory_name = None
+    object_id_field = None
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
+    def get_directory_name(self):
+        return self.file_directory_name
 
-    def get_picture_response(self, path):
-        if 'runserver' in sys.argv or 'runserver_plus' in sys.argv:
-            # this is a local devserver situation, guess mimetype from extension and return picture directly
-            response = HttpResponse(self.picture, content_type=mimetypes.types_map[".%s" % self.picture.name.split(".")[-1]])
-        else:
-            # make nginx serve the picture using X-Accel-Redirect
-            # (this works for nginx only, other webservers use x-sendfile)
-            # TODO: maybe make the header name configurable
-            response = HttpResponse()
-            response['X-Accel-Redirect'] = path
-            response['Content-Type'] = ''
-        return response
+    def get_identifier(self):
+        return getattr(self.get_object(), self.object_id_field)
 
+    def get_filename(self):
+        file_field = getattr(
+            self.get_object(),
+            self.file_field
+        )
+        return os.path.basename(file_field.name)
+
+    def get_path(self):
+        return '/public/{directory_name}/{camp_slug}/{identifier}/{filename}'.format(
+            directory_name=self.get_directory_name(),
+            camp_slug=self.camp.slug,
+            identifier=self.get_identifier(),
+            filename=self.get_filename()
+        )
+
+    def get(self, request, *args, **kwargs):
+        path = '{media_root}{file_path}'.format(
+            media_root=settings.MEDIA_ROOT,
+            file_path=self.get_path()
+        )
+        return sendfile(request, path)
 

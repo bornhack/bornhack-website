@@ -41,3 +41,4 @@ six==1.10.0
 sqlparse==0.2.2
 venusian==1.0
 webencodings==0.5
+django-sendfile==0.3.11
