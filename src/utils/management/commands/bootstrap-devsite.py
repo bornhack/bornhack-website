@@ -20,7 +20,12 @@ from program.models import (
 from tickets.models import (
     TicketType
 )
-from teams.models import Team, TeamArea, TeamMember
+from teams.models import (
+    Team,
+    TeamTask,
+    TeamArea,
+    TeamMember
+)
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
@@ -294,8 +299,6 @@ class Command(BaseCommand):
             ),
             slug='{}'.format(slugify(name)),
         )
-
-
 
         for camp in [camp2016, camp2017, camp2018]:
             year = camp.camp.lower.year
@@ -1404,6 +1407,53 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 description="The Bar team plans, builds and run the IRL bar!",
                 camp=camp,
                 area=bar_area
+            )
+
+            self.output("Creating TeamTasks for {}...".format(year))
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Setup private networks",
+                description="All the private networks need to be setup"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Setup public networks",
+                description="All the public networks need to be setup"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Deploy access points",
+                description="All access points need to be deployed"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Deploy fiber cables",
+                description="We need the fiber deployed where necessary"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="List of booze",
+                description="A list of the different booze we need to have in the bar durng bornhack"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Chairs",
+                description="We need a solution for chairs"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Taps",
+                description="Taps must be ordered"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Coffee",
+                description="We need to get some coffee for our coffee machine"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Ice",
+                description="We need ice cubes and crushed ice in the bar"
             )
 
             self.output("Setting team members for {}...".format(year))
