@@ -30,6 +30,7 @@ class ShopTicketListView(LoginRequiredMixin, ListView):
 
 
 class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
+    # Todo: Maybe look at using utils.mixins.FileViewMixin
     model = ShopTicket
 
     def dispatch(self, request, *args, **kwargs):

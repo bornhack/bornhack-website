@@ -21,8 +21,8 @@ from .mixins import (
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
     EnsureCFSOpenMixin,
-    FileViewMixin,
 )
+from utils.mixins import FileViewMixin
 from .email import (
     add_speakerproposal_updated_email,
     add_eventproposal_updated_email
