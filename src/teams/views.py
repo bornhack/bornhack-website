@@ -17,11 +17,12 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class EnsureTeamResponsibleMixin(SingleObjectMixin):
+class EnsureTeamResponsibleMixin(object):
     def dispatch(self, request, *args, **kwargs):
-        if request.user not in self.get_object().responsible.all():
+        self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
+        if request.user not in self.team.responsible.all():
             messages.error(request, 'No thanks')
-            return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.get_object().slug)
+            return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.team.slug)
 
         return super().dispatch(
             request, *args, **kwargs
@@ -161,10 +162,16 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMix
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
         context['team'] = self.team
         return context
 
     def get_success_url(self):
-        return reverse_lazy('task_detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.team.slug, 'slug': self.get_object().slug})
+        return reverse_lazy(
+            'task_detail',
+            kwargs={
+                'camp_slug': self.camp.slug,
+                'team_slug': self.team.slug,
+                'slug': self.get_object().slug
+            }
+        )
 

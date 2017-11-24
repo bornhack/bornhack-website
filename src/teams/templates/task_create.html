@@ -14,7 +14,7 @@ Create Task for {{ task.team.name }} Team
             <button type="submit" class="btn btn-primary">
         </form>
     </div>
-    <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:detail' slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
+    <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:detail' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
 </div>
 {% endblock %}
 
