@@ -150,3 +150,7 @@ class TeamTask(CampRelatedModel):
             self.slug = slug
         super().save(**kwargs)
 
+    @property
+    def responsible(self):
+        return team.responsible.all()
+

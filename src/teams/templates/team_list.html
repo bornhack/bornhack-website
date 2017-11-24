@@ -33,7 +33,7 @@ Teams | {{ block.super }}
     {% for team in teams %}
     <tr>
       <td>
-        <a href="{% url 'teams:detail' camp_slug=camp.slug slug=team.slug %}">
+        <a href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}">
           {{ team.name }} Team
         </a>
       </td>
@@ -72,15 +72,15 @@ Teams | {{ block.super }}
 
       <td>
       {% if request.user in team.members.all %}
-          <a href="{% url 'teams:leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
+          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
         {% else %}
             {% if team.needs_members %}
-              <a href="{% url 'teams:join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
+              <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
             {% endif %}
         {% endif %}
 
         {% if request.user in team.responsible.all %}
-          <a href="{% url 'teams:manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
+          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
         {% endif %}
       {% endif %}
       </td>

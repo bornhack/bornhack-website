@@ -1,5 +1,5 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView, FormView
+from django.views.generic.edit import CreateView, UpdateView, FormView
 from camps.mixins import CampViewMixin
 from .models import Team, TeamMember, TeamTask
 from .forms import ManageTeamForm
@@ -18,12 +18,10 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class EnsureTeamResponsibleMixin(SingleObjectMixin):
-    model = Team
-
     def dispatch(self, request, *args, **kwargs):
         if request.user not in self.get_object().responsible.all():
             messages.error(request, 'No thanks')
-            return redirect('team_detail', camp_slug=self.camp.slug, slug=self.get_object().slug)
+            return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.get_object().slug)
 
         return super().dispatch(
             request, *args, **kwargs
@@ -40,21 +38,24 @@ class TeamDetailView(CampViewMixin, DetailView):
     template_name = "team_detail.html"
     context_object_name = 'team'
     model = Team
+    slug_url_kwarg = 'team_slug'
 
 
 class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
     fields = ['description', 'needs_members']
+    slug_url_kwarg = 'team_slug'
 
     def get_success_url(self):
-        return reverse_lazy('team_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.get_object().slug})
+        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.get_object().slug})
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "team_join.html"
     model = Team
     fields = []
+    slug_url_kwarg = 'team_slug'
 
     def get(self, request, *args, **kwargs):
         if not Profile.objects.get(user=request.user).description:
@@ -84,6 +85,7 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "team_leave.html"
     model = Team
     fields = []
+    slug_url_kwarg = 'team_slug'
 
     def get(self, request, *args, **kwargs):
         if request.user not in self.get_object().members.all():
@@ -104,7 +106,7 @@ class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if request.user not in self.get_object().team.responsible.all():
             messages.error(request, 'No thanks')
-            return redirect('team_detail', camp_slug=self.get_object().team.camp.slug, slug=self.get_object().team.slug)
+            return redirect('teams:detail', camp_slug=self.get_object().team.camp.slug, team_slug=self.get_object().team.slug)
 
         return super().dispatch(
             request, *args, **kwargs
@@ -125,7 +127,7 @@ class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberRe
             logger.error(
                 'Unable to add removed email to outgoing queue for teammember: {}'.format(form.instance)
             )
-        return redirect('team_detail', camp_slug=self.camp.slug, slug=form.instance.team.slug)
+        return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
 
 
 class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
@@ -143,11 +145,26 @@ class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberR
             logger.error(
                 'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
             )
-        return redirect('team_detail', camp_slug=self.camp.slug, slug=form.instance.team.slug)
+        return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
 
 
 class TaskDetailView(CampViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
+
+
+class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):
+    model = TeamTask
+    template_name = "task_create.html"
+    fields = ['name', 'description']
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
+        context['team'] = self.team
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('task_detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.team.slug, 'slug': self.get_object().slug})
 

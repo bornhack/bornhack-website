@@ -14,7 +14,7 @@ Team: {{ team.name }} | {{ block.super }}
     <div class="panel-body">
         {{ team.description|unsafecommonmark }}
         {% if request.user in team.responsible.all %}
-              <a href="{% url 'teams:manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success">Manage Team</a>
+              <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success">Manage Team</a>
         {% endif %}
 
         <hr>
@@ -55,10 +55,10 @@ Team: {{ team.name }} | {{ block.super }}
         {% endif %}
 
         {% if request.user in team.members.all %}
-            <a href="{% url 'teams:leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger">Leave Team</a>
+            <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger">Leave Team</a>
         {% else %}
             {% if team.needs_members %}
-              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-xs btn-success">Join Team</a>
+              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success">Join Team</a>
             {% endif %}
         {% endif %}
 
