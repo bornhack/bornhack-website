@@ -85,3 +85,6 @@ IRCBOT_CHANNELS={
     'public': '{{ django_ircbot_public_channel }}'
 }
 
+SENDFILE_ROOT = MEDIA_ROOT
+SENDFILE_URL = '{{ django_sendfile_url }}'
+SENDFILE_BACKEND = '{{ django_sendfile_backend }}'
