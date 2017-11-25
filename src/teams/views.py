@@ -157,7 +157,7 @@ class TaskDetailView(CampViewMixin, DetailView):
 
 class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):
     model = TeamTask
-    template_name = "task_create.html"
+    template_name = "task_form.html"
     fields = ['name', 'description']
 
     def get_context_data(self, *args, **kwargs):
@@ -165,13 +165,36 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMix
         context['team'] = self.team
         return context
 
+    def form_valid(self, form):
+        task = form.save(commit=False)
+        task.team = self.team
+        if not task.name:
+            task.name = "noname"
+        task.save()
+        return HttpResponseRedirect(task.get_absolute_url())
+
     def get_success_url(self):
-        return reverse_lazy(
-            'task_detail',
-            kwargs={
-                'camp_slug': self.camp.slug,
-                'team_slug': self.team.slug,
-                'slug': self.get_object().slug
-            }
-        )
+        return self.get_object().get_absolute_url()
+
+
+class TaskUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
+    model = TeamTask
+    template_name = "task_form.html"
+    fields = ['name', 'description']
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = self.team
+        return context
+
+    def form_valid(self, form):
+        task = form.save(commit=False)
+        task.team = self.team
+        if not task.name:
+            task.name = "noname"
+        task.save()
+        return HttpResponseRedirect(task.get_absolute_url())
+
+    def get_success_url(self):
+        return self.get_object().get_absolute_url()
 

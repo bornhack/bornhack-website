@@ -51,10 +51,20 @@ urlpatterns = [
                         name='task_create',
                     ),
                     url(
-                        r'^(?P<slug>[-_\w+]+)/$',
-                        TaskDetailView.as_view(),
-                        name='task_detail',
+                        r'^(?P<slug>[-_\w+]+)/', include([
+                            url(
+                                r'^$',
+                                TaskDetailView.as_view(),
+                                name='task_detail',
+                            ),
+                            url(
+                                r'^update/$',
+                                TaskUpdateView.as_view(),
+                                name='task_update',
+                            ),
+                        ]),
                     ),
+
                 ]),
             ),
         ]),

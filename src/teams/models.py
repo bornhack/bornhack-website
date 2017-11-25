@@ -6,6 +6,7 @@ from utils.models import CampRelatedModel
 from .email import add_new_membership_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse_lazy
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -140,14 +141,16 @@ class TeamTask(CampRelatedModel):
         ordering = ['name']
         unique_together = (('name', 'team'), ('slug', 'team'))
 
+    def get_absolute_url(self):
+        return reverse_lazy('teams:task_detail', kwargs={'camp_slug': self.team.camp.slug, 'team_slug': self.team.slug, 'slug': self.slug})
+
     @property
     def camp(self):
         return self.team.camp
 
     def save(self, **kwargs):
         if not self.slug:
-            slug = slugify(self.name)
-            self.slug = slug
+            self.slug = slugify(self.name)
         super().save(**kwargs)
 
     @property
