@@ -117,7 +117,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
 
 class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
-    fields = ['name', 'biography', 'picture_small', 'picture_large', 'submission_notes']
+    fields = ['name', 'biography', 'picture_large', 'submission_notes']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):

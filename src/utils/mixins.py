@@ -24,7 +24,7 @@ class FileViewMixin(SingleObjectMixin):
         return os.path.basename(file_field.name)
 
     def get_path(self):
-        return '/public/{directory_name}/{camp_slug}/{identifier}/{filename}'.format(
+        return '/{directory_name}/{camp_slug}/{identifier}/{filename}'.format(
             directory_name=self.get_directory_name(),
             camp_slug=self.camp.slug,
             identifier=self.get_identifier(),

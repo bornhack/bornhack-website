@@ -140,7 +140,7 @@ def get_speakerproposal_picture_upload_path(instance, filename):
 
 def get_speakersubmission_picture_upload_path(instance, filename):
     """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
-    return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
+    return 'protected/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
         'campslug': instance.camp.slug,
         'proposaluuidd': instance.uuid,
         'filename': filename
@@ -164,7 +164,7 @@ class SpeakerProposal(UserSubmittedModel):
         help_text='Markdown is supported.'
     )
 
-    picture_large = models.ImageField(
+    picture = models.ImageField(
         null=True,
         blank=True,
         upload_to=get_speakerproposal_picture_upload_path,
@@ -173,6 +173,7 @@ class SpeakerProposal(UserSubmittedModel):
         max_length=255
     )
 
+    # Todo: picture_small is deprecated
     picture_small = models.ImageField(
         null=True,
         blank=True,
