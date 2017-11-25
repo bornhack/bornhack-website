@@ -12,9 +12,15 @@ Team: {{ team.name }} | {{ block.super }}
 <div class="panel panel-default">
     <div class="panel-heading"><h4>{{ team.name }} Team</h4></div>
     <div class="panel-body">
+    
+    
         {{ team.description|unsafecommonmark }}
+
+        {% if request.user|is_team_member:team %}
+              <a href="{% url 'teams:guide' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Team guide</a>
+        {% endif %}
         {% if request.user in team.responsible.all %}
-              <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Manage Team</a>
+              <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-default">Manage team</a>
         {% endif %}
 
         <hr>

@@ -1,0 +1,10 @@
+<html>{% load commonmark %}
+<head>
+<title>{{ team.name }}</title>
+</head>
+<body onload="window.print()">
+
+{{ team.guide|unsafecommonmark }}
+
+</body>
+</html>

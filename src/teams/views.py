@@ -14,6 +14,8 @@ from django.core.urlresolvers import reverse_lazy
 from profiles.models import Profile
 
 import logging
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -45,11 +47,34 @@ class TeamDetailView(CampViewMixin, DetailView):
 class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
-    fields = ['description', 'needs_members']
+    fields = ['description', 'guide', 'needs_members']
     slug_url_kwarg = 'team_slug'
 
     def get_success_url(self):
         return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.get_object().slug})
+
+
+class TeamGuideView(CampViewMixin, DetailView):
+    template_name = "team_guide.html"
+    context_object_name = 'team'
+    model = Team
+    slug_url_kwarg = 'team_slug'
+    
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return CampViewMixin.dispatch(self, request, *args, **kwargs)
+    
+    def get_queryset(self):
+        qs = CampViewMixin.get_queryset(self)
+        qs.filter(
+            teammember__approved=True,
+            teammember__user=self.request.user,
+        )
+        return qs
+
+
+class TeamGuidePrintView(TeamGuideView):
+    template_name = "team_guide_print.html"
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):

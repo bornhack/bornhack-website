@@ -44,6 +44,16 @@ urlpatterns = [
                 name='manage'
             ),
             url(
+                r'^guide/$',
+                TeamGuideView.as_view(),
+                name='guide'
+            ),
+            url(
+                r'^guide/print/$',
+                TeamGuidePrintView.as_view(),
+                name='guide_print'
+            ),
+            url(
                 r'^tasks/', include([
                     url(
                         r'^create/$',

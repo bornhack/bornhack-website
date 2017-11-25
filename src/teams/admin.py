@@ -13,6 +13,10 @@ class TeamTaskAdmin(admin.ModelAdmin):
     ]
 
 
+class TeamMemberInline(admin.TabularInline):
+    model = TeamMember
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     def get_responsible(self, obj):
@@ -30,6 +34,7 @@ class TeamAdmin(admin.ModelAdmin):
         'camp',
         'needs_members',
     ]
+    inlines = [TeamMemberInline]
 
 
 @admin.register(TeamMember)
