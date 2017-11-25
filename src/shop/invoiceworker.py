@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.files import File
 from utils.pdf import generate_pdf_letter
 from shop.email import add_invoice_email, add_creditnote_email
@@ -39,6 +40,11 @@ def do_work():
                 template=template,
                 formatdict={
                     'invoice': invoice,
+                    'bank': settings.BANKACCOUNT_BANK,
+                    'bank_iban': settings.BANKACCOUNT_IBAN,
+                    'bank_bic': settings.BANKACCOUNT_SWIFTBIC,
+                    'bank_dk_reg': settings.BANKACCOUNT_REG,
+                    'bank_dk_accno': settings.BANKACCOUNT_ACCOUNT,
                 },
             )
             logger.info('Generated pdf for invoice %s' % invoice)

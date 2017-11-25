@@ -61,6 +61,7 @@ COINIFY_CALLBACK_HOSTNAME='{{ coinify_callback_hostname | default('') }}' # leav
 
 # shop settings
 PDF_LETTERHEAD_FILENAME='{{ pdf_letterhead_filename }}'
+BANKACCOUNT_BANK='{{ bank_name }}'
 BANKACCOUNT_IBAN='{{ iban }}'
 BANKACCOUNT_SWIFTBIC='{{ swiftbic }}'
 BANKACCOUNT_REG='{{ regno }}'
