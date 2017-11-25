@@ -81,7 +81,9 @@ Team: {{ team.name }} | {{ block.super }}
                 <td>{{ task.description }}</td>
                 <td>
                   <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm">Details</a>
-                  <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm">Edit Task</a>
+                  {% if request.user in team.responsible.all %}
+                    <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm">Edit Task</a>
+                  {% endif %}
                 </td>
             </tr>
             {% endfor %}
