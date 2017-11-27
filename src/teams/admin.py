@@ -1,6 +1,16 @@
 from django.contrib import admin
-from .models import Team, TeamArea, TeamMember
+from .models import Team, TeamArea, TeamMember, TeamTask
 from .email import add_added_membership_email, add_removed_membership_email
+
+
+@admin.register(TeamTask)
+class TeamTaskAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'team',
+        'name',
+        'description',
+    ]
 
 
 @admin.register(Team)

@@ -13,6 +13,6 @@ Join Team: {{ team.name }} | {{ block.super }}
 {% csrf_token %}
 {{ form }}
 <button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Join {{ team.name }} Team</button>
-<a href="{% url 'team_list' camp_slug=camp.slug %}" class="btn btn-default" type="submit"><i class="fa fa-remove"></i> Cancel</a>
+<a href="{% url 'teams:list' camp_slug=camp.slug %}" class="btn btn-default" type="submit"><i class="fa fa-remove"></i> Cancel</a>
 </form>
 {% endblock %}

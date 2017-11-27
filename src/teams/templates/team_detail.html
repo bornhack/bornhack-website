@@ -9,56 +9,90 @@ Team: {{ team.name }} | {{ block.super }}
 
 {% block content %}
 
-<h3>{{ team.name }} Team ({{ team.area.name }} area)</h3>
+<div class="panel panel-default">
+    <div class="panel-heading"><h4>{{ team.name }} Team</h4></div>
+    <div class="panel-body">
+        {{ team.description|unsafecommonmark }}
+        {% if request.user in team.responsible.all %}
+              <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Manage Team</a>
+        {% endif %}
 
-{{ team.description|unsafecommonmark }}
-<p>Currently {{ team.approvedmembers.count }} people are members of this team{% if request.user in team.members.all %} (including you){% endif %}.</p>
+        <hr>
 
-{% if request.user in team.members.all %}
-<p>Your team status: {% membershipstatus request.user team %}</p>
-{% endif %}
+        <h3>Members</h3>
+        <p>The following <b>{{ team.approvedmembers.count }}</b> people are members of the <b>{{ team.name }} team</b>:</p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Name
+              </th>
+              <th>
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+           {% for teammember in team.approvedmembers.all %}
+              <tr>
+                <td>
+                    {% if teammember.user.profile.approved_public_credit_name %}
+                      {{ teammember.user.profile.approved_public_credit_name }}
+                    {% else %}
+                      anonymous
+                    {% endif %}
+                </td>
+                <td>
+                    {% if teammember.responsible %}Team Responsible{% else %}Team Member{% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
 
-{% if request.user in team.members.all %}
-    <a href="{% url 'team_leave' camp_slug=camp.slug slug=team.slug %}" class="btn btn-danger">Leave Team</a>
-{% else %}
-    {% if team.needs_members %}
-      <a href="{% url 'team_join' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success">Join Team</a>
-    {% endif %}
-{% endif %}
+        {% if request.user in team.members.all %}
+        <p>Your membership status: <b>{% membershipstatus request.user team %}</b></p>
+        {% endif %}
 
-{% if request.user in team.responsible.all %}
-      <a href="{% url 'team_manage' camp_slug=camp.slug slug=team.slug %}" class="btn btn-success">Manage Team</a>
-{% endif %}
-<hr />
-<h3>Team Members</h3>
-<p>The following people are members of the <b>{{ team.name }} team</b>:</p>
-<table class="table">
-  <thead>
-    <tr>
-      <th>
-        Name
-      </th>
-      <th>
-        Status
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-   {% for teammember in team.approvedmembers.all %}
-      {% if teammember.user.profile.approved_public_credit_name and teammember.approved or teammember.responsible %}
-      <tr>
-        <td>
-          {{ teammember.user.profile.approved_public_credit_name }}
-        </td>
-        <td>
-            {% if teammember.responsible %}Team Responsible{% else %}Team Member{% endif %}
-        </td>
-      </tr>
-      {% endif %}
-    {% endfor %}
-  </tbody>
-</table>
-{% if team.anoncount %}
-<p>Plus <b>{{ team.anoncount }}</b> member(s) who prefer to remain anonymous.</p>
-{% endif %}
+        {% if request.user in team.members.all %}
+            <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger">Leave Team</a>
+        {% else %}
+            {% if team.needs_members %}
+              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success">Join Team</a>
+            {% endif %}
+        {% endif %}
+
+        <hr>
+
+        <h3>Tasks</h3>
+        <p>This team is responsible for the following tasks</p>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for task in team.tasks.all %}
+            <tr>
+                <td><a href="{% url 'teams:task_detail' slug=task.slug camp_slug=camp.slug team_slug=team.slug %}">{{ task.name }}</a></td>
+                <td>{{ task.description }}</td>
+                <td>
+                  <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm">Details</a>
+                  {% if request.user in team.responsible.all %}
+                    <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm">Edit Task</a>
+                  {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% if request.user in team.responsible.all %}
+          <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Create Task</a>
+        {% endif %}
+    </div>
+</div>
+
 {% endblock %}
