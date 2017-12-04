@@ -22,5 +22,5 @@ class BackofficeIndexView(StaffMemberRequiredMixin, TemplateView):
 
 class InfodeskView(StaffMemberRequiredMixin, ListView):
     template_name = "infodesk.html"
-    queryset = OrderProductRelation.objects.filter(handed_out=False, order__paid=True, order__refunded=False, order__cancelled=False).order_by("'order')
+    queryset = OrderProductRelation.objects.filter(handed_out=False, order__paid=True, order__refunded=False, order__cancelled=False).order_by('order')
 
