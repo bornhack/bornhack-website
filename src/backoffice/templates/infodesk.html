@@ -26,17 +26,15 @@
        </tr>
       </thead>
       <tbody>
-      {% for order in order_list %}
-      {% for productrel in order.orderproductrelation_set.all %}
+      {% for productrel in orderproductrelation_list %}
       <tr>
-          <td><a href="/admin/shop/order/{{ order.id }}/change/">Order #{{ order.id }}</a></td>
-          <td>{{ order.user }}</td>
+          <td><a href="/admin/shop/order/{{ productrel.order.id }}/change/">Order #{{ productrel.order.id }}</a></td>
+          <td>{{ productrel.order.user }}</td>
           <td>{{ productrel.id }}</td>
           <td>{{ productrel.product.name }}</td>
           <td>{{ productrel.quantity }}</td>
           <td>{{ productrel.handed_out }}</td>
       </tr>
-      {% endfor %}
       {% endfor %}
       </tbody>
     </table>

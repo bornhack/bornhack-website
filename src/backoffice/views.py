@@ -4,7 +4,7 @@ from django.views import View
 from django.conf import settings
 from django.utils.decorators import method_decorator
 from django.http import HttpResponseForbidden
-from shop.models import Order
+from shop.models import OrderProductRelation
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -22,5 +22,5 @@ class BackofficeIndexView(StaffMemberRequiredMixin, TemplateView):
 
 class InfodeskView(StaffMemberRequiredMixin, ListView):
     template_name = "infodesk.html"
-    queryset = Order.objects.filter(paid=True, cancelled=False, refunded=False, orderproductrelation__handed_out=False).distinct()
+    queryset = OrderProductRelation.objects.filter(handed_out=False, order__paid=True, order__refunded=False, order__cancelled=False).order_by("'order')
 
