@@ -89,6 +89,7 @@ class DiscountTicket(BaseTicket):
     def shortname(self):
         return "discount"
 
+
 class ShopTicket(BaseTicket):
     order = models.ForeignKey('shop.Order', related_name='shoptickets')
     product = models.ForeignKey('shop.Product')
