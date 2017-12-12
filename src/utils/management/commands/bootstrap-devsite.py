@@ -364,6 +364,7 @@ class Command(BaseCommand):
                 product=tent1,
                 quantity=1,
             )
+            order0.mark_as_paid(request=None)
 
             order1 = Order.objects.create(
                 user=user2,
@@ -378,6 +379,8 @@ class Command(BaseCommand):
                 product=tent2,
                 quantity=1,
             )
+            order1.mark_as_paid(request=None)
+
             order2 = Order.objects.create(
                 user=user3,
                 payment_method='cash',
@@ -395,6 +398,8 @@ class Command(BaseCommand):
                 product=tent2,
                 quantity=1,
             )
+            order2.mark_as_paid(request=None)
+
             order3 = Order.objects.create(
                 user=user4,
                 payment_method='cash',
@@ -412,6 +417,7 @@ class Command(BaseCommand):
                 product=tent1,
                 quantity=1,
             )
+            order3.mark_as_paid(request=None)
 
             self.output('Creating eventlocations for {}...'.format(year))
             speakers_tent = EventLocation.objects.create(

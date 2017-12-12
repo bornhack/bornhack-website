@@ -199,7 +199,8 @@ class Order(CreatedUpdatedModel):
                         product=order_product.product,
                     )
                     ticket.save()
-                messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
+                if request:
+                    messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
                 # and mark the OPR as handed_out=True
                 order_product.handed_out=True
                 order_product.save()
