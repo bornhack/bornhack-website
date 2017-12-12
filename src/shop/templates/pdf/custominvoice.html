@@ -51,5 +51,12 @@
 <br>
 
 <p class="lead">
-Payment should be made by bank transfer to our account in Arbejdernes Landsbank reg. 5371 account no. 0244504 within two weeks from {{ invoice.created|date:"b jS, Y" }} please. Thank you!
+  Payment should be made by bank transfer to our account in {{ bank }}:
 </p>
+<ul>
+  <li>Reg. {{ bank_dk_reg }}, account no. {{ bank_dk_accno }}</li>
+  <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
+  <li>Add invoice number in the transfer notes.</li>
+  <li>Within two weeks from: {{ invoice.created|date:"b jS, Y" }}</li>
+  <li>Thank you!</li>
+</ul>
