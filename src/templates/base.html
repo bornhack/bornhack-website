@@ -72,6 +72,9 @@
             </li>
             <li><a href="{% url 'contact' %}">Contact</a></li>
             <li><a href="{% url 'people' %}">People</a></li>
+            {% if user.is_authenticated and user.is_staff %}
+            <li><a href="{% url 'backoffice:index' %}">Backoffice</a></li>
+            {% endif %}
           </ul>
           <ul class="nav navbar-nav navbar-right">
             {% if user.is_authenticated %}

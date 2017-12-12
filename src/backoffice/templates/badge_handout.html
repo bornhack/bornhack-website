@@ -21,21 +21,27 @@
     <table class="table table-hover">
       <thead>
       <tr>
-          <th>Ticket</th>
-          <th>User</th>
-          <th>Email</th>
-          <th>Name</th>
+          <th>Ticket UUID</th>
+          <th>Ticket Type</th>
+          <th>Ticket Order ID</th>
+          <th>Order User</th>
+          <th>Order Email</th>
+          <th>Ticket Name</th>
+          <th>Ticket Email</th>
           <th>Product</th>
        </tr>
       </thead>
       <tbody>
       {% for ticket in tickets %}
       <tr>
-          <td>{{ ticket.uuid }}</td>
+          <td><a href="/admin/tickets/shopticket/{{ ticket.uuid }}/change/">{{ ticket.uuid }}</a></td>
+          <td>{{ ticket.shortname }}</td>
+          <td><a href="/admin/shop/order/{{ ticket.order.id }}/change/">{{ ticket.order.id }}</a></td>
           <td>{{ ticket.order.user }}</td>
           <td>{{ ticket.order.user.email }}</td>
           <td>{{ ticket.name }}</td>
           <td>{{ ticket.email }}</td>
+          <td>{{ ticket.product }}</td>
       </tr>
       {% endfor %}
       </tbody>
