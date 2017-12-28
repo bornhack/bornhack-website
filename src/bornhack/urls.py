@@ -5,6 +5,7 @@ from allauth.account.views import (
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 from camps.views import *
 from info.views import *
 from villages.views import *
@@ -14,6 +15,8 @@ from teams.views import *
 from people.views import *
 from tickets.views import ShopTicketListView
 from bar.views import MenuView
+
+admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
     url(
