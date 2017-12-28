@@ -1,0 +1,35 @@
+{% extends 'profile_base.html' %}
+
+{% load account %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block profile_content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>
+        {% trans "Two-Factor Authentication Backup Tokens" %}
+      </h1>
+
+      <ul>
+        {% for token in backup_tokens %}
+        <li>{{ token.token }}</li>
+
+        {% empty %}
+        {% trans 'No tokens. Press the button below to generate some.' %}
+
+        {% endfor %}
+      </ul>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="buttonHolder">
+          <button class="btn btn-black" type="submit">
+          {% trans 'Generate backup tokens' %}
+          </button>
+          <a class="btn btn-warning" href="{% url 'two-factor-remove' %}">Disable Two-Factor</a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

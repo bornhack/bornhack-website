@@ -12,6 +12,7 @@ DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 WSGI_APPLICATION = 'bornhack.wsgi.application'
 ROOT_URLCONF = 'bornhack.urls'
 
+ACCOUNT_ADAPTER = 'allauth_2fa.adapter.OTPAdapter'
 
 SITE_ID = 1
 
@@ -48,6 +49,10 @@ INSTALLED_APPS = [
 
     'allauth',
     'allauth.account',
+    'allauth_2fa',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
+    'django_otp.plugins.otp_static',
     'bootstrap3',
     'django_extensions',
 ]
@@ -109,6 +114,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

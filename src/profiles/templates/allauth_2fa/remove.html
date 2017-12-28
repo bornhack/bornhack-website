@@ -1,0 +1,24 @@
+{% extends 'profile_base.html' %}
+
+{% load account %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block profile_content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h1>
+        {% trans "Disable Two-Factor Authentication" %}
+      </h1>
+
+      <p>{% trans "Are you sure?" %}</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">
+          {% trans 'Disable Two-Factor' %}
+        </button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

@@ -63,6 +63,7 @@ urlpatterns = [
         name='general-terms'
     ),
     url(r'^accounts/', include('allauth.urls')),
+    url(r'^accounts/', include('allauth_2fa.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
     url(
