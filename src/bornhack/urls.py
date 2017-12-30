@@ -16,6 +16,7 @@ from people.views import *
 from tickets.views import ShopTicketListView
 from bar.views import MenuView
 
+# require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
