@@ -4,16 +4,25 @@ import hashlib
 import base64
 import qrcode
 
-from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.conf import settings
+from django.utils import timezone
+from django.dispatch import receiver
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from utils.models import (
     UUIDModel,
+    CampRelatedModel,
     CreatedUpdatedModel
 )
 from utils.pdf import generate_pdf_letter
 from django.db import models
+from django.db.models.signals import post_save
+from datetime import (
+    timedelta,
+    datetime
+)
+from django.db.models import Count
+from ircbot.models import OutgoingIrcMessage
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -56,7 +65,9 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         return qrcode_base64
 
     def get_qr_code_url(self):
-        return 'data:image/png;base64,{}'.format(self.get_qr_code_base64().decode('utf-8'))
+        return 'data:image/png;base64,{}'.format(
+            self.get_qr_code_base64().decode('utf-8')
+        )
 
     def generate_pdf(self):
         return generate_pdf_letter(
@@ -134,3 +145,59 @@ class ShopTicket(BaseTicket):
     def shortname(self):
         return "shop"
 
+
+@receiver(post_save, sender=ShopTicket)
+def ticket_created(sender, instance, created, **kwargs):
+    # only send a message when a ticket is created
+    if not created:
+        return
+
+    # queue an IRC message to the orga channel if defined,
+    # otherwise for the default channel
+    target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
+
+    # get ticket stats
+    ticket_prefix = "BornHack {}".format(datetime.now().year)
+
+    stats = ", ".join(
+        [
+            "{}: {}".format(
+                tickettype['product__name'].replace(
+                    "{} ".format(ticket_prefix),
+                    ""
+                ),
+                tickettype['total']
+            ) for tickettype in ShopTicket.objects.filter(
+                product__name__startswith=ticket_prefix
+            ).exclude(
+                product__name__startswith="{} One Day".format(ticket_prefix)
+            ).values(
+                'product__name'
+            ).annotate(
+                total=Count('product__name')
+            ).order_by('-total')
+        ]
+    )
+
+    onedaystats = ShopTicket.objects.filter(
+        product__name__startswith="{} One Day Ticket".format(ticket_prefix)
+    ).count()
+    onedaychildstats = ShopTicket.objects.filter(
+        product__name__startswith="{} One Day Children".format(ticket_prefix)
+    ).count()
+
+    # queue the messages
+    OutgoingIrcMessage.objects.create(
+        target=target,
+        message="%s sold!" % instance.product.name,
+        timeout=timezone.now()+timedelta(minutes=10)
+    )
+    OutgoingIrcMessage.objects.create(
+        target=target,
+        message="Totals: {}, 1day: {}, 1day child: {}".format(
+            stats,
+            onedaystats,
+            onedaychildstats
+        )[:200],
+        timeout=timezone.now()+timedelta(minutes=10)
+    )
