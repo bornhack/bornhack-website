@@ -39,19 +39,15 @@ class CustomUrlStorage(FileSystemStorage):
         if parts[1] == "speakerproposals":
             # find speakerproposal
             speakerproposal_model = apps.get_model('program', 'speakerproposal')
+
             try:
-                speakerproposal = speakerproposal_model.objects.get(picture_small=name)
-                picture = "small"
+                speakerproposal = speakerproposal_model.objects.get(picture=name)
             except speakerproposal_model.DoesNotExist:
-                try:
-                    speakerproposal = speakerproposal_model.objects.get(picture_large=name)
-                    picture = "large"
-                except speakerproposal_model.DoesNotExist:
-                    return False
+                return False
+
             url = reverse('speakerproposal_picture', kwargs={
                 'camp_slug': speakerproposal.camp.slug,
-                'pk': speakerproposal.pk,
-                'picture': picture,
+                'pk': speakerproposal.pk
             })
         else:
             return False
@@ -173,16 +169,6 @@ class SpeakerProposal(UserSubmittedModel):
         max_length=255
     )
 
-    # Todo: picture_small is deprecated
-    picture_small = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speakerproposal_picture_upload_path,
-        help_text='A thumbnail of the speaker picture',
-        storage=storage,
-        max_length=255
-    )
-
     submission_notes = models.TextField(
         help_text='Private notes for this speaker. Only visible to the submitting user and the BornHack organisers.',
         blank=True
@@ -202,13 +188,10 @@ class SpeakerProposal(UserSubmittedModel):
         speaker.camp = self.camp
         speaker.name = self.name
         speaker.biography = self.biography
-        if self.picture_small and self.picture_large:
-            temp = ContentFile(self.picture_small.read())
-            temp.name = os.path.basename(self.picture_small.name)
-            speaker.picture_small = temp
-            temp = ContentFile(self.picture_large.read())
-            temp.name = os.path.basename(self.picture_large.name)
-            speaker.picture_large = temp
+        if self.picture:
+            temp = ContentFile(self.picture.read())
+            temp.name = os.path.basename(self.picture.name)
+            speaker.picture = temp
         speaker.proposal = self
         speaker.save()
 
@@ -580,14 +563,7 @@ class Speaker(CampRelatedModel):
         help_text='Markdown is supported.'
     )
 
-    picture_small = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speaker_picture_upload_path,
-        help_text='A thumbnail of the speaker picture'
-    )
-
-    picture_large = models.ImageField(
+    picture = models.ImageField(
         null=True,
         blank=True,
         upload_to=get_speaker_picture_upload_path,
@@ -637,14 +613,13 @@ class Speaker(CampRelatedModel):
         return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
     def get_picture_url(self, size):
-        return reverse('speaker_picture', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug, 'picture': size})
-
-    def get_small_picture_url(self):
-        return self.get_picture_url('thumbnail')
-
-    def get_large_picture_url(self):
-        return self.get_picture_url('large')
-
+        return reverse(
+            'speaker_picture',
+            kwargs={
+                'camp_slug': self.camp.slug,
+                'slug': self.slug
+            }
+        )
 
     def serialize(self):
         data = {
@@ -653,9 +628,8 @@ class Speaker(CampRelatedModel):
             'biography': self.biography,
         }
 
-        if self.picture_small and self.picture_large:
-            data['large_picture_url'] = self.get_large_picture_url()
-            data['small_picture_url'] = self.get_small_picture_url()
+        if self.picture:
+            data['picture_url'] = self.get_picture_url()
 
         return data
 

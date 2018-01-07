@@ -7,9 +7,21 @@ from program.views import (
     ProgramControlCenter,
     ProposalListView,
     SpeakerProposalCreateView,
-    SpeakerProposalDetailView, SpeakerProposalUpdateView, SpeakerProposalSubmitView, SpeakerProposalPictureView,
-    EventProposalCreateView, EventProposalDetailView, EventProposalUpdateView, EventProposalSubmitView, SpeakerListView,
-    SpeakerDetailView, SpeakerPictureView, EventListView, CallForSpeakersView, EventDetailView)
+    SpeakerProposalDetailView,
+    SpeakerProposalUpdateView,
+    SpeakerProposalSubmitView,
+    SpeakerProposalPictureView,
+    EventProposalCreateView,
+    EventProposalDetailView,
+    EventProposalUpdateView,
+    EventProposalSubmitView,
+    SpeakerListView,
+    SpeakerDetailView,
+    SpeakerPictureView,
+    EventListView,
+    CallForSpeakersView,
+    EventDetailView
+)
 
 speaker_proposal_urls = [
     url(

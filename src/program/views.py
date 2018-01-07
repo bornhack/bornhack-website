@@ -108,7 +108,7 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
 
 class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, CreateView):
     model = models.SpeakerProposal
-    fields = ['name', 'biography', 'picture_small', 'picture_large', 'submission_notes']
+    fields = ['name', 'biography', 'picture', 'submission_notes']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):
@@ -117,7 +117,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, CreateProposa
 
 class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, EnsureWritableCampMixin, EnsureCFSOpenMixin, UpdateView):
     model = models.SpeakerProposal
-    fields = ['name', 'biography', 'picture_large', 'submission_notes']
+    fields = ['name', 'biography', 'picture', 'submission_notes']
     template_name = 'speakerproposal_form.html'
 
     def get_success_url(self):
@@ -161,7 +161,7 @@ class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwn
 @method_decorator(require_safe, name='dispatch')
 class SpeakerProposalPictureView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, FileViewMixin, DetailView):
     model = models.SpeakerProposal
-    file_field = "picture_large"
+    file_field = "picture"
     file_directory_name = "speakerproposals"
     object_id_field = "uuid"
 
@@ -233,7 +233,7 @@ class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
 @method_decorator(require_safe, name='dispatch')
 class SpeakerPictureView(CampViewMixin, FileViewMixin, DetailView):
     model = models.Speaker
-    file_field = "picture_large"
+    file_field = "picture"
     file_directory_name = "speakers"
     object_id_field = "uuid"
 
