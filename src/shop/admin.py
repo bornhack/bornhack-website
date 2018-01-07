@@ -35,11 +35,15 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 
 def available_from(product):
-    return product.available_in.lower.strftime("%c")
+    if product.available_in:
+        return product.available_in.lower.strftime("%c")
+    return "None"
 available_from.short_description = 'Available from'
 
 def available_to(product):
-    return product.available_in.upper.strftime("%c")
+    if product.available_in:
+        return product.available_in.upper.strftime("%c")
+    return "None"
 available_to.short_description = 'Available to'
 
 
