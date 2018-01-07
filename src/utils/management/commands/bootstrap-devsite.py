@@ -321,29 +321,29 @@ class Command(BaseCommand):
                 camp=camp
             )
 
-            name = 'Standard ticket {}'.format(year)
+            name = 'BornHack {} Standard ticket'.format(year)
             ticket1 = Product.objects.create(
                 name=name,
                 description='A ticket',
                 price=1200,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='{}'.format(slugify(name)),
                 ticket_type=adult_full_week
             )
 
-            name = 'Hacker ticket {}'.format(year)
+            name = 'BornHack {} Hacker ticket'.format(year)
             ticket2 = Product.objects.create(
                 name=name,
                 description='Another ticket',
                 price=1337,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='{}'.format(slugify(name)),
                 ticket_type=adult_full_week
