@@ -34,6 +34,15 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     ]
 
 
+def available_from(product):
+    return product.available_in.lower.strftime("%c")
+available_from.short_description = 'Available from'
+
+def available_to(product):
+    return product.available_in.upper.strftime("%c")
+available_to.short_description = 'Available to'
+
+
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
@@ -41,8 +50,12 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
         'ticket_type',
         'price',
-        'available_in',
+        'description',
+        available_from,
+        available_to
     ]
+
+    search_fields = ['name']
 
 
 class ProductInline(admin.TabularInline):
