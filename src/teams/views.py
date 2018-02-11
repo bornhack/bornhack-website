@@ -49,7 +49,7 @@ class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     slug_url_kwarg = 'team_slug'
 
     def get_success_url(self):
-        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.get_object().slug})
+        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.get_object().slug})
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
