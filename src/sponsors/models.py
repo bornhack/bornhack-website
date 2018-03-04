@@ -1,6 +1,6 @@
 from django.db import models
 
-from utils.models import CampRelatedModel, CreatedUpdatedModel
+from utils.models import CampRelatedModel
 
 
 def get_sponsor_upload_path(instance, filename):
