@@ -101,9 +101,3 @@ You can also specify details like:
 * A `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
-
-### multicamp prod migration notes
-
-* when villages.0008 migration fails go add camp_id to all existing villages
-* go to admin interface and add bornhack 2017, and set slug for bornhack 2016
-* convert events to the new format (somehow)
