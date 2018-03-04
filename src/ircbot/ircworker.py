@@ -1,4 +1,3 @@
-from .models import OutgoingIrcMessage
 from django.conf import settings
 import logging, irc3
 logging.basicConfig(level=logging.INFO)
