@@ -4,6 +4,7 @@ from datetime import (
     datetime
 )
 from django.db.models import Count
+from django.utils import timezone
 
 def ticket_changed(sender, instance, created, **kwargs):
     """

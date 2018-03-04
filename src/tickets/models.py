@@ -5,7 +5,6 @@ import base64
 import qrcode
 
 from django.conf import settings
-from django.utils import timezone
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
