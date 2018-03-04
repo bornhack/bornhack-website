@@ -1,8 +1,4 @@
 from django.views.generic import TemplateView, ListView
-from django.shortcuts import redirect
-from django.views import View
-from django.conf import settings
-from django.utils.decorators import method_decorator
 from django.http import HttpResponseForbidden
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
