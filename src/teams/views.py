@@ -1,13 +1,12 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, FormView
+from django.views.generic.edit import CreateView, UpdateView
 from camps.mixins import CampViewMixin
 from .models import Team, TeamMember, TeamTask
-from .forms import ManageTeamForm
 from .email import add_added_membership_email, add_removed_membership_email
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
 
