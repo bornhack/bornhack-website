@@ -1,4 +1,8 @@
 from django.conf import settings
+from datetime import (
+    timedelta,
+    datetime
+)
 
 def ticket_changed(sender, instance, created, **kwargs):
     """

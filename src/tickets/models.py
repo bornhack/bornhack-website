@@ -17,10 +17,6 @@ from utils.models import (
 from utils.pdf import generate_pdf_letter
 from django.db import models
 from django.db.models.signals import post_save
-from datetime import (
-    timedelta,
-    datetime
-)
 from django.db.models import Count
 from ircbot.models import OutgoingIrcMessage
 
