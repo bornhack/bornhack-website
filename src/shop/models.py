@@ -72,6 +72,7 @@ class Order(CreatedUpdatedModel):
         verbose_name=_('User'),
         help_text=_('The user this shop order belongs to.'),
         related_name='orders',
+        on_delete=models.PROTECT,
     )
 
     paid = models.BooleanField(
@@ -290,7 +291,8 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
     category = models.ForeignKey(
         'shop.ProductCategory',
-        related_name='products'
+        related_name='products',
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(max_length=150)
@@ -311,6 +313,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
     ticket_type = models.ForeignKey(
         'tickets.TicketType',
+        on_delete=models.PROTECT,
         null=True,
         blank=True
     )
@@ -345,8 +348,8 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
 
 class OrderProductRelation(CreatedUpdatedModel):
-    order = models.ForeignKey('shop.Order')
-    product = models.ForeignKey('shop.Product')
+    order = models.ForeignKey('shop.Order', on_delete=models.PROTECT)
+    product = models.ForeignKey('shop.Product', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     handed_out = models.BooleanField(default=False)
 
@@ -374,7 +377,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = 'Epay Payments'
 
     order = models.OneToOneField('shop.Order')
-    callback = models.ForeignKey('shop.EpayCallback')
+    callback = models.ForeignKey('shop.EpayCallback', on_delete=models.PROTECT)
     txnid = models.IntegerField()
 
 
@@ -402,6 +405,7 @@ class CreditNote(CreatedUpdatedModel):
         verbose_name=_('User'),
         help_text=_('The user this credit note belongs to, if any.'),
         related_name='creditnotes',
+        on_delete=models.PROTECT,
         null=True,
         blank=True
     )

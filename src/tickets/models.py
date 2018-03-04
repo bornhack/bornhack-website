@@ -18,14 +18,14 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 # TicketType can be full week, one day. etc.
 class TicketType(CampRelatedModel, UUIDModel):
     name = models.TextField()
-    camp = models.ForeignKey('camps.Camp')
+    camp = models.ForeignKey('camps.Camp', on_delete=models.PROTECT)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp.title)
 
 
 class BaseTicket(CampRelatedModel, UUIDModel):
-    ticket_type = models.ForeignKey('TicketType')
+    ticket_type = models.ForeignKey('TicketType', on_delete=models.PROTECT)
     checked_in = models.BooleanField(default=False)
     badge_handed_out = models.BooleanField(default=False)
 
@@ -69,7 +69,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 
 
 class SponsorTicket(BaseTicket):
-    sponsor = models.ForeignKey('sponsors.Sponsor')
+    sponsor = models.ForeignKey('sponsors.Sponsor', on_delete=models.PROTECT)
 
     def __str__(self):
         return 'SponsorTicket: {}'.format(self.pk)
@@ -93,8 +93,12 @@ class DiscountTicket(BaseTicket):
 
 
 class ShopTicket(BaseTicket):
-    order = models.ForeignKey('shop.Order', related_name='shoptickets')
-    product = models.ForeignKey('shop.Product')
+    order = models.ForeignKey(
+        'shop.Order',
+        related_name='shoptickets',
+        on_delete=models.PROTECT
+    )
+    product = models.ForeignKey('shop.Product', on_delete=models.PROTECT)
 
     name = models.CharField(
         max_length=100,

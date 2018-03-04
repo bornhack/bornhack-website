@@ -19,7 +19,7 @@ class Sponsor(CampRelatedModel):
         help_text='Name of the sponsor'
     )
 
-    tier = models.ForeignKey('sponsors.SponsorTier')
+    tier = models.ForeignKey('sponsors.SponsorTier', on_delete=models.PROTECT)
 
     description = models.TextField(
         help_text='A short description of the sponsorship'
@@ -57,6 +57,7 @@ class SponsorTier(CampRelatedModel):
     camp = models.ForeignKey(
         'camps.Camp',
         null=True,
+        on_delete=models.PROTECT,
         related_name='sponsor_tiers',
         help_text='The camp this sponsor tier belongs to',
     )

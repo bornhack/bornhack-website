@@ -655,7 +655,11 @@ class Speaker(CampRelatedModel):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey('auth.User', related_name='favorites')
+    user = models.ForeignKey(
+        'auth.User',
+        related_name='favorites',
+        on_delete=models.PROTECT
+    )
     event_instance = models.ForeignKey('program.EventInstance')
 
     class Meta:
