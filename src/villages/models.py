@@ -1,7 +1,7 @@
 from django.core.urlresolvers import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
-from utils.models import CreatedUpdatedModel, UUIDModel, CampRelatedModel
+from utils.models import UUIDModel, CampRelatedModel
 from .managers import VillageQuerySet
 
 

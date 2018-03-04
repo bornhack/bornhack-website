@@ -8,7 +8,6 @@ from .models import Village
 from camps.models import Camp
 from camps.mixins import CampViewMixin
 from .mixins import EnsureWritableCampMixin
-from django.contrib import messages
 
 
 class VillageListView(CampViewMixin, ListView):
