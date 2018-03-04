@@ -1,7 +1,14 @@
 from channels.generic.websockets import JsonWebsocketConsumer
 
 from camps.models import Camp
-from .models import Event, EventInstance, Favorite, EventLocation, EventType, Speaker
+from .models import (
+    Event,
+    EventInstance,
+    Favorite,
+    EventLocation,
+    EventType,
+    Speaker
+)
 
 
 class ScheduleConsumer(JsonWebsocketConsumer):
