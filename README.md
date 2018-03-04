@@ -101,3 +101,21 @@ You can also specify details like:
 * A `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
+
+## Contributors
+Alexander Færøy https://github.com/ahf
+Benjamin Bach https://github.com/benjaoming
+coral https://github.com/coral
+Henrik Kramshøj https://github.com/kramse
+Janus Troelsen https://github.com/ysangkok
+Jonty Wareing https://github.com/Jonty
+Kasper Christensen https://github.com/fALKENdk
+klarstrup https://github.com/klarstrup
+kugg https://github.com/kugg
+RadicalPet https://github.com/RadicalPet
+Reynir Björnsson https://github.com/reynir
+Ronni Elken Lindsgaard https://github.com/rlindsgaard
+Stephan Telling https://github.com/Telling
+Thomas Steen Rasmusssen https://github.com/tykling
+Víðir Valberg Guðmundsson https://github.com/valberg
+Ximin Luo https://github.com/infinity0
