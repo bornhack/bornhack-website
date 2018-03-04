@@ -9,7 +9,7 @@ logger = logging.getLogger('bornhack.%s' % __name__)
 
 class Command(BaseCommand):
     args = 'none'
-    help = 'Run a worker. Takes the worker module as the first positional argument and calls the do_work() function in it. Optional argumends can be seen with -h / --help'
+    help = 'Run a worker. Takes the worker module as the first positional argument and calls the do_work() function in it. Optional arguments can be seen with -h / --help'
     exit_now = False
 
 
