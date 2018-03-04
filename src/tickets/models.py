@@ -1,22 +1,17 @@
 import io
-import logging
 import hashlib
 import base64
 import qrcode
-
 from django.conf import settings
-from django.dispatch import receiver
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from utils.models import (
     UUIDModel,
     CampRelatedModel,
-    CreatedUpdatedModel
 )
 from utils.pdf import generate_pdf_letter
 from django.db import models
-from django.db.models.signals import post_save
-
+import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
