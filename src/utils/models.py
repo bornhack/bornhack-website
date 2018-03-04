@@ -20,7 +20,7 @@ class CleanedModel(models.Model):
             # which is not supposed to happen. Call them manually one by one instead.
             self.clean_fields()
             self.clean()
-            self.validate_unique()
+            self.validate_unique(exclude=None)
         except ValidationError as e:
             message = "Got ValidationError while saving: %s" % e
             if hasattr(self, 'request'):

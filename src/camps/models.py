@@ -188,3 +188,10 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             return False
         else:
             return True
+
+    @property
+    def teams(self):
+        """ Return a queryset with all teams under all TeamAreas under this Camp """
+        from teams.models import Team
+        return Team.objects.filter(area__in=self.teamareas.all())
+

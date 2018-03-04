@@ -18,7 +18,7 @@ class TeamArea(CampRelatedModel):
 
     name = models.CharField(max_length=255)
     description = models.TextField(default='')
-    camp = models.ForeignKey('camps.Camp')
+    camp = models.ForeignKey('camps.Camp', related_name="teamareas", on_delete=models.PROTECT)
     responsible = models.ManyToManyField(
         'auth.User',
         related_name='responsible_team_areas'
