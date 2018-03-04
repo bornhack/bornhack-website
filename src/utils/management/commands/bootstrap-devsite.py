@@ -1405,13 +1405,11 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             noc_team = Team.objects.create(
                 name="NOC",
                 description="The NOC team is in charge of establishing and running a network onsite.".format(year),
-                camp=camp,
                 area=infrastructure_area,
             )
             bar_team = Team.objects.create(
                 name="Bar",
                 description="The Bar team plans, builds and run the IRL bar!",
-                camp=camp,
                 area=bar_area
             )
 
