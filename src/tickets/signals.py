@@ -1,6 +1,4 @@
 from django.conf import settings
-from .models import ShopTicket
-from ircbot.models import OutgoingIrcMessage
 
 def ticket_changed(sender, instance, created, **kwargs):
     """
@@ -15,6 +13,7 @@ def ticket_changed(sender, instance, created, **kwargs):
     target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
 
     # get ticket stats
+    from .models import ShopTicket
     ticket_prefix = "BornHack {}".format(datetime.now().year)
 
     stats = ", ".join(
@@ -45,6 +44,7 @@ def ticket_changed(sender, instance, created, **kwargs):
     ).count()
 
     # queue the messages
+    from ircbot.models import OutgoingIrcMessage
     OutgoingIrcMessage.objects.create(
         target=target,
         message="%s sold!" % instance.product.name,
@@ -54,3 +54,9 @@ def ticket_changed(sender, instance, created, **kwargs):
         target=target,
         message="Totals: {}, 1day: {}, 1day child: {}".format(
             stats,
+            onedaystats,
+            onedaychildstats
+        )[:200],
+        timeout=timezone.now()+timedelta(minutes=10)
+    )
+
