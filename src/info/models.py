@@ -1,5 +1,5 @@
 from django.db import models
-from utils.models import CreatedUpdatedModel, CampRelatedModel
+from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 
 
