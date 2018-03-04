@@ -12,7 +12,6 @@ from program.views import *
 from sponsors.views import *
 from teams.views import *
 from people.views import *
-from tickets.views import ShopTicketListView
 from bar.views import MenuView
 
 urlpatterns = [
