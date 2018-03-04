@@ -11,8 +11,8 @@ class Village(UUIDModel, CampRelatedModel):
         ordering = ['name']
         unique_together = ('slug', 'camp')
 
-    contact = models.ForeignKey('auth.User')
-    camp = models.ForeignKey('camps.Camp')
+    contact = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    camp = models.ForeignKey('camps.Camp', on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
     description = models.TextField(

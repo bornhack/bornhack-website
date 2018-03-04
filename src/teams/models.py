@@ -106,8 +106,8 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
-    user = models.ForeignKey('auth.User')
-    team = models.ForeignKey('teams.Team')
+    user = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    team = models.ForeignKey('teams.Team', on_delete=models.PROTECT)
     approved = models.BooleanField(default=False)
     responsible = models.BooleanField(default=False)
 
@@ -132,6 +132,7 @@ class TeamTask(CampRelatedModel):
     team = models.ForeignKey(
         'teams.Team',
         related_name='tasks',
+        on_delete=models.PROTECT,
         help_text='The team this task belongs to',
     )
     name = models.CharField(
