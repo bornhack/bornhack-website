@@ -165,5 +165,5 @@ class TeamTask(CampRelatedModel):
 
     @property
     def responsible(self):
-        return team.responsible.all()
+        return self.team.responsible.all()
 
