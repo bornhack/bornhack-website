@@ -1,6 +1,7 @@
 from django.views.generic import ListView, DetailView
 from django.utils import timezone
-from .models import *
+from .models import NewsItem
+
 
 class NewsIndex(ListView):
     model = NewsItem

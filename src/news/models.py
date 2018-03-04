@@ -1,5 +1,3 @@
-
-
 from django.db import models
 from django.utils import encoding
 from django.utils.text import slugify
