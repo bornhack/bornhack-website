@@ -11,22 +11,22 @@ class InfoCategory(CampRelatedModel):
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name = 'infocategories',
-        on_delete = models.PROTECT
+        related_name='infocategories',
+        on_delete=models.PROTECT
     )
 
     headline = models.CharField(
-        max_length = 100,
-        help_text = "The headline of this info category"
+        max_length=100,
+        help_text="The headline of this info category"
     )
 
     anchor = models.SlugField(
-        help_text = "The HTML anchor to use for this info category."
+        help_text="The HTML anchor to use for this info category."
     )
 
     weight = models.PositiveIntegerField(
-        help_text = 'Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically. Defaults to 100.',
-        default = 100,
+        help_text='Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically. Defaults to 100.',
+        default=100,
     )
 
     def clean(self):
@@ -45,26 +45,26 @@ class InfoItem(CampRelatedModel):
 
     category = models.ForeignKey(
         'info.InfoCategory',
-        related_name = 'infoitems',
-        on_delete = models.PROTECT
+        related_name='infoitems',
+        on_delete=models.PROTECT
     )
 
     headline = models.CharField(
-        max_length = 100,
-        help_text = "Headline of this info item."
+        max_length=100,
+        help_text="Headline of this info item."
     )
 
     anchor = models.SlugField(
-        help_text = "The HTML anchor to use for this info item."
+        help_text="The HTML anchor to use for this info item."
     )
 
     body = models.TextField(
-        help_text = 'Body of this info item. Markdown is supported.'
+        help_text='Body of this info item. Markdown is supported.'
     )
 
     weight = models.PositiveIntegerField(
-        help_text = 'Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.',
-        default = 100,
+        help_text='Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.',
+        default=100,
     )
 
     @property
@@ -78,5 +78,3 @@ class InfoItem(CampRelatedModel):
 
     def __str__(self):
         return '%s (%s)' % (self.headline, self.category)
-
-
