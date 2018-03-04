@@ -13,7 +13,6 @@ class Plugin(object):
     requires = [
         'irc3.plugins.core', # makes the bot able to connect to an irc server and do basic irc stuff
         'irc3.plugins.userlist', # maintains a convenient list of the channels the bot is in and their users
-        'irc3.plugins.command', # what does this do?
     ]
 
     def __init__(self, bot):
