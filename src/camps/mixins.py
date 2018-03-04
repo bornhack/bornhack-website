@@ -20,5 +20,13 @@ class CampViewMixin(object):
                 if field.name == "camp" and field.related_model._meta.label == "camps.Camp":
                     return queryset.filter(camp=self.camp)
 
+            # check if we have a camp property, filter if so
+            if hasattr(queryset[0], 'camp') and isinstance(getattr(type(queryset[0]), 'camp', None), property):
+                for item in queryset:
+                    if item.camp != self.camp:
+                        queryset = queryset.exclude(pk=item.pk)
+                return queryset
+
         # Camp relation not found, or queryset is empty, return it unaltered
         return queryset
+
