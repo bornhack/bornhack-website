@@ -3,6 +3,7 @@ from datetime import (
     timedelta,
     datetime
 )
+from django.db.models import Count
 
 def ticket_changed(sender, instance, created, **kwargs):
     """
