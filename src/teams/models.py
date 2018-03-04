@@ -29,13 +29,8 @@ class TeamArea(CampRelatedModel):
 
 
 class Team(CampRelatedModel):
-    class Meta:
-        ordering = ['name']
-        unique_together = (('name', 'camp'), ('slug', 'camp'))
-
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
-    camp = models.ForeignKey('camps.Camp', related_name="teams")
     area = models.ForeignKey(
         'teams.TeamArea',
         related_name='teams',
@@ -50,8 +45,27 @@ class Team(CampRelatedModel):
     )
     mailing_list = models.EmailField(blank=True)
 
+    class Meta:
+        ordering = ['name']
+
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
+
+    def validate_unique(self, exclude):
+        """
+        We cannot use unique_together with the camp field because it is a property,
+        so check uniqueness of team name and slug here instead
+        """
+        # check if this team name is in use under this camp
+        if self.camp.teams.filter(name=self.name).exists():
+            raise ValidationError("This Team name already exists for this Camp")
+        if self.camp.teams.filter(slug=self.slug).exists():
+            raise ValidationError("This Team slug already exists for this Camp")
+        return True
+
+    @property
+    def camp(self):
+        return self.area.camp
 
     def save(self, **kwargs):
         if (
@@ -62,10 +76,6 @@ class Team(CampRelatedModel):
             self.slug = slug
 
         super().save(**kwargs)
-
-    def clean(self):
-        if self.camp != self.area.camp:
-            raise ValidationError({'camp': 'camp is different from area.camp'})
 
     def memberstatus(self, member):
         if member not in self.members.all():

@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Team, TeamArea, TeamMember, TeamTask
 from .email import add_added_membership_email, add_removed_membership_email
+from camps.utils import CampPropertyListFilter
 
 
 @admin.register(TeamTask)
@@ -27,10 +28,9 @@ class TeamAdmin(admin.ModelAdmin):
     ]
 
     list_filter = [
-        'camp',
+        CampPropertyListFilter,
         'needs_members',
     ]
-
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):

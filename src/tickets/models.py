@@ -36,14 +36,17 @@ class TicketType(CampRelatedModel, UUIDModel):
         return '{} ({})'.format(self.name, self.camp.title)
 
 
-class BaseTicket(CreatedUpdatedModel, UUIDModel):
+class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey('TicketType')
     checked_in = models.BooleanField(default=False)
-
     badge_handed_out = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
+
+    @property
+    def camp(self):
+        return self.ticket_type.camp
 
     def _get_token(self):
         return hashlib.sha256(
@@ -146,58 +149,4 @@ class ShopTicket(BaseTicket):
         return "shop"
 
 
-@receiver(post_save, sender=ShopTicket)
-def ticket_created(sender, instance, created, **kwargs):
-    # only send a message when a ticket is created
-    if not created:
-        return
 
-    # queue an IRC message to the orga channel if defined,
-    # otherwise for the default channel
-    target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
-
-    # get ticket stats
-    ticket_prefix = "BornHack {}".format(datetime.now().year)
-
-    stats = ", ".join(
-        [
-            "{}: {}".format(
-                tickettype['product__name'].replace(
-                    "{} ".format(ticket_prefix),
-                    ""
-                ),
-                tickettype['total']
-            ) for tickettype in ShopTicket.objects.filter(
-                product__name__startswith=ticket_prefix
-            ).exclude(
-                product__name__startswith="{} One Day".format(ticket_prefix)
-            ).values(
-                'product__name'
-            ).annotate(
-                total=Count('product__name')
-            ).order_by('-total')
-        ]
-    )
-
-    onedaystats = ShopTicket.objects.filter(
-        product__name__startswith="{} One Day Ticket".format(ticket_prefix)
-    ).count()
-    onedaychildstats = ShopTicket.objects.filter(
-        product__name__startswith="{} One Day Children".format(ticket_prefix)
-    ).count()
-
-    # queue the messages
-    OutgoingIrcMessage.objects.create(
-        target=target,
-        message="%s sold!" % instance.product.name,
-        timeout=timezone.now()+timedelta(minutes=10)
-    )
-    OutgoingIrcMessage.objects.create(
-        target=target,
-        message="Totals: {}, 1day: {}, 1day child: {}".format(
-            stats,
-            onedaystats,
-            onedaychildstats
-        )[:200],
-        timeout=timezone.now()+timedelta(minutes=10)
-    )

@@ -13,7 +13,7 @@ def get_sponsor_upload_path(instance, filename):
     )
 
 
-class Sponsor(CreatedUpdatedModel):
+class Sponsor(CampRelatedModel):
     name = models.CharField(
         max_length=150,
         help_text='Name of the sponsor'
@@ -39,6 +39,9 @@ class Sponsor(CreatedUpdatedModel):
     def __str__(self):
         return '{} ({})'.format(self.name, self.tier.camp)
 
+    @property
+    def camp(self):
+        return self.tier.camp
 
 class SponsorTier(CampRelatedModel):
     name = models.CharField(
