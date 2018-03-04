@@ -1,8 +1,4 @@
-import io
 import logging
-import hashlib
-import base64
-import qrcode
 
 from django.conf import settings
 from django.db import models
@@ -202,7 +198,7 @@ class Order(CreatedUpdatedModel):
                 if request:
                     messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
                 # and mark the OPR as handed_out=True
-                order_product.handed_out=True
+                order_product.handed_out = True
                 order_product.save()
         self.save()
 
@@ -210,8 +206,8 @@ class Order(CreatedUpdatedModel):
         if not self.paid:
             messages.error(request, "Order %s is not paid, so cannot mark it as refunded!" % self.pk)
         else:
-            self.refunded=True
-            ### delete any tickets related to this order
+            self.refunded = True
+            # delete any tickets related to this order
             if self.tickets.all():
                 messages.success(request, "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.tickets.count()))
                 self.tickets.all().delete()
@@ -259,7 +255,6 @@ class Order(CreatedUpdatedModel):
         if not self.coinify_api_invoices.exists():
             return False
 
-        coinifyinvoice = None
         for tempinvoice in self.coinify_api_invoices.all():
             # we already have a coinifyinvoice for this order, check if it expired
             if not tempinvoice.expired:
@@ -512,7 +507,7 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
     @property
     def expired(self):
-         return parse_datetime(self.invoicejson['expire_time']) < timezone.now()
+        return parse_datetime(self.invoicejson['expire_time']) < timezone.now()
 
 
 class CoinifyAPICallback(CreatedUpdatedModel):

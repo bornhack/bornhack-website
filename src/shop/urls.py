@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from .views import *
-from tickets.views import ShopTicketListView
 
 urlpatterns = [
     url(r'^$', ShopIndexView.as_view(), name='index'),

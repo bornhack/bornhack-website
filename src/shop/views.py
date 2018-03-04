@@ -3,21 +3,23 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db.models import Count, F
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, Http404
+from django.http import (
+    HttpResponse,
+    HttpResponseRedirect,
+    HttpResponseBadRequest,
+    Http404
+)
 from django.shortcuts import get_object_or_404
 from django.views.generic import (
     View,
-    TemplateView,
     ListView,
     DetailView,
     FormView,
-    UpdateView,
 )
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.dateparse import parse_datetime
 from django.utils import timezone
 
 from shop.models import (
@@ -27,24 +29,22 @@ from shop.models import (
     ProductCategory,
     EpayCallback,
     EpayPayment,
-    CoinifyAPIInvoice,
-    CoinifyAPICallback,
     CreditNote,
 )
 from .forms import AddToOrderForm
 from .epay import calculate_epay_hash, validate_epay_callback
 from collections import OrderedDict
-from vendor.coinify.coinify_api import CoinifyAPI
 from vendor.coinify.coinify_callback import CoinifyCallback
-from .coinify import create_coinify_invoice, save_coinify_callback, process_coinify_invoice_json
-import json, time
+from .coinify import (
+    create_coinify_invoice,
+    save_coinify_callback,
+    process_coinify_invoice_json
+)
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-
-#################################################################################
-### Mixins
+# Mixins
 class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
     model = CreditNote
 
@@ -92,7 +92,9 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if self.get_object().paid:
             messages.error(request, "This order is already paid for!")
-            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+            return HttpResponseRedirect(
+                reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk})
+            )
 
         return super(EnsureUnpaidOrderMixin, self).dispatch(
             request, *args, **kwargs
@@ -105,7 +107,9 @@ class EnsurePaidOrderMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.get_object().paid:
             messages.error(request, "This order is not paid for!")
-            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+            return HttpResponseRedirect(
+                reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk})
+            )
 
         return super(EnsurePaidOrderMixin, self).dispatch(
             request, *args, **kwargs
@@ -118,7 +122,9 @@ class EnsureClosedOrderMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if self.get_object().open is not None:
             messages.error(request, 'This order is still open!')
-            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+            return HttpResponseRedirect(
+                reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk})
+            )
 
         return super(EnsureClosedOrderMixin, self).dispatch(
             request, *args, **kwargs
@@ -160,15 +166,16 @@ class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if not self.get_object().invoice.pdf:
             messages.error(request, "This order has no invoice yet!")
-            return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+            return HttpResponseRedirect(
+                reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk})
+            )
 
         return super(EnsureOrderHasInvoicePDFMixin, self).dispatch(
             request, *args, **kwargs
         )
 
 
-#################################################################################
-### Shop views
+# Shop views
 class ShopIndexView(ListView):
     model = Product
     template_name = "shop_index.html"
@@ -215,7 +222,7 @@ class ProductDetailView(FormView, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         if not self.get_object().category.public:
-            ### this product is not publicly available
+            # this product is not publicly available
             raise Http404("Product not found")
 
         return super(ProductDetailView, self).dispatch(
@@ -264,7 +271,9 @@ class ProductDetailView(FormView, DetailView):
         return super(ProductDetailView, self).form_valid(form)
 
     def get_success_url(self):
-        return Order.objects.get(user=self.request.user, open__isnull=False).get_absolute_url()
+        return Order.objects.get(
+            user=self.request.user, open__isnull=False
+        ).get_absolute_url()
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -289,7 +298,9 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
         if payment_method in order.PAYMENT_METHODS:
             if not request.POST.get('accept_terms'):
                 messages.error(request, "You need to accept the general terms and conditions before you can continue!")
-                return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': order.pk}))
+                return HttpResponseRedirect(
+                    reverse_lazy('shop:order_detail', kwargs={'pk': order.pk})
+                )
 
             # Set payment method and mark the order as closed
             order.payment_method = payment_method
@@ -389,9 +400,7 @@ class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-#################################################################################
-### Epay views
-
+# Epay views
 class EpayFormView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'epay_form.html'
@@ -435,18 +444,18 @@ class EpayCallbackView(SingleObjectMixin, View):
                 return HttpResponse(status=400)
 
             if order.paid:
-                ### this order is already paid, perhaps we are seeing a double callback?
+                # this order is already paid, perhaps we are seeing a double callback?
                 return HttpResponse('OK')
 
-            ### epay callback is valid - has the order been paid in full?
+            # epay callback is valid - has the order been paid in full?
             if int(query['amount']) == order.total * 100:
-                ### create an EpayPayment object linking the callback to the order
+                # create an EpayPayment object linking the callback to the order
                 EpayPayment.objects.create(
                     order=order,
                     callback=callback,
                     txnid=query.get('txnid'),
                 )
-                ### and mark order as paid (this will create tickets)
+                # and mark order as paid (this will create tickets)
                 order.mark_as_paid(request)
             else:
                 logger.error("valid epay callback with wrong amount detected")
@@ -464,15 +473,16 @@ class EpayThanksView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedO
         if request.GET:
             # epay redirects the user back to our accepturl with a long
             # and ugly querystring, redirect user to the clean url
-            return HttpResponseRedirect(reverse('shop:epay_thanks', kwargs={'pk': self.get_object().pk}))
+            return HttpResponseRedirect(
+                reverse('shop:epay_thanks', kwargs={'pk': self.get_object().pk})
+            )
 
         return super(EpayThanksView, self).dispatch(
             request, *args, **kwargs
         )
 
 
-#################################################################################
-### Bank Transfer view
+# Bank Transfer view
 
 class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
@@ -489,16 +499,14 @@ class BankTransferView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpai
         return context
 
 
-#################################################################################
-### Cash payment view
+# Cash payment view
 
 class CashView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureOrderHasProductsMixin, DetailView):
     model = Order
     template_name = 'cash.html'
 
 
-#################################################################################
-### Coinify views
+# Coinify views
 
 class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUnpaidOrderMixin, EnsureClosedOrderMixin, EnsureOrderHasProductsMixin, SingleObjectMixin, RedirectView):
     model = Order
@@ -511,7 +519,9 @@ class CoinifyRedirectView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureUn
             coinifyinvoice = create_coinify_invoice(order, request)
             if not coinifyinvoice:
                 messages.error(request, "There was a problem with the payment provider. Please try again later")
-                return HttpResponseRedirect(reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk}))
+                return HttpResponseRedirect(
+                    reverse_lazy('shop:order_detail', kwargs={'pk': self.get_object().pk})
+                )
 
         return super(CoinifyRedirectView, self).dispatch(
             request, *args, **kwargs
@@ -544,14 +554,17 @@ class CoinifyCallbackView(SingleObjectMixin, View):
         # attemt to validate the callbackc
         if sdk.validate_callback(request.body, request.META['HTTP_X_COINIFY_CALLBACK_SIGNATURE']):
             # mark callback as valid in db
-            callbackobject.valid=True
+            callbackobject.valid = True
             callbackobject.save()
         else:
             logger.error("invalid coinify callback detected")
             return HttpResponseBadRequest('something is fucky')
 
         if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
-            coinifyinvoice = process_coinify_invoice_json(callbackobject.payload['data'], self.get_object())
+            process_coinify_invoice_json(
+                callbackobject.payload['data'],
+                self.get_object()
+            )
             return HttpResponse('OK')
         else:
             logger.error("unsupported callback event %s" % callbackobject.payload['event'])

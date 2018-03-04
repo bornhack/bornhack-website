@@ -1,5 +1,3 @@
-from psycopg2.extras import DateTimeTZRange
-
 from django.db.models import QuerySet
 from django.utils import timezone
 

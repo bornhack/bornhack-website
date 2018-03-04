@@ -1,8 +1,9 @@
 from vendor.coinify.coinify_api import CoinifyAPI
-from vendor.coinify.coinify_callback import CoinifyCallback
 from .models import CoinifyAPIRequest, CoinifyAPIInvoice, CoinifyAPICallback
 from django.conf import settings
-import json, logging
+import json
+import logging
+import requests
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -34,7 +35,7 @@ def save_coinify_callback(request, order):
     # now attempt to parse json
     try:
         parsed = json.loads(request.body.decode('utf-8'))
-    except Exception as E:
+    except Exception:
         parsed = ''
 
     # save this callback to db
@@ -89,8 +90,8 @@ def handle_coinify_api_response(req, order):
         if req.response['success']:
             # save this new coinify invoice to the DB
             coinifyinvoice = process_coinify_invoice_json(
-                invoicejson = req.response['data'],
-                order = order,
+                invoicejson=req.response['data'],
+                order=order,
             )
             return coinifyinvoice
         else:

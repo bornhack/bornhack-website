@@ -1,5 +1,4 @@
 from django import forms
-from .models import Order
 
 
 class AddToOrderForm(forms.Form):
