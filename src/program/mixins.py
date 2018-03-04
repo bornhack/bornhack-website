@@ -3,8 +3,9 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from . import models
 from django.contrib import messages
-import sys, mimetypes
 from django.http import Http404, HttpResponse
+import sys
+import mimetypes
 
 
 class EnsureCFSOpenMixin(SingleObjectMixin):
@@ -12,7 +13,9 @@ class EnsureCFSOpenMixin(SingleObjectMixin):
         # do not permit editing if call for speakers is not open
         if not self.camp.call_for_speakers_open:
             messages.error(request, "The Call for Speakers is not open.")
-            return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
+            return redirect(
+                reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+            )
 
         # alright, continue with the request
         return super().dispatch(request, *args, **kwargs)
@@ -23,8 +26,10 @@ class CreateProposalMixin(SingleObjectMixin):
         # set camp and user before saving
         form.instance.camp = self.camp
         form.instance.user = self.request.user
-        speaker = form.save()
-        return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
+        form.save()
+        return redirect(
+            reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+        )
 
 
 class EnsureUnapprovedProposalMixin(SingleObjectMixin):
@@ -54,7 +59,9 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
         # make sure that this proposal belongs to the logged in user
         if self.get_object().user.username != request.user.username:
             messages.error(request, "No thanks")
-            return redirect(reverse('proposal_list', kwargs={'camp_slug': self.camp.slug}))
+            return redirect(
+                reverse('proposal_list', kwargs={'camp_slug': self.camp.slug})
+            )
 
         # alright, continue with the request
         return super().dispatch(request, *args, **kwargs)
@@ -83,7 +90,10 @@ class PictureViewMixin(SingleObjectMixin):
     def get_picture_response(self, path):
         if 'runserver' in sys.argv or 'runserver_plus' in sys.argv:
             # this is a local devserver situation, guess mimetype from extension and return picture directly
-            response = HttpResponse(self.picture, content_type=mimetypes.types_map[".%s" % self.picture.name.split(".")[-1]])
+            response = HttpResponse(
+                self.picture,
+                content_type=mimetypes.types_map[".%s" % self.picture.name.split(".")[-1]]
+            )
         else:
             # make nginx serve the picture using X-Accel-Redirect
             # (this works for nginx only, other webservers use x-sendfile)

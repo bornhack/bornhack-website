@@ -17,10 +17,8 @@ class CampViewMixin(object):
         if queryset:
             # check if we have a foreignkey to Camp, filter if so
             for field in queryset.model._meta.fields:
-                if field.name=="camp" and field.related_model._meta.label == "camps.Camp":
+                if field.name == "camp" and field.related_model._meta.label == "camps.Camp":
                     return queryset.filter(camp=self.camp)
 
         # Camp relation not found, or queryset is empty, return it unaltered
         return queryset
-
-

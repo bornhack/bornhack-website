@@ -1,5 +1,6 @@
 from django.conf import settings
-import logging, irc3
+import logging
+import irc3
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('bornhack.%s' % __name__)
 
@@ -24,5 +25,5 @@ def do_work():
         irc3.IrcBot(**config).run(forever=True)
     except Exception as E:
         logger.exception("Got exception inside do_work for %s" % self.workermodule)
-        raise
+        raise E
 

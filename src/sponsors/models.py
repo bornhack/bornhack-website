@@ -43,6 +43,7 @@ class Sponsor(CampRelatedModel):
     def camp(self):
         return self.tier.camp
 
+
 class SponsorTier(CampRelatedModel):
     name = models.CharField(
         max_length=25,

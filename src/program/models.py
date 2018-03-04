@@ -1,7 +1,6 @@
 import uuid
 import os
 import icalendar
-import CommonMark
 import logging
 
 from datetime import timedelta
@@ -10,12 +9,9 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib import messages
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.dispatch import receiver
 from django.utils.text import slugify
 from django.conf import settings
 from django.core.urlresolvers import reverse_lazy
-from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse_lazy, reverse
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
@@ -643,7 +639,6 @@ class Speaker(CampRelatedModel):
 
     def get_large_picture_url(self):
         return self.get_picture_url('large')
-
 
     def serialize(self):
         data = {

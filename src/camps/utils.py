@@ -2,11 +2,13 @@ from camps.models import Camp
 from django.utils import timezone
 from django.contrib import admin
 
+
 def get_current_camp():
     try:
         return Camp.objects.get(camp__contains=timezone.now())
     except Camp.DoesNotExist:
         return False
+
 
 class CampPropertyListFilter(admin.SimpleListFilter):
     """
@@ -27,7 +29,6 @@ class CampPropertyListFilter(admin.SimpleListFilter):
         for camp in unique_camps:
             yield (camp.slug, camp.title)
 
-
     def queryset(self, request, queryset):
         # if self.value() is None return everything
         if not self.value():
@@ -45,4 +46,3 @@ class CampPropertyListFilter(admin.SimpleListFilter):
             if item.camp != camp:
                 queryset = queryset.exclude(pk=item.pk)
         return queryset
-

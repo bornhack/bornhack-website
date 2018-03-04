@@ -1,4 +1,3 @@
-import datetime
 import logging
 import os
 
@@ -12,7 +11,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.urls import reverse
-from django.db.models import Q
 from django.template import Engine, Context
 
 import icalendar
@@ -34,7 +32,7 @@ from . import models
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-############## ical calendar ########################################################
+# ical calendar
 
 
 class ICSView(CampViewMixin, View):
@@ -90,7 +88,7 @@ class ICSView(CampViewMixin, View):
         return response
 
 
-############## proposals ########################################################
+# proposals
 
 
 class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -241,7 +239,7 @@ class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsP
     template_name = 'eventproposal_detail.html'
 
 
-################## speakers ###############################################
+# speakers
 
 
 @method_decorator(require_safe, name='dispatch')
@@ -268,7 +266,7 @@ class SpeakerListView(CampViewMixin, ListView):
     template_name = 'speaker_list.html'
 
 
-################## events ##############################################
+# events
 
 
 class EventListView(CampViewMixin, ListView):
@@ -281,7 +279,7 @@ class EventDetailView(CampViewMixin, DetailView):
     template_name = 'schedule_event_detail.html'
 
 
-################## schedule #############################################
+# schedule
 
 
 class NoScriptScheduleView(CampViewMixin, TemplateView):
@@ -293,13 +291,12 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
         return context
 
 
-
 class ScheduleView(CampViewMixin, TemplateView):
     template_name = 'schedule_overview.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
-        context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS;
+        context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS
         return context
 
 
@@ -308,8 +305,8 @@ class CallForSpeakersView(CampViewMixin, TemplateView):
         return '%s_call_for_speakers.html' % self.camp.slug
 
 
+# control center
 
-################## control center #############################################
 
 class ProgramControlCenter(CampViewMixin, TemplateView):
     template_name = "control/index.html"
