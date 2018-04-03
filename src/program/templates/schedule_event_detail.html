@@ -21,6 +21,11 @@
      </p>
 
       <hr>
+      <h4>Metadata</h4>
+      <ul>
+        <li>Video: {% if event.video_url %}<a href="{{ event.video_url }}">{{ event.video_url }}</a>{% else %}None{% endif %}</li>
+        <li>Slides: {% if event.slides %}<a href="{{ event.slides.url }}">{{ event.slides_filename }}</a>{% else %}None{% endif %}</li>
+      </ul>
 
       <h4>Instances</h4>
       <ul class="list-group">

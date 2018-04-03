@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from .email import add_new_speakerproposal_email, add_new_eventproposal_email
-from .models import EventProposal, SpeakerProposal
+from .models import EventProposal, SpeakerProposal, UserSubmittedModel
 from ircbot.models import OutgoingIrcMessage
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -48,7 +48,7 @@ def notify_proposal_submitted(sender, instance, **kwargs):
 
     target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
 
-    if original.proposal_status == 'draft' and instance.proposal_status == 'pending':
+    if original.proposal_status == UserSubmittedModel.PROPOSAL_DRAFT and instance.proposal_status == UserSubmittedModel.PROPOSAL_PENDING:
         if isinstance(instance, EventProposal):
             if not add_new_eventproposal_email(instance):
                 logger.error(

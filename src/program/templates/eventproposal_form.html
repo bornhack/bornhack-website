@@ -3,7 +3,7 @@
 
 {% block program_content %}
 <h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} Event Proposal</h3>
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "Save draft" button_type="submit" button_class="btn-primary" %}
