@@ -28,7 +28,7 @@ CHANNEL_LAYERS = {
     },
 }
 
-ASGI_APPLICATION = "bornhack.routing.channel_routing"
+ASGI_APPLICATION = "bornhack.routing.application"
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
