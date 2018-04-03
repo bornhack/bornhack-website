@@ -6,6 +6,8 @@ from .views import (
     ShopTicketDetailView
 )
 
+app_name = 'tickets'
+
 urlpatterns = [
     url(
         r'^$',

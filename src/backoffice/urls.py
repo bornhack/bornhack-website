@@ -1,6 +1,9 @@
 from django.conf.urls import url
 from .views import *
 
+
+app_name = 'backoffice'
+
 urlpatterns = [
     url(r'^$', BackofficeIndexView.as_view(), name='index'),
     url(r'product_handout/$', ProductHandoutView.as_view(), name='product_handout'),

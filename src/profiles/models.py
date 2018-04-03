@@ -24,6 +24,7 @@ class Profile(CreatedUpdatedModel, UUIDModel):
         User,
         verbose_name=_('User'),
         help_text=_('The django user this profile belongs to.'),
+        on_delete=models.PROTECT
     )
 
     name = models.CharField(

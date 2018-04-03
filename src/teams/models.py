@@ -6,7 +6,7 @@ from utils.models import CampRelatedModel
 from .email import add_new_membership_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 

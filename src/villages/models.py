@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
 from utils.models import UUIDModel, CampRelatedModel

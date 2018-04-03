@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from datetime import timedelta
@@ -376,7 +376,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
         verbose_name = 'Epay Payment'
         verbose_name_plural = 'Epay Payments'
 
-    order = models.OneToOneField('shop.Order')
+    order = models.OneToOneField('shop.Order', on_delete=models.PROTECT)
     callback = models.ForeignKey('shop.EpayCallback', on_delete=models.PROTECT)
     txnid = models.IntegerField()
 
@@ -469,8 +469,18 @@ class CreditNote(CreatedUpdatedModel):
 
 
 class Invoice(CreatedUpdatedModel):
-    order = models.OneToOneField('shop.Order', null=True, blank=True)
-    customorder = models.OneToOneField('shop.CustomOrder', null=True, blank=True)
+    order = models.OneToOneField(
+        'shop.Order',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT
+    )
+    customorder = models.OneToOneField(
+        'shop.CustomOrder',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT
+    )
     pdf = models.FileField(null=True, blank=True, upload_to='invoices/')
     sent_to_customer = models.BooleanField(default=False)
 
