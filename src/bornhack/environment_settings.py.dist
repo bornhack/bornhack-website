@@ -36,6 +36,9 @@ CAMP_REDIRECT_PERCENT=25
 ### changes below here are only needed for production
 
 # email settings
+{% if not django_email_realworld | default(False) %}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+{% endif %}
 EMAIL_HOST='{{ django_email_host }}'
 EMAIL_PORT={{ django_email_port }}
 EMAIL_HOST_USER='{{ django_email_user }}'
