@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Team, TeamArea, TeamMember, TeamTask
+from .models import Team, TeamMember, TeamTask
 from .email import add_added_membership_email, add_removed_membership_email
 from camps.utils import CampPropertyListFilter
 
@@ -17,12 +17,12 @@ class TeamTaskAdmin(admin.ModelAdmin):
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     def get_responsible(self, obj):
-        return ", ".join([resp.get_full_name() for resp in obj.responsible])
+        return ", ".join([resp.profile.public_credit_name for resp in obj.responsible_members.all()])
     get_responsible.short_description = 'Responsible'
 
     list_display = [
         'name',
-        'area',
+        'camp',
         'get_responsible',
         'needs_members',
     ]
@@ -78,9 +78,3 @@ class TeamMemberAdmin(admin.ModelAdmin):
         )
     remove_member.description = 'Remove a user from the team.'
 
-
-@admin.register(TeamArea)
-class TeamAreaAdmin(admin.ModelAdmin):
-    list_filter = [
-        'camp'
-    ]

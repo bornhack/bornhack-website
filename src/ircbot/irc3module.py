@@ -1,7 +1,8 @@
-import irc3
+import irc3, re
 from ircbot.models import OutgoingIrcMessage
 from django.conf import settings
 from django.utils import timezone
+from events.models import Routing
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -26,6 +27,12 @@ class Plugin(object):
         """triggered after the server sent the MOTD (require core plugin)"""
         logger.debug("inside server_ready(), kwargs: %s" % kwargs)
 
+        logger.info("Identifying with %s" % settings.IRCBOT_NICKSERV_MASK)
+        self.bot.privmsg(settings.IRCBOT_NICKSERV_MASK, "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
+
+        logger.info("Calling self.bot.get_outgoing_messages in %s seconds.." % settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
+        self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
+
 
     def connection_lost(self, **kwargs):
         """triggered when connection is lost"""
@@ -35,9 +42,6 @@ class Plugin(object):
     def connection_made(self, **kwargs):
         """triggered when connection is up"""
         logger.debug("inside connection_made(), kwargs: %s" % kwargs)
-
-        # wait 5 secs before starting the loop to check for outgoing messages
-        self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
 
 
     ###############################################################################################
@@ -49,15 +53,45 @@ class Plugin(object):
         logger.debug("inside on_join_part_quit(), kwargs: %s" % kwargs)
 
 
+    @irc3.event(irc3.rfc.JOIN)
+    def on_join(self, mask, channel, **kwargs):
+        """Triggered when a channel is joined by someone, including the bot itself"""
+        managed_channels = Routing.objects.filter(team__irc_channel=True, team__irc_channel_managed=True).values_list('team__irc_channel_name', flat=True).distinct()
+        if mask.nick == self.bot.nick and channel in managed_channels:
+            logger.debug("Just joined a channel I am supposed to be managing, asking ChanServ for info about %s" % channel)
+            self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "info %s" % channel)
+            return
+
+
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, **kwargs):
         """triggered when a privmsg is sent to the bot or to a channel the bot is in"""
         logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
 
-        # nickserv
-        if kwargs['mask'] == "NickServ!NickServ@services.baconsvin.org" and kwargs['event'] == "NOTICE" and kwargs['data'] == "This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02.":
-            logger.info("Nickserv identify needed, fixing...")
-            self.bot.privmsg("NickServ@services.baconsvin.org", "identify %s %s" % (settings.IRCBOT_NICK, settings.IRCBOT_NICKSERV_PASSWORD))
+        # we only handle NOTICEs for now
+        if kwargs['event'] != "NOTICE":
+            return
+
+        # check if this is a message from nickserv
+        if kwargs['mask'] == "NickServ!%s" % settings.IRCBOT_NICKSERV_MASK:
+            if kwargs['data'] == '\x02%s\x02 is not a registered nickname.' % self.bot.nick:
+                # the bots nickname is not registered, register new account with nickserv
+                self.bot.privmsg(settings.IRCBOT_NICKSERV_MASK, "register %s %s" % (settings.IRCBOT_NICKSERV_PASSWORD, settings.IRCBOT_NICKSERV_EMAIL))
+                return
+
+        # check if this is a message from chanserv
+        if kwargs['mask'] == "ChanServ!%s" % settings.IRCBOT_CHANSERV_MASK:
+            logger.debug("got message from ChanServ")
+            match = re.compile("Channel (#[a-zA-Z0-9-]+) is not registered.").match(kwargs['data'].replace("\x02", ""))
+            if match:
+                # the irc channel match.group(1) is not registered
+                ircchannel = match.group(1)
+                # get a list of the channels we are supposed to be managing
+                managed_channels = list(Routing.objects.filter(team__irc_channel=True, team__irc_channel_managed=True).values_list('team__irc_channel_name', flat=True).distinct())
+                if ircchannel in managed_channels:
+                    logger.debug("ChanServ says channel %s is not registered, bot is supposed to be managing this channel, registering it with chanserv" % ircchannel)
+                    self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "register %s" % ircchannel)
+                    return
 
 
     @irc3.event(irc3.rfc.KICK)
@@ -101,5 +135,4 @@ class Plugin(object):
 
         # call this function again in X seconds
         self.bot.loop.call_later(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.get_outgoing_messages)
-
 

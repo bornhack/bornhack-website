@@ -21,6 +21,7 @@ People | {{ block.super }}
           <thead>
           <tr>
             <th>Team Name</th>
+            <th>Team Responsible</th>
             <th>Team Members</th>
           </tr>
           </thead>
@@ -31,19 +32,27 @@ People | {{ block.super }}
                   {{ team.name }} Team
               </td>
               <td>
-                {% if team.anoncount == 0 and team.approvedmembers.count == 0 %}
-                <b>No team member(s)
-                {% elif team.approvedmembers.count == team.anoncount %}
-                <b>{{ team.anoncount }}</b> anonymous member(s)
-                {% endif %}
-
-                {% for member in team.approvedmembers.all %}
-                {% if member.user.profile.approved_public_credit_name %}
-                {{ member.user.profile.approved_public_credit_name }}{% if member in team.responsible.all %} (responsible){% endif %}<br>
+                {% for resp in team.responsible_members.all %}
+                {% if resp.user.profile.approved_public_credit_name %}
+                {{ resp.user.profile.approved_public_credit_name }}<br>
+                {% else %}
+                anonymous<br>
                 {% endif %}
                 {% endfor %}
-                {% if team.anoncount and team.anoncount != team.approvedmembers.count %}
-                plus <b>{{ team.anoncount }}</b> anonymous member(s).
+              </td>
+              <td>
+                {% if team.regular_named_members.count == 0 and team.regular_unnamed_members == 0 %}
+                <b>No team member(s)
+                {% else %}
+
+                {% for member in team.regular_named_members.all %}
+                {% if member.user.profile.approved_public_credit_name %}
+                {{ member.user.profile.approved_public_credit_name }}{% if member in team.responsible_members.all %} (responsible){% endif %}<br>
+                {% endif %}
+                {% endfor %}
+                {% if team.regular_unnamed_members %}
+                plus <b>{{ team.regular_unnamed_members }}</b> anonymous member(s).
+                {% endif %}
                 {% endif %}
               </td>
            </tr>

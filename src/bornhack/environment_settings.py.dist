@@ -76,13 +76,13 @@ SCHEDULE_EVENT_NOTIFICATION_MINUTES=10
 # irc bot settings
 IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS=10
 IRCBOT_NICK='{{ django_ircbot_nickname }}'
+IRCBOT_CHANSERV_MASK='{{ django_ircbot_chanserv_mask }}'
+IRCBOT_NICKSERV_MASK='{{ django_ircbot_nickserv_mask }}'
 IRCBOT_NICKSERV_PASSWORD='{{ django_ircbot_nickserv_password }}'
+IRCBOT_NICKSERV_EMAIL='{{ django_ircbot_nickserv_email }}'
+IRCBOT_NICKSERV_IDENTIFY_STRING="This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02."
 IRCBOT_SERVER_HOSTNAME='{{ django_ircbot_server }}'
 IRCBOT_SERVER_PORT=6697
 IRCBOT_SERVER_USETLS=True
-IRCBOT_CHANNELS={
-    'default': '{{ django_ircbot_default_channel }}',
-    'orga': '{{ django_ircbot_orga_channel }}',
-    'public': '{{ django_ircbot_public_channel }}'
-}
+IRCBOT_PUBLIC_CHANNEL='{{ django_ircbot_public_channel }}'
 

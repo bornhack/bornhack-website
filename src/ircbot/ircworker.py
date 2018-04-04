@@ -1,6 +1,7 @@
 from django.conf import settings
 import logging
 import irc3
+from events.models import Routing
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('bornhack.%s' % __name__)
 
@@ -9,9 +10,19 @@ def do_work():
     """
         Run irc3 module code, wait for events on IRC and wait for messages in OutgoingIrcMessage
     """
+    if hasattr(settings, 'IRCBOT_CHANNELS'):
+        logger.error("settings.IRCBOT_CHANNELS is deprecated. Please define settings.IRCBOT_PUBLIC_CHANNEL and use team channels for the rest.")
+        return False
+
+    # add the public channel
+    channel_list = [settings.IRCBOT_PUBLIC_CHANNEL]
+
+    # add the team channels
+    channel_list = channel_list + list(Routing.objects.filter(team__irc_channel=True).values_list('team__irc_channel_name', flat=True).distinct())
+
     config = {
         'nick': settings.IRCBOT_NICK,
-        'autojoins': list(set(settings.IRCBOT_CHANNELS.values())),
+        'autojoins': channel_list,
         'host': settings.IRCBOT_SERVER_HOSTNAME,
         'port': settings.IRCBOT_SERVER_PORT,
         'ssl': settings.IRCBOT_SERVER_USETLS,

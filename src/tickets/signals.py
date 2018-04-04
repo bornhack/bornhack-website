@@ -5,21 +5,20 @@ from datetime import (
 )
 from django.db.models import Count
 from django.utils import timezone
+from events.handler import handle_team_event
 
 def ticket_changed(sender, instance, created, **kwargs):
     """
     This signal is called every time a ShopTicket is saved
     """
-    # only queue an IRC message when a new ticket is created
+    # only trigger an event when a new ticket is created
     if not created:
         return
 
-    # queue an IRC message to the orga channel if defined,
-    # otherwise for the default channel
-    target = settings.IRCBOT_CHANNELS['orga'] if 'orga' in settings.IRCBOT_CHANNELS else settings.IRCBOT_CHANNELS['default']
-
     # get ticket stats
     from .models import ShopTicket
+
+    # TODO: this is nasty, get the prefix some other way
     ticket_prefix = "BornHack {}".format(datetime.now().year)
 
     stats = ", ".join(
@@ -50,19 +49,17 @@ def ticket_changed(sender, instance, created, **kwargs):
     ).count()
 
     # queue the messages
-    from ircbot.models import OutgoingIrcMessage
-    OutgoingIrcMessage.objects.create(
-        target=target,
-        message="%s sold!" % instance.product.name,
-        timeout=timezone.now()+timedelta(minutes=10)
+    handle_team_event(
+        eventtype='ticket_created',
+        irc_message="%s sold!" % instance.product.name
     )
-    OutgoingIrcMessage.objects.create(
-        target=target,
-        message="Totals: {}, 1day: {}, 1day child: {}".format(
+    # limit this one to a length of 200 because IRC is nice
+    handle_team_event(
+        eventtype='ticket_created',
+        irc_message="Totals: {}, 1day: {}, 1day child: {}".format(
             stats,
             onedaystats,
             onedaychildstats
-        )[:200],
-        timeout=timezone.now()+timedelta(minutes=10)
+        )[:200]
     )
 

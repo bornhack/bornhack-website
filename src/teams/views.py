@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
 from django.core.urlresolvers import reverse_lazy
+from django.conf import settings
 
 from profiles.models import Profile
 
@@ -19,7 +20,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class EnsureTeamResponsibleMixin(object):
     def dispatch(self, request, *args, **kwargs):
         self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
-        if request.user not in self.team.responsible.all():
+        if request.user not in self.team.responsible_members.all():
             messages.error(request, 'No thanks')
             return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.team.slug)
 
@@ -40,15 +41,25 @@ class TeamDetailView(CampViewMixin, DetailView):
     model = Team
     slug_url_kwarg = 'team_slug'
 
+    def get_context_data(self, **kwargs):
+        context = super(TeamDetailView, self).get_context_data(**kwargs)
+        context['IRCBOT_SERVER_HOSTNAME'] = settings.IRCBOT_SERVER_HOSTNAME
+        context['IRCBOT_PUBLIC_CHANNEL'] = settings.IRCBOT_PUBLIC_CHANNEL
+        return context
+
 
 class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
-    fields = ['description', 'needs_members']
+    fields = ['description', 'needs_members', 'irc_channel', 'irc_channel_name', 'irc_channel_managed', 'irc_channel_private']
     slug_url_kwarg = 'team_slug'
 
     def get_success_url(self):
         return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.get_object().slug})
+
+    def form_valid(self, form):
+        messages.success(self.request, "Team has been saved")
+        return super().form_valid(form)
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
@@ -104,7 +115,7 @@ class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user not in self.get_object().team.responsible.all():
+        if request.user not in self.get_object().team.responsible_members.all():
             messages.error(request, 'No thanks')
             return redirect('teams:detail', camp_slug=self.get_object().team.camp.slug, team_slug=self.get_object().team.slug)
 
@@ -113,7 +124,7 @@ class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
         )
 
 
-class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
+class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = []
@@ -130,7 +141,7 @@ class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberRe
         return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
 
 
-class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
+class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = []

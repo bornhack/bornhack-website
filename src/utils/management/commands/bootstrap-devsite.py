@@ -23,8 +23,11 @@ from tickets.models import (
 from teams.models import (
     Team,
     TeamTask,
-    TeamArea,
     TeamMember
+)
+from events.models import (
+    Type,
+    Routing
 )
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
@@ -44,6 +47,7 @@ class Command(BaseCommand):
             title='BornHack 2016',
             tagline='Initial Commit',
             slug='bornhack-2016',
+            shortslug='bh2016',
             buildup=(
                 timezone.datetime(2016, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2016, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -63,6 +67,7 @@ class Command(BaseCommand):
             title='BornHack 2017',
             tagline='Make Tradition',
             slug='bornhack-2017',
+            shortslug='bh2017',
             buildup=(
                 timezone.datetime(2017, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2017, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -82,6 +87,7 @@ class Command(BaseCommand):
             title='BornHack 2018',
             tagline='Undecided',
             slug='bornhack-2018',
+            shortslug='bh2018',
             buildup=(
                 timezone.datetime(2018, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2018, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -104,6 +110,8 @@ class Command(BaseCommand):
         )
         user1.profile.name = 'John Doe'
         user1.profile.description = 'one that once was'
+        user1.profile.public_credit_name = 'PublicDoe'
+        user1.profile.public_credit_name_approved = True
         user1.profile.save()
         email = EmailAddress.objects.create(
             user=user1,
@@ -112,6 +120,7 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user2 = User.objects.create_user(
             username='user2',
             password='user2',
@@ -127,6 +136,7 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user3 = User.objects.create_user(
             username='user3',
             password='user3',
@@ -134,6 +144,7 @@ class Command(BaseCommand):
         )
         user3.profile.name = 'Lorem Ipsum'
         user3.profile.description = 'just a user'
+        user3.profile.public_credit_name = 'Lorem Ipsum'
         user3.profile.save()
         email = EmailAddress.objects.create(
             user=user3,
@@ -142,6 +153,7 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user4 = User.objects.create_user(
             username='user4',
             password='user4',
@@ -149,6 +161,8 @@ class Command(BaseCommand):
         )
         user4.profile.name = 'Ethe Reum'
         user4.profile.description = 'I prefer doge'
+        user4.profile.public_credit_name = 'Dogefan'
+        user4.profile.public_credit_name_approved = True
         user4.profile.save()
         email = EmailAddress.objects.create(
             user=user4,
@@ -157,6 +171,96 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
+        user5 = User.objects.create_user(
+            username='user5',
+            password='user5',
+            is_staff=True
+        )
+        user5.profile.name = 'Pyra Mid'
+        user5.profile.description = 'This is not a scam'
+        user5.profile.public_credit_name = 'Ponziarne'
+        user5.profile.public_credit_name_approved = True
+        user5.profile.save()
+        email = EmailAddress.objects.create(
+            user=user5,
+            email='user5@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user6 = User.objects.create_user(
+            username='user6',
+            password='user6',
+            is_staff=True
+        )
+        user6.profile.name = 'User Number 6'
+        user6.profile.description = 'some description'
+        user6.profile.public_credit_name = 'bruger 6'
+        user6.profile.public_credit_name_approved = True
+        user6.profile.save()
+        email = EmailAddress.objects.create(
+            user=user6,
+            email='user6@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user7 = User.objects.create_user(
+            username='user7',
+            password='user7',
+            is_staff=True
+        )
+        user7.profile.name = 'Assembly Hacker'
+        user7.profile.description = 'Low level is best level'
+        user7.profile.public_credit_name = 'asm'
+        user7.profile.public_credit_name_approved = True
+        user7.profile.save()
+        email = EmailAddress.objects.create(
+            user=user7,
+            email='user7@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user8 = User.objects.create_user(
+            username='user8',
+            password='user8',
+            is_staff=True
+        )
+        user8.profile.name = 'TCL'
+        user8.profile.description = 'Expect me'
+        user8.profile.public_credit_name = 'TCL lover'
+        user8.profile.public_credit_name_approved = True
+        user8.profile.save()
+        email = EmailAddress.objects.create(
+            user=user8,
+            email='user8@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user9 = User.objects.create_user(
+            username='user9',
+            password='user9',
+            is_staff=True
+        )
+        user9.profile.name = 'John Windows'
+        user9.profile.description = 'Microsoft is best soft'
+        user9.profile.public_credit_name = 'msboy'
+        user9.profile.save()
+        email = EmailAddress.objects.create(
+            user=user9,
+            email='user9@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
         admin = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
@@ -1373,44 +1477,21 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
             )
 
-            self.output("Creating team areas for {}...".format(year))
-            pr_area = TeamArea.objects.create(
-                name='PR',
-                description="The Public Relations area covers website, social media and marketing related tasks.",
-                camp=camp
-            )
-            content_area = TeamArea.objects.create(
-                name='Content',
-                description="The Content area handles talks, A/V and photos.",
-                camp=camp
-            )
-            infrastructure_area = TeamArea.objects.create(
-                name='Infrastructure',
-                description="The Infrastructure area covers network/NOC, power, villages, CERT, logistics.",
-                camp=camp
-            )
-            bar_area = TeamArea.objects.create(
-                name='Bar',
-                description="The Bar area covers building and running the IRL bar, DJ booth and related tasks.",
-                camp=camp
-            )
-
-            self.output("Setting teamarea responsibles for {}...".format(year))
-            pr_area.responsible.add(user2)
-            content_area.responsible.add(user2, user3)
-            infrastructure_area.responsible.add(user3, user4)
-            bar_area.responsible.add(user4)
-
             self.output("Creating teams for {}...".format(year))
+            orga_team = Team.objects.create(
+                name="Orga",
+                description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
+                camp=camp
+            )
             noc_team = Team.objects.create(
                 name="NOC",
-                description="The NOC team is in charge of establishing and running a network onsite.".format(year),
-                area=infrastructure_area,
+                description="The NOC team is in charge of establishing and running a network onsite.",
+                camp=camp
             )
             bar_team = Team.objects.create(
                 name="Bar",
                 description="The Bar team plans, builds and run the IRL bar!",
-                area=bar_area
+                camp=camp
             )
 
             self.output("Creating TeamTasks for {}...".format(year))
@@ -1461,29 +1542,93 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             )
 
             self.output("Setting team members for {}...".format(year))
+            # noc team
             TeamMember.objects.create(
                 team=noc_team,
                 user=user4,
-                approved=True
+                approved=True,
+                responsible=True
             )
             TeamMember.objects.create(
                 team=noc_team,
-                user=user1
+                user=user1,
+                approved=True,
             )
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user5,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user6,
+            )
+
+            # bar team
             TeamMember.objects.create(
                 team=bar_team,
                 user=user1,
-                approved=True
+                approved=True,
+                responsible=True
             )
             TeamMember.objects.create(
                 team=bar_team,
                 user=user3,
-                approved=True
+                approved=True,
+                responsible=True
             )
             TeamMember.objects.create(
                 team=bar_team,
-                user=user2
+                user=user2,
+                approved=True,
             )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user7,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user8,
+            )
+
+            # orga team
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user1,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user3,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user8,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user9,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user4,
+            )
+
+        self.output("Adding event routing...")
+        Routing.objects.create(
+            team=orga_team,
+            eventtype=Type.objects.get(name="public_credit_name_changed")
+        )
+        Routing.objects.create(
+            team=orga_team,
+            eventtype=Type.objects.get(name="ticket_created")
+        )
 
 
         self.output("marking 2016 as read_only...")
