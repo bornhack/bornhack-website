@@ -29,8 +29,8 @@ def changed_public_credit_name(sender, instance, **kwargs):
         # public_credit_name has not been changed
         return
 
-    if not instance.public_credit_name_approved:
-        # instance.public_credit_name_approved is already False, no need to notify again
+    if original.public_credit_name and not original.public_credit_name_approved:
+        # the original.public_credit_name was not approved, no need to notify again
         return
 
     # put the message together
