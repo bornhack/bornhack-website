@@ -33,26 +33,19 @@ People | {{ block.super }}
               </td>
               <td>
                 {% for resp in team.responsible_members.all %}
-                {% if resp.user.profile.approved_public_credit_name %}
-                {{ resp.user.profile.approved_public_credit_name }}<br>
-                {% else %}
-                anonymous<br>
-                {% endif %}
+                  {{ resp.profile.get_public_credit_name }}<br>
                 {% endfor %}
               </td>
               <td>
-                {% if team.regular_named_members.count == 0 and team.regular_unnamed_members == 0 %}
-                <b>No team member(s)
-                {% else %}
-
-                {% for member in team.regular_named_members.all %}
-                {% if member.user.profile.approved_public_credit_name %}
-                {{ member.user.profile.approved_public_credit_name }}{% if member in team.responsible_members.all %} (responsible){% endif %}<br>
-                {% endif %}
+                {% for member in team.regular_members.all %}
+                  {% if member.profile.get_public_credit_name != "Unnamed" %}
+                    {{ member.profile.get_public_credit_name }}<br>
+                  {% endif %}
+                {% empty %}
+                  No team members
                 {% endfor %}
-                {% if team.regular_unnamed_members %}
-                plus <b>{{ team.regular_unnamed_members }}</b> anonymous member(s).
-                {% endif %}
+                {% if team.unnamed_members %}
+                  Plus <b>{{ team.unnamed_members.count }}</b> anonymous member(s).
                 {% endif %}
               </td>
            </tr>

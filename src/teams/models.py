@@ -110,17 +110,6 @@ class Team(CampRelatedModel):
             self.irc_channel_name = "#%s" % self.irc_channel_name
 
     @property
-    def memberships(self):
-        """
-        Returns all TeamMember objects for this team.
-        Use self.members.all() to get User objects for all members,
-        and use self.memberships.all() to get TeamMember objects for all members.
-        """
-        return TeamMember.objects.filter(
-            team=self
-        )
-
-    @property
     def approved_members(self):
         """
         Returns only approved members (returns User objects, not TeamMember objects)
@@ -147,6 +136,30 @@ class Team(CampRelatedModel):
         return self.members.filter(
             teammember__approved=True,
             teammember__responsible=True
+        )
+
+    @property
+    def regular_members(self):
+        """
+        Return only approved and not responsible members with
+        an approved public_credit_name.
+        Used on the people pages.
+        """
+        return self.members.filter(
+            teammember__approved=True,
+            teammember__responsible=False,
+        )
+
+    @property
+    def unnamed_members(self):
+        """
+        Returns only approved and not responsible members,
+        without an approved public_credit_name.
+        """
+        return self.members.filter(
+            teammember__approved=True,
+            teammember__responsible=False,
+            profile__public_credit_name_approved=False
         )
 
 
