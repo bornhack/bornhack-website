@@ -110,6 +110,17 @@ class Team(CampRelatedModel):
             self.irc_channel_name = "#%s" % self.irc_channel_name
 
     @property
+    def memberships(self):
+        """
+        Returns all TeamMember objects for this team.
+        Use self.members.all() to get User objects for all members,
+        or use self.memberships.all() to get TeamMember objects for all members.
+        """
+        return TeamMember.objects.filter(
+            team=self
+        )
+
+    @property
     def approved_members(self):
         """
         Returns only approved members (returns User objects, not TeamMember objects)
