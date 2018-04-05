@@ -27,6 +27,9 @@ def add_missing_team_responsibles(apps, schema_editor):
             # get the area responsibles instead
             responsibles = team.area.responsible.all()
         for responsible in responsibles:
+            if isinstance(responsible, TeamMember):
+                # we need User objects instead of TeamMember objects
+                responsible = responsible.user
             try:
                 membership = TeamMember.objects.get(team=team, user=responsible)
                 if not membership.responsible:
