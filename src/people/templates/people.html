@@ -45,7 +45,7 @@ People | {{ block.super }}
                   No team members
                 {% endfor %}
                 {% if team.unnamed_members %}
-                  Plus <b>{{ team.unnamed_members.count }}</b> anonymous member(s).
+                  {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}<b>{{ team.unnamed_members.count }}</b> anonymous member(s).
                 {% endif %}
               </td>
            </tr>
