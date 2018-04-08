@@ -291,7 +291,7 @@ class Plugin(object):
                 else:
                     logger.debug("ChanServ says channel %s is not registered, bot is supposed to be managing this channel, but the bot cannot register without @ in the channel" % channel)
                     self.bot.privmsg(channel, "I need @ before I can register this channel with ChanServ")
-                return
+            return
 
         ###############################################
         # handle "\x02#example\x02 is now registered to \x02tykbhdev\x02" message
@@ -316,6 +316,7 @@ class Plugin(object):
 
             # set channel modes and ACL
             self.bot.setup_private_channel(team)
+            return
 
         logger.debug("Unhandled ChanServ message: %s" % kwargs['data'])
 
