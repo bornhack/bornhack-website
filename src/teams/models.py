@@ -109,6 +109,10 @@ class Team(CampRelatedModel):
         if self.irc_channel_name and self.irc_channel_name[0] != "#":
             self.irc_channel_name = "#%s" % self.irc_channel_name
 
+        if self.irc_channel_name:
+            if Team.objects.filter(irc_channel_name=self.irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError("This IRC channel name is already in use")
+
     @property
     def memberships(self):
         """
@@ -175,10 +179,32 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
-    user = models.ForeignKey('auth.User', on_delete=models.PROTECT)
-    team = models.ForeignKey('teams.Team', on_delete=models.PROTECT)
-    approved = models.BooleanField(default=False)
-    responsible = models.BooleanField(default=False)
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.PROTECT,
+        help_text="The User object this team membership relates to",
+    )
+
+    team = models.ForeignKey(
+        'teams.Team',
+        on_delete=models.PROTECT,
+        help_text="The Team this membership relates to"
+    )
+
+    approved = models.BooleanField(
+        default=False,
+        help_text="True if this membership is approved. False if not."
+    )
+
+    responsible = models.BooleanField(
+        default=False,
+        help_text="True if this teammember is responsible for this Team. False if not."
+    )
+
+    irc_channel_acl_ok = models.BooleanField(
+        default=False,
+        help_text="Maintained by the IRC bot, do not edit manually. True if the teammembers NickServ username has been added to the Team IRC channels ACL.",
+    )
 
     class Meta:
         ordering = ['-responsible', '-approved']

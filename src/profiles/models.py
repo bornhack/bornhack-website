@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from datetime import timedelta
 
-from ircbot.models import OutgoingIrcMessage
 from utils.models import UUIDModel, CreatedUpdatedModel
 
 

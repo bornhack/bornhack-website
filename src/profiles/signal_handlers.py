@@ -3,6 +3,9 @@ from django.db.models.signals import (
     pre_save
 )
 from events.handler import handle_team_event
+import logging
+logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 def create_profile(sender, created, instance, **kwargs):
     """
@@ -14,17 +17,24 @@ def create_profile(sender, created, instance, **kwargs):
         Profile.objects.create(user=instance)
 
 
-def changed_public_credit_name(sender, instance, **kwargs):
+def profile_pre_save(sender, instance, **kwargs):
     """
     Signal handler called before a Profile object is saved.
-    Checks if a users public_credit_name has been changed, and triggers a public_credit_name_changed event if so
     """
     try:
         original = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
-        # newly created object, do nothing
-        return
+        original = None
+    logger.debug("inside profile_pre_save with instance.nickserv_username=%s and original.nickserv_username=%s" % (instance.nickserv_username, original.nickserv_username))
 
+    public_credit_name_changed(instance, original)
+    nickserv_username_changed(instance, original)
+
+
+def public_credit_name_changed(instance, original):
+    """
+    Checks if a users public_credit_name has been changed, and triggers a public_credit_name_changed event if so
+    """
     if original.public_credit_name == instance.public_credit_name:
         # public_credit_name has not been changed
         return
@@ -44,4 +54,28 @@ def changed_public_credit_name(sender, instance, **kwargs):
         eventtype='public_credit_name_changed',
         irc_message=message,
     )
+
+
+def nickserv_username_changed(instance, original):
+    """
+    Check if profile.nickserv_username was changed, and uncheck irc_channel_acl_ok if so
+    This will be picked up by the IRC bot and fixed as needed
+    """
+    if instance.nickserv_username and instance.nickserv_username != original.nickserv_username:
+        logger.debug("profile.nickserv_username changed for user %s, setting irc_channel_acl_ok=False" % instance.user.username)
+
+        # find team memberships for this user
+        from teams.models import TeamMember
+        memberships = TeamMember.objects.filter(
+            user=instance.user,
+            approved=True,
+            team__irc_channel=True,
+            team__irc_channel_managed=True,
+            team__irc_channel_private=True,
+        )
+
+        # loop over memberships
+        for membership in memberships:
+            membership.irc_channel_acl_ok = False
+            membership.save()
 

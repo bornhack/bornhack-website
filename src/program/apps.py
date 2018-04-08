@@ -14,12 +14,10 @@ class ProgramConfig(AppConfig):
         from .signal_handlers import (
             check_speaker_event_camp_consistency,
             check_speaker_camp_change,
-            notify_proposal_submitted
         )
         m2m_changed.connect(
             check_speaker_event_camp_consistency,
             sender=Speaker.events.through
         )
         pre_save.connect(check_speaker_camp_change, sender=Speaker)
-        pre_save.connect(notify_proposal_submitted, sender=SpeakerProposal)
-        pre_save.connect(notify_proposal_submitted, sender=EventProposal)
+

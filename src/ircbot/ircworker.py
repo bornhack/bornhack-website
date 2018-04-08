@@ -14,15 +14,9 @@ def do_work():
         logger.error("settings.IRCBOT_CHANNELS is deprecated. Please define settings.IRCBOT_PUBLIC_CHANNEL and use team channels for the rest.")
         return False
 
-    # add the public channel
-    channel_list = [settings.IRCBOT_PUBLIC_CHANNEL]
-
-    # add the team channels
-    channel_list = channel_list + list(Routing.objects.filter(team__irc_channel=True).values_list('team__irc_channel_name', flat=True).distinct())
-
     config = {
         'nick': settings.IRCBOT_NICK,
-        'autojoins': channel_list,
+        'autojoins': [],
         'host': settings.IRCBOT_SERVER_HOSTNAME,
         'port': settings.IRCBOT_SERVER_PORT,
         'ssl': settings.IRCBOT_SERVER_USETLS,

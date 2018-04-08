@@ -1,5 +1,6 @@
 from django.utils import timezone
 from datetime import timedelta
+from ircbot.utils import add_irc_message
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -52,13 +53,12 @@ def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
         return
 
     # send an IRC message to the the channel for this team
-    from ircbot.models import OutgoingIrcMessage
-    OutgoingIrcMessage.objects.create(
+    add_irc_message(
         target=team.irc_channel_name,
         message=irc_message,
-        timeout=timezone.now()+timedelta(minutes=irc_timeout)
+        timeout=60
     )
-    logger.info("Added new OutgoingIrcMessage for channel %s" % team.irc_channel_name)
+    logger.info("Added new IRC message for channel %s" % team.irc_channel_name)
 
 
 def team_email_notification(team, eventtype, email_template=None, email_formatdict=None):
