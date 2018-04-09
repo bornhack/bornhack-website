@@ -34,6 +34,11 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         help_text='The url slug to use for this camp'
     )
 
+    shortslug = models.SlugField(
+        verbose_name='Short Slug',
+        help_text='Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.',
+    )
+
     buildup = DateTimeRangeField(
         verbose_name='Buildup Period',
         help_text='The camp buildup period.',
@@ -188,10 +193,4 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             return False
         else:
             return True
-
-    @property
-    def teams(self):
-        """ Return a queryset with all teams under all TeamAreas under this Camp """
-        from teams.models import Team
-        return Team.objects.filter(area__in=self.teamareas.all())
 

@@ -14,6 +14,10 @@ class OrderAdmin(admin.ModelAdmin):
         'public_credit_name_approved',
     ]
 
+    list_filter = [
+        'public_credit_name_approved',
+    ]
+
     def approve_public_credit_names(self, request, queryset):
         for profile in queryset.filter(public_credit_name_approved=False):
             profile.approve_public_credit_name()
