@@ -48,7 +48,7 @@ class Profile(CreatedUpdatedModel, UUIDModel):
     nickserv_username = models.CharField(
         blank=True,
         max_length=50,
-        help_text='Your NickServ username is used to manage team IRC channel access lists.',
+        help_text='Your NickServ username is used to manage team IRC channel access lists. Make sure you register with NickServ _before_ you enter the username here!',
     )
 
     @property
