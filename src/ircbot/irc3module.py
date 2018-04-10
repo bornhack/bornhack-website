@@ -219,6 +219,17 @@ class Plugin(object):
 
 
     @irc3.extend
+    def setup_public_channel(self, team):
+        """
+        Configures a public team IRC channel (by unsetting SECURE and RESTRICTED modes used by private channels and setting mlock back to the default +nt-lk)
+        """
+        # basic private channel modes
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +nt-lk" % team.irc_channel_name)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE off" % team.irc_channel_name)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED off" % team.irc_channel_name)
+
+
+    @irc3.extend
     def add_user_to_team_channel_acl(self, username, channel):
         """
         Add user to team IRC channel ACL
