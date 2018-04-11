@@ -44,6 +44,11 @@ urlpatterns = [
                 name='manage'
             ),
             url(
+                r'^fix_irc_acl/$',
+                FixIrcAclView.as_view(),
+                name='fix_irc_acl',
+            ),
+            url(
                 r'^tasks/', include([
                     url(
                         r'^create/$',

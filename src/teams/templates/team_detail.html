@@ -70,6 +70,9 @@ Team: {{ team.name }} | {{ block.super }}
         <p>Your membership status: <b>{% membershipstatus user team %}</b></p>
 
         {% if request.user in team.members.all %}
+          {% if team.irc_channel and team.irc_channel_managed and request.user.profile.nickserv_username %}
+            <a href="{% url 'teams:fix_irc_acl' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-wrench"></i> Fix IRC ACL</a>&nbsp;
+          {% endif %}
           <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-remove"></i> Leave Team</a>
         {% else %}
             {% if team.needs_members %}

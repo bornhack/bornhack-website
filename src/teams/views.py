@@ -215,3 +215,66 @@ class TaskUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMix
     def get_success_url(self):
         return self.get_object().get_absolute_url()
 
+
+class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
+    template_name = "fix_irc_acl.html"
+    model = Team
+    fields = []
+    slug_url_kwarg = 'team_slug'
+
+    def dispatch(self, request, *args, **kwargs):
+        # we need to call the super().dispatch() method early so self.camp gets populated by CampViewMixin,
+        # because the lookups below depend on self.camp being set :)
+        response = super().dispatch(
+            request, *args, **kwargs
+        )
+
+        # check if the logged in user has an approved membership of this team
+        if request.user not in self.get_object().approved_members.all():
+            messages.error(request, 'No thanks')
+            return redirect('teams:detail', camp_slug=self.get_object().camp.slug, team_slug=self.get_object().slug)
+
+        # check if we manage the channel for this team
+        if not self.get_object().irc_channel or not self.get_object().irc_channel_managed:
+            messages.error(request, 'IRC functionality is disabled for this team, or the team channel is not managed by the bot')
+            return redirect('teams:detail', camp_slug=self.get_object().camp.slug, team_slug=self.get_object().slug)
+
+        # check if user has a nickserv username
+        if not request.user.profile.nickserv_username:
+            messages.error(request, 'Please go to your profile and set your NickServ username first. Make sure the account is registered with NickServ first!')
+            return redirect('teams:detail', camp_slug=self.get_object().camp.slug, team_slug=self.get_object().slug)
+
+        return response
+
+    def get(self, request, *args, **kwargs):
+        # get membership
+        try:
+            TeamMember.objects.get(
+                user=request.user,
+                team=self.get_object(),
+                approved=True,
+                irc_channel_acl_ok=True
+            )
+        except TeamMember.DoesNotExist:
+            # this membership is already marked as membership.irc_channel_acl_ok=False, no need to do anything
+            messages.error(request, 'No need, this membership is already marked as irc_channel_acl_ok=False, so the bot will fix the ACL soon')
+            return redirect('teams:detail', camp_slug=self.get_object().camp.slug, team_slug=self.get_object().slug)
+
+        return super().get(
+            request, *args, **kwargs
+        )
+
+
+    def form_valid(self, form):
+        membership = TeamMember.objects.get(
+            user=self.request.user,
+            team=self.get_object(),
+            approved=True,
+            irc_channel_acl_ok=True
+        )
+
+        membership.irc_channel_acl_ok = False
+        membership.save()
+        messages.success(self.request, "OK, hang on while we fix the permissions for your NickServ user '%s' for IRC channel '%s'" % (self.request.user.profile.nickserv_username, form.instance.irc_channel_name))
+        return redirect('teams:detail', camp_slug=form.instance.camp.slug, team_slug=form.instance.slug)
+
