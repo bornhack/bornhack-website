@@ -35,6 +35,7 @@ class TeamAdmin(admin.ModelAdmin):
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     list_filter = [
+        CampPropertyListFilter,
         'team',
         'approved',
     ]
