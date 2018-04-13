@@ -309,51 +309,53 @@ class Plugin(object):
         Loops over TeamMember objects and adds ACL entries as needed
         Loops over Team objects and fixes permissions and ACLS as needed
         """
+        # first find all TeamMember objects which needs a loving hand
         missing_acls = TeamMember.objects.filter(
             irc_acl_fix_needed=True
         ).exclude(
             user__profile__nickserv_username=''
         )
 
-        if not missing_acls:
-            return
+        # loop over them and fix what needs to be fixed
+        if missing_acls:
+            logger.debug("Found %s memberships which need IRC ACL fixing.." % missing_acls.count())
+            for membership in missing_acls:
+                # add to team public channel?
+                if membership.team.public_channel_name and membership.publíc_channel_managed:
+                    self.bot.add_user_to_channel_acl(
+                        username=membership.user.profile.nickserv_username,
+                        channel=membership.team.public_irc_channel_name,
+                        invite=False
+                    )
 
-        logger.debug("Found %s memberships which need IRC ACL fixing.." % missing_acls.count())
-        for membership in missing_acls:
-            # add to team public channel?
-            if membership.team.public_channel_name and membership.publíc_channel_managed:
+                # add to team private channel?
+                if membership.team.private_channel_name and membership.private_channel_managed:
+                    self.bot.add_user_to_channel_acl(
+                        username=membership.user.profile.nickserv_username,
+                        channel=membership.team.private_irc_channel_name,
+                        invite=True
+                    )
+
+                # add to volunteer channel
                 self.bot.add_user_to_channel_acl(
                     username=membership.user.profile.nickserv_username,
-                    channel=membership.team.public_irc_channel_name,
-                    invite=False
-                )
-
-            # add to team private channel?
-            if membership.team.private_channel_name and membership.private_channel_managed:
-                self.bot.add_user_to_channel_acl(
-                    username=membership.user.profile.nickserv_username,
-                    channel=membership.team.private_irc_channel_name,
+                    chanel=settings.IRCBOT_VOLUNTEER_CHANNEL,
                     invite=True
                 )
 
-            # add to volunteer channel
-            self.bot.add_user_to_channel_acl(
-                username=membership.user.profile.nickserv_username,
-                chanel=settings.IRCBOT_VOLUNTEER_CHANNEL,
-                invite=True
-            )
+                # mark membership as irc_channel_acl_ok=True and save
+                membership.irc_acl_fix_neede=False
+                membership.save()
 
-            # mark membership as irc_channel_acl_ok=True and save
-            membership.irc_acl_fix_neede=False
-            membership.save()
+        # loop over teams where the private channel needs fixing
+        for team in Team.objects.filter(private_irc_channel_fix_needed=True):
+            logger.debug("Team %s private IRC channel %s needs ACL fixing" % (team, team.private_irc_channel_name))
+            self.bot.setup_private_channel(team.private_irc_channel_name)
 
-    for team in Team.objects.filter(private_irc_channel_fix_needed=True):
-        logger.debug("Team %s private IRC channel %s needs ACL fixing" % (team, team.private_irc_channel_name))
-        self.bot.setup_private_channel(team.private_irc_channel_name)
-
-    for team in Team.objects.filter(public_irc_channel_fix_needed=True):
-        logger.debug("Team %s public IRC channel %s needs ACL fixing" % (team, team.public_irc_channel_name))
-        self.bot.setup_public_channel(team.public_irc_channel_name)
+        # loop over teams where the public channel needs fixing
+        for team in Team.objects.filter(public_irc_channel_fix_needed=True):
+            logger.debug("Team %s public IRC channel %s needs ACL fixing" % (team, team.public_irc_channel_name))
+            self.bot.setup_public_channel(team.public_irc_channel_name)
 
 
     ###############################################################################################
