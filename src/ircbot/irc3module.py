@@ -339,7 +339,7 @@ class Plugin(object):
                 # add to volunteer channel
                 self.bot.add_user_to_channel_acl(
                     username=membership.user.profile.nickserv_username,
-                    chanel=settings.IRCBOT_VOLUNTEER_CHANNEL,
+                    channel=settings.IRCBOT_VOLUNTEER_CHANNEL,
                     invite=True
                 )
 
