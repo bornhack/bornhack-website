@@ -407,7 +407,7 @@ class Plugin(object):
 
             # check if this channel is the volunteer channel
             if channel == settings.IRCBOT_VOLUNTEER_CHANNEL:
-                logger.debug("%s is the volunteer channel, setting up" channel)
+                logger.debug("%s is the volunteer channel, setting up" % channel)
                 self.bot.setup_private_channel(channel)
                 # lets handle the volunteer channels initial ACL manually..
                 return
