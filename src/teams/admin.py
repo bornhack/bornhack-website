@@ -25,12 +25,23 @@ class TeamAdmin(admin.ModelAdmin):
         'camp',
         'get_responsible',
         'needs_members',
+        'public_irc_channel_name',
+        'public_irc_channel_bot',
+        'public_irc_channel_managed',
+        'private_irc_channel_name',
+        'private_irc_channel_bot',
+        'private_irc_channel_managed',
     ]
 
     list_filter = [
         CampPropertyListFilter,
         'needs_members',
+        'public_irc_channel_bot',
+        'public_irc_channel_managed',
+        'private_irc_channel_bot',
+        'private_irc_channel_managed',
     ]
+
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
