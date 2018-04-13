@@ -344,7 +344,7 @@ class Plugin(object):
                 )
 
                 # mark membership as irc_channel_acl_ok=True and save
-                membership.irc_acl_fix_neede=False
+                membership.irc_acl_fix_needed=False
                 membership.save()
 
         # loop over teams where the private channel needs fixing
