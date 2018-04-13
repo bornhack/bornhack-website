@@ -321,7 +321,7 @@ class Plugin(object):
             logger.debug("Found %s memberships which need IRC ACL fixing.." % missing_acls.count())
             for membership in missing_acls:
                 # add to team public channel?
-                if membership.team.public_irc_channel_name and membership.publíc_irc_channel_managed:
+                if membership.team.public_irc_channel_name and membership.public_irc_channel_managed:
                     self.bot.add_user_to_channel_acl(
                         username=membership.user.profile.nickserv_username,
                         channel=membership.team.public_irc_channel_name,
