@@ -4,6 +4,8 @@ from teams.models import Team, TeamMember
 from django.conf import settings
 from django.utils import timezone
 from events.models import Routing
+from teams.utils import get_team_from_irc_channel
+
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -63,7 +65,7 @@ class Plugin(object):
         """Triggered when a channel is joined by someone, including the bot itself"""
         if mask.nick == self.bot.nick:
             # the bot just joined a channel
-            if channel in self.get_managed_team_channels():
+            if channel in self.get_managed_team_channels() or channel == settings.IRCBOT_PUBLIC_CHANNEL or channel == settings.IRCBOT_VOLUNTEER_CHANNEL:
                 logger.debug("Just joined a channel I am supposed to be managing, asking ChanServ for info about %s" % channel)
                 self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "info %s" % channel)
                 return
@@ -93,7 +95,7 @@ class Plugin(object):
 
 
     ###############################################################################################
-    ### custom irc3 methods
+    ### custom irc3 methods below here
 
     @irc3.extend
     def do_stuff(self):
@@ -151,7 +153,7 @@ class Plugin(object):
         Compare the list of IRC channels the bot is currently in with the list of IRC channels the bot is supposed to be in.
         Join or part channels as needed.
         """
-        desired_channel_list = list(set(list(self.get_managed_team_channels()) + list(self.get_unmanaged_team_channels()) + [settings.IRCBOT_PUBLIC_CHANNEL]))
+        desired_channel_list = self.bot.get_desired_channel_list()
         #logger.debug("Inside check_irc_channels(), desired_channel_list is: %s and self.bot.channels is: %s" % (desired_channel_list, self.bot.channels.keys()))
 
         # loop over desired_channel_list, join as needed
@@ -168,69 +170,121 @@ class Plugin(object):
 
 
     @irc3.extend
+    def get_desired_channel_list(self):
+        """
+        Return a list of strings of all the IRC channels the bot is supposed to be in
+        """
+        desired_channel_list = self.get_managed_team_channels()
+        desired_channel_list += self.get_unmanaged_team_channels()
+        desired_channel_list.append(settings.IRCBOT_PUBLIC_CHANNEL)
+        desired_channel_list.append(settings.IRCBOT_VOLUNTEER_CHANNEL)
+        return desired_channel_list
+
+
+    @irc3.extend
     def get_managed_team_channels(self):
         """
-        Return a unique list of team IRC channels which the bot is supposed to be managing.
+        Return a list of team IRC channels which the bot is supposed to be managing.
         """
-        return Team.objects.filter(
-            irc_channel=True,
-            irc_channel_managed=True
-        ).values_list("irc_channel_name", flat=True)
+        pubchans = Team.objects.filter(
+            public_irc_channel_name__isnull=False,
+            public_irc_channel_bot=True,
+            public_irc_channel_managed=True
+        ).values_list("public_irc_channel_name", flat=True)
+
+        privchans = Team.objects.filter(
+            private_irc_channel_name__isnull=False,
+            private_irc_channel_bot=True,
+            private_irc_channel_managed=True
+        ).values_list("private_irc_channel_name", flat=True)
+
+        return list(pubchans) + list(privchans)
 
 
     @irc3.extend
     def get_unmanaged_team_channels(self):
         """
-        Return a unique list of team IRC channels which the bot is not supposed to be managing.
+        Return a list of team IRC channels which the bot is supposed to be in, but not managing.
         """
-        return Team.objects.filter(
-            irc_channel=True,
-            irc_channel_managed=False
-        ).values_list("irc_channel_name", flat=True)
+        pubchans = Team.objects.filter(
+            public_irc_channel_name__isnull=False,
+            public_irc_channel_bot=True,
+            public_irc_channel_managed=False
+        ).values_list("public_irc_channel_name", flat=True)
+
+        privchans = Team.objects.filter(
+            private_irc_channel_name__isnull=False,
+            private_irc_channel_bot=True,
+            private_irc_channel_managed=False
+        ).values_list("private_irc_channel_name", flat=True)
+
+        return list(pubchans) + list(privchans)
 
 
     @irc3.extend
-    def setup_private_channel(self, team):
+    def setup_private_channel(self, channel):
         """
-        Configures a private team IRC channel by setting modes and adding all members to ACL
+        Configures a private IRC channel by setting modes and adding all members to ACL if it is a team channel
         """
+        logger.debug("Inside setup_private_channel() for %s" % channel)
+
         # basic private channel modes
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +inpst" % team.irc_channel_name)
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE on" % team.irc_channel_name)
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED on" % team.irc_channel_name)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +inpst" % channel)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE on" % channel)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED on" % channel)
 
         # add the bot to the ACL
-        self.bot.add_user_to_team_channel_acl(
+        self.bot.add_user_to_channel_acl(
             username=settings.IRCBOT_NICK,
-            channel=team.irc_channel_name
+            channel=channel,
+            invite=True
         )
 
+        team = get_team_from_irc_channel(channel)
+        if team:
+            # this is a team channel, add team members to channel ACL
+            self.bot.add_team_members_to_channel_acl(team)
+            # make sure private_irc_channel_fix_needed is set to False and save
+            team.private_irc_channel_fix_needed=False
+            team.save()
+
+
+    @irc3.extend
+    def setup_public_channel(self, channel):
+        """
+        Configures a public IRC channel by setting modes and giving all team members +oO if it is a team channel
+        """
+        logger.debug("Inside setup_public_channel() for %s" % channel)
+
+        # basic private channel modes
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +nt-lk" % channel)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE off" % channel)
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED off" % channel)
+
+        team = get_team_from_irc_channel(channel)
+        if team:
+            # add members to ACL
+            self.bot.add_team_members_to_channel_acl(team)
+            # make sure public_irc_channel_fix_needed is set to False and save
+            team.public_irc_channel_fix_needed=False
+            team.save()
+
+
+    @irc3.extend
+    def add_team_members_to_channel_acl(self, team):
+        """
+        Handles initial ACL for team channels.
+        Sets membership.irc_acl_fix_needed=True for each approved teammember with a NickServ username
+        """
         # add all members to the acl
         for membership in team.memberships.all():
             if membership.approved and membership.user.profile.nickserv_username:
-                self.bot.add_user_to_team_channel_acl(
-                    username=membership.user.profile.nickserv_username,
-                    channel=membership.team.irc_channel_name,
-                )
-
-                # mark membership as irc_channel_acl_ok=True and save
-                membership.irc_channel_acl_ok=True
+                membership.irc_acl_fix_needed=True
                 membership.save()
 
 
     @irc3.extend
-    def setup_public_channel(self, team):
-        """
-        Configures a public team IRC channel (by unsetting SECURE and RESTRICTED modes used by private channels and setting mlock back to the default +nt-lk)
-        """
-        # basic private channel modes
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +nt-lk" % team.irc_channel_name)
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE off" % team.irc_channel_name)
-        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED off" % team.irc_channel_name)
-
-
-    @irc3.extend
-    def add_user_to_team_channel_acl(self, username, channel):
+    def add_user_to_channel_acl(self, username, channel, invite):
         """
         Add user to team IRC channel ACL
         """
@@ -243,21 +297,20 @@ class Plugin(object):
             },
         )
 
-        # also add autoinvite for this username
-        self.bot.mode(channel, '+I', '$a:%s' % username)
+        if invite:
+            # also add autoinvite for this username
+            self.bot.mode(channel, '+I', '$a:%s' % username)
 
 
     @irc3.extend
     def fix_missing_acls(self):
         """
         Called periodically by do_stuff()
-        Loops over TeamMember objects and adds and removes ACL entries as needed
+        Loops over TeamMember objects and adds ACL entries as needed
+        Loops over Team objects and fixes permissions and ACLS as needed
         """
         missing_acls = TeamMember.objects.filter(
-            team__irc_channel=True,
-            team__irc_channel_managed=True,
-            team__irc_channel_private=True,
-            irc_channel_acl_ok=False
+            irc_acl_fix_needed=True
         ).exclude(
             user__profile__nickserv_username=''
         )
@@ -267,13 +320,40 @@ class Plugin(object):
 
         logger.debug("Found %s memberships which need IRC ACL fixing.." % missing_acls.count())
         for membership in missing_acls:
-            self.bot.add_user_to_team_channel_acl(
+            # add to team public channel?
+            if membership.team.public_channel_name and membership.publíc_channel_managed:
+                self.bot.add_user_to_channel_acl(
+                    username=membership.user.profile.nickserv_username,
+                    channel=membership.team.public_irc_channel_name,
+                    invite=False
+                )
+
+            # add to team private channel?
+            if membership.team.private_channel_name and membership.private_channel_managed:
+                self.bot.add_user_to_channel_acl(
+                    username=membership.user.profile.nickserv_username,
+                    channel=membership.team.private_irc_channel_name,
+                    invite=True
+                )
+
+            # add to volunteer channel
+            self.bot.add_user_to_channel_acl(
                 username=membership.user.profile.nickserv_username,
-                channel=membership.team.irc_channel_name,
+                chanel=settings.IRCBOT_VOLUNTEER_CHANNEL,
+                invite=True
             )
+
             # mark membership as irc_channel_acl_ok=True and save
-            membership.irc_channel_acl_ok=True
+            membership.irc_acl_fix_neede=False
             membership.save()
+
+    for team in Team.objects.filter(private_irc_channel_fix_needed=True):
+        logger.debug("Team %s private IRC channel %s needs ACL fixing" % (team, team.private_irc_channel_name))
+        self.bot.setup_private_channel(team.private_irc_channel_name)
+
+    for team in Team.objects.filter(public_irc_channel_fix_needed=True):
+        logger.debug("Team %s public IRC channel %s needs ACL fixing" % (team, team.public_irc_channel_name))
+        self.bot.setup_public_channel(team.public_irc_channel_name)
 
 
     ###############################################################################################
@@ -294,8 +374,8 @@ class Plugin(object):
             # the irc channel is not registered
             channel = match.group(1)
             # get a list of the channels we are supposed to be managing
-            if channel in self.bot.get_managed_team_channels():
-                # we want to register this channel! but we can only do so if we have a @ in the channel
+            if channel in self.bot.get_managed_team_channels() or channel == settings.IRCBOT_VOLUNTEER_CHANNEL:
+                # we want to register this channel! though we can only do so if we have a @ in the channel
                 if self.bot.nick in self.bot.channels[channel].modes['@']:
                     logger.debug("ChanServ says channel %s is not registered, bot is supposed to be managing this channel, registering it with chanserv" % channel)
                     self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "register %s" % channel)
@@ -314,27 +394,30 @@ class Plugin(object):
             botnick = match.group(2)
             logger.debug("Channel %s was registered with ChanServ, looking up Team..." % channel)
 
-            # if this channel is a private team IRC channel set modes and add initial ACL
-            try:
-                team = Team.objects.get(irc_channel_name=channel)
-            except Team.DoesNotExist:
-                logger.debug("Unable to find Team matching IRC channel %s" % channel)
+            team = get_team_from_irc_channel(channel)
+            if team:
+                if team.private_irc_channel_name == channel:
+                    # set private channel modes, +I and ACL
+                    self.bot.setup_private_channel(channel)
+                else:
+                    # set public channel modes and +oO for all members
+                    self.bot.setup_public_channel(channel)
                 return
+            logger.debug("Unable to find Team matching IRC channel %s" % channel)
 
-            if not team.irc_channel_private:
-                # this channel is not private, no mode change and ACL needed
+            # check if this channel is the volunteer channel
+            if channel == settings.IRCBOT_VOLUNTEER_CHANNEL:
+                logger.debug("%s is the volunteer channel, setting up" channel)
+                self.bot.setup_private_channel(channel)
+                # lets handle the volunteer channels initial ACL manually..
                 return
-
-            # set channel modes and ACL
-            self.bot.setup_private_channel(team)
-            return
 
         logger.debug("Unhandled ChanServ message: %s" % kwargs['data'])
 
 
     @irc3.extend
     def handle_nickserv_privmsg(self, **kwargs):
-        """th
+        """
         Handles messages from NickServ on networks with Services.
         """
         logger.debug("Got a message from NickServ")

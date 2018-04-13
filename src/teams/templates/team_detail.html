@@ -28,13 +28,14 @@ Team: {{ team.name }} | {{ block.super }}
         {% endif %}
 
         <h5>IRC Channel</h5>
-        {% if team.irc_channel and request.user in team.approved_members.all %}
-          <p>The {{ team.name }} Team IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.irc_channel_name }}">{{ team.irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
-          {% if team.irc_channel_private %}The channel is not open to the public. Enter your nickserv username in your <a href="{% url 'profiles:detail' %}">Profile</a> to get access.{% else %}The IRC channel is open for everyone to join.{% endif %}</p>
-        {% elif team.irc_channel and not team.irc_channel_private %}
-          <p>The {{ team.name }} Team IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.irc_channel_name }}">{{ team.irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a> and it is open for everyone to join.</p>
+        {% if team.public_irc_channel_name %}
+          <p>The {{ team.name }} Team public IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.public_irc_channel_name }}">{{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
         {% else %}
           <p>The {{ team.name }} Team does not have a public IRC channel, but it can be reached through our main IRC channel <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ IRCBOT_PUBLIC_CHANNEL }}">{{ IRCBOT_PUBLIC_CHANNEL }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
+        {% endif %}
+
+        {% if request.user in team.approved_members.all and team.private_irc_channel_name %}
+          <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
         {% endif %}
 
         <hr>

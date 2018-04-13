@@ -6,6 +6,7 @@ from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse_lazy
+from django.conf import settings
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -61,25 +62,44 @@ class Team(CampRelatedModel):
     )
 
     # IRC related fields
-    irc_channel = models.BooleanField(
-        default=False,
-        help_text='Check to make the IRC bot join the team IRC channel. Leave unchecked to disable IRC bot functionality for this team entirely.',
-    )
-
-    irc_channel_name = models.TextField(
-        default='',
+    public_irc_channel_name = models.CharField(
         blank=True,
-        help_text='Team IRC channel. Leave blank to generate channel name automatically, based on camp shortslug and team shortslug.',
+        null=True,
+        unique=True,
+        max_length=50,
+        help_text='The public IRC channel for this team. Will be shown on the team page so people know how to reach the team. Leave empty if the team has no public IRC channel.'
+    )
+    public_irc_channel_bot = models.BooleanField(
+        default=False,
+        help_text='Check to make the bot join the teams public IRC channel. Leave unchecked to disable the IRC bot for this channel.'
+    )
+    public_irc_channel_managed = models.BooleanField(
+        default=False,
+        help_text='Check to make the bot manage the teams public IRC channel by registering it with NickServ and setting +Oo for all teammembers.'
+    )
+    public_irc_channel_fix_needed = models.BooleanField(
+        default=False,
+        help_text='Used to indicate to the IRC bot that this teams public IRC channel is in need of a permissions and ACL fix.'
     )
 
-    irc_channel_managed = models.BooleanField(
-        default=True,
-        help_text='Check to make the bot manage the team IRC channel. The bot will register the channel with ChanServ if possible, and manage ACLs as needed.',
+    private_irc_channel_name = models.CharField(
+        blank=True,
+        null=True,
+        unique=True,
+        max_length=50,
+        help_text='The private IRC channel for this team. Will be shown to team members on the team page. Leave empty if the team has no private IRC channel.'
     )
-
-    irc_channel_private = models.BooleanField(
-        default=True,
-        help_text='Check to make the IRC channel secret and +i (private for team members only using an ACL). Leave unchecked to make the IRC channel public and open for everyone.'
+    private_irc_channel_bot = models.BooleanField(
+        default=False,
+        help_text='Check to make the bot join the teams private IRC channel. Leave unchecked to disable the IRC bot for this channel.'
+    )
+    private_irc_channel_managed = models.BooleanField(
+        default=False,
+        help_text='Check to make the bot manage the private IRC channel by registering it with NickServ, setting +I and maintaining the ACL.'
+    )
+    private_irc_channel_fix_needed = models.BooleanField(
+        default=False,
+        help_text='Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.'
     )
 
     class Meta:
@@ -95,23 +115,36 @@ class Team(CampRelatedModel):
             slug = slugify(self.name)
             self.slug = slug
 
+        # set shortslug if needed
         if not self.shortslug:
             self.shortslug = self.slug
-
-        # generate IRC channel name if needed
-        if self.irc_channel and not self.irc_channel_name:
-            self.irc_channel_name = "#%s-%s" % (self.camp.shortslug, self.shortslug)
 
         super().save(**kwargs)
 
     def clean(self):
-        # make sure the irc channel name is prefixed with a # if it is set
-        if self.irc_channel_name and self.irc_channel_name[0] != "#":
-            self.irc_channel_name = "#%s" % self.irc_channel_name
+        # make sure the public irc channel name is prefixed with a # if it is set
+        if self.public_irc_channel_name and self.public_irc_channel_name[0] != "#":
+            self.public_irc_channel_name = "#%s" % self.public_irc_channel_name
 
-        if self.irc_channel_name:
-            if Team.objects.filter(irc_channel_name=self.irc_channel_name).exclude(pk=self.pk).exists():
-                raise ValidationError("This IRC channel name is already in use")
+        # make sure the private irc channel name is prefixed with a # if it is set
+        if self.private_irc_channel_name and self.private_irc_channel_name[0] != "#":
+            self.private_irc_channel_name = "#%s" % self.private_irc_channel_name
+
+        # make sure the channel names are not reserved
+        if self.public_irc_channel_name == settings.IRCBOT_PUBLIC_CHANNEL or self.public_irc_channel_name == settings.IRCBOT_VOLUNTEER_CHANNEL:
+            raise ValidationError('The public IRC channel name is reserved')
+        if self.private_irc_channel_name == settings.IRCBOT_PUBLIC_CHANNEL or self.private_irc_channel_name == settings.IRCBOT_VOLUNTEER_CHANNEL:
+            raise ValidationError('The private IRC channel name is reserved')
+
+        # make sure public_irc_channel_name is unique
+        if self.public_irc_channel_name:
+            if Team.objects.filter(private_irc_channel_name=self.public_irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError('The public IRC channel name is already in use!')
+
+        # make sure private_irc_channel_name is unique
+        if self.private_irc_channel_name:
+            if Team.objects.filter(public_irc_channel_name=self.private_irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError('The private IRC channel name is already in use!')
 
     @property
     def memberships(self):
@@ -201,9 +234,9 @@ class TeamMember(CampRelatedModel):
         help_text="True if this teammember is responsible for this Team. False if not."
     )
 
-    irc_channel_acl_ok = models.BooleanField(
+    irc_acl_fix_needed = models.BooleanField(
         default=False,
-        help_text="Maintained by the IRC bot, do not edit manually. True if the teammembers NickServ username has been added to the Team IRC channels ACL.",
+        help_text='Maintained by the IRC bot, manual editing should not be needed. Will be set to true when a teammember sets or changes NickServ username, and back to false after the ACL has been fixed by the bot.',
     )
 
     class Meta:

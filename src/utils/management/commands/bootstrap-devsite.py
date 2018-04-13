@@ -1631,8 +1631,10 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
         )
 
 
-        self.output("marking 2016 as read_only...")
+        self.output("marking 2016 and 2017 as read_only...")
         camp2016.read_only = True
         camp2016.save()
+        camp2017.read_only = True
+        camp2017.save()
         self.output("done!")
 
