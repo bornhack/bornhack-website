@@ -12,7 +12,7 @@ Teams | {{ block.super }}
 <p>This is a list of the teams for {{ camp.title }}. To join a team just press the Join button, but please put some info in your <a href="{% url 'profiles:detail' %}">profile</a> first, so the team responsible has some idea who you are.</p>
 <p>You can also leave a team of course, but please let the team responsible know why :)</p>
 <p>Team memberships need to be approved by a team responsible. You will receive a message when your membership has been approved.</p>
-<p>At {{ camp.title }} all organisers and volunteers buy full tickets like everyone else. In the future our budget may allow for discounts or free tickets for volunteers, but not this year. However: Please let us know if you can't afford a ticket - we will figure something out!</p>
+<p>At {{ camp.title }} all organisers and volunteers buy full tickets like everyone else. At future events our budget may allow for discounts or free tickets for volunteers, but currently it does not.</p>
 <p>We currently have {{ teams.count }} teams for {{ camp.title }}:</p>
 {% if teams %}
 <table class="table table-hover">
@@ -42,13 +42,13 @@ Teams | {{ block.super }}
       </td>
 
       <td>
-        {% for resp in team.responsible.all %}
-        {{ resp.profile.approved_public_credit_name|default:"Unnamed" }}{% if not forloop.last %},{% endif %}<br>
+        {% for resp in team.responsible_members.all %}
+        {{ resp.profile.get_public_credit_name }}{% if not forloop.last %},{% endif %}<br>
         {% endfor %}
       </td>
 
       <td class="text-center">
-          <span class="badge">{{ team.approvedmembers.count }}</span><br>
+          <span class="badge">{{ team.members.count }}</span><br>
           {% if team.needs_members %}(more needed){% endif %}
       </td>
 
@@ -58,30 +58,23 @@ Teams | {{ block.super }}
 
       {% if request.user.is_authenticated %}
       <td class="text-center">
-        {% membershipstatus request.user team as membership_status %}
-        {% if membership_status == 'Membership Pending' %}
-          <i class='fa fa-clock-o' title='Pending'></i>
-        {% else %}
-          {% if membership_status == 'Member' %}
-            <i class='fa fa-thumbs-o-up' title='Member'></i>
-          {% else %}
-            <i class='fa fa-times' title='Not a member'></i>
-          {% endif %}
-        {% endif %}
+        {% membershipstatus request.user team True %}
       </td>
 
       <td>
-      {% if request.user in team.members.all %}
-          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-minus"></i> Leave</a>
-        {% else %}
-            {% if team.needs_members %}
-              <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
-            {% endif %}
-        {% endif %}
-
-        {% if request.user in team.responsible.all %}
+      <div class="btn-group-vertical">
+        <a class="btn btn-primary" href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}"><i class="fa fa-search"></i> Details</a>
+        {% if request.user in team.responsible_members.all %}
           <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
         {% endif %}
+        {% if request.user in team.members.all %}
+          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-remove"></i> Leave</a>
+          {% else %}
+              {% if team.needs_members %}
+                <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
+              {% endif %}
+          {% endif %}
+      </div>
       {% endif %}
       </td>
     </tr>

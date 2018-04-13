@@ -14,8 +14,12 @@
     <td>{{ profile.description|default:"N/A" }}</td>
   </tr>
   <tr>
-    <td><b>Public Credit Name (visible to the public, leave empty if you want no credits)</b></td>
+    <td><b>Public Credit Name (visible to the public, leave empty if you want no credits on this website)</b></td>
     <td>{{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
+  </tr>
+  <tr>
+    <td><b>NickServ username (visible to the public on IRC, used to handle team channel ACLs)</b></td>
+    <td>{{ profile.nickserv_username|default:"N/A" }}</td>
   </tr>
 </table>
 <a href="{% url 'profiles:update' %}" class="btn btn-black"><i class="fa fa-edit"></i> Edit Profile</a>

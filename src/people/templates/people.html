@@ -21,6 +21,7 @@ People | {{ block.super }}
           <thead>
           <tr>
             <th>Team Name</th>
+            <th>Team Responsible</th>
             <th>Team Members</th>
           </tr>
           </thead>
@@ -31,19 +32,20 @@ People | {{ block.super }}
                   {{ team.name }} Team
               </td>
               <td>
-                {% if team.anoncount == 0 and team.approvedmembers.count == 0 %}
-                <b>No team member(s)
-                {% elif team.approvedmembers.count == team.anoncount %}
-                <b>{{ team.anoncount }}</b> anonymous member(s)
-                {% endif %}
-
-                {% for member in team.approvedmembers.all %}
-                {% if member.user.profile.approved_public_credit_name %}
-                {{ member.user.profile.approved_public_credit_name }}{% if member in team.responsible.all %} (responsible){% endif %}<br>
-                {% endif %}
+                {% for resp in team.responsible_members.all %}
+                  {{ resp.profile.get_public_credit_name }}<br>
                 {% endfor %}
-                {% if team.anoncount and team.anoncount != team.approvedmembers.count %}
-                plus <b>{{ team.anoncount }}</b> anonymous member(s).
+              </td>
+              <td>
+                {% for member in team.regular_members.all %}
+                  {% if member.profile.get_public_credit_name != "Unnamed" %}
+                    {{ member.profile.get_public_credit_name }}<br>
+                  {% endif %}
+                {% empty %}
+                  No team members
+                {% endfor %}
+                {% if team.unnamed_members %}
+                  {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}<b>{{ team.unnamed_members.count }}</b> anonymous member(s).
                 {% endif %}
               </td>
            </tr>

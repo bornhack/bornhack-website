@@ -3,7 +3,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.text import slugify
 from utils.models import CampRelatedModel
-from .email import add_new_membership_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
@@ -11,121 +10,217 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class TeamArea(CampRelatedModel):
-    class Meta:
-        ordering = ['name']
-        unique_together = ('name', 'camp')
-
-    name = models.CharField(max_length=255)
-    description = models.TextField(default='')
-    camp = models.ForeignKey('camps.Camp', related_name="teamareas", on_delete=models.PROTECT)
-    responsible = models.ManyToManyField(
-        'auth.User',
-        related_name='responsible_team_areas'
-    )
-
-    def __str__(self):
-        return '{} ({})'.format(self.name, self.camp)
-
-
 class Team(CampRelatedModel):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255, blank=True)
-    area = models.ForeignKey(
-        'teams.TeamArea',
-        related_name='teams',
-        on_delete=models.PROTECT
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name="teams",
+        on_delete=models.PROTECT,
     )
+
+    name = models.CharField(
+        max_length=255,
+        help_text='The team name',
+    )
+
+    slug = models.SlugField(
+        max_length=255,
+        blank=True,
+        help_text='Url slug for this team. Leave blank to generate based on team name',
+    )
+
+    shortslug = models.SlugField(
+        help_text='Abbreviated version of the slug. Used in places like IRC channel names where space is limited',
+    )
+
     description = models.TextField()
-    needs_members = models.BooleanField(default=True)
+
+    needs_members = models.BooleanField(
+        default=True,
+        help_text='Check to indicate that this team needs more members',
+    )
+
     members = models.ManyToManyField(
         'auth.User',
         related_name='teams',
         through='teams.TeamMember'
     )
-    mailing_list = models.EmailField(blank=True)
+
+    # mailing list related fields
+    mailing_list = models.EmailField(
+        blank=True
+    )
+
+    mailing_list_archive_public = models.BooleanField(
+        default=False,
+        help_text='Check if the mailing list archive is public'
+    )
+
+    mailing_list_nonmember_posts = models.BooleanField(
+        default=False,
+        help_text='Check if the mailinglist allows non-list-members to post'
+    )
+
+    # IRC related fields
+    irc_channel = models.BooleanField(
+        default=False,
+        help_text='Check to make the IRC bot join the team IRC channel. Leave unchecked to disable IRC bot functionality for this team entirely.',
+    )
+
+    irc_channel_name = models.TextField(
+        default='',
+        blank=True,
+        help_text='Team IRC channel. Leave blank to generate channel name automatically, based on camp shortslug and team shortslug.',
+    )
+
+    irc_channel_managed = models.BooleanField(
+        default=True,
+        help_text='Check to make the bot manage the team IRC channel. The bot will register the channel with ChanServ if possible, and manage ACLs as needed.',
+    )
+
+    irc_channel_private = models.BooleanField(
+        default=True,
+        help_text='Check to make the IRC channel secret and +i (private for team members only using an ACL). Leave unchecked to make the IRC channel public and open for everyone.'
+    )
 
     class Meta:
         ordering = ['name']
+        unique_together = (('name', 'camp'), ('slug', 'camp'))
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
 
-    def validate_unique(self, exclude):
-        """
-        We cannot use unique_together with the camp field because it is a property,
-        so check uniqueness of team name and slug here instead
-        """
-        # check if this team name is in use under this camp
-        if self.camp.teams.filter(name=self.name).exists():
-            raise ValidationError("This Team name already exists for this Camp")
-        if self.camp.teams.filter(slug=self.slug).exists():
-            raise ValidationError("This Team slug already exists for this Camp")
-        return True
-
-    @property
-    def camp(self):
-        return self.area.camp
-
     def save(self, **kwargs):
-        if (
-            not self.pk or
-            not self.slug
-        ):
+        # generate slug if needed
+        if not self.pk or not self.slug:
             slug = slugify(self.name)
             self.slug = slug
 
+        if not self.shortslug:
+            self.shortslug = self.slug
+
+        # generate IRC channel name if needed
+        if self.irc_channel and not self.irc_channel_name:
+            self.irc_channel_name = "#%s-%s" % (self.camp.shortslug, self.shortslug)
+
         super().save(**kwargs)
 
-    def memberstatus(self, member):
-        if member not in self.members.all():
-            return "Not member"
-        else:
-            if TeamMember.objects.get(team=self, user=member).approved:
-                return "Member"
-            else:
-                return "Membership Pending"
+    def clean(self):
+        # make sure the irc channel name is prefixed with a # if it is set
+        if self.irc_channel_name and self.irc_channel_name[0] != "#":
+            self.irc_channel_name = "#%s" % self.irc_channel_name
+
+        if self.irc_channel_name:
+            if Team.objects.filter(irc_channel_name=self.irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError("This IRC channel name is already in use")
 
     @property
-    def responsible(self):
-        if TeamMember.objects.filter(team=self, responsible=True).exists():
-            return User.objects.filter(
-                teammember__team=self,
-                teammember__responsible=True
-            )
-        else:
-            return self.area.responsible.all()
+    def memberships(self):
+        """
+        Returns all TeamMember objects for this team.
+        Use self.members.all() to get User objects for all members,
+        or use self.memberships.all() to get TeamMember objects for all members.
+        """
+        return TeamMember.objects.filter(
+            team=self
+        )
 
     @property
-    def anoncount(self):
-        return self.approvedmembers.filter(user__profile__public_credit_name_approved=False).count()
+    def approved_members(self):
+        """
+        Returns only approved members (returns User objects, not TeamMember objects)
+        """
+        return self.members.filter(
+            teammember__approved=True
+        )
 
     @property
-    def approvedmembers(self):
-        return TeamMember.objects.filter(team=self, approved=True)
+    def unapproved_members(self):
+        """
+        Returns only unapproved members (returns User objects, not TeamMember objects)
+        """
+        return self.members.filter(
+            teammember__approved=False
+        )
+
+    @property
+    def responsible_members(self):
+        """
+        Return only approved and responsible members
+        Used to handle permissions for team management
+        """
+        return self.members.filter(
+            teammember__approved=True,
+            teammember__responsible=True
+        )
+
+    @property
+    def regular_members(self):
+        """
+        Return only approved and not responsible members with
+        an approved public_credit_name.
+        Used on the people pages.
+        """
+        return self.members.filter(
+            teammember__approved=True,
+            teammember__responsible=False,
+        )
+
+    @property
+    def unnamed_members(self):
+        """
+        Returns only approved and not responsible members,
+        without an approved public_credit_name.
+        """
+        return self.members.filter(
+            teammember__approved=True,
+            teammember__responsible=False,
+            profile__public_credit_name_approved=False
+        )
 
 
 class TeamMember(CampRelatedModel):
-    user = models.ForeignKey('auth.User', on_delete=models.PROTECT)
-    team = models.ForeignKey('teams.Team', on_delete=models.PROTECT)
-    approved = models.BooleanField(default=False)
-    responsible = models.BooleanField(default=False)
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.PROTECT,
+        help_text="The User object this team membership relates to",
+    )
+
+    team = models.ForeignKey(
+        'teams.Team',
+        on_delete=models.PROTECT,
+        help_text="The Team this membership relates to"
+    )
+
+    approved = models.BooleanField(
+        default=False,
+        help_text="True if this membership is approved. False if not."
+    )
+
+    responsible = models.BooleanField(
+        default=False,
+        help_text="True if this teammember is responsible for this Team. False if not."
+    )
+
+    irc_channel_acl_ok = models.BooleanField(
+        default=False,
+        help_text="Maintained by the IRC bot, do not edit manually. True if the teammembers NickServ username has been added to the Team IRC channels ACL.",
+    )
+
+    class Meta:
+        ordering = ['-responsible', '-approved']
 
     def __str__(self):
-        return '{} is {} member of team {}'.format(
-            self.user, '' if self.approved else 'an unapproved', self.team
+        return '{} is {} {} member of team {}'.format(
+            self.user,
+            '' if self.approved else 'an unapproved',
+            '' if not self.responsible else 'a responsible',
+            self.team
         )
 
     @property
     def camp(self):
+        """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
-
-
-@receiver(post_save, sender=TeamMember)
-def add_responsible_email(sender, instance, created, **kwargs):
-    if created:
-        if not add_new_membership_email(instance):
-            logger.error('Error adding email to outgoing queue')
 
 
 class TeamTask(CampRelatedModel):
@@ -157,14 +252,12 @@ class TeamTask(CampRelatedModel):
 
     @property
     def camp(self):
+        """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
 
     def save(self, **kwargs):
+        # generate slug if needed
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(**kwargs)
-
-    @property
-    def responsible(self):
-        return self.team.responsible.all()
 
