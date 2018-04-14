@@ -24,7 +24,7 @@ def handle_team_event(eventtype, irc_message=None, irc_timeout=60, email_templat
 
     if not eventtype.teams:
         # no routes found for this eventtype, do nothing
-        logger.error("No routes round for eventtype %s" % eventtype)
+        #logger.error("No routes round for eventtype %s" % eventtype)
         return
 
     # loop over routes (teams) for this eventtype
@@ -48,13 +48,13 @@ def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
         logger.error("IRC notifications not enabled for eventtype %s" % eventtype)
         return
 
-    if not team.irc_channel or not team.irc_channel_name:
-        logger.error("team %s is not IRC enabled" % team)
+    if not team.private_irc_channel_name or not team.private_irc_channel_bot:
+        logger.error("team %s does not have a private IRC channel" % team)
         return
 
     # send an IRC message to the the channel for this team
     add_irc_message(
-        target=team.irc_channel_name,
+        target=team.private_irc_channel_name,
         message=irc_message,
         timeout=60
     )

@@ -69,7 +69,7 @@ class TeamDetailView(CampViewMixin, DetailView):
 class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
-    fields = ['description', 'needs_members', 'irc_channel', 'irc_channel_name', 'irc_channel_managed', 'irc_channel_private']
+    fields = ['description', 'needs_members', 'public_irc_channel_name', 'public_irc_channel_bot', 'public_irc_channel_managed', 'private_irc_channel_name', 'private_irc_channel_bot', 'private_irc_channel_managed']
     slug_url_kwarg = 'team_slug'
 
     def get_success_url(self):

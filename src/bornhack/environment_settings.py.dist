@@ -89,4 +89,5 @@ IRCBOT_SERVER_HOSTNAME='{{ django_ircbot_server }}'
 IRCBOT_SERVER_PORT=6697
 IRCBOT_SERVER_USETLS=True
 IRCBOT_PUBLIC_CHANNEL='{{ django_ircbot_public_channel }}'
+IRCBOT_VOLUNTEER_CHANNEL='{{ django_ircbot_volunteer_channel }}'
 

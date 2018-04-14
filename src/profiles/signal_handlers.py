@@ -57,24 +57,29 @@ def public_credit_name_changed(instance, original):
 
 def nickserv_username_changed(instance, original):
     """
-    Check if profile.nickserv_username was changed, and uncheck irc_channel_acl_ok if so
+    Check if profile.nickserv_username was changed, and check irc_acl_fix_needed if so
     This will be picked up by the IRC bot and fixed as needed
     """
     if instance.nickserv_username and original and instance.nickserv_username != original.nickserv_username:
-        logger.debug("profile.nickserv_username changed for user %s, setting irc_channel_acl_ok=False" % instance.user.username)
+        logger.debug("profile.nickserv_username changed for user %s, setting membership.irc_acl_fix_needed=True" % instance.user.username)
 
         # find team memberships for this user
         from teams.models import TeamMember
         memberships = TeamMember.objects.filter(
             user=instance.user,
             approved=True,
-            team__irc_channel=True,
-            team__irc_channel_managed=True,
-            team__irc_channel_private=True,
         )
 
         # loop over memberships
         for membership in memberships:
-            membership.irc_channel_acl_ok = False
+            if not membership.team.public_irc_channel_name and not membership.team.private_irc_channel_name:
+                # no irc channels for this team
+                continue
+            if not membership.team.public_irc_channel_managed and not membership.team.private_irc_channel_managed:
+                # irc channel(s) are not managed for this team
+                continue
+
+            # ok, mark this membership as in need of fixing
+            membership.irc_acl_fix_needed = False
             membership.save()
 
