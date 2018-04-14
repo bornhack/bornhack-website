@@ -20,15 +20,6 @@ DEBUG={{ django_debug }}
 # the path to the wkhtmltopdf binary
 WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
 
-# set BACKEND to "asgiref.inmemory.ChannelLayer" and CONFIG to {} for local development
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "{{ django_channels_backend }}",
-        "CONFIG": {{ django_channels_config }}
-    },
-}
-
-ASGI_APPLICATION = "bornhack.routing.application"
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
