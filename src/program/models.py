@@ -11,7 +11,7 @@ from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.utils.text import slugify
 from django.conf import settings
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
@@ -75,6 +75,7 @@ class UserSubmittedModel(CampRelatedModel):
 
     user = models.ForeignKey(
         'auth.User',
+        on_delete=models.PROTECT
     )
 
     PROPOSAL_DRAFT = 'draft'
@@ -148,7 +149,8 @@ class SpeakerProposal(UserSubmittedModel):
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name='speakerproposals'
+        related_name='speakerproposals',
+        on_delete=models.PROTECT
     )
 
     name = models.CharField(
@@ -216,7 +218,8 @@ class EventProposal(UserSubmittedModel):
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name='eventproposals'
+        related_name='eventproposals',
+        on_delete=models.PROTECT
     )
 
     title = models.CharField(
@@ -231,6 +234,7 @@ class EventProposal(UserSubmittedModel):
     event_type = models.ForeignKey(
         'program.EventType',
         help_text='The type of event',
+        on_delete=models.PROTECT
     )
 
     speakers = models.ManyToManyField(
@@ -300,7 +304,8 @@ class EventLocation(CampRelatedModel):
 
     camp = models.ForeignKey(
         'camps.Camp',
-        related_name='eventlocations'
+        related_name='eventlocations',
+        on_delete=models.PROTECT
     )
 
     def __str__(self):
@@ -379,6 +384,7 @@ class Event(CampRelatedModel):
     event_type = models.ForeignKey(
         'program.EventType',
         help_text='The type of this event',
+        on_delete=models.PROTECT
     )
 
     slug = models.SlugField(
@@ -391,6 +397,7 @@ class Event(CampRelatedModel):
         'camps.Camp',
         related_name='events',
         help_text='The camp this event belongs to',
+        on_delete=models.PROTECT
     )
 
     video_url = models.URLField(
@@ -410,6 +417,7 @@ class Event(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The event proposal object this event was created from',
+        on_delete=models.PROTECT
     )
 
     class Meta:
@@ -463,7 +471,8 @@ class EventInstance(CampRelatedModel):
 
     event = models.ForeignKey(
         'program.event',
-        related_name='instances'
+        related_name='instances',
+        on_delete=models.PROTECT
     )
 
     when = DateTimeRangeField()
@@ -474,7 +483,8 @@ class EventInstance(CampRelatedModel):
 
     location = models.ForeignKey(
         'program.EventLocation',
-        related_name='eventinstances'
+        related_name='eventinstances',
+        on_delete=models.PROTECT
     )
 
     class Meta:
@@ -600,6 +610,7 @@ class Speaker(CampRelatedModel):
         null=True,
         related_name='speakers',
         help_text='The camp this speaker belongs to',
+        on_delete=models.PROTECT
     )
 
     events = models.ManyToManyField(
@@ -614,6 +625,7 @@ class Speaker(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The speaker proposal object this speaker was created from',
+        on_delete=models.PROTECT
     )
 
     class Meta:
@@ -660,7 +672,10 @@ class Favorite(models.Model):
         related_name='favorites',
         on_delete=models.PROTECT
     )
-    event_instance = models.ForeignKey('program.EventInstance')
+    event_instance = models.ForeignKey(
+        'program.EventInstance',
+        on_delete=models.PROTECT
+    )
 
     class Meta:
         unique_together = ['user', 'event_instance']

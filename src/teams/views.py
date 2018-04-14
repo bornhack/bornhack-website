@@ -8,9 +8,8 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.views.generic.detail import SingleObjectMixin
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.conf import settings
-
 from profiles.models import Profile
 
 import logging

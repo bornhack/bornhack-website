@@ -62,7 +62,7 @@ urlpatterns = [
         name='general-terms'
     ),
     url(r'^accounts/', include('allauth.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     url(
         r'^camps/$',

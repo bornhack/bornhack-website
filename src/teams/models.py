@@ -5,7 +5,7 @@ from django.utils.text import slugify
 from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.conf import settings
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)

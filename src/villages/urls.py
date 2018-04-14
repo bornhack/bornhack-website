@@ -1,6 +1,9 @@
 from django.conf.urls import url
 from .views import *
 
+
+app_name = 'villages'
+
 urlpatterns = [
     url(r'^$', VillageListView.as_view(), name='list'),
     url(r'create/$', VillageCreateView.as_view(), name='create'),
