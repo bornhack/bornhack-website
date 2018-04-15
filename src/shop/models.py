@@ -318,6 +318,15 @@ class Product(CreatedUpdatedModel, UUIDModel):
         blank=True
     )
 
+    stock_amount = models.IntegerField(
+        help_text=(
+            'Initial amount available in stock if there is a limited '
+            'supply, e.g. fridge space'
+        ),
+        null=True,
+        blank=True
+    )
+
     objects = ProductQuerySet.as_manager()
 
     def __str__(self):
@@ -333,8 +342,17 @@ class Product(CreatedUpdatedModel, UUIDModel):
             )
 
     def is_available(self):
+        """ Is the product available or not?
+
+        Checks for the following:
+
+        - Whether now is in the self.available_in
+        - If a stock is defined, that there are items left
+        """
         now = timezone.now()
-        return now in self.available_in
+        time_available = now in self.available_in
+        stock_available = (self.stock_amount - self.left_in_stock()) > 0
+        return time_available and stock_available
 
     def is_old(self):
         now = timezone.now()
@@ -345,6 +363,16 @@ class Product(CreatedUpdatedModel, UUIDModel):
     def is_upcoming(self):
         now = timezone.now()
         return self.available_in.lower > now
+
+    def left_in_stock(self):
+        sold = OrderProductRelation.objects.filter(
+            product=self,
+            order__paid=True,
+        ).aggregate(Sum('quantity'))['quantity__sum']
+
+        total_left = self.stock_amount - (sold or 0)
+
+        return total_left
 
 
 class OrderProductRelation(CreatedUpdatedModel):
