@@ -93,7 +93,7 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                     user=user
                 )
                 favorite.delete()
-            except EventInstance.DoesNotExist:
+            except Favorite.DoesNotExist:
                 # We don't want to do anything.
                 return
 
