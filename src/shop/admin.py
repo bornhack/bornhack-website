@@ -1,17 +1,57 @@
 from django.contrib import admin
 
-from . import models
+from .models import (
+    CoinifyAPICallback,
+    CoinifyAPIInvoice,
+    CoinifyAPIRequest,
+    EpayCallback,
+    EpayPayment,
+    Invoice,
+    CreditNote,
+    CustomOrder,
+    ProductCategory,
+    Product,
+    Order,
+    OrderProductRelation,
+)
 
-admin.site.register(models.EpayCallback)
-admin.site.register(models.EpayPayment)
-admin.site.register(models.CoinifyAPIInvoice)
-admin.site.register(models.CoinifyAPICallback)
-admin.site.register(models.CoinifyAPIRequest)
-admin.site.register(models.Invoice)
-admin.site.register(models.CreditNote)
+admin.site.register(EpayCallback)
+admin.site.register(EpayPayment)
+admin.site.register(CoinifyAPIInvoice)
+admin.site.register(CoinifyAPICallback)
+admin.site.register(CoinifyAPIRequest)
 
 
-@admin.register(models.CustomOrder)
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'order',
+        'customorder',
+        'created',
+        'updated',
+    ]
+
+
+@admin.register(CreditNote)
+class CreditNoteAdmin(admin.ModelAdmin):
+    list_display = [
+        'id',
+        'user',
+        'customer',
+        'amount',
+        'vat',
+        'paid',
+        'created',
+        'updated',
+    ]
+
+    list_filter = [
+        'paid'
+    ]
+
+
+@admin.register(CustomOrder)
 class CustomOrderAdmin(admin.ModelAdmin):
     list_display = [
         'id',
@@ -20,6 +60,8 @@ class CustomOrderAdmin(admin.ModelAdmin):
         'amount',
         'vat',
         'paid',
+        'created',
+        'updated',
     ]
 
     list_filter = [
@@ -27,7 +69,7 @@ class CustomOrderAdmin(admin.ModelAdmin):
     ]
 
 
-@admin.register(models.ProductCategory)
+@admin.register(ProductCategory)
 class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -48,7 +90,7 @@ def available_to(product):
 available_to.short_description = 'Available to'
 
 
-@admin.register(models.Product)
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -64,10 +106,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class ProductInline(admin.TabularInline):
-    model = models.OrderProductRelation
+    model = OrderProductRelation
 
 
-@admin.register(models.Order)
+@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/change_order_form.html'
     readonly_fields = (
@@ -121,4 +163,3 @@ class OrderAdmin(admin.ModelAdmin):
 
 def get_user_email(obj):
     return obj.order.user.email
-
