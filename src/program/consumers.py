@@ -83,13 +83,19 @@ class ScheduleConsumer(JsonWebsocketConsumer):
             )
 
         if action == 'unfavorite':
-            event_instance_id = content.get('event_instance_id')
-            event_instance = EventInstance.objects.get(id=event_instance_id)
-            favorite = Favorite.objects.get(
-                event_instance=event_instance,
-                user=user
-            )
-            favorite.delete()
+            try:
+                event_instance_id = content.get('event_instance_id')
+                event_instance = EventInstance.objects.get(
+                    id=event_instance_id
+                )
+                favorite = Favorite.objects.get(
+                    event_instance=event_instance,
+                    user=user
+                )
+                favorite.delete()
+            except EventInstance.DoesNotExist:
+                # We don't want to do anything.
+                return
 
         if data:
             self.send_json(data)
