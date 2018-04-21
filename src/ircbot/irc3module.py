@@ -5,6 +5,7 @@ from django.conf import settings
 from django.utils import timezone
 from events.models import Routing
 from teams.utils import get_team_from_irc_channel
+import time
 
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -300,6 +301,9 @@ class Plugin(object):
         if invite:
             # also add autoinvite for this username
             self.bot.mode(channel, '+I', '$a:%s' % username)
+
+        # add a delay so the bot doesn't flood itself off
+        time.sleep(1)
 
 
     @irc3.extend
