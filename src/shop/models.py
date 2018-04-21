@@ -351,7 +351,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
         """
         now = timezone.now()
         time_available = now in self.available_in
-        stock_available = (self.stock_amount - self.left_in_stock()) > 0
+        stock_available = self.left_in_stock() > 0
         return time_available and stock_available
 
     def is_old(self):
