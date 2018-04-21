@@ -25,6 +25,15 @@
 
     <hr />
 
+    {% if product.stock_amount %}
+    <h3>
+      <small>Availability</small><br />
+      <bold>{{ product.left_in_stock }}</bold> available<br />
+    </h3>
+
+    <hr />
+    {% endif %}
+
     <h3>Add to order</h3>
 
     {% if user.is_authenticated %}
