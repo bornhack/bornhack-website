@@ -1,9 +1,11 @@
 .dev
 .idea/
 __pycache__/
+.mypy_cache/
 db.sqlite3
 *.sw*
 *.pyc
 venv/
 environment_settings.py
 elm-stuff/
+docs/build/
