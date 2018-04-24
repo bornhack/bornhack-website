@@ -90,6 +90,15 @@ def available_to(product):
 available_to.short_description = 'Available to'
 
 
+def stock_info(product):
+    if product.stock_amount:
+        return "{} / {}".format(
+            product.left_in_stock,
+            product.stock_amount
+        )
+    return "N/A"
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
@@ -98,6 +107,7 @@ class ProductAdmin(admin.ModelAdmin):
         'ticket_type',
         'price',
         'description',
+        stock_info,
         available_from,
         available_to
     ]

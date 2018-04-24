@@ -349,10 +349,16 @@ class Product(CreatedUpdatedModel, UUIDModel):
         - Whether now is in the self.available_in
         - If a stock is defined, that there are items left
         """
+        predicates = [self.is_time_available]
+        if self.stock_amount:
+            predicates.append(self.is_stock_available)
+        return all(predicates)
+
+    @property
+    def is_time_available(self):
         now = timezone.now()
         time_available = now in self.available_in
-        stock_available = self.left_in_stock() > 0
-        return time_available and stock_available
+        return time_available
 
     def is_old(self):
         now = timezone.now()
@@ -364,16 +370,26 @@ class Product(CreatedUpdatedModel, UUIDModel):
         now = timezone.now()
         return self.available_in.lower > now
 
+    @property
     def left_in_stock(self):
-        sold = OrderProductRelation.objects.filter(
-            product=self,
-            order__paid=True,
-        ).aggregate(Sum('quantity'))['quantity__sum']
+        if self.stock_amount:
+            sold = OrderProductRelation.objects.filter(
+                product=self,
+                order__paid=True,
+            ).aggregate(Sum('quantity'))['quantity__sum']
 
-        total_left = self.stock_amount - (sold or 0)
+            total_left = self.stock_amount - (sold or 0)
 
-        return total_left
+            return total_left
+        return None
 
+    @property
+    def is_stock_available(self):
+        if self.stock_amount:
+            stock_available = self.left_in_stock > 0
+            return stock_available
+        # If there is no stock defined the product is generally available.
+        return True
 
 class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order', on_delete=models.PROTECT)

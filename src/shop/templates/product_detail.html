@@ -25,14 +25,20 @@
 
     <hr />
 
-    {% if product.stock_amount %}
+    {% if product.stock_amount and product.is_time_available %}
     <h3>
       <small>Availability</small><br />
+      {% if product.left_in_stock > 0 %}
       <bold>{{ product.left_in_stock }}</bold> available<br />
+      {% else %}
+      <bold>Sold out.</bold>
+      {% endif %}
     </h3>
 
     <hr />
     {% endif %}
+
+    {% if product.is_stock_available %}
 
     <h3>Add to order</h3>
 
@@ -65,6 +71,8 @@
     <a href="{% url 'account_login' %}?next={% url 'shop:product_detail' slug=product.slug %}">
       login</a>
     to order this product
+    {% endif %}
+
     {% endif %}
 
   </div>
