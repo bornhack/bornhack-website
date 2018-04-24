@@ -21,6 +21,9 @@ def do_work():
         'port': settings.IRCBOT_SERVER_PORT,
         'ssl': settings.IRCBOT_SERVER_USETLS,
         'timeout': 30,
+        'flood_burst': 2,
+        'flood_rate': 1,
+        'flood_rate_delay': 2,
         'includes': [
             'ircbot.irc3module',
         ],
