@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'product_handout/$', ProductHandoutView.as_view(), name='product_handout'),
     url(r'badge_handout/$', BadgeHandoutView.as_view(), name='badge_handout'),
     url(r'ticket_checkin/$', TicketCheckinView.as_view(), name='ticket_checkin'),
+    url(r'public_credit_names/$', ApproveNamesView.as_view(), name='public_credit_names'),
 ]
 

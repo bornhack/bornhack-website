@@ -5,7 +5,6 @@ from psycopg2.extras import DateTimeTZRange
 
 from .factories import (
     ProductFactory,
-    OrderFactory,
     OrderProductRelationFactory,
 )
 

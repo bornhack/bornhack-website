@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, ListView
 from django.http import HttpResponseForbidden
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
+from profiles.models import Profile
 from itertools import chain
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -43,4 +44,12 @@ class TicketCheckinView(StaffMemberRequiredMixin, ListView):
         sponsortickets = SponsorTicket.objects.filter(checked_in=False)
         discounttickets = DiscountTicket.objects.filter(checked_in=False)
         return list(chain(shoptickets, sponsortickets, discounttickets))
+
+
+class ApproveNamesView(StaffMemberRequiredMixin, ListView):
+    template_name = "approve_public_credit_names.html"
+    context_object_name = 'profiles'
+
+    def get_queryset(self, **kwargs):
+        return Profile.objects.filter(public_credit_name_approved=False).exclude(public_credit_name='')
 
