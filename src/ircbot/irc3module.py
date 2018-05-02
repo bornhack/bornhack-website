@@ -343,7 +343,7 @@ class Plugin(object):
                     invite=True
                 )
 
-                # mark membership as irc_channel_acl_ok=True and save
+                # mark membership as irc_acl_fix_needed=False and save
                 membership.irc_acl_fix_needed=False
                 membership.save()
 

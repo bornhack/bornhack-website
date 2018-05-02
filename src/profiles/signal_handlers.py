@@ -80,6 +80,6 @@ def nickserv_username_changed(instance, original):
                 continue
 
             # ok, mark this membership as in need of fixing
-            membership.irc_acl_fix_needed = False
+            membership.irc_acl_fix_needed = True
             membership.save()
 
