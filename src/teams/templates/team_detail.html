@@ -137,7 +137,7 @@ Team: {{ team.name }} | {{ block.super }}
                     <tr>
                         <td>{{ item.headline }}</td>
                         <td>
-                            <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=team.slug anchor=item.anchor %}"
+                            <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor item_anchor=item.anchor %}"
                                class="btn btn-primary btn-sm">
                                 <i class="fa fa-edit"></i> Edit Task
                             </a>
@@ -147,7 +147,10 @@ Team: {{ team.name }} | {{ block.super }}
                 </tbody>
             </table>
 
+            <a href="{% url 'teams:info_item_create' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Info Item</a>
+
         {% endfor %}
+
 
         {% endif %}
     </div>

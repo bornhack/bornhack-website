@@ -10,7 +10,7 @@ from teams.views.base import (
     TeamManageView,
     FixIrcAclView,
 )
-from teams.views.info import InfoItemUpdateView
+from teams.views.info import InfoItemUpdateView, InfoItemCreateView
 
 from teams.views.tasks import (
     TaskCreateView,
@@ -92,14 +92,14 @@ urlpatterns = [
                 ]),
             ),
             url(
-                r'^info_items/', include([
+                r'^info_items/(?P<category_anchor>[-_\w+]+)/', include([
                     url(
-                        r'^(?P<anchor>[-_\w+]+)/', include([
-                            # url(
-                            #     r'^$',
-                            #     TaskDetailView.as_view(),
-                            #     name='task_detail',
-                            # ),
+                        r'^create/$',
+                        InfoItemCreateView.as_view(),
+                        name='info_item_create',
+                    ),
+                    url(
+                        r'^(?P<item_anchor>[-_\w+]+)/', include([
                             url(
                                 r'^update/$',
                                 InfoItemUpdateView.as_view(),
