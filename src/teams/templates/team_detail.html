@@ -115,6 +115,41 @@ Team: {{ team.name }} | {{ block.super }}
         {% if request.user in team.responsible_members.all %}
           <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Task</a>
         {% endif %}
+
+        {# Team info categories section - only visible for team responsible #}
+        {% if request.user in team.responsible_members.all %}
+        <hr />
+
+        <h4>Info categories</h4>
+
+        {% for info_category in team.info_categories.all %}
+
+            {{ info_category.headline }}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Item name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in info_category.infoitems.all %}
+                    <tr>
+                        <td>{{ item.headline }}</td>
+                        <td>
+                            <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=team.slug anchor=item.anchor %}"
+                               class="btn btn-primary btn-sm">
+                                <i class="fa fa-edit"></i> Edit Task
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        {% endfor %}
+
+        {% endif %}
     </div>
 </div>
 

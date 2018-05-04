@@ -1,4 +1,5 @@
 from django.contrib import admin
+from reversion.admin import VersionAdmin
 from .models import (
     InfoItem,
     InfoCategory
@@ -6,7 +7,7 @@ from .models import (
 
 
 @admin.register(InfoItem)
-class InfoItemAdmin(admin.ModelAdmin):
+class InfoItemAdmin(VersionAdmin):
     list_filter = ['category', 'category__camp',]
     list_display = ['headline',]
 

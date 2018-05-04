@@ -1,50 +1,20 @@
 from django.views.generic import ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import UpdateView
 from camps.mixins import CampViewMixin
-from .models import Team, TeamMember, TeamTask
-from .email import add_added_membership_email, add_removed_membership_email
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.views.generic.detail import SingleObjectMixin
 from django.urls import reverse_lazy
 from django.conf import settings
+
 from profiles.models import Profile
+
+from .mixins import EnsureTeamResponsibleMixin, EnsureTeamMemberResponsibleMixin
+from ..models import Team, TeamMember
+from ..email import add_added_membership_email, add_removed_membership_email
 
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
-
-
-class EnsureTeamResponsibleMixin(object):
-    """
-    Use to make sure request.user is responsible for the team specified by kwargs['team_slug']
-    """
-    def dispatch(self, request, *args, **kwargs):
-        self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
-        if request.user not in self.team.responsible_members.all():
-            messages.error(request, 'No thanks')
-            return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.team.slug)
-
-        return super().dispatch(
-            request, *args, **kwargs
-        )
-
-
-class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
-    """
-    Use to make sure request.user is responsible for the team which TeamMember belongs to
-    """
-    model = TeamMember
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user not in self.get_object().team.responsible_members.all():
-            messages.error(request, 'No thanks')
-            return redirect('teams:detail', camp_slug=self.get_object().team.camp.slug, team_slug=self.get_object().team.slug)
-
-        return super().dispatch(
-            request, *args, **kwargs
-        )
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -163,56 +133,6 @@ class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberR
                 'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
             )
         return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
-
-
-class TaskDetailView(CampViewMixin, DetailView):
-    template_name = "task_detail.html"
-    context_object_name = "task"
-    model = TeamTask
-
-
-class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):
-    model = TeamTask
-    template_name = "task_form.html"
-    fields = ['name', 'description']
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.team
-        return context
-
-    def form_valid(self, form):
-        task = form.save(commit=False)
-        task.team = self.team
-        if not task.name:
-            task.name = "noname"
-        task.save()
-        return HttpResponseRedirect(task.get_absolute_url())
-
-    def get_success_url(self):
-        return self.get_object().get_absolute_url()
-
-
-class TaskUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
-    model = TeamTask
-    template_name = "task_form.html"
-    fields = ['name', 'description']
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.team
-        return context
-
-    def form_valid(self, form):
-        task = form.save(commit=False)
-        task.team = self.team
-        if not task.name:
-            task.name = "noname"
-        task.save()
-        return HttpResponseRedirect(task.get_absolute_url())
-
-    def get_success_url(self):
-        return self.get_object().get_absolute_url()
 
 
 class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):

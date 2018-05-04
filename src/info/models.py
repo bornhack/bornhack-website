@@ -37,6 +37,7 @@ class InfoCategory(CampRelatedModel):
         blank=True,
         help_text='The team responsible for this info category.',
         on_delete=models.PROTECT,
+        related_name='info_categories'
     )
 
     def clean(self):

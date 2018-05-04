@@ -1,6 +1,22 @@
 from django.conf.urls import url, include
-from .views import *
 
+from teams.views.base import (
+    TeamListView,
+    TeamMemberRemoveView,
+    TeamMemberApproveView,
+    TeamDetailView,
+    TeamJoinView,
+    TeamLeaveView,
+    TeamManageView,
+    FixIrcAclView,
+)
+from teams.views.info import InfoItemUpdateView
+
+from teams.views.tasks import (
+    TaskCreateView,
+    TaskDetailView,
+    TaskUpdateView,
+)
 
 app_name = 'teams'
 
@@ -75,6 +91,24 @@ urlpatterns = [
 
                 ]),
             ),
+            url(
+                r'^info_items/', include([
+                    url(
+                        r'^(?P<anchor>[-_\w+]+)/', include([
+                            # url(
+                            #     r'^$',
+                            #     TaskDetailView.as_view(),
+                            #     name='task_detail',
+                            # ),
+                            url(
+                                r'^update/$',
+                                InfoItemUpdateView.as_view(),
+                                name='info_item_update',
+                            ),
+                        ]),
+                    ),
+                ])
+            )
         ]),
     ),
 ]
