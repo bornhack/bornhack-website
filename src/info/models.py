@@ -2,6 +2,8 @@ from django.db import models
 from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 
+import reversion
+
 
 class InfoCategory(CampRelatedModel):
     class Meta:
@@ -29,15 +31,32 @@ class InfoCategory(CampRelatedModel):
         default=100,
     )
 
+    team = models.ForeignKey(
+        'teams.Team',
+        null=True,
+        blank=True,
+        help_text='The team responsible for this info category.',
+        on_delete=models.PROTECT,
+    )
+
     def clean(self):
         if InfoItem.objects.filter(category__camp=self.camp, anchor=self.anchor).exists():
             # this anchor is already in use on an item, so it cannot be used (must be unique on the page)
-            raise ValidationError({'anchor': 'Anchor is already in use on an info item for this camp'})
+            raise ValidationError(
+                {'anchor': 'Anchor is already in use on an info item for this camp'}
+            )
+
+        if self.team.camp != self.camp:
+            raise ValidationError(
+                {'team': 'Team is a team from another camp.'}
+            )
 
     def __str__(self):
         return '%s (%s)' % (self.headline, self.camp)
 
 
+# We want to have info items under version control
+@reversion.register()
 class InfoItem(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
