@@ -35,7 +35,7 @@ class InfoItemUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibl
     template_name = "info_item_form.html"
     fields = ['headline', 'body', 'anchor', 'weight']
     slug_field = 'anchor'
-    slug_url_kwarg = 'anchor'
+    slug_url_kwarg = 'item_anchor'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -43,4 +43,7 @@ class InfoItemUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibl
         return context
 
     def get_success_url(self):
+        next = self.request.GET.get('next')
+        if next:
+            return next
         return self.team.get_absolute_url()

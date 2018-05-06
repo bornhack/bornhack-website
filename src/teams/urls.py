@@ -92,7 +92,7 @@ urlpatterns = [
                 ]),
             ),
             url(
-                r'^info_items/(?P<category_anchor>[-_\w+]+)/', include([
+                r'^info/(?P<category_anchor>[-_\w+]+)/', include([
                     url(
                         r'^create/$',
                         InfoItemCreateView.as_view(),
