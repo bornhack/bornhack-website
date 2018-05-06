@@ -44,7 +44,7 @@ Info | {{ block.super }}
       <span class="anchor" id="{{ category.anchor }}"></span>
       <div class="row">
         <div class="col-md-12">
-        <h2>{{ category.headline }}</h2>
+        <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
           <div class="panel-group">
             {% for item in category.infoitems.all %}
               <div class="panel panel-default">
