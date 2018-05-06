@@ -8,6 +8,8 @@ Sponsors | {{ block.super }}
 
 {% block content %}
 
+{% if sponsors %}
+
 <h2>{{ view.camp.title }} Sponsors</h2>
 
 <p class="lead">
@@ -17,6 +19,7 @@ Sponsors | {{ block.super }}
   you, we are immensely grateful!
 </p>
 
+{% endif %}
 
 {% for sponsor in sponsors %}
 
@@ -46,5 +49,68 @@ Sponsors | {{ block.super }}
         </section>
     {% endif %}
 {% endfor %}
+
+{% if not camp.call_for_sponsors_open %}
+<div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Sponsors is no longer relevant. It is kept here for historic purposes.
+</div>
+{% endif %}
+
+<h2>Becoming a {{ camp.title }} Sponsor</h2>
+<p>We are looking for sponsors to help us make {{ camp.title }} as
+unforgettable as the previous ones. If you would like to sponsor us do not hesitate
+to contact us at <a
+href="mailto:sponsors@bornhack.dk">sponsors@bornhack.dk</a>. If you work for an
+organisation or company that you believe might be able and willing to sponsor
+{{ camp.title }} please direct the right people to this page.</p>
+
+<h3>The Concept</h3>
+<p>BornHack is an outdoor tent camping festival with a focus on technology
+and society, and how the two interact. The idea and basic concept of BornHack
+comes from participation in similar camps in Germany and the Netherlands. These
+events have huge traction (thousands of participants, sells out fast) and has
+inspired us to make BornHack.</p>
+
+<h3>The Organisers</h3>
+<p>BornHack is put together by a group of people from Denmark employed
+primarily in the IT industry. The organiser group share a desire to set up a
+forum where people with different interests in IT and technology can come
+together to share ideas and socialise. Several of the organisers have
+previously been (or are still) involved in organising conferences such as <a
+  href="https://opensourcedays.org/">Open Source Days</a>.</p>
+
+<h3>Location and Format</h3>
+<p>For {{ camp.title }} we will be inviting up to 500 paying guests for a full
+week, the ambition is to grow the number of attendees over the coming
+years. It will take place at <a href="http://jarlsgaard.dk">Jarlsgaard</a>
+on Bornholm, Denmark, where we have a great venue with a fiber connection to the
+outside world.</p>
+
+<h3>Sponsorship</h3>
+<p>A sponsorship can be in the range of 5000 DKK and up. You get
+to have a logo of your choice placed on our website in the sponsors
+section, and we can also display tasteful signs or banners in or
+around our speakers tent.</p>
+
+<p>Sponsors often prefer to sponsor a certain area or event at the
+camp, where we will figure out an appropriate display in cooperation
+with you. Suggested sponsorships include:</p>
+
+<ul>
+  <li>Bar area (sound system, lighting, decorations, building materials, inventory)</li>
+  <li>Lounge area (couches, hammocks, decoration)</li>
+  <li>Food area (renting barbeques and buying charcoal)</li>
+  <li>Speakers tent(s)</li>
+  <li>Sound system in speakers tent(s)</li>
+  <li>Shuttle buses</li>
+  <li>Insurance</li>
+  <li>Toilet facilities</li>
+  <li>Coffee cart</li>
+  </li>
+</ul>
+
+<p>If you have other ideas you would be interested in sponsoring, reach out to us on
+<a href="mailto:sponsors@bornhack.dk">sponsors@bornhack.dk</a>
+and we can talk about it. Cash sponsorships are also very welcome.</p>
 
 {% endblock %}
