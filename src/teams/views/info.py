@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, DeleteView
 from reversion.views import RevisionMixin
 
 from camps.mixins import CampViewMixin
@@ -41,6 +41,19 @@ class InfoItemUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibl
         context = super().get_context_data(**kwargs)
         context['team'] = self.team
         return context
+
+    def get_success_url(self):
+        next = self.request.GET.get('next')
+        if next:
+            return next
+        return self.team.get_absolute_url()
+
+
+class InfoItemDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, RevisionMixin, DeleteView):
+    model = InfoItem
+    template_name = "info_item_delete_confirm.html"
+    slug_field = 'anchor'
+    slug_url_kwarg = 'item_anchor'
 
     def get_success_url(self):
         next = self.request.GET.get('next')

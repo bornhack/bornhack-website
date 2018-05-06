@@ -10,7 +10,7 @@ from teams.views.base import (
     TeamManageView,
     FixIrcAclView,
 )
-from teams.views.info import InfoItemUpdateView, InfoItemCreateView
+from teams.views.info import InfoItemUpdateView, InfoItemCreateView, InfoItemDeleteView
 
 from teams.views.tasks import (
     TaskCreateView,
@@ -104,6 +104,11 @@ urlpatterns = [
                                 r'^update/$',
                                 InfoItemUpdateView.as_view(),
                                 name='info_item_update',
+                            ),
+                            url(
+                                r'^delete/$',
+                                InfoItemDeleteView.as_view(),
+                                name='info_item_delete',
                             ),
                         ]),
                     ),
