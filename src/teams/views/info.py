@@ -44,4 +44,3 @@ class InfoItemUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibl
 
     def get_success_url(self):
         return self.team.get_absolute_url()
-
