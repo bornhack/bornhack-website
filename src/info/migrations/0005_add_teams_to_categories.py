@@ -32,13 +32,16 @@ def add_teams_to_categories(apps, schema_editor):
         "where",
         "sleep",
         "bicycles",
-        "food-and-groceries",
         "infodesk-and-cert",
         "shower-and-toilets",
         "venue-map",
         "villages",
     ]
     infocategories2018.filter(anchor__in=info_anchors).update(team=infoteam)
+
+    # Food team
+    food = team2018.filter(name="Food")
+    infocategories2018.filter(anchor_in=["food-and-groceries"]).update(team=food)
 
     # NOC team
     noc = team2018.filter(name="NOC")
