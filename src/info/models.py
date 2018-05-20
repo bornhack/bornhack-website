@@ -26,8 +26,6 @@ class InfoCategory(CampRelatedModel):
 
     team = models.ForeignKey(
         'teams.Team',
-        null=True,
-        blank=True,
         help_text='The team responsible for this info category.',
         on_delete=models.PROTECT,
         related_name='info_categories'
