@@ -38,11 +38,6 @@ class InfoCategory(CampRelatedModel):
                 {'anchor': 'Anchor is already in use on an info item for this camp'}
             )
 
-        if self.team.camp != self.camp:
-            raise ValidationError(
-                {'team': 'Team is a team from another camp.'}
-            )
-
     @property
     def camp(self):
         return self.team.camp
