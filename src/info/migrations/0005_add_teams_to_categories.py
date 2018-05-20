@@ -41,7 +41,7 @@ def add_teams_to_categories(apps, schema_editor):
 
     # Food team
     food = team2018.get(name="Food")
-    infocategories2018.filter(anchor_in=["food-and-groceries"]).update(team=food)
+    infocategories2018.filter(anchor__in=["food-and-groceries"]).update(team=food)
 
     # NOC team
     noc = team2018.get(name="NOC")
