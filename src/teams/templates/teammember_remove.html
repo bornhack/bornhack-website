@@ -12,7 +12,7 @@ Remove member {{ teammember.user.profile.name }} from the {{ teammember.team.nam
 <form method="POST">
 {% csrf_token %}
 {{ form }}
-<button class="btn btn-danger" type="submit"><i class="fa fa-trash-o"></i> Remove teammember</button>
-<a href="{% url 'teams:detail' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-default" type="submit"><i class="fa fa-remove"></i> Cancel</a>
+<button class="btn btn-danger" type="submit"><i class="fas fa-trash-o"></i> Remove teammember</button>
+<a href="{% url 'teams:detail' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
 </form>
 {% endblock %}

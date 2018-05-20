@@ -1,0 +1,33 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+Add {{ eventproposal.event_type.host_title }} to {{ eventproposal.title }} | {{ block.super }}
+{% endblock %}
+
+{% block program_content %}
+
+<h3>Add New {{ eventproposal.event_type.host_title }} to {{ eventproposal.title }}</h3>
+
+<p class="lead">You are adding a new {{ eventproposal.event_type.host_title }} to {{ eventproposal.title }}. Either pick an existing {{ eventproposal.event_type.host_title }} from the list below, or press the button to create a new {{ eventproposal.event_type.host_title }}.</p>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">Existing Artists</h3>
+  </div>
+  <div class="panel-body">
+     <div class="list-group">
+    {% for speakerproposal in speakerproposal_list %}
+      <a href="{% url 'program:eventproposal_addperson' camp_slug=camp.slug event_uuid=eventproposal.uuid speaker_uuid=speakerproposal.uuid %}" class="list-group-item">
+        <h4 class="list-group-item-heading">
+            Add {{ speakerproposal.name }} to {{ eventproposal.title }}
+        </h4>
+      </a>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+
+<a href="{% url 'program:speakerproposal_create' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ eventproposal.event_type.host_title }}</a>
+<a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+{% endblock %}
+

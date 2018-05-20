@@ -72,17 +72,17 @@ Team: {{ team.name }} | {{ block.super }}
 
         {% if request.user in team.members.all %}
           {% if team.irc_channel and team.irc_channel_managed and request.user.profile.nickserv_username %}
-            <a href="{% url 'teams:fix_irc_acl' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-wrench"></i> Fix IRC ACL</a>&nbsp;
+            <a href="{% url 'teams:fix_irc_acl' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-wrench"></i> Fix IRC ACL</a>&nbsp;
           {% endif %}
-          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-remove"></i> Leave Team</a>
+          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Leave Team</a>
         {% else %}
             {% if team.needs_members %}
-              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success"><i class="fa fa-plus"></i> Join Team</a>
+              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success"><i class="fas fa-plus"></i> Join Team</a>
             {% endif %}
         {% endif %}
 
         {% if request.user in team.responsible_members.all %}
-          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage Team</a>
+          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage Team</a>
         {% endif %}
 
         <hr>
@@ -103,9 +103,9 @@ Team: {{ team.name }} | {{ block.super }}
                 <td><a href="{% url 'teams:task_detail' slug=task.slug camp_slug=camp.slug team_slug=team.slug %}">{{ task.name }}</a></td>
                 <td>{{ task.description }}</td>
                 <td>
-                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fa fa-search"></i> Details</a>
+                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Details</a>
                   {% if request.user in team.responsible_members.all %}
-                  <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fa fa-edit"></i> Edit Task</a>
+                  <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
                   {% endif %}
                 </td>
             </tr>
@@ -113,7 +113,7 @@ Team: {{ team.name }} | {{ block.super }}
           </tbody>
         </table>
         {% if request.user in team.responsible_members.all %}
-          <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-plus"></i> Create Task</a>
+          <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Task</a>
         {% endif %}
     </div>
 </div>

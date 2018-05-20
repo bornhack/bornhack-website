@@ -13,12 +13,10 @@
 
 <div class="list-group">
   {% for speaker in speaker_list %}
-  <a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
+  <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
     {{ speaker.name }} ({{ speaker.events.all.count }} event{{ speaker.events.all.count|pluralize }})
   </a>
   {% endfor %}
 </div>
 {% endif %}
-
-<p><a href="{% url 'call_for_speakers' camp_slug=camp.slug %}" class="btn btn-primary"><span {% if not camp.call_for_speakers_open %}style="text-decoration: line-through;"{% endif %}>Call for Speakers</span></a></p>
 {% endblock program_content %}

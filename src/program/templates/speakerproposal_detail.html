@@ -19,8 +19,8 @@
         {{ speakerproposal.biography|commonmark }}
           </div>
           <div class="col-md-4">
-            <a href="{% url 'speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='large' %}" >
-              <img src="{% url 'speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speakerproposal.name }}">
+            <a href="{% url 'program:speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='large' %}" >
+              <img src="{% url 'program:speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speakerproposal.name }}">
             </a>
           </div>
         </div>
@@ -31,7 +31,7 @@
 </div>
 
 <p>
-    <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
 </p>
 
 {% endblock program_content %}

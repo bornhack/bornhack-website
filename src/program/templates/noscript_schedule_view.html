@@ -26,7 +26,7 @@
 
     <tr>
       <td>{{ instance.when.lower|date:"H:i" }}-{{ instance.when.upper|date:"H:i" }}</td>
-      <td><a href="{% url 'event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
+      <td><a href="{% url 'program:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
       <td>{{ instance.location.name }}</td>
     </tr>
   {% endfor %}

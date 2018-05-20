@@ -11,6 +11,7 @@ from .models import (
     EventType,
     EventInstance,
     EventLocation,
+    EventTrack,
     SpeakerProposal,
     EventProposal,
     Favorite
@@ -47,7 +48,7 @@ class EventProposalAdmin(admin.ModelAdmin):
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
     actions = ['mark_eventproposal_as_approved']
-    list_filter = ('camp', 'proposal_status', 'user')
+    list_filter = ('track', 'proposal_status', 'user')
 
 
 @admin.register(EventLocation)
@@ -55,6 +56,11 @@ class EventLocationAdmin(admin.ModelAdmin):
     list_filter = ('camp',)
     list_display = ('name', 'camp')
 
+
+@admin.register(EventTrack)
+class EventTrackAdmin(admin.ModelAdmin):
+    list_filter = ('camp',)
+    list_display = ('name', 'camp')
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
@@ -82,7 +88,7 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ('camp', 'speakers')
+    list_filter = ('track', 'speakers')
     list_display = [
         'title',
         'event_type',
@@ -91,3 +97,4 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
+

@@ -1,0 +1,58 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+Call for Speakers | {{ block.super }}
+{% endblock %}
+
+{% block program_content %}
+
+{% if not camp.call_for_participation_open %}
+<div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Speakers is no longer relevant. It is kept here for historic purposes.
+</div>
+{% endif %}
+
+<h2>Call for Speakers</h2>
+<p>We are looking for gifted, talented, humourous, technically enlightened speakers to host talks, lightning talks, and workshops at BornHack.</p>
+
+<p>We are very open to different topics. We expect that the majority of the presentation at BornHack will be on security, networking, programming, distributed systems, privacy, and how these technologies relate to society.</p>
+
+<p>BornHack is trying to be an inclusive event so please make sure you have read and understood our <a href="{% url 'conduct' %}">Code of Conduct</a>.</p>
+
+<h3>Regular Talk</h3>
+<p>Regular talks are 45 minutes of presentation, 10 minutes of questions from the audience followed by 5 minutes of preparation for setting up the next speaker.</p>
+
+<p>Please bring your own laptop with your presentation on; it should have an ordinary HDMI output and we will provide the cable to the projector. We do not guarantee that audio will work, even if your laptop supports it - please reach out to us early if this is a requirement.</p>
+
+<p>We will provide speakers with a one-day entrance ticket free of charge, but due to our limited funds, you would have to pay for transportation to and from the event yourself. We also encourage speakers to participate for the entire week, but you will have to pay for the full ticket yourself.</p>
+
+<h3>Lightning Talk</h3>
+<p>Lightning talks are 10 minutes of presentation. A laptop will be connected to the projector at the location of the presentations.</p>
+
+<p>A lightning talk is an excellent opportunity for inexperienced speakers to share an interesting idea, presentation, or maybe just a small story.</p>
+
+<p>You must buy an entrance ticket to host a lightning talk; we are unable to offer free tickets for lightning talks.</p>
+
+<h3>Workshops</h3>
+<p>We have two workshop areas that will be able to host workshops for approximately 20 people per room. Workshops can be up to 3 hours per slot and can be extended to full day workshops.</p>
+
+<p>You must buy an entrance ticket to host a workshop; we are unable to offer free tickets for workshops.</p>
+
+<h3>Submitting Content</h3>
+<p>Please submit content for BornHack 2017 as early as possible. You can submit content via our website:</p>
+
+<ol>
+    <li>Create a <a href="{% url 'account_signup' %}">user account</a> on the BornHack website</li>
+    <li>Visit <a href="{% url 'program:proposal_list' camp_slug='bornhack-2017' %}">the proposals page</a></li>
+    <li>Propose a new speaker</li>
+    <li>Propose a new event</li>
+</ol>
+
+<p>We will review incoming proposals and notify you as early as possible on whether the proposal was accepted or not. Proposals submitted before 1st of July will be notified by us no later than the 16th of July. Late submissions are welcome, but we might be running low on available slots at that time.</p>
+
+<h3>Contact Information</h3>
+<p>The BornHack content team can be reached at content@bornhack.dk - for general questions regarding the event please reach out to the info team at info@bornhack.dk</p>
+
+<p>We are reachable via IRC in #BornHack on irc.baconsvin.org (6nbtgccn5nbcodn3.onion) on port 6697 with TLS, you can also follow us on Twitter at @bornhax.</p>
+
+{% endblock %}

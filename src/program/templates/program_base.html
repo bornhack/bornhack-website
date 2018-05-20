@@ -6,20 +6,10 @@
 
 <div class="row">
   <div class="btn-group btn-group-justified hidden-xs">
-    <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn {% if url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-default{% endif %}">Schedule</a>
-    <a href="{% url 'event_index' camp_slug=camp.slug %}" class="btn {% if url_name == "event_index" %}btn-primary{% else %}btn-default{% endif %}">Events</a>
-    <a href="{% url 'speaker_index' camp_slug=camp.slug %}" class="btn {% if url_name == "speaker_index" %}btn-primary{% else %}btn-default{% endif %}">Speakers</a>
-    {% if request.user.is_authenticated %}
-        <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-default{% endif %}">Your Proposals</a>
-    {% endif %}
+      {% include 'includes/program_menu.html' %}
   </div>
   <div class="btn-group-vertical visible-xs">
-    <a href="{% url 'schedule_index' camp_slug=camp.slug %}" class="btn {% if url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-default{% endif %}">Schedule</a>
-    <a href="{% url 'event_index' camp_slug=camp.slug %}" class="btn {% if url_name == "event_index" %}btn-primary{% else %}btn-default{% endif %}">Events</a>
-    <a href="{% url 'speaker_index' camp_slug=camp.slug %}" class="btn {% if url_name == "speaker_index" %}btn-primary{% else %}btn-default{% endif %}">Speakers</a>
-    {% if request.user.is_authenticated %}
-        <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-default{% endif %}">Your Proposals</a>
-    {% endif %}
+      {% include 'includes/program_menu.html' %}
   </div>
 </div>
 <p>

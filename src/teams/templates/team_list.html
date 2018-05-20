@@ -63,15 +63,15 @@ Teams | {{ block.super }}
 
       <td>
       <div class="btn-group-vertical">
-        <a class="btn btn-primary" href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}"><i class="fa fa-search"></i> Details</a>
+        <a class="btn btn-primary" href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i> Details</a>
         {% if request.user in team.responsible_members.all %}
-          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fa fa-cog"></i> Manage</a>
+          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a>
         {% endif %}
         {% if request.user in team.members.all %}
-          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fa fa-remove"></i> Leave</a>
+          <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Leave</a>
           {% else %}
               {% if team.needs_members %}
-                <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fa fa-plus"></i> Join</a>
+                <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Join</a>
               {% endif %}
           {% endif %}
       </div>
