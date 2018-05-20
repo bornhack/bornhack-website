@@ -9,6 +9,7 @@
     <div class="panel-heading">{{ speakerproposal.name }}</div>
     <div class="panel-body">
         {{ speakerproposal.biography|commonmark }}
+        <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
     </div>
     <div class="panel-footer">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span> | ID: <span class="badge">{{ speakerproposal.uuid }}</span></div>
 </div>
