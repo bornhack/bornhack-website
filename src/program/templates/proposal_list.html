@@ -14,39 +14,21 @@ Proposals | {{ block.super }}
     <h3 class="panel-title"><i class="fas fa-pencil"></i> Existing Proposals</h3>
   </div>
   <div class="panel-body">
-    <div class="col-sm-10 col-md-10 col-lg-10">
-        <h4>People</h4>
-        {% if speakerproposal_list %}
-        {% include 'includes/speaker_proposal_table.html' with speakerproposals=speakerproposal_list %}
-        {% else %}
-        <i>Nothing found.</i>
-        {% endif %}
+    <h4>People</h4>
+    {% if speakerproposal_list %}
+    {% include 'includes/speaker_proposal_table.html' with speakerproposals=speakerproposal_list %}
+    {% else %}
+    <i>Nothing found.</i>
+    {% endif %}
 
-        <p><hr></p>
+    <p><hr></p>
 
-        <h4>Events</h4>
-        {% if eventproposal_list %}
-        {% include 'includes/event_proposal_table.html' with eventproposals=eventproposal_list %}
-        {% else %}
-        <i>Nothing found.</i>
-        {% endif %}
-      </div>
-    <div class="col-sm-2 col-md-2 col-lg-2">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Status Help<i class="fas fa-question fa-pull-right"></i></h3>
-        </div>
-        <div class="panel-body">
-            <dl>
-                <dt><span class="badge">pending</span></dt>
-                <dd>Submission is pending review from the Content Team.</dd><br>
-                <dt><span class="badge">approved</span></dt>
-                <dd>Submission was approved and will be part of this years camp.</dd><br>
-                <dt><span class="badge">rejected</span></dt>
-                <dd>Submission was not approved.</dd>
-            </dl>
-        </div>
-      </div>
+    <h4>Events</h4>
+    {% if eventproposal_list %}
+    {% include 'includes/event_proposal_table.html' with eventproposals=eventproposal_list %}
+    {% else %}
+    <i>Nothing found.</i>
+    {% endif %}
   </div>
 </div>
 {% endif %}
