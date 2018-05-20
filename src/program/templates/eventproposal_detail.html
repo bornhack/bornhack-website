@@ -3,18 +3,15 @@
 
 {% block program_content %}
 
-<h2>{{ camp.title }} Event Proposal Details</h2>
-
-<ul>
-    <li class="list">Status: <span class="badge">{{ eventproposal.proposal_status }}</span></li>
-    <li class="list">ID: <span class="badge">{{ eventproposal.uuid }}</span></li>
-</ul>
+<h2>{{ eventproposal.title }} Details</h2>
 
 <div class="panel panel-default">
     <div class="panel-heading">{{ eventproposal.title }}</div>
     <div class="panel-body">
        {{ eventproposal.abstract|commonmark }}
+        <a href="{% url 'program:eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
     </div>
+    <div class="panel-footer">Status: <span class="badge">{{ eventproposal.proposal_status }}</span> ID: <span class="badge">{{ eventproposal.uuid }}</span></div>
 </div>
 
 <div class="panel panel-default">

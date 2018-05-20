@@ -3,18 +3,14 @@
 
 {% block program_content %}
 
-<h2>{{ camp.title }} Speaker Proposal Details</h2>
-
-<ul>
-    <li class="list">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span></li>
-    <li class="list">ID: <span class="badge">{{ speakerproposal.uuid }}</span></li>
-</ul>
+<h2>{{ speakerproposal.name }} Details</h2>
 
 <div class="panel panel-default">
     <div class="panel-heading">{{ speakerproposal.name }}</div>
     <div class="panel-body">
         {{ speakerproposal.biography|commonmark }}
     </div>
+    <div class="panel-footer">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span> | ID: <span class="badge">{{ speakerproposal.uuid }}</span></div>
 </div>
 
 <div class="panel panel-default">
