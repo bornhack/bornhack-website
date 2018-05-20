@@ -37,6 +37,9 @@ applyFilters day model =
         locations =
             slugs model.eventLocations model.filter.eventLocations
 
+        tracks =
+            slugs model.eventTracks model.filter.eventTracks
+
         videoFilters =
             slugs videoRecordingFilters model.filter.videoRecording
 
@@ -47,6 +50,7 @@ applyFilters day model =
                         && (Date.Extra.equalBy Date.Extra.Day eventInstance.from day.date)
                         && List.member eventInstance.location locations
                         && List.member eventInstance.eventType types
+                        && List.member eventInstance.eventTrack tracks
                         && List.member eventInstance.videoState videoFilters
                 )
                 model.eventInstances
@@ -77,6 +81,12 @@ filterSidebar model =
                 model.filter.eventLocations
                 model.eventInstances
                 .location
+            , filterView
+                "Track"
+                model.eventTracks
+                model.filter.eventTracks
+                model.eventInstances
+                .eventTrack
             , filterView
                 "Video"
                 videoRecordingFilters
@@ -309,11 +319,15 @@ parseFilterFromQuery query model =
         locations =
             getFilter "location" model.eventLocations query
 
+        tracks =
+            getFilter "tracks" model.eventTracks query
+
         videoFilters =
             getFilter "video" videoRecordingFilters query
     in
         { eventTypes = types
         , eventLocations = locations
+        , eventTracks = tracks
         , videoRecording = videoFilters
         }
 

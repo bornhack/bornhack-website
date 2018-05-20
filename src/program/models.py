@@ -258,6 +258,12 @@ class EventTrack(CampRelatedModel):
     class Meta:
         unique_together = (('camp', 'slug'), ('camp', 'name'))
 
+    def serialize(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+        }
+
 
 class EventLocation(CampRelatedModel):
     """ The places where stuff happens """
@@ -533,6 +539,7 @@ class EventInstance(CampRelatedModel):
             'bg-color': self.event.event_type.color,
             'fg-color': '#fff' if self.event.event_type.light_text else '#000',
             'event_type': self.event.event_type.slug,
+            'event_track': self.event.track.slug,
             'location': self.location.slug,
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,

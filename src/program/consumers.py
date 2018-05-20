@@ -7,6 +7,7 @@ from .models import (
     Favorite,
     EventLocation,
     EventType,
+    EventTrack,
     Speaker
 )
 
@@ -59,6 +60,14 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                     for x in event_types_query_set
                 ])
 
+                event_tracks_query_set = EventTrack.objects.filter(
+                    camp=camp
+                )
+                event_tracks = list([
+                    x.serialize()
+                    for x in event_tracks_query_set
+                ])
+
                 speakers_query_set = Speaker.objects.filter(camp=camp)
                 speakers = list([x.serialize() for x in speakers_query_set])
 
@@ -68,6 +77,7 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                     "event_instances": event_instances,
                     "event_locations": event_locations,
                     "event_types": event_types,
+                    "event_tracks": event_tracks,
                     "speakers": speakers,
                     "days": days,
                 }

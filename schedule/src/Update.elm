@@ -96,6 +96,19 @@ update msg model =
                                             videoRecording :: model.filter.videoRecording
                                 }
 
+                        TrackFilter name slug ->
+                            let
+                                eventTrack =
+                                    TrackFilter name slug
+                            in
+                                { currentFilter
+                                    | eventTracks =
+                                        if List.member eventTrack model.filter.eventTracks then
+                                            List.filter (\x -> x /= eventTrack) model.filter.videoRecording
+                                        else
+                                            eventTrack :: model.filter.eventTracks
+                                }
+
                 query =
                     filterToQuery newFilter
 
