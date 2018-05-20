@@ -176,15 +176,16 @@ class MusicEventProposalForm(BaseEventProposalForm):
         self.fields['title'].label = 'Title of music act'
         self.fields['title'].help_text = 'The title of this music act/concert/set.'
 
+        # fix label and help_text for the abstract field
+        self.fields['abstract'].label = 'Description'
+        self.fields['abstract'].help_text = 'The description of this music act'
+
         # fix label and help_text for the submission_notes field
         self.fields['submission_notes'].label = 'Music Act Notes'
         self.fields['submission_notes'].help_text = 'Private notes regarding this music act. Only visible to yourself and the BornHack organisers.'
 
         # no video recording for music acts
         del(self.fields['allow_video_recording'])
-
-        # no abstract for music acts
-        del(self.fields['abstract'])
 
         # better placeholder text for duration field
         self.fields['duration'].widget.attrs['placeholder'] = 'Duration (minutes)'
