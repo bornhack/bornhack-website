@@ -17,45 +17,7 @@ Proposals | {{ block.super }}
     <div class="col-sm-10 col-md-10 col-lg-10">
         <h4>People</h4>
         {% if speakerproposal_list %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th class="text-center">Events</th>
-                    <th>Status</th>
-                    <th class="text-right">Available Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for speakerproposal in speakerproposal_list %}
-                <tr>
-                    <td><span class="h4">{{ speakerproposal.name }}</span></td>
-                    <td class="text-center">
-                        {% if speakerproposal.eventproposals.all %}
-                            {% for ep in speakerproposal.eventproposals.all %}
-                                <a href="{% url 'program:eventproposal_update' camp_slug=camp.slug pk=ep.uuid %}"><i class="fas fa-{{ ep.event_type.icon }} fa-lg" style="color: {{ ep.event_type.color }};" data-toggle="tooltip" title="{{ ep.title }} ({{ ep.event_type.name }})"></i></a>
-                            {% endfor %}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                    <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>
-                    <td class="text-right">
-                        <a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}"
-                           class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i><span class="h5"> Detail</span></a>
-                        {% if not camp.read_only %}
-                            <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
-                            <a href="{% url 'program:eventproposal_typeselect' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm" data-toggle="tooltip" title="Click to add a new talk/act/event for '{{ speakerproposal.name }}'"><i class="fas fa-plus"></i><span class="h5"> Add Event</span></a>
-                            {% if not speakerproposal.eventproposals.all %}
-                                <a href="{% url 'program:speakerproposal_delete' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include 'includes/speaker_proposal_table.html' with speakerproposals=speakerproposal_list %}
         {% else %}
         <i>Nothing found.</i>
         {% endif %}
@@ -64,43 +26,7 @@ Proposals | {{ block.super }}
 
         <h4>Events</h4>
         {% if eventproposal_list %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>People</th>
-                    <th>Track</th>
-                    <th>Status</th>
-                    <th class='text-right'>Available Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for eventproposal in eventproposal_list %}
-                <tr>
-                    <td><span class="h4">{{ eventproposal.title }}</span></td>
-                    <td><i class="fas fa-{{ eventproposal.event_type.icon }} fa-lg" style="color: {{ eventproposal.event_type.color }};"></i><span class="h4"> {{ eventproposal.event_type }}</span></td>
-                    <td><span class="h4">{% for person in eventproposal.speakers.all %}<a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a> {% endfor %}</span></td>
-                    <td><span class="h4">{{ eventproposal.track.name }}</span></td>
-                    <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>
-                    <td class='text-right'>
-                        <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}"
-                           class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i><span class="h5"> Detail</span></a>
-                        {% if not camp.read_only %}
-                            <a href="{% url 'program:eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
-                            {% if eventproposal.get_available_speakerproposals.exists %}
-                                <a href="{% url 'program:eventproposal_selectperson' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i><span class="h5"> Add {{ eventproposal.event_type.host_title }}</span></a>
-                            {% else %}
-                                <a href="{% url 'program:speakerproposal_create' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i><span class="h5"> Add {{ eventproposal.event_type.host_title }}</span></a>
-                            {% endif %}
-                            <a href="{% url 'program:eventproposal_delete' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include 'includes/event_proposal_table.html' with eventproposals=eventproposal_list %}
         {% else %}
         <i>Nothing found.</i>
         {% endif %}

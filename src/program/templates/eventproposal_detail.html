@@ -17,6 +17,17 @@
     </div>
 </div>
 
+<div class="panel panel-default">
+    <div class="panel-heading">Events</div>
+    <div class="panel-body">
+      {% if eventproposal.speakers.exists %}
+        {% include 'includes/speaker_proposal_table.html' with speakerproposals=eventproposal.speakers.all %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+    </div>
+</div>
+
 <p>
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
 </p>

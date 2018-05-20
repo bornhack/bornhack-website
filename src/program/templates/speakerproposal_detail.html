@@ -13,20 +13,18 @@
 <div class="panel panel-default">
     <div class="panel-heading">{{ speakerproposal.name }}</div>
     <div class="panel-body">
-        {% if speakerproposal.picture_large and speakerproposal.picture_small %}
-        <div class="row">
-          <div class="col-md-8 text-container">
         {{ speakerproposal.biography|commonmark }}
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'program:speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='large' %}" >
-              <img src="{% url 'program:speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speakerproposal.name }}">
-            </a>
-          </div>
-        </div>
-        {% else %}
-        {{ speakerproposal.biography|commonmark }}
-        {% endif %}
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Events</div>
+    <div class="panel-body">
+      {% if speakerproposal.eventproposals.exists %}
+        {% include 'includes/event_proposal_table.html' with eventproposals=speakerproposal.eventproposals.all %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
     </div>
 </div>
 
