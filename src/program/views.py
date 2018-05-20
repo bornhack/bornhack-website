@@ -413,6 +413,10 @@ class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListVi
 
         return super().dispatch(request, *args, **kwargs)
 
+    def get_queryset(self, **kwargs):
+        # only show speaker proposals for the current user
+        return super().get_queryset().filter(user=self.request.user)
+
     def get_context_data(self, **kwargs):
         """
         Add EventType to template context
@@ -420,6 +424,12 @@ class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListVi
         context = super().get_context_data(**kwargs)
         context['eventtype'] = self.eventtype
         return context
+
+    def get(self, request, *args, **kwargs):
+        """ If we don't have any existing SpeakerProposals just redirect directly to the combined submit view """
+        if not self.get_queryset().exists():
+            return redirect(reverse_lazy('program:proposal_combined_submit', kwargs={'camp_slug': self.camp.slug, 'event_type_slug': self.eventtype.slug}))
+        return super().get(request, *args, **kwargs)
 
 
 class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
