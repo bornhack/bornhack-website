@@ -44,6 +44,11 @@ urlpatterns = [
             url(
                 r'^people/', include([
                     url(
+                        r'^(?P<pk>[a-f0-9-]+)/$',
+                        SpeakerProposalDetailView.as_view(),
+                        name='speakerproposal_detail'
+                    ),
+                    url(
                         r'^(?P<pk>[a-f0-9-]+)/update/$',
                         SpeakerProposalUpdateView.as_view(),
                         name='speakerproposal_update'
@@ -67,6 +72,11 @@ urlpatterns = [
             ),
             url(
                 r'^events/', include([
+                    url(
+                        r'^(?P<pk>[a-f0-9-]+)/$',
+                        EventProposalDetailView.as_view(),
+                        name='eventproposal_detail'
+                    ),
                     url(
                         r'^(?P<pk>[a-f0-9-]+)/edit/$',
                         EventProposalUpdateView.as_view(),

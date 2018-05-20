@@ -202,6 +202,12 @@ class SpeakerProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
+
+class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DetailView):
+    model = models.SpeakerProposal
+    template_name = 'speakerproposal_detail.html'
+
+
 ###################################################################################################
 # eventproposal views
 
@@ -369,6 +375,10 @@ class EventProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         messages.success(self.request, "Proposal '%s' has been deleted." % self.object.title)
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
+
+class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DetailView):
+    model = models.EventProposal
+    template_name = 'eventproposal_detail.html'
 
 ###################################################################################################
 # combined proposal views
