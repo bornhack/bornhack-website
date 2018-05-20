@@ -8,14 +8,7 @@ import reversion
 class InfoCategory(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
-        unique_together = (('anchor', 'camp'), ('headline', 'camp'))
         verbose_name_plural = "Info Categories"
-
-    camp = models.ForeignKey(
-        'camps.Camp',
-        related_name='infocategories',
-        on_delete=models.PROTECT
-    )
 
     headline = models.CharField(
         max_length=100,
@@ -51,6 +44,10 @@ class InfoCategory(CampRelatedModel):
             raise ValidationError(
                 {'team': 'Team is a team from another camp.'}
             )
+
+    @property
+    def camp(self):
+        return self.team.camp
 
     def __str__(self):
         return '%s (%s)' % (self.headline, self.camp)

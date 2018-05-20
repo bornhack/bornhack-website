@@ -8,19 +8,19 @@ from .models import (
 
 @admin.register(InfoItem)
 class InfoItemAdmin(VersionAdmin):
-    list_filter = ['category', 'category__camp',]
+    list_filter = ['category', 'category__team__camp',]
     list_display = ['headline',]
 
 
 class InfoItemInlineAdmin(admin.StackedInline):
     model = InfoItem
-    list_filter = ['category', 'category__camp',]
+    list_filter = ['category', 'category__team__camp',]
     list_display = ['headline',]
 
 
 @admin.register(InfoCategory)
 class InfoCategorydmin(admin.ModelAdmin):
-    list_filter = ['camp',]
+    list_filter = ['team__camp',]
     list_display = ['headline',]
     search_fields = ['headline', 'body']
     inlines = [InfoItemInlineAdmin]
