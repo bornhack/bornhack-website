@@ -13921,9 +13921,9 @@ var _user$project$Models$Day = F3(
 	function (a, b, c) {
 		return {day_name: a, date: b, repr: c};
 	});
-var _user$project$Models$Speaker = F5(
-	function (a, b, c, d, e) {
-		return {name: a, slug: b, biography: c, largePictureUrl: d, smallPictureUrl: e};
+var _user$project$Models$Speaker = F3(
+	function (a, b, c) {
+		return {name: a, slug: b, biography: c};
 	});
 var _user$project$Models$EventInstance = function (a) {
 	return function (b) {
@@ -14133,29 +14133,19 @@ var _user$project$Decoders$eventDecoder = A3(
 							'title',
 							_elm_lang$core$Json_Decode$string,
 							_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Event))))))));
-var _user$project$Decoders$speakerDecoder = A4(
-	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-	'small_picture_url',
-	_elm_lang$core$Json_Decode$nullable(_elm_lang$core$Json_Decode$string),
-	_elm_lang$core$Maybe$Nothing,
-	A4(
-		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$optional,
-		'large_picture_url',
-		_elm_lang$core$Json_Decode$nullable(_elm_lang$core$Json_Decode$string),
-		_elm_lang$core$Maybe$Nothing,
+var _user$project$Decoders$speakerDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'biography',
+	_elm_lang$core$Json_Decode$string,
+	A3(
+		_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+		'slug',
+		_elm_lang$core$Json_Decode$string,
 		A3(
 			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-			'biography',
+			'name',
 			_elm_lang$core$Json_Decode$string,
-			A3(
-				_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-				'slug',
-				_elm_lang$core$Json_Decode$string,
-				A3(
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
-					'name',
-					_elm_lang$core$Json_Decode$string,
-					_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Speaker))))));
+			_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Models$Speaker))));
 var _user$project$Decoders$dayDecoder = A3(
 	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
 	'repr',
@@ -16224,117 +16214,90 @@ var _user$project$Views_SpeakerDetail$speakerDetailView = F2(
 					return _elm_lang$core$Native_Utils.eq(speaker.slug, speakerSlug);
 				},
 				model.speakers));
-		var image = function () {
-			var _p1 = speaker;
-			if (_p1.ctor === 'Just') {
-				var _p2 = _p1._0.smallPictureUrl;
-				if (_p2.ctor === 'Just') {
-					return {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$img,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$src(_p2._0),
-								_1: {ctor: '[]'}
-							},
-							{ctor: '[]'}),
-						_1: {ctor: '[]'}
-					};
-				} else {
-					return {ctor: '[]'};
-				}
-			} else {
-				return {ctor: '[]'};
-			}
-		}();
-		var _p3 = speaker;
-		if (_p3.ctor === 'Just') {
-			var _p4 = _p3._0;
+		var _p1 = speaker;
+		if (_p1.ctor === 'Just') {
+			var _p2 = _p1._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{ctor: '[]'},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$a,
-							{
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$a,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$BackInHistory),
+							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onClick(_user$project$Messages$BackInHistory),
-								_1: {
+								_0: _elm_lang$html$Html_Attributes$classList(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'btn-default', _1: true},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$i,
+								{
 									ctor: '::',
 									_0: _elm_lang$html$Html_Attributes$classList(
 										{
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
+											_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
 											_1: {
 												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'btn-default', _1: true},
+												_0: {ctor: '_Tuple2', _0: 'fa-chevron-left', _1: true},
 												_1: {ctor: '[]'}
 											}
 										}),
 									_1: {ctor: '[]'}
-								}
-							},
+								},
+								{ctor: '[]'}),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(' Back'),
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$h3,
+							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$i,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$classList(
-											{
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'fa-chevron-left', _1: true},
-													_1: {ctor: '[]'}
-												}
-											}),
-										_1: {ctor: '[]'}
-									},
-									{ctor: '[]'}),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(' Back'),
-									_1: {ctor: '[]'}
-								}
+								_0: _elm_lang$html$Html$text(_p2.name),
+								_1: {ctor: '[]'}
 							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$h3,
+								_elm_lang$html$Html$div,
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text(_p4.name),
+									_0: A2(
+										_evancz$elm_markdown$Markdown$toHtml,
+										{ctor: '[]'},
+										_p2.biography),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									{ctor: '[]'},
-									{
-										ctor: '::',
-										_0: A2(
-											_evancz$elm_markdown$Markdown$toHtml,
-											{ctor: '[]'},
-											_p4.biography),
-										_1: {ctor: '[]'}
-									}),
-								_1: {
-									ctor: '::',
-									_0: A2(_user$project$Views_SpeakerDetail$speakerEvents, _p4, model),
-									_1: {ctor: '[]'}
-								}
+								_0: A2(_user$project$Views_SpeakerDetail$speakerEvents, _p2, model),
+								_1: {ctor: '[]'}
 							}
 						}
-					},
-					image));
+					}
+				});
 		} else {
 			return A2(
 				_elm_lang$html$Html$div,

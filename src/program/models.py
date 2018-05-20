@@ -659,10 +659,6 @@ class Speaker(CampRelatedModel):
             'biography': self.biography,
         }
 
-        if self.picture_small and self.picture_large:
-            data['large_picture_url'] = self.get_large_picture_url()
-            data['small_picture_url'] = self.get_small_picture_url()
-
         return data
 
 
