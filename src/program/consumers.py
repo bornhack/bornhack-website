@@ -34,11 +34,11 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                     camp.get_days('camp')
                 ))
 
-                events_query_set = Event.objects.filter(camp=camp)
+                events_query_set = Event.objects.filter(track__camp=camp)
                 events = list([x.serialize() for x in events_query_set])
 
                 event_instances_query_set = EventInstance.objects.filter(
-                    event__camp=camp
+                    event__track__camp=camp
                 )
                 event_instances = list([
                     x.serialize(user=user)
