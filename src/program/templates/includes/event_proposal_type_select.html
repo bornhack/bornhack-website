@@ -14,7 +14,7 @@
         {% if speaker %}
             <a href="{%url 'program:eventproposal_create' camp_slug=camp.slug event_type_slug=eventtype.slug speaker_uuid=speaker.uuid %}" class="list-group-item">
         {% else %}
-            <a href="{% url 'program:proposal_combined_submit' camp_slug=camp.slug event_type_slug=eventtype.slug %}" class="list-group-item">
+            <a href="{% url 'program:proposal_combined_person_select' camp_slug=camp.slug event_type_slug=eventtype.slug %}" class="list-group-item">
         {% endif %}
             <h4 class="list-group-item-heading">
                 <i class="fas fa-{{ eventtype.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ eventtype.color }};"></i>

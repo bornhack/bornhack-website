@@ -39,6 +39,11 @@ urlpatterns = [
                         CombinedProposalSubmitView.as_view(),
                         name='proposal_combined_submit',
                     ),
+                    url(
+                        r'^(?P<event_type_slug>[-_\w+]+)/select_person/$',
+                        CombinedProposalPersonSelectView.as_view(),
+                        name='proposal_combined_person_select',
+                    ),
                 ]),
             ),
             url(

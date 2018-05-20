@@ -269,9 +269,8 @@ class EventProposalAddPersonView(LoginRequiredMixin, CampViewMixin, EnsureWritab
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the speakerproposal object """
-        response = super().dispatch(request, *args, **kwargs)
         self.speakerproposal = get_object_or_404(models.SpeakerProposal, pk=kwargs['speaker_uuid'], user=request.user)
-        return response
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal object available in template """
@@ -396,10 +395,38 @@ class CombinedProposalTypeSelectView(LoginRequiredMixin, CampViewMixin, ListView
         return super().get_queryset().filter(public=True)
 
 
+class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListView):
+    """
+    A view which allows the user to 1) choose between existing SpeakerProposals or
+    2) pressing a button to create a new SpeakerProposal.
+    Redirect straight to 2) if no existing SpeakerProposals exist.
+    """
+    model = models.SpeakerProposal
+    template_name = 'combined_proposal_select_person.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        """
+        Check that we have a valid EventType
+        """
+        # get EventType from url kwargs
+        self.eventtype = get_object_or_404(models.EventType, slug=self.kwargs['event_type_slug'])
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """
+        Add EventType to template context
+        """
+        context = super().get_context_data(**kwargs)
+        context['eventtype'] = self.eventtype
+        return context
+
+
 class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
     """
     This view is used by users to submit CFP proposals.
     It allows the user to submit an EventProposal and a SpeakerProposal together.
+    It can also be used with a preselected SpeakerProposal uuid in url kwargs
     """
     template_name = 'combined_proposal_submit.html'
 
@@ -407,16 +434,10 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         """
         Check that we have a valid EventType
         """
-        try:
-            self.eventtype = models.EventType.objects.get(
-                slug=self.kwargs['event_type_slug']
-            )
-        except models.EventType.DoesNotExist:
-            raise Http404
+        # get EventType from url kwargs
+        self.eventtype = get_object_or_404(models.EventType, slug=self.kwargs['event_type_slug'])
 
-        return super().dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
@@ -428,30 +449,43 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
 
     def form_valid(self, form):
         """
-        We save each object here before redirecting
+        Save the object(s) here before redirecting
         """
-        # first save the SpeakerProposal
-        speakerproposal = form['speakerproposal'].save(commit=False)
-        speakerproposal.camp = self.camp
-        speakerproposal.user = self.request.user
-        speakerproposal.save()
+        if hasattr(self, 'speakerproposal'):
+            eventproposal = form.save(commit=False)
+            eventproposal.user = self.request.user
+            eventproposal.event_type = self.eventtype
+            eventproposal.save()
+            eventproposal.speakers.add(self.speakerproposal)
+        else:
+            # first save the SpeakerProposal
+            speakerproposal = form['speakerproposal'].save(commit=False)
+            speakerproposal.camp = self.camp
+            speakerproposal.user = self.request.user
+            speakerproposal.save()
 
-        # then save the eventproposal
-        eventproposal = form['eventproposal'].save(commit=False)
-        eventproposal.user = self.request.user
-        eventproposal.event_type = self.eventtype
-        eventproposal.save()
+            # then save the eventproposal
+            eventproposal = form['eventproposal'].save(commit=False)
+            eventproposal.user = self.request.user
+            eventproposal.event_type = self.eventtype
+            eventproposal.save()
 
-        # add the speakerproposal to the eventproposal
-        eventproposal.speakers.add(speakerproposal)
+            # add the speakerproposal to the eventproposal
+            eventproposal.speakers.add(speakerproposal)
 
         # all good
         return redirect(reverse_lazy('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
     def get_form_class(self):
         """
+        Unless we have an existing SpeakerProposal we must show two forms on the page.
         We use betterforms.MultiModelForm to combine two forms on the page
         """
+        if hasattr(self, 'speakerproposal'):
+            # we already have a speakerproposal, just show an eventproposal form
+            return get_eventproposal_form_class(eventtype=self.eventtype)
+
+        # get the two forms we need to build the MultiModelForm
         SpeakerProposalForm = get_speakerproposal_form_class(eventtype=self.eventtype)
         EventProposalForm = get_eventproposal_form_class(eventtype=self.eventtype)
 
