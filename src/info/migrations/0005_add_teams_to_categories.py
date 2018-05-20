@@ -59,6 +59,9 @@ def add_teams_to_categories(apps, schema_editor):
     bar = team2018.get(name="Bar")
     infocategories2018.filter(anchor__in=["bar"]).update(team=bar)
 
+    # Make info team catch all remaining
+    infocategories2018.filter(team__isnull=True).update(team=infoteam)
+
 
 class Migration(migrations.Migration):
 
