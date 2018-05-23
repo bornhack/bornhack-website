@@ -3,7 +3,7 @@ from allauth.account.views import (
     LogoutView,
 )
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib import admin
 from camps.views import *
 from info.views import *
@@ -15,180 +15,180 @@ from people.views import *
 from bar.views import MenuView
 
 urlpatterns = [
-    url(
-        r'^profile/',
+    path(
+        'profile/',
         include('profiles.urls', namespace='profiles')
     ),
-    url(
-        r'^tickets/',
+    path(
+        'tickets/',
         include('tickets.urls', namespace='tickets')
     ),
-    url(
-        r'^shop/',
+    path(
+        'shop/',
         include('shop.urls', namespace='shop')
     ),
-    url(
-        r'^news/',
+    path(
+        'news/',
         include('news.urls', namespace='news')
     ),
-    url(
-        r'^contact/',
+    path(
+        'contact/',
         TemplateView.as_view(template_name='contact.html'),
         name='contact'
     ),
-    url(
-        r'^conduct/',
+    path(
+        'conduct/',
         TemplateView.as_view(template_name='coc.html'),
         name='conduct'
     ),
-    url(
-        r'^login/$',
+    path(
+        'login/',
         LoginView.as_view(),
         name='account_login',
     ),
-    url(
-        r'^logout/$',
+    path(
+        'logout/',
         LogoutView.as_view(),
         name='account_logout',
     ),
-    url(
-        r'^privacy-policy/$',
+    path(
+        'privacy-policy/',
         TemplateView.as_view(template_name='legal/privacy_policy.html'),
         name='privacy-policy'
     ),
-    url(
-        r'^general-terms-and-conditions/$',
+    path(
+        'general-terms-and-conditions/',
         TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'),
         name='general-terms'
     ),
-    url(r'^accounts/', include('allauth.urls')),
-    url(r'^admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('admin/', admin.site.urls),
 
-    url(
-        r'^camps/$',
+    path(
+        'camps/',
         CampListView.as_view(),
         name='camp_list'
     ),
 
     # camp redirect views here
 
-    url(
-        r'^$',
+    path(
+        '',
         CampRedirectView.as_view(),
         kwargs={'page': 'camp_detail'},
         name='camp_detail_redirect',
     ),
 
-    url(
-        r'^program/$',
+    path(
+        'program/',
         CampRedirectView.as_view(),
         kwargs={'page': 'schedule_index'},
         name='schedule_index_redirect',
     ),
 
-    url(
-        r'^info/$',
+    path(
+        'info/',
         CampRedirectView.as_view(),
         kwargs={'page': 'info'},
         name='info_redirect',
     ),
 
-    url(
-        r'^sponsors/$',
+    path(
+        'sponsors/',
         CampRedirectView.as_view(),
         kwargs={'page': 'sponsors'},
         name='sponsors_redirect',
     ),
 
-    url(
-        r'^villages/$',
+    path(
+        'villages/',
         CampRedirectView.as_view(),
         kwargs={'page': 'village_list'},
         name='village_list_redirect',
     ),
 
-    url(
-        r'^people/$',
+    path(
+        'people/',
         PeopleView.as_view(),
         name='people',
     ),
 
-    url(
-        r'^backoffice/',
+    path(
+        'backoffice/',
         include('backoffice.urls', namespace='backoffice')
     ),
 
     # camp specific urls below here
 
-    url(
-        r'(?P<camp_slug>[-_\w+]+)/', include([
-            url(
-                r'^$',
+    path(
+        '<slug:camp_slug>/', include([
+            path(
+                '',
                 CampDetailView.as_view(),
                 name='camp_detail'
             ),
 
-            url(
-                r'^info/$',
+            path(
+                'info/',
                 CampInfoView.as_view(),
                 name='info'
             ),
 
-            url(
-                r'^program/',
+            path(
+                'program/',
                 include('program.urls', namespace='program'),
             ),
 
-            url(
-                r'^sponsors/call/$',
+            path(
+                'sponsors/call/',
                 CallForSponsorsView.as_view(),
                 name='call-for-sponsors'
             ),
-            url(
-                r'^sponsors/$',
+            path(
+                'sponsors/',
                 SponsorsView.as_view(),
                 name='sponsors'
             ),
 
-            url(
-                r'^bar/menu$',
+            path(
+                'bar/menu',
                 MenuView.as_view(),
                 name='menu'
             ),
 
-            url(
-                r'^villages/', include([
-                    url(
-                        r'^$',
+            path(
+                'villages/', include([
+                    path(
+                        '',
                         VillageListView.as_view(),
                         name='village_list'
                     ),
-                    url(
-                        r'create/$',
+                    path(
+                        'create/',
                         VillageCreateView.as_view(),
                         name='village_create'
                     ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/delete/$',
+                    path(
+                        '<slug:slug>/delete/',
                         VillageDeleteView.as_view(),
                         name='village_delete'
                     ),
-                    url(
-                        r'(?P<slug>[-_\w+]+)/edit/$',
+                    path(
+                        '<slug:slug>/edit/',
                         VillageUpdateView.as_view(),
                         name='village_update'
                     ),
                     # this has to be the last url in the list
-                    url(
-                        r'(?P<slug>[-_\w+]+)/$',
+                    path(
+                        '<slug:slug>/',
                         VillageDetailView.as_view(),
                         name='village_detail'
                     ),
                 ])
             ),
 
-            url(
-                r'^teams/',
+            path(
+                'teams/',
                 include('teams.urls', namespace='teams')
             ),
 
@@ -200,5 +200,6 @@ urlpatterns = [
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+

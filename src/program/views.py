@@ -24,7 +24,8 @@ from .mixins import (
     EnsureUnapprovedProposalMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
-    EnsureCFPOpenMixin
+    EnsureCFPOpenMixin,
+    UrlViewMixin,
 )
 from .email import (
     add_speakerproposal_updated_email,
@@ -599,4 +600,41 @@ class ProgramControlCenter(CampViewMixin, TemplateView):
         context['csv'] = csv
 
         return context
+
+###################################################################################################
+# URL views
+
+class UrlCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, CreateView):
+    model = models.Url
+    template_name = 'url_form.html'
+    fields = ['urltype', 'url']
+
+    def form_valid(self, form):
+        """
+        Set the proposal FK before saving
+        """
+        if hasattr(self, 'eventproposal') and self.eventproposal:
+            form.instance.eventproposal = self.eventproposal
+            url = form.save()
+        else:
+            form.instance.speakerproposal = self.speakerproposal
+            url = form.save()
+
+        messages.success(self.request, "URL saved.")
+
+        # all good
+        return redirect(self.get_success_url())
+
+
+class UrlUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, UpdateView):
+    model = models.Url
+    template_name = 'url_form.html'
+    fields = ['urltype', 'url']
+    pk_url_kwarg = 'url_uuid'
+
+
+class UrlDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, DeleteView):
+    model = models.Url
+    template_name = 'url_delete.html'
+    pk_url_kwarg = 'url_uuid'
 

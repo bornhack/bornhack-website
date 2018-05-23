@@ -15,9 +15,139 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
 from django.core.files.base import ContentFile
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
+
+
 logger = logging.getLogger("bornhack.%s" % __name__)
+
+
+class UrlType(CreatedUpdatedModel):
+    """
+    Each Url object has a type.
+    """
+    name = models.CharField(
+        max_length=25,
+        help_text='The name of this type',
+        unique=True,
+    )
+
+    icon = models.CharField(
+        max_length=100,
+        default='link',
+        help_text="Name of the fontawesome icon to use without the 'fa-' part"
+    )
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Url(CampRelatedModel):
+    """
+        This model contains URLs related to
+        - SpeakerProposals
+        - EventProposals
+        - Speakers
+        - Events
+        Each URL has a UrlType and a GenericForeignKey to the model to which it belongs.
+        When a SpeakerProposal or EventProposal is approved the related URLs will be copied with FK to the new Speaker/Event objects.
+    """
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    url = models.URLField(
+        help_text='The actual URL'
+    )
+
+    urltype = models.ForeignKey(
+        'program.UrlType',
+        help_text='The type of this URL',
+        on_delete=models.PROTECT,
+    )
+
+    speakerproposal = models.ForeignKey(
+        'program.SpeakerProposal',
+        null=True,
+        blank=True,
+        help_text='The speaker proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    eventproposal = models.ForeignKey(
+        'program.EventProposal',
+        null=True,
+        blank=True,
+        help_text='The event proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    speaker = models.ForeignKey(
+        'program.Speaker',
+        null=True,
+        blank=True,
+        help_text='The speaker proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    event = models.ForeignKey(
+        'program.Event',
+        null=True,
+        blank=True,
+        help_text='The event proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    def __str__(self):
+        return self.url
+
+    def clean(self):
+        ''' Make sure we have exactly one FK '''
+        fks = 0
+        if self.speakerproposal:
+            fks += 1
+        if self.eventproposal:
+            fks += 1
+        if self.speaker:
+            fks += 1
+        if self.event:
+            fks += 1
+        if fks > 1:
+            raise(ValidationError("Url objects must have maximum one FK, this has %s" % fks))
+
+    @property
+    def owner(self):
+        """
+        Return the object this Url belongs to
+        """
+        if self.speakerproposal:
+            return self.speakerproposal
+        elif self.eventproposal:
+            return self.eventproposal
+        elif self.speaker:
+            return self.speaker
+        elif self.event:
+            return self.event
+        else:
+            return None
+
+    @property
+    def camp(self):
+        return self.owner.camp
+
+
+###############################################################################
 
 
 class UserSubmittedModel(CampRelatedModel):

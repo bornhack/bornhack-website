@@ -1,14 +1,14 @@
-from django.conf.urls import url
+from django.urls import path
 from .views import *
 
 
 app_name = 'backoffice'
 
 urlpatterns = [
-    url(r'^$', BackofficeIndexView.as_view(), name='index'),
-    url(r'product_handout/$', ProductHandoutView.as_view(), name='product_handout'),
-    url(r'badge_handout/$', BadgeHandoutView.as_view(), name='badge_handout'),
-    url(r'ticket_checkin/$', TicketCheckinView.as_view(), name='ticket_checkin'),
-    url(r'public_credit_names/$', ApproveNamesView.as_view(), name='public_credit_names'),
+    path('', BackofficeIndexView.as_view(), name='index'),
+    path('product_handout/', ProductHandoutView.as_view(), name='product_handout'),
+    path('badge_handout/', BadgeHandoutView.as_view(), name='badge_handout'),
+    path('ticket_checkin/', TicketCheckinView.as_view(), name='ticket_checkin'),
+    path('public_credit_names/', ApproveNamesView.as_view(), name='public_credit_names'),
 ]
 

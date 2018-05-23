@@ -15,7 +15,19 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading">Events</div>
+    <div class="panel-heading">URLs for {{ speakerproposal.name }}</div>
+    <div class="panel-body">
+      {% if speakerproposal.urls.exists %}
+        {% include 'includes/speakerproposalurl_table.html' %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+      <a href="{% url 'program:speakerproposalurl_create' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Events for {{ speakerproposal.name }}</div>
     <div class="panel-body">
       {% if speakerproposal.eventproposals.exists %}
         {% include 'includes/event_proposal_table.html' with eventproposals=speakerproposal.eventproposals.all %}

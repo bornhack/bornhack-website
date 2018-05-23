@@ -14,7 +14,9 @@ from .models import (
     EventTrack,
     SpeakerProposal,
     EventProposal,
-    Favorite
+    Favorite,
+    UrlType,
+    Url
 )
 
 
@@ -97,4 +99,12 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
+
+@admin.register(UrlType)
+class UrlTypeAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Url)
+class UrlAdmin(admin.ModelAdmin):
+    pass
 

@@ -1,154 +1,184 @@
-from django.conf.urls import include, url
+from django.urls import path, include
 from .views import *
 
 app_name = 'program'
 
 urlpatterns = [
-    url(
-        r'^$',
+    path(
+        '',
         ScheduleView.as_view(),
         name='schedule_index'
     ),
-    url(
-        r'^noscript/$',
+    path(
+        'noscript/',
         NoScriptScheduleView.as_view(),
         name='noscript_schedule_index'
     ),
-    url(
-        r'^ics/', ICSView.as_view(), name="ics_view"
+    path(
+        'ics/', ICSView.as_view(), name="ics_view"
     ),
-    url(
-        r'^control/', ProgramControlCenter.as_view(), name="program_control_center"
+    path(
+        'control/', ProgramControlCenter.as_view(), name="program_control_center"
     ),
-    url(
-        r'^proposals/', include([
-            url(
-                r'^$',
+    path(
+        'proposals/', include([
+            path(
+                '',
                 ProposalListView.as_view(),
                 name='proposal_list',
             ),
-            url(
-                r'^submit/', include([
-                    url(
-                        r'^$',
+            path(
+                'submit/', include([
+                    path(
+                        '',
                         CombinedProposalTypeSelectView.as_view(),
                         name='proposal_combined_type_select',
                     ),
-                    url(
-                        r'^(?P<event_type_slug>[-_\w+]+)/$',
+                    path(
+                        '<slug:event_type_slug>/',
                         CombinedProposalSubmitView.as_view(),
                         name='proposal_combined_submit',
                     ),
-                    url(
-                        r'^(?P<event_type_slug>[-_\w+]+)/select_person/$',
+                    path(
+                        '<slug:event_type_slug>/select_person/',
                         CombinedProposalPersonSelectView.as_view(),
                         name='proposal_combined_person_select',
                     ),
                 ]),
             ),
-            url(
-                r'^people/', include([
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/$',
+            path(
+                'people/', include([
+                    path(
+                        '<uuid:pk>/',
                         SpeakerProposalDetailView.as_view(),
                         name='speakerproposal_detail'
                     ),
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/update/$',
+                    path(
+                        '<uuid:pk>/update/',
                         SpeakerProposalUpdateView.as_view(),
                         name='speakerproposal_update'
                     ),
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/delete/$',
+                    path(
+                        '<uuid:pk>/delete/',
                         SpeakerProposalDeleteView.as_view(),
                         name='speakerproposal_delete'
                     ),
-                    url(
-                        r'^(?P<speaker_uuid>[a-f0-9-]+)/add_event/$',
+                    path(
+                        '<uuid:speaker_uuid>/add_event/',
                         EventProposalTypeSelectView.as_view(),
                         name='eventproposal_typeselect'
                     ),
-                    url(
-                        r'^(?P<speaker_uuid>[a-f0-9-]+)/add_event/(?P<event_type_slug>[-_\w+]+)/$',
+                    path(
+                        '<uuid:speaker_uuid>/add_event/<slug:event_type_slug>/',
                         EventProposalCreateView.as_view(),
                         name='eventproposal_create'
                     ),
+                    path(
+                        '<uuid:speaker_uuid>/add_url/',
+                        UrlCreateView.as_view(),
+                        name='speakerproposalurl_create'
+                    ),
+                    path(
+                        '<uuid:speaker_uuid>/urls/<uuid:url_uuid>/update/',
+                        UrlUpdateView.as_view(),
+                        name='speakerproposalurl_update'
+                    ),
+                    path(
+                        '<uuid:speaker_uuid>/urls/<uuid:url_uuid>/delete/',
+                        UrlDeleteView.as_view(),
+                        name='speakerproposalurl_delete'
+                    ),
                 ])
             ),
-            url(
-                r'^events/', include([
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/$',
+            path(
+                'events/', include([
+                    path(
+                        '<uuid:pk>/',
                         EventProposalDetailView.as_view(),
                         name='eventproposal_detail'
                     ),
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/edit/$',
+                    path(
+                        '<uuid:pk>/update/',
                         EventProposalUpdateView.as_view(),
                         name='eventproposal_update'
                     ),
-                    url(
-                        r'^(?P<pk>[a-f0-9-]+)/delete/$',
+                    path(
+                        '<uuid:pk>/delete/',
                         EventProposalDeleteView.as_view(),
                         name='eventproposal_delete'
                     ),
-                    url(
-                        r'^(?P<event_uuid>[a-f0-9-]+)/add_person/$',
+                    path(
+                        '<uuid:event_uuid>/add_person/',
                         EventProposalSelectPersonView.as_view(),
                         name='eventproposal_selectperson'
                     ),
-                    url(
-                        r'^(?P<event_uuid>[a-f0-9-]+)/add_person/new/$',
+                    path(
+                        '<uuid:event_uuid>/add_person/new/',
                         SpeakerProposalCreateView.as_view(),
                         name='speakerproposal_create'
                     ),
-                    url(
-                        r'^(?P<event_uuid>[a-f0-9-]+)/add_person/(?P<speaker_uuid>[a-f0-9-]+)/$',
+                    path(
+                        '<uuid:event_uuid>/add_person/<uuid:speaker_uuid>/',
                         EventProposalAddPersonView.as_view(),
                         name='eventproposal_addperson'
+                    ),
+                    path(
+                        '<uuid:event_uuid>/add_url/',
+                        UrlCreateView.as_view(),
+                        name='eventproposalurl_create'
+                    ),
+                    path(
+                        '<uuid:event_uuid>/urls/<uuid:url_uuid>/update/',
+                        UrlUpdateView.as_view(),
+                        name='eventproposalurl_update'
+                    ),
+                    path(
+                        '<uuid:event_uuid>/urls/<uuid:url_uuid>/delete/',
+                        UrlDeleteView.as_view(),
+                        name='eventproposalurl_delete'
                     ),
                 ])
             ),
         ])
     ),
-    url(
-        r'^speakers/', include([
-            url(
-                r'^$',
+    path(
+        'speakers/', include([
+            path(
+                '',
                 SpeakerListView.as_view(),
                 name='speaker_index'
             ),
-            url(
-                r'^(?P<slug>[-_\w+]+)/$',
+            path(
+                '<slug:slug>/',
                 SpeakerDetailView.as_view(),
                 name='speaker_detail'
             ),
         ]),
     ),
-    url(
-        r'^events/$',
+    path(
+        'events/',
         EventListView.as_view(),
         name='event_index'
     ),
     # legacy CFS url kept on purpose to keep old links functional
-    url(
-        r'^call-for-speakers/$',
+    path(
+        'call-for-speakers/',
         CallForParticipationView.as_view(),
         name='call_for_speakers'
     ),
-    url(
-        r'^call-for-participation/$',
+    path(
+        'call-for-participation/',
         CallForParticipationView.as_view(),
         name='call_for_participation'
     ),
-    url(
-        r'^calendar/',
+    path(
+        'calendar',
         ICSView.as_view(),
         name='ics_calendar'
     ),
     # this must be the last URL here or the regex will overrule the others
-    url(
-        r'^(?P<slug>[-_\w+]+)/$',
+    path(
+        '<slug:slug>',
         EventDetailView.as_view(),
         name='event_detail'
     ),
