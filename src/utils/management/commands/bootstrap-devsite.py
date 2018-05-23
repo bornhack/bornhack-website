@@ -127,7 +127,6 @@ class Command(BaseCommand):
         user2 = User.objects.create_user(
             username='user2',
             password='user2',
-            is_staff=True
         )
         user2.profile.name = 'Jane Doe'
         user2.profile.description = 'one that once was'
@@ -143,7 +142,6 @@ class Command(BaseCommand):
         user3 = User.objects.create_user(
             username='user3',
             password='user3',
-            is_staff=True
         )
         user3.profile.name = 'Lorem Ipsum'
         user3.profile.description = 'just a user'
@@ -160,7 +158,6 @@ class Command(BaseCommand):
         user4 = User.objects.create_user(
             username='user4',
             password='user4',
-            is_staff=True
         )
         user4.profile.name = 'Ethe Reum'
         user4.profile.description = 'I prefer doge'
@@ -178,7 +175,6 @@ class Command(BaseCommand):
         user5 = User.objects.create_user(
             username='user5',
             password='user5',
-            is_staff=True
         )
         user5.profile.name = 'Pyra Mid'
         user5.profile.description = 'This is not a scam'
@@ -196,7 +192,6 @@ class Command(BaseCommand):
         user6 = User.objects.create_user(
             username='user6',
             password='user6',
-            is_staff=True
         )
         user6.profile.name = 'User Number 6'
         user6.profile.description = 'some description'
@@ -214,7 +209,6 @@ class Command(BaseCommand):
         user7 = User.objects.create_user(
             username='user7',
             password='user7',
-            is_staff=True
         )
         user7.profile.name = 'Assembly Hacker'
         user7.profile.description = 'Low level is best level'
@@ -232,7 +226,6 @@ class Command(BaseCommand):
         user8 = User.objects.create_user(
             username='user8',
             password='user8',
-            is_staff=True
         )
         user8.profile.name = 'TCL'
         user8.profile.description = 'Expect me'
@@ -250,7 +243,6 @@ class Command(BaseCommand):
         user9 = User.objects.create_user(
             username='user9',
             password='user9',
-            is_staff=True
         )
         user9.profile.name = 'John Windows'
         user9.profile.description = 'Microsoft is best soft'
