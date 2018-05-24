@@ -287,6 +287,65 @@ class EventProposalAddPersonView(LoginRequiredMixin, CampViewMixin, EnsureWritab
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
+class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UpdateView):
+    """
+    This view is for removing a speakerproposal from an existing eventproposal
+    """
+    model = models.EventProposal
+    template_name = 'event_proposal_remove_person.html'
+    fields = []
+    pk_url_kwarg = 'event_uuid'
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Get the speakerproposal object and check a few things """
+        # get the speakerproposal object from URL kwargs
+        self.speakerproposal = get_object_or_404(models.SpeakerProposal, pk=kwargs['speaker_uuid'], user=request.user)
+        # run the super() dispatch method so we have self.camp otherwise the .all() lookup below craps out
+        response = super().dispatch(request, *args, **kwargs)
+
+        # is this speakerproposal even in use on this eventproposal
+        if self.speakerproposal not in self.get_object().speakers.all():
+            # this speaker is not associated with this event
+            raise Http404
+
+        # all good
+        return response
+
+    def get_context_data(self, *args, **kwargs):
+        """ Make speakerproposal object available in template """
+        context = super().get_context_data(**kwargs)
+        context['speakerproposal'] = self.speakerproposal
+        return context
+
+    def form_valid(self, form):
+        """ Remove the speaker from the event """
+        if self.speakerproposal not in self.get_object().speakers.all():
+            # this speaker is not associated with this event
+            raise Http404
+
+        if self.get_object().speakers.count() == 1:
+            messages.error(self.request, "Cannot delete the last person associalted with event!")
+            return redirect(reverse(
+                'program:eventproposal_detail', kwargs={
+                'camp_slug': self.camp.slug,
+                'pk': self.get_object().uuid
+            }))
+
+        form.instance.speakers.remove(self.speakerproposal)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        messages.success(self.request, "Speaker %s has been removed from %s" % (
+            self.speakerproposal.name,
+            self.get_object().title
+        ))
+        return reverse(
+            'program:eventproposal_detail', kwargs={
+            'camp_slug': self.camp.slug,
+            'pk': self.get_object().uuid
+        })
+
+
 class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, CreateView):
     """
     This view allows a user to create a new eventproposal linked to an existing speakerproposal

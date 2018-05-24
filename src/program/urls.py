@@ -123,6 +123,11 @@ urlpatterns = [
                         name='eventproposal_addperson'
                     ),
                     path(
+                        '<uuid:event_uuid>/remove_person/<uuid:speaker_uuid>/',
+                        EventProposalRemovePersonView.as_view(),
+                        name='eventproposal_removeperson'
+                    ),
+                    path(
                         '<uuid:event_uuid>/add_url/',
                         UrlCreateView.as_view(),
                         name='eventproposalurl_create'

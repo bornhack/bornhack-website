@@ -31,7 +31,6 @@
                     {% else %}
                         <a href="{% url 'program:speakerproposal_create' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-plus"></i><span class="h5"> Add {{ eventproposal.event_type.host_title }}</span></a>
                     {% endif %}
-                    <a href="{% url 'program:eventproposal_delete' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
                 {% endif %}
             </td>
         </tr>

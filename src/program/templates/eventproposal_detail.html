@@ -27,18 +27,24 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading">{{ eventproposal.event_type.host_title }} List</div>
+    <div class="panel-heading">{{ eventproposal.event_type.host_title }} List for {{ eventproposal.title }}</div>
     <div class="panel-body">
       {% if eventproposal.speakers.exists %}
         {% include 'includes/speaker_proposal_table.html' with speakerproposals=eventproposal.speakers.all %}
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
+      {% if eventproposal.get_available_speakerproposals.exists %}
+        <a href="{% url 'program:eventproposal_selectperson' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ eventproposal.event_type.host_title }}</span></a>
+      {% else %}
+        <a href="{% url 'program:speakerproposal_create' camp_slug=camp.slug event_uuid=eventproposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ eventproposal.event_type.host_title }}</span></a>
+      {% endif %}
     </div>
 </div>
 
 <p>
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+    <a href="{% url 'program:eventproposal_delete' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
 </p>
 
 {% endblock program_content %}
