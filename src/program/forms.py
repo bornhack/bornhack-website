@@ -43,6 +43,9 @@ class BaseEventProposalForm(forms.ModelForm):
         # disable the empty_label for the track select box
         self.fields['track'].empty_label = None
 
+        # make sure video_recording checkbox defaults to checked
+        self.fields['allow_video_recording'].initial = True
+
 
 ################################ EventType "Talk" ################################################
 
