@@ -631,8 +631,15 @@ class ScheduleView(CampViewMixin, TemplateView):
 
 
 class CallForParticipationView(CampViewMixin, TemplateView):
-    def get_template_names(self):
-        return '%s_call_for_participation.html' % self.camp.slug
+    template_name = 'call_for_participation.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.camp.call_for_participation:
+            context['cfp_markdown'] = self.camp.call_for_participation
+        else:
+            context['cfp_markdown'] = "<p class='lead'>This CFP has not been written yet.</p>"
+        return context
 
 
 ###################################################################################################

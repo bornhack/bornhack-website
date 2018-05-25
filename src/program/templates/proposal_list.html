@@ -6,7 +6,14 @@ Proposals | {{ block.super }}
 
 {% block program_content %}
 
-{% include 'includes/event_proposal_type_select.html' %}
+{% if camp.call_for_participation_open %}
+    {% include 'includes/event_proposal_type_select.html' %}
+{% else %}
+<div class="alert alert-danger">
+    <strong>Note!</strong> This Call for Particilation is not open.
+</div>
+{% endif %}
+
 
 {% if speakerproposal_list or eventproposal_list %}
 <div class="panel panel-default">

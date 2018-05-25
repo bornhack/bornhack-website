@@ -70,9 +70,21 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         default=False,
     )
 
+    call_for_participation = models.TextField(
+        blank=True,
+        help_text='The CFP markdown for this Camp',
+        default='The Call For Participation for this Camp has not been written yet',
+    )
+
     call_for_sponsors_open = models.BooleanField(
         help_text='Check if the Call for Sponsors is open for this camp',
         default=False,
+    )
+
+    call_for_sponsors = models.TextField(
+        blank=True,
+        help_text='The CFS markdown for this Camp',
+        default='The Call For Sponsors for this Camp has not been written yet',
     )
 
     def get_absolute_url(self):

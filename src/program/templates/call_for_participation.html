@@ -1,0 +1,17 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+Call for Participation | {{ block.super }}
+{% endblock %}
+
+{% block program_content %}
+
+{% if not camp.call_for_participation_open %}
+<div class="alert alert-danger">
+    <strong>Note!</strong> This Call for Particilation is not open.
+</div>
+{% endif %}
+
+{{ cfp_markdown|safe }}
+
+{% endblock %}
