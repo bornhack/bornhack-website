@@ -224,7 +224,7 @@ class SpeakerProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
 
 
 
-class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DetailView):
+class SpeakerProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
     model = models.SpeakerProposal
     template_name = 'speakerproposal_detail.html'
 
@@ -470,7 +470,7 @@ class EventProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
-class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DetailView):
+class EventProposalDetailView(LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView):
     model = models.EventProposal
     template_name = 'eventproposal_detail.html'
 
