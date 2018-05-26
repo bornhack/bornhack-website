@@ -1,0 +1,23 @@
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>URLs</th>
+            <th class='text-right'>Available Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for url in speakerproposal.urls.all %}
+        <tr>
+            <td><i class="fas fa-{{ url.urltype.icon }} fa-lg"></i><span class="h4"> {{ url.urltype.name }}</span></td>
+            <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
+            <td class='text-right'>
+                {% if not camp.read_only %}
+                    <a href="{% url 'program:speakerproposalurl_update' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid url_uuid=url.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>
+                    <a href="{% url 'program:speakerproposalurl_delete' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

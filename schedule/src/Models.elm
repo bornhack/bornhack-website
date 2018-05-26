@@ -49,6 +49,7 @@ type alias Model =
     , eventInstances : List EventInstance
     , eventLocations : List FilterType
     , eventTypes : List FilterType
+    , eventTracks : List FilterType
     , speakers : List Speaker
     , flags : Flags
     , filter : Filter
@@ -81,6 +82,7 @@ type alias EventInstance =
     , url : String
     , eventSlug : EventSlug
     , eventType : String
+    , eventTrack : String
     , backgroundColor : String
     , forgroundColor : String
     , from : Date
@@ -142,11 +144,13 @@ type FilterType
     = TypeFilter FilterName FilterSlug TypeColor TypeLightText
     | LocationFilter FilterName FilterSlug LocationIcon
     | VideoFilter FilterName FilterSlug
+    | TrackFilter FilterName FilterSlug
 
 
 type alias Filter =
     { eventTypes : List FilterType
     , eventLocations : List FilterType
+    , eventTracks : List FilterType
     , videoRecording : List FilterType
     }
 
@@ -160,6 +164,9 @@ unpackFilterType filter =
             ( name, slug )
 
         VideoFilter name slug ->
+            ( name, slug )
+
+        TrackFilter name slug ->
             ( name, slug )
 
 

@@ -5,20 +5,11 @@
 
 <h3>{{ speaker.name }}</h3>
 
-{% if speaker.picture_large and speaker.picture_small %}
 <div class="row">
-  <div class="col-md-8 text-container">
+  <div class="col-md-12 text-container">
 {{ speaker.biography|commonmark }}
-  </div>
-  <div class="col-md-4">
-    <a href="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='large' %}" >
-      <img src="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speaker.name }}" width="200px">
-    </a>
   </div>
 </div>
-{% else %}
-{{ speaker.biography|commonmark }}
-{% endif %}
 
 <hr />
 
@@ -28,7 +19,7 @@
             <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
                 {{ event.event_type.name }}
             </small>
-            <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
         </h3>
         {{ event.abstract|commonmark }}
 

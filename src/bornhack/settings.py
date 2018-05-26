@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'bootstrap3',
     'django_extensions',
+    'betterforms',
 ]
 
 #MEDIA_URL = '/media/'

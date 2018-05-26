@@ -1,11 +1,10 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Call for Speakers | {{ block.super }}
+Select Event Type | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-
-<h2>Call for Speakers coming eventually!</h2>
-
+{% include 'includes/event_proposal_type_select.html' %}
 {% endblock %}
+

@@ -4,8 +4,7 @@ import icalendar
 import logging
 
 from datetime import timedelta
-
-from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import DateTimeRangeField, ArrayField
 from django.contrib import messages
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -16,46 +15,139 @@ from django.core.files.storage import FileSystemStorage
 from django.urls import reverse
 from django.apps import apps
 from django.core.files.base import ContentFile
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
+
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class CustomUrlStorage(FileSystemStorage):
-    def __init__(self, location=None):
-        super(CustomUrlStorage, self).__init__(location)
+class UrlType(CreatedUpdatedModel):
+    """
+    Each Url object has a type.
+    """
+    name = models.CharField(
+        max_length=25,
+        help_text='The name of this type',
+        unique=True,
+    )
 
-    def url(self, name):
-        url = super(CustomUrlStorage, self).url(name)
-        parts = url.split("/")
-        if parts[0] != "public":
-            # first bit should always be "public"
-            return False
+    icon = models.CharField(
+        max_length=100,
+        default='link',
+        help_text="Name of the fontawesome icon to use without the 'fa-' part"
+    )
 
-        if parts[1] == "speakerproposals":
-            # find speakerproposal
-            speakerproposal_model = apps.get_model('program', 'speakerproposal')
-            try:
-                speakerproposal = speakerproposal_model.objects.get(picture_small=name)
-                picture = "small"
-            except speakerproposal_model.DoesNotExist:
-                try:
-                    speakerproposal = speakerproposal_model.objects.get(picture_large=name)
-                    picture = "large"
-                except speakerproposal_model.DoesNotExist:
-                    return False
-            url = reverse('speakerproposal_picture', kwargs={
-                'camp_slug': speakerproposal.camp.slug,
-                'pk': speakerproposal.pk,
-                'picture': picture,
-            })
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Url(CampRelatedModel):
+    """
+        This model contains URLs related to
+        - SpeakerProposals
+        - EventProposals
+        - Speakers
+        - Events
+        Each URL has a UrlType and a GenericForeignKey to the model to which it belongs.
+        When a SpeakerProposal or EventProposal is approved the related URLs will be copied with FK to the new Speaker/Event objects.
+    """
+    uuid = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False,
+    )
+
+    url = models.URLField(
+        help_text='The actual URL'
+    )
+
+    urltype = models.ForeignKey(
+        'program.UrlType',
+        help_text='The type of this URL',
+        on_delete=models.PROTECT,
+    )
+
+    speakerproposal = models.ForeignKey(
+        'program.SpeakerProposal',
+        null=True,
+        blank=True,
+        help_text='The speaker proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    eventproposal = models.ForeignKey(
+        'program.EventProposal',
+        null=True,
+        blank=True,
+        help_text='The event proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    speaker = models.ForeignKey(
+        'program.Speaker',
+        null=True,
+        blank=True,
+        help_text='The speaker proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    event = models.ForeignKey(
+        'program.Event',
+        null=True,
+        blank=True,
+        help_text='The event proposal object this URL belongs to',
+        on_delete=models.PROTECT,
+        related_name='urls',
+    )
+
+    def __str__(self):
+        return self.url
+
+    def clean(self):
+        ''' Make sure we have exactly one FK '''
+        fks = 0
+        if self.speakerproposal:
+            fks += 1
+        if self.eventproposal:
+            fks += 1
+        if self.speaker:
+            fks += 1
+        if self.event:
+            fks += 1
+        if fks > 1:
+            raise(ValidationError("Url objects must have maximum one FK, this has %s" % fks))
+
+    @property
+    def owner(self):
+        """
+        Return the object this Url belongs to
+        """
+        if self.speakerproposal:
+            return self.speakerproposal
+        elif self.eventproposal:
+            return self.eventproposal
+        elif self.speaker:
+            return self.speaker
+        elif self.event:
+            return self.event
         else:
-            return False
+            return None
 
-        return url
+    @property
+    def camp(self):
+        return self.owner.camp
 
 
-storage = CustomUrlStorage()
+###############################################################################
 
 
 class UserSubmittedModel(CampRelatedModel):
@@ -78,70 +170,46 @@ class UserSubmittedModel(CampRelatedModel):
         on_delete=models.PROTECT
     )
 
-    PROPOSAL_DRAFT = 'draft'
     PROPOSAL_PENDING = 'pending'
     PROPOSAL_APPROVED = 'approved'
     PROPOSAL_REJECTED = 'rejected'
-    PROPOSAL_MODIFIED_AFTER_APPROVAL = 'modified after approval'
 
     PROPOSAL_STATUSES = [
-        PROPOSAL_DRAFT,
         PROPOSAL_PENDING,
         PROPOSAL_APPROVED,
         PROPOSAL_REJECTED,
-        PROPOSAL_MODIFIED_AFTER_APPROVAL
     ]
 
     PROPOSAL_STATUS_CHOICES = [
-        (PROPOSAL_DRAFT, 'Draft'),
         (PROPOSAL_PENDING, 'Pending approval'),
         (PROPOSAL_APPROVED, 'Approved'),
         (PROPOSAL_REJECTED, 'Rejected'),
-        (PROPOSAL_MODIFIED_AFTER_APPROVAL, 'Modified after approval'),
     ]
 
     proposal_status = models.CharField(
         max_length=50,
         choices=PROPOSAL_STATUS_CHOICES,
-        default=PROPOSAL_DRAFT,
+        default=PROPOSAL_PENDING,
     )
 
     def __str__(self):
         return '%s (submitted by: %s, status: %s)' % (self.headline, self.user, self.proposal_status)
 
     def save(self, **kwargs):
-        if not self.camp.call_for_speakers_open:
-            message = 'Call for speakers is not open'
+        if not self.camp.call_for_participation_open:
+            message = 'Call for participation is not open'
             if hasattr(self, 'request'):
                 messages.error(self.request, message)
             raise ValidationError(message)
         super().save(**kwargs)
 
     def delete(self, **kwargs):
-        if not self.camp.call_for_speakers_open:
-            message = 'Call for speakers is not open'
+        if not self.camp.call_for_participation_open:
+            message = 'Call for participation is not open'
             if hasattr(self, 'request'):
                 messages.error(self.request, message)
             raise ValidationError(message)
         super().delete(**kwargs)
-
-
-def get_speakerproposal_picture_upload_path(instance, filename):
-    """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
-    return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
-        'campslug': instance.camp.slug,
-        'proposaluuid': instance.uuid,
-        'filename': filename
-    }
-
-
-def get_speakersubmission_picture_upload_path(instance, filename):
-    """ We want speakerproposal pictures saved as MEDIA_ROOT/public/speakerproposals/camp-slug/proposal-uuid/filename """
-    return 'public/speakerproposals/%(campslug)s/%(proposaluuid)s/%(filename)s' % {
-        'campslug': instance.camp.slug,
-        'proposaluuidd': instance.uuid,
-        'filename': filename
-    }
 
 
 class SpeakerProposal(UserSubmittedModel):
@@ -155,34 +223,21 @@ class SpeakerProposal(UserSubmittedModel):
 
     name = models.CharField(
         max_length=150,
-        help_text='Name or alias of the speaker',
+        help_text='Name or alias of the speaker/artist/host',
     )
 
     biography = models.TextField(
-        help_text='Markdown is supported.'
-    )
-
-    picture_large = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speakerproposal_picture_upload_path,
-        help_text='A picture of the speaker',
-        storage=storage,
-        max_length=255
-    )
-
-    picture_small = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speakerproposal_picture_upload_path,
-        help_text='A thumbnail of the speaker picture',
-        storage=storage,
-        max_length=255
+        help_text='Biography of the speaker/artist/host. Markdown is supported.'
     )
 
     submission_notes = models.TextField(
-        help_text='Private notes for this speaker. Only visible to the submitting user and the BornHack organisers.',
+        help_text='Private notes for this speaker/artist/host. Only visible to the submitting user and the BornHack organisers.',
         blank=True
+    )
+
+    needs_oneday_ticket = models.BooleanField(
+        default=False,
+        help_text='Check if BornHack needs to provide a free one-day ticket for this speaker',
     )
 
     @property
@@ -190,45 +245,51 @@ class SpeakerProposal(UserSubmittedModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse_lazy('speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
+        return reverse_lazy('program:speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
-    def mark_as_approved(self):
+    def mark_as_approved(self, request):
         speakermodel = apps.get_model('program', 'speaker')
         speakerproposalmodel = apps.get_model('program', 'speakerproposal')
         speaker = speakermodel()
         speaker.camp = self.camp
         speaker.name = self.name
         speaker.biography = self.biography
-        if self.picture_small and self.picture_large:
-            temp = ContentFile(self.picture_small.read())
-            temp.name = os.path.basename(self.picture_small.name)
-            speaker.picture_small = temp
-            temp = ContentFile(self.picture_large.read())
-            temp.name = os.path.basename(self.picture_large.name)
-            speaker.picture_large = temp
+        speaker.needs_oneday_ticket = self.needs_oneday_ticket
         speaker.proposal = self
         speaker.save()
 
         self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
         self.save()
 
+        # copy all the URLs too
+        for url in self.urls.all():
+            Url.objects.create(
+                url=url.url,
+                urltype=url.urltype,
+                speaker=speaker
+            )
+
+        messages.success(request, "Speaker object %s has been created" % speaker)
+
 
 class EventProposal(UserSubmittedModel):
     """ An event proposal """
 
-    camp = models.ForeignKey(
-        'camps.Camp',
+    track = models.ForeignKey(
+        'program.EventTrack',
         related_name='eventproposals',
+        help_text='The track this event belongs to',
         on_delete=models.PROTECT
     )
 
     title = models.CharField(
         max_length=255,
-        help_text='The title of this event',
+        help_text='The title of this event. Keep it short and memorable.',
     )
 
     abstract = models.TextField(
-        help_text='The abstract for this event'
+        help_text='The abstract for this event. Describe what the audience can expect to see/hear.',
+        blank=True,
     )
 
     event_type = models.ForeignKey(
@@ -241,11 +302,19 @@ class EventProposal(UserSubmittedModel):
         'program.SpeakerProposal',
         blank=True,
         help_text='Pick the speaker(s) for this event. If you cannot see anything here you need to go back and create Speaker Proposal(s) first.',
+        related_name='eventproposals',
     )
 
     allow_video_recording = models.BooleanField(
         default=False,
-        help_text='If we can video record the event or not'
+        help_text='Check to allow video recording of the event. Leave unchecked to avoid video recording.'
+    )
+
+    duration = models.IntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text='How much time (in minutes) should we set aside for this act? Please keep it between 60 and 180 minutes (1-3 hours).'
     )
 
     submission_notes = models.TextField(
@@ -254,20 +323,34 @@ class EventProposal(UserSubmittedModel):
     )
 
     @property
+    def camp(self):
+        return self.track.camp
+
+    @property
     def headline(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse_lazy(
-            'eventproposal_detail',
+            'program:eventproposal_detail',
             kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid}
         )
 
-    def mark_as_approved(self):
+    def get_available_speakerproposals(self):
+        """
+        Return all SpeakerProposals submitted by the user who submitted this EventProposal,
+        which are not already added to this EventProposal
+        """
+        return SpeakerProposal.objects.filter(
+            camp=self.track.camp,
+            user=self.user
+        ).exclude(uuid__in=self.speakers.all().values_list('uuid'))
+
+    def mark_as_approved(self, request):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
         event = eventmodel()
-        event.camp = self.camp
+        event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
         event.event_type = self.event_type
@@ -285,7 +368,50 @@ class EventProposal(UserSubmittedModel):
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
+        # copy all the URLs too
+        for url in self.urls.all():
+            Url.objects.create(
+                url=url.url,
+                urltype=url.urltype,
+                event=event
+            )
+
+        messages.success(request, "Event object %s has been created" % event)
+
 ###############################################################################
+
+
+class EventTrack(CampRelatedModel):
+    """ All events belong to a track. Administration of a track can be delegated to one or more users. """
+
+    name = models.CharField(
+        max_length=100
+    )
+
+    slug = models.SlugField()
+
+    camp = models.ForeignKey(
+        'camps.Camp',
+        related_name='eventtracks',
+        on_delete=models.PROTECT
+    )
+
+    managers = models.ManyToManyField(
+        'auth.User',
+        related_name='managed_tracks',
+    )
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        unique_together = (('camp', 'slug'), ('camp', 'name'))
+
+    def serialize(self):
+        return {
+            "name": self.name,
+            "slug": self.slug,
+        }
 
 
 class EventLocation(CampRelatedModel):
@@ -299,7 +425,7 @@ class EventLocation(CampRelatedModel):
 
     icon = models.CharField(
         max_length=100,
-        help_text="hex for the unicode character in the fontawesome icon set to use, like 'f000' for 'fa-glass'"
+        help_text="Name of the fontawesome icon to use without the 'fa-' part"
     )
 
     camp = models.ForeignKey(
@@ -332,6 +458,12 @@ class EventType(CreatedUpdatedModel):
 
     slug = models.SlugField()
 
+    description = models.TextField(
+        default='',
+        help_text='The description of this type of event. Used in content submission flow.',
+        blank=True,
+    )
+
     color = models.CharField(
         max_length=50,
         help_text='The background color of this event type',
@@ -340,6 +472,12 @@ class EventType(CreatedUpdatedModel):
     light_text = models.BooleanField(
         default=False,
         help_text='Check if this event type should use white text color',
+    )
+
+    icon = models.CharField(
+        max_length=25,
+        help_text="Name of the fontawesome icon to use, without the 'fa-' part",
+        default='wrench',
     )
 
     notifications = models.BooleanField(
@@ -355,6 +493,12 @@ class EventType(CreatedUpdatedModel):
     include_in_event_list = models.BooleanField(
         default=True,
         help_text='Include events of this type in the event list?',
+    )
+
+    host_title = models.CharField(
+        max_length=30,
+        help_text='What to call someone hosting this type of event. Like "Artist" for Music or "Speaker" for talks.',
+        default='Person',
     )
 
     def __str__(self):
@@ -393,10 +537,10 @@ class Event(CampRelatedModel):
         help_text='The slug for this event, created automatically',
     )
 
-    camp = models.ForeignKey(
-        'camps.Camp',
+    track = models.ForeignKey(
+        'program.EventTrack',
         related_name='events',
-        help_text='The camp this event belongs to',
+        help_text='The track this event belongs to',
         on_delete=models.PROTECT
     )
 
@@ -422,7 +566,7 @@ class Event(CampRelatedModel):
 
     class Meta:
         ordering = ['title']
-        unique_together = (('camp', 'slug'), ('camp', 'title'))
+        unique_together = (('track', 'slug'), ('track', 'title'))
 
     def __str__(self):
         return '%s (%s)' % (self.title, self.camp.title)
@@ -433,13 +577,17 @@ class Event(CampRelatedModel):
         super(Event, self).save(**kwargs)
 
     @property
+    def camp(self):
+        return self.track.camp
+
+    @property
     def speakers_list(self):
         if self.speakers.exists():
             return ", ".join(self.speakers.all().values_list('name', flat=True))
         return False
 
     def get_absolute_url(self):
-        return reverse_lazy('event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
+        return reverse_lazy('program:event_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
     def serialize(self):
         data = {
@@ -514,9 +662,7 @@ class EventInstance(CampRelatedModel):
 
     @property
     def timeslots(self):
-        """
-            Find the number of timeslots this eventinstance takes up
-        """
+        """ Find the number of timeslots this eventinstance takes up """
         seconds = (self.when.upper-self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
@@ -542,6 +688,7 @@ class EventInstance(CampRelatedModel):
             'bg-color': self.event.event_type.color,
             'fg-color': '#fff' if self.event.event_type.light_text else '#000',
             'event_type': self.event.event_type.slug,
+            'event_track': self.event.track.slug,
             'location': self.location.slug,
             'location_icon': self.location.icon,
             'timeslots': self.timeslots,
@@ -564,15 +711,6 @@ class EventInstance(CampRelatedModel):
         return data
 
 
-def get_speaker_picture_upload_path(instance, filename):
-    """ We want speaker pictures are saved as MEDIA_ROOT/public/speakers/camp-slug/speaker-slug/filename """
-    return 'public/speakers/%(campslug)s/%(speakerslug)s/%(filename)s' % {
-        'campslug': instance.camp.slug,
-        'speakerslug': instance.slug,
-        'filename': filename
-    }
-
-
 class Speaker(CampRelatedModel):
     """ A Person (co)anchoring one or more events on a camp. """
 
@@ -583,20 +721,6 @@ class Speaker(CampRelatedModel):
 
     biography = models.TextField(
         help_text='Markdown is supported.'
-    )
-
-    picture_small = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speaker_picture_upload_path,
-        help_text='A thumbnail of the speaker picture'
-    )
-
-    picture_large = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=get_speaker_picture_upload_path,
-        help_text='A picture of the speaker'
     )
 
     slug = models.SlugField(
@@ -628,6 +752,11 @@ class Speaker(CampRelatedModel):
         on_delete=models.PROTECT
     )
 
+    needs_oneday_ticket = models.BooleanField(
+        default=False,
+        help_text='Check if BornHack needs to provide a free one-day ticket for this speaker',
+    )
+
     class Meta:
         ordering = ['name']
         unique_together = (('camp', 'name'), ('camp', 'slug'))
@@ -641,16 +770,7 @@ class Speaker(CampRelatedModel):
         super(Speaker, self).save(**kwargs)
 
     def get_absolute_url(self):
-        return reverse_lazy('speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
-
-    def get_picture_url(self, size):
-        return reverse('speaker_picture', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug, 'picture': size})
-
-    def get_small_picture_url(self):
-        return self.get_picture_url('thumbnail')
-
-    def get_large_picture_url(self):
-        return self.get_picture_url('large')
+        return reverse_lazy('program:speaker_detail', kwargs={'camp_slug': self.camp.slug, 'slug': self.slug})
 
     def serialize(self):
         data = {
@@ -658,11 +778,6 @@ class Speaker(CampRelatedModel):
             'slug': self.slug,
             'biography': self.biography,
         }
-
-        if self.picture_small and self.picture_large:
-            data['large_picture_url'] = self.get_large_picture_url()
-            data['small_picture_url'] = self.get_small_picture_url()
-
         return data
 
 
@@ -679,4 +794,34 @@ class Favorite(models.Model):
 
     class Meta:
         unique_together = ['user', 'event_instance']
+
+# classes and functions below here was used by picture handling for speakers before it was removed in May 2018 by tyk
+
+class CustomUrlStorage(FileSystemStorage):
+    """
+    Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point
+    """
+    pass
+
+def get_speaker_picture_upload_path():
+    """
+    Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point
+    """
+    pass
+
+def get_speakerproposal_picture_upload_path():
+    """
+    Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point
+    """
+    pass
+
+def get_speakersubmission_picture_upload_path():
+    """
+    Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point
+    """
+    pass
 

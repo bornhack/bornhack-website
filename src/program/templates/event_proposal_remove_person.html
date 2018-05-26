@@ -1,0 +1,15 @@
+{% extends 'program_base.html' %}
+{% load bootstrap3 %}
+
+{% block program_content %}
+<h3>Remove "{{ speakerproposal.name }}" from "{{ eventproposal.title }}"?</h3>
+<p class="lead">Really remove this {{ eventproposal.event_type.host_title }} from this event?</p>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% bootstrap_button "<i class='fas fa-times'></i> Remove" button_type="submit" button_class="btn-danger" %}
+    <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}">{% bootstrap_button "<i class='fas fa-undo'></i> Cancel" button_type="link" button_class="btn-primary" %}</a>
+</form>
+
+{% endblock program_content %}
+

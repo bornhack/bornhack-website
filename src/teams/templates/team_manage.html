@@ -17,8 +17,8 @@ Manage Team: {{ team.name }} | {{ block.super }}
       {% bootstrap_form form %}
 
       {% buttons %}
-        <button class="btn btn-success pull-right" type="submit"><i class="fa fa-check"></i> Save Team</button>
-        <a class="btn btn-primary pull-right" href="{% url 'teams:detail' team_slug=team.slug camp_slug=camp.slug %}"><i class="fa fa-remove"></i> Cancel</a>&nbsp;
+        <button class="btn btn-success pull-right" type="submit"><i class="fas fa-check"></i> Save Team</button>
+        <a class="btn btn-primary pull-right" href="{% url 'teams:detail' team_slug=team.slug camp_slug=camp.slug %}"><i class="fas fa-times"></i> Cancel</a>&nbsp;
       {% endbuttons %}
       </form>
     </div>
@@ -79,9 +79,9 @@ Manage Team: {{ team.name }} | {{ block.super }}
         </td>
         <td>
           <div class="btn-group-vertical">
-            <a class="btn btn-danger" href="{% url 'teams:teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-trash-o"></i> Remove Member</a>
+            <a class="btn btn-danger" href="{% url 'teams:teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fas fa-trash-o"></i> Remove Member</a>
             {% if not membership.approved %}
-            <a class="btn btn-success" href="{% url 'teams:teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fa fa-check"></i> Approve Member</a>
+            <a class="btn btn-success" href="{% url 'teams:teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fas fa-check"></i> Approve Member</a>
             {% endif %}
           </div>
         </td>

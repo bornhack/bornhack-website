@@ -15,7 +15,8 @@ from program.models import (
     Event,
     EventInstance,
     Speaker,
-    EventLocation
+    EventLocation,
+    EventTrack,
 )
 from tickets.models import (
     TicketType
@@ -85,9 +86,11 @@ class Command(BaseCommand):
 
         camp2018 = Camp.objects.create(
             title='BornHack 2018',
-            tagline='Undecided',
+            tagline='scale it',
             slug='bornhack-2018',
             shortslug='bh2018',
+            call_for_participation_open=True,
+            call_for_sponsors_open=True,
             buildup=(
                 timezone.datetime(2018, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2018, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -124,7 +127,6 @@ class Command(BaseCommand):
         user2 = User.objects.create_user(
             username='user2',
             password='user2',
-            is_staff=True
         )
         user2.profile.name = 'Jane Doe'
         user2.profile.description = 'one that once was'
@@ -140,7 +142,6 @@ class Command(BaseCommand):
         user3 = User.objects.create_user(
             username='user3',
             password='user3',
-            is_staff=True
         )
         user3.profile.name = 'Lorem Ipsum'
         user3.profile.description = 'just a user'
@@ -157,7 +158,6 @@ class Command(BaseCommand):
         user4 = User.objects.create_user(
             username='user4',
             password='user4',
-            is_staff=True
         )
         user4.profile.name = 'Ethe Reum'
         user4.profile.description = 'I prefer doge'
@@ -175,7 +175,6 @@ class Command(BaseCommand):
         user5 = User.objects.create_user(
             username='user5',
             password='user5',
-            is_staff=True
         )
         user5.profile.name = 'Pyra Mid'
         user5.profile.description = 'This is not a scam'
@@ -193,7 +192,6 @@ class Command(BaseCommand):
         user6 = User.objects.create_user(
             username='user6',
             password='user6',
-            is_staff=True
         )
         user6.profile.name = 'User Number 6'
         user6.profile.description = 'some description'
@@ -211,7 +209,6 @@ class Command(BaseCommand):
         user7 = User.objects.create_user(
             username='user7',
             password='user7',
-            is_staff=True
         )
         user7.profile.name = 'Assembly Hacker'
         user7.profile.description = 'Low level is best level'
@@ -229,7 +226,6 @@ class Command(BaseCommand):
         user8 = User.objects.create_user(
             username='user8',
             password='user8',
-            is_staff=True
         )
         user8.profile.name = 'TCL'
         user8.profile.description = 'Expect me'
@@ -247,7 +243,6 @@ class Command(BaseCommand):
         user9 = User.objects.create_user(
             username='user9',
             password='user9',
-            is_staff=True
         )
         user9.profile.name = 'John Windows'
         user9.profile.description = 'Microsoft is best soft'
@@ -278,26 +273,57 @@ class Command(BaseCommand):
 
         self.output("Creating event types...")
         workshop = EventType.objects.create(
-            name='Workshops',
-            slug='workshops',
+            name='Workshop',
+            slug='workshop',
             color='#ff9900',
             light_text=False,
-            public=True
+            public=True,
+            description='Workshops actively involve the participants in the learning experience',
+            icon='toolbox',
+            host_title='Host',
         )
 
         talk = EventType.objects.create(
-            name='Talks',
-            slug='talks',
+            name='Talk',
+            slug='talk',
             color='#2D9595',
             light_text=True,
-            public=True
+            public=True,
+            description='A presentation on a stage',
+            icon='chalkboard-teacher',
+            host_title='Speaker',
+        )
+
+        lightning = EventType.objects.create(
+            name='Lightning Talk',
+            slug='lightning-talk',
+            color='#ff0000',
+            light_text=True,
+            public=True,
+            description='A short 5-10 minute presentation',
+            icon='bolt',
+            host_title='Speaker',
+        )
+
+        music = EventType.objects.create(
+            name='Music Act',
+            slug='music',
+            color='#1D0095',
+            light_text=True,
+            public=True,
+            description='A musical performance',
+            icon='music',
+            host_title='Artist',
         )
 
         keynote = EventType.objects.create(
-            name='Keynotes',
-            slug='keynotes',
+            name='Keynote',
+            slug='keynote',
             color='#FF3453',
-            light_text=True
+            light_text=True,
+            description='A keynote presentation',
+            icon='star',
+            host_title='Speaker',
         )
 
         facility = EventType.objects.create(
@@ -306,13 +332,20 @@ class Command(BaseCommand):
             color='#cccccc',
             light_text=False,
             include_in_event_list=False,
+            description='Events involving facilities like bathrooms, food area and so on',
+            icon='home',
+            host_title='Host',
         )
 
         slack = EventType.objects.create(
-            name='Slacking Off',
-            slug='slacking-off',
+            name='Recreational Event',
+            slug='recreational-event',
             color='#0000ff',
-            light_text=True
+            light_text=True,
+            public=True,
+            description='Events of a recreational nature',
+            icon='dice',
+            host_title='Host',
         )
 
         self.output("Creating productcategories...")
@@ -523,6 +556,13 @@ class Command(BaseCommand):
             )
             order3.mark_as_paid(request=None)
 
+            self.output('Creating eventtracks for {}...'.format(year))
+            track = EventTrack.objects.create(
+                camp=camp,
+                name="BornHack",
+                slug=camp.slug,
+            )
+
             self.output('Creating eventlocations for {}...'.format(year))
             speakers_tent = EventLocation.objects.create(
                 name='Speakers Tent',
@@ -566,61 +606,61 @@ class Command(BaseCommand):
                 title='Developing the BornHack website',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev2 = Event.objects.create(
                 title='State of the world',
                 abstract='abstract here, bla bla bla',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev3 = Event.objects.create(
                 title='Welcome to bornhack!',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev4 = Event.objects.create(
                 title='bar is open',
                 abstract='the bar is open, yay',
                 event_type=facility,
-                camp=camp
+                track=track
             )
             ev5 = Event.objects.create(
                 title='Network something',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev6 = Event.objects.create(
                 title='State of outer space',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev9 = Event.objects.create(
                 title='The Alternative Welcoming',
                 abstract='Why does The Alternative support BornHack? Why does The Alternative think IT is an overlooked topic? A quick runt-hrough of our program and workshops. We will bring an IT political debate to both the stage and the beer tents.',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev10 = Event.objects.create(
                 title='Words and Power - are we making the most of online activism?',
                 abstract='For years, big names like Ed Snowden and Chelsea Manning have given up their lives in order to protect regular people like you and me from breaches of our privacy. But we are still struggling with getting people interested in internet privacy. Why is this, and what can we do? Using experience from communicating privacy issues on multiple levels for a couple of years, I have encountered some deep seated issues in the way we talk about what privacy means. Are we good enough at letting people know whats going on?',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev11 = Event.objects.create(
                 title='r4d1o hacking 101',
                 abstract='Learn how to enable the antenna part of your ccc badge and get started with receiving narrow band FM. In the workshop you will have the opportunity to sneak peak on the organizers radio communications using your SDR. If there is more time we will look at WiFi radar or your protocol of choice.',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev12 = Event.objects.create(
                 title='Introduction to Sustainable Growth in a Digital World',
                 abstract='Free Choice is the underestimated key to secure value creation in a complex economy, where GDP-models only measure commercial profit and ignore the environment. We reconstruct the model thinking about Utility, Production, Security and Environment around the 5 Criteria for Sustainability.',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev13 = Event.objects.create(
                 title='American Fuzzy Lop and Address Sanitizer',
@@ -632,7 +672,7 @@ Code written in C and C++ is often riddled with bugs in the memory management. O
 Slides: [https://www.int21.de/slides/bornhack2016-fuzzing/](https://www.int21.de/slides/bornhack2016-fuzzing/)
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev14 = Event.objects.create(
                 title='PGP Keysigning Party',
@@ -647,7 +687,7 @@ For people who haven't attended a PGP keysigning party before, we will guide you
 2. (Optional) Bring some government-issued identification paper (passport, drivers license, etc.). The ID should contain a picture of yourself. You can leave this out, but then it will be a bit harder for others to verify your key properly.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev15 = Event.objects.create(
                 title='Bluetooth Low Energy',
@@ -677,7 +717,7 @@ of applications you can build on top.  Finally, a low-level
 demonstration of interfacing with a BLE controller is performed.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev16 = Event.objects.create(
                 title='TLS attacks and the burden of faulty TLS implementations',
@@ -699,13 +739,13 @@ underappreciated problem.
 Slides: [https://www.int21.de/slides/bornhack2016-tls/](https://www.int21.de/slides/bornhack2016-tls/)
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev17 = Event.objects.create(
                 title='State of the Network',
                 abstract='Come and meet the network team who will talk about the design and operation of the network at BornHack.',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev18 = Event.objects.create(
                 title='Running Exit Nodes in the North',
@@ -733,19 +773,19 @@ In Finland, Juha Nurmi has been establishing good relationships with ISPs
 and law enforcement agencies to keep Finnish exit nodes online.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev19 = Event.objects.create(
                 title='Hacker Jeopardy Qualifier',
                 abstract='Hacker Jeopardy qualifying',
                 event_type=slack,
-                camp=camp
+                track=track
             )
             ev20 = Event.objects.create(
                 title='Hacker Jeopardy Finals',
                 abstract='Hacker Jeopardy Finals between the winners of the qualifying games',
                 event_type=slack,
-                camp=camp
+                track=track
             )
             ev21 = Event.objects.create(
                 title='Incompleteness Phenomena in Mathematics: From Kurt Gödel to Harvey Friedman',
@@ -763,7 +803,7 @@ discovered and many of these (relative) unprovable sentences are of genuine math
 Note that these (early 20th century) developments also play an important role in developing the theoretical computer.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev22 = Event.objects.create(
                 title='Infocalypse Now - and how to Survive It?',
@@ -780,7 +820,7 @@ herfbombs, solarstorms and intelligence agencies on steroids
 The Beast is unleashed, can it be stopped, or is it anyone for him self?
                 ''',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev23 = Event.objects.create(
                 title='Liquid Democracy (Introduction and Debate)',
@@ -790,7 +830,7 @@ A lot has happened ever since the German pirates developed the first visions abo
 Monday will primarily be focused around The Alternatives experiment with Liquid Democracy and a constructive debate about how liquid democracy can improve The Alternative. Rolf Bjerre leads the process.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev24 = Event.objects.create(
                 title='Badge Workshop',
@@ -798,7 +838,7 @@ Monday will primarily be focused around The Alternatives experiment with Liquid 
 In this workshop you can learn how to solder and get help assembling your badge. We will have soldering irons and other tools to help things along. You can also discuss your ideas for badge hacks and modifications with the other participants and the host, Thomas Flummer.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev25 = Event.objects.create(
                 title='Checking a Distributed Hash Table for Correctness',
@@ -824,7 +864,7 @@ to give people an overview
 of how to attack larger code bases with (semi-) formal methods.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev26 = Event.objects.create(
                 title='GraphQL - A Data Language',
@@ -853,7 +893,7 @@ of the language. The running example is a GraphQL compiler written for
 Erlang.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev27 = Event.objects.create(
                 title='Visualisation of Public Datasets',
@@ -865,19 +905,19 @@ I will present some portals where it is possible to get public datasets. Afterwa
 Towards the end we will open up to debate about how to use these resources or if there are other solutions.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev28 = Event.objects.create(
                 title='Local delicacies',
                 abstract='Come taste delicacies from bornholm',
                 event_type=facility,
-                camp=camp
+                track=track
             )
             ev29 = Event.objects.create(
                 title='Local delicacies from the world',
                 abstract='An attempt to create an event where we all prepare local delicacies for each other',
                 event_type=facility,
-                camp=camp
+                track=track
             )
 
             self.output("Creating speakers for {}...".format(year))

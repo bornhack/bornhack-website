@@ -21,16 +21,16 @@
       {% if event.event_type.include_in_event_list %}
         <tr>
           <td style="background-color: {{ event.event_type.color }}; ">
-            <a href="{% url 'schedule_index' camp_slug=camp.slug %}?type={{ event.event_type.slug }}" style="color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
+            <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}?type={{ event.event_type.slug }}" style="color: {% if event.event_type.light_text %}white{% else %}black{% endif %};">
               {{ event.event_type.name }}
             </a>
           </td>
           <td>
-              <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+              <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
           </td>
           <td>
             {% for speaker in event.speakers.all %}
-              <a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
+              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
             {% empty %}
               N/A
             {% endfor %}

@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import (
     ShopTicketListView,
@@ -9,18 +9,18 @@ from .views import (
 app_name = 'tickets'
 
 urlpatterns = [
-    url(
-        r'^$',
+    path(
+        '',
         ShopTicketListView.as_view(),
         name='shopticket_list'
     ),
-    url(
-        r'^(?P<pk>\b[0-9A-Fa-f]{8}\b(-\b[0-9A-Fa-f]{4}\b){3}-\b[0-9A-Fa-f]{12}\b)/download/$',
+    path(
+        '<uuid:pk>/download/',
         ShopTicketDownloadView.as_view(),
         name='shopticket_download'
     ),
-    url(
-        r'^(?P<pk>\b[0-9A-Fa-f]{8}\b(-\b[0-9A-Fa-f]{4}\b){3}-\b[0-9A-Fa-f]{12}\b)/edit/$',
+    path(
+        '<uuid:pk>/edit/',
         ShopTicketDetailView.as_view(),
         name='shopticket_edit'
     ),

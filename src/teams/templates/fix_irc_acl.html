@@ -12,7 +12,7 @@ Fix IRC permissions for NickServ user {{ request.user.profile.nickserv_username 
 <form method="POST">
 {% csrf_token %}
 {{ form }}
-<button class="btn btn-success" type="submit"><i class="fa fa-check"></i> Yes Please</button>
-<a href="{% url 'teams:detail' camp_slug=team.camp.slug team_slug=team.slug %}" class="btn btn-default" type="submit"><i class="fa fa-remove"></i> Cancel</a>
+<button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Yes Please</button>
+<a href="{% url 'teams:detail' camp_slug=team.camp.slug team_slug=team.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
 </form>
 {% endblock %}
