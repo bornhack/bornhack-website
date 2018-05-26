@@ -46,8 +46,6 @@ speakerDecoder =
         |> required "name" string
         |> required "slug" string
         |> required "biography" string
-        |> optional "large_picture_url" (nullable string) Nothing
-        |> optional "small_picture_url" (nullable string) Nothing
 
 
 eventDecoder : Decoder Event

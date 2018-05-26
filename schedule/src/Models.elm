@@ -70,8 +70,6 @@ type alias Speaker =
     { name : String
     , slug : SpeakerSlug
     , biography : String
-    , largePictureUrl : Maybe String
-    , smallPictureUrl : Maybe String
     }
 
 

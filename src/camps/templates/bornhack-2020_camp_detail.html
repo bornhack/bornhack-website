@@ -27,7 +27,7 @@
         </div>
         <div class="col-md-9 col-sm-9 text-container">
             <div class="lead">
-                <strong>Bornhack 2019</strong> will be the fourth BornHack. It will take place from <strong>August 13th to August 20th 2019</strong> on the Danish island of Bornholm.
+                <strong>Bornhack 2020</strong> will be the fifth BornHack. It will take place from <strong>August 11th to August 18th 2020</strong> on the Danish island of Bornholm.
             </div>
         </div>
 </div>
@@ -52,7 +52,7 @@
         {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5149.JPG' 'Danish politicians debating at BornHack 2016' %}
     </div>
     <div class="col-md-9 col-sm-9 text-container">
-        <div class="lead">We want to encourage <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> with something to say to read our <a href="{% url 'program:call_for_participation' camp_slug=camp.slug %}">call for participation</a>.</div>
+        <div class="lead">We want to encourage <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> with something to say to read our <a href="{% url 'call_for_speakers' camp_slug=camp.slug %}">call for speakers</a>.</div>
     </div>
 </div>
 
@@ -90,4 +90,3 @@
   {% thumbnail 'img/bornhack-2016/esbjerg' '1600x900-B12A2604.jpg' 'Sitting around the campfire at BornHack 2016' %}
 </p>
 {% endblock content %}
-
