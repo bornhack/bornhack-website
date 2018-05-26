@@ -47,7 +47,9 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
-        eventinstances = models.EventInstance.objects.filter(event__camp=self.camp)
+        eventinstances = models.EventInstance.objects.filter(
+            event__track__camp=self.camp
+        )
 
         # Type query
         type_query = request.GET.get('type', None)
@@ -659,7 +661,9 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['eventinstances'] = models.EventInstance.objects.filter(event__camp=self.camp).order_by('when')
+        context['eventinstances'] = models.EventInstance.objects.filter(
+            event__track__camp=self.camp
+        ).order_by('when')
         return context
 
 
