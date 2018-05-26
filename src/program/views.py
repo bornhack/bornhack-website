@@ -28,6 +28,8 @@ from .mixins import (
     UrlViewMixin,
 )
 from .email import (
+    add_new_eventproposal_email,
+    add_new_speakerproposal_email,
     add_speakerproposal_updated_email,
     add_eventproposal_updated_email
 )
@@ -151,6 +153,10 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
         # add speakerproposal to eventproposal
         self.eventproposal.speakers.add(speakerproposal)
 
+        # send mail to content team
+        if not add_new_speakerproposal_email(speakerproposal):
+            logger.error("Unable to send email to content team after new speakerproposal")
+
         return redirect(
             reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
         )
@@ -163,8 +169,6 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     model = models.SpeakerProposal
     template_name = 'speakerproposal_form.html'
 
-    def get_success_url(self):
-        return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
     def get_form_class(self):
         """ Get the appropriate form class based on the eventtype """
@@ -180,6 +184,22 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
                 return get_speakerproposal_form_class(ep.event_type)
             # more than one type of event for this person, return the generic speakerproposal form
             return BaseSpeakerProposalForm
+
+    def form_valid(self, form):
+        """
+        Change the speakerproposal status to pending
+        """
+        # set proposal status to pending
+        form.instance.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+        speakerproposal = form.save()
+
+        # send mail to content team
+        if not add_speakerproposal_updated_email(speakerproposal):
+            logger.error("Unable to send email to content team after speakerproposal update")
+
+        # message user and redirect
+        messages.info(self.request, "Your proposal is now pending approval by the content team.")
+        return redirect(reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
 
 class SpeakerProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DeleteView):
@@ -391,6 +411,10 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         # add the speakerproposal to the eventproposal
         eventproposal.speakers.add(self.speakerproposal)
 
+        # send mail to content team
+        if not add_new_eventproposal_email(eventproposal):
+            logger.error("Unable to send email to content team after new eventproposal")
+
         # all good
         return redirect(self.get_success_url())
 
@@ -406,8 +430,6 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         """ Get the appropriate form class based on the eventtype """
         return get_eventproposal_form_class(self.get_object().event_type)
 
-    def get_success_url(self):
-        return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal and eventtype objects available in the template """
@@ -424,6 +446,19 @@ class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         form = form_class(**self.get_form_kwargs())
         form.fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
         return form
+
+    def form_valid(self, form):
+        # set status to pending and save eventproposal
+        form.instance.proposal_status = models.EventProposal.PROPOSAL_PENDING
+        eventproposal = form.save()
+
+        # send email to content team
+        if not add_eventproposal_updated_email(eventproposal):
+            logger.error("Unable to send email to content team after eventproposal update")
+
+        # message for the user and redirect
+        messages.info(self.request, "Your proposal is now pending approval by the content team.")
+        return redirect(reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
 
 class EventProposalDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, DeleteView):
@@ -542,6 +577,13 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
 
             # add the speakerproposal to the eventproposal
             eventproposal.speakers.add(speakerproposal)
+
+        # send mail(s) to content team
+        if not add_new_eventproposal_email(eventproposal):
+            logger.error("Unable to send email to content team after new eventproposal")
+        if not hasattr(self, 'speakerproposal'):
+            if not add_new_speakerproposal_email(speakerproposal):
+                logger.error("Unable to send email to content team after new speakerproposal")
 
         # all good
         return redirect(reverse_lazy('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))

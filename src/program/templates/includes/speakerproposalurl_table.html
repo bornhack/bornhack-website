@@ -10,7 +10,7 @@
         {% for url in speakerproposal.urls.all %}
         <tr>
             <td><i class="fas fa-{{ url.urltype.icon }} fa-lg"></i><span class="h4"> {{ url.urltype.name }}</span></td>
-            <td><span class="h4"><a href="{{ url.url }}">{{ url }}</a></span></td>
+            <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
             <td class='text-right'>
                 {% if not camp.read_only %}
                     <a href="{% url 'program:speakerproposalurl_update' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid url_uuid=url.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>

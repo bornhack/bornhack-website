@@ -15,7 +15,7 @@
         <tr>
             <td><span class="h4">{{ eventproposal.title }}</span></td>
             <td><i class="fas fa-{{ eventproposal.event_type.icon }} fa-lg" style="color: {{ eventproposal.event_type.color }};"></i><span class="h4"> {{ eventproposal.event_type }}</span></td>
-            <td><span class="h4">{% for url in eventproposal.urls.all %}<a href="{{ url.url }}"><i class="fas fa-{{ url.urltype.icon }}" data-toggle="tooltip" title="{{ url.urltype.name }}"></i></a> {% empty %}N/A{% endfor %}</span></td>
+            <td><span class="h4">{% for url in eventproposal.urls.all %}<a href="{{ url.url }}" target="_blank"><i class="fas fa-{{ url.urltype.icon }}" data-toggle="tooltip" title="{{ url.urltype.name }}"></i></a> {% empty %}N/A{% endfor %}</span></td>
             <td><span class="h4">{% for person in eventproposal.speakers.all %}<a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a> {% endfor %}</span></td>
             <td><span class="h4">{{ eventproposal.track.name }}</span></td>
             <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>

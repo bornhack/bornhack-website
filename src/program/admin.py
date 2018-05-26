@@ -24,7 +24,7 @@ from .models import (
 class SpeakerProposalAdmin(admin.ModelAdmin):
     def mark_speakerproposal_as_approved(self, request, queryset):
         for sp in queryset:
-            sp.mark_as_approved()
+            sp.mark_as_approved(request)
     mark_speakerproposal_as_approved.description = 'Approve and create Speaker object(s)'
 
     actions = ['mark_speakerproposal_as_approved']
@@ -43,7 +43,7 @@ class EventProposalAdmin(admin.ModelAdmin):
                 return False
             else:
                 try:
-                    ep.mark_as_approved()
+                    ep.mark_as_approved(request)
                 except ValidationError as e:
                     messages.error(request, e)
                     return False

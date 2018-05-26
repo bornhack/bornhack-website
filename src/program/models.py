@@ -247,7 +247,7 @@ class SpeakerProposal(UserSubmittedModel):
     def get_absolute_url(self):
         return reverse_lazy('program:speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
-    def mark_as_approved(self):
+    def mark_as_approved(self, request):
         speakermodel = apps.get_model('program', 'speaker')
         speakerproposalmodel = apps.get_model('program', 'speakerproposal')
         speaker = speakermodel()
@@ -260,6 +260,16 @@ class SpeakerProposal(UserSubmittedModel):
 
         self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
         self.save()
+
+        # copy all the URLs too
+        for url in self.urls.all():
+            Url.objects.create(
+                url=url.url,
+                urltype=url.urltype,
+                speaker=speaker
+            )
+
+        messages.success(request, "Speaker object %s has been created" % speaker)
 
 
 class EventProposal(UserSubmittedModel):
@@ -336,11 +346,11 @@ class EventProposal(UserSubmittedModel):
             user=self.user
         ).exclude(uuid__in=self.speakers.all().values_list('uuid'))
 
-    def mark_as_approved(self):
+    def mark_as_approved(self, request):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
         event = eventmodel()
-        event.camp = self.camp
+        event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
         event.event_type = self.event_type
@@ -358,6 +368,15 @@ class EventProposal(UserSubmittedModel):
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
+        # copy all the URLs too
+        for url in self.urls.all():
+            Url.objects.create(
+                url=url.url,
+                urltype=url.urltype,
+                event=event
+            )
+
+        messages.success(request, "Event object %s has been created" % event)
 
 ###############################################################################
 

@@ -10,7 +10,7 @@
         {% for url in eventproposal.urls.all %}
         <tr>
             <td><i class="fas fa-{{ url.urltype.icon }} fa-lg"></i><span class="h4"> {{ url.urltype.name }}</span></td>
-            <td><span class="h4"><a href="{{ url.url }}">{{ url }}</a></span></td>
+            <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
             <td class='text-right'>
                 {% if not camp.read_only %}
                     <a href="{% url 'program:eventproposalurl_update' camp_slug=camp.slug event_uuid=eventproposal.uuid url_uuid=url.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>
