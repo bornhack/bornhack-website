@@ -34,6 +34,7 @@
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
+      <a href="{% url 'program:eventproposal_typeselect' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add New Event</span></a>
     </div>
 </div>
 
