@@ -12,6 +12,10 @@ Call for Participation | {{ block.super }}
 </div>
 {% endif %}
 
-{{ cfp_markdown|safe }}
+{% if not camp.call_for_participation %}
+<p class='lead'>This CFP has not been written yet.</p>
+{% else %}
+{{ camp.call_for_participation|safe }}
+{% endif %}
 
 {% endblock %}

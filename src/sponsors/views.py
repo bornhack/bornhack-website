@@ -18,7 +18,3 @@ class SponsorsView(CampViewMixin, ListView):
             'name',
         )
 
-
-class CallForSponsorsView(CampViewMixin, TemplateView):
-    def get_template_names(self):
-        return '%s_call_for_sponsors.html' % self.camp.slug

@@ -140,11 +140,6 @@ urlpatterns = [
             ),
 
             path(
-                'sponsors/call/',
-                CallForSponsorsView.as_view(),
-                name='call-for-sponsors'
-            ),
-            path(
                 'sponsors/',
                 SponsorsView.as_view(),
                 name='sponsors'
