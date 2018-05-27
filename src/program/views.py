@@ -303,10 +303,12 @@ class EventProposalAddPersonView(LoginRequiredMixin, CampViewMixin, EnsureWritab
 
     def form_valid(self, form):
         form.instance.speakers.add(self.speakerproposal)
+        messages.success(self.request, "%s has been added as %s for %s" % (
+            self.speakerproposal.name,
+            form.instance.event_type.host_title,
+            form.instance.title
+        ))
         return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
 class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UpdateView):
@@ -322,16 +324,8 @@ class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWri
         """ Get the speakerproposal object and check a few things """
         # get the speakerproposal object from URL kwargs
         self.speakerproposal = get_object_or_404(models.SpeakerProposal, pk=kwargs['speaker_uuid'], user=request.user)
-        # run the super() dispatch method so we have self.camp otherwise the .all() lookup below craps out
-        response = super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
-        # is this speakerproposal even in use on this eventproposal
-        if self.speakerproposal not in self.get_object().speakers.all():
-            # this speaker is not associated with this event
-            raise Http404
-
-        # all good
-        return response
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal object available in template """
@@ -347,20 +341,17 @@ class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWri
 
         if self.get_object().speakers.count() == 1:
             messages.error(self.request, "Cannot delete the last person associalted with event!")
-            return redirect(reverse(
-                'program:eventproposal_detail', kwargs={
-                'camp_slug': self.camp.slug,
-                'pk': self.get_object().uuid
-            }))
+            return redirect(self.get_success_url())
 
+        # remove speakerproposal from eventproposal
         form.instance.speakers.remove(self.speakerproposal)
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        messages.success(self.request, "Speaker %s has been removed from %s" % (
+        messages.success(self.request, "%s has been removed from %s" % (
             self.speakerproposal.name,
             self.get_object().title
         ))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
         return reverse(
             'program:eventproposal_detail', kwargs={
             'camp_slug': self.camp.slug,
