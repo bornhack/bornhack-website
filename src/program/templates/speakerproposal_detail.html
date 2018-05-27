@@ -3,13 +3,21 @@
 
 {% block program_content %}
 
+{% if not camp.call_for_participation_open %}
+<div class="alert alert-danger">
+    <strong>Note!</strong> This Call for Particilation is not open.
+</div>
+{% endif %}
+
 <h2>{{ speakerproposal.name }} Details</h2>
 
 <div class="panel panel-default">
     <div class="panel-heading">{{ speakerproposal.name }}</div>
     <div class="panel-body">
         {{ speakerproposal.biography|commonmark }}
+        {% if camp.call_for_participation_open and not camp.read_only %}
         <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
+        {% endif %}
     </div>
     <div class="panel-footer">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span> | ID: <span class="badge">{{ speakerproposal.uuid }}</span></div>
 </div>
@@ -22,7 +30,9 @@
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
+      {% if camp.call_for_participation_open and not camp.read_only %}
       <a href="{% url 'program:speakerproposalurl_create' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
+      {% endif %}
     </div>
 </div>
 
@@ -34,14 +44,18 @@
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
+      {% if camp.call_for_participation_open and not camp.read_only %}
       <a href="{% url 'program:eventproposal_typeselect' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add New Event</span></a>
+      {% endif %}
     </div>
 </div>
 
 <p>
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
-    {% if not speakerproposal.eventproposals.all %}
+    {% if camp.call_for_participation_open and not camp.read_only %}
+      {% if not speakerproposal.eventproposals.all %}
         <a href="{% url 'program:speakerproposal_delete' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete Person</span></a>
+      {% endif %}
     {% endif %}
 </p>
 
