@@ -30,246 +30,144 @@ from events.models import (
     Type,
     Routing
 )
+from profiles.models import (
+    Profile,
+)
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
+
+import factory
+
+
+class UserFactory(factory.Factory):
+
+    class Meta:
+        model = User
+
+
+class ProfileFactory(factory.Factory):
+
+    class Meta:
+        model = Profile
+
+    name = factory.Faker('name')
+    description = factory.Faker('text')
+    public_credit_name = factory.Faker('name')
+    public_credit_name_approved = True
+
+
+class EmailAddressFactory(factory.Factory):
+    class Meta:
+        model = EmailAddress
+
+    primary = True
+    verified = True
 
 
 class Command(BaseCommand):
     args = 'none'
     help = 'Create mock data for development instances'
 
-    def output(self, message):
-        self.stdout.write('%s: %s' % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message))
-
-    def handle(self, *args, **options):
+    def create_camps(self):
         self.output('Creating camps...')
-        camp2016 = Camp.objects.create(
-            title='BornHack 2016',
-            tagline='Initial Commit',
-            slug='bornhack-2016',
-            shortslug='bh2016',
-            buildup=(
-                timezone.datetime(2016, 8, 25, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2016, 8, 27, 11, 59, tzinfo=timezone.utc),
+        camps = [
+            dict(
+                year=2016,
+                tagline='Initial Commit',
+                read_only=True,
             ),
-            camp=(
-                timezone.datetime(2016, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2016, 9, 4, 11, 59, tzinfo=timezone.utc),
+            dict(
+                year=2017,
+                tagline='Make Tradition',
+                read_only=True,
             ),
-            teardown=(
-                timezone.datetime(2016, 9, 4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2016, 9, 6, 12, 0, tzinfo=timezone.utc),
+            dict(
+                year=2018,
+                tagline='scale it',
+                read_only=False,
             ),
-            colour='#000000',
-        )
+            dict(
+                year=2019,
+                tagline='Undecided',
+                read_only=False,
+            ),
+            dict(
+                year=2020,
+                tagline='Undecided',
+                read_only=False,
+            ),
+        ]
 
-        camp2017 = Camp.objects.create(
-            title='BornHack 2017',
-            tagline='Make Tradition',
-            slug='bornhack-2017',
-            shortslug='bh2017',
-            buildup=(
-                timezone.datetime(2017, 8, 25, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 8, 27, 11, 59, tzinfo=timezone.utc),
-            ),
-            camp=(
-                timezone.datetime(2017, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 9, 4, 11, 59, tzinfo=timezone.utc),
-            ),
-            teardown=(
-                timezone.datetime(2017, 9, 4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 9, 6, 12, 0, tzinfo=timezone.utc),
-            ),
-            colour='#000000',
-        )
+        camp_instances = []
 
-        camp2018 = Camp.objects.create(
-            title='BornHack 2018',
-            tagline='scale it',
-            slug='bornhack-2018',
-            shortslug='bh2018',
-            call_for_participation_open=True,
-            call_for_sponsors_open=True,
-            buildup=(
-                timezone.datetime(2018, 8, 25, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2018, 8, 27, 11, 59, tzinfo=timezone.utc),
-            ),
-            camp=(
-                timezone.datetime(2018, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2018, 9, 4, 11, 59, tzinfo=timezone.utc),
-            ),
-            teardown=(
-                timezone.datetime(2018, 9, 4, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2018, 9, 6, 12, 0, tzinfo=timezone.utc),
-            ),
-            colour='#000000',
-        )
+        for camp in camps:
+            year = camp['year']
+            read_only = camp['read_only']
+            camp_instances.append((Camp.objects.create(
+                title="BornHack {}".format(year),
+                tagline=camp['tagline'],
+                slug="bornhack-{}".format(year),
+                shortslug="bornhack-{}".format(year),
+                buildup=(
+                    timezone.datetime(year, 8, 25, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 8, 25, 12, 0, tzinfo=timezone.utc),
+                ),
+                camp=(
+                    timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 4, 11, 0, tzinfo=timezone.utc),
+                ),
+                teardown=(
+                    timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 9, 6, 12, 0, tzinfo=timezone.utc),
+                ),
+                colour='#000000'
+            ), read_only))
 
+        return camp_instances
+
+
+    def create_users(self):
         self.output("Creating users...")
-        user1 = User.objects.create_user(
-            username='user1',
-            password='user1',
-        )
-        user1.profile.name = 'John Doe'
-        user1.profile.description = 'one that once was'
-        user1.profile.public_credit_name = 'PublicDoe'
-        user1.profile.public_credit_name_approved = True
-        user1.profile.save()
-        email = EmailAddress.objects.create(
-            user=user1,
-            email='user1@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
 
-        user2 = User.objects.create_user(
-            username='user2',
-            password='user2',
-        )
-        user2.profile.name = 'Jane Doe'
-        user2.profile.description = 'one that once was'
-        user2.profile.save()
-        email = EmailAddress.objects.create(
-            user=user2,
-            email='user2@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
+        users = {}
 
-        user3 = User.objects.create_user(
-            username='user3',
-            password='user3',
-        )
-        user3.profile.name = 'Lorem Ipsum'
-        user3.profile.description = 'just a user'
-        user3.profile.public_credit_name = 'Lorem Ipsum'
-        user3.profile.save()
-        email = EmailAddress.objects.create(
-            user=user3,
-            email='user3@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user4 = User.objects.create_user(
-            username='user4',
-            password='user4',
-        )
-        user4.profile.name = 'Ethe Reum'
-        user4.profile.description = 'I prefer doge'
-        user4.profile.public_credit_name = 'Dogefan'
-        user4.profile.public_credit_name_approved = True
-        user4.profile.save()
-        email = EmailAddress.objects.create(
-            user=user4,
-            email='user4@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user5 = User.objects.create_user(
-            username='user5',
-            password='user5',
-        )
-        user5.profile.name = 'Pyra Mid'
-        user5.profile.description = 'This is not a scam'
-        user5.profile.public_credit_name = 'Ponziarne'
-        user5.profile.public_credit_name_approved = True
-        user5.profile.save()
-        email = EmailAddress.objects.create(
-            user=user5,
-            email='user5@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user6 = User.objects.create_user(
-            username='user6',
-            password='user6',
-        )
-        user6.profile.name = 'User Number 6'
-        user6.profile.description = 'some description'
-        user6.profile.public_credit_name = 'bruger 6'
-        user6.profile.public_credit_name_approved = True
-        user6.profile.save()
-        email = EmailAddress.objects.create(
-            user=user6,
-            email='user6@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user7 = User.objects.create_user(
-            username='user7',
-            password='user7',
-        )
-        user7.profile.name = 'Assembly Hacker'
-        user7.profile.description = 'Low level is best level'
-        user7.profile.public_credit_name = 'asm'
-        user7.profile.public_credit_name_approved = True
-        user7.profile.save()
-        email = EmailAddress.objects.create(
-            user=user7,
-            email='user7@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user8 = User.objects.create_user(
-            username='user8',
-            password='user8',
-        )
-        user8.profile.name = 'TCL'
-        user8.profile.description = 'Expect me'
-        user8.profile.public_credit_name = 'TCL lover'
-        user8.profile.public_credit_name_approved = True
-        user8.profile.save()
-        email = EmailAddress.objects.create(
-            user=user8,
-            email='user8@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
-
-        user9 = User.objects.create_user(
-            username='user9',
-            password='user9',
-        )
-        user9.profile.name = 'John Windows'
-        user9.profile.description = 'Microsoft is best soft'
-        user9.profile.public_credit_name = 'msboy'
-        user9.profile.save()
-        email = EmailAddress.objects.create(
-            user=user9,
-            email='user9@example.com',
-            primary=False,
-            verified=True
-        )
-        email.set_as_primary()
+        for i in range(1, 10):
+            username = "user{}".format(i)
+            user = User.objects.create_user(
+                username=username,
+                password=username,
+            )
+            users[i] = user
+            user.profile = ProfileFactory.create()
+            EmailAddressFactory.create(
+                user=user,
+                email='{}@example.com'.format(username),
+            )
 
         admin = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
             password='admin',
         )
-        admin.profile.name = "Ad min"
-        admin.profile.description = 'I can administer the admin rights'
-        admin.profile.save()
-        email = EmailAddress.objects.create(
+        users['admin'] = admin
+        admin.profile = ProfileFactory.create()
+        EmailAddress.objects.create(
             user=admin,
             email='admin@example.com',
-            verified=True
+            verified=True,
+            primary=True,
         )
-        email.set_as_primary()
+
+        return users
+
+
+    def output(self, message):
+        self.stdout.write('%s: %s' % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message))
+
+    def handle(self, *args, **options):
+        camps = self.create_camps()
+        users = self.create_users()
 
         self.output("Creating event types...")
         workshop = EventType.objects.create(
@@ -437,7 +335,7 @@ class Command(BaseCommand):
             slug='{}'.format(slugify(name)),
         )
 
-        for camp in [camp2016, camp2017, camp2018]:
+        for (camp, read_only) in camps:
             year = camp.camp.lower.year
 
             self.output('Creating tickettypes for {}...'.format(year))
@@ -488,7 +386,7 @@ class Command(BaseCommand):
 
             self.output('Creating orders...')
             order0 = Order.objects.create(
-                user=user1,
+                user=users[1],
                 payment_method='cash',
                 open=None,
                 paid=True
@@ -504,7 +402,7 @@ class Command(BaseCommand):
             order0.mark_as_paid(request=None)
 
             order1 = Order.objects.create(
-                user=user2,
+                user=users[2],
                 payment_method='cash',
                 open=None,
             )
@@ -519,7 +417,7 @@ class Command(BaseCommand):
             order1.mark_as_paid(request=None)
 
             order2 = Order.objects.create(
-                user=user3,
+                user=users[3],
                 payment_method='cash',
                 open=None,
             )
@@ -538,7 +436,7 @@ class Command(BaseCommand):
             order2.mark_as_paid(request=None)
 
             order3 = Order.objects.create(
-                user=user4,
+                user=users[4],
                 payment_method='cash',
                 open=None,
             )
@@ -1496,21 +1394,21 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
 
             self.output("Creating villages for {}...".format(year))
             Village.objects.create(
-                contact=user1,
+                contact=users[1],
                 camp=camp,
                 name='Baconsvin',
                 slug='baconsvin',
                 description='The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. A lot of the organizers of BornHack live in Baconsvin village. Come by and squeeze the pig and sign our guestbook!'
             )
             Village.objects.create(
-                contact=user2,
+                contact=users[2],
                 camp=camp,
                 name='NetworkWarriors',
                 slug='networkwarriors',
                 description='We will have a tent which house the NOC people, various lab equipment people can play with, and have fun. If you want to talk about networking, come by, and if you have trouble with the Bornhack network contact us.'
             )
             Village.objects.create(
-                contact=user3,
+                contact=users[3],
                 camp=camp,
                 name='TheCamp.dk',
                 slug='the-camp',
@@ -1585,80 +1483,82 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             # noc team
             TeamMember.objects.create(
                 team=noc_team,
-                user=user4,
+                user=users[4],
                 approved=True,
                 responsible=True
             )
             TeamMember.objects.create(
                 team=noc_team,
-                user=user1,
+                user=users[1],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=noc_team,
-                user=user5,
+                user=users[5],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=noc_team,
-                user=user6,
+                user=users[1],
             )
 
             # bar team
             TeamMember.objects.create(
                 team=bar_team,
-                user=user1,
+                user=users[1],
                 approved=True,
                 responsible=True
             )
             TeamMember.objects.create(
                 team=bar_team,
-                user=user3,
+                user=users[3],
                 approved=True,
                 responsible=True
             )
             TeamMember.objects.create(
                 team=bar_team,
-                user=user2,
+                user=users[2],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=bar_team,
-                user=user7,
+                user=users[7],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=bar_team,
-                user=user8,
+                user=users[8],
             )
 
             # orga team
             TeamMember.objects.create(
                 team=orga_team,
-                user=user1,
+                user=users[1],
                 approved=True,
                 responsible=True
             )
             TeamMember.objects.create(
                 team=orga_team,
-                user=user3,
+                user=users[3],
                 approved=True,
                 responsible=True
             )
             TeamMember.objects.create(
                 team=orga_team,
-                user=user8,
+                user=users[8],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=orga_team,
-                user=user9,
+                user=users[9],
                 approved=True,
             )
             TeamMember.objects.create(
                 team=orga_team,
-                user=user4,
+                user=users[4],
             )
+            camp.read_only = read_only
+            camp.save()
 
         self.output("Adding event routing...")
         Routing.objects.create(
@@ -1670,11 +1570,5 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             eventtype=Type.objects.get(name="ticket_created")
         )
 
-
-        self.output("marking 2016 and 2017 as read_only...")
-        camp2016.read_only = True
-        camp2016.save()
-        camp2017.read_only = True
-        camp2017.save()
         self.output("done!")
 
