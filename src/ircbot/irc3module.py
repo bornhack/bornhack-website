@@ -74,11 +74,11 @@ class Plugin(object):
     @irc3.event(irc3.rfc.PRIVMSG)
     def on_privmsg(self, **kwargs):
         """triggered when a privmsg is sent to the bot or to a channel the bot is in"""
-        logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
-
         # we only handle NOTICEs for now
         if kwargs['event'] != "NOTICE":
             return
+
+        logger.debug("inside on_privmsg(), kwargs: %s" % kwargs)
 
         # check if this is a message from nickserv
         if kwargs['mask'] == "NickServ!%s" % settings.IRCBOT_NICKSERV_MASK:
