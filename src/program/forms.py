@@ -29,7 +29,7 @@ class BaseEventProposalForm(forms.ModelForm):
 
     def clean_duration(self):
         duration = self.cleaned_data['duration']
-        if duration < 60 or duration > 180:
+        if not duration or duration < 60 or duration > 180:
             raise forms.ValidationError("Please keep duration between 60 and 180 minutes.")
         return duration
 
