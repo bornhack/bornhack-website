@@ -1,5 +1,6 @@
 from camps.models import Camp
 from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
 
 
 class CampViewMixin(object):
@@ -20,8 +21,8 @@ class CampViewMixin(object):
                 if field.name == "camp" and field.related_model._meta.label == "camps.Camp":
                     return queryset.filter(camp=self.camp)
 
-            # check if we have a camp property, filter if so
-            if hasattr(queryset[0], 'camp') and isinstance(getattr(type(queryset[0]), 'camp', None), property):
+            # check if we have a camp property or cached_property, filter if so
+            if hasattr(queryset[0], 'camp') and (isinstance(getattr(type(queryset[0]), 'camp', None), property) or isinstance(getattr(type(queryset[0]), 'camp', None), cached_property)):
                 for item in queryset:
                     if item.camp != self.camp:
                         queryset = queryset.exclude(pk=item.pk)
