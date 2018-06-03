@@ -36,7 +36,7 @@ class UrlType(CreatedUpdatedModel):
 
     icon = models.CharField(
         max_length=100,
-        default='link',
+        default='fas fa-link',
         help_text="Name of the fontawesome icon to use without the 'fa-' part"
     )
 
@@ -250,10 +250,10 @@ class SpeakerProposal(UserSubmittedModel):
 
     def mark_as_approved(self, request):
         """ Marks a SpeakerProposal as approved, including creating/updating the related Speaker object """
+        speakerproposalmodel = apps.get_model('program', 'speakerproposal')
         # create a Speaker if we don't have one
         if not hasattr(self, 'speaker'):
             speakermodel = apps.get_model('program', 'speaker')
-            speakerproposalmodel = apps.get_model('program', 'speakerproposal')
             speaker = speakermodel()
             speaker.proposal = self
         else:
@@ -394,6 +394,13 @@ class EventProposal(UserSubmittedModel):
             )
 
         messages.success(request, "Event object %s has been created" % event)
+
+    def mark_as_rejected(self, request):
+        eventproposalmodel = apps.get_model('program', 'eventproposal')
+        self.proposal_status = eventproposalmodel.PROPOSAL_REJECTED
+        self.save()
+        messages.success(request, "EventProposal %s has been rejected" % self.title)
+
 
 ###############################################################################
 
