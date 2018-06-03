@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% load bornhack %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+{% block content %}
+<div class="row">
+  <h2>BackOffice - Manage Speaker+EventProposals</h2>
+  <div class="lead">
+      The Content team can approve or reject pending SpeakerProposals and EventProposals from this page.
+ </div>
+</div>
+<br>
+<div class="row">
+    <h3>SpeakerProposals</h3>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+          <th>Name</th>
+          <th class="text-center">Ticket?</th>
+          <th class="text-center">Speaker?</th>
+          <th>Submitting User</th>
+          <th>Action</th>
+       </tr>
+      </thead>
+      <tbody>
+      {% for proposal in speakerproposals %}
+      <tr>
+          <td>{{ proposal.name }}</td>
+          <td class="text-center">{{ proposal.needs_oneday_ticket|truefalseicon }}</td>
+          <td class="text-center">{{ proposal.event|truefalseicon }}</td>
+          <td>{{ proposal.user }}</td>
+          <td><a href="{% url 'backoffice:speakerproposal_manage' bocamp_slug=bocamp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>EventProposals</h3>
+    <table class="table table-hover">
+      <thead>
+      <tr>
+          <th>Title</th>
+          <th>Track</th>
+          <th>Type</th>
+          <th>Speakers</th>
+          <th class="text-center">Event?</th>
+          <th>Submitting User</th>
+          <th>Action</th>
+       </tr>
+      </thead>
+      <tbody>
+      {% for proposal in eventproposals %}
+      <tr>
+          <td>{{ proposal.title }}</td>
+          <td>{{ proposal.track }}</td>
+          <td><i class="fas fa-{{ proposal.event_type.icon }} fa-lg" style="color: {{ proposal.event_type.color }};"></i> {{ proposal.event_type }}</td>
+          <td>{% for speaker in proposal.speakers.all %}<i class="fas fa-user" data-toggle="tooltip" title="{{ speaker.name }}"></i> {% endfor %}</td>
+          <td class="text-center">{{ proposal.speaker|truefalseicon }}</td>
+          <td>{{ proposal.user }}</td>
+          <td><a href="{% url 'backoffice:eventproposal_manage' bocamp_slug=bocamp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+</div>
+<script>
+$(document).ready(function(){
+        $('.table').DataTable();
+});
+</script>
+{% endblock content %}
+
+

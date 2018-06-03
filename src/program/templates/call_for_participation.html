@@ -1,4 +1,5 @@
 {% extends 'program_base.html' %}
+{% load commonmark %}
 
 {% block title %}
 Call for Participation | {{ block.super }}
@@ -15,7 +16,7 @@ Call for Participation | {{ block.super }}
 {% if not camp.call_for_participation %}
 <p class='lead'>This CFP has not been written yet.</p>
 {% else %}
-{{ camp.call_for_participation|safe }}
+{{ camp.call_for_participation|trustedcommonmark }}
 {% endif %}
 
 {% endblock %}

@@ -10,7 +10,7 @@
 <div class="row">
   <h2>Hand Out Badges</h2>
   <div class="lead">
-      Use this view to hand out badges to participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To check in participants go to the <a href="{% url 'backoffice:ticket_checkin' %}">Ticket Checkin view</a> instead. To hand out merchandise and other products go to the <a href="{% url 'backoffice:product_handout' %}">Hand Out Products</a> view instead.
+      Use this view to hand out badges to participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To check in participants go to the <a href="{% url 'backoffice:ticket_checkin' bocamp_slug=bocamp.slug %}">Ticket Checkin view</a> instead. To hand out merchandise and other products go to the <a href="{% url 'backoffice:product_handout' bocamp_slug=bocamp.slug %}">Hand Out Products</a> view instead.
  </div>
   <div>
       This table shows all (Shop|Discount|Sponsor)Tickets which are badge_handed_out=False. Tickets must be checked in before they are shown in this list.

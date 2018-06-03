@@ -10,7 +10,7 @@
 <div class="row">
   <h2>Ticket Check-In</h2>
   <div class="lead">
-      Use this view to check in participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' %}">Badge Handout view</a> instead. To hand out other products go to the <a href="{% url 'backoffice:product_handout' %}">Hand Out Products</a> view instead.
+      Use this view to check in participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' bocamp_slug=bocamp.slug %}">Badge Handout view</a> instead. To hand out other products go to the <a href="{% url 'backoffice:product_handout' bocamp_slug=bocamp.slug %}">Hand Out Products</a> view instead.
   </div>
   <div>
       This table shows all (Shop|Discount|Sponsor)Tickets which are checked_in=False.

@@ -38,7 +38,7 @@ Teams | {{ block.super }}
         </a>
       </td>
       <td>
-        {{ team.description|unsafecommonmark|truncatewords:50 }}
+        {{ team.description|untrustedcommonmark|truncatewords:50 }}
       </td>
 
       <td>

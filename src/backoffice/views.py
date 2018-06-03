@@ -1,30 +1,63 @@
+import logging
+from itertools import chain
+
 from django.views.generic import TemplateView, ListView
-from django.http import HttpResponseForbidden
+from django.views.generic.edit import UpdateView
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
-from itertools import chain
-import logging
+from camps.models import Camp
+from utils.mixins import StaffMemberRequiredMixin
+from program.models import SpeakerProposal, EventProposal
+
+from .mixins import BackofficeViewMixin
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class StaffMemberRequiredMixin(object):
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
+class CampSelectView(StaffMemberRequiredMixin, ListView):
+    model = Camp
+    template_name = "camp_select.html"
+
+    def get_queryset(self):
+        """
+        Filter away camps that are not writeable, since they are not interesting from a backoffice perspective
+        """
+        return super().get_queryset().filter(read_only=False)
+
+    def get(self, request, *args, **kwargs):
+        """
+        If we only have one writable Camp redirect directly to it rather than show a 1 item list
+        """
+        if self.get_queryset().count() == 1:
+            return redirect(
+                reverse('backoffice:camp_index', kwargs={
+                    'bocamp_slug': self.get_queryset().first().slug
+                })
+            )
+        return super().get(request, *args, **kwargs)
 
 
-class BackofficeIndexView(StaffMemberRequiredMixin, TemplateView):
-    template_name = "backoffice_index.html"
+class CampIndexView(BackofficeViewMixin, TemplateView):
+    template_name = "camp_index.html"
 
 
-class ProductHandoutView(StaffMemberRequiredMixin, ListView):
+class ProductHandoutView(BackofficeViewMixin, ListView):
     template_name = "product_handout.html"
-    queryset = OrderProductRelation.objects.filter(handed_out=False, order__paid=True, order__refunded=False, order__cancelled=False).order_by('order')
+    queryset = OrderProductRelation.objects.filter(
+        handed_out=False,
+        order__paid=True,
+        order__refunded=False,
+        order__cancelled=False
+    ).order_by('order')
 
 
-class BadgeHandoutView(StaffMemberRequiredMixin, ListView):
+class BadgeHandoutView(BackofficeViewMixin, ListView):
     template_name = "badge_handout.html"
     context_object_name = 'tickets'
 
@@ -35,7 +68,7 @@ class BadgeHandoutView(StaffMemberRequiredMixin, ListView):
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
-class TicketCheckinView(StaffMemberRequiredMixin, ListView):
+class TicketCheckinView(BackofficeViewMixin, ListView):
     template_name = "ticket_checkin.html"
     context_object_name = 'tickets'
 
@@ -46,10 +79,70 @@ class TicketCheckinView(StaffMemberRequiredMixin, ListView):
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
-class ApproveNamesView(StaffMemberRequiredMixin, ListView):
+class ApproveNamesView(BackofficeViewMixin, ListView):
     template_name = "approve_public_credit_names.html"
     context_object_name = 'profiles'
 
     def get_queryset(self, **kwargs):
         return Profile.objects.filter(public_credit_name_approved=False).exclude(public_credit_name='')
+
+
+class ManageProposalsView(BackofficeViewMixin, ListView):
+    """
+    This view shows a list of pending SpeakerProposal and EventProposals.
+    """
+    template_name = "manage_proposals.html"
+    context_object_name = 'speakerproposals'
+
+    def get_queryset(self, **kwargs):
+        return SpeakerProposal.objects.filter(
+            camp=self.bocamp,
+            proposal_status=SpeakerProposal.PROPOSAL_PENDING
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['eventproposals'] = EventProposal.objects.filter(
+            track__camp=self.bocamp,
+            proposal_status=EventProposal.PROPOSAL_PENDING
+        )
+        return context
+
+
+class ProposalManageView(BackofficeViewMixin, UpdateView):
+    """
+    This class contains the shared logic between SpeakerProposalManageView and EventProposalManageView
+    """
+    fields = []
+
+    def form_valid(self, form):
+        """
+        We have two submit buttons in this form, Approve and Reject
+        """
+        logger.debug(form.data)
+        if 'approve' in form.data:
+            # approve button was pressed
+            form.instance.mark_as_approved(self.request)
+        elif 'reject' in form.data:
+            # reject button was pressed
+            form.instance.mark_as_rejected(self.request)
+        else:
+            messages.error(self.request, "Unknown submit action")
+        return redirect(reverse('backoffice:manage_proposals', kwargs={'bocamp_slug': self.bocamp.slug}))
+
+
+class SpeakerProposalManageView(ProposalManageView):
+    """
+    This view allows an admin to approve/reject SpeakerProposals
+    """
+    model = SpeakerProposal
+    template_name = "manage_speakerproposal.html"
+
+
+class EventProposalManageView(ProposalManageView):
+    """
+    This view allows an admin to approve/reject EventProposals
+    """
+    model = EventProposal
+    template_name = "manage_eventproposal.html"
 

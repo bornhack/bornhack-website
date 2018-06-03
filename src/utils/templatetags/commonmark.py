@@ -9,8 +9,8 @@ register = template.Library()
 
 @register.filter
 @stringfilter
-def commonmark(value):
-    """Returns HTML given some CommonMark Markdown. Does not clean HTML, not for use with untrusted input."""
+def trustedcommonmark(value):
+    """Returns HTML given some CommonMark Markdown. Also allows real HTML, so do not use this with untrusted input."""
     parser = CommonMark.Parser()
     renderer = CommonMark.HtmlRenderer()
     ast = parser.parse(value)
@@ -18,8 +18,8 @@ def commonmark(value):
 
 @register.filter
 @stringfilter
-def unsafecommonmark(value):
-    """Returns HTML given some CommonMark Markdown. Cleans HTML from input using bleach, suitable for use with untrusted input."""
+def untrustedcommonmark(value):
+    """Returns HTML given some CommonMark Markdown. Cleans actual HTML from input using bleach, suitable for use with untrusted input."""
     parser = CommonMark.Parser()
     renderer = CommonMark.HtmlRenderer()
     ast = parser.parse(bleach.clean(value))

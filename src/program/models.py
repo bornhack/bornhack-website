@@ -218,7 +218,8 @@ class SpeakerProposal(UserSubmittedModel):
     camp = models.ForeignKey(
         'camps.Camp',
         related_name='speakerproposals',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     name = models.CharField(
@@ -248,20 +249,29 @@ class SpeakerProposal(UserSubmittedModel):
         return reverse_lazy('program:speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
     def mark_as_approved(self, request):
-        speakermodel = apps.get_model('program', 'speaker')
-        speakerproposalmodel = apps.get_model('program', 'speakerproposal')
-        speaker = speakermodel()
+        """ Marks a SpeakerProposal as approved, including creating/updating the related Speaker object """
+        # create a Speaker if we don't have one
+        if not hasattr(self, 'speaker'):
+            speakermodel = apps.get_model('program', 'speaker')
+            speakerproposalmodel = apps.get_model('program', 'speakerproposal')
+            speaker = speakermodel()
+            speaker.proposal = self
+        else:
+            speaker = self.speaker
+
+        # set Speaker data
         speaker.camp = self.camp
         speaker.name = self.name
         speaker.biography = self.biography
         speaker.needs_oneday_ticket = self.needs_oneday_ticket
-        speaker.proposal = self
         speaker.save()
 
+        # mark as approved and save
         self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
         self.save()
 
-        # copy all the URLs too
+        # copy all the URLs to the speaker object
+        speaker.urls.clear()
         for url in self.urls.all():
             Url.objects.create(
                 url=url.url,
@@ -269,7 +279,14 @@ class SpeakerProposal(UserSubmittedModel):
                 speaker=speaker
             )
 
-        messages.success(request, "Speaker object %s has been created" % speaker)
+        # a message to the admin
+        messages.success(request, "Speaker object %s has been created/updated" % speaker)
+
+    def mark_as_rejected(self, request):
+        speakerproposalmodel = apps.get_model('program', 'speakerproposal')
+        self.proposal_status = speakerproposalmodel.PROPOSAL_REJECTED
+        self.save()
+        messages.success(request, "SpeakerProposal %s has been rejected" % self.name)
 
 
 class EventProposal(UserSubmittedModel):
@@ -385,20 +402,26 @@ class EventTrack(CampRelatedModel):
     """ All events belong to a track. Administration of a track can be delegated to one or more users. """
 
     name = models.CharField(
-        max_length=100
+        max_length=100,
+        help_text='The name of this Track',
     )
 
-    slug = models.SlugField()
+    slug = models.SlugField(
+        help_text='The url slug for this Track'
+    )
 
     camp = models.ForeignKey(
         'camps.Camp',
         related_name='eventtracks',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        help_text='The Camp this Track belongs to',
     )
 
     managers = models.ManyToManyField(
         'auth.User',
         related_name='managed_tracks',
+        blank=True,
+        help_text='If this track is managed by someone other than the Content team pick the users here.'
     )
 
     def __str__(self):
@@ -561,7 +584,8 @@ class Event(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The event proposal object this event was created from',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     class Meta:
@@ -749,7 +773,8 @@ class Speaker(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The speaker proposal object this speaker was created from',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     needs_oneday_ticket = models.BooleanField(

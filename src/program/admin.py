@@ -77,6 +77,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ('camp',)
+    readonly_fields = ['proposal']
 
 
 @admin.register(Favorite)
@@ -99,6 +100,8 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
+
+    readonly_fields = ['proposal']
 
 @admin.register(UrlType)
 class UrlTypeAdmin(admin.ModelAdmin):

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
+{% load commonmark %}
 
 {% block title %}
 Sponsors | {{ block.super }}
@@ -59,7 +60,7 @@ Sponsors | {{ block.super }}
 {% if not camp.call_for_sponsors %}
 <p class='lead'>This CFS has not been written yet.</p>
 {% else %}
-{{ camp.call_for_sponsors|safe }}
+{{ camp.call_for_sponsors|trustedcommonmark }}
 {% endif %}
 
 {% endblock %}

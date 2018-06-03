@@ -1,5 +1,4 @@
 {% extends 'program_base.html' %}
-{% load commonmark %}
 
 {% block program_content %}
 
@@ -11,44 +10,7 @@
 
 <h2>Details for {{ speakerproposal.name }}</h2>
 
-<div class="panel panel-default">
-    <div class="panel-heading">{{ speakerproposal.name }}</div>
-    <div class="panel-body">
-        {{ speakerproposal.biography|commonmark }}
-        {% if camp.call_for_participation_open and not camp.read_only %}
-        <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
-        {% endif %}
-    </div>
-    <div class="panel-footer">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span> | ID: <span class="badge">{{ speakerproposal.uuid }}</span></div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">URLs for {{ speakerproposal.name }}</div>
-    <div class="panel-body">
-      {% if speakerproposal.urls.exists %}
-        {% include 'includes/speakerproposalurl_table.html' %}
-      {% else %}
-        <i>Nothing found.</i>
-      {% endif %}
-      {% if camp.call_for_participation_open and not camp.read_only %}
-      <a href="{% url 'program:speakerproposalurl_create' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
-      {% endif %}
-    </div>
-</div>
-
-<div class="panel panel-default">
-    <div class="panel-heading">Events for {{ speakerproposal.name }}</div>
-    <div class="panel-body">
-      {% if speakerproposal.eventproposals.exists %}
-        {% include 'includes/event_proposal_table.html' with eventproposals=speakerproposal.eventproposals.all %}
-      {% else %}
-        <i>Nothing found.</i>
-      {% endif %}
-      {% if camp.call_for_participation_open and not camp.read_only %}
-      <a href="{% url 'program:eventproposal_typeselect' camp_slug=camp.slug speaker_uuid=speakerproposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add New Event</span></a>
-      {% endif %}
-    </div>
-</div>
+{% include 'includes/speakerproposal_detail.html' %}
 
 <p>
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>

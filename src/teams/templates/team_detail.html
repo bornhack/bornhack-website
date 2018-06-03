@@ -11,7 +11,7 @@ Team: {{ team.name }} | {{ block.super }}
 <div class="panel panel-default">
     <div class="panel-heading"><h4>{{ team.name }} Team Details</h4></div>
     <div class="panel-body">
-        {{ team.description|unsafecommonmark }}
+        {{ team.description|untrustedcommonmark }}
 
         <hr>
 

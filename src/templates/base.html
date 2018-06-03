@@ -74,7 +74,7 @@
             <li><a href="{% url 'contact' %}">Contact</a></li>
             <li><a href="{% url 'people' %}">People</a></li>
             {% if user.is_authenticated and user.is_staff %}
-            <li><a href="{% url 'backoffice:index' %}">Backoffice</a></li>
+            <li><a href="{% url 'backoffice:camp_select' %}">Backoffice</a></li>
             <li><a href="{% url 'admin:index' %}">Django Admin</a></li>
             {% endif %}
           </ul>
@@ -91,20 +91,10 @@
       {% if camp %}
         <div class="row">
           <div class="btn-group btn-group-justified hidden-xs">
-            <a class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
-            <a class="btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
-            <a class="btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
-            <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
-            <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
-            <a class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+              {% include 'includes/menuitems.html' %}
           </div>
           <div class="btn-group-vertical visible-xs">
-            <a class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
-            <a class="btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
-            <a class="btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
-            <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
-            <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
-            <a class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+              {% include 'includes/menuitems.html' %}
           </div>
         <p>
       </div>

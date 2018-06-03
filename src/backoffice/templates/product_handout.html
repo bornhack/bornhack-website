@@ -10,7 +10,7 @@
 <div class="row">
   <h2>Hand Out Products</h2>
   <div class="lead">
-      Use this view to hand out products to participants. Use the search field to search for username, email, products, order ID etc. To check in participants go to the <a href="{% url 'backoffice:ticket_checkin' %}">Ticket Checkin view</a> instead. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' %}">Badge Handout view</a> instead.
+      Use this view to hand out products to participants. Use the search field to search for username, email, products, order ID etc. To check in participants go to the <a href="{% url 'backoffice:ticket_checkin' bocamp_slug=bocamp.slug %}">Ticket Checkin view</a> instead. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' bocamp_slug=bocamp.slug %}">Badge Handout view</a> instead.
  </div>
   <div>
       This table shows all OrderProductRelations which are handed_out=False (not including unpaid, cancelled and refunded orders). The table is initally sorted by order ID but the sorting can be changed by clicking the column headlines (if javascript is enabled).
