@@ -2,8 +2,8 @@ import uuid
 import os
 import icalendar
 import logging
-
 from datetime import timedelta
+
 from django.contrib.postgres.fields import DateTimeRangeField, ArrayField
 from django.contrib import messages
 from django.db import models
