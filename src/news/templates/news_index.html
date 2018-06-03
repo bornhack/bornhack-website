@@ -13,7 +13,7 @@ News | {{ block.super }}
   <div>
     <h3><a href="{% url 'news:detail' slug=item.slug %}">{{ item.title }}</a> <small>{{ item.published_at|date:"Y-m-d" }}</small></h3>
   </div>
-  {{ item.content|commonmark }}
+  {{ item.content|trustedcommonmark }}
   {% if not forloop.last %}
     <hr />
   {% endif %}

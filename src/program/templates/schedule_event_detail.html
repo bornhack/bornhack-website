@@ -17,7 +17,7 @@
       <div class="panel-heading" ><span style="font-size: x-large"><span style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">{{ event.event_type.name }}</span> {{ event.title }}</span></div>
     <div class="panel-body">
       <p>
-      {{ event.abstract|commonmark }}
+      {{ event.abstract|untrustedcommonmark }}
      </p>
 
       <hr>

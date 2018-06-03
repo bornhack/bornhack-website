@@ -326,6 +326,17 @@ class Command(BaseCommand):
             host_title='Speaker',
         )
 
+        debate = EventType.objects.create(
+            name='Debate',
+            slug='debate',
+            color='#F734C3',
+            light_text=True,
+            description='A panel debate with invited guests',
+            icon='users',
+            host_title='Guest',
+            public=True,
+        )
+
         facility = EventType.objects.create(
             name='Facilities',
             slug='facilities',
