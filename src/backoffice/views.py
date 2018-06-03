@@ -12,7 +12,7 @@ from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
 from camps.models import Camp
-from utils.mixins import StaffMemberRequiredMixin
+from camps.mixins import CampViewMixin
 from program.models import SpeakerProposal, EventProposal
 
 from .mixins import BackofficeViewMixin
@@ -20,31 +20,8 @@ from .mixins import BackofficeViewMixin
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class CampSelectView(StaffMemberRequiredMixin, ListView):
-    model = Camp
-    template_name = "camp_select.html"
-
-    def get_queryset(self):
-        """
-        Filter away camps that are not writeable, since they are not interesting from a backoffice perspective
-        """
-        return super().get_queryset().filter(read_only=False)
-
-    def get(self, request, *args, **kwargs):
-        """
-        If we only have one writable Camp redirect directly to it rather than show a 1 item list
-        """
-        if self.get_queryset().count() == 1:
-            return redirect(
-                reverse('backoffice:camp_index', kwargs={
-                    'bocamp_slug': self.get_queryset().first().slug
-                })
-            )
-        return super().get(request, *args, **kwargs)
-
-
-class CampIndexView(BackofficeViewMixin, TemplateView):
-    template_name = "camp_index.html"
+class BackofficeIndexView(BackofficeViewMixin, TemplateView):
+    template_name = "index.html"
 
 
 class ProductHandoutView(BackofficeViewMixin, ListView):
@@ -96,14 +73,14 @@ class ManageProposalsView(BackofficeViewMixin, ListView):
 
     def get_queryset(self, **kwargs):
         return SpeakerProposal.objects.filter(
-            camp=self.bocamp,
+            camp=self.camp,
             proposal_status=SpeakerProposal.PROPOSAL_PENDING
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['eventproposals'] = EventProposal.objects.filter(
-            track__camp=self.bocamp,
+            track__camp=self.camp,
             proposal_status=EventProposal.PROPOSAL_PENDING
         )
         return context
@@ -128,7 +105,7 @@ class ProposalManageView(BackofficeViewMixin, UpdateView):
             form.instance.mark_as_rejected(self.request)
         else:
             messages.error(self.request, "Unknown submit action")
-        return redirect(reverse('backoffice:manage_proposals', kwargs={'bocamp_slug': self.bocamp.slug}))
+        return redirect(reverse('backoffice:manage_proposals', kwargs={'camp_slug': self.camp.slug}))
 
 
 class SpeakerProposalManageView(ProposalManageView):

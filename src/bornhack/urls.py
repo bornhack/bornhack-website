@@ -113,11 +113,6 @@ urlpatterns = [
         name='people',
     ),
 
-    path(
-        'backoffice/',
-        include('backoffice.urls', namespace='backoffice')
-    ),
-
     # camp specific urls below here
 
     path(
@@ -187,6 +182,10 @@ urlpatterns = [
                 include('teams.urls', namespace='teams')
             ),
 
+            path(
+                'backoffice/',
+                include('backoffice.urls', namespace='backoffice')
+            ),
 
         ])
     )

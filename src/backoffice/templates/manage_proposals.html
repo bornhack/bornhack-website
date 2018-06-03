@@ -35,7 +35,7 @@
           <td class="text-center">{{ proposal.needs_oneday_ticket|truefalseicon }}</td>
           <td class="text-center">{{ proposal.event|truefalseicon }}</td>
           <td>{{ proposal.user }}</td>
-          <td><a href="{% url 'backoffice:speakerproposal_manage' bocamp_slug=bocamp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
+          <td><a href="{% url 'backoffice:speakerproposal_manage' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
       </tr>
       {% endfor %}
       </tbody>
@@ -63,7 +63,7 @@
           <td>{% for speaker in proposal.speakers.all %}<i class="fas fa-user" data-toggle="tooltip" title="{{ speaker.name }}"></i> {% endfor %}</td>
           <td class="text-center">{{ proposal.speaker|truefalseicon }}</td>
           <td>{{ proposal.user }}</td>
-          <td><a href="{% url 'backoffice:eventproposal_manage' bocamp_slug=bocamp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
+          <td><a href="{% url 'backoffice:eventproposal_manage' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>
       </tr>
       {% endfor %}
       </tbody>

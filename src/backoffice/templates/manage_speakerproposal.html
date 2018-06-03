@@ -3,13 +3,13 @@
 
 {% block content %}
 <h3>Manage Speaker Proposal</h3>
-{% include 'includes/speakerproposal_detail.html' with camp=bocamp %}
+{% include 'includes/speakerproposal_detail.html' with camp=camp %}
 <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
     {% bootstrap_button "<i class='fas fa-times'></i> Reject" button_type="submit" button_class="btn-danger" name="reject" %}
-    <a href="{% url 'backoffice:manage_proposals' bocamp_slug=bocamp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    <a href="{% url 'backoffice:manage_proposals' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 </form>
 {% endblock content %}
 

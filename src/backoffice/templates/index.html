@@ -14,23 +14,23 @@
 <div class="row">
     <p>
     <div class="list-group">
-      <a href="{% url 'backoffice:product_handout' bocamp_slug=bocamp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:product_handout' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Hand Out Products</h4>
         <p class="list-group-item-text">Use this view to mark products such as merchandise, cabins, fridges and so on as handed out.</p>
       </a>
-      <a href="{% url 'backoffice:ticket_checkin' bocamp_slug=bocamp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:ticket_checkin' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Check-In Tickets</h4>
         <p class="list-group-item-text">Use this view to check-in tickets when participants arrive.</p>
       </a>
-      <a href="{% url 'backoffice:badge_handout' bocamp_slug=bocamp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:badge_handout' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Hand Out Badges</h4>
         <p class="list-group-item-text">Use this view to mark badges as handed out.</p>
       </a>
-      <a href="{% url 'backoffice:public_credit_names' bocamp_slug=bocamp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
         <p class="list-group-item-text">Use this view to check and approve users Public Credit Names</p>
       </a>
-      <a href="{% url 'backoffice:manage_proposals' bocamp_slug=bocamp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:manage_proposals' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Manage Proposals</h4>
         <p class="list-group-item-text">Use this view to manage SpeakerProposals and EventProposals</p>
       </a>
