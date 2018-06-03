@@ -34,8 +34,7 @@ from .email import (
     add_eventproposal_updated_email
 )
 from . import models
-from .utils import get_speakerproposal_form_class, get_eventproposal_form_class
-from .forms import BaseSpeakerProposalForm
+from .forms import SpeakerProposalForm, EventProposalForm
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -129,6 +128,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     """ This view allows a user to create a new SpeakerProposal linked to an existing EventProposal """
     model = models.SpeakerProposal
     template_name = 'speakerproposal_form.html'
+    form_class = SpeakerProposalForm
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the eventproposal object """
@@ -138,8 +138,16 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     def get_success_url(self):
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
-    def get_form_class(self):
-        return get_speakerproposal_form_class(eventtype=self.eventproposal.event_type)
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.eventproposal.event_type
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -170,22 +178,34 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     """
     model = models.SpeakerProposal
     template_name = 'speakerproposal_form.html'
+    form_class = SpeakerProposalForm
 
-
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
         if self.get_object().eventproposals.count() == 1:
             # determine which form to use based on the type of event associated with the proposal
-            return get_speakerproposal_form_class(self.get_object().eventproposals.get().event_type)
+            eventtype = self.get_object().eventproposals.get().event_type
         else:
             # more than one eventproposal. If all events are the same type we can still show a non-generic form here
             eventtypes = set()
             for ep in self.get_object().eventproposals.all():
                 eventtypes.add(ep.event_type)
             if len(eventtypes) == 1:
-                return get_speakerproposal_form_class(ep.event_type)
-            # more than one type of event for this person, return the generic speakerproposal form
-            return BaseSpeakerProposalForm
+                eventtype = self.get_object().eventproposals.get().event_type
+            else:
+                # more than one type of event for this person, return the generic speakerproposal form
+                eventtype = None
+
+        # add camp and eventtype to form kwargs
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': eventtype
+        })
+
+        return kwargs
 
     def form_valid(self, form):
         """
@@ -365,10 +385,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
     """
     model = models.EventProposal
     template_name = 'eventproposal_form.html'
-
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
-        return get_eventproposal_form_class(self.event_type)
+    form_class = EventProposalForm
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the speakerproposal object """
@@ -383,16 +400,16 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         context['event_type'] = self.event_type
         return context
 
-    def get_form(self):
+    def get_form_kwargs(self):
         """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
+        Set camp and eventtype for the form
         """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
-
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.event_type
+        })
+        return kwargs
 
     def form_valid(self, form):
         # set camp and user for this eventproposal
@@ -418,27 +435,24 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
 class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, UpdateView):
     model = models.EventProposal
     template_name = 'eventproposal_form.html'
+    form_class = EventProposalForm
 
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
-        return get_eventproposal_form_class(self.get_object().event_type)
-
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.get_object().event_type
+        })
+        return kwargs
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal and eventtype objects available in the template """
         context = super().get_context_data(**kwargs)
         context['event_type'] = self.get_object().event_type
         return context
-
-    def get_form(self):
-        """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
-        """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
 
     def form_valid(self, form):
         # set status to pending and save eventproposal
@@ -588,11 +602,7 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         """
         if hasattr(self, 'speakerproposal'):
             # we already have a speakerproposal, just show an eventproposal form
-            return get_eventproposal_form_class(eventtype=self.eventtype)
-
-        # get the two forms we need to build the MultiModelForm
-        SpeakerProposalForm = get_speakerproposal_form_class(eventtype=self.eventtype)
-        EventProposalForm = get_eventproposal_form_class(eventtype=self.eventtype)
+            return EventProposalForm
 
         # build our MultiModelForm
         class CombinedProposalSubmitForm(MultiModelForm):
@@ -604,15 +614,16 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         # return the form class
         return CombinedProposalSubmitForm
 
-    def get_form(self):
+    def get_form_kwargs(self):
         """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
+        Set camp and eventtype for the form
         """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.forms['eventproposal'].fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.eventtype
+        })
+        return kwargs
 
 
 ###################################################################################################
