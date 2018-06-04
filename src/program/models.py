@@ -146,6 +146,8 @@ class Url(CampRelatedModel):
     def camp(self):
         return self.owner.camp
 
+    camp_filter = 'owner__camp'
+
 
 ###############################################################################
 
@@ -342,6 +344,8 @@ class EventProposal(UserSubmittedModel):
     @property
     def camp(self):
         return self.track.camp
+
+    camp_filter = 'track__camp'
 
     @property
     def headline(self):
@@ -611,6 +615,8 @@ class Event(CampRelatedModel):
     def camp(self):
         return self.track.camp
 
+    camp_filter = 'track__camp'
+
     @property
     def speakers_list(self):
         if self.speakers.exists():
@@ -679,6 +685,8 @@ class EventInstance(CampRelatedModel):
     @property
     def camp(self):
         return self.event.camp
+
+    camp_filter = 'event__track__camp'
 
     @property
     def schedule_date(self):
