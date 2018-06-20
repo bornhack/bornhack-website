@@ -71,6 +71,8 @@ class InfoItem(CampRelatedModel):
     def camp(self):
         return self.category.camp
 
+    camp_filter = 'category__camp'
+
     def clean(self):
         if InfoCategory.objects.filter(camp=self.category.camp, anchor=self.anchor).exists():
             # this anchor is already in use on a category, so it cannot be used here (they must be unique on the entire page)
