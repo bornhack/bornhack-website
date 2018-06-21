@@ -91,22 +91,22 @@ urlpatterns = [
 
                 ]),
             ),
-            url(
-                r'^info/(?P<category_anchor>[-_\w+]+)/', include([
-                    url(
-                        r'^create/$',
+            path(
+                'info/<slug:category_anchor>/', include([
+                    path(
+                        'create/',
                         InfoItemCreateView.as_view(),
                         name='info_item_create',
                     ),
-                    url(
-                        r'^(?P<item_anchor>[-_\w+]+)/', include([
-                            url(
-                                r'^update/$',
+                    path(
+                        '<slug:item_anchor>/', include([
+                            path(
+                                'update/',
                                 InfoItemUpdateView.as_view(),
                                 name='info_item_update',
                             ),
-                            url(
-                                r'^delete/$',
+                            path(
+                                'delete/',
                                 InfoItemDeleteView.as_view(),
                                 name='info_item_delete',
                             ),
