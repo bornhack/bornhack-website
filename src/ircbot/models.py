@@ -12,7 +12,7 @@ class OutgoingIrcMessage(CreatedUpdatedModel):
     expired = models.BooleanField(default=False)
 
     def __str__(self):
-        return "PRIVMSG %s %s (%s)" % (self.target, self.message, 'processed' if self.processed else 'unprocessed') 
+        return "PRIVMSG %s %s (%s)" % (self.target, self.message, 'processed' if self.processed else 'unprocessed')
 
     def clean(self):
         if not self.pk:

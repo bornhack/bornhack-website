@@ -65,6 +65,28 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         max_length=7
     )
 
+    call_for_participation_open = models.BooleanField(
+        help_text='Check if the Call for Participation is open for this camp',
+        default=False,
+    )
+
+    call_for_participation = models.TextField(
+        blank=True,
+        help_text='The CFP markdown for this Camp',
+        default='The Call For Participation for this Camp has not been written yet',
+    )
+
+    call_for_sponsors_open = models.BooleanField(
+        help_text='Check if the Call for Sponsors is open for this camp',
+        default=False,
+    )
+
+    call_for_sponsors = models.TextField(
+        blank=True,
+        help_text='The CFS markdown for this Camp',
+        default='The Call For Sponsors for this Camp has not been written yet',
+    )
+
     def get_absolute_url(self):
         return reverse('camp_detail', kwargs={'camp_slug': self.slug})
 
@@ -91,7 +113,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
 
     @property
     def event_types(self):
-        # return all event types with at least one event in this camp
+        """ Return all event types with at least one event in this camp """
         return EventType.objects.filter(event__instances__isnull=False, event__camp=self).distinct()
 
     @property
@@ -178,19 +200,4 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         Returns a list of DateTimeTZRanges representing the days during the buildup.
         '''
         return self.get_days('teardown')
-
-    @property
-    def call_for_speakers_open(self):
-        if self.camp.upper < timezone.now():
-            return False
-        else:
-            return True
-
-    @property
-    def call_for_sponsors_open(self):
-        """ Keep call for sponsors open 30 days after camp end """
-        if self.camp.upper + timedelta(days=30) < timezone.now():
-            return False
-        else:
-            return True
 

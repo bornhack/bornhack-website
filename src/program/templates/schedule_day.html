@@ -9,7 +9,7 @@
     {% for eventinstance in eventinstances %}
         {% if eventinstance.when.lower.time == timeslot.time %}
         <td style="background-color: {{ eventinstance.event.event_type.color }}; color: {% if eventinstance.event.event_type.light_text %}white{% else %}black{% endif %};" class="event-td" rowspan={{ eventinstance.timeslots }} data-eventinstance-id="{{ eventinstance.id }}">
-            <a style="color:inherit;" href="{% url 'event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}">
+            <a style="color:inherit;" href="{% url 'program:event_detail' camp_slug=camp.slug slug=eventinstance.event.slug %}">
                 {{ eventinstance.event.title }}<br>
                 {{ eventinstance.when.lower.time }}-{{ eventinstance.when.upper.time }}
             </a>

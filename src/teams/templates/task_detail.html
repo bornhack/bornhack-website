@@ -8,7 +8,7 @@
 {% block content %}
 <div class="panel panel-default">
     <div class="panel-heading"><h4>Task: {{ task.name }}</h4></div>
-    <div class="panel-body">{{ task.description|commonmark }}</div>
+    <div class="panel-body">{{ task.description|untrustedcommonmark }}</div>
     <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:detail' team_slug=task.team.slug camp_slug=task.team.camp.slug %}">{{ task.team.name }} Team</a></i></div>
 </div>
 

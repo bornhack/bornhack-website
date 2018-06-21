@@ -258,6 +258,8 @@ class TeamMember(CampRelatedModel):
         """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
 
+    camp_filter = 'team__camp'
+
 
 class TeamTask(CampRelatedModel):
     team = models.ForeignKey(
@@ -290,6 +292,8 @@ class TeamTask(CampRelatedModel):
     def camp(self):
         """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
+
+    camp_filter = 'team__camp'
 
     def save(self, **kwargs):
         # generate slug if needed

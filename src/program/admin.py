@@ -11,9 +11,12 @@ from .models import (
     EventType,
     EventInstance,
     EventLocation,
+    EventTrack,
     SpeakerProposal,
     EventProposal,
-    Favorite
+    Favorite,
+    UrlType,
+    Url
 )
 
 
@@ -21,7 +24,7 @@ from .models import (
 class SpeakerProposalAdmin(admin.ModelAdmin):
     def mark_speakerproposal_as_approved(self, request, queryset):
         for sp in queryset:
-            sp.mark_as_approved()
+            sp.mark_as_approved(request)
     mark_speakerproposal_as_approved.description = 'Approve and create Speaker object(s)'
 
     actions = ['mark_speakerproposal_as_approved']
@@ -40,14 +43,14 @@ class EventProposalAdmin(admin.ModelAdmin):
                 return False
             else:
                 try:
-                    ep.mark_as_approved()
+                    ep.mark_as_approved(request)
                 except ValidationError as e:
                     messages.error(request, e)
                     return False
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
     actions = ['mark_eventproposal_as_approved']
-    list_filter = ('camp', 'proposal_status', 'user')
+    list_filter = ('track', 'proposal_status', 'user')
 
 
 @admin.register(EventLocation)
@@ -55,6 +58,11 @@ class EventLocationAdmin(admin.ModelAdmin):
     list_filter = ('camp',)
     list_display = ('name', 'camp')
 
+
+@admin.register(EventTrack)
+class EventTrackAdmin(admin.ModelAdmin):
+    list_filter = ('camp',)
+    list_display = ('name', 'camp')
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
@@ -69,6 +77,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ('camp',)
+    readonly_fields = ['proposal']
 
 
 @admin.register(Favorite)
@@ -82,7 +91,7 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ('camp', 'speakers')
+    list_filter = ('track', 'speakers')
     list_display = [
         'title',
         'event_type',
@@ -91,3 +100,14 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
+
+    readonly_fields = ['proposal']
+
+@admin.register(UrlType)
+class UrlTypeAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Url)
+class UrlAdmin(admin.ModelAdmin):
+    pass
+

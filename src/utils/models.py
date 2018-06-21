@@ -51,6 +51,9 @@ class CreatedUpdatedModel(CleanedModel):
 
 
 class CampRelatedModel(CreatedUpdatedModel):
+
+    camp_filter = 'camp'
+
     class Meta:
         abstract = True
 
@@ -69,6 +72,10 @@ class CampRelatedModel(CreatedUpdatedModel):
             raise ValidationError('This camp is in read only mode.')
 
         super().delete(**kwargs)
+
+    @classmethod
+    def get_camp_filter(cls):
+        return cls.camp_filter
 
 
 class OutgoingEmail(CreatedUpdatedModel):

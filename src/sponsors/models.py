@@ -43,6 +43,8 @@ class Sponsor(CampRelatedModel):
     def camp(self):
         return self.tier.camp
 
+    camp_filter = 'tier__camp'
+
 
 class SponsorTier(CampRelatedModel):
     name = models.CharField(

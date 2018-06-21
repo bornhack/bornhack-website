@@ -5,98 +5,39 @@ Proposals | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h3>Submitting</h3>
-<p>To submit a talk or other event for {{ camp.title }} you need to to the following:</p>
 
-<ol>
-    <li>First you propose one or more speakers. Most events just have one speaker, but some events might have two or more. Be sure to create everyone before going on to step 2.</li>
-    <li>Then you propose one or more events. The <i>Propose New Event</i> form will allow you to choose the speaker(s) you proposed.</li>
-</ol>
-
-<p>If you experience problems submitting proposals here please let us know on IRC or by mail. You can also send an email with your proposal and the Content team will take care of creating it in the system.</p>
-
-<h3>Your {{ camp.title }} Speaker Proposals</h3>
-{% if speakerproposal_list %}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for speakerproposal in speakerproposal_list %}
-        <tr>
-            <td><b>{{ speakerproposal.name }}</b></td>
-            <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>
-            <td>
-                <a href="{% url 'speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
-                {% if not camp.read_only %}
-                    <a href="{% url 'speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
-                    {% if speakerproposal.proposal_status == "pending" or speakerproposal.proposal_status == "approved" %}
-                        <a href="{% url 'speakerproposal_submit' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Submit</a>
-                    {% else %}
-                        <a href="{% url 'speakerproposal_submit' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-xs">Submit</a>
-                    {% endif %}
-                    <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% if camp.call_for_participation_open %}
+    {% include 'includes/event_proposal_type_select.html' %}
 {% else %}
-<h4>No speaker proposals found</h4>
+<div class="alert alert-danger">
+    <strong>Note!</strong> This Call for Particilation is not open.
+</div>
 {% endif %}
 
-{% if not camp.read_only and camp.call_for_speakers_open %}
-<a href="{% url 'speakerproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Speaker</a>
-{% endif %}
 
-<p>
-<br>
-</p>
+{% if speakerproposal_list or eventproposal_list %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><i class="fas fa-pencil"></i> Existing Proposals</h3>
+  </div>
+  <div class="panel-body">
+    <h4>People</h4>
+    {% if speakerproposal_list %}
+    {% include 'includes/speaker_proposal_table.html' with speakerproposals=speakerproposal_list %}
+    {% else %}
+    <i>Nothing found.</i>
+    {% endif %}
 
-<h3>Your {{ camp.title }} Event Proposals</h3>
-{% if eventproposal_list %}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Type</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for eventproposal in eventproposal_list %}
-        <tr>
-            <td><b>{{ eventproposal.title }}</b></td>
-            <td><b>{{ eventproposal.event_type }}</b></td>
-            <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>
-            <td>
-                <a href="{% url 'eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Details</a>
-                {% if not camp.read_only %}
-                    <a href="{% url 'eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Modify</a>
-                    {% if eventproposal.proposal_status == "pending" %}
-                        <a href="{% url 'eventproposal_submit' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs btn-disabled" disabled>Submit</a>
-                    {% else %}
-                        <a href="{% url 'eventproposal_submit' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-xs">Submit</a>
-                    {% endif %}
-                    <a href="#" class="btn btn-danger btn-xs btn-disabled" disabled>Delete</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-{% else %}
-<h4>No event proposals found</h4>
-{% endif %}
+    <p><hr></p>
 
-{% if not camp.read_only and camp.call_for_speakers_open %}
-    <a href="{% url 'eventproposal_create' camp_slug=camp.slug %}" class="btn btn-primary btn-sm">Propose New Event</a>
+    <h4>Events</h4>
+    {% if eventproposal_list %}
+    {% include 'includes/event_proposal_table.html' with eventproposals=eventproposal_list %}
+    {% else %}
+    <i>Nothing found.</i>
+    {% endif %}
+  </div>
+</div>
 {% endif %}
 
 {% endblock %}

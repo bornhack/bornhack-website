@@ -11,7 +11,7 @@ def handle_team_event(eventtype, irc_message=None, irc_timeout=60, email_templat
     The type of event determines which teams receive notifications.
     TODO: Add some sort of priority to messages
     """
-    logger.info("Inside handle_team_event, eventtype %s" % eventtype)
+    #logger.info("Inside handle_team_event, eventtype %s" % eventtype)
 
     # get event type from database
     from .models import Type

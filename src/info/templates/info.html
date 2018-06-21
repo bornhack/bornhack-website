@@ -64,7 +64,7 @@ Info | {{ block.super }}
                   <small></small>
                 </div>
                 <div class="panel-body">
-                  <p>{{ item.body|commonmark }}</p>
+                  <p>{{ item.body|trustedcommonmark }}</p>
                 </div>
               </div>
             {% endfor %}

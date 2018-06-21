@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'bootstrap3',
     'django_extensions',
     'reversion',
+    'betterforms',
 ]
 
 #MEDIA_URL = '/media/'

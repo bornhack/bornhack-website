@@ -22,33 +22,18 @@ speakerDetailView speakerSlug model =
             model.speakers
                 |> List.filter (\speaker -> speaker.slug == speakerSlug)
                 |> List.head
-
-        image =
-            case speaker of
-                Just speaker ->
-                    case speaker.smallPictureUrl of
-                        Just smallPictureUrl ->
-                            [ img [ src smallPictureUrl ] [] ]
-
-                        Nothing ->
-                            []
-
-                Nothing ->
-                    []
     in
         case speaker of
             Just speaker ->
                 div []
-                    ([ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
+                    [ a [ onClick BackInHistory, classList [ ( "btn", True ), ( "btn-default", True ) ] ]
                         [ i [ classList [ ( "fa", True ), ( "fa-chevron-left", True ) ] ] []
                         , text " Back"
                         ]
-                     , h3 [] [ text speaker.name ]
-                     , div [] [ Markdown.toHtml [] speaker.biography ]
-                     , speakerEvents speaker model
-                     ]
-                        ++ image
-                    )
+                    , h3 [] [ text speaker.name ]
+                    , div [] [ Markdown.toHtml [] speaker.biography ]
+                    , speakerEvents speaker model
+                    ]
 
             Nothing ->
                 div [] [ text "Unknown speaker..." ]

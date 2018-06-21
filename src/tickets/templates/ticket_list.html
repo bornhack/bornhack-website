@@ -40,11 +40,11 @@
           Not yet
           {% endif %}
         <td>
-          <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-download" aria-hidden="true"></i> Download PDF</a>
+          <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
           {% if not ticket.name %}
-            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-edit" aria-hidden="true"></i> Set name</a>
+            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Set name</a>
           {% else %}
-            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fa fa-edit" aria-hidden="true"></i> Edit name</a>
+            <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Edit name</a>
           {% endif %}
       {% endfor %}
   </table>

@@ -5,7 +5,7 @@
 
 <div class="row">
   <noscript>
-    <a href="{% url "noscript_schedule_index" camp_slug=camp.slug %}" class="btn btn-primary">
+    <a href="{% url "program:noscript_schedule_index" camp_slug=camp.slug %}" class="btn btn-primary">
       Back to noscript schedule
     </a>
     <hr />
@@ -14,10 +14,10 @@
 
 <div class="row">
   <div class="panel panel-default">
-      <div class="panel-heading" ><span style="font-size: x-large"><span style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">{{ event.event_type.name }}</span> {{ event.title }}</span></div>
+      <div class="panel-heading" ><span style="font-size: x-large"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}</span></div>
     <div class="panel-body">
       <p>
-      {{ event.abstract|commonmark }}
+      {{ event.abstract|untrustedcommonmark }}
      </p>
 
       <hr>
@@ -37,7 +37,7 @@
         <h4>Speakers</h4>
         <div class="list-group">
         {% for speaker in event.speakers.all %}
-        <h4><a href="{% url 'speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">{{ speaker.name }}</a></h4>
+        <h4><a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">{{ speaker.name }}</a></h4>
         {% endfor %}
         </div>
       {% endif %}
