@@ -120,6 +120,22 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for workshops
             del(self.fields['needs_oneday_ticket'])
 
+        elif eventtype.name == 'Slacking Off':
+            # fix label and help_text for the name field
+            self.fields['name'].label = 'Host Name'
+            self.fields['name'].help_text = 'Can be a real name or an alias.'
+
+            # fix label and help_text for the biograpy field
+            self.fields['biography'].label = 'Host Biography'
+            self.fields['biography'].help_text = 'The biography of the host.'
+
+            # fix label and help_text for the submission_notes field
+            self.fields['submission_notes'].label = 'Host Notes'
+            self.fields['submission_notes'].help_text = 'Private notes regarding this host. Only visible to yourself and the BornHack organisers.'
+
+            # no free tickets for workshops
+            del(self.fields['needs_oneday_ticket'])
+
         else:
             raise ImproperlyConfigured("Unsupported event type, don't know which form class to use")
 
