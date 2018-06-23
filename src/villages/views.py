@@ -18,6 +18,7 @@ class VillageListView(CampViewMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
 
+
 class VillageDetailView(CampViewMixin, DetailView):
     model = Village
     template_name = 'village_detail.html'
@@ -68,7 +69,7 @@ class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequired
         village = form.save(commit=False)
         if not village.name:
             village.name = "noname"
-        return HttpResponseRedirect(village.get_absolute_url())
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
