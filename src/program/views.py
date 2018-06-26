@@ -720,11 +720,21 @@ class UrlCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, 
         Set the proposal FK before saving
         """
         if hasattr(self, 'eventproposal') and self.eventproposal:
+            # this URL belongs to an eventproposal
             form.instance.eventproposal = self.eventproposal
             url = form.save()
+            if self.eventproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.eventproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.eventproposal.save()
+                messages.success(self.request, "Event Proposal is now pending review by the Content Team.")
         else:
+            # this URL belongs to a speakerproposal
             form.instance.speakerproposal = self.speakerproposal
             url = form.save()
+            if self.speakerproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.speakerproposal.save()
+                messages.success(self.request, "Proposal is now pending review by the Content Team.")
 
         messages.success(self.request, "URL saved.")
 
@@ -737,6 +747,30 @@ class UrlUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, 
     template_name = 'url_form.html'
     fields = ['urltype', 'url']
     pk_url_kwarg = 'url_uuid'
+
+    def form_valid(self, form):
+        """
+        Set the proposal FK before saving
+        """
+        if hasattr(self, 'eventproposal') and self.eventproposal:
+            # this URL belongs to a speakerproposal
+            url = form.save()
+            if self.eventproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.eventproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.eventproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.eventproposal.title)
+        else:
+            # this URL belongs to a speakerproposal
+            url = form.save()
+            if self.speakerproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.speakerproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.speakerproposal.name)
+
+        messages.success(self.request, "URL saved.")
+
+        # all good
+        return redirect(self.get_success_url())
 
 
 class UrlDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, DeleteView):
