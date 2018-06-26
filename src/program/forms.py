@@ -261,6 +261,26 @@ class EventProposalForm(forms.ModelForm):
             self.fields['duration'].label = 'Workshop Duration'
             self.fields['duration'].help_text = 'How much time (in minutes) should we set aside for this workshop? Please keep it between 60 and 180 minutes (1-3 hours).'
 
+        elif eventtype.name == 'Slacking Off':
+            # fix label and help_text for the title field
+            self.fields['title'].label = 'Event Title'
+            self.fields['title'].help_text = 'The title of this recreational event.'
+
+            # fix label and help_text for the submission_notes field
+            self.fields['submission_notes'].label = 'Event Notes'
+            self.fields['submission_notes'].help_text = 'Private notes regarding this recreational event. Only visible to yourself and the BornHack organisers.'
+
+            # fix label and help_text for the abstract field
+            self.fields['abstract'].label = 'Event Abstract'
+            self.fields['abstract'].help_text = 'The description/abstract of this event. Explain what the participants will experience.'
+
+            # no video recording for recreational events
+            del(self.fields['allow_video_recording'])
+
+            # duration field
+            self.fields['duration'].label = 'Event Duration'
+            self.fields['duration'].help_text = 'How much time (in minutes) should we set aside for this event? Please keep it between 60 and 180 minutes (1-3 hours).'
+
         else:
             raise ImproperlyConfigured("Unsupported event type, don't know which form class to use")
 
