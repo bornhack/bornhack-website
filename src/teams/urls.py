@@ -1,6 +1,22 @@
 from django.urls import path, include
-from .views import *
 
+from teams.views.base import (
+    TeamListView,
+    TeamMemberRemoveView,
+    TeamMemberApproveView,
+    TeamDetailView,
+    TeamJoinView,
+    TeamLeaveView,
+    TeamManageView,
+    FixIrcAclView,
+)
+from teams.views.info import InfoItemUpdateView, InfoItemCreateView, InfoItemDeleteView
+
+from teams.views.tasks import (
+    TaskCreateView,
+    TaskDetailView,
+    TaskUpdateView,
+)
 
 app_name = 'teams'
 
@@ -75,6 +91,29 @@ urlpatterns = [
 
                 ]),
             ),
+            path(
+                'info/<slug:category_anchor>/', include([
+                    path(
+                        'create/',
+                        InfoItemCreateView.as_view(),
+                        name='info_item_create',
+                    ),
+                    path(
+                        '<slug:item_anchor>/', include([
+                            path(
+                                'update/',
+                                InfoItemUpdateView.as_view(),
+                                name='info_item_update',
+                            ),
+                            path(
+                                'delete/',
+                                InfoItemDeleteView.as_view(),
+                                name='info_item_delete',
+                            ),
+                        ]),
+                    ),
+                ])
+            )
         ]),
     ),
 ]

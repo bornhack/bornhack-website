@@ -2,18 +2,13 @@ from django.db import models
 from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 
+import reversion
+
 
 class InfoCategory(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
-        unique_together = (('anchor', 'camp'), ('headline', 'camp'))
         verbose_name_plural = "Info Categories"
-
-    camp = models.ForeignKey(
-        'camps.Camp',
-        related_name='infocategories',
-        on_delete=models.PROTECT
-    )
 
     headline = models.CharField(
         max_length=100,
@@ -29,15 +24,32 @@ class InfoCategory(CampRelatedModel):
         default=100,
     )
 
+    team = models.ForeignKey(
+        'teams.Team',
+        help_text='The team responsible for this info category.',
+        on_delete=models.PROTECT,
+        related_name='info_categories'
+    )
+
     def clean(self):
-        if InfoItem.objects.filter(category__camp=self.camp, anchor=self.anchor).exists():
+        if InfoItem.objects.filter(category__team__camp=self.camp, anchor=self.anchor).exists():
             # this anchor is already in use on an item, so it cannot be used (must be unique on the page)
-            raise ValidationError({'anchor': 'Anchor is already in use on an info item for this camp'})
+            raise ValidationError(
+                {'anchor': 'Anchor is already in use on an info item for this camp'}
+            )
+
+    @property
+    def camp(self):
+        return self.team.camp
+
+    camp_filter = 'team__camp'
 
     def __str__(self):
         return '%s (%s)' % (self.headline, self.camp)
 
 
+# We want to have info items under version control
+@reversion.register()
 class InfoItem(CampRelatedModel):
     class Meta:
         ordering = ['weight', 'headline']
@@ -71,10 +83,10 @@ class InfoItem(CampRelatedModel):
     def camp(self):
         return self.category.camp
 
-    camp_filter = 'category__camp'
+    camp_filter = 'category__team__camp'
 
     def clean(self):
-        if InfoCategory.objects.filter(camp=self.category.camp, anchor=self.anchor).exists():
+        if hasattr(self, 'category') and InfoCategory.objects.filter(team__camp=self.category.team.camp, anchor=self.anchor).exists():
             # this anchor is already in use on a category, so it cannot be used here (they must be unique on the entire page)
             raise ValidationError({'anchor': 'Anchor is already in use on an info category for this camp'})
 

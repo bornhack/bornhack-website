@@ -109,6 +109,9 @@ class Team(CampRelatedModel):
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
 
+    def get_absolute_url(self):
+        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
+
     def save(self, **kwargs):
         # generate slug if needed
         if not self.pk or not self.slug:

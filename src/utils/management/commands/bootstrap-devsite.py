@@ -1401,110 +1401,6 @@ programming for a danish startup.
                 )
             )
 
-
-            self.output("Creating infocategories for {}...".format(year))
-            info_cat1 = InfoCategory.objects.create(
-                camp=camp,
-                headline='When is BornHack happening?',
-                anchor='when'
-            )
-            info_cat2 = InfoCategory.objects.create(
-                camp=camp,
-                headline='Travel Information',
-                anchor='travel'
-            )
-            info_cat3 = InfoCategory.objects.create(
-                camp=camp,
-                headline='Where do I sleep?',
-                anchor='sleep'
-            )
-
-            self.output("Creating infoitems for {}...".format(year))
-            InfoItem.objects.create(
-                category=info_cat1,
-                headline='Opening',
-                anchor='opening',
-                body='BornHack 2016 starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)'
-            )
-            InfoItem.objects.create(
-                category=info_cat1,
-                headline='Closing',
-                anchor='closing',
-                body='BornHack 2016 ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).'
-            )
-            InfoItem.objects.create(
-                category=info_cat2,
-                headline='Public Transportation',
-                anchor='public-transportation',
-                body='''
-From/Via Copenhagen
-
-There are several ways to get to Bornholm from Copenhagen. A domestic plane departs from Copenhagen Airport, and you can get from Copenhagen Central station by either bus or train via Ystad or the Køge-Rønne ferry connection.
-
-Plane (very fast, most expensive)
-    You can check plane departures and book tickets at dat.dk. There are multiple departures daily. The flight takes approximately 25 minutes.
-Via Ystad (quick, cheap and easy, crosses Sweden border)
-    You can drive over Øresundsbroen to Ystad or you can take the train/bus from Copenhagen Central Station. You can buy train and ferry ticket at dsb.dk (Type in "København H" and "Rønne Havn"). More information about the crossing. The crossing takes 1 hour 20 minutes. In total about 3 hours 15 minutes. Due to recent developments an ID (passport, drivers license or similar) is required when crossing the Denmark/Sweden border.
-Via Køge (cheap, slow)
-    Take the S-train to Køge Station (you need an "all zones" ticket) or travel by car. The ferry terminal is within walking distance from the station. You can check out prices here. It takes approximately 1 hour to get to Køge. The crossing takes 5 hours 30 minutes.
-
-From Sweden/Malmö
-
-To get to Bornholm from Malmö you may take a train from Malmö to Ystad and the ferry from Ystad to Bornholm.
-
-Skånetrafiken runs trains from Malmö C to Ystad every 30 minutes. Trains leave at 08 and 38 minutes past the hour. Go to skanetrafiken for details.
-
-The ferry from Ystad to Rønne leaves four times per day. Morning: 08:30-09:50 Noon: 12:30-13:50 Afternoon: 16:30-17:50 Evening: 20:30-21:50 Booking the ferry tickets prior to departure can drastically reduce the price. See "Getting from Rønne to the Venue" final step.
-From Abroad
-
-If you are going to BornHack from abroad you have different options as well.
-
-Berlin (Germany)
-    There are no public transport routes from Berlin to Mukran, Sassnitz ferry terminal on Saturdays, including Aug 27 and Sept 03 the Bornhack start/end dates. Your best bet is to get a train to Dubnitz, Sassnitz station. Unfortunately it is still 1.7km to the actual ferry terminal: map of route. There is a bus, but it only goes once a weekday at 12:28 and not at all on Weekends. You can of course take a taxi. Search for routes Berlin ‐ Dubnitz on bahn.de. At the time of writing, the best route is:
-    08:45 Berlin Hbf → train with 2 changes, 50€ for a 2-way return ticket.
-    12:52 Sassnitz → taxi, ~14€, 10 min.
-    13:00 Mukran-Sassnitz ferry terminal
-    If you want to try your luck at a direct route to the ferry terminal, search for routes Berlin ‐ Sassnitz-Mukran Fährhafen on bahn.de or for routes Berlin ‐ Fährhafen Sassnitz on checkmybus.com.
-Sassnitz (Germany)
-    There is a direct ferry taking cars going from Sassnitz ferry terminal which is 4km away from Sassnitz itself. The company is called BornholmerFærgen and the tickets cost 32€ (outgoing) and 25€ (return). It can also be booked from aferry.co.uk. The ferry departs for Bornholm on Aug 27 at 11:50, 13:30, and returns to Sassnitz on Sept 03 at 08:00, 09:00. Detailed timetable: English, Danish.
-Kolobrzeg (Poland)
-    There is a passenger ferry from Kolobrzeg to Nexø havn.
-
-Getting from Rønne to the Venue
-
-The venue is 24km from Rønne. We will have a shuttle bus that will pick people up and take them to the venue. It is also possible to take a public bus to near the venue. Local taxis can also get you here. The company operating on Bornholm is called Dantaxi and the local phonenumber is +4556952301.
-            '''
-            )
-            InfoItem.objects.create(
-                category=info_cat1,
-                headline='Bus to and from BornHack',
-                anchor='bus-to-and-from-bornhack',
-                body='PROSA, the union of IT-professionals in Denmark, has set up a great deal for BornHack attendees travelling from Copenhagen to BornHack. For only 125kr, about 17 euros, you can be transported to the camp on opening day, and back to Copenhagen at the end of the camp!'
-
-            )
-            InfoItem.objects.create(
-                category=info_cat1,
-                headline='Driving and Parking',
-                anchor='driving-and-parking',
-                body='''
-A car is very convenient when bringing lots of equipment, and we know that hackers like to bring all the things. We welcome cars and vans at BornHack. We have ample parking space very close (less than 50 meters) to the main entrance.
-
-Please note that sleeping in the parking lot is not permitted. If you want to sleep in your car/RV/autocamper/caravan please contact us, and we will work something out.
-                '''
-            )
-            InfoItem.objects.create(
-                category=info_cat3,
-                headline='Camping',
-                anchor='camping',
-                body='BornHack is first and foremost a tent camp. You need to bring a tent to sleep in. Most people go with some friends and make a camp somewhere at the venue. See also the section on Villages - you might be able to find some likeminded people to camp with.'
-            )
-            InfoItem.objects.create(
-                category=info_cat3,
-                headline='Cabins',
-                anchor='cabins',
-                body='We rent out a few cabins at the venue with 8 beds each for people who don\'t want to sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), but the cabins are there if you want them.'
-            )
-
             self.output("Creating villages for {}...".format(year))
             Village.objects.create(
                 contact=user1,
@@ -1669,6 +1565,109 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
             TeamMember.objects.create(
                 team=orga_team,
                 user=user4,
+            )
+
+            self.output("Creating infocategories for {}...".format(year))
+            info_cat1 = InfoCategory.objects.create(
+                team=orga_team,
+                headline='When is BornHack happening?',
+                anchor='when'
+            )
+            info_cat2 = InfoCategory.objects.create(
+                team=orga_team,
+                headline='Travel Information',
+                anchor='travel'
+            )
+            info_cat3 = InfoCategory.objects.create(
+                team=orga_team,
+                headline='Where do I sleep?',
+                anchor='sleep'
+            )
+
+            self.output("Creating infoitems for {}...".format(year))
+            InfoItem.objects.create(
+                category=info_cat1,
+                headline='Opening',
+                anchor='opening',
+                body='BornHack 2016 starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)'
+            )
+            InfoItem.objects.create(
+                category=info_cat1,
+                headline='Closing',
+                anchor='closing',
+                body='BornHack 2016 ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).'
+            )
+            InfoItem.objects.create(
+                category=info_cat2,
+                headline='Public Transportation',
+                anchor='public-transportation',
+                body='''
+From/Via Copenhagen
+
+There are several ways to get to Bornholm from Copenhagen. A domestic plane departs from Copenhagen Airport, and you can get from Copenhagen Central station by either bus or train via Ystad or the Køge-Rønne ferry connection.
+
+Plane (very fast, most expensive)
+    You can check plane departures and book tickets at dat.dk. There are multiple departures daily. The flight takes approximately 25 minutes.
+Via Ystad (quick, cheap and easy, crosses Sweden border)
+    You can drive over Øresundsbroen to Ystad or you can take the train/bus from Copenhagen Central Station. You can buy train and ferry ticket at dsb.dk (Type in "København H" and "Rønne Havn"). More information about the crossing. The crossing takes 1 hour 20 minutes. In total about 3 hours 15 minutes. Due to recent developments an ID (passport, drivers license or similar) is required when crossing the Denmark/Sweden border.
+Via Køge (cheap, slow)
+    Take the S-train to Køge Station (you need an "all zones" ticket) or travel by car. The ferry terminal is within walking distance from the station. You can check out prices here. It takes approximately 1 hour to get to Køge. The crossing takes 5 hours 30 minutes.
+
+From Sweden/Malmö
+
+To get to Bornholm from Malmö you may take a train from Malmö to Ystad and the ferry from Ystad to Bornholm.
+
+Skånetrafiken runs trains from Malmö C to Ystad every 30 minutes. Trains leave at 08 and 38 minutes past the hour. Go to skanetrafiken for details.
+
+The ferry from Ystad to Rønne leaves four times per day. Morning: 08:30-09:50 Noon: 12:30-13:50 Afternoon: 16:30-17:50 Evening: 20:30-21:50 Booking the ferry tickets prior to departure can drastically reduce the price. See "Getting from Rønne to the Venue" final step.
+From Abroad
+
+If you are going to BornHack from abroad you have different options as well.
+
+Berlin (Germany)
+    There are no public transport routes from Berlin to Mukran, Sassnitz ferry terminal on Saturdays, including Aug 27 and Sept 03 the Bornhack start/end dates. Your best bet is to get a train to Dubnitz, Sassnitz station. Unfortunately it is still 1.7km to the actual ferry terminal: map of route. There is a bus, but it only goes once a weekday at 12:28 and not at all on Weekends. You can of course take a taxi. Search for routes Berlin ‐ Dubnitz on bahn.de. At the time of writing, the best route is:
+    08:45 Berlin Hbf → train with 2 changes, 50€ for a 2-way return ticket.
+    12:52 Sassnitz → taxi, ~14€, 10 min.
+    13:00 Mukran-Sassnitz ferry terminal
+    If you want to try your luck at a direct route to the ferry terminal, search for routes Berlin ‐ Sassnitz-Mukran Fährhafen on bahn.de or for routes Berlin ‐ Fährhafen Sassnitz on checkmybus.com.
+Sassnitz (Germany)
+    There is a direct ferry taking cars going from Sassnitz ferry terminal which is 4km away from Sassnitz itself. The company is called BornholmerFærgen and the tickets cost 32€ (outgoing) and 25€ (return). It can also be booked from aferry.co.uk. The ferry departs for Bornholm on Aug 27 at 11:50, 13:30, and returns to Sassnitz on Sept 03 at 08:00, 09:00. Detailed timetable: English, Danish.
+Kolobrzeg (Poland)
+    There is a passenger ferry from Kolobrzeg to Nexø havn.
+
+Getting from Rønne to the Venue
+
+The venue is 24km from Rønne. We will have a shuttle bus that will pick people up and take them to the venue. It is also possible to take a public bus to near the venue. Local taxis can also get you here. The company operating on Bornholm is called Dantaxi and the local phonenumber is +4556952301.
+            '''
+            )
+            InfoItem.objects.create(
+                category=info_cat1,
+                headline='Bus to and from BornHack',
+                anchor='bus-to-and-from-bornhack',
+                body='PROSA, the union of IT-professionals in Denmark, has set up a great deal for BornHack attendees travelling from Copenhagen to BornHack. For only 125kr, about 17 euros, you can be transported to the camp on opening day, and back to Copenhagen at the end of the camp!'
+
+            )
+            InfoItem.objects.create(
+                category=info_cat1,
+                headline='Driving and Parking',
+                anchor='driving-and-parking',
+                body='''
+A car is very convenient when bringing lots of equipment, and we know that hackers like to bring all the things. We welcome cars and vans at BornHack. We have ample parking space very close (less than 50 meters) to the main entrance.
+
+Please note that sleeping in the parking lot is not permitted. If you want to sleep in your car/RV/autocamper/caravan please contact us, and we will work something out.
+                '''
+            )
+            InfoItem.objects.create(
+                category=info_cat3,
+                headline='Camping',
+                anchor='camping',
+                body='BornHack is first and foremost a tent camp. You need to bring a tent to sleep in. Most people go with some friends and make a camp somewhere at the venue. See also the section on Villages - you might be able to find some likeminded people to camp with.'
+            )
+            InfoItem.objects.create(
+                category=info_cat3,
+                headline='Cabins',
+                anchor='cabins',
+                body='We rent out a few cabins at the venue with 8 beds each for people who don\'t want to sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), but the cabins are there if you want them.'
             )
 
         self.output("Adding event routing...")
