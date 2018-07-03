@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.postgres.forms.ranges import RangeWidget
 from django.utils import timezone
 from django.urls import reverse
+
 from psycopg2.extras import DateTimeTZRange
 
 from camps.mixins import CampViewMixin
@@ -61,8 +62,26 @@ class ShiftForm(forms.ModelForm):
             'people_required'
         ]
 
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(instance=instance, **kwargs)
+        if instance:
+            current_tz = timezone.get_current_timezone()
+
+            lower = instance.shift_range.lower.astimezone(current_tz)
+            upper = instance.shift_range.upper.astimezone(current_tz)
+
+            from_date = lower.strftime('%Y-%m-%d')
+            from_time = lower.strftime('%H:%M')
+            to_date = upper.strftime('%Y-%m-%d')
+            to_time = upper.strftime('%H:%M')
+
+            self.fields['from_date'].initial = from_date
+            self.fields['from_time'].initial = from_time
+            self.fields['to_date'].initial = to_date
+            self.fields['to_time'].initial = to_time
+
     from_date = forms.DateField(
-        help_text="Format is YYYY-MM-DD - ie. 2018-08-15"
+        help_text="Format is YYYY-MM-DD"
     )
 
     from_time = forms.ChoiceField(
@@ -70,7 +89,7 @@ class ShiftForm(forms.ModelForm):
     )
 
     to_date = forms.DateField(
-        help_text="Format is YYYY-MM-DD - ie. 2018-08-15"
+        help_text="Format is YYYY-MM-DD"
     )
 
     to_time = forms.ChoiceField(
@@ -87,10 +106,18 @@ class ShiftForm(forms.ModelForm):
             self.cleaned_data['to_time']
         )
         datetime_format = '%Y-%m-%d %H:%M'
-        self.instance.shift_range = DateTimeTZRange(
-            timezone.datetime.strptime(from_string, datetime_format),
-            timezone.datetime.strptime(to_string, datetime_format)
+        current_timezone = timezone.get_current_timezone()
+        lower = (
+            timezone.datetime
+            .strptime(from_string, datetime_format)
+            .astimezone(current_timezone)
         )
+        upper = (
+            timezone.datetime
+            .strptime(to_string, datetime_format)
+            .astimezone(current_timezone)
+        )
+        self.instance.shift_range = DateTimeTZRange(lower, upper)
         return super().save(commit=commit)
 
 
@@ -113,8 +140,28 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
             kwargs=self.kwargs
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = Team.objects.get(
+            camp=self.camp,
+            slug=self.kwargs['team_slug']
+        )
+        return context
+
 
 class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
     model = TeamShift
     template_name = "shifts/shift_form.html"
+    form_class = ShiftForm
 
+    def get_success_url(self):
+        self.kwargs.pop('pk')
+        return reverse(
+            'teams:shift_list',
+            kwargs=self.kwargs
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = self.object.team
+        return context

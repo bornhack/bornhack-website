@@ -309,6 +309,10 @@ class TeamTask(CampRelatedModel):
 
 
 class TeamShift(CampRelatedModel):
+
+    class Meta:
+        ordering = ("shift_range",)
+
     team = models.ForeignKey(
         'teams.Team',
         related_name='shifts',

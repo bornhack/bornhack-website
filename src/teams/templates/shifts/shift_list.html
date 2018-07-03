@@ -37,6 +37,8 @@
                 People required
             <th>
                 People
+            <th>
+                Actions
         {% endifchanged %}
 
         <tr>
@@ -47,7 +49,17 @@
             <td>
                 {{ shift.people_required }}
             <td>
-                {{ shift.team_members}}
+                {{ shift.team_members }}
+            <td>
+                {% if request.user in team.responsible_members.all %}
+                <a class="btn btn-info"
+                   href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a class="btn btn-danger" href="">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                {% endif %}
         {% endfor %}
 </table>
 {% endblock %}

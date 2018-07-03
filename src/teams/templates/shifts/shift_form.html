@@ -5,6 +5,13 @@
 
 {% block content %}
 
+<a class="btn btn-info"
+   href="{% url 'teams:shift_list' camp_slug=camp.slug team_slug=team.slug %}">
+    <i class="fas fa-chevron-left"></i> Cancel
+</a>
+
+<hr />
+
 {% if form.errors %}
 {{ form.errors }}
 {% endif %}
@@ -13,7 +20,7 @@
   {% csrf_token %}
   {% bootstrap_form form %}
   <button type="submit" class="btn btn-success">
-    Create
+      {% if object.pk %}Update{% else %}Create{% endif %}
   </button>
 </form>
 
