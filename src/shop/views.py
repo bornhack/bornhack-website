@@ -562,8 +562,9 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
             process_coinify_invoice_json(
-                callbackobject.payload['data'],
-                self.get_object()
+                invoicejson=callbackobject.payload['data'],
+                order=self.get_object(),
+                request=request,
             )
             return HttpResponse('OK')
         else:

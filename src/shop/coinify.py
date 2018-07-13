@@ -8,7 +8,7 @@ import requests
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def process_coinify_invoice_json(invoicejson, order):
+def process_coinify_invoice_json(invoicejson, order, request):
     # create or update the invoice object in our database
     coinifyinvoice, created = CoinifyAPIInvoice.objects.update_or_create(
         coinify_id=invoicejson['id'],
@@ -20,7 +20,7 @@ def process_coinify_invoice_json(invoicejson, order):
 
     # if the order is paid in full call the mark as paid method now
     if invoicejson['state'] == 'complete' and not coinifyinvoice.order.paid:
-        coinifyinvoice.order.mark_as_paid()
+        coinifyinvoice.order.mark_as_paid(request=request)
 
     return coinifyinvoice
 
