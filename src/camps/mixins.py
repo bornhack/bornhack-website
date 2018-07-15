@@ -17,8 +17,16 @@ class CampViewMixin(object):
     def get_queryset(self):
         queryset = super(CampViewMixin, self).get_queryset()
         if queryset:
-            camp_filter = {self.model.get_camp_filter(): self.camp}
-            return queryset.filter(**camp_filter)
+            camp_filter = self.model.get_camp_filter()
+
+            # Let us deal with eveything as a list
+            if isinstance(camp_filter, str):
+                camp_filter = [camp_filter]
+
+            for _filter in camp_filter:
+                result = queryset.filter(**{_filter: self.camp})
+                if result.exists():
+                    return result
 
         # Camp relation not found, or queryset is empty, return it unaltered
         return queryset
