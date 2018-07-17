@@ -146,7 +146,12 @@ class Url(CampRelatedModel):
     def camp(self):
         return self.owner.camp
 
-    camp_filter = 'owner__camp'
+    camp_filter = [
+        'speakerproposal__camp',
+        'eventproposal__track__camp',
+        'speaker__camp',
+        'event__track__camp',
+    ]
 
 
 ###############################################################################

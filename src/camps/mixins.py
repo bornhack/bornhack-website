@@ -24,7 +24,11 @@ class CampViewMixin(object):
                 camp_filter = [camp_filter]
 
             for _filter in camp_filter:
-                result = queryset.filter(**{_filter: self.camp})
+                filter_dict = {_filter: self.camp}
+                if hasattr(self, 'pk_url_kwarg'):
+                    # We should also filter for the pk of the object
+                    filter_dict['pk'] = str(self.kwargs.get(self.pk_url_kwarg))
+                result = queryset.filter(**filter_dict)
                 if result.exists():
                     return result
 
