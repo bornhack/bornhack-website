@@ -15,7 +15,7 @@ class CampViewMixin(object):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = super(CampViewMixin, self).get_queryset()
+        queryset = super().get_queryset()
         if queryset:
             camp_filter = self.model.get_camp_filter()
 
@@ -24,13 +24,26 @@ class CampViewMixin(object):
                 camp_filter = [camp_filter]
 
             for _filter in camp_filter:
+                # add camp to the filter_dict
                 filter_dict = {_filter: self.camp}
-                if hasattr(self, 'pk_url_kwarg'):
+
+                # get pk from kwargs if we have it
+                pk = self.kwargs.get(self.pk_url_kwarg)
+                if pk is not None:
                     # We should also filter for the pk of the object
-                    filter_dict['pk'] = str(self.kwargs.get(self.pk_url_kwarg))
+                    filter_dict['pk'] = pk
+
+                # get slug from kwargs if we have it
+                slug = self.kwargs.get(self.slug_url_kwarg)
+                if slug is not None and (pk is None or self.query_pk_and_slug):
+                    # we should also filter for the slug of the object
+                    filter_dict[self.get_slug_field()] = slug
+
+                # do the filtering and return the result
                 result = queryset.filter(**filter_dict)
                 if result.exists():
                     return result
 
         # Camp relation not found, or queryset is empty, return it unaltered
         return queryset
+
