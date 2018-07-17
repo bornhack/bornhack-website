@@ -15,7 +15,11 @@
 {% if request.user in team.responsible_members.all %}
 <a class="btn btn-success"
    href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
-    Create shift
+    Create a single shift
+</a>
+<a class="btn btn-success"
+   href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
+    Create multiple shifts
 </a>
 {% endif %}
 

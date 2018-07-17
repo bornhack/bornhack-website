@@ -21,6 +21,7 @@ from teams.views.tasks import (
 from teams.views.shifts import (
     ShiftListView,
     ShiftCreateView,
+    ShiftCreateMultipleView,
     ShiftUpdateView,
 )
 
@@ -130,6 +131,11 @@ urlpatterns = [
                     'create/',
                     ShiftCreateView.as_view(),
                     name="shift_create"
+                ),
+                path(
+                    'create_multiple/',
+                    ShiftCreateMultipleView.as_view(),
+                    name="shift_create_multiple"
                 ),
                 path(
                     '<int:pk>/',
