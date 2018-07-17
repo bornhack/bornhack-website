@@ -672,6 +672,15 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 class ScheduleView(CampViewMixin, TemplateView):
     template_name = 'schedule_overview.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        """
+        If no events are scheduled redirect to the event page
+        """
+        response = super().dispatch(request, *args, **kwargs)
+        if not models.EventInstance.objects.filter(event__track__camp=self.camp).exists():
+            return(redirect(reverse('program:event_index', kwargs={'camp_slug': self.camp.slug})))
+        return response
+
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
         context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS
