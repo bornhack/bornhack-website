@@ -6,14 +6,14 @@
 <h3>{{ speaker.name }}</h3>
 
 <div class="row">
-  <div class="col-md-12 text-container">
+  <div class="col-md-12">
 {{ speaker.biography|untrustedcommonmark }}
   </div>
 </div>
 
 <hr />
 
-<h3>URLs for {{ speaker.name }}</h3>
+<h4>URLs for {{ speaker.name }}</h4>
 {% if speaker.urls.exists %}
     {% for url in speaker.urls.all %}
         <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
@@ -34,7 +34,7 @@
         </h3>
         {{ event.abstract|untrustedcommonmark }}
 
-        <h4>Instances</h4>
+        <h4>Scheduled Instances of "{{ event.title }}"</h4>
             <ul class="list-group">
                 {% for ei in event.instances.all %}
                     <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
@@ -42,7 +42,6 @@
                     No instances scheduled yet
                 {% endfor %}
             </ul>
-        </h4>
         <hr>
     {% empty %}
       No events registered for this speaker yet

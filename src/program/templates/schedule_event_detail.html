@@ -22,7 +22,7 @@
 
       <hr>
 
-      <h3>URLs for {{ event.title }}</h3>
+      <h4>URLs for {{ event.title }}</h4>
       {% if event.urls.exists %}
         {% for url in event.urls.all %}
             <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
