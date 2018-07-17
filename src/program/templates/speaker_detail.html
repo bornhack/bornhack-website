@@ -13,6 +13,17 @@
 
 <hr />
 
+<h3>URLs for {{ speaker.name }}</h3>
+{% if speaker.urls.exists %}
+    {% for url in speaker.urls.all %}
+        <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+    {% endfor %}
+{% else %}
+    <p><i>No URLs found.</i></p>
+{% endif %}
+
+<hr />
+
 {% if speaker.events.exists %}
     {% for event in speaker.events.all %}
         <h3>
