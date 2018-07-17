@@ -16,36 +16,43 @@ class CampViewMixin(object):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if queryset:
-            camp_filter = self.model.get_camp_filter()
 
-            # Let us deal with eveything as a list
-            if isinstance(camp_filter, str):
-                camp_filter = [camp_filter]
+        # if this queryset is empty return it right away, because nothing for us to do
+        if not queryset:
+            return queryset
 
-            for _filter in camp_filter:
-                # add camp to the filter_dict
-                filter_dict = {_filter: self.camp}
+        # get the camp_filter from the model
+        camp_filter = self.model.get_camp_filter()
 
-                # get pk from kwargs if we have it
-                if hasattr(self, 'pk_url_kwarg'):
-                    pk = self.kwargs.get(self.pk_url_kwarg)
-                    if pk is not None:
-                        # We should also filter for the pk of the object
-                        filter_dict['pk'] = pk
+        # Let us deal with eveything as a list
+        if isinstance(camp_filter, str):
+            camp_filter = [camp_filter]
 
-                # get slug from kwargs if we have it
-                if hasattr(self, 'slug_url_kwarg'):
-                    slug = self.kwargs.get(self.slug_url_kwarg)
-                    if slug is not None and (pk is None or self.query_pk_and_slug):
-                        # we should also filter for the slug of the object
-                        filter_dict[self.get_slug_field()] = slug
+        for _filter in camp_filter:
+            # add camp to the filter_dict
+            filter_dict = {_filter: self.camp}
 
-                # do the filtering and return the result
-                result = queryset.filter(**filter_dict)
-                if result.exists():
-                    return result
+            # get pk from kwargs if we have it
+            if hasattr(self, 'pk_url_kwarg'):
+                pk = self.kwargs.get(self.pk_url_kwarg)
+                if pk is not None:
+                    # We should also filter for the pk of the object
+                    filter_dict['pk'] = pk
 
-        # Camp relation not found, or queryset is empty, return it unaltered
-        return queryset
+            # get slug from kwargs if we have it
+            if hasattr(self, 'slug_url_kwarg'):
+                slug = self.kwargs.get(self.slug_url_kwarg)
+                if slug is not None and (pk is None or self.query_pk_and_slug):
+                    # we should also filter for the slug of the object
+                    filter_dict[self.get_slug_field()] = slug
+
+            # do the filtering and return the result
+            print("filter_dict is %s" % filter_dict)
+            result = queryset.filter(**filter_dict)
+            if result.exists():
+                # we got some results with this camp_filter, return now
+                return result
+
+        # no camp_filter returned any results, return an empty queryset
+        return result
 

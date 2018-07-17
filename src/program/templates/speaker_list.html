@@ -17,5 +17,7 @@
       {{ speaker.name }} {% for event in speaker.events.all %}<i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};" data-toggle="tooltip" title="{{ event.title }}"></i> {% endfor %}</a>
   {% endfor %}
 </div>
+{% else %}
+<p class="lead">No speakers found for {{ camp.title }}</p>
 {% endif %}
 {% endblock program_content %}
