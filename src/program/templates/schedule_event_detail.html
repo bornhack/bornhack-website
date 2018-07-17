@@ -22,6 +22,17 @@
 
       <hr>
 
+      <h3>URLs for {{ event.title }}</h3>
+      {% if speaker.urls.exists %}
+        {% for url in speaker.urls.all %}
+            <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+        {% endfor %}
+      {% else %}
+        <p><i>No URLs found.</i></p>
+      {% endif %}
+
+      <hr />
+
       <h4>Instances</h4>
       <ul class="list-group">
       {% for ei in event.instances.all %}

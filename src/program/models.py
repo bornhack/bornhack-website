@@ -37,7 +37,7 @@ class UrlType(CreatedUpdatedModel):
     icon = models.CharField(
         max_length=100,
         default='fas fa-link',
-        help_text="Name of the fontawesome icon to use without the 'fa-' part"
+        help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part."
     )
 
     class Meta:
@@ -375,7 +375,11 @@ class EventProposal(UserSubmittedModel):
     def mark_as_approved(self, request):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
-        event = eventmodel()
+        # use existing event if we have one
+        if self.event:
+            event = self.event
+        else:
+            event = eventmodel()
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
@@ -394,7 +398,8 @@ class EventProposal(UserSubmittedModel):
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
-        # copy all the URLs too
+        # clear any old urls from the event object and copy all the URLs from the proposal
+        event.urls.clear()
         for url in self.urls.all():
             Url.objects.create(
                 url=url.url,
@@ -402,7 +407,7 @@ class EventProposal(UserSubmittedModel):
                 event=event
             )
 
-        messages.success(request, "Event object %s has been created" % event)
+        messages.success(request, "Event object %s has been created/updated" % event)
 
     def mark_as_rejected(self, request):
         eventproposalmodel = apps.get_model('program', 'eventproposal')
