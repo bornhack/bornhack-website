@@ -183,7 +183,7 @@ urlpatterns = [
     ),
     # this must be the last URL here or the regex will overrule the others
     path(
-        '<slug:slug>',
+        '<slug:slug>/',
         EventDetailView.as_view(),
         name='event_detail'
     ),
