@@ -23,6 +23,8 @@ from teams.views.shifts import (
     ShiftCreateView,
     ShiftCreateMultipleView,
     ShiftUpdateView,
+    ShiftDeleteView,
+    MemberTakesShift,
 )
 
 app_name = 'teams'
@@ -137,11 +139,23 @@ urlpatterns = [
                     ShiftCreateMultipleView.as_view(),
                     name="shift_create_multiple"
                 ),
-                path(
-                    '<int:pk>/',
-                    ShiftUpdateView.as_view(),
-                    name="shift_update"
-                )
+                path('<int:pk>/', include([
+                    path(
+                        '',
+                        ShiftUpdateView.as_view(),
+                        name="shift_update"
+                    ),
+                    path(
+                        'delete',
+                        ShiftDeleteView.as_view(),
+                        name="shift_delete"
+                    ),
+                    path(
+                        'take',
+                        MemberTakesShift.as_view(),
+                        name="shift_member_take"
+                    ),
+                ])),
             ]))
         ]),
     ),

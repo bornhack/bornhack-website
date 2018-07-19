@@ -1,5 +1,13 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, UpdateView, ListView, FormView
+from django.http import HttpResponseRedirect
+from django.views.generic import (
+    View,
+    CreateView,
+    UpdateView,
+    ListView,
+    FormView,
+    DeleteView,
+)
 from django import forms
 from django.contrib.postgres.forms.ranges import RangeWidget
 from django.utils import timezone
@@ -11,6 +19,7 @@ from camps.mixins import CampViewMixin
 
 from ..models import (
     Team,
+    TeamMember,
     TeamShift,
 )
 
@@ -33,99 +42,102 @@ class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
 
-def time_choices():
+def date_choices(camp):
+
     index = 0
     minute_choices = []
-    SHIFT_MINIMUM_LENGTH = 15  # TODO: Maybe this should be configurable per team?
+    # To begin with we assume a shift can not be shorter than an hour
+    SHIFT_MINIMUM_LENGTH = 60
     while index * SHIFT_MINIMUM_LENGTH < 60:
         minutes = int(index * SHIFT_MINIMUM_LENGTH)
         minute_choices.append(minutes)
         index += 1
 
-    time_choices = []
-    for hour in range(0, 24):
-        for minute in minute_choices:
-            choice_label = "{hour:02d}:{minutes:02d}".format(hour=hour, minutes=minute)
-            time_choices.append((choice_label, choice_label))
+    def get_time_choices(date):
+        time_choices = []
+        for hour in range(0, 24):
+            for minute in minute_choices:
+                time_label = "{hour:02d}:{minutes:02d}".format(
+                    hour=hour,
+                    minutes=minute
+                )
+                choice_value = "{} {}".format(date, time_label)
+                time_choices.append((choice_value, choice_value))
+        return time_choices
 
-    return time_choices
+    choices = []
+
+    current_date = camp.camp.lower.date()
+    while current_date != camp.camp.upper.date():
+        choices.append(
+            (
+                current_date,
+                get_time_choices(current_date.strftime("%Y-%m-%d"))
+            )
+        )
+        current_date += timezone.timedelta(days=1)
+    return choices
 
 
 class ShiftForm(forms.ModelForm):
     class Meta:
         model = TeamShift
         fields = [
-            'from_date',
-            'from_time',
-            'to_date',
-            'to_time',
+            'from_datetime',
+            'to_datetime',
             'people_required'
         ]
 
     def __init__(self, instance=None, **kwargs):
+        camp = kwargs.pop('camp')
         super().__init__(instance=instance, **kwargs)
+        self.fields['from_datetime'].widget = forms.Select(choices=date_choices(camp))
+        self.fields['to_datetime'].widget = forms.Select(choices=date_choices(camp))
         if instance:
             current_tz = timezone.get_current_timezone()
+            lower = instance.shift_range.lower.astimezone(current_tz).strftime("%Y-%m-%d %H:%M")
+            upper = instance.shift_range.upper.astimezone(current_tz).strftime("%Y-%m-%d %H:%M")
+            self.fields['from_datetime'].initial = lower
+            self.fields['to_datetime'].initial = upper
 
-            lower = instance.shift_range.lower.astimezone(current_tz)
-            upper = instance.shift_range.upper.astimezone(current_tz)
+    from_datetime = forms.DateTimeField()
+    to_datetime = forms.DateTimeField()
 
-            from_date = lower.strftime('%Y-%m-%d')
-            from_time = lower.strftime('%H:%M')
-            to_date = upper.strftime('%Y-%m-%d')
-            to_time = upper.strftime('%H:%M')
+    def _get_from_datetime(self):
+        current_timezone = timezone.get_current_timezone()
+        return (
+            self.cleaned_data['from_datetime']
+            .astimezone(current_timezone)
+        )
 
-            self.fields['from_date'].initial = from_date
-            self.fields['from_time'].initial = from_time
-            self.fields['to_date'].initial = to_date
-            self.fields['to_time'].initial = to_time
+    def _get_to_datetime(self):
+        current_timezone = timezone.get_current_timezone()
+        return (
+            self.cleaned_data['to_datetime']
+            .astimezone(current_timezone)
+        )
 
-    from_date = forms.DateField(
-        help_text="Format is YYYY-MM-DD"
-    )
-
-    from_time = forms.ChoiceField(
-        choices=time_choices
-    )
-
-    to_date = forms.DateField(
-        help_text="Format is YYYY-MM-DD"
-    )
-
-    to_time = forms.ChoiceField(
-        choices=time_choices
-    )
+    def clean(self):
+        self.lower = self._get_from_datetime()
+        self.upper = self._get_to_datetime()
+        if self.lower > self.upper:
+            raise forms.ValidationError('Start can not be after end.')
 
     def save(self, commit=True):
-        from_string = "{} {}".format(
-            self.cleaned_data['from_date'],
-            self.cleaned_data['from_time']
-        )
-        to_string = "{} {}".format(
-            self.cleaned_data['to_date'],
-            self.cleaned_data['to_time']
-        )
-        datetime_format = '%Y-%m-%d %H:%M'
-        current_timezone = timezone.get_current_timezone()
-        lower = (
-            timezone.datetime
-            .strptime(from_string, datetime_format)
-            .astimezone(current_timezone)
-        )
-        upper = (
-            timezone.datetime
-            .strptime(to_string, datetime_format)
-            .astimezone(current_timezone)
-        )
-        self.instance.shift_range = DateTimeTZRange(lower, upper)
+        # self has .lower and .upper from .clean()
+        self.instance.shift_range = DateTimeTZRange(self.lower, self.upper)
         return super().save(commit=commit)
-
 
 
 class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     model = TeamShift
     template_name = "shifts/shift_form.html"
     form_class = ShiftForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['camp'] = self.camp
+        return kwargs
 
     def form_valid(self, form):
         shift = form.save(commit=False)
@@ -155,6 +167,11 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "shifts/shift_form.html"
     form_class = ShiftForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['camp'] = self.camp
+        return kwargs
+
     def get_success_url(self):
         self.kwargs.pop('pk')
         return reverse(
@@ -168,26 +185,41 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
         return context
 
 
+class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
+    model = TeamShift
+    template_name = "shifts/shift_confirm_delete.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = Team.objects.get(
+            camp=self.camp,
+            slug=self.kwargs['team_slug']
+        )
+        return context
+
+    def get_success_url(self):
+        self.kwargs.pop('pk')
+        return reverse(
+            'teams:shift_list',
+            kwargs=self.kwargs
+        )
+
+
 class MultipleShiftForm(forms.Form):
 
-    date = forms.DateField(
-        help_text="Format is YYYY-MM-DD"
-    )
+    def __init__(self, instance=None, **kwargs):
+        camp = kwargs.pop('camp')
+        super().__init__(**kwargs)
+        self.fields['from_datetime'].widget = forms.Select(choices=date_choices(camp))
+
+    from_datetime = forms.DateTimeField()
 
     number_of_shifts = forms.IntegerField(
-        help_text="How many shifts in a day?"
+        help_text="How many shifts?"
     )
 
-    start_time = forms.TimeField(
-        help_text="When the first shift should start? Defaults to 00:00.",
-        required=False,
-        initial="00:00"
-    )
-
-    end_time = forms.TimeField(
-        help_text="When the last shift should end? Defaults to 00:00 (next day).",
-        required=False,
-        initial="00:00"
+    shift_length = forms.IntegerField(
+        help_text="How long should a shift be in minutes?"
     )
 
     people_required = forms.IntegerField()
@@ -197,50 +229,38 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
     template_name = "shifts/shift_form.html"
     form_class = MultipleShiftForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['camp'] = self.camp
+        return kwargs
+
     def form_valid(self, form):
         team = Team.objects.get(
             camp=self.camp,
             slug=self.kwargs['team_slug']
         )
-        date = form.cleaned_data['date']
-        number_of_shifts = form.cleaned_data['number_of_shifts']
-        start_time = form.cleaned_data['start_time']
-        end_time = form.cleaned_data['end_time']
-        people_required = form.cleaned_data['people_required']
-
         current_timezone = timezone.get_current_timezone()
 
-        # create start datetime
         start_datetime = (
-            timezone.datetime.combine(date, start_time)
+            form.cleaned_data['from_datetime']
             .astimezone(current_timezone)
         )
-        # create end datetime
-        if end_time == "00:00":
-            # if end time is midnight, we want midnight for next day
-            date = date + timezone.timedelta(days=1)
-
-        end_datetime = (
-            timezone.datetime.combine(date, end_time)
-            .astimezone(current_timezone)
-        )
-        # figure out minutes between start and end datetime
-        total_minutes = (end_datetime - start_datetime).total_seconds() / 60
-        # divide by number of shifts -> duration for each shift
-        shift_duration = total_minutes / number_of_shifts
+        number_of_shifts = form.cleaned_data['number_of_shifts']
+        shift_length = form.cleaned_data['shift_length']
+        people_required = form.cleaned_data['people_required']
 
         shifts = []
         for index in range(number_of_shifts + 1):
             shift_range = DateTimeTZRange(
                 start_datetime,
-                start_datetime + timezone.timedelta(minutes=shift_duration),
+                start_datetime + timezone.timedelta(minutes=shift_length),
             )
             shifts.append(TeamShift(
                 team=team,
                 people_required=people_required,
                 shift_range=shift_range
             ))
-            start_datetime += timezone.timedelta(minutes=shift_duration)
+            start_datetime += timezone.timedelta(minutes=shift_length)
 
         TeamShift.objects.bulk_create(shifts)
 
@@ -259,3 +279,28 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
             slug=self.kwargs['team_slug']
         )
         return context
+
+
+class MemberTakesShift(CampViewMixin, View):
+
+    http_methods = ['get']
+
+    def get(self, request, **kwargs):
+        shift = TeamShift.objects.get(id=kwargs['pk'])
+        team = Team.objects.get(
+            camp=self.camp,
+            slug=kwargs['team_slug']
+        )
+
+        team_member = TeamMember.objects.get(team=team, user=request.user)
+
+        shift.team_members.add(team_member)
+
+        kwargs.pop('pk')
+
+        return HttpResponseRedirect(
+            reverse(
+                'teams:shift_list',
+                kwargs=kwargs
+            )
+        )

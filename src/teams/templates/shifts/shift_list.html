@@ -53,15 +53,27 @@
             <td>
                 {{ shift.people_required }}
             <td>
-                {{ shift.team_members }}
+                {% for member in shift.team_members.all %}
+                {{ member.user }}{% if not forloop.last %},{% endif %}
+                {% empty %}
+                    None!
+                {% endfor %}
+
             <td>
                 {% if request.user in team.responsible_members.all %}
                 <a class="btn btn-info"
                    href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                     <i class="fas fa-edit"></i> Edit
                 </a>
-                <a class="btn btn-danger" href="">
+                <a class="btn btn-danger"
+                   href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                     <i class="fas fa-trash"></i> Delete
+                </a>
+                {% endif %}
+                {% if shift.people_required > shift.team_members.count %}
+                <a class="btn btn-success"
+                   href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                    <i class="fas fa-thumbs-up"></i> Take it!
                 </a>
                 {% endif %}
         {% endfor %}
