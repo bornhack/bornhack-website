@@ -47,7 +47,6 @@ class CampViewMixin(object):
                     filter_dict[self.get_slug_field()] = slug
 
             # do the filtering and return the result
-            print("filter_dict is %s" % filter_dict)
             result = queryset.filter(**filter_dict)
             if result.exists():
                 # we got some results with this camp_filter, return now
