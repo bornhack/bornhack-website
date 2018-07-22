@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load bootstrap3 %}
+{% load teams_tags %}
+
+{% block title %}
+Team: {{ team.name }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h1>{{ team.name }} Team</h1>
+</div>
+
+<div class="row">
+<div class="col-md-2">
+    <ul class="nav nav-pills nav-stacked">
+      <li {% if view.template_name == "team_general.html" %}class="active"{% endif %}>
+            <a href="{% url "teams:general" camp_slug=team.camp.slug team_slug=team.slug %}">
+                General
+            </a>
+        </li>
+
+        <li {% if view.template_name == "team_tasks.html" %}class="active"{% endif %}>
+            <a href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Tasks
+            </a>
+        </li>
+
+        <li {% if view.template_name == "team_members.html" %}class="active"{% endif %}>
+            <a href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Members
+                {% if request.user in team.responsible_members.all and team.unapproved_members %}
+                <span class="label label-danger">Pending</span>
+                {% endif %}
+            </a>
+        </li>
+
+    </ul>
+
+    <hr />
+
+    {% if request.user.is_authenticated %}
+
+    {% if request.user in team.members.all %}
+    <p>Your membership status: <b>{% membershipstatus user team %}</b></p>
+
+    {% if request.user in team.responsible_members.all %}
+      <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage Team</a>
+    {% endif %}
+
+    {% else %}
+    {% if team.needs_members %}
+        <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success"><i class="fas fa-plus"></i> Join Team</a>
+    {% endif %}
+    {% endif %}
+
+    {% endif %}
+</div>
+
+<div class="col-md-10">
+
+  {% block team_content %}{% endblock %}
+
+</div>
+</div>
+
+{% endblock %}

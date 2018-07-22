@@ -48,7 +48,7 @@ a, a:active, a:focus {
   margin-top: 6px;
 }
 
-.nav li a {
+#top-navbar > .nav li a {
    padding: 30px 7px;
 }
 

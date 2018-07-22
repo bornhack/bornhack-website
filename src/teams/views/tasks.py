@@ -3,14 +3,26 @@ from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, CreateView, UpdateView
 
 from camps.mixins import CampViewMixin
-from ..models import TeamTask
+from ..models import Team, TeamTask
 from .mixins import EnsureTeamResponsibleMixin
+
+
+class TeamTasksView(CampViewMixin, DetailView):
+    template_name = "team_tasks.html"
+    context_object_name = 'team'
+    model = Team
+    slug_url_kwarg = 'team_slug'
 
 
 class TaskDetailView(CampViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = self.object.team
+        return context
 
 
 class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):

@@ -110,7 +110,7 @@ class Team(CampRelatedModel):
         return '{} ({})'.format(self.name, self.camp)
 
     def get_absolute_url(self):
-        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
+        return reverse_lazy('teams:general', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
 
     def save(self, **kwargs):
         # generate slug if needed
@@ -215,6 +215,7 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
+
     user = models.ForeignKey(
         'auth.User',
         on_delete=models.PROTECT,

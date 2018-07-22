@@ -2,17 +2,27 @@ from django.urls import path, include
 
 from teams.views.base import (
     TeamListView,
-    TeamMemberRemoveView,
-    TeamMemberApproveView,
-    TeamDetailView,
-    TeamJoinView,
-    TeamLeaveView,
+    TeamGeneralView,
     TeamManageView,
     FixIrcAclView,
 )
-from teams.views.info import InfoItemUpdateView, InfoItemCreateView, InfoItemDeleteView
+
+from teams.views.members import (
+    TeamMembersView,
+    TeamMemberRemoveView,
+    TeamMemberApproveView,
+    TeamJoinView,
+    TeamLeaveView,
+)
+
+from teams.views.info import (
+    InfoItemUpdateView,
+    InfoItemCreateView,
+    InfoItemDeleteView,
+)
 
 from teams.views.tasks import (
+    TeamTasksView,
     TaskCreateView,
     TaskDetailView,
     TaskUpdateView,
@@ -27,25 +37,11 @@ urlpatterns = [
         name='list'
     ),
     path(
-        'members/', include([
-            path(
-                '<int:pk>/remove/',
-                TeamMemberRemoveView.as_view(),
-                name='teammember_remove',
-            ),
-            path(
-                '<int:pk>/approve/',
-                TeamMemberApproveView.as_view(),
-                name='teammember_approve',
-            ),
-        ]),
-    ),
-    path(
         '<slug:team_slug>/', include([
             path(
                 '',
-                TeamDetailView.as_view(),
-                name='detail'
+                TeamGeneralView.as_view(),
+                name='general'
             ),
             path(
                 'join/',
@@ -68,7 +64,31 @@ urlpatterns = [
                 name='fix_irc_acl',
             ),
             path(
+                'members/', include([
+                    path(
+                        '',
+                        TeamMembersView.as_view(),
+                        name='members'
+                    ),
+                    path(
+                        '<int:pk>/remove/',
+                        TeamMemberRemoveView.as_view(),
+                        name='teammember_remove',
+                    ),
+                    path(
+                        '<int:pk>/approve/',
+                        TeamMemberApproveView.as_view(),
+                        name='teammember_approve',
+                    ),
+                ]),
+            ),
+            path(
                 'tasks/', include([
+                    path(
+                        '',
+                        TeamTasksView.as_view(),
+                        name='tasks',
+                    ),
                     path(
                         'create/',
                         TaskCreateView.as_view(),

@@ -13,7 +13,7 @@ class EnsureTeamResponsibleMixin(object):
         self.team = Team.objects.get(slug=kwargs['team_slug'], camp=self.camp)
         if request.user not in self.team.responsible_members.all():
             messages.error(request, 'No thanks')
-            return redirect('teams:detail', camp_slug=self.camp.slug, team_slug=self.team.slug)
+            return redirect('teams:general', camp_slug=self.camp.slug, team_slug=self.team.slug)
 
         return super().dispatch(
             request, *args, **kwargs
@@ -29,7 +29,7 @@ class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if request.user not in self.get_object().team.responsible_members.all():
             messages.error(request, 'No thanks')
-            return redirect('teams:detail', camp_slug=self.get_object().team.camp.slug, team_slug=self.get_object().team.slug)
+            return redirect('teams:general', camp_slug=self.get_object().team.camp.slug, team_slug=self.get_object().team.slug)
 
         return super().dispatch(
             request, *args, **kwargs
