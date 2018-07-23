@@ -33,8 +33,6 @@ Teams | {{ block.super }}
     {% for team in teams %}
     <tr>
       <td>
-          {{ camp.slug}}
-          {{ team.slug}}
         <a href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}">
           {{ team.name }} Team
         </a>

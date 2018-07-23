@@ -4,7 +4,7 @@ from django.views.generic import DetailView, CreateView, UpdateView
 
 from camps.mixins import CampViewMixin
 from ..models import Team, TeamTask
-from .mixins import EnsureTeamResponsibleMixin
+from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
 
 
 class TeamTasksView(CampViewMixin, DetailView):
@@ -14,26 +14,16 @@ class TeamTasksView(CampViewMixin, DetailView):
     slug_url_kwarg = 'team_slug'
 
 
-class TaskDetailView(CampViewMixin, DetailView):
+class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.object.team
-        return context
 
-
-class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):
+class TaskCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamResponsibleMixin, CreateView):
     model = TeamTask
     template_name = "task_form.html"
     fields = ['name', 'description']
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.team
-        return context
 
     def form_valid(self, form):
         task = form.save(commit=False)
@@ -47,7 +37,7 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMix
         return self.get_object().get_absolute_url()
 
 
-class TaskUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
+class TaskUpdateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = TeamTask
     template_name = "task_form.html"
     fields = ['name', 'description']

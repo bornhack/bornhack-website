@@ -34,3 +34,10 @@ class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
         return super().dispatch(
             request, *args, **kwargs
         )
+
+
+class TeamViewMixin:
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['team'] = self.get_object().team
+        return context

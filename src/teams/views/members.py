@@ -9,7 +9,7 @@ from ..models import Team, TeamMember
 from profiles.models import Profile
 from camps.mixins import CampViewMixin
 
-from .mixins import EnsureTeamMemberResponsibleMixin
+from .mixins import EnsureTeamMemberResponsibleMixin, TeamViewMixin
 from ..email import add_added_membership_email, add_removed_membership_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -71,8 +71,7 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         return redirect('teams:list', camp_slug=self.get_object().camp.slug)
 
 
-
-class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
+class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = []
@@ -88,13 +87,8 @@ class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberRe
             )
         return redirect('teams:general', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.get_object().team
-        return context
 
-
-class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
+class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamMemberResponsibleMixin, UpdateView):
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = []
@@ -110,8 +104,3 @@ class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberR
                 'Unable to add approved email to outgoing queue for teammember: {}'.format(form.instance)
             )
         return redirect('teams:general', camp_slug=self.camp.slug, team_slug=form.instance.team.slug)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['team'] = self.get_object().team
-        return context
