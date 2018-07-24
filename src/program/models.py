@@ -376,10 +376,10 @@ class EventProposal(UserSubmittedModel):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
         # use existing event if we have one
-        if self.event:
-            event = self.event
-        else:
+        if not hasattr(self, 'event'):
             event = eventmodel()
+        else:
+            event = self.event
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
@@ -392,6 +392,8 @@ class EventProposal(UserSubmittedModel):
             try:
                 event.speakers.add(sp.speaker)
             except ObjectDoesNotExist:
+                # clean up
+                event.urls.clear()
                 event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
