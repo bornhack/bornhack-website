@@ -90,7 +90,7 @@ def handle_coinify_api_response(apireq, order, request):
         if apireq.response['success']:
             # save this new coinify invoice to the DB
             coinifyinvoice = process_coinify_invoice_json(
-                invoicejson=req.response['data'],
+                invoicejson=apireq.response['data'],
                 order=order,
                 request=request,
             )
