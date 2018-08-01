@@ -14,31 +14,14 @@ a, a:active, a:focus {
 
 /* Z-index */
 /* Bootstrap values
-.dropdown-backdrop {
-  z-index: 990;
-}
-.navbar-static-top,
-.dropdown-menu {
-  z-index: 1000;
-}
-.navbar-fixed-top,
-.navbar-fixed-bottom {
-  z-index: 1030;
-}
-.modal-backdrop {
-  z-index: 1040;
-}
-.modal {
-  z-index: 1050;
-}
-.popover {
-  z-index: 1060;
-}
-.tooltip {
-  z-index: 1070;
-}
+.dropdown-backdrop { z-index: 990; }
+.navbar-static-top, .dropdown-menu { z-index: 1000; }
+.navbar-fixed-top, .navbar-fixed-bottom { z-index: 1030; }
+.modal-backdrop { z-index: 1040; }
+.modal { z-index: 1050; }
+.popover { z-index: 1060; }
+.tooltip { z-index: 1070; }
  */
-/* Custom */
 .sticky {
   z-index: 980;
 }
