@@ -5,14 +5,11 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
-from camps.models import Camp
-from camps.mixins import CampViewMixin
 from program.models import SpeakerProposal, EventProposal
 
 from .mixins import BackofficeViewMixin
@@ -26,12 +23,14 @@ class BackofficeIndexView(BackofficeViewMixin, TemplateView):
 
 class ProductHandoutView(BackofficeViewMixin, ListView):
     template_name = "product_handout.html"
-    queryset = OrderProductRelation.objects.filter(
-        handed_out=False,
-        order__paid=True,
-        order__refunded=False,
-        order__cancelled=False
-    ).order_by('order')
+
+    def get_queryset(self, **kwargs):
+        return OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False
+        ).order_by('order')
 
 
 class BadgeHandoutView(BackofficeViewMixin, ListView):
