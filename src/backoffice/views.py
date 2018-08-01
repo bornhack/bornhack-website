@@ -1,5 +1,6 @@
 import logging
 from itertools import chain
+from datetime import datetime
 
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
@@ -122,3 +123,48 @@ class EventProposalManageView(ProposalManageView):
     model = EventProposal
     template_name = "manage_eventproposal.html"
 
+
+class MerchandiseOrdersView(BackofficeViewMixin, ListView):
+    template_name = "orders_merchandise.html"
+
+    def get_queryset(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(datetime.now().strftime('%Y'))
+
+        return OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Merchandise',
+        ).filter(
+            product__name__startswith=camp_prefix
+        ).order_by('order')
+
+
+class MerchandiseToOrderView(BackofficeViewMixin, TemplateView):
+    template_name = "merchandise_to_order.html"
+
+    def get_context_data(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(datetime.now().strftime('%Y'))
+
+        order_relations = OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Merchandise',
+        ).filter(
+            product__name__startswith=camp_prefix
+        )
+
+        merchandise_orders = {}
+        for relation in order_relations:
+            try:
+                quantity = merchandise_orders[relation.product.name] + relation.quantity
+                merchandise_orders[relation.product.name] = quantity
+            except KeyError:
+                merchandise_orders[relation.product.name] = relation.quantity
+
+        context = super().get_context_data(**kwargs)
+        context['merchandise'] = merchandise_orders
+        return context
