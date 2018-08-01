@@ -5,14 +5,12 @@ from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.utils import timezone
 
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
-from camps.models import Camp
-from camps.mixins import CampViewMixin
 from program.models import SpeakerProposal, EventProposal
 
 from .mixins import BackofficeViewMixin
@@ -26,12 +24,14 @@ class BackofficeIndexView(BackofficeViewMixin, TemplateView):
 
 class ProductHandoutView(BackofficeViewMixin, ListView):
     template_name = "product_handout.html"
-    queryset = OrderProductRelation.objects.filter(
-        handed_out=False,
-        order__paid=True,
-        order__refunded=False,
-        order__cancelled=False
-    ).order_by('order')
+
+    def get_queryset(self, **kwargs):
+        return OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False
+        ).order_by('order')
 
 
 class BadgeHandoutView(BackofficeViewMixin, ListView):
@@ -123,3 +123,48 @@ class EventProposalManageView(ProposalManageView):
     model = EventProposal
     template_name = "manage_eventproposal.html"
 
+
+class MerchandiseOrdersView(BackofficeViewMixin, ListView):
+    template_name = "orders_merchandise.html"
+
+    def get_queryset(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
+
+        return OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Merchandise',
+        ).filter(
+            product__name__startswith=camp_prefix
+        ).order_by('order')
+
+
+class MerchandiseToOrderView(BackofficeViewMixin, TemplateView):
+    template_name = "merchandise_to_order.html"
+
+    def get_context_data(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
+
+        order_relations = OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Merchandise',
+        ).filter(
+            product__name__startswith=camp_prefix
+        )
+
+        merchandise_orders = {}
+        for relation in order_relations:
+            try:
+                quantity = merchandise_orders[relation.product.name] + relation.quantity
+                merchandise_orders[relation.product.name] = quantity
+            except KeyError:
+                merchandise_orders[relation.product.name] = relation.quantity
+
+        context = super().get_context_data(**kwargs)
+        context['merchandise'] = merchandise_orders
+        return context
