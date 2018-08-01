@@ -1,12 +1,12 @@
 import logging
 from itertools import chain
-from datetime import datetime
 
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.contrib import messages
+from django.utils import timezone
 
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
@@ -128,7 +128,7 @@ class MerchandiseOrdersView(BackofficeViewMixin, ListView):
     template_name = "orders_merchandise.html"
 
     def get_queryset(self, **kwargs):
-        camp_prefix = 'BornHack {}'.format(datetime.now().strftime('%Y'))
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
 
         return OrderProductRelation.objects.filter(
             handed_out=False,
@@ -145,7 +145,7 @@ class MerchandiseToOrderView(BackofficeViewMixin, TemplateView):
     template_name = "merchandise_to_order.html"
 
     def get_context_data(self, **kwargs):
-        camp_prefix = 'BornHack {}'.format(datetime.now().strftime('%Y'))
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
 
         order_relations = OrderProductRelation.objects.filter(
             handed_out=False,
