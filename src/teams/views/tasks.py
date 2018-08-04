@@ -25,6 +25,12 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTea
     template_name = "task_form.html"
     fields = ['name', 'description']
 
+    def get_team(self):
+        return Team.objects.get(
+            camp__slug=self.kwargs['camp_slug'],
+            slug=self.kwargs['team_slug']
+        )
+
     def form_valid(self, form):
         task = form.save(commit=False)
         task.team = self.team
