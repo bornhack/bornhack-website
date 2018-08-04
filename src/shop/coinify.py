@@ -84,45 +84,46 @@ def coinify_api_request(api_method, order, **kwargs):
     return req
 
 
-def handle_coinify_api_response(req, order):
-    if req.method == 'invoice_create' or req.method == 'invoice_get':
+def handle_coinify_api_response(apireq, order, request):
+    if apireq.method == 'invoice_create' or apireq.method == 'invoice_get':
         # Parse api response
-        if req.response['success']:
+        if apireq.response['success']:
             # save this new coinify invoice to the DB
             coinifyinvoice = process_coinify_invoice_json(
-                invoicejson=req.response['data'],
+                invoicejson=apireq.response['data'],
                 order=order,
+                request=request,
             )
             return coinifyinvoice
         else:
-            api_error = req.response['error']
+            api_error = apireq.response['error']
             logger.error("coinify API error: %s (%s)" % (
                 api_error['message'],
                 api_error['code']
             ))
             return False
     else:
-        logger.error("coinify api method not supported" % req.method)
+        logger.error("coinify api method not supported" % apireq.method)
         return False
 
 
 ################### API CALLS ################################################
 
 
-def get_coinify_invoice(coinify_invoiceid, order):
+def get_coinify_invoice(coinify_invoiceid, order, request):
     # put args for API request together
     invoicedict = {
         'invoice_id': coinify_invoiceid
     }
 
     # perform the api request
-    req = coinify_api_request(
+    apireq = coinify_api_request(
         api_method='invoice_get',
         order=order,
         **invoicedict
     )
 
-    coinifyinvoice = handle_coinify_api_response(req, order)
+    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
     return coinifyinvoice
 
 
@@ -140,12 +141,12 @@ def create_coinify_invoice(order, request):
     }
 
     # perform the API request
-    req = coinify_api_request(
+    apireq = coinify_api_request(
         api_method='invoice_create',
         order=order,
         **invoicedict
     )
 
-    coinifyinvoice = handle_coinify_api_response(req, order)
+    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
     return coinifyinvoice
 

@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.utils.text import slugify
 from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.conf import settings
@@ -280,6 +281,15 @@ class TeamTask(CampRelatedModel):
     )
     description = models.TextField(
         help_text='Description of the task. Markdown is supported.'
+    )
+    when = DateTimeRangeField(
+        blank=True,
+        null=True,
+        help_text='When does this task need to be started and/or finished?'
+    )
+    completed = models.BooleanField(
+        help_text='Check to mark this task as completed.',
+        default=False
     )
 
     class Meta:

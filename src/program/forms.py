@@ -136,6 +136,22 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for workshops
             del(self.fields['needs_oneday_ticket'])
 
+        elif eventtype.name == 'Meetup':
+            # fix label and help_text for the name field
+            self.fields['name'].label = 'Host Name'
+            self.fields['name'].help_text = 'The name of the meetup host. Can be a real name or an alias.'
+
+            # fix label and help_text for the biograpy field
+            self.fields['biography'].label = 'Host Biography'
+            self.fields['biography'].help_text = 'The biography of the host.'
+
+            # fix label and help_text for the submission_notes field
+            self.fields['submission_notes'].label = 'Host Notes'
+            self.fields['submission_notes'].help_text = 'Private notes regarding this host. Only visible to yourself and the BornHack organisers.'
+
+            # no free tickets for workshops
+            del(self.fields['needs_oneday_ticket'])
+
         else:
             raise ImproperlyConfigured("Unsupported event type, don't know which form class to use")
 
@@ -280,6 +296,26 @@ class EventProposalForm(forms.ModelForm):
             # duration field
             self.fields['duration'].label = 'Event Duration'
             self.fields['duration'].help_text = 'How much time (in minutes) should we set aside for this event? Please keep it between 60 and 180 minutes (1-3 hours).'
+
+        elif eventtype.name == 'Meetup':
+            # fix label and help_text for the title field
+            self.fields['title'].label = 'Meetup Title'
+            self.fields['title'].help_text = 'The title of this meetup.'
+
+            # fix label and help_text for the submission_notes field
+            self.fields['submission_notes'].label = 'Meetup Notes'
+            self.fields['submission_notes'].help_text = 'Private notes regarding this meetup. Only visible to yourself and the BornHack organisers.'
+
+            # fix label and help_text for the abstract field
+            self.fields['abstract'].label = 'Meetup Abstract'
+            self.fields['abstract'].help_text = 'The description/abstract of this meetup. Explain what the meetup is about and who should attend.'
+
+            # no video recording for meetups
+            del(self.fields['allow_video_recording'])
+
+            # duration field
+            self.fields['duration'].label = 'Meetup Duration'
+            self.fields['duration'].help_text = 'How much time (in minutes) should we set aside for this meetup? Please keep it between 60 and 180 minutes (1-3 hours).'
 
         else:
             raise ImproperlyConfigured("Unsupported event type, don't know which form class to use")
