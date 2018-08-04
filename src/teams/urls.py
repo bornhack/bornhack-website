@@ -16,6 +16,7 @@ from teams.views.members import (
 )
 
 from teams.views.info import (
+    InfoCategoriesListView,
     InfoItemUpdateView,
     InfoItemCreateView,
     InfoItemDeleteView,
@@ -73,12 +74,12 @@ urlpatterns = [
                     path(
                         '<int:pk>/remove/',
                         TeamMemberRemoveView.as_view(),
-                        name='teammember_remove',
+                        name='member_remove',
                     ),
                     path(
                         '<int:pk>/approve/',
                         TeamMemberApproveView.as_view(),
-                        name='teammember_approve',
+                        name='member_approve',
                     ),
                 ]),
             ),
@@ -112,26 +113,36 @@ urlpatterns = [
                 ]),
             ),
             path(
-                'info/<slug:category_anchor>/', include([
+                'info/',
+                include([
                     path(
-                        'create/',
-                        InfoItemCreateView.as_view(),
-                        name='info_item_create',
+                        '',
+                        InfoCategoriesListView.as_view(),
+                        name='info_categories'
                     ),
                     path(
-                        '<slug:item_anchor>/', include([
+                        '<slug:category_anchor>/', include([
                             path(
-                                'update/',
-                                InfoItemUpdateView.as_view(),
-                                name='info_item_update',
+                                'create/',
+                                InfoItemCreateView.as_view(),
+                                name='info_item_create',
                             ),
                             path(
-                                'delete/',
-                                InfoItemDeleteView.as_view(),
-                                name='info_item_delete',
+                                '<slug:item_anchor>/', include([
+                                    path(
+                                        'update/',
+                                        InfoItemUpdateView.as_view(),
+                                        name='info_item_update',
+                                    ),
+                                    path(
+                                        'delete/',
+                                        InfoItemDeleteView.as_view(),
+                                        name='info_item_delete',
+                                    ),
+                                ]),
                             ),
-                        ]),
-                    ),
+                        ])
+                    )
                 ])
             )
         ]),

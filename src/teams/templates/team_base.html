@@ -16,19 +16,13 @@ Team: {{ team.name }} | {{ block.super }}
 <div class="row">
 <div class="col-md-2">
     <ul class="nav nav-pills nav-stacked">
-      <li {% if view.template_name == "team_general.html" %}class="active"{% endif %}>
+      <li {% if view.active_menu == "general" %}class="active"{% endif %}>
             <a href="{% url "teams:general" camp_slug=team.camp.slug team_slug=team.slug %}">
                 General
             </a>
         </li>
 
-        <li {% if view.template_name == "team_tasks.html" %}class="active"{% endif %}>
-            <a href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
-                Tasks
-            </a>
-        </li>
-
-        <li {% if view.template_name == "team_members.html" %}class="active"{% endif %}>
+        <li {% if view.active_menu == "members" %}class="active"{% endif %}>
             <a href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
                 Members
                 {% if request.user in team.responsible_members.all and team.unapproved_members %}
@@ -36,6 +30,20 @@ Team: {{ team.name }} | {{ block.super }}
                 {% endif %}
             </a>
         </li>
+
+        <li {% if view.active_menu == "tasks" %}class="active"{% endif %}>
+            <a href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Tasks
+            </a>
+        </li>
+
+        {% if request.user in team.responsible_members.all %}
+        <li {% if view.active_menu == "info_categories" %}class="active"{% endif %}>
+            <a href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Info categories
+            </a>
+        </li>
+        {% endif %}
 
     </ul>
 

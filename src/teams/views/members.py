@@ -20,6 +20,7 @@ class TeamMembersView(CampViewMixin, DetailView):
     context_object_name = 'team'
     model = Team
     slug_url_kwarg = 'team_slug'
+    active_menu = 'members'
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
@@ -27,6 +28,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     model = Team
     fields = []
     slug_url_kwarg = 'team_slug'
+    active_menu = 'members'
 
     def get(self, request, *args, **kwargs):
         if not Profile.objects.get(user=request.user).description:
@@ -57,6 +59,7 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     model = Team
     fields = []
     slug_url_kwarg = 'team_slug'
+    active_menu = 'members'
 
     def get(self, request, *args, **kwargs):
         if request.user not in self.get_object().members.all():
@@ -75,6 +78,7 @@ class TeamMemberRemoveView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, Ens
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = []
+    active_menu = 'members'
 
     def form_valid(self, form):
         form.instance.delete()
@@ -92,6 +96,7 @@ class TeamMemberApproveView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, En
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = []
+    active_menu = 'members'
 
     def form_valid(self, form):
         form.instance.approved = True

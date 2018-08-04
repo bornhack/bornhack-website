@@ -5,10 +5,11 @@
 {% block title %}
 {% if object %}
 Editing "{{ object.headline }}"
+in "{{ form.instance.category.headline }}"
 {% else %}
 Create Info item
+in "{{ category.headline }}"
 {% endif %}
-in "{{ form.instance.category.headline }}"
 {% endblock %}
 
 {% block team_content %}
@@ -17,10 +18,11 @@ in "{{ form.instance.category.headline }}"
         <h4>
             {% if object %}
             Editing "{{ object.headline }}"
+            in "{{ object.category.headline }}"
             {% else %}
             Create Info Item
+            in "{{ category.headline }}"
             {% endif %}
-            in "{{ object.category.headline }}"
         </h4>
     </div>
     <div class="panel-body">

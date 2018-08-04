@@ -6,10 +6,6 @@
 
 {% block team_content %}
 
-{% if request.user in team.responsible_members.all and team.info_categories.exists %}
-<h4> SHOULD NOT HAPPEN !!! </h4>
-{% endif %}
-
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4>Info Categories</h4>

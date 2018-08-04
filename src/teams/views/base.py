@@ -25,6 +25,7 @@ class TeamGeneralView(CampViewMixin, DetailView):
     context_object_name = 'team'
     model = Team
     slug_url_kwarg = 'team_slug'
+    active_menu = 'general'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

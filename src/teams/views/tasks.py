@@ -12,18 +12,21 @@ class TeamTasksView(CampViewMixin, DetailView):
     context_object_name = 'team'
     model = Team
     slug_url_kwarg = 'team_slug'
+    active_menu = 'tasks'
 
 
 class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
+    active_menu = 'tasks'
 
 
 class TaskCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamResponsibleMixin, CreateView):
     model = TeamTask
     template_name = "task_form.html"
     fields = ['name', 'description']
+    active_menu = 'tasks'
 
     def get_team(self):
         return Team.objects.get(
@@ -47,6 +50,7 @@ class TaskUpdateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTea
     model = TeamTask
     template_name = "task_form.html"
     fields = ['name', 'description']
+    active_menu = 'tasks'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)

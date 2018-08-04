@@ -29,25 +29,26 @@
             </tr>
           </thead>
           <tbody>
-            {% for teammember in team.memberships.all %}
+            {% for member in team.memberships.all %}
+              {% if member.approved or not member.approved and request.user in team.responsible_members.all %}
               <tr>
                 <td>
-                    {{ teammember.user.profile.get_public_credit_name }} {% if teammember.user == request.user %}(this is you!){% endif %}
+                    {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
                 </td>
                 <td>
-                    Team {% if teammember.responsible %}Responsible{% else %}Member{% endif %}
-                    {% if not teammember.approved %}(pending approval){% endif %}
+                    Team {% if member.responsible %}Responsible{% else %}Member{% endif %}
+                    {% if not member.approved %}(pending approval){% endif %}
                 </td>
                 {% if request.user in team.responsible_members.all %}
                 <td>
                   <div class="btn-group-vertical">
                       <a class="btn btn-danger"
-                         href="{% url 'teams:teammember_remove' camp_slug=camp.slug team_slug=team.slug pk=teammember.id %}">
+                         href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-trash"></i> Remove
                       </a>
-                      {% if not teammember.approved %}
+                      {% if not member.approved %}
                       <a class="btn btn-success"
-                         href="{% url 'teams:teammember_approve' camp_slug=camp.slug team_slug=team.slug pk=teammember.id %}">
+                         href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve
                       </a>
                       {% endif %}
@@ -55,6 +56,7 @@
                 </td>
                 {% endif %}
               </tr>
+              {% endif %}
             {% empty %}
                 <p>No members found!</p>
             {% endfor %}
