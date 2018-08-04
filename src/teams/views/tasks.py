@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import DetailView, CreateView, UpdateView
+from django import forms
 
 from camps.mixins import CampViewMixin
 from ..models import Team, TeamTask
@@ -22,10 +23,27 @@ class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
     active_menu = 'tasks'
 
 
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = TeamTask
+        fields = ['name', 'description', 'when', 'completed']
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fields['when'].widget.widgets = [
+            forms.DateTimeInput(
+                attrs={"placeholder": "Start"}
+            ),
+            forms.DateTimeInput(
+                attrs={"placeholder": "End"}
+            )
+        ]
+
+
 class TaskCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamResponsibleMixin, CreateView):
     model = TeamTask
     template_name = "task_form.html"
-    fields = ['name', 'description', 'when', 'completed']
+    form_class = TaskForm
     active_menu = 'tasks'
 
     def get_team(self):
@@ -49,7 +67,7 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTea
 class TaskUpdateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = TeamTask
     template_name = "task_form.html"
-    fields = ['name', 'description', 'when', 'completed']
+    form_class = TaskForm
     active_menu = 'tasks'
 
     def get_context_data(self, *args, **kwargs):
