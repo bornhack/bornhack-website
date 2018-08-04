@@ -16,7 +16,7 @@ class TaskDetailView(CampViewMixin, DetailView):
 class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, CreateView):
     model = TeamTask
     template_name = "task_form.html"
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'when', 'completed']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -38,7 +38,7 @@ class TaskCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMix
 class TaskUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = TeamTask
     template_name = "task_form.html"
-    fields = ['name', 'description']
+    fields = ['name', 'description', 'when', 'completed']
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
