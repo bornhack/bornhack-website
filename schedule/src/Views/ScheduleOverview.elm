@@ -80,25 +80,25 @@ dayEventInstanceIcons eventInstance =
             case eventInstance.videoState of
                 "has-recording" ->
                     [ i
-                        [ classList [ ( "fa", True ), ( "fa-film", True ), ( "pull-right", True ) ] ]
+                        [ classList [ ( "fa", True ), ( "fa-film", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
                         []
                     ]
 
                 "to-be-recorded" ->
                     [ i
-                        [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ) ] ]
+                        [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
                         []
                     ]
 
                 "not-to-be-recorded" ->
                     [ i
-                        [ classList [ ( "fa", True ), ( "fa-ban", True ), ( "pull-right", True ) ] ]
+                        [ classList [ ( "fa", True ), ( "fa-ban", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
                         []
                     ]
 
                 _ ->
                     []
     in
-        [ i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ) ] ] []
+        [ i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ), ( "pull-right", True ), ( "fa-fw", True ) ] ] []
         ]
             ++ videoIcon

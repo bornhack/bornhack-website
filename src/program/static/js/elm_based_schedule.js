@@ -16384,7 +16384,11 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'fa-fw', _1: true},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}),
@@ -16410,7 +16414,11 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'fa-fw', _1: true},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}),
@@ -16436,7 +16444,11 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'fa-fw', _1: true},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}),
@@ -16471,7 +16483,11 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 								_1: {
 									ctor: '::',
 									_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'fa-fw', _1: true},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}),
