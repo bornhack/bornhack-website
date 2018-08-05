@@ -68,8 +68,8 @@ def date_choices(camp):
 
     choices = []
 
-    current_date = camp.camp.lower.date()
-    while current_date != camp.camp.upper.date():
+    current_date = camp.buildup.lower.date()
+    while current_date != camp.teardown.upper.date():
         choices.append(
             (
                 current_date,
