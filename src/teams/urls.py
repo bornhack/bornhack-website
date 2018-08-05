@@ -158,7 +158,7 @@ urlpatterns = [
                 path(
                     '',
                     ShiftListView.as_view(),
-                    name="shift_list"
+                    name="shifts"
                 ),
                 path(
                     'create/',

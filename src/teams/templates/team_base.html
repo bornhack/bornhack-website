@@ -37,6 +37,12 @@ Team: {{ team.name }} | {{ block.super }}
             </a>
         </li>
 
+        <li {% if view.active_menu == "shifts" %}class="active"{% endif %}>
+            <a href="{% url "teams:shifts" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Shifts
+            </a>
+        </li>
+
         {% if request.user in team.responsible_members.all %}
         <li {% if view.active_menu == "info_categories" %}class="active"{% endif %}>
             <a href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">

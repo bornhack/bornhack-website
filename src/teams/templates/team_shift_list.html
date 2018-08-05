@@ -1,16 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 {% load bootstrap3 %}
 
 
-{% block content %}
-
-<a class="btn btn-info"
-   href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}">
-    <i class="fas fa-chevron-left"></i> Back to team detail
-</a>
-
-<hr />
+{% block team_content %}
 
 {% if request.user in team.responsible_members.all %}
 <a class="btn btn-success"

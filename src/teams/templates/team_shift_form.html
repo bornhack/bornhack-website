@@ -1,16 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 {% load bootstrap3 %}
 
 
-{% block content %}
-
-<a class="btn btn-info"
-   href="{% url 'teams:shift_list' camp_slug=camp.slug team_slug=team.slug %}">
-    <i class="fas fa-chevron-left"></i> Cancel
-</a>
-
-<hr />
+{% block team_content %}
 
 <form method="POST">
   {% csrf_token %}

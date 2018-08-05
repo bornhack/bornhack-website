@@ -26,7 +26,7 @@ from ..models import (
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
     model = TeamShift
-    template_name = "shifts/shift_list.html"
+    template_name = "team_shift_list.html"
     context_object_name = "shifts"
 
     def get_queryset(self):
@@ -131,7 +131,7 @@ class ShiftForm(forms.ModelForm):
 
 class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     model = TeamShift
-    template_name = "shifts/shift_form.html"
+    template_name = "team_shift_form.html"
     form_class = ShiftForm
 
     def get_form_kwargs(self):
@@ -149,7 +149,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
 
     def get_success_url(self):
         return reverse(
-            'teams:shift_list',
+            'teams:shifts',
             kwargs=self.kwargs
         )
 
@@ -164,7 +164,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
 
 class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
     model = TeamShift
-    template_name = "shifts/shift_form.html"
+    template_name = "team_shift_form.html"
     form_class = ShiftForm
 
     def get_form_kwargs(self):
@@ -175,7 +175,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
     def get_success_url(self):
         self.kwargs.pop('pk')
         return reverse(
-            'teams:shift_list',
+            'teams:shifts',
             kwargs=self.kwargs
         )
 
@@ -187,7 +187,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
     model = TeamShift
-    template_name = "shifts/shift_confirm_delete.html"
+    template_name = "team_shift_confirm_delete.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -200,7 +200,7 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
     def get_success_url(self):
         self.kwargs.pop('pk')
         return reverse(
-            'teams:shift_list',
+            'teams:shifts',
             kwargs=self.kwargs
         )
 
@@ -226,7 +226,7 @@ class MultipleShiftForm(forms.Form):
 
 
 class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
-    template_name = "shifts/shift_form.html"
+    template_name = "team_shift_form.html"
     form_class = MultipleShiftForm
 
     def get_form_kwargs(self):
@@ -268,7 +268,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 
     def get_success_url(self):
         return reverse(
-            'teams:shift_list',
+            'teams:shifts',
             kwargs=self.kwargs
         )
 
@@ -300,7 +300,7 @@ class MemberTakesShift(CampViewMixin, View):
 
         return HttpResponseRedirect(
             reverse(
-                'teams:shift_list',
+                'teams:shifts',
                 kwargs=kwargs
             )
         )
