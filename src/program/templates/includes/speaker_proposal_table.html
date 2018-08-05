@@ -25,9 +25,9 @@
             </td>
             <td class="text-center">
                 {% for url in speakerproposal.urls.all %}
-                <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}"><i class="fas fa-{{ url.urltype.icon }}"></i></a>
+                    <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}"><i class="{{ url.urltype.icon }}"></i></a>
                 {% empty %}
-                N/A
+                    N/A
                 {% endfor %}
             </td>
             <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>

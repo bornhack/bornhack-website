@@ -3,6 +3,8 @@ import logging
 from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.conf import settings
 from django.contrib.postgres.fields import DateTimeRangeField
@@ -116,7 +118,7 @@ class Team(CampRelatedModel):
         return '{} ({})'.format(self.name, self.camp)
 
     def get_absolute_url(self):
-        return reverse_lazy('teams:detail', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
+        return reverse_lazy('teams:general', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
 
     def save(self, **kwargs):
         # generate slug if needed
@@ -221,6 +223,7 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
+
     user = models.ForeignKey(
         'auth.User',
         on_delete=models.PROTECT,
@@ -285,6 +288,15 @@ class TeamTask(CampRelatedModel):
     )
     description = models.TextField(
         help_text='Description of the task. Markdown is supported.'
+    )
+    when = DateTimeRangeField(
+        blank=True,
+        null=True,
+        help_text='When does this task need to be started and/or finished?'
+    )
+    completed = models.BooleanField(
+        help_text='Check to mark this task as completed.',
+        default=False
     )
 
     class Meta:

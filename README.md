@@ -38,7 +38,7 @@ Install system dependencies (method depends on OS):
 ### Python packages
 Install pip packages:
 ```
-    (venv) $ pip install -r src/requirements.txt
+    (venv) $ pip install -r src/requirements/dev.txt
 ```
 
 ### Configuration file

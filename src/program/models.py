@@ -37,7 +37,7 @@ class UrlType(CreatedUpdatedModel):
     icon = models.CharField(
         max_length=100,
         default='fas fa-link',
-        help_text="Name of the fontawesome icon to use without the 'fa-' part"
+        help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part."
     )
 
     class Meta:
@@ -146,7 +146,12 @@ class Url(CampRelatedModel):
     def camp(self):
         return self.owner.camp
 
-    camp_filter = 'owner__camp'
+    camp_filter = [
+        'speakerproposal__camp',
+        'eventproposal__track__camp',
+        'speaker__camp',
+        'event__track__camp',
+    ]
 
 
 ###############################################################################
@@ -370,7 +375,11 @@ class EventProposal(UserSubmittedModel):
     def mark_as_approved(self, request):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
-        event = eventmodel()
+        # use existing event if we have one
+        if not hasattr(self, 'event'):
+            event = eventmodel()
+        else:
+            event = self.event
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
@@ -383,13 +392,16 @@ class EventProposal(UserSubmittedModel):
             try:
                 event.speakers.add(sp.speaker)
             except ObjectDoesNotExist:
+                # clean up
+                event.urls.clear()
                 event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
-        # copy all the URLs too
+        # clear any old urls from the event object and copy all the URLs from the proposal
+        event.urls.clear()
         for url in self.urls.all():
             Url.objects.create(
                 url=url.url,
@@ -397,7 +409,7 @@ class EventProposal(UserSubmittedModel):
                 event=event
             )
 
-        messages.success(request, "Event object %s has been created" % event)
+        messages.success(request, "Event object %s has been created/updated" % event)
 
     def mark_as_rejected(self, request):
         eventproposalmodel = apps.get_model('program', 'eventproposal')

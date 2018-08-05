@@ -1,26 +1,28 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 {% load bootstrap3 %}
 
 {% block title %}
 {% if object %}
 Editing "{{ object.headline }}"
+in "{{ form.instance.category.headline }}"
 {% else %}
 Create Info item
+in "{{ category.headline }}"
 {% endif %}
-in "{{ form.instance.category.headline }}"
 {% endblock %}
 
-{% block content %}
+{% block team_content %}
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4>
             {% if object %}
             Editing "{{ object.headline }}"
+            in "{{ object.category.headline }}"
             {% else %}
             Create Info Item
+            in "{{ category.headline }}"
             {% endif %}
-            in "{{ object.category.headline }}"
         </h4>
     </div>
     <div class="panel-body">
@@ -36,6 +38,6 @@ in "{{ form.instance.category.headline }}"
             {% endif %}
         </form>
     </div>
-    <div class="panel-footer"><i>This info item belongs to the <a href="{% url 'teams:detail' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
+    <div class="panel-footer"><i>This info item belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
 </div>
 {% endblock %}

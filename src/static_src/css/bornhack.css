@@ -1,6 +1,6 @@
 body {
   margin-top: 85px;
-  margin-bottom: 35px;
+  margin-bottom: 65px;
   overflow: scroll;
 }
 
@@ -10,6 +10,20 @@ body {
 
 a, a:active, a:focus {
    outline: none;
+}
+
+/* Z-index */
+/* Bootstrap values
+.dropdown-backdrop { z-index: 990; }
+.navbar-static-top, .dropdown-menu { z-index: 1000; }
+.navbar-fixed-top, .navbar-fixed-bottom { z-index: 1030; }
+.modal-backdrop { z-index: 1040; }
+.modal { z-index: 1050; }
+.popover { z-index: 1060; }
+.tooltip { z-index: 1070; }
+ */
+.sticky {
+  z-index: 980;
 }
 
 @media (max-width: 520px) {
@@ -48,7 +62,7 @@ a, a:active, a:focus {
   margin-top: 6px;
 }
 
-.nav li a {
+#top-navbar > .nav li a {
    padding: 30px 7px;
 }
 
@@ -236,7 +250,6 @@ footer {
 .sticky {
   position: sticky;
   background-color: #fff;
-  z-index: 9999;
 }
 
 #daypicker {

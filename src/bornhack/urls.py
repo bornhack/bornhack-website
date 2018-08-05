@@ -141,7 +141,7 @@ urlpatterns = [
             ),
 
             path(
-                'bar/menu',
+                'bar/menu/',
                 MenuView.as_view(),
                 name='menu'
             ),
