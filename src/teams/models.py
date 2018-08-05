@@ -349,3 +349,10 @@ class TeamShift(CampRelatedModel):
         return self.team.camp
 
     camp_filter = 'team__camp'
+
+    def __str__(self):
+        return "{} team shift from {} to {}".format(
+            self.team.name,
+            self.shift_range.lower,
+            self.shift_range.upper
+        )
