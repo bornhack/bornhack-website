@@ -168,3 +168,50 @@ class MerchandiseToOrderView(BackofficeViewMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['merchandise'] = merchandise_orders
         return context
+
+
+class VillageOrdersView(BackofficeViewMixin, ListView):
+    template_name = "orders_village.html"
+
+    def get_queryset(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
+
+        return OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Villages',
+        ).filter(
+            product__name__startswith=camp_prefix
+        ).order_by('order')
+
+
+class VillageToOrderView(BackofficeViewMixin, TemplateView):
+    template_name = "village_to_order.html"
+
+    def get_context_data(self, **kwargs):
+        camp_prefix = 'BornHack {}'.format(timezone.now().year)
+
+        order_relations = OrderProductRelation.objects.filter(
+            handed_out=False,
+            order__paid=True,
+            order__refunded=False,
+            order__cancelled=False,
+            product__category__name='Villages',
+        ).filter(
+            product__name__startswith=camp_prefix
+        )
+
+        village_orders = {}
+        for relation in order_relations:
+            try:
+                quantity = village_orders[relation.product.name] + relation.quantity
+                village_orders[relation.product.name] = quantity
+            except KeyError:
+                village_orders[relation.product.name] = relation.quantity
+
+        context = super().get_context_data(**kwargs)
+        context['village'] = village_orders
+        return context
+

@@ -17,5 +17,7 @@ urlpatterns = [
         path('speakers/<uuid:pk>/', SpeakerProposalManageView.as_view(), name='speakerproposal_manage'),
         path('events/<uuid:pk>/', EventProposalManageView.as_view(), name='eventproposal_manage'),
     ])),
+    path('village_orders/', VillageOrdersView.as_view(), name='village_orders'),
+    path('village_to_order/', VillageToOrderView.as_view(), name='village_to_order'),
 ]
 

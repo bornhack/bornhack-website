@@ -42,6 +42,14 @@
         <h4 class="list-group-item-heading">Merchandise To Order</h4>
         <p class="list-group-item-text">Use this view to generate a list of merchandise that needs to be ordered</p>
       </a>
+      <a href="{% url 'backoffice:village_orders' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Village Orders</h4>
+        <p class="list-group-item-text">Use this view to look at Village category OrderProductRelations</p>
+      </a>
+      <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Village Gear To Order</h4>
+        <p class="list-group-item-text">Use this view to generate a list of village gear that needs to be ordered</p>
+      </a>
     </div>
 </div>
 
