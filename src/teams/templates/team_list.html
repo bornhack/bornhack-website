@@ -33,7 +33,7 @@ Teams | {{ block.super }}
     {% for team in teams %}
     <tr>
       <td>
-        <a href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}">
+        <a href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}">
           {{ team.name }} Team
         </a>
       </td>
@@ -63,7 +63,7 @@ Teams | {{ block.super }}
 
       <td>
       <div class="btn-group-vertical">
-        <a class="btn btn-primary" href="{% url 'teams:detail' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i> Details</a>
+        <a class="btn btn-primary" href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i> Details</a>
         {% if request.user in team.responsible_members.all %}
           <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a>
         {% endif %}

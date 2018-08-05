@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 {% load bootstrap3 %}
 
@@ -6,7 +6,7 @@
 Manage Team: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block team_content %}
 <div class="panel panel-default">
   <div class="panel-heading"><h4>Manage {{ team.name }} Team</h4></div>
   <div class="panel-body" style="margin-left: 1em; margin-right: 1em;">
@@ -18,85 +18,11 @@ Manage Team: {{ team.name }} | {{ block.super }}
 
       {% buttons %}
         <button class="btn btn-success pull-right" type="submit"><i class="fas fa-check"></i> Save Team</button>
-        <a class="btn btn-primary pull-right" href="{% url 'teams:detail' team_slug=team.slug camp_slug=camp.slug %}"><i class="fas fa-times"></i> Cancel</a>&nbsp;
+        <a class="btn btn-primary pull-right" href="{% url 'teams:general' team_slug=team.slug camp_slug=camp.slug %}"><i class="fas fa-times"></i> Cancel</a>&nbsp;
       {% endbuttons %}
       </form>
     </div>
   </div>
 </div>
 
-<div class="panel panel-default">
-  <div class="panel-heading"><h4>Manage {{ team.name }} Team Members</h4></div>
-  <div class="panel-body" style="margin-left: 1em; margin-right: 1em;">
-    {% if team.teammember_set.exists %}
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>
-            Username
-          </th>
-          <th>
-            Name
-          </th>
-          <th>
-            Email
-          </th>
-          <th>
-            Description
-          </th>
-          <th>
-            Public Credit Name
-          </th>
-          <th>
-            Membership
-          </th>
-          <th>
-            Action
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for membership in team.teammember_set.all %}
-      <tr>
-        <td>
-          {{ membership.user }}
-        </td>
-        <td>
-          {{ membership.user.profile.name }}
-        </td>
-        <td>
-          {{ membership.user.profile.email }}
-        </td>
-        <td>
-          {{ membership.user.profile.description }}
-        </td>
-        <td>
-          {{ membership.user.profile.public_credit_name|default:"N/A" }}
-          {% if membership.user.profile.public_credit_name and not membership.user.profile.public_credit_name_approved %}<span class="text-warning">(name not approved)</span>{% endif %}
-        </td>
-        <td>
-          {% if membership.approved %}member{% else %}pending{% endif %}
-        </td>
-        <td>
-          <div class="btn-group-vertical">
-            <a class="btn btn-danger" href="{% url 'teams:teammember_remove' camp_slug=camp.slug pk=membership.id %}"><i class="fas fa-trash-o"></i> Remove Member</a>
-            {% if not membership.approved %}
-            <a class="btn btn-success" href="{% url 'teams:teammember_approve' camp_slug=camp.slug pk=membership.id %}"><i class="fas fa-check"></i> Approve Member</a>
-            {% endif %}
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p>No members found!</p>
-    {% endif %}
-  </div>
-</div>
-
-{% include 'includes/team_tasks.html' %}
-
 {% endblock %}
-
-

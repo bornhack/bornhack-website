@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 
 {% block title %}
 {{ task.name }}
 {% endblock %}
 
-{% block content %}
+{% block team_content %}
 <div class="panel panel-default">
     <div class="panel-heading"><h4>Task: {{ task.name }} ({% if not task.completed %}Not {% endif %}Completed)</h4></div>
     <div class="panel-body">
