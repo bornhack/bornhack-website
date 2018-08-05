@@ -86,13 +86,13 @@ dayEventInstanceIcons eventInstance =
 
                 "to-be-recorded" ->
                     [ i
-                        [ classList [ ( "fa", True ), ( "fa-video-camera", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
+                        [ classList [ ( "fa", True ), ( "fa-video", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
                         []
                     ]
 
                 "not-to-be-recorded" ->
                     [ i
-                        [ classList [ ( "fa", True ), ( "fa-ban", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
+                        [ classList [ ( "fa", True ), ( "fa-video-slash", True ), ( "pull-right", True ), ( "fa-fw", True ) ] ]
                         []
                     ]
 

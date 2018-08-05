@@ -14453,9 +14453,9 @@ var _user$project$Views_FilterView$filterChoiceView = F4(
 						case 'has-recording':
 							return 'film';
 						case 'to-be-recorded':
-							return 'video-camera';
+							return 'video';
 						case 'not-to-be-recorded':
-							return 'ban';
+							return 'video-slash';
 						default:
 							return '';
 					}
@@ -16410,7 +16410,7 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 									_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'fa-video-camera', _1: true},
+										_0: {ctor: '_Tuple2', _0: 'fa-video', _1: true},
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
@@ -16440,7 +16440,7 @@ var _user$project$Views_ScheduleOverview$dayEventInstanceIcons = function (event
 									_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'fa-ban', _1: true},
+										_0: {ctor: '_Tuple2', _0: 'fa-video-slash', _1: true},
 										_1: {
 											ctor: '::',
 											_0: {ctor: '_Tuple2', _0: 'pull-right', _1: true},
