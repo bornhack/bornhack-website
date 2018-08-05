@@ -23,6 +23,9 @@
               </th>
               {% if request.user in team.responsible_members.all %}
                 <th>
+                  Email
+                </th>
+                <th>
                     Action
                 </th>
               {% endif %}
@@ -40,6 +43,9 @@
                     {% if not member.approved %}(pending approval){% endif %}
                 </td>
                 {% if request.user in team.responsible_members.all %}
+                <td>
+                    {{ member.user.email }}
+                </td>
                 <td>
                   <div class="btn-group-vertical">
                       <a class="btn btn-danger"
