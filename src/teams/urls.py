@@ -29,6 +29,15 @@ from teams.views.tasks import (
     TaskUpdateView,
 )
 
+from teams.views.shifts import (
+    ShiftListView,
+    ShiftCreateView,
+    ShiftCreateMultipleView,
+    ShiftUpdateView,
+    ShiftDeleteView,
+    MemberTakesShift,
+)
+
 app_name = 'teams'
 
 urlpatterns = [
@@ -144,7 +153,41 @@ urlpatterns = [
                         ])
                     )
                 ])
-            )
+            ),
+            path('shifts/', include([
+                path(
+                    '',
+                    ShiftListView.as_view(),
+                    name="shifts"
+                ),
+                path(
+                    'create/',
+                    ShiftCreateView.as_view(),
+                    name="shift_create"
+                ),
+                path(
+                    'create_multiple/',
+                    ShiftCreateMultipleView.as_view(),
+                    name="shift_create_multiple"
+                ),
+                path('<int:pk>/', include([
+                    path(
+                        '',
+                        ShiftUpdateView.as_view(),
+                        name="shift_update"
+                    ),
+                    path(
+                        'delete',
+                        ShiftDeleteView.as_view(),
+                        name="shift_delete"
+                    ),
+                    path(
+                        'take',
+                        MemberTakesShift.as_view(),
+                        name="shift_member_take"
+                    ),
+                ])),
+            ]))
         ]),
     ),
 ]

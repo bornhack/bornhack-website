@@ -1,0 +1,74 @@
+{% extends 'team_base.html' %}
+{% load commonmark %}
+{% load bootstrap3 %}
+
+
+{% block team_content %}
+
+{% if request.user in team.responsible_members.all %}
+<a class="btn btn-success"
+   href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
+    Create a single shift
+</a>
+<a class="btn btn-success"
+   href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
+    Create multiple shifts
+</a>
+{% endif %}
+
+<table class="table table-condensed">
+    <tbody>
+        {% for shift in shifts %}
+        {% ifchanged shift.shift_range.lower|date:'d' %}
+        <tr>
+            <td colspan=4>
+                <h4>
+                {{ shift.shift_range.lower|date:'Y-m-d l' }}
+                </h4>
+        <tr>
+            <th>
+                From
+            <th>
+                To
+            <th>
+                People required
+            <th>
+                People
+            <th>
+                Actions
+        {% endifchanged %}
+
+        <tr>
+            <td>
+                {{ shift.shift_range.lower|date:'H:i' }}
+            <td>
+                {{ shift.shift_range.upper|date:'H:i' }}
+            <td>
+                {{ shift.people_required }}
+            <td>
+                {% for member in shift.team_members.all %}
+                {{ member.user }}{% if not forloop.last %},{% endif %}
+                {% empty %}
+                    None!
+                {% endfor %}
+
+            <td>
+                {% if request.user in team.responsible_members.all %}
+                <a class="btn btn-info"
+                   href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a class="btn btn-danger"
+                   href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                    <i class="fas fa-trash"></i> Delete
+                </a>
+                {% endif %}
+                {% if shift.people_required > shift.team_members.count %}
+                <a class="btn btn-success"
+                   href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                    <i class="fas fa-thumbs-up"></i> Take it!
+                </a>
+                {% endif %}
+        {% endfor %}
+</table>
+{% endblock %}

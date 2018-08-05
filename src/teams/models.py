@@ -1,14 +1,16 @@
+import logging
+
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.text import slugify
-from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.conf import settings
-import logging
+from django.contrib.postgres.fields import DateTimeRangeField
+
+from utils.models import CampRelatedModel
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -101,6 +103,11 @@ class Team(CampRelatedModel):
     private_irc_channel_fix_needed = models.BooleanField(
         default=False,
         help_text='Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.'
+    )
+
+    shifts_enabled = models.BooleanField(
+        default=False,
+        help_text="Does this team have shifts? This enables defining shifts for this team."
     )
 
     class Meta:
@@ -312,3 +319,40 @@ class TeamTask(CampRelatedModel):
             self.slug = slugify(self.name)
         super().save(**kwargs)
 
+
+class TeamShift(CampRelatedModel):
+
+    class Meta:
+        ordering = ("shift_range",)
+
+    team = models.ForeignKey(
+        'teams.Team',
+        related_name='shifts',
+        on_delete=models.PROTECT,
+        help_text='The team this shift belongs to',
+    )
+
+    shift_range = DateTimeRangeField()
+
+    team_members = models.ManyToManyField(
+        TeamMember,
+        blank=True,
+    )
+
+    people_required = models.IntegerField(
+        default=1
+    )
+
+    @property
+    def camp(self):
+        """ All CampRelatedModels must have a camp FK or a camp property """
+        return self.team.camp
+
+    camp_filter = 'team__camp'
+
+    def __str__(self):
+        return "{} team shift from {} to {}".format(
+            self.team.name,
+            self.shift_range.lower,
+            self.shift_range.upper
+        )
