@@ -28,6 +28,7 @@ class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
     model = TeamShift
     template_name = "team_shift_list.html"
     context_object_name = "shifts"
+    active_menu = "shifts"
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -133,6 +134,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
+    active_menu = "shifts"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -166,6 +168,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
+    active_menu = "shifts"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -188,6 +191,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
 class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
+    active_menu = "shifts"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -228,6 +232,7 @@ class MultipleShiftForm(forms.Form):
 class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm
+    active_menu = "shifts"
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
