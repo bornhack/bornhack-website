@@ -16,7 +16,7 @@
             <li>Finish: {{ task.when.upper|default:"N/A" }}<br>
         </ul>
     </div>
-    <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:detail' team_slug=task.team.slug camp_slug=task.team.camp.slug %}">{{ task.team.name }} Team</a></i></div>
+    <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:general' team_slug=task.team.slug camp_slug=task.team.camp.slug %}">{{ task.team.name }} Team</a></i></div>
 </div>
 
 
