@@ -255,7 +255,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
         people_required = form.cleaned_data['people_required']
 
         shifts = []
-        for index in range(number_of_shifts + 1):
+        for index in range(number_of_shifts):
             shift_range = DateTimeTZRange(
                 start_datetime,
                 start_datetime + timezone.timedelta(minutes=shift_length),
