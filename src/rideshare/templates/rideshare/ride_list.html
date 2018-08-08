@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<a class="btn btn-success" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
+  Create ride
+</a>
+
+<hr />
+
+{% for ride in ride_list %}
+
+  {{ ride.from_location }} at {{ ride.from_datetime}}
+
+
+{% endfor %}
+
+{% endblock %}
