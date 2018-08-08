@@ -286,7 +286,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
         return context
 
 
-class MemberTakesShift(CampViewMixin, View):
+class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 
     http_methods = ['get']
 
@@ -300,6 +300,31 @@ class MemberTakesShift(CampViewMixin, View):
         team_member = TeamMember.objects.get(team=team, user=request.user)
 
         shift.team_members.add(team_member)
+
+        kwargs.pop('pk')
+
+        return HttpResponseRedirect(
+            reverse(
+                'teams:shifts',
+                kwargs=kwargs
+            )
+        )
+
+
+class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
+
+    http_methods = ['get']
+
+    def get(self, request, **kwargs):
+        shift = TeamShift.objects.get(id=kwargs['pk'])
+        team = Team.objects.get(
+            camp=self.camp,
+            slug=kwargs['team_slug']
+        )
+
+        team_member = TeamMember.objects.get(team=team, user=request.user)
+
+        shift.team_members.remove(team_member)
 
         kwargs.pop('pk')
 

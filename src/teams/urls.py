@@ -36,6 +36,7 @@ from teams.views.shifts import (
     ShiftUpdateView,
     ShiftDeleteView,
     MemberTakesShift,
+    MemberDropsShift,
 )
 
 app_name = 'teams'
@@ -185,6 +186,11 @@ urlpatterns = [
                         'take',
                         MemberTakesShift.as_view(),
                         name="shift_member_take"
+                    ),
+                    path(
+                        'drop',
+                        MemberDropsShift.as_view(),
+                        name="shift_member_drop"
                     ),
                 ])),
             ]))

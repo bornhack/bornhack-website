@@ -356,3 +356,7 @@ class TeamShift(CampRelatedModel):
             self.shift_range.lower,
             self.shift_range.upper
         )
+
+    @property
+    def users(self):
+        return [member.user for member in self.team_members.all()]
