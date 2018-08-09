@@ -331,7 +331,7 @@ class EventProposal(UserSubmittedModel):
 
     allow_video_recording = models.BooleanField(
         default=True,
-        help_text='Uncheck this to avoid video recording.'
+        help_text='Uncheck to avoid video recording.'
     )
 
     duration = models.IntegerField(
