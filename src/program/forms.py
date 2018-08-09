@@ -183,9 +183,6 @@ class EventProposalForm(forms.ModelForm):
         self.fields['track'].empty_label = None
         self.fields['track'].queryset = EventTrack.objects.filter(camp=camp)
 
-        # make sure video_recording checkbox defaults to checked
-        self.fields['allow_video_recording'].initial = True
-
         if eventtype.name == 'Debate':
             # fix label and help_text for the title field
             self.fields['title'].label = 'Title of debate'
