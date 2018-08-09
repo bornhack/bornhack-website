@@ -5,6 +5,7 @@ from django.views.generic import (
     CreateView,
     UpdateView,
     DeleteView,
+    TemplateView,
 )
 from django.http import HttpResponseRedirect
 
@@ -41,3 +42,11 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, DeleteView):
     model = Ride
+
+
+class RideContactConfirm(LoginRequiredMixin, CampViewMixin, DetailView):
+    model = Ride
+    template_name = "rideshare/ride_contact_confirm.html"
+
+
+# class RideContact(View):

@@ -6,6 +6,7 @@ from .views import (
     RideDetail,
     RideUpdate,
     RideDelete,
+    RideContactConfirm,
 )
 
 app_name = 'rideshare'
@@ -37,6 +38,11 @@ urlpatterns = [
                 'delete/',
                 RideDelete.as_view(),
                 name='delete'
+            ),
+            path(
+                'confirm/',
+                RideContactConfirm.as_view(),
+                name='contact-confirm'
             ),
         ])
     )

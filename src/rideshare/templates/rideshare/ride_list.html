@@ -2,17 +2,49 @@
 
 {% block content %}
 
+<div class="page-header">
+    <h1>Ridesharing</h1>
+</div>
+
+<p>
+On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival.
+</p>
+
 <a class="btn btn-success" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
   Create ride
 </a>
 
-<hr />
+<table class="table table-condensed table-striped">
+    <thead>
+        <th>
+            When
+        <th>
+            Location
+        <th>
+            Seats
+        <th>
+    <tbody>
 
 {% for ride in ride_list %}
+        <tr>
+            <td>
+                {{ ride.when|date:"c" }}
+            <td>
+                {{ ride.location }}
+            <td>
+                {{ ride.seats }}
+            <td>
+                <a class="btn btn-primary" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
+                    <i class="fas fa-eye"></i> Details
+                </a>
 
-  {{ ride.from_location }} at {{ ride.from_datetime}}
+{% empty %}
 
+        <tr>
+            <td colspan=4>
+                No rideshares yet!
 
 {% endfor %}
+</table>
 
 {% endblock %}

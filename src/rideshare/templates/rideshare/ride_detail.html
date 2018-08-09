@@ -3,10 +3,39 @@
 
 {% block content %}
 
-{{ object.location }}
+<a class="btn btn-primary" href="{% url 'rideshare:list' camp_slug=camp.slug %}">
+    <i class="fas fa-chevron-left"></i>
+    Back
+</a>
 
-{{ object.datetime }}
+<hr />
 
-{{ object.description }}
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <strong>{{ object.seats }}</strong>
+            seats free, going from
+            <strong>{{ object.location }}</strong>
+            at
+            <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <strong>Description:</strong>
+        <p>
+            {{ object.description|untrustedcommonmark }}
+        </p>
+    </div>
+    <div class="panel-footer">
+        <a class="btn btn-success pull-right" href="{% url 'rideshare:contact-confirm' camp_slug=camp.slug pk=object.pk %}">
+            <i class="fas fa-thumbs-up"></i>
+            Contact this rideshare
+        </a>
+        <span class="clearfix"></span>
+    </div>
+    </div>
+</div>
+
+
 
 {% endblock %}
