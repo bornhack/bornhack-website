@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.views.generic import (
     ListView,
@@ -73,10 +73,15 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class RideUpdate(LoginRequiredMixin, CampViewMixin, UpdateView):
+class IsRideOwnerMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.get_object().user == self.request.user
+
+
+class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
     model = Ride
     fields = ['location', 'when', 'seats', 'description']
 
 
-class RideDelete(LoginRequiredMixin, CampViewMixin, DeleteView):
+class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
     model = Ride
