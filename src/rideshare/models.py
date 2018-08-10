@@ -9,7 +9,7 @@ class Ride(UUIDModel, CampRelatedModel):
     user = models.ForeignKey('auth.User', on_delete=models.PROTECT)
     seats = models.PositiveIntegerField()
     location = models.CharField(max_length=100)
-    when = models.DateTimeField()
+    when = models.DateTimeField(help_text="Format is YYYY-MM-DD HH:mm")
     description = models.TextField()
 
     def get_absolute_url(self):
