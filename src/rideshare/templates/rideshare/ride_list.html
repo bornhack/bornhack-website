@@ -10,9 +10,13 @@
 On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival.
 </p>
 
-<a class="btn btn-success" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
-  Create ride
+<a class="btn btn-success pull-right" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
+    <i class="fas fa-car"></i>
+    Create ride
 </a>
+<span class="clearfix"></span>
+
+<hr />
 
 <table class="table table-condensed table-striped">
     <thead>

@@ -1,17 +1,29 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse
 from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
     UpdateView,
     DeleteView,
-    TemplateView,
+    FormView
 )
 from django.http import HttpResponseRedirect
+from django import forms
 
 from camps.mixins import CampViewMixin
+from utils.email import add_outgoing_email
 
 from .models import Ride
+
+
+class ContactRideForm(forms.Form):
+    message = forms.CharField(
+        widget=forms.Textarea(attrs={"placeholder": "Remember to include your contact information!"}),
+        label="Write a message to this rideshare",
+        help_text="ATTENTION!: Pressing send will send an email with the above text. It is up to you to include your contact information so the person receiving the email can contact you.",
+    )
 
 
 class RideList(LoginRequiredMixin, CampViewMixin, ListView):
@@ -20,6 +32,32 @@ class RideList(LoginRequiredMixin, CampViewMixin, ListView):
 
 class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
     model = Ride
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ContactRideForm()
+        return context
+
+    def post(self, request, **kwargs):
+        form = ContactRideForm(request.POST)
+        if form.is_valid():
+            ride = self.get_object()
+            add_outgoing_email(
+                text_template='rideshare/emails/contact_mail.txt',
+                to_recipients=[ride.user.emailaddress_set.get(primary=True).email],
+                formatdict=dict(
+                    rideshare_url="https://bornhack.dk{}".format(
+                        reverse(
+                            'rideshare:detail',
+                            kwargs={"camp_slug": self.camp.slug, "pk": ride.pk}
+                        )
+                    ),
+                    message=form.cleaned_data['message'],
+                ),
+                subject="BornHack rideshare message!",
+            )
+        messages.info(request, "Your message has been sent.")
+        return HttpResponseRedirect(ride.get_absolute_url())
 
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
@@ -42,11 +80,3 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, DeleteView):
     model = Ride
-
-
-class RideContactConfirm(LoginRequiredMixin, CampViewMixin, DetailView):
-    model = Ride
-    template_name = "rideshare/ride_contact_confirm.html"
-
-
-# class RideContact(View):
