@@ -82,3 +82,10 @@ IRCBOT_SERVER_USETLS=True
 IRCBOT_PUBLIC_CHANNEL='{{ django_ircbot_public_channel }}'
 IRCBOT_VOLUNTEER_CHANNEL='{{ django_ircbot_volunteer_channel }}'
 
+# set BACKEND to "channels.layers.InMemoryChannelLayer" and CONFIG to {} for local development
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "{{ django_channels_backend }}",
+        "CONFIG": {{ django_channels_config }}
+    },
+}
