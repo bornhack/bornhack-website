@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load bootstrap3 %}
+
+{% block content %}
+
+<a class="btn btn-primary" href="{% url 'rideshare:list' camp_slug=camp.slug %}">
+    <i class="fas fa-chevron-left"></i>
+    Back
+</a>
+
+<hr />
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>
+            <strong>{{ object.seats }}</strong>
+            seats free, going from
+            <strong>{{ object.location }}</strong>
+            at
+            <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <strong>Description:</strong>
+        <p>
+            {{ object.description|untrustedcommonmark }}
+        </p>
+    </div>
+    {% if user == object.user %}
+    <div class="panel-footer">
+        <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=object.pk %}">
+            <i class="fas fa-trash"></i>
+            Delete
+        </a>
+        <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=object.pk %}">
+            <i class="fas fa-edit"></i>
+            Edit
+        </a>
+        <span class="clearfix"></span>
+    </div>
+    {% else %}
+    <div class="panel-footer">
+        <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button type="submit" class="btn btn-success pull-right">
+                <i class="fas fa-envelope"></i>
+                Send
+            </button>
+            <span class="clearfix"></span>
+        </form>
+    </div>
+
+    {% endif %}
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,13 @@
+Hello!
+
+The following message has been submitted to your rideshare on {{ rideshare_url }}.
+
+<message>
+
+{{ message }}
+
+</message>
+
+Best regards,
+
+The BornHack Team

@@ -183,6 +183,11 @@ urlpatterns = [
             ),
 
             path(
+                'rideshare/',
+                include('rideshare.urls', namespace='rideshare')
+            ),
+
+            path(
                 'backoffice/',
                 include('backoffice.urls', namespace='backoffice')
             ),
