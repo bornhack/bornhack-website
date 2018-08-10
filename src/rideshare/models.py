@@ -20,3 +20,11 @@ class Ride(UUIDModel, CampRelatedModel):
                 'camp_slug': self.camp.slug
             }
         )
+
+    def __str__(self):
+        return "{} seats from {} at {} by {}".format(
+            self.seats,
+            self.location,
+            self.when,
+            self.user
+        )
