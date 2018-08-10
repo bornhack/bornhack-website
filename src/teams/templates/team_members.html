@@ -26,6 +26,9 @@
                   Email
                 </th>
                 <th>
+                  Description
+                </th>
+                <th>
                     Action
                 </th>
               {% endif %}
@@ -45,6 +48,9 @@
                 {% if request.user in team.responsible_members.all %}
                 <td>
                     {{ member.user.email }}
+                </td>
+                <td>
+                    {{ member.user.profile.description|untrustedcommonmark }}
                 </td>
                 <td>
                   <div class="btn-group-vertical">
