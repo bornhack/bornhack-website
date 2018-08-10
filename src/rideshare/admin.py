@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Ride
+
+
+@admin.register(Ride)
+class RideModelAdmin(admin.ModelAdmin):
+    list_filter = ('camp', 'user')
