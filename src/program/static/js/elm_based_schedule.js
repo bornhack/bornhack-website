@@ -15706,50 +15706,6 @@ var _user$project$Views_DayView$dayView = F2(
 			});
 	});
 
-var _user$project$Views_EventDetail$eventInstanceItem = function (eventInstance) {
-	var toFormat = _elm_lang$core$Native_Utils.eq(
-		_elm_lang$core$Date$day(eventInstance.from),
-		_elm_lang$core$Date$day(eventInstance.to)) ? 'HH:mm' : 'E HH:mm';
-	return A2(
-		_elm_lang$html$Html$li,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'E HH:mm', eventInstance.from),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						' to ',
-						A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, toFormat, eventInstance.to)))),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Views_EventDetail$eventInstancesSidebar = function (eventInstances) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$h4,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html$text('This event will occur at:'),
-					_1: {ctor: '[]'}
-				}),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$ul,
-					{ctor: '[]'},
-					A2(_elm_lang$core$List$map, _user$project$Views_EventDetail$eventInstanceItem, eventInstances)),
-				_1: {ctor: '[]'}
-			}
-		});
-};
 var _user$project$Views_EventDetail$speakerDetail = function (speaker) {
 	return A2(
 		_elm_lang$html$Html$li,
@@ -15797,67 +15753,173 @@ var _user$project$Views_EventDetail$speakerSidebar = function (speakers) {
 			}
 		});
 };
-var _user$project$Views_EventDetail$eventMetaDataSidebar = function (event) {
-	var _p0 = function () {
-		var _p1 = event.videoState;
-		switch (_p1) {
-			case 'to-be-recorded':
-				return {ctor: '_Tuple2', _0: true, _1: 'Yes'};
-			case 'not-to-be-recorded':
-				return {ctor: '_Tuple2', _0: true, _1: 'No'};
-			default:
-				return {ctor: '_Tuple2', _0: false, _1: ''};
-		}
-	}();
-	var showVideoRecoring = _p0._0;
-	var videoRecording = _p0._1;
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		{
+var _user$project$Views_EventDetail$eventInstanceItem = F2(
+	function (eventInstance, model) {
+		var _p0 = A2(
+			_elm_lang$core$Maybe$withDefault,
+			{ctor: '_Tuple2', _0: 'Unknown', _1: ''},
+			_elm_lang$core$List$head(
+				A2(
+					_elm_lang$core$List$filter,
+					function (_p1) {
+						var _p2 = _p1;
+						return _elm_lang$core$Native_Utils.eq(_p2._1, eventInstance.location);
+					},
+					A2(_elm_lang$core$List$map, _user$project$Models$unpackFilterType, model.eventLocations))));
+		var locationName = _p0._0;
+		var toFormat = _elm_lang$core$Native_Utils.eq(
+			_elm_lang$core$Date$day(eventInstance.from),
+			_elm_lang$core$Date$day(eventInstance.to)) ? 'HH:mm' : 'E HH:mm';
+		return {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$h4,
+				_elm_lang$html$Html$p,
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Metadata'),
-					_1: {ctor: '[]'}
+					_0: A2(
+						_elm_lang$html$Html$strong,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('When: '),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, 'E HH:mm', eventInstance.from),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									' to ',
+									A2(_justinmimbs$elm_date_extra$Date_Extra$toFormattedString, toFormat, eventInstance.to)))),
+						_1: {ctor: '[]'}
+					}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$ul,
+					_elm_lang$html$Html$p,
 					{ctor: '[]'},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$strong,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Where: '),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html$text(
+								A2(_elm_lang$core$Basics_ops['++'], locationName, ' ')),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$i,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$classList(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'fa', _1: true},
+												_1: {
+													ctor: '::',
+													_0: {
+														ctor: '_Tuple2',
+														_0: A2(_elm_lang$core$Basics_ops['++'], 'fa-', eventInstance.locationIcon),
+														_1: true
+													},
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									},
+									{ctor: '[]'}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _user$project$Views_EventDetail$eventMetaDataSidebar = F3(
+	function (event, eventInstances, model) {
+		var eventInstanceMetaData = function () {
+			var _p3 = eventInstances;
+			if ((_p3.ctor === '::') && (_p3._1.ctor === '[]')) {
+				return A2(_user$project$Views_EventDetail$eventInstanceItem, _p3._0, model);
+			} else {
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h4,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$li,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$strong,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html$text('Type: '),
-											_1: {ctor: '[]'}
-										}),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html$text(event.eventType),
-										_1: {ctor: '[]'}
-									}
-								}),
+							_0: _elm_lang$html$Html$text('Multiple occurences:'),
 							_1: {ctor: '[]'}
-						},
-						function () {
-							var _p2 = showVideoRecoring;
-							if (_p2 === true) {
-								return {
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$ul,
+							{ctor: '[]'},
+							A2(
+								_elm_lang$core$List$map,
+								function (ei) {
+									return A2(
+										_elm_lang$html$Html$li,
+										{ctor: '[]'},
+										A2(_user$project$Views_EventDetail$eventInstanceItem, ei, model));
+								},
+								_p3)),
+						_1: {ctor: '[]'}
+					}
+				};
+			}
+		}();
+		var _p4 = function () {
+			var _p5 = event.videoState;
+			switch (_p5) {
+				case 'to-be-recorded':
+					return {ctor: '_Tuple2', _0: true, _1: 'Yes'};
+				case 'not-to-be-recorded':
+					return {ctor: '_Tuple2', _0: true, _1: 'No'};
+				default:
+					return {ctor: '_Tuple2', _0: false, _1: ''};
+			}
+		}();
+		var showVideoRecoring = _p4._0;
+		var videoRecording = _p4._1;
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$h4,
+						{ctor: '[]'},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Metadata'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$ul,
+							{ctor: '[]'},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								{
 									ctor: '::',
 									_0: A2(
 										_elm_lang$html$Html$li,
@@ -15869,47 +15931,74 @@ var _user$project$Views_EventDetail$eventMetaDataSidebar = function (event) {
 												{ctor: '[]'},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Recording: '),
+													_0: _elm_lang$html$Html$text('Type: '),
 													_1: {ctor: '[]'}
 												}),
 											_1: {
 												ctor: '::',
-												_0: _elm_lang$html$Html$text(videoRecording),
+												_0: _elm_lang$html$Html$text(event.eventType),
 												_1: {ctor: '[]'}
 											}
 										}),
 									_1: {ctor: '[]'}
-								};
-							} else {
-								return {ctor: '[]'};
-							}
-						}())),
-				_1: {ctor: '[]'}
-			}
-		});
-};
+								},
+								function () {
+									var _p6 = showVideoRecoring;
+									if (_p6 === true) {
+										return {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$li,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$strong,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Recording: '),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(videoRecording),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										};
+									} else {
+										return {ctor: '[]'};
+									}
+								}())),
+						_1: {ctor: '[]'}
+					}
+				},
+				eventInstanceMetaData));
+	});
 var _user$project$Views_EventDetail$getSpeakersFromSlugs = F3(
 	function (speakers, slugs, collectedSpeakers) {
 		getSpeakersFromSlugs:
 		while (true) {
-			var _p3 = speakers;
-			if (_p3.ctor === '[]') {
+			var _p7 = speakers;
+			if (_p7.ctor === '[]') {
 				return collectedSpeakers;
 			} else {
-				var _p7 = _p3._0;
+				var _p11 = _p7._0;
 				var foundSlug = _elm_lang$core$List$head(
 					A2(
 						_elm_lang$core$List$filter,
 						function (slug) {
-							return _elm_lang$core$Native_Utils.eq(slug, _p7.slug);
+							return _elm_lang$core$Native_Utils.eq(slug, _p11.slug);
 						},
 						slugs));
 				var foundSpeaker = function () {
-					var _p4 = foundSlug;
-					if (_p4.ctor === 'Just') {
+					var _p8 = foundSlug;
+					if (_p8.ctor === 'Just') {
 						return {
 							ctor: '::',
-							_0: _p7,
+							_0: _p11,
 							_1: {ctor: '[]'}
 						};
 					} else {
@@ -15918,28 +16007,28 @@ var _user$project$Views_EventDetail$getSpeakersFromSlugs = F3(
 				}();
 				var newCollectedSpeakers = A2(_elm_lang$core$Basics_ops['++'], collectedSpeakers, foundSpeaker);
 				var newSlugs = function () {
-					var _p5 = foundSlug;
-					if (_p5.ctor === 'Just') {
+					var _p9 = foundSlug;
+					if (_p9.ctor === 'Just') {
 						return A2(
 							_elm_lang$core$List$filter,
 							function (x) {
-								return !_elm_lang$core$Native_Utils.eq(x, _p5._0);
+								return !_elm_lang$core$Native_Utils.eq(x, _p9._0);
 							},
 							slugs);
 					} else {
 						return slugs;
 					}
 				}();
-				var _p6 = slugs;
-				if (_p6.ctor === '[]') {
+				var _p10 = slugs;
+				if (_p10.ctor === '[]') {
 					return collectedSpeakers;
 				} else {
-					var _v6 = _p3._1,
-						_v7 = newSlugs,
-						_v8 = newCollectedSpeakers;
-					speakers = _v6;
-					slugs = _v7;
-					collectedSpeakers = _v8;
+					var _v8 = _p7._1,
+						_v9 = newSlugs,
+						_v10 = newCollectedSpeakers;
+					speakers = _v8;
+					slugs = _v9;
+					collectedSpeakers = _v10;
 					continue getSpeakersFromSlugs;
 				}
 			}
@@ -15959,8 +16048,8 @@ var _user$project$Views_EventDetail$eventDetailSidebar = F2(
 			},
 			model.eventInstances);
 		var videoRecordingLink = function () {
-			var _p8 = event.videoUrl;
-			if (_p8.ctor === 'Nothing') {
+			var _p12 = event.videoUrl;
+			if (_p12.ctor === 'Nothing') {
 				return {ctor: '[]'};
 			} else {
 				return {
@@ -15969,7 +16058,7 @@ var _user$project$Views_EventDetail$eventDetailSidebar = F2(
 						_elm_lang$html$Html$a,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$href(_p8._0),
+							_0: _elm_lang$html$Html_Attributes$href(_p12._0),
 							_1: {
 								ctor: '::',
 								_0: _elm_lang$html$Html_Attributes$classList(
@@ -16034,12 +16123,8 @@ var _user$project$Views_EventDetail$eventDetailSidebar = F2(
 					_0: _user$project$Views_EventDetail$speakerSidebar(speakers),
 					_1: {
 						ctor: '::',
-						_0: _user$project$Views_EventDetail$eventMetaDataSidebar(event),
-						_1: {
-							ctor: '::',
-							_0: _user$project$Views_EventDetail$eventInstancesSidebar(eventInstances),
-							_1: {ctor: '[]'}
-						}
+						_0: A3(_user$project$Views_EventDetail$eventMetaDataSidebar, event, eventInstances, model),
+						_1: {ctor: '[]'}
 					}
 				}));
 	});
@@ -16135,9 +16220,9 @@ var _user$project$Views_EventDetail$eventDetailView = F2(
 					return _elm_lang$core$Native_Utils.eq(e.slug, eventSlug);
 				},
 				model.events));
-		var _p9 = event;
-		if (_p9.ctor === 'Just') {
-			var _p10 = _p9._0;
+		var _p13 = event;
+		if (_p13.ctor === 'Just') {
+			var _p14 = _p13._0;
 			return A2(
 				_elm_lang$html$Html$div,
 				{
@@ -16147,10 +16232,10 @@ var _user$project$Views_EventDetail$eventDetailView = F2(
 				},
 				{
 					ctor: '::',
-					_0: _user$project$Views_EventDetail$eventDetailContent(_p10),
+					_0: _user$project$Views_EventDetail$eventDetailContent(_p14),
 					_1: {
 						ctor: '::',
-						_0: A2(_user$project$Views_EventDetail$eventDetailSidebar, _p10, model),
+						_0: A2(_user$project$Views_EventDetail$eventDetailSidebar, _p14, model),
 						_1: {ctor: '[]'}
 					}
 				});
