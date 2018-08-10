@@ -36,7 +36,7 @@
       <h4>Instances</h4>
       <ul class="list-group">
       {% for ei in event.instances.all %}
-        <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
+      <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }} at {{ ei.location.name }} <i class="fas fa-{{ei.location.icon}}"></i></li>
       {% empty %}
         No instances scheduled yet
       {% endfor %}
