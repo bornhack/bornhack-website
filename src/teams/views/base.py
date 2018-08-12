@@ -19,6 +19,12 @@ class TeamListView(CampViewMixin, ListView):
     model = Team
     context_object_name = 'teams'
 
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        if self.request.user.is_authenticated:
+            context['user_teams'] = self.request.user.teammember_set.filter(team__camp=self.camp)
+        return context
+
 
 class TeamGeneralView(CampViewMixin, DetailView):
     template_name = "team_general.html"

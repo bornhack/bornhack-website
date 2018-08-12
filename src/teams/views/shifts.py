@@ -1,5 +1,7 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
+from django.template import Template, Context
 from django.views.generic import (
     View,
     CreateView,
@@ -7,9 +9,9 @@ from django.views.generic import (
     ListView,
     FormView,
     DeleteView,
+    TemplateView
 )
 from django import forms
-from django.contrib.postgres.forms.ranges import RangeWidget
 from django.utils import timezone
 from django.urls import reverse
 
@@ -299,7 +301,25 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 
         team_member = TeamMember.objects.get(team=team, user=request.user)
 
-        shift.team_members.add(team_member)
+        overlapping_shifts = TeamShift.objects.filter(
+            team__camp=self.camp,
+            team_members__user=request.user,
+            shift_range__overlap=shift.shift_range
+        )
+
+        if overlapping_shifts.exists():
+            template = Template("""You have shifts overlapping with the one you are trying to assign:<br/> <ul>
+            {% for shift in shifts %}
+            <li>{{ shift }}</li>
+            {% endfor %}
+            </ul>
+            """)
+            messages.error(
+                request,
+                template.render(Context({"shifts": overlapping_shifts}))
+            )
+        else:
+            shift.team_members.add(team_member)
 
         kwargs.pop('pk')
 
@@ -334,3 +354,16 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
                 kwargs=kwargs
             )
         )
+
+
+class UserShifts(CampViewMixin, TemplateView):
+    template_name = 'team_user_shifts.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_teams'] = self.request.user.teammember_set.filter(team__camp=self.camp)
+        context['user_shifts'] = TeamShift.objects.filter(
+            team__camp=self.camp,
+            team_members__user=self.request.user
+        )
+        return context
