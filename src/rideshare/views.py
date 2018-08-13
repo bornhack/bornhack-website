@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views.generic import (
     ListView,
     DetailView,
@@ -84,4 +84,6 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
     model = Ride
-    success_url = reverse_lazy('rideshare:list')
+
+    def get_success_url(self):
+        return reverse('rideshare:list', kwargs={'camp_slug': self.camp.slug})
