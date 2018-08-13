@@ -85,3 +85,4 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
     model = Ride
+    success_url = reverse('rideshare:list')
