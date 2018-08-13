@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.generic import (
     ListView,
     DetailView,
     CreateView,
     UpdateView,
     DeleteView,
-    FormView
 )
 from django.http import HttpResponseRedirect
 from django import forms
@@ -85,4 +84,4 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
     model = Ride
-    success_url = reverse('rideshare:list')
+    success_url = reverse_lazy('rideshare:list')
