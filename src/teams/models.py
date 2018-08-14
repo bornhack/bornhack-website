@@ -300,7 +300,7 @@ class TeamTask(CampRelatedModel):
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ['completed', 'when', 'name']
         unique_together = (('name', 'team'), ('slug', 'team'))
 
     def get_absolute_url(self):
