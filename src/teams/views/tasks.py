@@ -1,10 +1,12 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.views.generic import DetailView, CreateView, UpdateView
 from django import forms
+from django.views.generic.edit import ProcessFormView
 
 from camps.mixins import CampViewMixin
-from ..models import Team, TeamTask
+from ..models import Team, TeamTask, TaskComment, TeamMember
 from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
 
 
@@ -16,11 +18,38 @@ class TeamTasksView(CampViewMixin, DetailView):
     active_menu = 'tasks'
 
 
+class TaskCommentForm(forms.ModelForm):
+    class Meta:
+        model = TaskComment
+        fields = ['comment']
+
+
 class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
     active_menu = 'tasks'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['comment_form'] = TaskCommentForm()
+        return context
+
+    def post(self, request, **kwargs):
+        task = self.get_object()
+        if request.user not in task.team.members.all():
+            return HttpResponseNotAllowed('Nope')
+
+        form = TaskCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = TeamMember.objects.get(user=request.user, team=task.team)
+            comment.task = task
+            comment.save()
+        else:
+            messages.error(request, "Something went wrong.")
+
+        return HttpResponseRedirect(task.get_absolute_url())
 
 
 class TaskForm(forms.ModelForm):

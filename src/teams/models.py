@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 from django.contrib.postgres.fields import DateTimeRangeField
 
-from utils.models import CampRelatedModel
+from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -318,6 +318,12 @@ class TeamTask(CampRelatedModel):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(**kwargs)
+
+
+class TaskComment(UUIDModel, CreatedUpdatedModel):
+    task = models.ForeignKey('teams.TeamTask', on_delete=models.PROTECT, related_name="comments")
+    author = models.ForeignKey('teams.TeamMember', on_delete=models.PROTECT)
+    comment = models.TextField()
 
 
 class TeamShift(CampRelatedModel):
