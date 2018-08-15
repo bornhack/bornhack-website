@@ -34,5 +34,8 @@ class Command(BaseCommand):
                     ticket.save()
                     ticket.generate_pdf()
                     self.output("- {}_ticket_{}.pdf".format(ticket.shortname, ticket.pk))
+                sponsor.tickets_generated = True
+                sponsor.save()
             else:
                 self.output("{} is in tier {}, which has no tickets set.".format(sponsor, sponsor.tier))
+
