@@ -1,7 +1,7 @@
 import logging
 from itertools import chain
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
@@ -14,8 +14,6 @@ from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
 from program.models import SpeakerProposal, EventProposal
-
-from .mixins import BackofficeViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -52,7 +50,7 @@ class BadgeHandoutView(InfodeskMixin, ListView):
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
-class TicketCheckinView(InfodeskMixin, BackofficeViewMixin, ListView):
+class TicketCheckinView(InfodeskMixin, ListView):
     template_name = "ticket_checkin.html"
     context_object_name = 'tickets'
 
@@ -61,6 +59,15 @@ class TicketCheckinView(InfodeskMixin, BackofficeViewMixin, ListView):
         sponsortickets = SponsorTicket.objects.filter(checked_in=False)
         discounttickets = DiscountTicket.objects.filter(checked_in=False)
         return list(chain(shoptickets, sponsortickets, discounttickets))
+
+
+class BackofficeViewMixin(CampViewMixin, UserPassesTestMixin):
+    """
+    Mixin used by all backoffice views. For now just uses CampViewMixin and StaffMemberRequiredMixin.
+    """
+
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
 class ApproveNamesView(BackofficeViewMixin, ListView):
