@@ -36,6 +36,8 @@ class Sponsor(CampRelatedModel):
         help_text="An URL to the sponsor."
     )
 
+    tickets_generated = models.BooleanField(default=False)
+
     def __str__(self):
         return '{} ({})'.format(self.name, self.tier.camp)
 
@@ -68,6 +70,12 @@ class SponsorTier(CampRelatedModel):
         default=0,
         help_text="""This decides where on the list the tier will be shown. I.e.
         gold should have a lower value than silver."""
+    )
+
+    tickets = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="If set this is the number of tickets generated for a sponsor in this tier."
     )
 
     def __str__(self):
