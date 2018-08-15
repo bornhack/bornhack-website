@@ -16,6 +16,9 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         verbose_name = 'Camp'
         verbose_name_plural = 'Camps'
         ordering = ['-title']
+        permissions = (
+            ("infodesk_permission", "Infodesk permission"),
+        )
 
     title = models.CharField(
         verbose_name='Title',

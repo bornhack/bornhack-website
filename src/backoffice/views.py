@@ -1,6 +1,7 @@
 import logging
 from itertools import chain
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import UpdateView
 from django.shortcuts import redirect
@@ -8,6 +9,7 @@ from django.urls import reverse
 from django.contrib import messages
 from django.utils import timezone
 
+from camps.mixins import CampViewMixin
 from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
@@ -18,11 +20,16 @@ from .mixins import BackofficeViewMixin
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class BackofficeIndexView(BackofficeViewMixin, TemplateView):
+
+class InfodeskMixin(CampViewMixin, PermissionRequiredMixin):
+    permission_required = ("camps.infodesk_permission")
+
+
+class BackofficeIndexView(InfodeskMixin, TemplateView):
     template_name = "index.html"
 
 
-class ProductHandoutView(BackofficeViewMixin, ListView):
+class ProductHandoutView(InfodeskMixin, ListView):
     template_name = "product_handout.html"
 
     def get_queryset(self, **kwargs):
@@ -34,7 +41,7 @@ class ProductHandoutView(BackofficeViewMixin, ListView):
         ).order_by('order')
 
 
-class BadgeHandoutView(BackofficeViewMixin, ListView):
+class BadgeHandoutView(InfodeskMixin, ListView):
     template_name = "badge_handout.html"
     context_object_name = 'tickets'
 
@@ -45,7 +52,7 @@ class BadgeHandoutView(BackofficeViewMixin, ListView):
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
-class TicketCheckinView(BackofficeViewMixin, ListView):
+class TicketCheckinView(InfodeskMixin, BackofficeViewMixin, ListView):
     template_name = "ticket_checkin.html"
     context_object_name = 'tickets'
 
