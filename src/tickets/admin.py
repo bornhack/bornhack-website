@@ -47,7 +47,7 @@ class SponsorTicketAdmin(BaseTicketAdmin):
         'sponsor',
     ]
 
-    search_fields = ['name', 'email', 'sponsor__name']
+    search_fields = ['pk', 'email', 'sponsor__name']
 
 
 @admin.register(DiscountTicket)
