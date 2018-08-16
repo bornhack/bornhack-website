@@ -66,7 +66,9 @@ class EventTrackAdmin(admin.ModelAdmin):
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('event', 'when', 'location')
+    list_filter = ('event__track__camp', 'event')
+    search_fields = ['event__title']
 
 
 @admin.register(EventType)
