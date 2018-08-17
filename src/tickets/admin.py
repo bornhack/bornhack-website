@@ -82,3 +82,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
     ]
 
     search_fields = ['uuid', 'order__id', 'order__user__email', 'name', 'email']
+
+
+class ShopTicketInline(admin.TabularInline):
+    model = ShopTicket
