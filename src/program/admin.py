@@ -32,7 +32,7 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
 
 
 def get_speakers_string(event_proposal):
-    return ', '.join(event_proposal.speakers.all().values_list('name', flat=True))
+    return ', '.join(event_proposal.speakers.all().values_list('email', flat=True))
 get_speakers_string.short_description = 'Speakers'
 
 

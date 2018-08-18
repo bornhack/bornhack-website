@@ -237,8 +237,6 @@ class SpeakerProposal(UserSubmittedModel):
     email = models.EmailField(
         max_length=150,
         help_text="The email of the speaker (defaults to the logged in user if empty.",
-        null=True,
-        blank=True,
     )
 
     biography = models.TextField(
@@ -790,8 +788,6 @@ class Speaker(CampRelatedModel):
     email = models.EmailField(
         max_length=150,
         help_text="The email of the speaker.",
-        null=True,
-        blank=True
     )
 
     biography = models.TextField(
