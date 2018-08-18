@@ -23,6 +23,10 @@ class InfodeskMixin(CampViewMixin, PermissionRequiredMixin):
     permission_required = ("camps.infodesk_permission")
 
 
+class ContentTeamMixin(CampViewMixin, PermissionRequiredMixin):
+    permission_required = ("program.can_approve_proposals")
+
+
 class BackofficeIndexView(InfodeskMixin, TemplateView):
     template_name = "index.html"
 
@@ -78,7 +82,7 @@ class ApproveNamesView(BackofficeViewMixin, ListView):
         return Profile.objects.filter(public_credit_name_approved=False).exclude(public_credit_name='')
 
 
-class ManageProposalsView(BackofficeViewMixin, ListView):
+class ManageProposalsView(ContentTeamMixin, ListView):
     """
     This view shows a list of pending SpeakerProposal and EventProposals.
     """

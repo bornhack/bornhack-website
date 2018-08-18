@@ -311,6 +311,11 @@ class SpeakerProposal(UserSubmittedModel):
 class EventProposal(UserSubmittedModel):
     """ An event proposal """
 
+    class Meta:
+        permissions = (
+            ("can_approve_proposals", "Can approve proposals"),
+        )
+
     track = models.ForeignKey(
         'program.EventTrack',
         related_name='eventproposals',
