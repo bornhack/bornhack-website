@@ -104,7 +104,7 @@ class ManageProposalsView(ContentTeamMixin, ListView):
         return context
 
 
-class ProposalManageView(BackofficeViewMixin, UpdateView):
+class ProposalManageView(ContentTeamMixin, UpdateView):
     """
     This class contains the shared logic between SpeakerProposalManageView and EventProposalManageView
     """
