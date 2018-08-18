@@ -68,6 +68,11 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         max_length=7
     )
 
+    light_text = models.BooleanField(
+        default=True,
+        help_text='Check if this camps colour requires white text, uncheck if black text is better',
+    )
+
     call_for_participation_open = models.BooleanField(
         help_text='Check if the Call for Participation is open for this camp',
         default=False,
