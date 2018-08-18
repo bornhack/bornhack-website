@@ -1,12 +1,8 @@
 import logging
-from betterforms.multiform import MultiModelForm
-from collections import OrderedDict
 
 from django import forms
-from django.forms.widgets import TextInput
-from django.utils.dateparse import parse_duration
 
-from .models import SpeakerProposal, EventProposal, EventTrack
+from .models import SpeakerProposal, EventProposal, EventTrack, Url, UrlType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -160,9 +156,16 @@ class EventProposalForm(forms.ModelForm):
     """
     The EventProposalForm. Takes an EventType in __init__ and changes fields accordingly.
     """
+
+    slides_url = forms.URLField(
+        label="Slides URL",
+        help_text="Add a URL to your slides.",
+        required=False
+    )
+
     class Meta:
         model = EventProposal
-        fields = ['title', 'abstract', 'allow_video_recording', 'duration', 'submission_notes', 'track']
+        fields = ['title', 'abstract', 'allow_video_recording', 'duration', 'slides_url', 'submission_notes', 'track']
 
     def clean_duration(self):
         duration = self.cleaned_data['duration']
@@ -175,6 +178,19 @@ class EventProposalForm(forms.ModelForm):
         # TODO: make sure the track is part of the current camp, needs camp as form kwarg to verify
         return track
 
+    def save(self, user, event_type, commit=True):
+        self.instance.user = user
+        self.instance.event_type = event_type
+        super().save(commit=True)
+        if self.cleaned_data['slides_url'] and (self.instance.event_type.name == 'Talk' or self.instance.event_type.name == 'Lightning Talk'):
+            slides_url = Url()
+            slides_url.eventproposal = self.instance
+            slides_url.url = self.cleaned_data['slides_url']
+            slides_url.urltype = UrlType.objects.get(name="Slides")
+            slides_url.save()
+        return self.instance
+
+
     def __init__(self, camp, eventtype=None, *args, **kwargs):
         # initialise form
         super().__init__(*args, **kwargs)
@@ -185,6 +201,10 @@ class EventProposalForm(forms.ModelForm):
 
         # make sure video_recording checkbox defaults to checked
         self.fields['allow_video_recording'].initial = True
+
+        if not (eventtype.name == 'Talk' or eventtype.name == 'Lightning Talk'):
+            # Only talk or lightning talk should show the slides_url field
+            del(self.fields['slides_url'])
 
         if eventtype.name == 'Debate':
             # fix label and help_text for the title field
@@ -253,6 +273,9 @@ class EventProposalForm(forms.ModelForm):
             # fix label and help_text for the submission_notes field
             self.fields['submission_notes'].label = 'Talk Notes'
             self.fields['submission_notes'].help_text = 'Private notes regarding this talk. Only visible to yourself and the BornHack organisers.'
+
+            if eventtype.name == "Lightning Talk":
+                self.fields['slides_url'].help_text += " You will only get assigned a slot if you have provided slides (a title slide is enough if you don't use slides for the talk). You can add an URL later if need be."
 
             # no duration for talks
             del(self.fields['duration'])

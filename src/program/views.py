@@ -417,10 +417,11 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
 
     def form_valid(self, form):
         # set camp and user for this eventproposal
-        eventproposal = form.save(commit=False)
-        eventproposal.user = self.request.user
-        eventproposal.event_type = self.event_type
-        eventproposal.save()
+        eventproposal = form.save(
+            user=self.request.user,
+            event_type=self.event_type,
+            commit=True,
+        )
 
         # add the speakerproposal to the eventproposal
         eventproposal.speakers.add(self.speakerproposal)
