@@ -182,7 +182,7 @@ class EventProposalForm(forms.ModelForm):
         self.instance.user = user
         self.instance.event_type = event_type
         super().save(commit=True)
-        if self.cleaned_data['slides_url'] and (self.instance.event_type.name == 'Talk' or self.instance.event_type.name == 'Lightning Talk'):
+        if self.cleaned_data.get('slides_url') and (self.instance.event_type.name == 'Talk' or self.instance.event_type.name == 'Lightning Talk'):
             slides_url = Url()
             slides_url.eventproposal = self.instance
             slides_url.url = self.cleaned_data['slides_url']
