@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+{% load commonmark %}$
+
+{% block title %}
+Secret Token Found! | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3 class="text-center">Secret Token Found!</h3>
+<p class="lead text-center">You found a secret token:</p>
+<p class="lead text-center"><span class="badge">{{ token.description }}</span></p>
+<p class="lead text-center">Your visit has been registered! Keep hunting, there might be more tokens out there.</p>
+<p class="lead text-center"><a href="{% url 'tokens:tokenfind_list' %}">List All Tokens</a></p>
+{% endblock %}
+

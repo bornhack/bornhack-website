@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'backoffice',
     'events',
     'rideshare',
+    'tokens',
 
     'allauth',
     'allauth.account',

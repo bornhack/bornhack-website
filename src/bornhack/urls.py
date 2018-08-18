@@ -70,6 +70,11 @@ urlpatterns = [
         name='camp_list'
     ),
 
+    path(
+        'token/',
+        include('tokens.urls', namespace='tokens'),
+    ),
+
     # camp redirect views here
 
     path(

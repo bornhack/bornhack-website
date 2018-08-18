@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+{% load commonmark %}$
+
+{% block title %}
+Your Secret Tokens | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3>Your Secret Tokens</h3>
+{% if object_list %}
+<p class="lead">You have found the following secret tokens in the BornHack Secret Token Game:</p>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Camp</th>
+      <th>Token</th>
+      <th>Description</th>
+      <th>Found</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for tokenfind in object_list %}
+    <tr>
+      <td>{{ tokenfind.token.camp.title }}</td>
+      <td>{{ tokenfind.token.token }}</td>
+      <td>{{ tokenfind.token.description }}</td>
+      <td>{{ tokenfind.created }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="lead">You haven't found any secret tokens yet. Happy hunting!</p>
+{% endif %}
+{% endblock %}
+
