@@ -70,14 +70,6 @@ Is this for local development? Bootstrap the database with dummy data and users:
 (venv) $ src/manage.py bootstrap-devsite
 ```
 
-### Deploy camps+program test data
-
-Run this command to create a bunch of nice test data:
-
-```
-(venv) $ src/manage.py bootstrap-devsite
-```
-
 
 ### Done
 Is this for local development? Start the Django devserver:
