@@ -31,6 +31,11 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
     list_filter = ('camp', 'proposal_status', 'user')
 
 
+def get_speakers_string(event_proposal):
+    return ', '.join(event_proposal.speakers.all().values_list('name', flat=True))
+get_speakers_string.short_description = 'Speakers'
+
+
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
     def mark_eventproposal_as_approved(self, request, queryset):
@@ -49,8 +54,12 @@ class EventProposalAdmin(admin.ModelAdmin):
                     return False
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
+    def get_speakers(self):
+        return
+
     actions = ['mark_eventproposal_as_approved']
-    list_filter = ('track', 'proposal_status', 'user')
+    list_filter = ('event_type', 'proposal_status', 'track', 'user',)
+    list_display = ['title', get_speakers_string, 'event_type', 'proposal_status',]
 
 
 @admin.register(EventLocation)
