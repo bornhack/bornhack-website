@@ -158,6 +158,10 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
         # set user before saving
         form.instance.user = self.request.user
         form.instance.camp = self.camp
+
+        if not form.instance.email:
+            form.instance.email = self.request.user.email
+
         speakerproposal = form.save()
 
         # add speakerproposal to eventproposal
@@ -574,6 +578,8 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
             speakerproposal = form['speakerproposal'].save(commit=False)
             speakerproposal.camp = self.camp
             speakerproposal.user = self.request.user
+            if not speakerproposal.email:
+                speakerproposal.email = self.request.user.email
             speakerproposal.save()
 
             # then save the eventproposal

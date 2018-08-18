@@ -36,7 +36,7 @@
       {% for proposal in speakerproposals %}
       <tr>
           <td>{{ proposal.name }}</td>
-          <td>{{ proposal.user.email }}</td>
+          <td>{{ proposal.email }}</td>
           <td class="text-center">{{ proposal.needs_oneday_ticket|truefalseicon }}</td>
           <td class="text-center">{{ proposal.event|truefalseicon }}</td>
           <td>{{ proposal.user }}</td>

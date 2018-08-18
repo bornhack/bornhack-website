@@ -234,6 +234,13 @@ class SpeakerProposal(UserSubmittedModel):
         help_text='Name or alias of the speaker/artist/host',
     )
 
+    email = models.EmailField(
+        max_length=150,
+        help_text="The email of the speaker (defaults to the logged in user if empty.",
+        null=True,
+        blank=True,
+    )
+
     biography = models.TextField(
         help_text='Biography of the speaker/artist/host. Markdown is supported.'
     )
@@ -268,6 +275,11 @@ class SpeakerProposal(UserSubmittedModel):
 
         # set Speaker data
         speaker.camp = self.camp
+        if self.email:
+            email = self.email
+        else:
+            email = request.user.email
+        speaker.email = email
         speaker.name = self.name
         speaker.biography = self.biography
         speaker.needs_oneday_ticket = self.needs_oneday_ticket
@@ -768,6 +780,13 @@ class Speaker(CampRelatedModel):
     name = models.CharField(
         max_length=150,
         help_text='Name or alias of the speaker',
+    )
+
+    email = models.EmailField(
+        max_length=150,
+        help_text="The email of the speaker.",
+        null=True,
+        blank=True
     )
 
     biography = models.TextField(

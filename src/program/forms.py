@@ -17,7 +17,7 @@ class SpeakerProposalForm(forms.ModelForm):
     """
     class Meta:
         model = SpeakerProposal
-        fields = ['name', 'biography', 'needs_oneday_ticket', 'submission_notes']
+        fields = ['name', 'email', 'biography', 'needs_oneday_ticket', 'submission_notes']
 
     def __init__(self, camp, eventtype=None, *args, **kwargs):
         # initialise the form
