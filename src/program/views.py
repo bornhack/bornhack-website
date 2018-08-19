@@ -1,11 +1,9 @@
 import logging
-import os
 from collections import OrderedDict
 
 from django.views.generic import ListView, TemplateView, DetailView, View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.conf import settings
-from django.views.decorators.http import require_safe
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
@@ -14,14 +12,13 @@ from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.template import Engine, Context
 from django.shortcuts import redirect
-from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 from betterforms.multiform import MultiModelForm
 import icalendar
 
 from camps.mixins import CampViewMixin
+from program.models import Url, UrlType
 from .mixins import (
-    EnsureUnapprovedProposalMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
     EnsureCFPOpenMixin,
@@ -417,11 +414,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
 
     def form_valid(self, form):
         # set camp and user for this eventproposal
-        eventproposal = form.save(
-            user=self.request.user,
-            event_type=self.event_type,
-            commit=True,
-        )
+        eventproposal = form.save(user=self.request.user, event_type=self.event_type)
 
         # add the speakerproposal to the eventproposal
         eventproposal.speakers.add(self.speakerproposal)
@@ -569,10 +562,7 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         Save the object(s) here before redirecting
         """
         if hasattr(self, 'speakerproposal'):
-            eventproposal = form.save(commit=False)
-            eventproposal.user = self.request.user
-            eventproposal.event_type = self.eventtype
-            eventproposal.save()
+            eventproposal = form.save(user=self.request.user, event_type=self.eventtype)
             eventproposal.speakers.add(self.speakerproposal)
         else:
             # first save the SpeakerProposal
@@ -584,7 +574,7 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
             speakerproposal.save()
 
             # then save the eventproposal
-            eventproposal = form['eventproposal'].save(commit=False)
+            eventproposal = form['eventproposal'].save(user=self.request.user, event_type=self.eventtype)
             eventproposal.user = self.request.user
             eventproposal.event_type = self.eventtype
             eventproposal.save()

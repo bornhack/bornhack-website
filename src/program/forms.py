@@ -1,6 +1,7 @@
 import logging
 
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 
 from .models import SpeakerProposal, EventProposal, EventTrack, Url, UrlType
 
@@ -178,18 +179,25 @@ class EventProposalForm(forms.ModelForm):
         # TODO: make sure the track is part of the current camp, needs camp as form kwarg to verify
         return track
 
-    def save(self, user, event_type, commit=True):
-        self.instance.user = user
-        self.instance.event_type = event_type
-        super().save(commit=True)
-        if self.cleaned_data.get('slides_url') and (self.instance.event_type.name == 'Talk' or self.instance.event_type.name == 'Lightning Talk'):
-            slides_url = Url()
-            slides_url.eventproposal = self.instance
-            slides_url.url = self.cleaned_data['slides_url']
-            slides_url.urltype = UrlType.objects.get(name="Slides")
-            slides_url.save()
-        return self.instance
+    def save(self, commit=True, user=None, event_type=None):
+        eventproposal = super().save(commit=False)
+        if user:
+            eventproposal.user = user
+        if event_type:
+            eventproposal.event_type = event_type
+        eventproposal.save()
 
+
+        if self.cleaned_data.get('slides_url') and event_type.name in ['Talk', 'Lightning Talk']:
+            url = self.cleaned_data.get('slides_url')
+            if not eventproposal.urls.filter(url=url).exists():
+                slides_url = Url()
+                slides_url.eventproposal = eventproposal
+                slides_url.url = url
+                slides_url.urltype = UrlType.objects.get(name="Slides")
+                slides_url.save()
+
+        return eventproposal
 
     def __init__(self, camp, eventtype=None, *args, **kwargs):
         # initialise form
@@ -274,7 +282,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields['submission_notes'].label = 'Talk Notes'
             self.fields['submission_notes'].help_text = 'Private notes regarding this talk. Only visible to yourself and the BornHack organisers.'
 
-            if eventtype.name == "Lightning Talk":
+            if self.fields.get('slides_url') and eventtype.name == "Lightning Talk":
                 self.fields['slides_url'].help_text += " You will only get assigned a slot if you have provided slides (a title slide is enough if you don't use slides for the talk). You can add an URL later if need be."
 
             # no duration for talks
