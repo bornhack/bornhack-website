@@ -31,11 +31,13 @@ Your Secret Tokens | {{ block.super }}
     </tr>
     {% endfor %}
     {% for unfound in unfound_list %}
+    <tr>
       <td>{{ unfound.camp.title }}</td>
       <td>-</td>
       <td>{{ unfound.category }}</td>
       <td>-</td>
       <td>-</td>
+    </tr>
     {% endfor %}
   </tbody>
 </table>
