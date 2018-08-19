@@ -13,6 +13,10 @@ class Token(CampRelatedModel):
         help_text="The secret token"
     )
 
+    category = models.TextField(
+        help_text="The category/hint for this token (physical, website, whatever)"
+    )
+
     description = models.TextField(
         help_text="The description of the token"
     )
@@ -24,6 +28,9 @@ class Token(CampRelatedModel):
 
 
 class TokenFind(CampRelatedModel):
+    class Meta:
+        unique_together = (('user', 'token'))
+
     token = models.ForeignKey(
         'tokens.Token',
         on_delete=models.PROTECT
