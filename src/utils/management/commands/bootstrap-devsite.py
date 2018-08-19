@@ -936,56 +936,64 @@ Towards the end we will open up to debate about how to use these resources or if
                 name='Henrik Kramse',
                 biography='Henrik is an internet samurai working in internet and security around the world.',
                 slug='henrik-kramshj',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp1.events.add(ev5)
             sp2 = Speaker.objects.create(
                 name='Thomas Tykling',
                 biography='random danish hacker',
                 slug='thomas-tykling',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp2.events.add(ev3, ev1)
             sp3 = Speaker.objects.create(
                 name='Alex Ahf',
                 biography='functional alcoholic',
                 slug='alex-ahf',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp3.events.add(ev4, ev2)
             sp4 = Speaker.objects.create(
                 name='Jesper Arp',
                 biography='Representative from The Alternative with focus in data visualization.',
                 slug='jesper-arp',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp4.events.add(ev9, ev27)
             sp5 = Speaker.objects.create(
                 name='Rolf Bjerre',
                 biography='The green pirate',
                 slug='rolf-bjerre',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp5.events.add(ev9, ev23)
             sp6 = Speaker.objects.create(
                 name='Emma Holten',
                 biography='Emma Holten is a feminist and human rights activist. She is co-founder and editor of the standard critical magazine Friktion and also a student at the University of Copenhagen. She speaks in both national and global contexts of feminism, digital activism and why privacy on the internet is crucial to a democracy, where everyone is equal.',
                 slug='emma-holten',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp6.events.add(ev10)
             sp7 = Speaker.objects.create(
                 name='Christoffer Jerkeby',
                 biography='Hacker and phone phreaker from Stockholm bent on radio. Researching security and privacy in wireless protocols.',
                 slug='christoffer-jerkeby',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp7.events.add(ev11)
             sp8 = Speaker.objects.create(
                 name='Stephan Engberg',
                 biography='Stephan Engberg is a Computer Scientist specializing in Innovation Strategist working with Digital Business when he realized the Digital World is designed through our approach to security models and economic models. He then dedicated himself to Privacy/Security by Design in Open Business Innovation making numerous breakthroughs in security and engaged in EU research activities he was e.g. member of the Strategic Advisory Board for FP7 Security Research Roadmapping and started manufacturing of RFID computer chips based on Privacy by Design with zero-knowledge based computing in passive chips without battery or ultra-low memory and computational capabilities. In 2003, he was selected by an a transatlantic panel of researchers in ethics as a Moral Example in the Computer Profession.',
                 slug='stephan-engberg',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp8.events.add(ev12)
             sp9 = Speaker.objects.create(
@@ -999,7 +1007,8 @@ security issues for various publications. He is the author of the
 monthly Bulletproof TLS Newsletter.
                 ''',
                 slug='hanno-bock',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp9.events.add(ev13, ev16)
             sp10 = Speaker.objects.create(
@@ -1014,7 +1023,8 @@ I also like music, cooking, sci-fi and cats, in an order indistinguishable from
 a truly random sequence by a polynomial-time-bounded computational adversary.
                 ''',
                 slug='ximin-luo',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp10.events.add(ev14)
             sp11 = Speaker.objects.create(
@@ -1025,14 +1035,16 @@ His dayjob involves writing firmware for a BT/wifi controller
 for a semiconductor company.
                 ''',
                 slug='michael-knudsen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp11.events.add(ev15)
             sp12 = Speaker.objects.create(
                 name='BornHack Network Team',
                 biography='The team you won\'t notice if everything goes as it should. Please bring them rum or beer if they look too stressed.',
                 slug='bornhack-network-team',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp12.events.add(ev17)
             sp13 = Speaker.objects.create(
@@ -1046,7 +1058,8 @@ Valley. Juha is also a noted lecturer and public speaker. Juha's work on
 Ahmia has been in part sponsored by the Google Summer of Code.
                 ''',
                 slug='juha-nurmi',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp13.events.add(ev18)
             sp14 = Speaker.objects.create(
@@ -1060,7 +1073,8 @@ programming, machine learning, road engineering.
 Also, I enjoy nature quite a bit. Presently, I work at the Danish Road Directorate with rolling resistance modelling and pavement management as the main focus. Besides doing a lot of programming at work (primarily Python) I also experiment with Erlang in my spare time trying to build peer2peer software.
                 ''',
                 slug='lasse-andersen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp14.events.add(ev21)
             sp15 = Speaker.objects.create(
@@ -1074,7 +1088,8 @@ dim future, that lies ahead.
 Website: [aflyttet.dk](https://aflyttet.dk)
                 ''',
                 slug='anders-kjrulff',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp15.events.add(ev22)
             sp16 = Speaker.objects.create(
@@ -1083,7 +1098,8 @@ Website: [aflyttet.dk](https://aflyttet.dk)
 Thomas is an electronics engineer, though he is mostly doing software development in his professional life. For the past 7 years Thomas has been a member of the hackerspace Labitat, where he has been doing various projects, mostly with electronics, 3D printing and video documentation.
                 ''',
                 slug='thomas-flummer',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp16.events.add(ev24)
             sp17 = Speaker.objects.create(
@@ -1099,7 +1115,8 @@ real world use whenever possible. His dayjob involves functional
 programming for a danish startup.
                 ''',
                 slug='jesper-louis-andersen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp17.events.add(ev25, ev26)
 
