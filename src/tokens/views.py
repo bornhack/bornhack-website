@@ -25,3 +25,9 @@ class TokenFindListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         return TokenFind.objects.filter(user=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # find the tokens the user still needs to find
+        context['unfound_list'] = Token.objects.all().exclude(id__in=TokenFind.objects.filter(user=self.request.user).values_list('id', flat=True))
+        return context
+
