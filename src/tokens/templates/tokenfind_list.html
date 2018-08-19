@@ -8,7 +8,6 @@ Your Secret Tokens | {{ block.super }}
 
 {% block content %}
 <h3>Your Secret Tokens</h3>
-{% if object_list %}
 <p class="lead">You have found the following secret tokens in the BornHack Secret Token Game:</p>
 <table class="table">
   <thead>
@@ -41,9 +40,8 @@ Your Secret Tokens | {{ block.super }}
     {% endfor %}
   </tbody>
 </table>
-{% else %}
-<p class="lead">You haven't found any secret tokens yet. Happy hunting!</p>
+{% if not unfound_list %}
+<p class="lead">Congratulations! You've found all tokens we have created right now.</p>
 {% endif %}
-<hr>
 {% endblock %}
 
