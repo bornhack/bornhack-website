@@ -81,6 +81,15 @@ Otherwise start uwsgi or similar to serve the application.
 
 Enjoy!
 
+### Elm schedule
+
+To build the schedule source with Elm, you need NPM and Elm, but if you have Docker, you can also run the `docker` make target:
+
+```
+cd schedule
+make docker
+```
+
 ## Notes
 
 ### Add a camp
