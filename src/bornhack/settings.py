@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'events',
     'rideshare',
     'tokens',
+    'feedback',
 
     'allauth',
     'allauth.account',

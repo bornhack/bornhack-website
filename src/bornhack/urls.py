@@ -2,15 +2,14 @@ from allauth.account.views import (
     LoginView,
     LogoutView,
 )
-from django.conf import settings
 from django.urls import include, path
 from django.contrib import admin
 from camps.views import *
+from feedback.views import FeedbackCreate
 from info.views import *
 from villages.views import *
 from program.views import *
 from sponsors.views import *
-from teams.views import *
 from people.views import *
 from bar.views import MenuView
 
@@ -195,6 +194,12 @@ urlpatterns = [
             path(
                 'backoffice/',
                 include('backoffice.urls', namespace='backoffice')
+            ),
+
+            path(
+                'feedback/',
+                FeedbackCreate.as_view(),
+                name='feedback'
             ),
 
         ])
