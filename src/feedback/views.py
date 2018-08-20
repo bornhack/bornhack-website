@@ -16,6 +16,7 @@ class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     def form_valid(self, form):
         feedback = form.save(commit=False)
         feedback.user = self.request.user
+        feedback.save()
         thanks_message = "Thank you! Your feedback is highly appreciated!"
         try:
             token = Token.objects.get(
