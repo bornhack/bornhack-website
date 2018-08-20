@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rideshare',
     'tokens',
     'feedback',
+    'reimbursement',
 
     'allauth',
     'allauth.account',
