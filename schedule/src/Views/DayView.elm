@@ -69,7 +69,7 @@ locationColumns eventInstances eventLocations offset minutes =
                 , ( "justify-content", "space-around" )
                 ]
             , classList
-                [ ( "col-sm-11", True )
+                [ ( "col-xs-11", True )
                 ]
             ]
             (List.map (\location -> locationColumn columnWidth eventInstances offset minutes location) eventLocations)
@@ -269,7 +269,7 @@ gutter : List Date -> Html Msg
 gutter hours =
     div
         [ classList
-            [ ( "col-sm-1", True )
+            [ ( "col-xs-1", True )
             , ( "day-view-gutter", True )
             ]
         ]
