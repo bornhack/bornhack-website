@@ -187,6 +187,8 @@ class EventProposalForm(forms.ModelForm):
             eventproposal.event_type = event_type
         eventproposal.save()
 
+        if not event_type and hasattr(eventproposal, 'event_type'):
+            event_type = eventproposal.event_type
 
         if self.cleaned_data.get('slides_url') and event_type.name in ['Talk', 'Lightning Talk']:
             url = self.cleaned_data.get('slides_url')
