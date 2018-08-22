@@ -87,6 +87,12 @@ class Order(CreatedUpdatedModel):
         default=True,
     )
 
+    customer_address = models.TextField(
+        help_text=_('The additional customer address for this order'),
+        blank=True
+    )
+
+
     CREDIT_CARD = 'credit_card'
     BLOCKCHAIN = 'blockchain'
     BANK_TRANSFER = 'bank_transfer'
