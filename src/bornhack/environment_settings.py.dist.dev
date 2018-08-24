@@ -76,3 +76,5 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
+
+REIMBURSEMENT_MAIL = "reimbursement@example.com"

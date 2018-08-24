@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.views.generic import CreateView
 
 from camps.mixins import CampViewMixin
-from utils.email import add_outgoing_email
 from .models import Reimbursement
 
 
@@ -17,7 +16,8 @@ class ReimbursementCreate(CampViewMixin, CreateView):
         reimbursement.camp = self.camp
         reimbursement.save()
 
-        add_outgoing_email(...)
-
-        messages.success(self.request, "Your reimbursement has now been created.")
+        messages.success(
+            self.request,
+            "Your reimbursement has now been created. You will receive an email when it has been approved."
+        )
         return HttpResponseRedirect(reverse('reimbursement', kwargs={'camp_slug': self.camp.slug}))
