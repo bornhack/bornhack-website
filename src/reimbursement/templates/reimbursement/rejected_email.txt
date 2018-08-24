@@ -1,0 +1,7 @@
+Hi,
+
+Your reimbursement for {{ reimbursement.camp.title }} has been rejected. Please contact us for more info.
+
+Greetings
+
+The {{ reimbursement.camp.title }} Team

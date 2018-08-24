@@ -89,3 +89,5 @@ CHANNEL_LAYERS = {
         "CONFIG": {{ django_channels_config }}
     },
 }
+
+REIMBURSEMENT_MAIL = "{{ reimbursement_mail }}"
