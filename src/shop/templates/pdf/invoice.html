@@ -14,9 +14,9 @@
         </td>
     </tr>
 </table>
-{% if invoice.order.customer_address %}
+{% if invoice.order.invoice_address %}
 <h2>CUSTOMER</h2>
-<p class="lead">{{ invoice.order.customer_address|linebreaks }}</p>
+<p class="lead">{{ invoice.order.invoice_address|linebreaks }}</p>
 {% else %}
 <h3>Customer: {{ invoice.order.user.email }}</h3>
 {% endif %}

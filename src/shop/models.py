@@ -87,12 +87,6 @@ class Order(CreatedUpdatedModel):
         default=True,
     )
 
-    customer_address = models.TextField(
-        help_text=_('The additional customer address for this order'),
-        blank=True
-    )
-
-
     CREDIT_CARD = 'credit_card'
     BLOCKCHAIN = 'blockchain'
     BANK_TRANSFER = 'bank_transfer'
@@ -132,6 +126,11 @@ class Order(CreatedUpdatedModel):
         help_text=_('If you have any comments about the order please enter them here.'),
         default='',
         blank=True,
+    )
+
+    invoice_address = models.TextField(
+        help_text=_('The invoice address for this order. Leave blank to use the email associated with the logged in user.'),
+        blank=True
     )
 
     objects = OrderQuerySet.as_manager()
