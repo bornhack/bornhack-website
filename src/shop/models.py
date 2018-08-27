@@ -133,6 +133,12 @@ class Order(CreatedUpdatedModel):
         blank=True
     )
 
+    notes = models.TextField(
+        help_text='Any internal notes about this order can be entered here. They will not be printed on the invoice or shown to the customer in any way.',
+        default='',
+        blank=True,
+    )
+
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
