@@ -29,7 +29,7 @@
             </tr>
             {% endif %}
             <tr>
-              <td>Invoice</td>
+              <th>Invoice</th>
               <td>
                   <a href="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}"><img src="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}" height=200></a><br>
                   Filename: {{ expense.invoice_filename }}
