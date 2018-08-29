@@ -7,7 +7,6 @@ from django.contrib import admin
 from camps.views import *
 from feedback.views import FeedbackCreate
 from info.views import *
-from reimbursement.views import ReimbursementCreate
 from villages.views import *
 from program.views import *
 from sponsors.views import *
@@ -204,9 +203,8 @@ urlpatterns = [
             ),
 
             path(
-                'reimbursement/',
-                ReimbursementCreate.as_view(),
-                name='reimbursement'
+                'economy/',
+                include('economy.urls', namespace='economy'),
             ),
         ])
     )

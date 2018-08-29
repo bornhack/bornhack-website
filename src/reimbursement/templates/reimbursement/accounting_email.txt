@@ -1,6 +1,0 @@
-The attached reimbursement has the following attached description:
-
-{{ reimbursement.description }}
-
-Greetings
-The {{ reimbursement.camp.title }} Team

@@ -19,5 +19,11 @@ urlpatterns = [
     ])),
     path('village_orders/', VillageOrdersView.as_view(), name='village_orders'),
     path('village_to_order/', VillageToOrderView.as_view(), name='village_to_order'),
+    path('economy/expenses/', ExpenseManageListView.as_view(), name='expense_manage_list'),
+    path('economy/expenses/<uuid:pk>/', ExpenseManageDetailView.as_view(), name='expense_manage_detail'),
+    path('economy/reimbursements/', ReimbursementListView.as_view(), name='reimbursement_list'),
+    path('economy/reimbursements/<uuid:pk>/', ReimbursementDetailView.as_view(), name='reimbursement_detail'),
+    path('economy/reimbursements/create/', ReimbursementCreateUserSelectView.as_view(), name='reimbursement_create_userselect'),
+    path('economy/reimbursements/create/<int:user_id>/', ReimbursementCreateView.as_view(), name='reimbursement_create'),
 ]
 

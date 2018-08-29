@@ -1,0 +1,30 @@
+<div class="panel panel-default">
+    <div class="panel-heading">Reimbursement Details for {{ reimbursement.pk }}</div>
+    <div class="panel-body">
+        <table class="table">
+            <tr>
+              <th>Amount</th>
+              <td>{{ reimbursement.amount }} DKK</td>
+            </tr>
+            <tr>
+              <th>Economy Team Notes</th>
+              <td>{{ reimbursement.notes|default:"N/A" }}</td>
+            </tr>
+            <tr>
+              <th>Total amount</th>
+              <td>{{ reimbursement.amount }} DKK</td>
+            </tr>
+            <tr>
+              <th>Paid</th>
+              <td>{{ reimbursement.paid }}</td>
+            </tr>
+            <tr>
+              <th>Created</th>
+              <td>{{ reimbursement.created }}</td>
+            </tr>
+            <tr>
+              <th>Expenses</th>
+              <td>{% for expense in reimbursement.expenses.all %}{% if not expense.paid_by_bornhack %}{{ expense.pk }} - {{ expense.amount }} DKK - {{ expense.description }}<br>{% endif %}{% endfor %}</td>
+        </table>
+    </div>
+</div>

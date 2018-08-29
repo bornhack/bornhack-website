@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<h3>Create {{ camp.title }} Expense</h3>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <button class="btn btn-primary pull-right" type="submit">Save</button>
+</form>
+{% endblock %}

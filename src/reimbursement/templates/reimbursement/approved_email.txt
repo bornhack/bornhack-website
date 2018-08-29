@@ -1,7 +1,0 @@
-Hi,
-
-Your reimbursement for {{ reimbursement.camp.title }} has been approved.
-
-Greetings
-
-The {{ reimbursement.camp.title }} Team

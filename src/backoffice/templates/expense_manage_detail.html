@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<h3>Manage Expense</h3>
+
+{% include 'includes/expense_detail_panel.html' %}
+
+{% if expense.approved != None %}
+<div class="alert alert-info">This expense has already been approved/rejected.</div>
+<div class="lead">Economy Team notes for this expense:</div>
+<div class="lead">{{ expense.notes }}</div>
+{% else %}
+<form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button "<i class='fas fa-check'></i> Approve Expense" button_type="submit" button_class="btn-success" name="approve" %}
+    {% bootstrap_button "<i class='fas fa-times'></i> Reject Expense" button_type="submit" button_class="btn-danger" name="reject" %}
+    <a href="{% url 'backoffice:expense_manage_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+</form>
+{% endif %}
+
+{% endblock content %}
+

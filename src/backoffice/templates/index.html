@@ -14,7 +14,8 @@
 <div class="row">
     <p>
     <div class="list-group">
-      {% if perms.camps.infodesk_permission %}
+      {% if perms.camps.infoteam_permission %}
+      <h3>Info Team</h3>
       <a href="{% url 'backoffice:product_handout' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Hand Out Products</h4>
         <p class="list-group-item-text">Use this view to mark products such as merchandise, cabins, fridges and so on as handed out.</p>
@@ -29,14 +30,16 @@
       </a>
       {% endif %}
 
-      {% if perms.program.can_approve_proposals %}
+      {% if perms.camps.contentteam_permission %}
+      <h3>Content Team</h3>
       <a href="{% url 'backoffice:manage_proposals' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Manage Proposals</h4>
         <p class="list-group-item-text">Use this view to manage SpeakerProposals and EventProposals</p>
       </a>
       {% endif %}
 
-      {% if user.is_superuser %}
+      {% if perms.camps.orgateam_permission %}
+      <h3>Orga Team</h3>
       <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
         <p class="list-group-item-text">Use this view to check and approve users Public Credit Names</p>
@@ -56,6 +59,18 @@
       <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Village Gear To Order</h4>
         <p class="list-group-item-text">Use this view to generate a list of village gear that needs to be ordered</p>
+      </a>
+      {% endif %}
+
+      {% if perms.camps.economyteam_permission %}
+      <h3>Economy Team</h3>
+      <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Reimbursements</h4>
+        <p class="list-group-item-text">Use this view to view and create reimbursements</p>
+      </a>
+      <a href="{% url 'backoffice:expense_manage_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Expenses</h4>
+        <p class="list-group-item-text">Use this view to see and approve/reject expenses</p>
       </a>
       {% endif %}
     </div>
