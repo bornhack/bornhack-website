@@ -37,7 +37,6 @@ class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
 class ExpenseDetailView(CampViewMixin, ExpensePermissionMixin, DetailView):
     model = Expense
     template_name = 'expense_detail.html'
-    pk_url_kwarg = 'expense_uuid'
 
 
 class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
