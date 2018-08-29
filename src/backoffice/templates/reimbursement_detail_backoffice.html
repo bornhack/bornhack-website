@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<h3>Reimbursement Details</h3>
+
+{% include 'includes/reimbursement_detail_panel.html' %}
+
+<a class="btn btn-success" href="{% url "backoffice:reimbursement_list" camp_slug=camp.slug %}">Back to reimbursement list</a>
+
+{% endblock content %}
+

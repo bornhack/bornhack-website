@@ -202,6 +202,10 @@ urlpatterns = [
                 name='feedback'
             ),
 
+            path(
+                'economy/',
+                include('economy.urls', namespace='economy'),
+            ),
         ])
     )
 ]

@@ -89,3 +89,8 @@ CHANNEL_LAYERS = {
         "CONFIG": {{ django_channels_config }}
     },
 }
+
+ACCOUNTINGSYSTEM_EMAIL = "{{ django_accountingsystem_email }}"
+ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
+ECONOMYTEAM_NAME = "Economy"
+

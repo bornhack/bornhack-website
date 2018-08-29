@@ -1,0 +1,12 @@
+Hi,
+
+Your expense {{ expense.pk }} for {{ expense.camp.title }} has been rejected. The amount is DKK {{ expense.amount }} and description of the expense is:
+
+{{ expense.description }}
+
+Please contact us for more info.
+
+Have a nice day!
+
+The {{ expense.camp.title }} Economy Team
+

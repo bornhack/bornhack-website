@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<div class="row">
+  <h2>Expenses for {{ camp.title }}</h2>
+  <div class="lead">
+      This page shows all expenses for {{ camp.title }}.
+  </div>
+</div>
+<br>
+<div class="row">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+          <th>User</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Paid by</th>
+          <th>Approved?</th>
+          <th>Reimbursement?</th>
+          <th>Actions</th>
+       </tr>
+      </thead>
+      <tbody>
+      {% for expense in expense_list %}
+      <tr>
+        <td>{{ expense.user }}</td>
+        <td>{{ expense.description }}</td>
+        <td>{{ expense.amount }} DKK</td>
+        <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
+        <td>{{ expense.approval_status }}</td>
+        <td>{{ expense.reimbursement.pk }}</td>
+        <td>
+          <a class="btn btn-primary" href="{% url "backoffice:expense_manage_detail" camp_slug=camp.slug pk=expense.pk %}">Details</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+</div>
+
+<script>
+$(document).ready(function(){
+        $('.table').DataTable();
+});
+</script>
+
+{% endblock content %}

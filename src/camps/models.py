@@ -11,14 +11,28 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
+class Permission(models.Model):
+    """
+    An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
+    """
+    class Meta:
+        managed = False
+        default_permissions=()
+        permissions = (
+            ("backoffice_permission", "BackOffice access"),
+            ("orgateam_permission", "Orga Team permissions set"),
+            ("infoteam_permission", "Info Team permissions set"),
+            ("economyteam_permission", "Economy Team permissions set"),
+            ("contentteam_permission", "Content Team permissions set"),
+            ("expense_create_permission", "Expense Create permission"),
+        )
+
+
 class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Camp'
         verbose_name_plural = 'Camps'
         ordering = ['-title']
-        permissions = (
-            ("infodesk_permission", "Infodesk permission"),
-        )
 
     title = models.CharField(
         verbose_name='Title',
