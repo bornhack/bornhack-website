@@ -4,13 +4,13 @@ from .models import Expense, Reimbursement
 
 def approve_expenses(modeladmin, request, queryset):
     for expense in queryset.all():
-        expense.approve()
+        expense.approve(request)
 approve_expenses.short_description = "Approve Expenses"
 
 
 def reject_expenses(modeladmin, request, queryset):
     for expense in queryset.all():
-        expense.reject()
+        expense.reject(request)
 reject_expenses.short_description = "Reject Expenses"
 
 

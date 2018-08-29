@@ -3,6 +3,7 @@ import os
 from django.db import models
 from django.conf import settings
 from django.db import models
+from django.contrib import messages
 
 from utils.email import add_outgoing_email
 from utils.models import CampRelatedModel, UUIDModel
@@ -83,11 +84,15 @@ class Expense(CampRelatedModel, UUIDModel):
         else:
             return "Rejected"
 
-    def approve(self):
+    def approve(self, request):
         """
         This method marks an expense as approved.
         Approving an expense triggers an email to the economy system, and another email to the user who submitted the expense in the first place.
         """
+        if request.user == self.user:
+            messages.error(request, "You cannot approve your own expenses, aka. the anti-stein-bagger defence")
+            return
+
         self.approved = True
         self.save()
 
@@ -109,7 +114,9 @@ class Expense(CampRelatedModel, UUIDModel):
             to_recipients=[self.user.emailaddress_set.get(primary=True).email],
         )
 
-    def reject(self):
+        messages.success(request, "Expense %s approved" % self.pk)
+
+    def reject(self, request):
         """
         This method marks an expense as not approved.
         Not approving an expense triggers an email to the user who submitted the expense in the first place.
@@ -125,6 +132,7 @@ class Expense(CampRelatedModel, UUIDModel):
             to_recipients=[self.user.emailaddress_set.get(primary=True).email],
         )
 
+        messages.success(request, "Expense %s rejected" % self.pk)
 
 class Reimbursement(CampRelatedModel, UUIDModel):
     """

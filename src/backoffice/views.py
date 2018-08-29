@@ -245,10 +245,10 @@ class ExpenseManageDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateV
         expense = form.save()
         if 'approve' in form.data:
             # approve button was pressed
-            expense.approve()
+            expense.approve(self.request)
         elif 'reject' in form.data:
             # reject button was pressed
-            expense.reject()
+            expense.reject(self.request)
         else:
             messages.error(self.request, "Unknown submit action")
         return redirect(reverse('backoffice:expense_manage_list', kwargs={'camp_slug': self.camp.slug}))
