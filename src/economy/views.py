@@ -1,4 +1,4 @@
-import magic
+import os, magic
 
 from django.shortcuts import render
 from django.conf import settings
@@ -15,6 +15,7 @@ from utils.mixins import RaisePermissionRequiredMixin
 from teams.models import Team
 from .models import Expense, Reimbursement
 from .mixins import ExpensePermissionMixin, ReimbursementPermissionMixin
+from .forms import ExpenseCreateForm
 
 
 class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -41,9 +42,9 @@ class ExpenseDetailView(CampViewMixin, ExpensePermissionMixin, DetailView):
 
 class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     model = Expense
-    fields = ['description', 'amount', 'invoice', 'paid_by_bornhack', 'responsible_team'] 
     template_name = 'expense_form.html'
     permission_required = ("camps.expense_create_permission")
+    form_class = ExpenseCreateForm
 
     def get_context_data(self, **kwargs):
         """
@@ -92,6 +93,10 @@ class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
         invoicedata = expense.invoice.read()
         # find mimetype
         mimetype = magic.from_buffer(invoicedata, mime=True)
+        # check if we have a PDF, no preview if so, load a pdf icon instead
+        if mimetype=="application/pdf" and 'preview' in request.GET:
+                invoicedata = open(os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/pdf.png"), "rb").read()
+                mimetype = magic.from_buffer(invoicedata, mime=True)
         # put the response together and return it
         response = HttpResponse(content_type=mimetype)
         response.write(invoicedata)
