@@ -6,5 +6,7 @@
 
 {% include 'includes/reimbursement_detail_panel.html' %}
 
+<a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to list</a>
+
 {% endblock content %}
 

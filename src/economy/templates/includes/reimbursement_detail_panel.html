@@ -19,8 +19,19 @@
               <td>{{ reimbursement.created }}</td>
             </tr>
             <tr>
-              <th>Expenses</th>
-              <td>{% for expense in reimbursement.expenses.all %}{% if not expense.paid_by_bornhack %}{{ expense.pk }} - {{ expense.amount }} DKK - {{ expense.description }}<br>{% endif %}{% endfor %}</td>
+              <th>Expenses covered by this Reimbursement</th>
+              <td>
+                {% for expense in reimbursement.expenses.all %}
+                  {% if not expense.paid_by_bornhack %}
+                    {% if request.resolver_match.app_name == "backoffice" %}
+                      <a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">{{ expense.pk }}</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
+                    {% else %}
+                      <a href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">{{ expense.pk }}</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </td>
+            </tr>
         </table>
     </div>
 </div>

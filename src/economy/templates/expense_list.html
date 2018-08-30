@@ -22,6 +22,7 @@ Expenses | {{ block.super }}
     <th>Description</th>
     <th>Responsible Team</th>
     <th>Approved</th>
+    <th>Reimbursement?</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -33,6 +34,7 @@ Expenses | {{ block.super }}
       <td>{{ expense.description }}</td>
       <td>{{ expense.responsible_team.name }} Team</td>
       <td>{{ expense.approval_status }}</td>
+      <td>{% if expense.reimbursement %}<a href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary">Details</a>{% else %}N/A{% endif %}</td>
       <td>
         <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
       </td>
@@ -75,7 +77,17 @@ Expenses | {{ block.super }}
         <td>{{ reim.notes|default:"N/A" }}</td>
         <td>{{ reim.amount }} DKK</td>
         <td>{{ reim.paid }}</td>
-        <td>{% for expense in reim.expenses.all %}{{ expense.pk }}<br>{% endfor %}</td>
+        <td>
+            {% for expense in reim.expenses.all %}
+              {% if not expense.paid_by_bornhack %}
+                {% if request.resolver_match.app_name == "backoffice" %}
+                  <a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">Details</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
+                {% else %}
+                  <a href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">Details</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+        </td>
         <td>
           <a class="btn btn-primary" href="{% url "economy:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}">Details</a>
         </td>

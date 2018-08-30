@@ -25,7 +25,11 @@
             {% if not expense.paid_by_bornhack %}
             <tr>
               <th>Reimbursement?</th>
-              <td>{% if expense.reimbursement %}<a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug %}">{{ expense.reimbursement.pk }}</a>{% else %}N/A{% endif %}</td>
+              {% if request.resolver_match.app_name == "backoffice" %}
+              <td>{% if expense.reimbursement %}<a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>{% else %}N/A{% endif %}</td>
+              {% else %}
+              <td>{% if expense.reimbursement %}<a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>{% else %}N/A{% endif %}</td>
+              {% endif %}
             </tr>
             {% endif %}
             <tr>

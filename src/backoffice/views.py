@@ -232,6 +232,20 @@ class ExpenseManageListView(CampViewMixin, EconomyTeamPermissionMixin, ListView)
     model = Expense
     template_name = 'expense_manage_list.html'
 
+    def get_queryset(self, **kwargs):
+        """
+        Exclude unapproved expenses
+        """
+        queryset = super().get_queryset(**kwargs)
+        return queryset.exclude(approved__isnull=True)
+
+    def get_context_data(self, **kwargs):
+        """
+        Include unapproved expenses seperately
+        """
+        context = super().get_context_data(**kwargs)
+        context['unapproved_expenses'] = Expense.objects.filter(camp=self.camp, approved__isnull=True)
+        return context
 
 class ExpenseManageDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Expense

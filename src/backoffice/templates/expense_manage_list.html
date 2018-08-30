@@ -7,43 +7,80 @@
 {% endblock extra_head %}
 
 {% block content %}
-<div class="row">
-  <h2>Expenses for {{ camp.title }}</h2>
-  <div class="lead">
-      This page shows all expenses for {{ camp.title }}.
-  </div>
+<h2>Manage Expenses for {{ camp.title }}</h2>
+
+{% if unapproved_expenses %}
+<div class="lead">
+  This table shows unapproved expenses for {{ camp.title }}.
 </div>
+
+
+<table class="table table-hover">
+  <thead>
+  <tr>
+      <th>User</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Paid by</th>
+      <th>Approved?</th>
+      <th>Reimbursement?</th>
+      <th>Actions</th>
+   </tr>
+  </thead>
+  <tbody>
+  {% for expense in unapproved_expenses %}
+  <tr>
+    <td>{{ expense.user }}</td>
+    <td>{{ expense.description }}</td>
+    <td>{{ expense.amount }} DKK</td>
+    <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
+    <td>{{ expense.approval_status }}</td>
+    <td>{% if expense.reimbursement %}<a href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary">Details</a>{% else %}N/A{% endif %}</td>
+    <td>
+      <a class="btn btn-primary" href="{% url "backoffice:expense_detail" camp_slug=camp.slug pk=expense.pk %}">Details</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<hr>
+
+<div class="lead">
+  This table shows all expenses for {{ camp.title }}.
+</div>
+
 <br>
-<div class="row">
-    <table class="table table-hover">
-      <thead>
-      <tr>
-          <th>User</th>
-          <th>Description</th>
-          <th>Amount</th>
-          <th>Paid by</th>
-          <th>Approved?</th>
-          <th>Reimbursement?</th>
-          <th>Actions</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for expense in expense_list %}
-      <tr>
-        <td>{{ expense.user }}</td>
-        <td>{{ expense.description }}</td>
-        <td>{{ expense.amount }} DKK</td>
-        <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
-        <td>{{ expense.approval_status }}</td>
-        <td>{{ expense.reimbursement.pk }}</td>
-        <td>
-          <a class="btn btn-primary" href="{% url "backoffice:expense_manage_detail" camp_slug=camp.slug pk=expense.pk %}">Details</a>
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-</div>
+
+<table class="table table-hover">
+  <thead>
+  <tr>
+      <th>User</th>
+      <th>Description</th>
+      <th>Amount</th>
+      <th>Paid by</th>
+      <th>Approved?</th>
+      <th>Reimbursement?</th>
+      <th>Actions</th>
+   </tr>
+  </thead>
+  <tbody>
+  {% for expense in expense_list %}
+  <tr>
+    <td>{{ expense.user }}</td>
+    <td>{{ expense.description }}</td>
+    <td>{{ expense.amount }} DKK</td>
+    <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
+    <td>{{ expense.approval_status }}</td>
+    <td>{% if expense.reimbursement %}<a href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary">Details</a>{% else %}N/A{% endif %}</td>
+    <td>
+      <a class="btn btn-primary" href="{% url "backoffice:expense_detail" camp_slug=camp.slug pk=expense.pk %}">Details</a>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
 
 <script>
 $(document).ready(function(){
