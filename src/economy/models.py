@@ -175,7 +175,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses
         """
         amount = 0
-        for expense in self.expenses.all():
+        for expense in self.expenses.filter(paid_by_bornhack=False):
             amount += expense.amount
         return amount
 
