@@ -100,7 +100,7 @@ class Expense(CampRelatedModel, UUIDModel):
         add_outgoing_email(
             "emails/accountingsystem_email.txt",
             formatdict=dict(expense=self),
-            subject="Expense for %s" % self.camp.title,
+            subject="Expense %s for %s" % (self.pk, self.camp.title),
             to_recipients=[settings.ACCOUNTINGSYSTEM_EMAIL],
             attachment=self.invoice.read(),
             attachment_filename=self.invoice.file.name,
