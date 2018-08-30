@@ -5,8 +5,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib import messages
 
-from utils.email import add_outgoing_email
 from utils.models import CampRelatedModel, UUIDModel
+from .email import *
 
 
 class Expense(CampRelatedModel, UUIDModel):
@@ -93,27 +93,17 @@ class Expense(CampRelatedModel, UUIDModel):
             messages.error(request, "You cannot approve your own expenses, aka. the anti-stein-bagger defence")
             return
 
+        # mark as approved and save
         self.approved = True
         self.save()
 
-        # Add email for this expense which will be sent to the accounting software
-        add_outgoing_email(
-            "emails/accountingsystem_email.txt",
-            formatdict=dict(expense=self),
-            subject="Expense %s for %s" % (self.pk, self.camp.title),
-            to_recipients=[settings.ACCOUNTINGSYSTEM_EMAIL],
-            attachment=self.invoice.read(),
-            attachment_filename=os.path.basename(self.invoice.file.name),
-        )
+        # send email to economic for this expense
+        send_accountingsystem_email(expense=self)
 
-        # Add email which will be sent to the user who entered the expense
-        add_outgoing_email(
-            "emails/expense_approved_email.txt",
-            formatdict=dict(expense=self),
-            subject="Your expense for %s has been approved." % self.camp.title,
-            to_recipients=[self.user.emailaddress_set.get(primary=True).email],
-        )
+        # send email to the user
+        send_expense_approved_email(expense=self)
 
+        # message to the browser
         messages.success(request, "Expense %s approved" % self.pk)
 
     def reject(self, request):
@@ -121,18 +111,16 @@ class Expense(CampRelatedModel, UUIDModel):
         This method marks an expense as not approved.
         Not approving an expense triggers an email to the user who submitted the expense in the first place.
         """
+        # mark as not approved and save
         self.approved = False
         self.save()
 
-        # Add email which will be sent to the user who entered the expense
-        add_outgoing_email(
-            "emails/expense_rejected_email.txt",
-            formatdict=dict(expense=self),
-            subject="Your expense for %s has been rejected." % self.camp.title,
-            to_recipients=[self.user.emailaddress_set.get(primary=True).email],
-        )
+        # send email to the user
+        send_expense_rejected_email(expense=self)
 
+        # message to the browser
         messages.success(request, "Expense %s rejected" % self.pk)
+
 
 class Reimbursement(CampRelatedModel, UUIDModel):
     """
