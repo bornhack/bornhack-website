@@ -103,7 +103,7 @@ class Expense(CampRelatedModel, UUIDModel):
             subject="Expense %s for %s" % (self.pk, self.camp.title),
             to_recipients=[settings.ACCOUNTINGSYSTEM_EMAIL],
             attachment=self.invoice.read(),
-            attachment_filename=self.invoice.file.name,
+            attachment_filename=os.path.basename(self.invoice.file.name),
         )
 
         # Add email which will be sent to the user who entered the expense
