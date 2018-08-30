@@ -21,3 +21,13 @@ class ExpenseAdmin(admin.ModelAdmin):
     search_fields = ['description', 'amount', 'user']
     actions = [approve_expenses, reject_expenses]
 
+
+@admin.register(Reimbursement)
+class ReimbursementAdmin(admin.ModelAdmin):
+    def get_amount(self, obj):
+        return obj.amount
+
+    list_filter = ['camp', 'user', 'reimbursement_user', 'paid']
+    list_display = ['camp', 'user', 'reimbursement_user', 'paid', 'notes', 'get_amount']
+    search_fields = ['user__username', 'reimbursement_user__username', 'notes']
+
