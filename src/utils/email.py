@@ -5,7 +5,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.template.loader import render_to_string
 from .models import OutgoingEmail
-import logging
+import logging, magic
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -41,9 +41,11 @@ def _send_email(
                 'text/html'
             )
 
-        # is there a pdf attachment to this mail?
+        # is there an attachment to this mail?
         if attachment:
-            msg.attach(attachment_filename, attachment, 'application/pdf')
+            # figure out the mimetype
+            mimetype = magic.from_buffer(attachment, mime=True)
+            msg.attach(attachment_filename, attachment, mimetype)
     except Exception as e:
         logger.exception('exception while rendering email: {}'.format(e))
         return False
