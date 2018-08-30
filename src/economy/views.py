@@ -31,7 +31,7 @@ class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
         Add reimbursements to the context
         """
         context = super().get_context_data(**kwargs)
-        context['reimbursement_list'] = Reimbursement.objects.filter(user=self.request.user)
+        context['reimbursement_list'] = Reimbursement.objects.filter(reimbursement_user=self.request.user)
         return context
 
 
