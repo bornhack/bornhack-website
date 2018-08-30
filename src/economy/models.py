@@ -102,7 +102,7 @@ class Expense(CampRelatedModel, UUIDModel):
             formatdict=dict(expense=self),
             subject="Expense for %s" % self.camp.title,
             to_recipients=[settings.ACCOUNTINGSYSTEM_EMAIL],
-            attachment=self.invoice.path,
+            attachment=self.invoice.read(),
             attachment_filename=self.invoice.file.name,
         )
 
