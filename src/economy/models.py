@@ -27,7 +27,7 @@ class Expense(CampRelatedModel, UUIDModel):
     amount = models.DecimalField(
         decimal_places=2,
         max_digits=12,
-        help_text='The amount of this expense in DKK. Must match the amount on the invoice uploaded below.',
+        help_text='The amount of this expense in DKK. Must match the amount on the invoice uploaded below. The amount can be negative in some cases (like when returning bottle deposit).',
     )
 
     description = models.CharField(
