@@ -4,6 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.db import models
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 from utils.models import CampRelatedModel, UUIDModel
 from .email import *
@@ -27,7 +28,7 @@ class Expense(CampRelatedModel, UUIDModel):
     amount = models.DecimalField(
         decimal_places=2,
         max_digits=12,
-        help_text='The amount of this expense in DKK. Must match the amount on the invoice uploaded below. The amount can be negative in some cases (like when returning bottle deposit).',
+        help_text='The amount of this expense in DKK. Must match the amount on the invoice uploaded below.',
     )
 
     description = models.CharField(
@@ -70,6 +71,10 @@ class Expense(CampRelatedModel, UUIDModel):
         blank=True,
         help_text='Economy Team notes for this expense. Only visible to the Economy team and the submitting user.'
     )
+
+    def clean(self):
+        if self.amount < 0:
+            raise ValidationError('Amount of an expense can not be negative')
 
     @property
     def invoice_filename(self):
