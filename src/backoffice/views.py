@@ -325,6 +325,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
             paid_by_bornhack=False,
         )
         context['total_amount'] = context['expenses'].aggregate(Sum('amount'))
+        context['reimbursement_user'] = self.reimbursement_user
         return context
 
     def form_valid(self, form):
