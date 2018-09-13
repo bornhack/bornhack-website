@@ -1,7 +1,11 @@
 <div class="panel panel-default">
-    <div class="panel-heading">Reimbursement Details for {{ reimbursement.pk }}</div>
+    <div class="panel-heading">Reimbursement Details for {{ reimbursement.pk }} for {{ reimbursement.reimbursement_user }}</div>
     <div class="panel-body">
         <table class="table">
+            <tr>
+              <th>Reimbursement User</th>
+              <td>{{ reimbursement.reimbursement_user }}</td>
+            </tr>
             <tr>
               <th>Total Amount</th>
               <td>{{ reimbursement.amount }} DKK</td>
@@ -16,7 +20,7 @@
             </tr>
             <tr>
               <th>Created</th>
-              <td>{{ reimbursement.created }}</td>
+              <td>{{ reimbursement.created }} by {{ reimbursement.user }}</td>
             </tr>
             <tr>
               <th>Expenses covered by this Reimbursement</th>

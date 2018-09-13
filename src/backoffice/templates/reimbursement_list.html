@@ -16,7 +16,7 @@
       <thead>
       <tr>
           <th>Camp</th>
-          <th>Created by</th>
+          <th>Created</th>
           <th>Reimbursement User</th>
           <th>Economy Team Notes</th>
           <th>Amount</th>
@@ -29,7 +29,7 @@
       {% for reim in reimbursement_list %}
       <tr>
         <td>{{ reim.camp }}</td>
-        <td>{{ reim.user }}</td>
+        <td>{{ reim.created }} by {{ reim.user }}</td>
         <td>{{ reim.reimbursement_user }}</td>
         <td>{{ reim.notes|default:"N/A" }}</td>
         <td>{{ reim.amount }} DKK</td>
