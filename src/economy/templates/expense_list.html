@@ -13,96 +13,12 @@ Expenses | {{ block.super }}
 <{% block content %}
 <h3>Your {{ camp.title }} Expenses</h3>
 
-{% if expense_list %}
-<table class="table table-hover">
-  <thead>
-  <tr>
-    <th>Paid by</th>
-    <th>Amount</th>
-    <th>Description</th>
-    <th>Responsible Team</th>
-    <th>Approved</th>
-    <th>Reimbursement?</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-    {% for expense in expense_list %}
-    <tr>
-      <td>{% if expense.paid_by_bornhack %}BornHack{% else %}You ({{ expense.user }}){% endif %}</td>
-      <td>{{ expense.amount }} DKK</td>
-      <td>{{ expense.description }}</td>
-      <td>{{ expense.responsible_team.name }} Team</td>
-      <td>{{ expense.approval_status }}</td>
-      <td>{% if expense.reimbursement %}<a href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary">Details</a>{% else %}N/A{% endif %}</td>
-      <td>
-        <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<h4>No expenses found for BornHack 2018, you haven't submitted any yet!</h4>
-{% endif %}
+{% include 'includes/expense_list_panel.html' %}
 
 {% if perms.camps.expense_create_permission %}
 <a class="btn btn-primary" href="{% url 'economy:expense_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Expense</a>
 {% else %}
 <div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add expenses. Please ask someone from the Economy team to add the permission if you need it.</p></div>
 {% endif %}
-
-<hr>
-
-<h3>Your {{ camp.title }} Reimbursements</h3>
-
-{% if reimbursement_list %}
-    <table class="table table-hover">
-      <thead>
-      <tr>
-          <th>Camp</th>
-          <th>User</th>
-          <th>Economy Team Notes</th>
-          <th>Amount</th>
-          <th>Paid</th>
-          <th>Expenses</th>
-          <th>Actions</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for reim in reimbursement_list %}
-      <tr>
-        <td>{{ reim.camp }}</td>
-        <td>{{ reim.user }}</td>
-        <td>{{ reim.notes|default:"N/A" }}</td>
-        <td>{{ reim.amount }} DKK</td>
-        <td>{{ reim.paid }}</td>
-        <td>
-            {% for expense in reim.expenses.all %}
-              {% if not expense.paid_by_bornhack %}
-                {% if request.resolver_match.app_name == "backoffice" %}
-                  <a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">Details</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
-                {% else %}
-                  <a href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.pk %}" class="btn btn-primary">Details</a> {{ expense.amount }} DKK - {{ expense.description }}<br>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-        </td>
-        <td>
-          <a class="btn btn-primary" href="{% url "economy:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}">Details</a>
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-{% else %}
-    <h4>No reimbursements found for BornHack 2018</h4>
-{% endif %}
-
-<script>
-$(document).ready(function(){
-        $('.table').DataTable();
-});
-</script>
 
 {% endblock %}

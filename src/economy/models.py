@@ -9,6 +9,85 @@ from django.core.exceptions import ValidationError
 from utils.models import CampRelatedModel, UUIDModel
 from .email import *
 
+class Revenue(CampRelatedModel, UUIDModel):
+    """
+    The Revenue model represents any type of income for BornHack.
+    Most Revenue objects will have a FK to the Invoice model, but only if the revenue relates directly to an Invoice in our system.
+    Other Revenue objects (such as money returned from bottle deposits) will not have a related BornHack Invoice object.
+    """
+    camp = models.ForeignKey(
+        'camps.Camp',
+        on_delete=models.PROTECT,
+        related_name='revenues',
+        help_text='The camp to which this revenue belongs',
+    )
+
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.PROTECT,
+        related_name='revenues',
+        help_text='The user who submitted this revenue',
+    )
+
+    amount = models.DecimalField(
+        decimal_places=2,
+        max_digits=12,
+        help_text='The amount of this revenue in DKK. Must match the amount on the documentation uploaded below.',
+    )
+
+    description = models.CharField(
+        max_length=200,
+        help_text='A short description of this revenue. Please keep it meningful as it helps the Economy team a lot when categorising revenue. 200 characters or fewer.',
+    )
+
+    invoice = models.ImageField(
+        help_text='The invoice file for this revenue. Please make sure the amount on the invoice matches the amount you entered above. All common image formats are accepted, as well as PDF.',
+        upload_to='revenues/',
+    )
+
+    invoice_fk = models.ForeignKey(
+        'shop.Invoice',
+        on_delete=models.PROTECT,
+        related_name='revenues',
+        help_text='The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.',
+        blank=True,
+        null=True,
+    )
+
+    responsible_team = models.ForeignKey(
+        'teams.Team',
+        on_delete=models.PROTECT,
+        related_name='revenues',
+        help_text='The team to which this revenue belongs. When in doubt pick the Economy team.'
+    )
+
+    approved = models.NullBooleanField(
+        default=None,
+        help_text='True if this Revenue has been approved by the responsible team. False if it has been rejected. Blank if noone has decided yet.'
+    )
+
+    notes = models.TextField(
+        blank=True,
+        help_text='Economy Team notes for this revenue. Only visible to the Economy team and the submitting user.'
+    )
+
+    def clean(self):
+        if self.amount < 0:
+            raise ValidationError('Amount of a Revenue object can not be negative')
+
+    @property
+    def invoice_filename(self):
+        return os.path.basename(self.invoice.file.name)
+
+    @property
+    def approval_status(self):
+        if self.approved == None:
+            return "Pending approval"
+        elif self.approved == True:
+            return "Approved"
+        else:
+            return "Rejected"
+
 
 class Expense(CampRelatedModel, UUIDModel):
     camp = models.ForeignKey(
@@ -161,6 +240,13 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         default=False,
         help_text="Check when this reimbursement has been paid to the user",
     )
+
+    @property
+    def covered_expenses(self):
+        """
+        Returns a queryset of all expenses covered by this reimbursement. Does not include the expense that paid for the reimbursement.
+        """
+        return self.expenses.filter(paid_by_bornhack=False)
 
     @property
     def amount(self):

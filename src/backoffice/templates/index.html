@@ -64,13 +64,17 @@
 
       {% if perms.camps.economyteam_permission %}
       <h3>Economy Team</h3>
+      <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Expenses</h4>
+        <p class="list-group-item-text">Use this view to see and approve/reject expenses.</p>
+      </a>
       <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Reimbursements</h4>
-        <p class="list-group-item-text">Use this view to view and create reimbursements</p>
+        <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
       </a>
-      <a href="{% url 'backoffice:expense_manage_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Expenses</h4>
-        <p class="list-group-item-text">Use this view to see and approve/reject expenses</p>
+      <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Revenues</h4>
+        <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
       </a>
       {% endif %}
     </div>

@@ -25,6 +25,7 @@ class Permission(models.Model):
             ("economyteam_permission", "Economy Team permissions set"),
             ("contentteam_permission", "Content Team permissions set"),
             ("expense_create_permission", "Expense Create permission"),
+            ("revenue_create_permission", "Revenue Create permission"),
         )
 
 

@@ -6,17 +6,55 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.urls import reverse
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, TemplateView
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.db.models import Sum
 
 from camps.mixins import CampViewMixin
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
 from teams.models import Team
-from .models import Expense, Reimbursement
-from .mixins import ExpensePermissionMixin, ReimbursementPermissionMixin
-from .forms import ExpenseCreateForm
+from .models import Expense, Reimbursement, Revenue
+from .mixins import ExpensePermissionMixin, RevenuePermissionMixin, ReimbursementPermissionMixin
+from .forms import ExpenseCreateForm, RevenueCreateForm
 
+
+class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
+    template_name = 'dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Add expenses, reimbursements and revenues to the context
+        """
+        context = super().get_context_data(**kwargs)
+
+        # get reimbursement stats
+        context['reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user).count()
+        context['unpaid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=False).count()
+        context['paid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=True).count()
+        reimbursement_total = 0
+        for reimbursement in Reimbursement.objects.filter(user=self.request.user):
+            reimbursement_total += reimbursement.amount
+        context['reimbursement_total'] = reimbursement_total
+
+        # get expense stats
+        context['expense_count'] = Expense.objects.filter(user=self.request.user).count()
+        context['unapproved_expense_count'] = Expense.objects.filter(user=self.request.user, approved__isnull=True).count()
+        context['approved_expense_count'] = Expense.objects.filter(user=self.request.user, approved=True).count()
+        context['rejected_expense_count'] = Expense.objects.filter(user=self.request.user, approved=False).count()
+        context['expense_total'] = Expense.objects.filter(user=self.request.user).aggregate(Sum('amount'))['amount__sum']
+
+        # get revenue stats
+        context['revenue_count'] = Revenue.objects.filter(user=self.request.user).count()
+        context['unapproved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved__isnull=True).count()
+        context['approved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=True).count()
+        context['rejected_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=False).count()
+        context['revenue_total'] = Revenue.objects.filter(user=self.request.user).aggregate(Sum('amount'))['amount__sum']
+
+        return context
+
+
+########### Expense related views ###############
 
 class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
     model = Expense
@@ -25,14 +63,6 @@ class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
     def get_queryset(self):
         # only return Expenses belonging to the current user
         return super().get_queryset().filter(user=self.request.user)
-
-    def get_context_data(self, **kwargs):
-        """
-        Add reimbursements to the context
-        """
-        context = super().get_context_data(**kwargs)
-        context['reimbursement_list'] = Reimbursement.objects.filter(reimbursement_user=self.request.user)
-        return context
 
 
 class ExpenseDetailView(CampViewMixin, ExpensePermissionMixin, DetailView):
@@ -55,7 +85,6 @@ class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView)
         return context
 
     def form_valid(self, form):
-        # TODO: make sure this user has permission to create expenses
         expense = form.save(commit=False)
         expense.user = self.request.user
         expense.camp = self.camp
@@ -103,7 +132,98 @@ class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
         return response
 
 
+########### Reimbursement related views ###############
+
+
+class ReimbursementListView(LoginRequiredMixin, CampViewMixin, ListView):
+    model = Reimbursement
+    template_name = 'reimbursement_list.html'
+
+    def get_queryset(self):
+        # only return Expenses belonging to the current user
+        return super().get_queryset().filter(reimbursement_user=self.request.user)
+
+
 class ReimbursementDetailView(CampViewMixin, ReimbursementPermissionMixin, DetailView):
     model = Reimbursement
     template_name = 'reimbursement_detail.html'
+
+
+########### Revenue related views ###############
+
+
+class RevenueListView(LoginRequiredMixin, CampViewMixin, ListView):
+    model = Revenue
+    template_name = 'revenue_list.html'
+
+    def get_queryset(self):
+        # only return Revenues belonging to the current user
+        return super().get_queryset().filter(user=self.request.user)
+
+
+class RevenueDetailView(CampViewMixin, RevenuePermissionMixin, DetailView):
+    model = Revenue
+    template_name = 'revenue_detail.html'
+
+
+class RevenueCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
+    model = Revenue
+    template_name = 'revenue_form.html'
+    permission_required = ("camps.revenue_create_permission")
+    form_class = RevenueCreateForm
+
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        return context
+
+    def form_valid(self, form):
+        revenue = form.save(commit=False)
+        revenue.user = self.request.user
+        revenue.camp = self.camp
+        revenue.save()
+
+        # a message for the user
+        messages.success(
+            self.request,
+            "The revenue has been saved. It is now awaiting approval by the economy team.",
+        )
+
+        # send an email to the economy team
+        add_outgoing_email(
+            "emails/revenue_awaiting_approval_email.txt",
+            formatdict=dict(revenue=revenue),
+            subject="New %s revenue for %s Team is awaiting approval" % (revenue.camp.title, revenue.responsible_team.name),
+            to_recipients=[settings.ECONOMYTEAM_EMAIL],
+        )
+
+        # return to the expense list page
+        return HttpResponseRedirect(reverse('economy:revenue_list', kwargs={'camp_slug': self.camp.slug}))
+
+
+class RevenueInvoiceView(CampViewMixin, RevenuePermissionMixin, DetailView):
+    """
+    This view returns a http response with the invoice for a Revenue object, with the proper mimetype
+    Uses RevenuePermissionMixin to make sure the user is allowed to see the file
+    """
+    model = Revenue
+
+    def get(self, request, *args, **kwargs):
+        # get revenue
+        revenue = self.get_object()
+        # read invoice file
+        invoicedata = revenue.invoice.read()
+        # find mimetype
+        mimetype = magic.from_buffer(invoicedata, mime=True)
+        # check if we have a PDF, no preview if so, load a pdf icon instead
+        if mimetype=="application/pdf" and 'preview' in request.GET:
+                invoicedata = open(os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/pdf.png"), "rb").read()
+                mimetype = magic.from_buffer(invoicedata, mime=True)
+        # put the response together and return it
+        response = HttpResponse(content_type=mimetype)
+        response.write(invoicedata)
+        return response
 

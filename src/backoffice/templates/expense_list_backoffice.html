@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<h2>Manage Expenses for {{ camp.title }}</h2>
+
+{% if unapproved_expenses %}
+<div class="lead">
+  This table shows unapproved expenses for {{ camp.title }}.
+</div>
+
+{% include 'includes/expense_list_panel.html' with expense_list=unapproved_expenses %}
+
+<hr>
+{% endif %}
+
+<div class="lead">
+  This table shows all expenses for {{ camp.title }}.
+</div>
+
+{% include 'includes/expense_list_panel.html' %}
+
+{% endblock content %}

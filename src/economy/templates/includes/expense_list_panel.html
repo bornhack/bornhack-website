@@ -1,0 +1,57 @@
+{% if expense_list %}
+<table class="table table-hover">
+  <thead>
+  <tr>
+    {% if not reimbursement %}
+    <th>Paid by</th>
+    {% endif %}
+    <th>Amount</th>
+    <th>Description</th>
+    <th>Responsible Team</th>
+    {% if not reimbursement %}
+    <th>Approved</th>
+    <th>Reimbursement</th>
+    {% endif %}
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for expense in expense_list %}
+    <tr>
+      {% if not reimbursement %}
+      <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
+      {% endif %}
+      <td>{{ expense.amount }} DKK</td>
+      <td>{{ expense.description }}</td>
+      <td>{{ expense.responsible_team.name }} Team</td>
+
+      {% if not reimbursement %}
+        <td>{{ expense.approval_status }}</td>
+        <td>
+        {% if expense.reimbursement and not expense.paid_by_bornhack %}
+          {% if request.resolver_match.app_name == "backoffice" %}
+            <a href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          {% else %}
+            <a href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          {% endif %}
+        {% else %}
+          N/A
+        {% endif %}
+        </td>
+      {% endif %}
+
+      <td>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <a class="btn btn-primary" href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
+      {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <h4>No expenses found.</h4>
+{% endif %}
+

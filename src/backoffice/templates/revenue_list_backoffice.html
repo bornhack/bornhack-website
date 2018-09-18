@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<h2>Manage Revenues for {{ camp.title }}</h2>
+
+{% if unapproved_revenues %}
+<div class="lead">
+  This table shows unapproved revenues for {{ camp.title }}.
+</div>
+
+{% include 'includes/revenue_list_panel.html' with revenue_list=unapproved_revenues %}
+
+<hr>
+{% endif %}
+
+<div class="lead">
+  This table shows all approved and rejected revenues for {{ camp.title }}.
+</div>
+
+{% include 'includes/revenue_list_panel.html' %}
+
+{% endblock content %}
