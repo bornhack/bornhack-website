@@ -9,7 +9,7 @@ Clone with --recursive to include submodules:
 
     git clone --recursive https://github.com/bornhack/bornhack-website
 
-If you already cloned the repository, you can add the submodules like this:
+If you already cloned the repository without --recursive, you can change into the directory and add the submodules with:
 
     git submodule update --init --recursive
 
@@ -20,20 +20,31 @@ $ virtualenv venv -p python3
 $ source venv/bin/activate
 ```
 
+If you installed python3 using Homebrew on macOS, you will need to install virtualenv by runinng the following command first:
+```
+pip3 install virtualenv
+```
+
 ### System libraries
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev
   - FreeBSD: databases/postgresql93-client
+  - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
+  - macOS: brew install libjpeg
+- libmagic (might already be installed)
+  - macOS: brew install libmagic
 - wkhtmltopdf (also for pdf generation):
   - Debian: wkhtmltopdf
   - FreeBSD: converters/wkhtmltopdf
+  - macOS: install from https://wkhtmltopdf.org/
 - fonts
   - Debian: ?
   - FreeBSD: x11-fonts/webfonts
+  - macOS: ?
 
 ### Python packages
 Install pip packages:
@@ -117,6 +128,7 @@ You can also specify details like:
 * Reynir Björnsson https://github.com/reynir
 * Ronni Elken Lindsgaard https://github.com/rlindsgaard
 * Stephan Telling https://github.com/Telling
+* Thomas Flummer https://github.com/flummer
 * Thomas Steen Rasmusssen https://github.com/tykling
 * Víðir Valberg Guðmundsson https://github.com/valberg
 * Ximin Luo https://github.com/infinity0
