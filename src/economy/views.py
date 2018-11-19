@@ -1,12 +1,12 @@
 import os, magic
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.urls import reverse
-from django.views.generic import CreateView, ListView, DetailView, TemplateView
+from django.views.generic import CreateView, ListView, DetailView, TemplateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Sum
 
@@ -14,9 +14,9 @@ from camps.mixins import CampViewMixin
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
 from teams.models import Team
-from .models import Expense, Reimbursement, Revenue
-from .mixins import ExpensePermissionMixin, RevenuePermissionMixin, ReimbursementPermissionMixin
-from .forms import ExpenseCreateForm, RevenueCreateForm
+from .models import *
+from .mixins import *
+from .forms import *
 
 
 class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
@@ -106,6 +106,50 @@ class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView)
 
         # return to the expense list page
         return HttpResponseRedirect(reverse('economy:expense_list', kwargs={'camp_slug': self.camp.slug}))
+
+
+class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
+    model = Expense
+    template_name = 'expense_form.html'
+    form_class = ExpenseUpdateForm
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if self.get_object().approved:
+            messages.error(self.request, "This expense has already been approved, it cannot be updated")
+            return redirect(reverse('economy:expense_list', kwargs={'camp_slug': self.camp.slug}))
+        return response
+
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        return context
+
+    def get_success_url(self):
+        messages.success(self.request, "Expense %s has been updated" % self.get_object().pk)
+        return(reverse('economy:expense_list', kwargs={'camp_slug': self.camp.slug}))
+
+
+class ExpenseDeleteView(CampViewMixin, ExpensePermissionMixin, UpdateView):
+    model = Expense
+    template_name = 'expense_delete.html'
+    fields = []
+
+    def form_valid(self, form):
+        expense = self.get_object()
+        if expense.approved:
+            messages.error(self.request, "This expense has already been approved, it cannot be deleted")
+        else:
+            message = "Expense %s has been deleted" % expense.pk
+            expense.delete()
+            messages.success(self.request, message)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return(reverse('economy:expense_list', kwargs={'camp_slug': self.camp.slug}))
 
 
 class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
@@ -200,8 +244,52 @@ class RevenueCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView)
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 
-        # return to the expense list page
+        # return to the revenue list page
         return HttpResponseRedirect(reverse('economy:revenue_list', kwargs={'camp_slug': self.camp.slug}))
+
+
+class RevenueUpdateView(CampViewMixin, RevenuePermissionMixin, UpdateView):
+    model = Revenue
+    template_name = 'revenue_form.html'
+    form_class = RevenueUpdateForm
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if self.get_object().approved:
+            messages.error(self.request, "This revenue has already been approved, it cannot be updated")
+            return redirect(reverse('economy:revenue_list', kwargs={'camp_slug': self.camp.slug}))
+        return response
+
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        return context
+
+    def get_success_url(self):
+        messages.success(self.request, "Revenue %s has been updated" % self.get_object().pk)
+        return(reverse('economy:revenue_list', kwargs={'camp_slug': self.camp.slug}))
+
+
+class RevenueDeleteView(CampViewMixin, RevenuePermissionMixin, UpdateView):
+    model = Revenue
+    template_name = 'revenue_delete.html'
+    fields = []
+
+    def form_valid(self, form):
+        revenue = self.get_object()
+        if revenue.approved:
+            messages.error(self.request, "This revenue has already been approved, it cannot be deleted")
+        else:
+            message = "Revenue %s has been deleted" % revenue.pk
+            revenue.delete()
+            messages.success(self.request, message)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return(reverse('economy:revenue_list', kwargs={'camp_slug': self.camp.slug}))
 
 
 class RevenueInvoiceView(CampViewMixin, RevenuePermissionMixin, DetailView):

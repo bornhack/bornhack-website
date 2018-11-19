@@ -44,7 +44,7 @@ urlpatterns = [
             path('revenues/',
                 include([
                     path('', RevenueListView.as_view(), name='revenue_list'),
-                    path('<uuid:pk>/', ExpenseDetailView.as_view(), name='revenue_detail'),
+                    path('<uuid:pk>/', RevenueDetailView.as_view(), name='revenue_detail'),
                 ]),
             ),
 

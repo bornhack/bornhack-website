@@ -2,7 +2,7 @@
 <table class="table table-hover">
   <thead>
   <tr>
-    <th>Amount</th>
+    <th>Amaount</th>
     <th>Description</th>
     <th>Responsible Team</th>
     <th>Approved</th>
@@ -22,7 +22,7 @@
       {% else %}
         <a class="btn btn-primary" href="{% url 'economy:revenue_detail' camp_slug=camp.slug pk=revenue.uuid %}"><i class="fas fa-search"></i> Details</a>
         <a class="btn btn-primary" href="{% url 'economy:revenue_update' camp_slug=camp.slug pk=revenue.uuid %}"><i class="fas fa-edit"></i> Update</a>
-        <a class="btn btn-primary" href="{% url 'economy:revenue_delete' camp_slug=camp.slug pk=revenue.uuid %}"><i class="fas fa-times"></i> Delete</a>
+        <a class="btn btn-danger" href="{% url 'economy:revenue_delete' camp_slug=camp.slug pk=revenue.uuid %}"><i class="fas fa-times"></i> Delete</a>
       {% endif %}
       </td>
     </tr>

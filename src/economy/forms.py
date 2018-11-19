@@ -39,8 +39,20 @@ class ExpenseCreateForm(CleanInvoiceForm):
         fields = ['description', 'amount', 'invoice', 'paid_by_bornhack', 'responsible_team']
 
 
+class ExpenseUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Expense
+        fields = ['description', 'amount', 'paid_by_bornhack', 'responsible_team']
+
+
 class RevenueCreateForm(CleanInvoiceForm):
     class Meta:
         model = Revenue
         fields = ['description', 'amount', 'invoice', 'responsible_team']
+
+
+class RevenueUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Revenue
+        fields = ['description', 'amount', 'responsible_team']
 

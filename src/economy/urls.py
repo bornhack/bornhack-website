@@ -26,13 +26,28 @@ urlpatterns = [
             ),
             path(
                 '<uuid:pk>/',
-                ExpenseDetailView.as_view(),
-                name='expense_detail'
-            ),
-            path(
-                '<uuid:pk>/invoice/',
-                ExpenseInvoiceView.as_view(),
-                name='expense_invoice'
+                include([
+                    path(
+                        '',
+                        ExpenseDetailView.as_view(),
+                        name='expense_detail'
+                    ),
+                    path(
+                        'update/',
+                        ExpenseUpdateView.as_view(),
+                        name='expense_update'
+                    ),
+                    path(
+                        'delete/',
+                        ExpenseDeleteView.as_view(),
+                        name='expense_delete'
+                    ),
+                    path(
+                        'invoice/',
+                        ExpenseInvoiceView.as_view(),
+                        name='expense_invoice'
+                    ),
+                ]),
             ),
         ]),
     ),
@@ -70,13 +85,28 @@ urlpatterns = [
             ),
             path(
                 '<uuid:pk>/',
-                RevenueDetailView.as_view(),
-                name='revenue_detail'
-            ),
-            path(
-                '<uuid:pk>/invoice/',
-                RevenueInvoiceView.as_view(),
-                name='revenue_invoice'
+                include([
+                    path(
+                        '',
+                        RevenueDetailView.as_view(),
+                        name='revenue_detail'
+                    ),
+                    path(
+                        'update/',
+                        RevenueUpdateView.as_view(),
+                        name='revenue_update'
+                    ),
+                    path(
+                        'delete/',
+                        RevenueDeleteView.as_view(),
+                        name='revenue_delete'
+                    ),
+                    path(
+                        'invoice/',
+                        RevenueInvoiceView.as_view(),
+                        name='revenue_invoice'
+                    ),
+                ]),
             ),
         ]),
     ),

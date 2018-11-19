@@ -88,6 +88,43 @@ class Revenue(CampRelatedModel, UUIDModel):
         else:
             return "Rejected"
 
+    def approve(self, request):
+        """
+        This method marks a revenue as approved.
+        Approving a revenue triggers an email to the economy system, and another email to the user who submitted the revenue
+        """
+        if request.user == self.user:
+            messages.error(request, "You cannot approve your own revenues, aka. the anti-stein-bagger defense")
+            return
+
+        # mark as approved and save
+        self.approved = True
+        self.save()
+
+        # send email to economic for this revenue
+        send_accountingsystem_revenue_email(revenue=self)
+
+        # send email to the user
+        send_revenue_approved_email(revenue=self)
+
+        # message to the browser
+        messages.success(request, "Revenue %s approved" % self.pk)
+
+    def reject(self, request):
+        """
+        This method marks a revenue as not approved.
+        Not approving a revenue triggers an email to the user who submitted the revenue in the first place.
+        """
+        # mark as not approved and save
+        self.approved = False
+        self.save()
+
+        # send email to the user
+        send_revenue_rejected_email(revenue=self)
+
+        # message to the browser
+        messages.success(request, "Revenue %s rejected" % self.pk)
+
 
 class Expense(CampRelatedModel, UUIDModel):
     camp = models.ForeignKey(
@@ -174,7 +211,7 @@ class Expense(CampRelatedModel, UUIDModel):
         Approving an expense triggers an email to the economy system, and another email to the user who submitted the expense in the first place.
         """
         if request.user == self.user:
-            messages.error(request, "You cannot approve your own expenses, aka. the anti-stein-bagger defence")
+            messages.error(request, "You cannot approve your own expenses, aka. the anti-stein-bagger defense")
             return
 
         # mark as approved and save
@@ -182,7 +219,7 @@ class Expense(CampRelatedModel, UUIDModel):
         self.save()
 
         # send email to economic for this expense
-        send_accountingsystem_email(expense=self)
+        send_accountingsystem_expense_email(expense=self)
 
         # send email to the user
         send_expense_approved_email(expense=self)
@@ -257,4 +294,5 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         for expense in self.expenses.filter(paid_by_bornhack=False):
             amount += expense.amount
         return amount
+
 

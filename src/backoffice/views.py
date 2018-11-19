@@ -445,4 +445,3 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
             messages.error(self.request, "Unknown submit action")
         return redirect(reverse('backoffice:revenue_list', kwargs={'camp_slug': self.camp.slug}))
 
-

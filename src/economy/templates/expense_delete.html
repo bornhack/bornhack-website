@@ -2,15 +2,15 @@
 {% load bootstrap3 %}
 
 {% block title %}
-{% if object %}Update{% else %}Create{% endif %} Expense | {{ block.super }}
+Delete Expense | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} Expense</h3>
+<h3>Really delete expense {{ expense.uuid }}?</h3>
+{% include 'includes/expense_detail_panel.html' %}
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
-  {% bootstrap_form form %}
-  <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Save</button>
+  <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete Expense</button>
   <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 </form>
 {% endblock %}
