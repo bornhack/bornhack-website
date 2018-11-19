@@ -25,9 +25,9 @@ class Sponsor(CampRelatedModel):
         help_text='A short description of the sponsorship'
     )
 
-    logo = models.URLField(
+    logo_filename = models.CharField(
         max_length=255,
-        help_text='A URL to the logo'
+        help_text='Filename of the logo'
     )
 
     url = models.URLField(
