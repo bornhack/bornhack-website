@@ -258,7 +258,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         'auth.User',
         on_delete=models.PROTECT,
         related_name='created_reimbursements',
-        help_text='The user who created this reimbursement.'
+        help_text='The economy team member who created this reimbursement.'
     )
 
     reimbursement_user = models.ForeignKey(

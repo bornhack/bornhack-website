@@ -33,7 +33,7 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         context['unpaid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=False, camp=self.camp).count()
         context['paid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=True, camp=self.camp).count()
         reimbursement_total = 0
-        for reimbursement in Reimbursement.objects.filter(user=self.request.user, camp=self.camp):
+        for reimbursement in Reimbursement.objects.filter(reimbursement_user=self.request.user, camp=self.camp):
             reimbursement_total += reimbursement.amount
         context['reimbursement_total'] = reimbursement_total
 
