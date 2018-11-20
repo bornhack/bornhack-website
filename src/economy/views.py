@@ -29,27 +29,27 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         context = super().get_context_data(**kwargs)
 
         # get reimbursement stats
-        context['reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user).count()
-        context['unpaid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=False).count()
-        context['paid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=True).count()
+        context['reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, camp=self.camp).count()
+        context['unpaid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=False, camp=self.camp).count()
+        context['paid_reimbursement_count'] = Reimbursement.objects.filter(reimbursement_user=self.request.user, paid=True, camp=self.camp).count()
         reimbursement_total = 0
-        for reimbursement in Reimbursement.objects.filter(user=self.request.user):
+        for reimbursement in Reimbursement.objects.filter(user=self.request.user, camp=self.camp):
             reimbursement_total += reimbursement.amount
         context['reimbursement_total'] = reimbursement_total
 
         # get expense stats
-        context['expense_count'] = Expense.objects.filter(user=self.request.user).count()
-        context['unapproved_expense_count'] = Expense.objects.filter(user=self.request.user, approved__isnull=True).count()
-        context['approved_expense_count'] = Expense.objects.filter(user=self.request.user, approved=True).count()
-        context['rejected_expense_count'] = Expense.objects.filter(user=self.request.user, approved=False).count()
-        context['expense_total'] = Expense.objects.filter(user=self.request.user).aggregate(Sum('amount'))['amount__sum']
+        context['expense_count'] = Expense.objects.filter(user=self.request.user, camp=self.camp).count()
+        context['unapproved_expense_count'] = Expense.objects.filter(user=self.request.user, approved__isnull=True, camp=self.camp).count()
+        context['approved_expense_count'] = Expense.objects.filter(user=self.request.user, approved=True, camp=self.camp).count()
+        context['rejected_expense_count'] = Expense.objects.filter(user=self.request.user, approved=False, camp=self.camp).count()
+        context['expense_total'] = Expense.objects.filter(user=self.request.user, camp=self.camp).aggregate(Sum('amount'))['amount__sum']
 
         # get revenue stats
-        context['revenue_count'] = Revenue.objects.filter(user=self.request.user).count()
-        context['unapproved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved__isnull=True).count()
-        context['approved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=True).count()
-        context['rejected_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=False).count()
-        context['revenue_total'] = Revenue.objects.filter(user=self.request.user).aggregate(Sum('amount'))['amount__sum']
+        context['revenue_count'] = Revenue.objects.filter(user=self.request.user, camp=self.camp).count()
+        context['unapproved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved__isnull=True, camp=self.camp).count()
+        context['approved_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=True, camp=self.camp).count()
+        context['rejected_revenue_count'] = Revenue.objects.filter(user=self.request.user, approved=False, camp=self.camp).count()
+        context['revenue_total'] = Revenue.objects.filter(user=self.request.user, camp=self.camp).aggregate(Sum('amount'))['amount__sum']
 
         return context
 
