@@ -1,0 +1,10 @@
+Hi,
+
+A new revenue {{ revenue.pk }} for {{ revenue.responsible_team.name }} Team was just submitted by user {{ revenue.user }}. The amount is DKK {{ revenue.amount }} and description of the revenue is:
+
+{{ revenue.description }}
+
+Have a nice day!
+
+The {{ revenue.camp.title }} Team
+

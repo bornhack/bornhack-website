@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+{% if object %}Update{% else %}Create{% endif %} Revenue | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} Revenue</h3>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Save</button>
+  <a href="{% url 'economy:revenue_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
+</form>
+{% endblock %}

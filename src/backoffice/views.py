@@ -4,7 +4,7 @@ from itertools import chain
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView, ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib import messages
@@ -18,7 +18,7 @@ from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
 from program.models import SpeakerProposal, EventProposal
-from economy.models import Expense, Reimbursement
+from economy.models import Expense, Reimbursement, Revenue
 from utils.mixins import RaisePermissionRequiredMixin
 from teams.models import Team
 from .mixins import *
@@ -98,7 +98,7 @@ class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
         return context
 
 
-class ProposalManageView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
+class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
     """
     This class contains the shared logic between SpeakerProposalManageView and EventProposalManageView
     """
@@ -120,7 +120,7 @@ class ProposalManageView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
         return redirect(reverse('backoffice:manage_proposals', kwargs={'camp_slug': self.camp.slug}))
 
 
-class SpeakerProposalManageView(ProposalManageView):
+class SpeakerProposalManageView(ProposalManageBaseView):
     """
     This view allows an admin to approve/reject SpeakerProposals
     """
@@ -128,7 +128,7 @@ class SpeakerProposalManageView(ProposalManageView):
     template_name = "manage_speakerproposal.html"
 
 
-class EventProposalManageView(ProposalManageView):
+class EventProposalManageView(ProposalManageBaseView):
     """
     This view allows an admin to approve/reject EventProposals
     """
@@ -228,13 +228,16 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
         return context
 
 
-class ExpenseManageListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+################################
+########### EXPENSES ###########
+
+class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Expense
-    template_name = 'expense_manage_list.html'
+    template_name = 'expense_list_backoffice.html'
 
     def get_queryset(self, **kwargs):
         """
-        Exclude unapproved expenses
+        Exclude unapproved expenses, they are shown seperately
         """
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True)
@@ -247,9 +250,10 @@ class ExpenseManageListView(CampViewMixin, EconomyTeamPermissionMixin, ListView)
         context['unapproved_expenses'] = Expense.objects.filter(camp=self.camp, approved__isnull=True)
         return context
 
-class ExpenseManageDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+
+class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Expense
-    template_name = 'expense_manage_detail.html'
+    template_name = 'expense_detail_backoffice.html'
     fields = ['notes']
 
     def form_valid(self, form):
@@ -265,12 +269,15 @@ class ExpenseManageDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateV
             expense.reject(self.request)
         else:
             messages.error(self.request, "Unknown submit action")
-        return redirect(reverse('backoffice:expense_manage_list', kwargs={'camp_slug': self.camp.slug}))
+        return redirect(reverse('backoffice:expense_list', kwargs={'camp_slug': self.camp.slug}))
 
+
+######################################
+########### REIMBURSEMENTS ###########
 
 class ReimbursementListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Reimbursement
-    template_name = 'reimbursement_list.html'
+    template_name = 'reimbursement_list_backoffice.html'
 
 
 class ReimbursementDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
@@ -372,4 +379,69 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
 
         messages.success(self.request, "Reimbursement %s has been created" % reimbursement.pk)
         return redirect(reverse('backoffice:reimbursement_detail', kwargs={'camp_slug': self.camp.slug, 'pk': reimbursement.pk}))
+
+
+class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+    model = Reimbursement
+    template_name = 'reimbursement_form.html'
+    fields = ['notes', 'paid']
+
+    def get_success_url(self):
+        return reverse('backoffice:reimbursement_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.get_object().pk})
+
+class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteView):
+    model = Reimbursement
+    template_name = 'reimbursement_delete.html'
+    fields = ['notes', 'paid']
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        if self.get_object().paid:
+            messages.error(request, "This reimbursement has already been paid so it cannot be deleted")
+            return redirect(reverse('backoffice:reimbursement_list', kwargs={'camp_slug': self.camp.slug}))
+        return response
+
+
+################################
+########### REVENUES ###########
+
+class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = Revenue
+    template_name = 'revenue_list_backoffice.html'
+
+    def get_queryset(self, **kwargs):
+        """
+        Exclude unapproved revenues, they are shown seperately
+        """
+        queryset = super().get_queryset(**kwargs)
+        return queryset.exclude(approved__isnull=True)
+
+    def get_context_data(self, **kwargs):
+        """
+        Include unapproved revenues seperately
+        """
+        context = super().get_context_data(**kwargs)
+        context['unapproved_revenues'] = Revenue.objects.filter(camp=self.camp, approved__isnull=True)
+        return context
+
+
+class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+    model = Revenue
+    template_name = 'revenue_detail_backoffice.html'
+    fields = ['notes']
+
+    def form_valid(self, form):
+        """
+        We have two submit buttons in this form, Approve and Reject
+        """
+        revenue = form.save()
+        if 'approve' in form.data:
+            # approve button was pressed
+            revenue.approve(self.request)
+        elif 'reject' in form.data:
+            # reject button was pressed
+            revenue.reject(self.request)
+        else:
+            messages.error(self.request, "Unknown submit action")
+        return redirect(reverse('backoffice:revenue_list', kwargs={'camp_slug': self.camp.slug}))
 

@@ -11,8 +11,8 @@
             <a class="btn {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
             {% endif %}
 
-            {% if perms.camps.expense_create_permission %}
-            <a class="btn {% menubuttonclass 'economy' %}" href="{% url 'economy:expense_list' camp_slug=camp.slug %}">Expenses</a>
+            {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+            <a class="btn {% menubuttonclass 'economy' %}" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a>
             {% endif %}
 
             {% if perms.camps.backoffice_permission %}

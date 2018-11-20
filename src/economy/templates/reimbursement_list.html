@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}
+Expenses | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+<{% block content %}
+<h3>Your {{ camp.title }} Reimbursements</h3>
+
+{% include 'includes/reimbursement_list_panel.html' %}
+
+{% endblock %}

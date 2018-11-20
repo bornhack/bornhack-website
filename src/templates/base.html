@@ -113,10 +113,11 @@
           {% endblock %}
       </div>
     </footer>
-    <!-- Enable all bootstrap tooltips on the page, only works if the useragent has JS enabled -->
+    <!-- Enable all bootstrap tooltips and jquery datatables on the page, only works if the useragent has JS enabled -->
     <script>
         $(document).ready(function(){
             $('[data-toggle="tooltip"]').tooltip();
+            $('.table').DataTable();
         });
     </script>
   </body>

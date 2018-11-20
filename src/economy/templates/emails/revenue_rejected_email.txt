@@ -1,0 +1,12 @@
+Hi,
+
+Your revenue {{ revenue.pk }} for {{ revenue.camp.title }} has been rejected. The amount is DKK {{ revenue.amount }} and description of the revenue is:
+
+{{ revenue.description }}
+
+Please contact us for more info.
+
+Have a nice day!
+
+The {{ revenue.camp.title }} Economy Team
+
