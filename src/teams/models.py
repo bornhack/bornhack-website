@@ -149,12 +149,12 @@ class Team(CampRelatedModel):
 
         # make sure public_irc_channel_name is unique
         if self.public_irc_channel_name:
-            if Team.objects.filter(private_irc_channel_name=self.public_irc_channel_name).exclude(pk=self.pk).exists():
+            if Team.objects.filter(private_irc_channel_name__iexact=self.public_irc_channel_name).exclude(pk=self.pk).exists():
                 raise ValidationError('The public IRC channel name is already in use!')
 
         # make sure private_irc_channel_name is unique
         if self.private_irc_channel_name:
-            if Team.objects.filter(public_irc_channel_name=self.private_irc_channel_name).exclude(pk=self.pk).exists():
+            if Team.objects.filter(public_irc_channel_name__iexact=self.private_irc_channel_name).exclude(pk=self.pk).exists():
                 raise ValidationError('The private IRC channel name is already in use!')
 
     @property
