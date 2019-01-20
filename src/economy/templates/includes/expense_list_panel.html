@@ -2,6 +2,7 @@
 <table class="table table-hover">
   <thead>
   <tr>
+    <th>Created By</th>
     {% if not reimbursement %}
     <th>Paid by</th>
     {% endif %}
@@ -19,6 +20,7 @@
   <tbody>
     {% for expense in expense_list %}
     <tr>
+      <td>{{ expense.user }}</td>
       {% if not reimbursement %}
       <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
       {% endif %}
