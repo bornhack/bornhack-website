@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Team, TeamMember, TeamTask
+from .models import Team, TeamMember, TeamTask, TeamShift
 from .email import add_added_membership_email, add_removed_membership_email
 from camps.utils import CampPropertyListFilter
 
@@ -90,3 +90,10 @@ class TeamMemberAdmin(admin.ModelAdmin):
         )
     remove_member.description = 'Remove a user from the team.'
 
+
+
+@admin.register(TeamShift)
+class TeamShiftAdmin(admin.ModelAdmin):
+    list_filter = [
+        'team',
+    ]

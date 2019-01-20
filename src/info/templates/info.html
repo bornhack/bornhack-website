@@ -44,7 +44,7 @@ Info | {{ block.super }}
       <span class="anchor" id="{{ category.anchor }}"></span>
       <div class="row">
         <div class="col-md-12">
-        <h2>{{ category.headline }}</h2>
+        <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
           <div class="panel-group">
             {% for item in category.infoitems.all %}
               <div class="panel panel-default">
@@ -54,10 +54,17 @@ Info | {{ block.super }}
                     <a href="#{{ item.anchor }}">
                       <i class="glyphicon glyphicon-link"></i>
                     </a>
+                    {% if request.user in category.team.responsible_members.all %}
+                      <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=category.team.slug category_anchor=category.anchor item_anchor=item.anchor %}?next={% url 'info'  camp_slug=camp.slug %}#{{ item.anchor }}"
+                         class="btn btn-xs btn-primary pull-right">
+                        <i class="fa fa-edit"></i> Edit
+                      </a>
+                    {% endif %}
                   </h4>
+                  <small></small>
                 </div>
                 <div class="panel-body">
-                  <p>{{ item.body|commonmark }}</p>
+                  <p>{{ item.body|trustedcommonmark }}</p>
                 </div>
               </div>
             {% endfor %}

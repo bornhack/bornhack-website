@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+
+<div class="row">
+  <h2>BornHack Backoffice Camp Picker</h2>
+</div>
+
+<div class="row">
+    <p>
+    <div class="list-group">
+      {% for camp in camp_list %}
+      <a href="{% url 'backoffice:camp_index' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">{{ camp.title }}</h4>
+        <p class="list-group-item-text">Manage {{ camp.title }}</p>
+      </a>
+      {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}
+

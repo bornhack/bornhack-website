@@ -8,7 +8,7 @@
 <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_button "<i class='fas fa-times'></i> Remove" button_type="submit" button_class="btn-danger" %}
-    <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}">{% bootstrap_button "<i class='fas fa-undo'></i> Cancel" button_type="link" button_class="btn-primary" %}</a>
+    <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary"><i class='fas fa-undo'></i> Cancel</a>
 </form>
 
 {% endblock program_content %}

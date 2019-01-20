@@ -2,7 +2,6 @@ from django.urls import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
 from utils.models import UUIDModel, CampRelatedModel
-from .managers import VillageQuerySet
 
 
 class Village(UUIDModel, CampRelatedModel):
@@ -27,8 +26,6 @@ class Village(UUIDModel, CampRelatedModel):
     deleted = models.BooleanField(
         default=False,
     )
-
-    objects = VillageQuerySet.as_manager()
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.camp.title)

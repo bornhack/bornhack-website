@@ -11,15 +11,21 @@ from .mixins import EnsureWritableCampMixin
 
 
 class VillageListView(CampViewMixin, ListView):
-    queryset = Village.objects.not_deleted()
+    model = Village
     template_name = 'village_list.html'
     context_object_name = 'villages'
 
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
+
 
 class VillageDetailView(CampViewMixin, DetailView):
-    queryset = Village.objects.not_deleted()
+    model = Village
     template_name = 'village_detail.html'
     context_object_name = 'village'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
 
 
 class VillageCreateView(CampViewMixin, LoginRequiredMixin, EnsureWritableCampMixin, CreateView):
@@ -56,7 +62,6 @@ class EnsureUserOwnsVillageMixin(SingleObjectMixin):
 
 class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, UpdateView):
     model = Village
-    queryset = Village.objects.not_deleted()
     template_name = 'village_form.html'
     fields = ['name', 'description', 'private']
 
@@ -64,10 +69,13 @@ class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequired
         village = form.save(commit=False)
         if not village.name:
             village.name = "noname"
-        return HttpResponseRedirect(village.get_absolute_url())
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.get_object().get_absolute_url()
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False)
 
 
 class VillageDeleteView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, DeleteView):

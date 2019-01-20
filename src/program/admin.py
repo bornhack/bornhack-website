@@ -31,6 +31,11 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
     list_filter = ('camp', 'proposal_status', 'user')
 
 
+def get_speakers_string(event_proposal):
+    return ', '.join(event_proposal.speakers.all().values_list('email', flat=True))
+get_speakers_string.short_description = 'Speakers'
+
+
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
     def mark_eventproposal_as_approved(self, request, queryset):
@@ -49,8 +54,12 @@ class EventProposalAdmin(admin.ModelAdmin):
                     return False
     mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
 
+    def get_speakers(self):
+        return
+
     actions = ['mark_eventproposal_as_approved']
-    list_filter = ('track', 'proposal_status', 'user')
+    list_filter = ('event_type', 'proposal_status', 'track', 'user',)
+    list_display = ['title', get_speakers_string, 'event_type', 'proposal_status',]
 
 
 @admin.register(EventLocation)
@@ -66,7 +75,9 @@ class EventTrackAdmin(admin.ModelAdmin):
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('event', 'when', 'location')
+    list_filter = ('event__track__camp', 'event')
+    search_fields = ['event__title']
 
 
 @admin.register(EventType)
@@ -77,6 +88,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ('camp',)
+    readonly_fields = ['proposal']
 
 
 @admin.register(Favorite)
@@ -99,6 +111,8 @@ class EventAdmin(admin.ModelAdmin):
     inlines = [
         SpeakerInline
     ]
+
+    readonly_fields = ['proposal']
 
 @admin.register(UrlType)
 class UrlTypeAdmin(admin.ModelAdmin):

@@ -2,17 +2,19 @@
     <thead>
         <tr>
             <th>Type</th>
-            <th>URLs</th>
-            <th class='text-right'>Available Actions</th>
+            <th>URL</th>
+            {% if not camp.read_only and request.resolver_match.app_name == "program" and eventproposal.user == request.user %}
+                <th class='text-right'>Available Actions</th>
+            {% endif %}
         </tr>
     </thead>
     <tbody>
         {% for url in eventproposal.urls.all %}
         <tr>
-            <td><i class="fas fa-{{ url.urltype.icon }} fa-lg"></i><span class="h4"> {{ url.urltype.name }}</span></td>
+            <td><i class="{{ url.urltype.icon }} fa-lg"></i><span class="h4"> {{ url.urltype.name }}</span></td>
             <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
             <td class='text-right'>
-                {% if not camp.read_only %}
+                {% if not camp.read_only and request.resolver_match.app_name == "program" and eventproposal.user == request.user %}
                     <a href="{% url 'program:eventproposalurl_update' camp_slug=camp.slug event_uuid=eventproposal.uuid url_uuid=url.uuid %}" class="btn btn-success btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>
                     <a href="{% url 'program:eventproposalurl_delete' camp_slug=camp.slug event_uuid=eventproposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
                 {% endif %}

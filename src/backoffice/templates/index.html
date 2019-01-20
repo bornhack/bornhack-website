@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block content %}
+
+<div class="row">
+    <h2>{{ camp.title }} Backoffice</h2>
+  <div class="lead">
+    Welcome to the promised land! Please select your desired action below:
+  </div>
+</div>
+
+<div class="row">
+    <p>
+    <div class="list-group">
+      {% if perms.camps.infoteam_permission %}
+      <h3>Info Team</h3>
+      <a href="{% url 'backoffice:product_handout' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Hand Out Products</h4>
+        <p class="list-group-item-text">Use this view to mark products such as merchandise, cabins, fridges and so on as handed out.</p>
+      </a>
+      <a href="{% url 'backoffice:ticket_checkin' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Check-In Tickets</h4>
+        <p class="list-group-item-text">Use this view to check-in tickets when participants arrive.</p>
+      </a>
+      <a href="{% url 'backoffice:badge_handout' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Hand Out Badges</h4>
+        <p class="list-group-item-text">Use this view to mark badges as handed out.</p>
+      </a>
+      {% endif %}
+
+      {% if perms.camps.contentteam_permission %}
+      <h3>Content Team</h3>
+      <a href="{% url 'backoffice:manage_proposals' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Manage Proposals</h4>
+        <p class="list-group-item-text">Use this view to manage SpeakerProposals and EventProposals</p>
+      </a>
+      {% endif %}
+
+      {% if perms.camps.orgateam_permission %}
+      <h3>Orga Team</h3>
+      <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
+        <p class="list-group-item-text">Use this view to check and approve users Public Credit Names</p>
+      </a>
+      <a href="{% url 'backoffice:merchandise_orders' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Merchandise Orders</h4>
+        <p class="list-group-item-text">Use this view to look at Merchandise Orders</p>
+      </a>
+      <a href="{% url 'backoffice:merchandise_to_order' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Merchandise To Order</h4>
+        <p class="list-group-item-text">Use this view to generate a list of merchandise that needs to be ordered</p>
+      </a>
+      <a href="{% url 'backoffice:village_orders' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Village Orders</h4>
+        <p class="list-group-item-text">Use this view to look at Village category OrderProductRelations</p>
+      </a>
+      <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Village Gear To Order</h4>
+        <p class="list-group-item-text">Use this view to generate a list of village gear that needs to be ordered</p>
+      </a>
+      {% endif %}
+
+      {% if perms.camps.economyteam_permission %}
+      <h3>Economy Team</h3>
+      <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Expenses</h4>
+        <p class="list-group-item-text">Use this view to see and approve/reject expenses.</p>
+      </a>
+      <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Reimbursements</h4>
+        <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
+      </a>
+      <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Revenues</h4>
+        <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
+      </a>
+      {% endif %}
+    </div>
+</div>
+
+{% endblock content %}
+

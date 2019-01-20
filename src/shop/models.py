@@ -128,6 +128,17 @@ class Order(CreatedUpdatedModel):
         blank=True,
     )
 
+    invoice_address = models.TextField(
+        help_text=_('The invoice address for this order. Leave blank to use the email associated with the logged in user.'),
+        blank=True
+    )
+
+    notes = models.TextField(
+        help_text='Any internal notes about this order can be entered here. They will not be printed on the invoice or shown to the customer in any way.',
+        default='',
+        blank=True,
+    )
+
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):

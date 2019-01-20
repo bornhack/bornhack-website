@@ -2,8 +2,8 @@ import uuid
 import os
 import icalendar
 import logging
-
 from datetime import timedelta
+
 from django.contrib.postgres.fields import DateTimeRangeField, ArrayField
 from django.contrib import messages
 from django.db import models
@@ -36,8 +36,8 @@ class UrlType(CreatedUpdatedModel):
 
     icon = models.CharField(
         max_length=100,
-        default='link',
-        help_text="Name of the fontawesome icon to use without the 'fa-' part"
+        default='fas fa-link',
+        help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part."
     )
 
     class Meta:
@@ -146,6 +146,13 @@ class Url(CampRelatedModel):
     def camp(self):
         return self.owner.camp
 
+    camp_filter = [
+        'speakerproposal__camp',
+        'eventproposal__track__camp',
+        'speaker__camp',
+        'event__track__camp',
+    ]
+
 
 ###############################################################################
 
@@ -218,12 +225,18 @@ class SpeakerProposal(UserSubmittedModel):
     camp = models.ForeignKey(
         'camps.Camp',
         related_name='speakerproposals',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     name = models.CharField(
         max_length=150,
         help_text='Name or alias of the speaker/artist/host',
+    )
+
+    email = models.EmailField(
+        max_length=150,
+        help_text="The email of the speaker (defaults to the logged in user if empty.",
     )
 
     biography = models.TextField(
@@ -248,20 +261,34 @@ class SpeakerProposal(UserSubmittedModel):
         return reverse_lazy('program:speakerproposal_detail', kwargs={'camp_slug': self.camp.slug, 'pk': self.uuid})
 
     def mark_as_approved(self, request):
-        speakermodel = apps.get_model('program', 'speaker')
+        """ Marks a SpeakerProposal as approved, including creating/updating the related Speaker object """
         speakerproposalmodel = apps.get_model('program', 'speakerproposal')
-        speaker = speakermodel()
+        # create a Speaker if we don't have one
+        if not hasattr(self, 'speaker'):
+            speakermodel = apps.get_model('program', 'speaker')
+            speaker = speakermodel()
+            speaker.proposal = self
+        else:
+            speaker = self.speaker
+
+        # set Speaker data
         speaker.camp = self.camp
+        if self.email:
+            email = self.email
+        else:
+            email = request.user.email
+        speaker.email = email
         speaker.name = self.name
         speaker.biography = self.biography
         speaker.needs_oneday_ticket = self.needs_oneday_ticket
-        speaker.proposal = self
         speaker.save()
 
+        # mark as approved and save
         self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
         self.save()
 
-        # copy all the URLs too
+        # copy all the URLs to the speaker object
+        speaker.urls.clear()
         for url in self.urls.all():
             Url.objects.create(
                 url=url.url,
@@ -269,12 +296,18 @@ class SpeakerProposal(UserSubmittedModel):
                 speaker=speaker
             )
 
-        messages.success(request, "Speaker object %s has been created" % speaker)
+        # a message to the admin
+        messages.success(request, "Speaker object %s has been created/updated" % speaker)
+
+    def mark_as_rejected(self, request):
+        speakerproposalmodel = apps.get_model('program', 'speakerproposal')
+        self.proposal_status = speakerproposalmodel.PROPOSAL_REJECTED
+        self.save()
+        messages.success(request, "SpeakerProposal %s has been rejected" % self.name)
 
 
 class EventProposal(UserSubmittedModel):
     """ An event proposal """
-
     track = models.ForeignKey(
         'program.EventTrack',
         related_name='eventproposals',
@@ -307,7 +340,7 @@ class EventProposal(UserSubmittedModel):
 
     allow_video_recording = models.BooleanField(
         default=False,
-        help_text='Check to allow video recording of the event. Leave unchecked to avoid video recording.'
+        help_text='Uncheck to avoid video recording.'
     )
 
     duration = models.IntegerField(
@@ -325,6 +358,8 @@ class EventProposal(UserSubmittedModel):
     @property
     def camp(self):
         return self.track.camp
+
+    camp_filter = 'track__camp'
 
     @property
     def headline(self):
@@ -349,7 +384,11 @@ class EventProposal(UserSubmittedModel):
     def mark_as_approved(self, request):
         eventmodel = apps.get_model('program', 'event')
         eventproposalmodel = apps.get_model('program', 'eventproposal')
-        event = eventmodel()
+        # use existing event if we have one
+        if not hasattr(self, 'event'):
+            event = eventmodel()
+        else:
+            event = self.event
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
@@ -362,13 +401,16 @@ class EventProposal(UserSubmittedModel):
             try:
                 event.speakers.add(sp.speaker)
             except ObjectDoesNotExist:
+                # clean up
+                event.urls.clear()
                 event.delete()
                 raise ValidationError('Not all speakers are approved or created yet.')
 
         self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
         self.save()
 
-        # copy all the URLs too
+        # clear any old urls from the event object and copy all the URLs from the proposal
+        event.urls.clear()
         for url in self.urls.all():
             Url.objects.create(
                 url=url.url,
@@ -376,7 +418,14 @@ class EventProposal(UserSubmittedModel):
                 event=event
             )
 
-        messages.success(request, "Event object %s has been created" % event)
+        messages.success(request, "Event object %s has been created/updated" % event)
+
+    def mark_as_rejected(self, request):
+        eventproposalmodel = apps.get_model('program', 'eventproposal')
+        self.proposal_status = eventproposalmodel.PROPOSAL_REJECTED
+        self.save()
+        messages.success(request, "EventProposal %s has been rejected" % self.title)
+
 
 ###############################################################################
 
@@ -385,20 +434,26 @@ class EventTrack(CampRelatedModel):
     """ All events belong to a track. Administration of a track can be delegated to one or more users. """
 
     name = models.CharField(
-        max_length=100
+        max_length=100,
+        help_text='The name of this Track',
     )
 
-    slug = models.SlugField()
+    slug = models.SlugField(
+        help_text='The url slug for this Track'
+    )
 
     camp = models.ForeignKey(
         'camps.Camp',
         related_name='eventtracks',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        help_text='The Camp this Track belongs to',
     )
 
     managers = models.ManyToManyField(
         'auth.User',
         related_name='managed_tracks',
+        blank=True,
+        help_text='If this track is managed by someone other than the Content team pick the users here.'
     )
 
     def __str__(self):
@@ -561,7 +616,8 @@ class Event(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The event proposal object this event was created from',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     class Meta:
@@ -579,6 +635,8 @@ class Event(CampRelatedModel):
     @property
     def camp(self):
         return self.track.camp
+
+    camp_filter = 'track__camp'
 
     @property
     def speakers_list(self):
@@ -649,6 +707,8 @@ class EventInstance(CampRelatedModel):
     def camp(self):
         return self.event.camp
 
+    camp_filter = 'event__track__camp'
+
     @property
     def schedule_date(self):
         """
@@ -681,8 +741,8 @@ class EventInstance(CampRelatedModel):
             'title': self.event.title,
             'slug': self.event.slug + '-' + str(self.id),
             'event_slug': self.event.slug,
-            'from': self.when.lower.astimezone().isoformat(),
-            'to': self.when.upper.astimezone().isoformat(),
+            'from': self.when.lower.isoformat(),
+            'to': self.when.upper.isoformat(),
             'url': str(self.event.get_absolute_url()),
             'id': self.id,
             'bg-color': self.event.event_type.color,
@@ -719,6 +779,11 @@ class Speaker(CampRelatedModel):
         help_text='Name or alias of the speaker',
     )
 
+    email = models.EmailField(
+        max_length=150,
+        help_text="The email of the speaker.",
+    )
+
     biography = models.TextField(
         help_text='Markdown is supported.'
     )
@@ -749,7 +814,8 @@ class Speaker(CampRelatedModel):
         null=True,
         blank=True,
         help_text='The speaker proposal object this speaker was created from',
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        editable=False,
     )
 
     needs_oneday_ticket = models.BooleanField(

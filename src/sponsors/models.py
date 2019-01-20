@@ -25,9 +25,9 @@ class Sponsor(CampRelatedModel):
         help_text='A short description of the sponsorship'
     )
 
-    logo = models.URLField(
+    logo_filename = models.CharField(
         max_length=255,
-        help_text='A URL to the logo'
+        help_text='Filename of the logo'
     )
 
     url = models.URLField(
@@ -36,12 +36,16 @@ class Sponsor(CampRelatedModel):
         help_text="An URL to the sponsor."
     )
 
+    tickets_generated = models.BooleanField(default=False)
+
     def __str__(self):
         return '{} ({})'.format(self.name, self.tier.camp)
 
     @property
     def camp(self):
         return self.tier.camp
+
+    camp_filter = 'tier__camp'
 
 
 class SponsorTier(CampRelatedModel):
@@ -66,6 +70,12 @@ class SponsorTier(CampRelatedModel):
         default=0,
         help_text="""This decides where on the list the tier will be shown. I.e.
         gold should have a lower value than silver."""
+    )
+
+    tickets = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="If set this is the number of tickets generated for a sponsor in this tier."
     )
 
     def __str__(self):

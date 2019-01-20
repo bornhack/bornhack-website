@@ -47,7 +47,7 @@ class SponsorTicketAdmin(BaseTicketAdmin):
         'sponsor',
     ]
 
-    search_fields = ['name', 'email', 'sponsor__name']
+    search_fields = ['pk', 'sponsor__name']
 
 
 @admin.register(DiscountTicket)
@@ -82,3 +82,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
     ]
 
     search_fields = ['uuid', 'order__id', 'order__user__email', 'name', 'email']
+
+
+class ShopTicketInline(admin.TabularInline):
+    model = ShopTicket

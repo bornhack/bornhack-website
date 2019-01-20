@@ -14,18 +14,29 @@
 
 <div class="row">
   <div class="panel panel-default">
-      <div class="panel-heading" ><span style="font-size: x-large"><span style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">{{ event.event_type.name }}</span> {{ event.title }}</span></div>
+      <div class="panel-heading" ><span style="font-size: x-large"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}</span></div>
     <div class="panel-body">
       <p>
-      {{ event.abstract|commonmark }}
+      {{ event.abstract|untrustedcommonmark }}
      </p>
 
       <hr>
 
+      <h4>URLs for {{ event.title }}</h4>
+      {% if event.urls.exists %}
+        {% for url in event.urls.all %}
+            <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+        {% endfor %}
+      {% else %}
+        <p><i>No URLs found.</i></p>
+      {% endif %}
+
+      <hr />
+
       <h4>Instances</h4>
       <ul class="list-group">
       {% for ei in event.instances.all %}
-        <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
+      <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }} at {{ ei.location.name }} <i class="fas fa-{{ei.location.icon}}"></i></li>
       {% empty %}
         No instances scheduled yet
       {% endfor %}
@@ -34,7 +45,7 @@
       <hr>
 
       {% if event.speakers.exists %}
-        <h4>Speakers</h4>
+      <h4>{{ event.event_type.host_title }}(s):</h4>
         <div class="list-group">
         {% for speaker in event.speakers.all %}
         <h4><a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">{{ speaker.name }}</a></h4>

@@ -2,15 +2,14 @@ from allauth.account.views import (
     LoginView,
     LogoutView,
 )
-from django.conf import settings
 from django.urls import include, path
 from django.contrib import admin
 from camps.views import *
+from feedback.views import FeedbackCreate
 from info.views import *
 from villages.views import *
 from program.views import *
 from sponsors.views import *
-from teams.views import *
 from people.views import *
 from bar.views import MenuView
 
@@ -70,6 +69,11 @@ urlpatterns = [
         name='camp_list'
     ),
 
+    path(
+        'token/',
+        include('tokens.urls', namespace='tokens'),
+    ),
+
     # camp redirect views here
 
     path(
@@ -113,11 +117,6 @@ urlpatterns = [
         name='people',
     ),
 
-    path(
-        'backoffice/',
-        include('backoffice.urls', namespace='backoffice')
-    ),
-
     # camp specific urls below here
 
     path(
@@ -146,7 +145,7 @@ urlpatterns = [
             ),
 
             path(
-                'bar/menu',
+                'bar/menu/',
                 MenuView.as_view(),
                 name='menu'
             ),
@@ -187,7 +186,26 @@ urlpatterns = [
                 include('teams.urls', namespace='teams')
             ),
 
+            path(
+                'rideshare/',
+                include('rideshare.urls', namespace='rideshare')
+            ),
 
+            path(
+                'backoffice/',
+                include('backoffice.urls', namespace='backoffice')
+            ),
+
+            path(
+                'feedback/',
+                FeedbackCreate.as_view(),
+                name='feedback'
+            ),
+
+            path(
+                'economy/',
+                include('economy.urls', namespace='economy'),
+            ),
         ])
     )
 ]

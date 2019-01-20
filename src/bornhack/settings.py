@@ -1,11 +1,26 @@
 import os
+import wrapt
+import django.views
+
 from .environment_settings import *
+
 
 def local_dir(entry):
     return os.path.join(
         os.path.dirname(os.path.dirname(__file__)),
         entry
     )
+
+
+# We do this hacky monkeypatching to enable us to define a setup method
+# on class based views for setting up variables without touching the dispatch
+# method.
+@wrapt.patch_function_wrapper(django.views.View, 'dispatch')
+def monkey_patched_dispatch(wrapped, instance, args, kwargs):
+    if hasattr(instance, 'setup'):
+        instance.setup(*args, **kwargs)
+    return wrapped(*args, **kwargs)
+
 
 DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
@@ -46,11 +61,16 @@ INSTALLED_APPS = [
     'bar',
     'backoffice',
     'events',
+    'rideshare',
+    'tokens',
+    'feedback',
+    'economy',
 
     'allauth',
     'allauth.account',
     'bootstrap3',
     'django_extensions',
+    'reversion',
     'betterforms',
 ]
 

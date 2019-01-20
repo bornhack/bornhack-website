@@ -306,6 +306,7 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
             order.payment_method = payment_method
             order.open = None
             order.customer_comment = request.POST.get('customer_comment') or ''
+            order.invoice_address = request.POST.get('invoice_address') or ''
             order.save()
 
             reverses = {
@@ -337,6 +338,7 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
                     order_product.quantity = new_quantity
                     order_product.save()
             order.customer_comment = request.POST.get('customer_comment') or ''
+            order.invoice_address = request.POST.get('invoice_address') or ''
             order.save()
 
         product_remove = request.POST.get('remove_product')
@@ -562,8 +564,9 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         if callbackobject.payload['event'] == 'invoice_state_change' or callbackobject.payload['event'] == 'invoice_manual_resend':
             process_coinify_invoice_json(
-                callbackobject.payload['data'],
-                self.get_object()
+                invoicejson=callbackobject.payload['data'],
+                order=self.get_object(),
+                request=request,
             )
             return HttpResponse('OK')
         else:

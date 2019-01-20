@@ -1,13 +1,16 @@
+import logging
+
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.text import slugify
-from utils.models import CampRelatedModel
 from django.core.exceptions import ValidationError
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.conf import settings
-import logging
+from django.contrib.postgres.fields import DateTimeRangeField
+
+from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -102,12 +105,20 @@ class Team(CampRelatedModel):
         help_text='Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.'
     )
 
+    shifts_enabled = models.BooleanField(
+        default=False,
+        help_text="Does this team have shifts? This enables defining shifts for this team."
+    )
+
     class Meta:
         ordering = ['name']
         unique_together = (('name', 'camp'), ('slug', 'camp'))
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)
+
+    def get_absolute_url(self):
+        return reverse_lazy('teams:general', kwargs={'camp_slug': self.camp.slug, 'team_slug': self.slug})
 
     def save(self, **kwargs):
         # generate slug if needed
@@ -136,15 +147,15 @@ class Team(CampRelatedModel):
         if self.private_irc_channel_name == settings.IRCBOT_PUBLIC_CHANNEL or self.private_irc_channel_name == settings.IRCBOT_VOLUNTEER_CHANNEL:
             raise ValidationError('The private IRC channel name is reserved')
 
-        # make sure public_irc_channel_name is unique
+        # make sure public_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
         if self.public_irc_channel_name:
-            if Team.objects.filter(private_irc_channel_name=self.public_irc_channel_name).exclude(pk=self.pk).exists():
-                raise ValidationError('The public IRC channel name is already in use!')
+            if Team.objects.filter(private_irc_channel_name__iexact=self.public_irc_channel_name).exclude(pk=self.pk).exists() or Team.objects.filter(public_irc_channel_name__iexact=self.public_irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError('The public IRC channel name is already in use on another team!')
 
-        # make sure private_irc_channel_name is unique
+        # make sure private_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
         if self.private_irc_channel_name:
-            if Team.objects.filter(public_irc_channel_name=self.private_irc_channel_name).exclude(pk=self.pk).exists():
-                raise ValidationError('The private IRC channel name is already in use!')
+            if Team.objects.filter(private_irc_channel_name__iexact=self.private_irc_channel_name).exclude(pk=self.pk).exists() or Team.objects.filter(public_irc_channel_name__iexact=self.private_irc_channel_name).exclude(pk=self.pk).exists():
+                raise ValidationError('The private IRC channel name is already in use on another team!')
 
     @property
     def memberships(self):
@@ -212,6 +223,7 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
+
     user = models.ForeignKey(
         'auth.User',
         on_delete=models.PROTECT,
@@ -255,6 +267,8 @@ class TeamMember(CampRelatedModel):
         """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
 
+    camp_filter = 'team__camp'
+
 
 class TeamTask(CampRelatedModel):
     team = models.ForeignKey(
@@ -275,9 +289,18 @@ class TeamTask(CampRelatedModel):
     description = models.TextField(
         help_text='Description of the task. Markdown is supported.'
     )
+    when = DateTimeRangeField(
+        blank=True,
+        null=True,
+        help_text='When does this task need to be started and/or finished?'
+    )
+    completed = models.BooleanField(
+        help_text='Check to mark this task as completed.',
+        default=False
+    )
 
     class Meta:
-        ordering = ['name']
+        ordering = ['completed', 'when', 'name']
         unique_together = (('name', 'team'), ('slug', 'team'))
 
     def get_absolute_url(self):
@@ -288,9 +311,58 @@ class TeamTask(CampRelatedModel):
         """ All CampRelatedModels must have a camp FK or a camp property """
         return self.team.camp
 
+    camp_filter = 'team__camp'
+
     def save(self, **kwargs):
         # generate slug if needed
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(**kwargs)
 
+
+class TaskComment(UUIDModel, CreatedUpdatedModel):
+    task = models.ForeignKey('teams.TeamTask', on_delete=models.PROTECT, related_name="comments")
+    author = models.ForeignKey('teams.TeamMember', on_delete=models.PROTECT)
+    comment = models.TextField()
+
+
+class TeamShift(CampRelatedModel):
+
+    class Meta:
+        ordering = ("shift_range",)
+
+    team = models.ForeignKey(
+        'teams.Team',
+        related_name='shifts',
+        on_delete=models.PROTECT,
+        help_text='The team this shift belongs to',
+    )
+
+    shift_range = DateTimeRangeField()
+
+    team_members = models.ManyToManyField(
+        TeamMember,
+        blank=True,
+    )
+
+    people_required = models.IntegerField(
+        default=1
+    )
+
+    @property
+    def camp(self):
+        """ All CampRelatedModels must have a camp FK or a camp property """
+        return self.team.camp
+
+    camp_filter = 'team__camp'
+
+    def __str__(self):
+        return "{} team shift from {} to {}".format(
+            self.team.name,
+            self.shift_range.lower,
+            self.shift_range.upper
+        )
+
+    @property
+    def users(self):
+        return [member.user for member in self.team_members.all()]

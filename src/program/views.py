@@ -1,11 +1,9 @@
 import logging
-import os
 from collections import OrderedDict
 
 from django.views.generic import ListView, TemplateView, DetailView, View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.conf import settings
-from django.views.decorators.http import require_safe
 from django.http import Http404, HttpResponse
 from django.utils.decorators import method_decorator
 from django.contrib.admin.views.decorators import staff_member_required
@@ -14,14 +12,13 @@ from django.contrib import messages
 from django.urls import reverse, reverse_lazy
 from django.template import Engine, Context
 from django.shortcuts import redirect
-from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 from betterforms.multiform import MultiModelForm
 import icalendar
 
 from camps.mixins import CampViewMixin
+from program.models import Url, UrlType
 from .mixins import (
-    EnsureUnapprovedProposalMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
     EnsureCFPOpenMixin,
@@ -34,8 +31,7 @@ from .email import (
     add_eventproposal_updated_email
 )
 from . import models
-from .utils import get_speakerproposal_form_class, get_eventproposal_form_class
-from .forms import BaseSpeakerProposalForm
+from .forms import SpeakerProposalForm, EventProposalForm
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -129,6 +125,7 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     """ This view allows a user to create a new SpeakerProposal linked to an existing EventProposal """
     model = models.SpeakerProposal
     template_name = 'speakerproposal_form.html'
+    form_class = SpeakerProposalForm
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the eventproposal object """
@@ -138,8 +135,16 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     def get_success_url(self):
         return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
-    def get_form_class(self):
-        return get_speakerproposal_form_class(eventtype=self.eventproposal.event_type)
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.eventproposal.event_type
+        })
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -150,6 +155,10 @@ class SpeakerProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
         # set user before saving
         form.instance.user = self.request.user
         form.instance.camp = self.camp
+
+        if not form.instance.email:
+            form.instance.email = self.request.user.email
+
         speakerproposal = form.save()
 
         # add speakerproposal to eventproposal
@@ -170,22 +179,34 @@ class SpeakerProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritabl
     """
     model = models.SpeakerProposal
     template_name = 'speakerproposal_form.html'
+    form_class = SpeakerProposalForm
 
-
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
         if self.get_object().eventproposals.count() == 1:
             # determine which form to use based on the type of event associated with the proposal
-            return get_speakerproposal_form_class(self.get_object().eventproposals.get().event_type)
+            eventtype = self.get_object().eventproposals.get().event_type
         else:
             # more than one eventproposal. If all events are the same type we can still show a non-generic form here
             eventtypes = set()
             for ep in self.get_object().eventproposals.all():
                 eventtypes.add(ep.event_type)
             if len(eventtypes) == 1:
-                return get_speakerproposal_form_class(ep.event_type)
-            # more than one type of event for this person, return the generic speakerproposal form
-            return BaseSpeakerProposalForm
+                eventtype = self.get_object().eventproposals.get().event_type
+            else:
+                # more than one type of event for this person, return the generic speakerproposal form
+                eventtype = None
+
+        # add camp and eventtype to form kwargs
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': eventtype
+        })
+
+        return kwargs
 
     def form_valid(self, form):
         """
@@ -303,10 +324,12 @@ class EventProposalAddPersonView(LoginRequiredMixin, CampViewMixin, EnsureWritab
 
     def form_valid(self, form):
         form.instance.speakers.add(self.speakerproposal)
+        messages.success(self.request, "%s has been added as %s for %s" % (
+            self.speakerproposal.name,
+            form.instance.event_type.host_title,
+            form.instance.title
+        ))
         return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse('program:proposal_list', kwargs={'camp_slug': self.camp.slug})
 
 
 class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UpdateView):
@@ -322,16 +345,8 @@ class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWri
         """ Get the speakerproposal object and check a few things """
         # get the speakerproposal object from URL kwargs
         self.speakerproposal = get_object_or_404(models.SpeakerProposal, pk=kwargs['speaker_uuid'], user=request.user)
-        # run the super() dispatch method so we have self.camp otherwise the .all() lookup below craps out
-        response = super().dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
-        # is this speakerproposal even in use on this eventproposal
-        if self.speakerproposal not in self.get_object().speakers.all():
-            # this speaker is not associated with this event
-            raise Http404
-
-        # all good
-        return response
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal object available in template """
@@ -347,20 +362,17 @@ class EventProposalRemovePersonView(LoginRequiredMixin, CampViewMixin, EnsureWri
 
         if self.get_object().speakers.count() == 1:
             messages.error(self.request, "Cannot delete the last person associalted with event!")
-            return redirect(reverse(
-                'program:eventproposal_detail', kwargs={
-                'camp_slug': self.camp.slug,
-                'pk': self.get_object().uuid
-            }))
+            return redirect(self.get_success_url())
 
+        # remove speakerproposal from eventproposal
         form.instance.speakers.remove(self.speakerproposal)
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        messages.success(self.request, "Speaker %s has been removed from %s" % (
+        messages.success(self.request, "%s has been removed from %s" % (
             self.speakerproposal.name,
             self.get_object().title
         ))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
         return reverse(
             'program:eventproposal_detail', kwargs={
             'camp_slug': self.camp.slug,
@@ -374,10 +386,7 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
     """
     model = models.EventProposal
     template_name = 'eventproposal_form.html'
-
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
-        return get_eventproposal_form_class(self.event_type)
+    form_class = EventProposalForm
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the speakerproposal object """
@@ -392,23 +401,20 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
         context['event_type'] = self.event_type
         return context
 
-    def get_form(self):
+    def get_form_kwargs(self):
         """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
+        Set camp and eventtype for the form
         """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
-
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.event_type
+        })
+        return kwargs
 
     def form_valid(self, form):
         # set camp and user for this eventproposal
-        eventproposal = form.save(commit=False)
-        eventproposal.user = self.request.user
-        eventproposal.event_type = self.event_type
-        eventproposal.save()
+        eventproposal = form.save(user=self.request.user, event_type=self.event_type)
 
         # add the speakerproposal to the eventproposal
         eventproposal.speakers.add(self.speakerproposal)
@@ -427,27 +433,24 @@ class EventProposalCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableC
 class EventProposalUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureUserOwnsProposalMixin, EnsureCFPOpenMixin, UpdateView):
     model = models.EventProposal
     template_name = 'eventproposal_form.html'
+    form_class = EventProposalForm
 
-    def get_form_class(self):
-        """ Get the appropriate form class based on the eventtype """
-        return get_eventproposal_form_class(self.get_object().event_type)
-
+    def get_form_kwargs(self):
+        """
+        Set camp and eventtype for the form
+        """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.get_object().event_type
+        })
+        return kwargs
 
     def get_context_data(self, *args, **kwargs):
         """ Make speakerproposal and eventtype objects available in the template """
         context = super().get_context_data(**kwargs)
         context['event_type'] = self.get_object().event_type
         return context
-
-    def get_form(self):
-        """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
-        """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
 
     def form_valid(self, form):
         # set status to pending and save eventproposal
@@ -559,20 +562,19 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         Save the object(s) here before redirecting
         """
         if hasattr(self, 'speakerproposal'):
-            eventproposal = form.save(commit=False)
-            eventproposal.user = self.request.user
-            eventproposal.event_type = self.eventtype
-            eventproposal.save()
+            eventproposal = form.save(user=self.request.user, event_type=self.eventtype)
             eventproposal.speakers.add(self.speakerproposal)
         else:
             # first save the SpeakerProposal
             speakerproposal = form['speakerproposal'].save(commit=False)
             speakerproposal.camp = self.camp
             speakerproposal.user = self.request.user
+            if not speakerproposal.email:
+                speakerproposal.email = self.request.user.email
             speakerproposal.save()
 
             # then save the eventproposal
-            eventproposal = form['eventproposal'].save(commit=False)
+            eventproposal = form['eventproposal'].save(user=self.request.user, event_type=self.eventtype)
             eventproposal.user = self.request.user
             eventproposal.event_type = self.eventtype
             eventproposal.save()
@@ -597,11 +599,7 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         """
         if hasattr(self, 'speakerproposal'):
             # we already have a speakerproposal, just show an eventproposal form
-            return get_eventproposal_form_class(eventtype=self.eventtype)
-
-        # get the two forms we need to build the MultiModelForm
-        SpeakerProposalForm = get_speakerproposal_form_class(eventtype=self.eventtype)
-        EventProposalForm = get_eventproposal_form_class(eventtype=self.eventtype)
+            return EventProposalForm
 
         # build our MultiModelForm
         class CombinedProposalSubmitForm(MultiModelForm):
@@ -613,15 +611,16 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         # return the form class
         return CombinedProposalSubmitForm
 
-    def get_form(self):
+    def get_form_kwargs(self):
         """
-        Override get_form() method so we can set the queryset for the track selector.
-        Usually this kind of thing would go into get_initial() but that does not work for some reason, so we do it here instead.
+        Set camp and eventtype for the form
         """
-        form_class = self.get_form_class()
-        form = form_class(**self.get_form_kwargs())
-        form.forms['eventproposal'].fields['track'].queryset = models.EventTrack.objects.filter(camp=self.camp)
-        return form
+        kwargs = super().get_form_kwargs()
+        kwargs.update({
+            'camp': self.camp,
+            'eventtype': self.eventtype
+        })
+        return kwargs
 
 
 ###################################################################################################
@@ -670,6 +669,15 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 class ScheduleView(CampViewMixin, TemplateView):
     template_name = 'schedule_overview.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        """
+        If no events are scheduled redirect to the event page
+        """
+        response = super().dispatch(request, *args, **kwargs)
+        if not models.EventInstance.objects.filter(event__track__camp=self.camp).exists():
+            return(redirect(reverse('program:event_index', kwargs={'camp_slug': self.camp.slug})))
+        return response
+
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
         context['schedule_midnight_offset_hours'] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS
@@ -716,18 +724,29 @@ class UrlCreateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, 
     def form_valid(self, form):
         """
         Set the proposal FK before saving
+        Set proposal as pending if it isn't already
         """
         if hasattr(self, 'eventproposal') and self.eventproposal:
+            # this URL belongs to an eventproposal
             form.instance.eventproposal = self.eventproposal
             url = form.save()
+            if self.eventproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.eventproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.eventproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.eventproposal.title)
         else:
+            # this URL belongs to a speakerproposal
             form.instance.speakerproposal = self.speakerproposal
             url = form.save()
+            if self.speakerproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.speakerproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.speakerproposal.name)
 
         messages.success(self.request, "URL saved.")
 
         # all good
-        return redirect(self.get_success_url())
+        return redirect(reverse_lazy('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
 
 
 class UrlUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, UpdateView):
@@ -736,9 +755,57 @@ class UrlUpdateView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, 
     fields = ['urltype', 'url']
     pk_url_kwarg = 'url_uuid'
 
+    def form_valid(self, form):
+        """
+        Set proposal as pending if it isn't already
+        """
+        if hasattr(self, 'eventproposal') and self.eventproposal:
+            # this URL belongs to a speakerproposal
+            url = form.save()
+            if self.eventproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.eventproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.eventproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.eventproposal.title)
+        else:
+            # this URL belongs to a speakerproposal
+            url = form.save()
+            if self.speakerproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.speakerproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.speakerproposal.name)
+
+        messages.success(self.request, "URL saved.")
+
+        # all good
+        return redirect(reverse_lazy('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
+
 
 class UrlDeleteView(LoginRequiredMixin, CampViewMixin, EnsureWritableCampMixin, EnsureCFPOpenMixin, UrlViewMixin, DeleteView):
     model = models.Url
     template_name = 'url_delete.html'
     pk_url_kwarg = 'url_uuid'
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Set proposal as pending if it isn't already
+        """
+        if hasattr(self, 'eventproposal') and self.eventproposal:
+            # this URL belongs to a speakerproposal
+            if self.eventproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.eventproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.eventproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.eventproposal.title)
+        else:
+            # this URL belongs to a speakerproposal
+            if self.speakerproposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
+                self.speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+                self.speakerproposal.save()
+                messages.success(self.request, "%s is now pending review by the Content Team." % self.speakerproposal.name)
+
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(self.request, "URL deleted.")
+
+        # all good
+        return redirect(reverse_lazy('program:proposal_list', kwargs={'camp_slug': self.camp.slug}))
 

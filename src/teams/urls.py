@@ -1,6 +1,44 @@
 from django.urls import path, include
-from .views import *
 
+from teams.views.base import (
+    TeamListView,
+    TeamGeneralView,
+    TeamManageView,
+    FixIrcAclView,
+)
+
+from teams.views.members import (
+    TeamMembersView,
+    TeamMemberRemoveView,
+    TeamMemberApproveView,
+    TeamJoinView,
+    TeamLeaveView,
+)
+
+from teams.views.info import (
+    InfoCategoriesListView,
+    InfoItemUpdateView,
+    InfoItemCreateView,
+    InfoItemDeleteView,
+)
+
+from teams.views.tasks import (
+    TeamTasksView,
+    TaskCreateView,
+    TaskDetailView,
+    TaskUpdateView,
+)
+
+from teams.views.shifts import (
+    ShiftListView,
+    ShiftCreateView,
+    ShiftCreateMultipleView,
+    ShiftUpdateView,
+    ShiftDeleteView,
+    MemberTakesShift,
+    MemberDropsShift,
+    UserShifts,
+)
 
 app_name = 'teams'
 
@@ -11,25 +49,16 @@ urlpatterns = [
         name='list'
     ),
     path(
-        'members/', include([
-            path(
-                '<int:pk>/remove/',
-                TeamMemberRemoveView.as_view(),
-                name='teammember_remove',
-            ),
-            path(
-                '<int:pk>/approve/',
-                TeamMemberApproveView.as_view(),
-                name='teammember_approve',
-            ),
-        ]),
+        'shifts',
+        UserShifts.as_view(),
+        name='user_shifts'
     ),
     path(
         '<slug:team_slug>/', include([
             path(
                 '',
-                TeamDetailView.as_view(),
-                name='detail'
+                TeamGeneralView.as_view(),
+                name='general'
             ),
             path(
                 'join/',
@@ -52,7 +81,31 @@ urlpatterns = [
                 name='fix_irc_acl',
             ),
             path(
+                'members/', include([
+                    path(
+                        '',
+                        TeamMembersView.as_view(),
+                        name='members'
+                    ),
+                    path(
+                        '<int:pk>/remove/',
+                        TeamMemberRemoveView.as_view(),
+                        name='member_remove',
+                    ),
+                    path(
+                        '<int:pk>/approve/',
+                        TeamMemberApproveView.as_view(),
+                        name='member_approve',
+                    ),
+                ]),
+            ),
+            path(
                 'tasks/', include([
+                    path(
+                        '',
+                        TeamTasksView.as_view(),
+                        name='tasks',
+                    ),
                     path(
                         'create/',
                         TaskCreateView.as_view(),
@@ -75,6 +128,78 @@ urlpatterns = [
 
                 ]),
             ),
+            path(
+                'info/',
+                include([
+                    path(
+                        '',
+                        InfoCategoriesListView.as_view(),
+                        name='info_categories'
+                    ),
+                    path(
+                        '<slug:category_anchor>/', include([
+                            path(
+                                'create/',
+                                InfoItemCreateView.as_view(),
+                                name='info_item_create',
+                            ),
+                            path(
+                                '<slug:item_anchor>/', include([
+                                    path(
+                                        'update/',
+                                        InfoItemUpdateView.as_view(),
+                                        name='info_item_update',
+                                    ),
+                                    path(
+                                        'delete/',
+                                        InfoItemDeleteView.as_view(),
+                                        name='info_item_delete',
+                                    ),
+                                ]),
+                            ),
+                        ])
+                    )
+                ])
+            ),
+            path('shifts/', include([
+                path(
+                    '',
+                    ShiftListView.as_view(),
+                    name="shifts"
+                ),
+                path(
+                    'create/',
+                    ShiftCreateView.as_view(),
+                    name="shift_create"
+                ),
+                path(
+                    'create_multiple/',
+                    ShiftCreateMultipleView.as_view(),
+                    name="shift_create_multiple"
+                ),
+                path('<int:pk>/', include([
+                    path(
+                        '',
+                        ShiftUpdateView.as_view(),
+                        name="shift_update"
+                    ),
+                    path(
+                        'delete',
+                        ShiftDeleteView.as_view(),
+                        name="shift_delete"
+                    ),
+                    path(
+                        'take',
+                        MemberTakesShift.as_view(),
+                        name="shift_member_take"
+                    ),
+                    path(
+                        'drop',
+                        MemberDropsShift.as_view(),
+                        name="shift_member_drop"
+                    ),
+                ])),
+            ]))
         ]),
     ),
 ]

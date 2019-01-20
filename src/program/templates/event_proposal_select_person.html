@@ -19,7 +19,7 @@ Add {{ eventproposal.event_type.host_title }} to {{ eventproposal.title }} | {{ 
     {% for speakerproposal in speakerproposal_list %}
       <a href="{% url 'program:eventproposal_addperson' camp_slug=camp.slug event_uuid=eventproposal.uuid speaker_uuid=speakerproposal.uuid %}" class="list-group-item">
         <h4 class="list-group-item-heading">
-            Add {{ speakerproposal.name }} to {{ eventproposal.title }}
+            Add <b>{{ speakerproposal.name }}</b> to <b>{{ eventproposal.title }}</b>
         </h4>
       </a>
     {% endfor %}

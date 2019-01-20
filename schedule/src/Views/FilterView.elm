@@ -224,10 +224,10 @@ filterChoiceView filter currentFilters eventInstances slugLike =
                                     "film"
 
                                 "to-be-recorded" ->
-                                    "video-camera"
+                                    "video"
 
                                 "not-to-be-recorded" ->
-                                    "ban"
+                                    "video-slash"
 
                                 _ ->
                                     ""

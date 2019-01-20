@@ -11,6 +11,24 @@ import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
+class Permission(models.Model):
+    """
+    An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
+    """
+    class Meta:
+        managed = False
+        default_permissions=()
+        permissions = (
+            ("backoffice_permission", "BackOffice access"),
+            ("orgateam_permission", "Orga Team permissions set"),
+            ("infoteam_permission", "Info Team permissions set"),
+            ("economyteam_permission", "Economy Team permissions set"),
+            ("contentteam_permission", "Content Team permissions set"),
+            ("expense_create_permission", "Expense Create permission"),
+            ("revenue_create_permission", "Revenue Create permission"),
+        )
+
+
 class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = 'Camp'
@@ -63,6 +81,11 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         verbose_name='Colour',
         help_text='The primary colour for the camp in hex',
         max_length=7
+    )
+
+    light_text = models.BooleanField(
+        default=True,
+        help_text='Check if this camps colour requires white text, uncheck if black text is better',
     )
 
     call_for_participation_open = models.BooleanField(

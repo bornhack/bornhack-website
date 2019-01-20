@@ -1,11 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 
 {% block title %}
 Join Team: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block team_content %}
 
 <p class="lead">Really join the <b>{{ team.name }}</b> Team for <b>{{ team.camp.title }}</b>?</p>
 
