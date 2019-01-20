@@ -3,7 +3,8 @@
       <thead>
       <tr>
           <th>Camp</th>
-          <th>User</th>
+          <th>Created By</th>
+          <th>Created For</th>
           <th>Economy Team Notes</th>
           <th>Amount</th>
           <th>Paid</th>
@@ -15,6 +16,7 @@
       <tr>
         <td>{{ reim.camp }}</td>
         <td>{{ reim.user }}</td>
+        <td>{{ reim.reimbursement_user }}</td>
         <td>{{ reim.notes|default:"N/A" }}</td>
         <td>{{ reim.amount }} DKK</td>
         <td>{{ reim.paid }}</td>
