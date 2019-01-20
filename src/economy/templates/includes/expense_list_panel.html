@@ -6,6 +6,7 @@
     <th>Paid by</th>
     {% endif %}
     <th>Amount</th>
+    <th>Invoice Date</th>
     <th>Description</th>
     <th>Responsible Team</th>
     {% if not reimbursement %}
@@ -22,6 +23,7 @@
       <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
       {% endif %}
       <td>{{ expense.amount }} DKK</td>
+      <td>{{ expense.invoice_date }}</td>
       <td>{{ expense.description }}</td>
       <td>{{ expense.responsible_team.name }} Team</td>
 
