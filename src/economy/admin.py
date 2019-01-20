@@ -19,7 +19,7 @@ reject_expenses.short_description = "Reject Expenses"
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
     list_filter = ['camp', 'responsible_team', 'approved', 'user', 'reimbursement']
-    list_display = ['user', 'description', 'amount', 'camp', 'responsible_team', 'approved', 'reimbursement']
+    list_display = ['user', 'description', 'invoice_date', 'amount', 'camp', 'responsible_team', 'approved', 'reimbursement']
     search_fields = ['description', 'amount', 'user']
     actions = [approve_expenses, reject_expenses]
 
@@ -41,7 +41,7 @@ reject_revenues.short_description = "Reject Revenues"
 @admin.register(Revenue)
 class RevenueAdmin(admin.ModelAdmin):
     list_filter = ['camp', 'responsible_team', 'approved', 'user']
-    list_display = ['user', 'description', 'amount', 'camp', 'responsible_team', 'approved']
+    list_display = ['user', 'description', 'invoice_date', 'amount', 'camp', 'responsible_team', 'approved']
     search_fields = ['description', 'amount', 'user']
     actions = [approve_revenues, reject_revenues]
 
