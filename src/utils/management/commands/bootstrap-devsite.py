@@ -75,26 +75,31 @@ class Command(BaseCommand):
             dict(
                 year=2016,
                 tagline='Initial Commit',
+                colour='#004dff',
                 read_only=True,
             ),
             dict(
                 year=2017,
                 tagline='Make Tradition',
+                colour='#750787',
                 read_only=True,
             ),
             dict(
                 year=2018,
                 tagline='scale it',
+                colour='#008026',
                 read_only=False,
             ),
             dict(
                 year=2019,
                 tagline='Undecided',
+                colour='#ffed00',
                 read_only=False,
             ),
             dict(
                 year=2020,
                 tagline='Undecided',
+                colour='#ff8c00',
                 read_only=False,
             ),
         ]
@@ -121,7 +126,7 @@ class Command(BaseCommand):
                     timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
                     timezone.datetime(year, 9, 6, 12, 0, tzinfo=timezone.utc),
                 ),
-                colour='#000000'
+                colour=camp['colour'],
             ), read_only))
 
         return camp_instances
@@ -835,7 +840,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='Henrik is an internet samurai working in internet and security around the world.',
                 slug='henrik-kramshj',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp1.events.add(ev5)
             sp2 = Speaker.objects.create(
@@ -843,7 +848,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='random danish hacker',
                 slug='thomas-tykling',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp2.events.add(ev3, ev1)
             sp3 = Speaker.objects.create(
@@ -851,7 +856,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='functional alcoholic',
                 slug='alex-ahf',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp3.events.add(ev4, ev2)
             sp4 = Speaker.objects.create(
@@ -859,7 +864,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='Representative from The Alternative with focus in data visualization.',
                 slug='jesper-arp',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp4.events.add(ev9, ev27)
             sp5 = Speaker.objects.create(
@@ -867,7 +872,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='The green pirate',
                 slug='rolf-bjerre',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp5.events.add(ev9, ev23)
             sp6 = Speaker.objects.create(
@@ -875,7 +880,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='Emma Holten is a feminist and human rights activist. She is co-founder and editor of the standard critical magazine Friktion and also a student at the University of Copenhagen. She speaks in both national and global contexts of feminism, digital activism and why privacy on the internet is crucial to a democracy, where everyone is equal.',
                 slug='emma-holten',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp6.events.add(ev10)
             sp7 = Speaker.objects.create(
@@ -883,7 +888,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='Hacker and phone phreaker from Stockholm bent on radio. Researching security and privacy in wireless protocols.',
                 slug='christoffer-jerkeby',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp7.events.add(ev11)
             sp8 = Speaker.objects.create(
@@ -891,7 +896,7 @@ Towards the end we will open up to debate about how to use these resources or if
                 biography='Stephan Engberg is a Computer Scientist specializing in Innovation Strategist working with Digital Business when he realized the Digital World is designed through our approach to security models and economic models. He then dedicated himself to Privacy/Security by Design in Open Business Innovation making numerous breakthroughs in security and engaged in EU research activities he was e.g. member of the Strategic Advisory Board for FP7 Security Research Roadmapping and started manufacturing of RFID computer chips based on Privacy by Design with zero-knowledge based computing in passive chips without battery or ultra-low memory and computational capabilities. In 2003, he was selected by an a transatlantic panel of researchers in ethics as a Moral Example in the Computer Profession.',
                 slug='stephan-engberg',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp8.events.add(ev12)
             sp9 = Speaker.objects.create(
@@ -906,7 +911,7 @@ monthly Bulletproof TLS Newsletter.
                 ''',
                 slug='hanno-bock',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp9.events.add(ev13, ev16)
             sp10 = Speaker.objects.create(
@@ -922,7 +927,7 @@ a truly random sequence by a polynomial-time-bounded computational adversary.
                 ''',
                 slug='ximin-luo',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp10.events.add(ev14)
             sp11 = Speaker.objects.create(
@@ -934,7 +939,7 @@ for a semiconductor company.
                 ''',
                 slug='michael-knudsen',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp11.events.add(ev15)
             sp12 = Speaker.objects.create(
@@ -942,7 +947,7 @@ for a semiconductor company.
                 biography='The team you won\'t notice if everything goes as it should. Please bring them rum or beer if they look too stressed.',
                 slug='bornhack-network-team',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp12.events.add(ev17)
             sp13 = Speaker.objects.create(
@@ -957,7 +962,7 @@ Ahmia has been in part sponsored by the Google Summer of Code.
                 ''',
                 slug='juha-nurmi',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp13.events.add(ev18)
             sp14 = Speaker.objects.create(
@@ -972,7 +977,7 @@ Also, I enjoy nature quite a bit. Presently, I work at the Danish Road Directora
                 ''',
                 slug='lasse-andersen',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp14.events.add(ev21)
             sp15 = Speaker.objects.create(
@@ -987,7 +992,7 @@ Website: [aflyttet.dk](https://aflyttet.dk)
                 ''',
                 slug='anders-kjrulff',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp15.events.add(ev22)
             sp16 = Speaker.objects.create(
@@ -997,7 +1002,7 @@ Thomas is an electronics engineer, though he is mostly doing software developmen
                 ''',
                 slug='thomas-flummer',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp16.events.add(ev24)
             sp17 = Speaker.objects.create(
@@ -1014,7 +1019,7 @@ programming for a danish startup.
                 ''',
                 slug='jesper-louis-andersen',
                 camp=camp,
-                email="email@email.lol",
+                email="email@example.com",
             )
             sp17.events.add(ev25, ev26)
 
