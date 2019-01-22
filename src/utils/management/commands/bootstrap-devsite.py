@@ -36,32 +36,33 @@ from profiles.models import (
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
 from django.utils.text import slugify
-
+from django.db.models.signals import post_save
 import factory
 
 
-class UserFactory(factory.Factory):
-
-    class Meta:
-        model = User
-
-
-class ProfileFactory(factory.Factory):
-
+@factory.django.mute_signals(post_save)
+class ProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Profile
 
+    user = factory.SubFactory('self.UserFactory', profile=None)
     name = factory.Faker('name')
     description = factory.Faker('text')
     public_credit_name = factory.Faker('name')
     public_credit_name_approved = True
 
+@factory.django.mute_signals(post_save)
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
 
-class EmailAddressFactory(factory.Factory):
+    profile = factory.RelatedFactory(ProfileFactory, 'user')
+
+class EmailAddressFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EmailAddress
 
-    primary = True
+    primary = False
     verified = True
 
 
@@ -139,12 +140,12 @@ class Command(BaseCommand):
 
         for i in range(1, 10):
             username = "user{}".format(i)
-            user = User.objects.create_user(
+            user = UserFactory.create(
                 username=username,
                 password=username,
+                email='{}@example.com'.format(username),
             )
             users[i] = user
-            user.profile = ProfileFactory.create()
             EmailAddressFactory.create(
                 user=user,
                 email='{}@example.com'.format(username),
@@ -156,7 +157,11 @@ class Command(BaseCommand):
             password='admin',
         )
         users['admin'] = admin
-        admin.profile = ProfileFactory.create()
+        admin.profile.name = 'Administrator'
+        admin.profile.description = 'Default adminstrative user'
+        admin.profile.public_credit_name = 'Administrator'
+        admin.profile.public_credit_name_approved = True
+        admin.profile.save()
         EmailAddress.objects.create(
             user=admin,
             email='admin@example.com',
