@@ -18,9 +18,9 @@ reject_expenses.short_description = "Reject Expenses"
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_filter = ['camp', 'responsible_team', 'approved', 'user', 'reimbursement']
+    list_filter = ['camp', 'responsible_team', 'approved', 'user']
     list_display = ['user', 'description', 'invoice_date', 'amount', 'camp', 'responsible_team', 'approved', 'reimbursement']
-    search_fields = ['description', 'amount', 'user']
+    search_fields = ['description', 'amount', 'uuid']
     actions = [approve_expenses, reject_expenses]
 
 
