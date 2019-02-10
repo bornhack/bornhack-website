@@ -107,10 +107,14 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
         'ticket_type',
         'price',
-        'description',
         stock_info,
         available_from,
         available_to
+    ]
+
+    list_filter = [
+        'category',
+        'ticket_type',
     ]
 
     search_fields = ['name']
