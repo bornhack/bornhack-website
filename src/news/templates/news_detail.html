@@ -14,5 +14,5 @@
     {% endif %}
     <h3>{{ news_item.title }} <small>{{ news_item.published_at|date:"Y-m-d" }}</small></h3>
   </div>
-  {{ news_item.content|trustedcommonmark }}
+  {{ news_item.content|trustedcommonmark|urlize }}
 {% endblock %}
