@@ -15,6 +15,9 @@ urlpatterns = [
         name='noscript_schedule_index'
     ),
     path(
+        'json/', JSONView.as_view(), name="json_view"
+    ),
+    path(
         'ics/', ICSView.as_view(), name="ics_view"
     ),
     path(
