@@ -1,18 +1,34 @@
 {% load commonmark %}
 
 <div class="panel panel-default">
-    <div class="panel-heading">{{ eventproposal.title }}</div>
+    <div class="panel-body">
+        <strong>Title:</strong> {{ eventproposal.title }}<br />
+        <strong>ID</strong>: {{ eventproposal.uuid }}<br />
+        <strong>Status</strong>: {{ eventproposal.proposal_status }}<br />
+        <strong>Duration</strong>: {{ eventproposal.duration|default:"Not defined" }}<br />
+    </div>
+</div>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">Abstract</div>
     <div class="panel-body">
        {{ eventproposal.abstract|untrustedcommonmark }}
         {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
         <a href="{% url 'program:eventproposal_update' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
         {% endif %}
     </div>
-    <div class="panel-footer">Status: <span class="badge">{{ eventproposal.proposal_status }}</span> ID: <span class="badge">{{ eventproposal.uuid }}</span></div>
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading">URLs for {{ eventproposal.title }}</div>
+    <div class="panel-heading">Notes</div>
+    <div class="panel-body">
+       {{ eventproposal.submission_notes|untrustedcommonmark }}
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">URLs</div>
     <div class="panel-body">
       {% if eventproposal.urls.exists %}
         {% include 'includes/eventproposalurl_table.html' %}
@@ -26,7 +42,7 @@
 </div>
 
 <div class="panel panel-default">
-    <div class="panel-heading">{{ eventproposal.event_type.host_title }} List for {{ eventproposal.title }}</div>
+    <div class="panel-heading">{{ eventproposal.event_type.host_title }} List</div>
     <div class="panel-body">
       {% if eventproposal.speakers.exists %}
         {% include 'includes/speaker_proposal_table.html' with speakerproposals=eventproposal.speakers.all %}
