@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'graphene_django',
     'channels',
 
     'profiles',
@@ -190,4 +191,6 @@ LOGGING = {
     },
 }
 
-
+GRAPHENE = {
+    'SCHEMA': 'bornhack.schema.schema'
+}

@@ -1,9 +1,13 @@
+from django.urls import include, path
+from django.contrib import admin
+from django.conf import settings
+
 from allauth.account.views import (
     LoginView,
     LogoutView,
 )
-from django.urls import include, path
-from django.contrib import admin
+from graphene_django.views import GraphQLView
+
 from camps.views import *
 from feedback.views import FeedbackCreate
 from info.views import *
@@ -62,6 +66,7 @@ urlpatterns = [
     ),
     path('accounts/', include('allauth.urls')),
     path('admin/', admin.site.urls),
+    path('api/', GraphQLView.as_view(graphiql=True)),
 
     path(
         'camps/',
