@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load commonmark %}
+{% load static %}
 
 {% block title %}
 News | {{ block.super }}
@@ -8,6 +9,12 @@ News | {{ block.super }}
 {% block content %}
 {% if request.resolver_match.kwargs.archived %}
 <i>Showing archived news items. <a href="{% url 'news:index' archived=False %}">Show regular news items</a></i>
+{% else %}
+<br />
+<a href="{% url 'news:feed' %}" class="btn btn-default">
+<img src="{% static 'img/feed-icon-14x14.png' %}"> Get BornHack news as a RSS feed
+</a>
+<hr />
 {% endif %}
 {% for item in news_items %}
   <div>
