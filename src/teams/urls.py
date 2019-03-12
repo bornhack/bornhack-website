@@ -40,6 +40,11 @@ from teams.views.shifts import (
     UserShifts,
 )
 
+from teams.views.guide import (
+    TeamGuideView,
+    TeamGuidePrintView
+)
+
 app_name = 'teams'
 
 urlpatterns = [
@@ -74,6 +79,16 @@ urlpatterns = [
                 'manage/',
                 TeamManageView.as_view(),
                 name='manage'
+            ),
+            path(
+                'guide/',
+                TeamGuideView.as_view(),
+                name='guide'
+            ),
+            path(
+                'guide/print/',
+                TeamGuidePrintView.as_view(),
+                name='guide_print'
             ),
             path(
                 'fix_irc_acl/',

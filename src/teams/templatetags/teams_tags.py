@@ -1,6 +1,15 @@
 from django import template
+from teams.models import TeamMember
 from django.utils.safestring import mark_safe
 register = template.Library()
+
+
+@register.filter
+def is_team_member(user, team):
+    return TeamMember.objects.filter(
+        team=team, user=user, approved=True
+    ).exists()
+
 
 @register.simple_tag
 def membershipstatus(user, team, showicon=False):
@@ -21,4 +30,3 @@ def membershipstatus(user, team, showicon=False):
         return mark_safe("<i class='fa %s' title='%s'></i>" % (icon, text))
     else:
         return text
-
