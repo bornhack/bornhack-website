@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Team, TeamArea, TeamMember, TeamTask
+from .models import Team, TeamMember, TeamTask, TeamShift
 from .email import add_added_membership_email, add_removed_membership_email
+from camps.utils import CampPropertyListFilter
 
 
 @admin.register(TeamTask)
@@ -20,19 +21,29 @@ class TeamMemberInline(admin.TabularInline):
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     def get_responsible(self, obj):
-        return ", ".join([resp.get_full_name() for resp in obj.responsible])
+        return ", ".join([resp.profile.public_credit_name for resp in obj.responsible_members.all()])
     get_responsible.short_description = 'Responsible'
 
     list_display = [
         'name',
-        'area',
+        'camp',
         'get_responsible',
         'needs_members',
+        'public_irc_channel_name',
+        'public_irc_channel_bot',
+        'public_irc_channel_managed',
+        'private_irc_channel_name',
+        'private_irc_channel_bot',
+        'private_irc_channel_managed',
     ]
 
     list_filter = [
-        'camp',
+        CampPropertyListFilter,
         'needs_members',
+        'public_irc_channel_bot',
+        'public_irc_channel_managed',
+        'private_irc_channel_bot',
+        'private_irc_channel_managed',
     ]
     inlines = [TeamMemberInline]
 
@@ -40,6 +51,7 @@ class TeamAdmin(admin.ModelAdmin):
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
     list_filter = [
+        CampPropertyListFilter,
         'team',
         'approved',
     ]
@@ -84,8 +96,9 @@ class TeamMemberAdmin(admin.ModelAdmin):
     remove_member.description = 'Remove a user from the team.'
 
 
-@admin.register(TeamArea)
-class TeamAreaAdmin(admin.ModelAdmin):
+
+@admin.register(TeamShift)
+class TeamShiftAdmin(admin.ModelAdmin):
     list_filter = [
-        'camp'
+        'team',
     ]

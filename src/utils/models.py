@@ -20,7 +20,7 @@ class CleanedModel(models.Model):
             # which is not supposed to happen. Call them manually one by one instead.
             self.clean_fields()
             self.clean()
-            self.validate_unique()
+            self.validate_unique(exclude=None)
         except ValidationError as e:
             message = "Got ValidationError while saving: %s" % e
             if hasattr(self, 'request'):
@@ -51,6 +51,9 @@ class CreatedUpdatedModel(CleanedModel):
 
 
 class CampRelatedModel(CreatedUpdatedModel):
+
+    camp_filter = 'camp'
+
     class Meta:
         abstract = True
 
@@ -69,6 +72,10 @@ class CampRelatedModel(CreatedUpdatedModel):
             raise ValidationError('This camp is in read only mode.')
 
         super().delete(**kwargs)
+
+    @classmethod
+    def get_camp_filter(cls):
+        return cls.camp_filter
 
 
 class OutgoingEmail(CreatedUpdatedModel):

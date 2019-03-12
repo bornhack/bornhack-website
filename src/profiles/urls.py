@@ -1,8 +1,10 @@
-from django.conf.urls import url
+from django.urls import path
 
 from .views import ProfileDetail, ProfileUpdate
 
+
+app_name = 'profiles'
 urlpatterns = [
-    url(r'^$', ProfileDetail.as_view(), name='detail'),
-    url(r'^edit$', ProfileUpdate.as_view(), name='update'),
+    path('', ProfileDetail.as_view(), name='detail'),
+    path('edit', ProfileUpdate.as_view(), name='update'),
 ]

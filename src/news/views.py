@@ -1,6 +1,22 @@
 from django.views.generic import ListView, DetailView
 from django.utils import timezone
-from .models import *
+from django.contrib.syndication.views import Feed
+
+from .models import NewsItem
+
+
+def news_items_queryset(kwargs=None):
+    if not kwargs:
+        archived = False
+    else:
+        archived = kwargs['archived']
+
+    return NewsItem.objects.filter(
+        published_at__isnull=False,
+        published_at__lt=timezone.now(),
+        archived=archived
+    )
+
 
 class NewsIndex(ListView):
     model = NewsItem
@@ -8,11 +24,7 @@ class NewsIndex(ListView):
     context_object_name = 'news_items'
 
     def get_queryset(self):
-        return NewsItem.objects.filter(
-            published_at__isnull=False,
-            published_at__lt=timezone.now(),
-            archived=self.kwargs['archived']
-        )
+        return news_items_queryset(self.kwargs)
 
 
 class NewsDetail(DetailView):
@@ -20,3 +32,16 @@ class NewsDetail(DetailView):
     template_name = 'news_detail.html'
     context_object_name = 'news_item'
 
+
+class NewsFeed(Feed):
+    title = "BornHack News"
+    link = "/news"
+
+    def items(self):
+        return news_items_queryset()
+
+    def item_title(self, item):
+        return item.title
+
+    def item_description(self, item):
+        return item.content

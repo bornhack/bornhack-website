@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static from staticfiles %}
+{% load imageutils %}
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+{% block content %}
+<div class="row">
+  <h2>Ticket Check-In</h2>
+  <div class="lead">
+      Use this view to check in participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' camp_slug=camp.slug %}">Badge Handout view</a> instead. To hand out other products go to the <a href="{% url 'backoffice:product_handout' camp_slug=camp.slug %}">Hand Out Products</a> view instead.
+  </div>
+  <div>
+      This table shows all (Shop|Discount|Sponsor)Tickets which are checked_in=False.
+  </div>
+</div>
+<br>
+<div class="row">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+          <th>Ticket UUID</th>
+          <th>Ticket Type</th>
+          <th>Order ID</th>
+          <th>Order User</th>
+          <th>Order Email</th>
+          <th>Ticket Name</th>
+          <th>Ticket Email</th>
+          <th>Product</th>
+       </tr>
+      </thead>
+      <tbody>
+      {% for ticket in tickets %}
+      <tr>
+          <td><a href="/admin/tickets/shopticket/{{ ticket.uuid }}/change/">{{ ticket.uuid }}</a></td>
+          <td>{{ ticket.shortname }}</td>
+          <td><a href="/admin/shop/order/{{ ticket.order.id }}/change/">{{ ticket.order.id }}</a></td>
+          <td>{{ ticket.order.user }}</td>
+          <td>{{ ticket.order.user.email }}</td>
+          <td>{{ ticket.name }}</td>
+          <td>{{ ticket.email }}</td>
+          <td>{{ ticket.product }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+</div>
+{% endblock content %}
+

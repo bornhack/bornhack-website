@@ -1,0 +1,12 @@
+Hi,
+
+A new expense {{ expense.pk }} for {{ expense.responsible_team.name }} Team was just submitted by user {{ expense.user }}. The amount is DKK {{ expense.amount }} and description of the expense is:
+
+{{ expense.description }}
+
+{% if expense.paid_by_bornhack %}The expense was paid for by BornHack{% else %}The expense was paid for by the user "{{ expense.user }}" so it will need to be reimbursed after approval.{% endif %}
+
+Have a nice day!
+
+The {{ expense.camp.title }} Team
+

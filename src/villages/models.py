@@ -1,8 +1,7 @@
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.db import models
 from django.utils.text import slugify
-from utils.models import CreatedUpdatedModel, UUIDModel, CampRelatedModel
-from .managers import VillageQuerySet
+from utils.models import UUIDModel, CampRelatedModel
 
 
 class Village(UUIDModel, CampRelatedModel):
@@ -11,8 +10,8 @@ class Village(UUIDModel, CampRelatedModel):
         ordering = ['name']
         unique_together = ('slug', 'camp')
 
-    contact = models.ForeignKey('auth.User')
-    camp = models.ForeignKey('camps.Camp')
+    contact = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    camp = models.ForeignKey('camps.Camp', on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True)
     description = models.TextField(
@@ -27,8 +26,6 @@ class Village(UUIDModel, CampRelatedModel):
     deleted = models.BooleanField(
         default=False,
     )
-
-    objects = VillageQuerySet.as_manager()
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.camp.title)

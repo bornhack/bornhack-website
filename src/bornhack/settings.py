@@ -1,5 +1,9 @@
 import os
+import wrapt
+import django.views
+
 from .environment_settings import *
+
 
 def local_dir(entry):
     return os.path.join(
@@ -7,11 +11,22 @@ def local_dir(entry):
         entry
     )
 
+
+# We do this hacky monkeypatching to enable us to define a setup method
+# on class based views for setting up variables without touching the dispatch
+# method.
+@wrapt.patch_function_wrapper(django.views.View, 'dispatch')
+def monkey_patched_dispatch(wrapped, instance, args, kwargs):
+    if hasattr(instance, 'setup'):
+        instance.setup(*args, **kwargs)
+    return wrapped(*args, **kwargs)
+
+
 DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
 WSGI_APPLICATION = 'bornhack.wsgi.application'
+ASGI_APPLICATION = 'bornhack.routing.application'
 ROOT_URLCONF = 'bornhack.urls'
-
 
 SITE_ID = 1
 
@@ -28,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'graphene_django',
     'channels',
 
     'profiles',
@@ -45,11 +61,18 @@ INSTALLED_APPS = [
     'tickets',
     'bar',
     'backoffice',
+    'events',
+    'rideshare',
+    'tokens',
+    'feedback',
+    'economy',
 
     'allauth',
     'allauth.account',
     'bootstrap3',
     'django_extensions',
+    'reversion',
+    'betterforms',
 ]
 
 #MEDIA_URL = '/media/'
@@ -168,4 +191,6 @@ LOGGING = {
     },
 }
 
-
+GRAPHENE = {
+    'SCHEMA': 'bornhack.schema.schema'
+}

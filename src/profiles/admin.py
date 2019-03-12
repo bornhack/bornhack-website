@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Profile
 
+
 @admin.register(Profile)
 class OrderAdmin(admin.ModelAdmin):
     actions = ['approve_public_credit_names']
@@ -10,6 +11,10 @@ class OrderAdmin(admin.ModelAdmin):
         'name',
         'description',
         'public_credit_name',
+        'public_credit_name_approved',
+    ]
+
+    list_filter = [
         'public_credit_name_approved',
     ]
 

@@ -5,7 +5,7 @@
 
 {% block extra_head %}
 <noscript>
-    <meta http-equiv="refresh" content="0; url={% url "noscript_schedule_index" camp_slug=camp.slug %}" />
+    <meta http-equiv="refresh" content="0; url={% url "program:noscript_schedule_index" camp_slug=camp.slug %}" />
 </noscript>
 {% endblock %}
 
@@ -17,7 +17,7 @@
         No javascript? Don't worry, we have a HTML only version of the schedule! Redirecting you there now.
         </p>
         <p>
-        <a href="{% url "noscript_schedule_index" camp_slug=camp.slug %}">
+        <a href="{% url "program:noscript_schedule_index" camp_slug=camp.slug %}">
             Click here if you are not redirected.
         </a>
         </p>
@@ -30,13 +30,14 @@
 
 <script>
 var container = document.getElementById('schedule-container');
+var ws_scheme = window.location.protocol == "https:" ? "wss" : "ws";
 var elm_app = Elm.Main.embed(
     container,
     { 'schedule_timeslot_length_minutes': Number('{{ schedule_timeslot_length_minutes }}')
     , 'schedule_midnight_offset_hours': Number('{{ schedule_midnight_offset_hours }}')
-    , 'ics_button_href': "{% url 'ics_view' camp_slug=camp.slug %}"
+    , 'ics_button_href': "{% url 'program:ics_view' camp_slug=camp.slug %}"
     , 'camp_slug': "{{ camp.slug }}"
-    , 'websocket_server': "ws://" + window.location.host + "/schedule/"
+    , 'websocket_server': ws_scheme + "://" + window.location.host + "/schedule/"
     }
 );
 </script>

@@ -1,8 +1,5 @@
-from django.conf import settings
-
-
 def current_order(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         order = None
         orders = request.user.orders.filter(open__isnull=False)
 
@@ -11,5 +8,3 @@ def current_order(request):
 
         return {'current_order': order}
     return {}
-
-

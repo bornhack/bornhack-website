@@ -7,7 +7,7 @@
     <a href="{% url 'account_email' %}" class="btn btn-black">
       Manage emails
     </a>
-    {% if user.is_authenticated and user.orders.exists %}
+    {% if user.orders.exists %}
       <a href="{% url 'shop:order_list' %}" class="btn btn-black">
         Orders
       </a>
@@ -20,6 +20,9 @@
       </a>
       {% endif %}
     {% endif %}
+    <a href="{% url 'tokens:tokenfind_list' %}" class="btn btn-black">
+        Secret Tokens
+    </a>
     <a href="{% url 'account_logout' %}" class="btn btn-black">
       Logout
     </a>

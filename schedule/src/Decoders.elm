@@ -46,8 +46,6 @@ speakerDecoder =
         |> required "name" string
         |> required "slug" string
         |> required "biography" string
-        |> optional "large_picture_url" (nullable string) Nothing
-        |> optional "small_picture_url" (nullable string) Nothing
 
 
 eventDecoder : Decoder Event
@@ -82,6 +80,7 @@ eventInstanceDecoder =
         |> required "url" string
         |> required "event_slug" string
         |> required "event_type" string
+        |> required "event_track" string
         |> required "bg-color" string
         |> required "fg-color" string
         |> required "from" dateDecoder
@@ -111,6 +110,13 @@ eventTypeDecoder =
         |> required "light_text" bool
 
 
+eventTrackDecoder : Decoder FilterType
+eventTrackDecoder =
+    decode TrackFilter
+        |> required "name" string
+        |> required "slug" string
+
+
 initDataDecoder : Decoder (Flags -> Filter -> Location -> Route -> Bool -> Model)
 initDataDecoder =
     decode Model
@@ -119,4 +125,5 @@ initDataDecoder =
         |> required "event_instances" (list eventInstanceDecoder)
         |> required "event_locations" (list eventLocationDecoder)
         |> required "event_types" (list eventTypeDecoder)
+        |> required "event_tracks" (list eventTrackDecoder)
         |> required "speakers" (list speakerDecoder)

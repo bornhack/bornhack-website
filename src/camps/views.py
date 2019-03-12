@@ -18,19 +18,29 @@ class CampRedirectView(CampViewMixin, View):
             camp = Camp.objects.get(
                 camp__contains=now
             )
-
             logger.debug("Redirecting to camp '%s' for page '%s' because it is now!" % (camp.slug, kwargs['page']))
+            return redirect(kwargs['page'], camp_slug=camp.slug)
         except Camp.DoesNotExist:
-            # find the closest camp in the past
+            pass
+
+        # no ongoing camp, find the closest camp in the past
+        try:
             prevcamp = Camp.objects.filter(
                 camp__endswith__lt=now
-            ).order_by('-camp')[0]
+            ).order_by('-camp').first()
+        except Camp.DoesNotExist:
+            prevcamp = None
 
-            # find the closest upcoming camp
+        # find the closest upcoming camp
+        try:
             nextcamp = Camp.objects.filter(
                 camp__startswith__gt=now
-            ).order_by('camp')[0]
+            ).order_by('camp').first()
+        except Camp.DoesNotExist:
+            nextcamp = None
 
+        percentpassed = False
+        if prevcamp and nextcamp:
             # find the number of days between the two camps
             daysbetween = (nextcamp.camp.lower - prevcamp.camp.upper).days
 
@@ -40,14 +50,15 @@ class CampRedirectView(CampViewMixin, View):
             # find the percentage of time passed
             percentpassed = (dayssinceprevcamp / daysbetween) * 100
 
-            # do the redirect
-            if percentpassed > settings.CAMP_REDIRECT_PERCENT:
-                camp = nextcamp
-            else:
-                camp = prevcamp
+        # figure out where to redirect
+        if percentpassed > settings.CAMP_REDIRECT_PERCENT or not prevcamp:
+            # either we have no previous camp, or we have both and more than settings.CAMP_REDIRECT_PERCENT has passed, so redirect to the next camp
+            camp = nextcamp
+        else:
+            # either we have no next camp, or we have both and less than settings.CAMP_REDIRECT_PERCENT has passed, so redirect to the previous camp
+            camp = prevcamp
 
-            logger.debug("Redirecting to camp '%s' for page '%s' because %s%% of the time between the camps passed" % (camp.slug, kwargs['page'], int(percentpassed)))
-
+        # do the redirect
         return redirect(kwargs['page'], camp_slug=camp.slug)
 
 

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static from staticfiles %}
+{% load commonmark %}
 
 {% block title %}
 Sponsors | {{ block.super }}
@@ -7,6 +8,8 @@ Sponsors | {{ block.super }}
 
 
 {% block content %}
+
+{% if sponsors %}
 
 <h2>{{ view.camp.title }} Sponsors</h2>
 
@@ -17,6 +20,7 @@ Sponsors | {{ block.super }}
   you, we are immensely grateful!
 </p>
 
+{% endif %}
 
 {% for sponsor in sponsors %}
 
@@ -35,7 +39,7 @@ Sponsors | {{ block.super }}
         {% if sponsor.url %}
         <a href="{{ sponsor.url }}">
         {% endif %}
-        <img class="img-responsive center-block" src="{{ sponsor.logo }}" width="300" />
+        <img class="img-responsive center-block" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300" />
         {% if sponsor.url %}
         </a>
         {% endif %}
@@ -46,5 +50,17 @@ Sponsors | {{ block.super }}
         </section>
     {% endif %}
 {% endfor %}
+
+{% if not camp.call_for_sponsors_open %}
+<div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Sponsors is not open.
+</div>
+{% endif %}
+
+{% if not camp.call_for_sponsors %}
+<p class='lead'>This CFS has not been written yet.</p>
+{% else %}
+{{ camp.call_for_sponsors|trustedcommonmark }}
+{% endif %}
 
 {% endblock %}

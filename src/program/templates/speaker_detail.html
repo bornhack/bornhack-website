@@ -5,19 +5,21 @@
 
 <h3>{{ speaker.name }}</h3>
 
-{% if speaker.picture_large and speaker.picture_small %}
 <div class="row">
-  <div class="col-md-8 text-container">
-{{ speaker.biography|commonmark }}
-  </div>
-  <div class="col-md-4">
-    <a href="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='large' %}" >
-      <img src="{% url 'speaker_picture' camp_slug=camp.slug slug=speaker.slug picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speaker.name }}" width="200px">
-    </a>
+  <div class="col-md-12">
+{{ speaker.biography|untrustedcommonmark }}
   </div>
 </div>
+
+<hr />
+
+<h4>URLs for {{ speaker.name }}</h4>
+{% if speaker.urls.exists %}
+    {% for url in speaker.urls.all %}
+        <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+    {% endfor %}
 {% else %}
-{{ speaker.biography|commonmark }}
+    <p><i>No URLs found.</i></p>
 {% endif %}
 
 <hr />
@@ -28,11 +30,11 @@
             <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
                 {{ event.event_type.name }}
             </small>
-            <a href="{% url 'event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
         </h3>
-        {{ event.abstract|commonmark }}
+        {{ event.abstract|untrustedcommonmark }}
 
-        <h4>Instances</h4>
+        <h4>Scheduled Instances of "{{ event.title }}"</h4>
             <ul class="list-group">
                 {% for ei in event.instances.all %}
                     <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
@@ -40,7 +42,6 @@
                     No instances scheduled yet
                 {% endfor %}
             </ul>
-        </h4>
         <hr>
     {% empty %}
       No events registered for this speaker yet

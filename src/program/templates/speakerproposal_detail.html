@@ -1,37 +1,24 @@
 {% extends 'program_base.html' %}
-{% load commonmark %}
 
 {% block program_content %}
 
-<h2>{{ camp.title }} Speaker Proposal Details</h2>
-
-<ul>
-    <li class="list">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span></li>
-    <li class="list">ID: <span class="badge">{{ speakerproposal.uuid }}</span></li>
-</ul>
-
-<div class="panel panel-default">
-    <div class="panel-heading">{{ speakerproposal.name }}</div>
-    <div class="panel-body">
-        {% if speakerproposal.picture_large and speakerproposal.picture_small %}
-        <div class="row">
-          <div class="col-md-8 text-container">
-        {{ speakerproposal.biography|commonmark }}
-          </div>
-          <div class="col-md-4">
-            <a href="{% url 'speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='large' %}" >
-              <img src="{% url 'speakerproposal_picture' camp_slug=camp.slug pk=speakerproposal.pk picture='thumbnail' %}" alt="{{ camp.title }} speaker picture of {{ speakerproposal.name }}">
-            </a>
-          </div>
-        </div>
-        {% else %}
-        {{ speakerproposal.biography|commonmark }}
-        {% endif %}
-    </div>
+{% if not camp.call_for_participation_open %}
+<div class="alert alert-danger">
+    <strong>Note!</strong> This Call for Particilation is not open.
 </div>
+{% endif %}
+
+<h2>Details for {{ speakerproposal.name }}</h2>
+
+{% include 'includes/speakerproposal_detail.html' %}
 
 <p>
-    <a href="{% url 'proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+    {% if camp.call_for_participation_open and not camp.read_only %}
+      {% if not speakerproposal.eventproposals.all %}
+        <a href="{% url 'program:speakerproposal_delete' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete Person</span></a>
+      {% endif %}
+    {% endif %}
 </p>
 
 {% endblock program_content %}

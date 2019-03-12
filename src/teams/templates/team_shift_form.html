@@ -1,0 +1,16 @@
+{% extends 'team_base.html' %}
+{% load commonmark %}
+{% load bootstrap3 %}
+
+
+{% block team_content %}
+
+<form method="POST">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <button type="submit" class="btn btn-success">
+      {% if object.pk %}Update{% else %}Create{% endif %}
+  </button>
+</form>
+
+{% endblock %}

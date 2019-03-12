@@ -123,14 +123,13 @@ eventDetailSidebar event model =
             ]
             (videoRecordingLink
                 ++ [ speakerSidebar speakers
-                   , eventMetaDataSidebar event
-                   , eventInstancesSidebar eventInstances
+                   , eventMetaDataSidebar event eventInstances model
                    ]
             )
 
 
-eventMetaDataSidebar : Event -> Html Msg
-eventMetaDataSidebar event =
+eventMetaDataSidebar : Event -> List EventInstance -> Model -> Html Msg
+eventMetaDataSidebar event eventInstances model =
     let
         ( showVideoRecoring, videoRecording ) =
             case event.videoState of
@@ -142,10 +141,23 @@ eventMetaDataSidebar event =
 
                 _ ->
                     ( False, "" )
+
+        eventInstanceMetaData =
+            case eventInstances of
+                [ instance ] ->
+                    eventInstanceItem instance model
+
+                instances ->
+                    [ h4 []
+                        [ text "Multiple occurences:" ]
+                    , ul
+                        []
+                        (List.map (\ei -> li [] <| eventInstanceItem ei model) instances)
+                    ]
     in
         div []
-            [ h4 [] [ text "Metadata" ]
-            , ul []
+            ([ h4 [] [ text "Metadata" ]
+             , ul []
                 ([ li [] [ strong [] [ text "Type: " ], text event.eventType ]
                  ]
                     ++ (case showVideoRecoring of
@@ -156,7 +168,44 @@ eventMetaDataSidebar event =
                                 []
                        )
                 )
+             ]
+                ++ eventInstanceMetaData
+            )
+
+
+eventInstanceItem : EventInstance -> Model -> List (Html Msg)
+eventInstanceItem eventInstance model =
+    let
+        toFormat =
+            if Date.day eventInstance.from == Date.day eventInstance.to then
+                "HH:mm"
+            else
+                "E HH:mm"
+
+        ( locationName, _ ) =
+            model.eventLocations
+                |> List.map unpackFilterType
+                |> List.filter
+                    (\( _, locationSlug ) ->
+                        locationSlug == eventInstance.location
+                    )
+                |> List.head
+                |> Maybe.withDefault ( "Unknown", "" )
+    in
+        [ p []
+            [ strong [] [ text "When: " ]
+            , text
+                ((Date.Extra.toFormattedString "E HH:mm" eventInstance.from)
+                    ++ " to "
+                    ++ (Date.Extra.toFormattedString toFormat eventInstance.to)
+                )
             ]
+        , p []
+            [ strong [] [ text "Where: " ]
+            , text <| locationName ++ " "
+            , i [ classList [ ( "fa", True ), ( "fa-" ++ eventInstance.locationIcon, True ) ] ] []
+            ]
+        ]
 
 
 speakerSidebar : List Speaker -> Html Msg
@@ -175,32 +224,3 @@ speakerDetail speaker =
     li []
         [ a [ href <| routeToString <| SpeakerRoute speaker.slug ] [ text speaker.name ]
         ]
-
-
-eventInstancesSidebar : List EventInstance -> Html Msg
-eventInstancesSidebar eventInstances =
-    div []
-        [ h4 []
-            [ text "This event will occur at:" ]
-        , ul
-            []
-            (List.map eventInstanceItem eventInstances)
-        ]
-
-
-eventInstanceItem : EventInstance -> Html Msg
-eventInstanceItem eventInstance =
-    let
-        toFormat =
-            if Date.day eventInstance.from == Date.day eventInstance.to then
-                "HH:mm"
-            else
-                "E HH:mm"
-    in
-        li []
-            [ text
-                ((Date.Extra.toFormattedString "E HH:mm" eventInstance.from)
-                    ++ " to "
-                    ++ (Date.Extra.toFormattedString toFormat eventInstance.to)
-                )
-            ]

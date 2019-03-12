@@ -1,10 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 from . import views
 
-
+app_name = 'news'
 urlpatterns = [
-    url(r'^$', views.NewsIndex.as_view(), kwargs={'archived': False}, name='index'),
-    url(r'^archive/$', views.NewsIndex.as_view(), kwargs={'archived': True}, name='archive'),
-    url(r'(?P<slug>[-_\w+]+)/$', views.NewsDetail.as_view(), name='detail'),
+    path('', views.NewsIndex.as_view(), kwargs={'archived': False}, name='index'),
+    path('archive/', views.NewsIndex.as_view(), kwargs={'archived': True}, name='archive'),
+    path('feed/', views.NewsFeed(), name='feed'),
+    path('<slug:slug>/', views.NewsDetail.as_view(), name='detail'),
 ]
 

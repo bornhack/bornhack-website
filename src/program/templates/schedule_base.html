@@ -31,8 +31,8 @@
                         <div class="btn-group">
                             <label for="event-type-{{ type.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
                                 <span>
-                                    <i class="fa fa-minus"></i>
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-plus"></i>
                                     &nbsp;&nbsp;
                                     {{ type.name }}
                                 </span>
@@ -59,12 +59,12 @@
                         <div class="btn-group">
                             <label for="location-{{ location.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
                                 <span class="pull-left">
-                                    <i class="fa fa-minus"></i>
-                                    <i class="fa fa-plus"></i>
+                                    <i class="fas fa-minus"></i>
+                                    <i class="fas fa-plus"></i>
                                     &nbsp;&nbsp;
                                     {{ location.name }}
                                 </span>
-                                <i class="pull-right fa fa-{{ location.icon }}"></i>
+                                <i class="pull-right fas fa-{{ location.icon }}"></i>
                             </label>
                         </div>
 
@@ -74,7 +74,7 @@
                 </div>
 
                 <a id="ics-button" class="btn btn-default form-control filter-control">
-                    <i class="fa fa-calendar"></i> ICS
+                    <i class="fas fa-calendar"></i> ICS
                 </a>
             </div>
         </form>
@@ -88,7 +88,7 @@
 <hr />
 
 
-{% url 'schedule_index' camp_slug=camp.slug as baseurl %}
+{% url 'program:schedule_index' camp_slug=camp.slug as baseurl %}
 
 <script>
     $('.filter-control').on('change', function() {
