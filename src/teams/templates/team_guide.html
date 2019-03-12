@@ -1,24 +1,36 @@
-{% extends 'base.html' %}
+{% extends 'team_base.html' %}
 {% load commonmark %}
 
 {% block title %}
 Guide for: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
-{% block content %}
+{% block team_content %}
 
-<h1 class="page-header">Guide / Howto for {{ team.name }}</h1>
+<div class="panel panel-default">
+    <div class="panel-heading clearfix">
+        <h4 class="pull-left">
+            Guide / Howto for {{ team.name }}
+        </h4>
+        <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
+            class="btn btn-default pull-right"
+            target="_blank">
+            Print
+        </a>
+    </div>
+    <div class="panel-body">
+        <p>
+        {% if request.user in team.responsible.all %}
+        <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-warning">Edit</a>
+        {% endif %}
+        </p>
 
-<p>
-<a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-default" target="_blank">Print</a>
-{% if request.user in team.responsible.all %}
-  <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-warning">Edit</a>
-{% endif %}
-</p>
-
-<div class="team-guide-markdown">
-{{ team.guide|unsafecommonmark }}
+        <div class="team-guide-markdown">
+        {{ team.guide|untrustedcommonmark }}
+        </div>
+    </div>
 </div>
+
 
 
 {% endblock %}

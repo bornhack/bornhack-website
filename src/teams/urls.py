@@ -40,6 +40,11 @@ from teams.views.shifts import (
     UserShifts,
 )
 
+from teams.views.guide import (
+    TeamGuideView,
+    TeamGuidePrintView
+)
+
 app_name = 'teams'
 
 urlpatterns = [

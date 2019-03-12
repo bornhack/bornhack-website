@@ -3,7 +3,7 @@ from django.views.generic import ListView, DetailView
 
 from camps.mixins import CampViewMixin
 
-from .models import Team
+from ..models import Team
 
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, DetailView):
@@ -11,6 +11,7 @@ class TeamGuideView(LoginRequiredMixin, CampViewMixin, DetailView):
     context_object_name = 'team'
     model = Team
     slug_url_kwarg = 'team_slug'
+    active_menu = 'guide'
 
     def get_queryset(self):
         qs = CampViewMixin.get_queryset(self)

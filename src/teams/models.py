@@ -15,23 +15,23 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 TEAM_GUIDE_TEMPLATE="""
-# Preparations
+## Preparations
 
 ...
 
-# Camp setup
+## Camp setup
 
 ...
 
-# During camp
+## During camp
 
 ...
 
-# Takedown
+## Takedown
 
 ...
 
-# Notes for next year
+## Notes for next year
 
  1. Remember to take notes
  1. ...
