@@ -232,6 +232,7 @@ class Order(CreatedUpdatedModel):
             messages.error(request, "Order %s is paid, cannot cancel a paid order!" % self.pk)
         else:
             self.cancelled = True
+            self.open = None
             self.save()
 
     def is_not_handed_out(self):
@@ -263,11 +264,6 @@ class Order(CreatedUpdatedModel):
             return "fully"
         else:
             return False
-
-    def mark_as_cancelled(self):
-        self.cancelled = True
-        self.open = None
-        self.save()
 
     @property
     def coinifyapiinvoice(self):
