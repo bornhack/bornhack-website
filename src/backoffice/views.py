@@ -369,7 +369,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
         expense.camp=self.camp
         expense.user=self.request.user
         expense.amount=reimbursement.amount
-        expense.description="Payment of reimbursement %s" % reimbursement.pk
+        expense.description="Payment of reimbursement %s to %s" % (reimbursement.pk, reimbursement.reimbursement_user)
         expense.paid_by_bornhack=True
         expense.responsible_team=economyteam
         expense.approved=True

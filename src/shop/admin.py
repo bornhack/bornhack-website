@@ -107,10 +107,14 @@ class ProductAdmin(admin.ModelAdmin):
         'category',
         'ticket_type',
         'price',
-        'description',
         stock_info,
         available_from,
         available_to
+    ]
+
+    list_filter = [
+        'category',
+        'ticket_type',
     ]
 
     search_fields = ['name']
@@ -159,7 +163,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     inlines = [ProductInline, ShopTicketInline]
 
-    actions = ['mark_order_as_paid', 'mark_order_as_refunded']
+    actions = ['mark_order_as_paid', 'mark_order_as_refunded', 'mark_order_as_cancelled']
 
     def mark_order_as_paid(self, request, queryset):
         for order in queryset.filter(paid=False):
@@ -170,6 +174,11 @@ class OrderAdmin(admin.ModelAdmin):
         for order in queryset.filter(refunded=False):
             order.mark_as_refunded(request)
     mark_order_as_refunded.description = 'Mark order(s) as refunded'
+
+    def mark_order_as_cancelled(self, request, queryset):
+        for order in queryset.filter(cancelled=False):
+            order.mark_as_cancelled(request)
+    mark_order_as_cancelled.description = 'Mark order(s) as cancelled'
 
 
 def get_user_email(obj):

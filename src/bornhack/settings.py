@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'graphene_django',
     'channels',
+    'corsheaders',
 
     'profiles',
     'camps',
@@ -126,6 +128,7 @@ BOOTSTRAP3 = {
     'javascript_url': '/static/js/bootstrap.min.js'
 }
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -134,6 +137,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/*$'
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -190,4 +196,6 @@ LOGGING = {
     },
 }
 
-
+GRAPHENE = {
+    'SCHEMA': 'bornhack.schema.schema'
+}

@@ -14,6 +14,30 @@ from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
+TEAM_GUIDE_TEMPLATE="""
+## Preparations
+
+...
+
+## Camp setup
+
+...
+
+## During camp
+
+...
+
+## Takedown
+
+...
+
+## Notes for next year
+
+ 1. Remember to take notes
+ 1. ...
+"""
+
+
 class Team(CampRelatedModel):
     camp = models.ForeignKey(
         'camps.Camp',
@@ -113,6 +137,13 @@ class Team(CampRelatedModel):
     class Meta:
         ordering = ['name']
         unique_together = (('name', 'camp'), ('slug', 'camp'))
+
+    guide = models.TextField(
+        blank=True,
+        help_text="HowTo guide for this year (and next year)",
+        verbose_name="team guide (Markdown)",
+        default=TEAM_GUIDE_TEMPLATE,
+    )
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp)

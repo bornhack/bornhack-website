@@ -45,6 +45,12 @@ class Revenue(CampRelatedModel, UUIDModel):
         upload_to='revenues/',
     )
 
+    invoice_date = models.DateField(
+        help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below.',
+        blank=True,
+        null=True,
+    )
+
     invoice_fk = models.ForeignKey(
         'shop.Invoice',
         on_delete=models.PROTECT,
@@ -160,6 +166,12 @@ class Expense(CampRelatedModel, UUIDModel):
     invoice = models.ImageField(
         help_text='The invoice for this expense. Please make sure the amount on the invoice matches the amount you entered above. All common image formats are accepted.',
         upload_to='expenses/',
+    )
+
+    invoice_date = models.DateField(
+        help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below.',
+        blank=True,
+        null=True,
     )
 
     responsible_team = models.ForeignKey(

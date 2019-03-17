@@ -37,7 +37,7 @@ class InfoItemCreateView(LoginRequiredMixin, CampViewMixin, TeamViewMixin, Ensur
 
     def form_valid(self, form):
         info_item = form.save(commit=False)
-        category = InfoCategory.objects.get(camp=self.camp, anchor=self.kwargs.get('category_anchor'))
+        category = InfoCategory.objects.get(team__camp=self.camp, anchor=self.kwargs.get('category_anchor'))
         info_item.category = category
         info_item.save()
         return HttpResponseRedirect(self.get_success_url())

@@ -53,6 +53,12 @@ Team: {{ team.name }} | {{ block.super }}
         </li>
         {% endif %}
 
+        <li {% if view.active_menu == "guide" %}class="active"{% endif %}>
+            <a href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
+                Team guide
+            </a>
+        </li>
+
     </ul>
 
     <hr />

@@ -3,8 +3,16 @@
     <div class="panel-body">
         <table class="table">
             <tr>
+              <th>Created By</th>
+              <td>{{ revenue.user }}</td>
+            </tr>
+            <tr>
               <th>Amount</th>
               <td>{{ revenue.amount }} DKK</td>
+            </tr>
+            <tr>
+              <th>Invoice Date</th>
+              <td>{{ revenue.invoice_date }}</td>
             </tr>
             <tr>
               <th>Description</th>

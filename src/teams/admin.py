@@ -14,6 +14,10 @@ class TeamTaskAdmin(admin.ModelAdmin):
     ]
 
 
+class TeamMemberInline(admin.TabularInline):
+    model = TeamMember
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     def get_responsible(self, obj):
@@ -41,6 +45,7 @@ class TeamAdmin(admin.ModelAdmin):
         'private_irc_channel_bot',
         'private_irc_channel_managed',
     ]
+    inlines = [TeamMemberInline]
 
 
 @admin.register(TeamMember)
