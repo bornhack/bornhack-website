@@ -227,6 +227,13 @@ class Order(CreatedUpdatedModel):
                 messages.success(request, "Order %s marked as refunded, no tickets to delete" % self.pk)
             self.save()
 
+    def mark_as_cancelled(self, request):
+        if self.paid:
+            messages.error(request, "Order %s is paid, cannot cancel a paid order!" % self.pk)
+        else:
+            self.cancelled = True
+            self.save()
+
     def is_not_handed_out(self):
         if self.orderproductrelation_set.filter(handed_out=True).count() == 0:
             return True
