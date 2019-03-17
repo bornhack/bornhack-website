@@ -16,7 +16,6 @@ from unidecode import unidecode
 from django.utils.dateparse import parse_datetime
 
 from utils.models import UUIDModel, CreatedUpdatedModel
-from tickets.models import ShopTicket
 from .managers import ProductQuerySet, OrderQuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -193,43 +192,73 @@ class Order(CreatedUpdatedModel):
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
-    def mark_as_paid(self, request):
-        self.paid = True
-        self.open = None
+    def create_tickets(self, request=None):
         for order_product in self.orderproductrelation_set.all():
             # if this is a Ticket product?
             if order_product.product.ticket_type:
+                query_kwargs = dict(
+                    product=order_product.product,
+                    ticket_type=order_product.product.ticket_type,
+                )
+
+                already_created_tickets = self.shoptickets.filter(**query_kwargs).count()
+                tickets_to_create = max(0, order_product.quantity - already_created_tickets)
+
                 # create the number of tickets required
-                for _ in range(0, order_product.quantity):
-                    ticket = ShopTicket(
-                        ticket_type=order_product.product.ticket_type,
-                        order=self,
-                        product=order_product.product,
-                    )
-                    ticket.save()
-                if request:
-                    messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
-                # and mark the OPR as handed_out=True
-                order_product.handed_out = True
-                order_product.save()
+                if tickets_to_create > 0:
+                    for _ in range(0, (order_product.quantity - already_created_tickets)):
+                        self.shoptickets.create(
+                            **query_kwargs
+                        )
+
+                    msg = "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name)
+                    if request:
+                        messages.success(request, msg)
+                    else:
+                        print(msg)
+
+                    # and mark the OPR as handed_out=True
+                    order_product.handed_out = True
+                    order_product.save()
+
+    def mark_as_paid(self, request=None):
+        self.paid = True
+        self.open = None
+        self.create_tickets(request)
         self.save()
 
-    def mark_as_refunded(self, request):
+    def mark_as_refunded(self, request=None):
         if not self.paid:
-            messages.error(request, "Order %s is not paid, so cannot mark it as refunded!" % self.pk)
+            msg = "Order %s is not paid, so cannot mark it as refunded!" % self.pk
+            if request:
+                messages.error(request, msg)
+            else:
+                print(msg)
         else:
             self.refunded = True
             # delete any tickets related to this order
-            if self.tickets.all():
-                messages.success(request, "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.tickets.count()))
-                self.tickets.all().delete()
+            if self.shoptickets.all():
+                msg = "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.shoptickets.count())
+                if request:
+                    messages.success(request, msg)
+                else:
+                    print(msg)
+                self.shoptickets.all().delete()
             else:
-                messages.success(request, "Order %s marked as refunded, no tickets to delete" % self.pk)
+                msg = "Order %s marked as refunded, no tickets to delete" % self.pk
+                if request:
+                    messages.success(request, msg)
+                else:
+                    print(msg)
             self.save()
 
-    def mark_as_cancelled(self, request):
+    def mark_as_cancelled(self, request=None):
         if self.paid:
-            messages.error(request, "Order %s is paid, cannot cancel a paid order!" % self.pk)
+            msg = "Order %s is paid, cannot cancel a paid order!" % self.pk
+            if request:
+                messages.error(request, msg)
+            else:
+                print(msg)
         else:
             self.cancelled = True
             self.open = None
