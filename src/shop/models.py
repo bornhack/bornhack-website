@@ -405,6 +405,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
         # If there is no stock defined the product is generally available.
         return True
 
+
 class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey('shop.Order', on_delete=models.PROTECT)
     product = models.ForeignKey('shop.Product', on_delete=models.PROTECT)
@@ -414,6 +415,12 @@ class OrderProductRelation(CreatedUpdatedModel):
     @property
     def total(self):
         return Decimal(self.product.price * self.quantity)
+
+    def clean(self):
+        if self.handed_out and not self.order.paid:
+            raise ValidationError(
+                'Product can not be handed out when order is not paid.'
+            )
 
 
 class EpayCallback(CreatedUpdatedModel, UUIDModel):
