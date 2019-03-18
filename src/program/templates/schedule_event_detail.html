@@ -5,7 +5,7 @@
 
 <div class="row">
   <noscript>
-    <a href="{% url "program:noscript_schedule_index" camp_slug=camp.slug %}" class="btn btn-primary">
+    <a href="{% url 'program:noscript_schedule_index' camp_slug=camp.slug %}" class="btn btn-primary">
       Back to noscript schedule
     </a>
     <hr />
@@ -20,6 +20,13 @@
       {{ event.abstract|untrustedcommonmark }}
      </p>
 
+        <hr />
+
+        <h4>Metadata</h4>
+        <strong>To be recorded?</strong>: {{ event.video_recording|yesno:"Yes,No" }}<br />
+        {% if event.video_url %}
+            <strong>Video:</strong> <a href="{{ event.video_url }}">Watch video recording</a>
+        {% endif %}
       <hr>
 
       <h4>URLs for {{ event.title }}</h4>

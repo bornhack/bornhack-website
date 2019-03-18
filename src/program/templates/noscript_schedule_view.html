@@ -12,6 +12,7 @@
     <th>When?</th>
     <th>What?</th>
     <th>Where?</th>
+    <th>Type</th>
   </thead>
   <tbody>
 
@@ -20,14 +21,18 @@
 
     {% ifchanged instance.when.lower.date %}
       <tr>
-        <td colspan=3><strong>{{ instance.when.lower.date|date:"l Y-m-d" }}</strong></td>
+        <td colspan=4><strong>{{ instance.when.lower.date|date:"l Y-m-d" }}</strong></td>
       </tr>
     {% endifchanged %}
 
     <tr>
       <td>{{ instance.when.lower|date:"H:i" }}-{{ instance.when.upper|date:"H:i" }}</td>
-      <td><a href="{% url 'program:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
+      <td>
+        <i class="fas fa-video{% if not instance.event.video_recording %}-slash{% endif %}"></i>
+        <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a>
+      </td>
       <td>{{ instance.location.name }}</td>
+      <td>{{ instance.event.event_type }}</td>
     </tr>
   {% endfor %}
   </tbody>
