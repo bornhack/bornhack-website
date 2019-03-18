@@ -1,6 +1,6 @@
 Django==2.1.7
 channels==2.1.7
-channels-redis==2.3.3
+channels-redis==2.3.2
 
 commonmark==0.8.1
 Pillow==5.4.1
