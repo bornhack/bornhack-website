@@ -39,8 +39,14 @@ class EventTrackNode(DjangoObjectType):
 
 class EventInstanceNode(DjangoObjectType):
 
-    start = graphene.Int(description="When this instance of the event starts. In posix time.")
-    end = graphene.Int(description="When this instance of the event ends. In posix time.")
+    start = graphene.Int(
+        required=True,
+        description="When this instance of the event starts. In posix time.",
+    )
+    end = graphene.Int(
+        required=True,
+        description="When this instance of the event ends. In posix time.",
+    )
 
     class Meta:
         model = EventInstance
