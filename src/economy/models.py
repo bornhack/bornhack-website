@@ -46,7 +46,7 @@ class Revenue(CampRelatedModel, UUIDModel):
     )
 
     invoice_date = models.DateField(
-        help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below.',
+        help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.',
         blank=True,
         null=True,
     )
@@ -169,7 +169,7 @@ class Expense(CampRelatedModel, UUIDModel):
     )
 
     invoice_date = models.DateField(
-        help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below.',
+        help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.',
         blank=True,
         null=True,
     )
