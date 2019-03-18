@@ -1,3 +1,4 @@
+from django.db.models import Q
 from graphene import relay
 
 from graphene_django import DjangoObjectType
@@ -10,7 +11,7 @@ from .models import (
     EventTrack,
     EventInstance,
     Speaker,
-)
+    Url, UrlType)
 
 
 class EventTypeNode(DjangoObjectType):
@@ -28,6 +29,7 @@ class EventLocationNode(DjangoObjectType):
         interfaces = (relay.Node, )
         filter_fields = {
             'name': ['iexact'],
+            'camp__slug': ['iexact'],
         }
 
 
@@ -37,6 +39,7 @@ class EventTrackNode(DjangoObjectType):
         interfaces = (relay.Node, )
         filter_fields = {
             'name': ['iexact'],
+            'camp__slug': ['iexact'],
         }
 
 
@@ -47,6 +50,7 @@ class EventInstanceNode(DjangoObjectType):
         interfaces = (relay.Node, )
         filter_fields = {
             'event__title': ['iexact'],
+            'event__track__camp__slug': ['iexact'],
         }
 
     def resolve_when(self, info):
@@ -58,9 +62,10 @@ class SpeakerNode(DjangoObjectType):
     class Meta:
         model = Speaker
         interfaces = (relay.Node, )
-        only_fields = ('id', 'name', 'biography', 'slug', 'camp', 'events')
+        only_fields = ('id', 'name', 'biography', 'slug', 'camp', 'events',)
         filter_fields = {
             'name': ['iexact'],
+            'camp__slug': ['iexact'],
         }
 
 
@@ -72,6 +77,19 @@ class EventNode(DjangoObjectType):
             'title': ['iexact'],
             'track__camp__slug': ['iexact'],
         }
+
+
+class UrlNode(DjangoObjectType):
+    class Meta:
+        model = Url
+        interfaces = (relay.Node, )
+        only_fields = ('url', 'urltype',)
+
+
+class UrlTypeNode(DjangoObjectType):
+    class Meta:
+        model = UrlType
+        interfaces = (relay.Node, )
 
 
 class ProgramQuery(object):
@@ -93,3 +111,5 @@ class ProgramQuery(object):
     speaker = relay.Node.Field(SpeakerNode)
     all_speakers = DjangoFilterConnectionField(SpeakerNode)
 
+    url = relay.Node.Field(UrlNode)
+    url_type = relay.Node.Field(UrlTypeNode)
