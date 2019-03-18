@@ -1,5 +1,3 @@
-import time
-
 import graphene
 from graphene import relay
 
@@ -54,10 +52,10 @@ class EventInstanceNode(DjangoObjectType):
         }
 
     def resolve_start(self, info, **kwargs):
-        return time.mktime(self.when.lower.timetuple())
+        return self.when.lower.timestamp()
 
     def resolve_end(self, info, **kwargs):
-        return time.mktime(self.when.upper.timetuple())
+        return self.when.upper.timestamp()
 
 
 class SpeakerNode(DjangoObjectType):
