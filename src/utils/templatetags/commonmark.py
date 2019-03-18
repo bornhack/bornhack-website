@@ -7,6 +7,7 @@ from django.template.defaultfilters import stringfilter
 
 register = template.Library()
 
+
 def parse_commonmark(value):
     parser = commonmark.Parser()
     renderer = commonmark.HtmlRenderer()
@@ -18,8 +19,8 @@ def parse_commonmark(value):
 @stringfilter
 def trustedcommonmark(value):
     """Returns HTML given some commonmark Markdown. Also allows real HTML, so do not use this with untrusted input."""
-    linkified_value = bleach.linkify(value, parse_email=True)
-    result = parse_commonmark(linkified_value)
+    markdown = parse_commonmark(value)
+    result = bleach.linkify(markdown, parse_email=True)
     return mark_safe(result)
 
 
