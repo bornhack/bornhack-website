@@ -1,3 +1,4 @@
 -r production.txt
 
-django-debug-toolbar==1.9.1
+django-debug-toolbar==1.11
+factory_boy==2.11.1
