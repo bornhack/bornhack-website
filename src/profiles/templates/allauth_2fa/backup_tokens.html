@@ -12,24 +12,34 @@
           <h4>Two-Factor Authentication Backup Tokens</h4>
         </div>
         <div class="panel-body">
-            {% if backup_tokens %}
+          <div class="alert alert-danger">
+            <h4>Attention!</h4>
+            <p >
+              Backup Tokens are important if you for some reason <strong>lose access</strong> to your two-factor authentication device (ie. misplace your phone).<br />
+              If this happens you will <strong>not be able to login to BornHack.dk</strong> without using a backup token.<br />
+              So generate some tokens and <strong>keep them safe</strong> for a rainy day ;)
+            </p>
+          </div>
+          {% if backup_tokens %}
           <ul>
             {% for token in backup_tokens %}
-            <li>{{ token.token }}</li>
+            <li><h4>{{ token.token }}</h4></li>
             {% endfor %}
           </ul>
           {% else %}
           <p>No tokens. Press the button below to generate some.</p>
           {% endif %}
 
+        </div>
+        <div class="panel-footer">
           <form method="post">
             {% csrf_token %}
             <div class="buttonHolder">
               <button class="btn btn-success" type="submit">
                 {% if backup_tokens %}
-                  Generate new backup tokens
+                Generate new backup tokens
                 {% else %}
-                  Generate new backup tokens
+                Generate backup tokens
                 {% endif %}
               </button>
             </div>
