@@ -19,11 +19,12 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 
-class TokenFindListBaseView(LoginRequiredMixin, ListView):
+class TokenFindListView(LoginRequiredMixin, ListView):
     """
     This class is meant to be extended in other apps like `profiles`.
     """
     model = TokenFind
+    template_name = "tokens/tokenfind_list.html"
 
     def get_queryset(self):
         return TokenFind.objects.filter(user=self.request.user)

@@ -1,8 +1,9 @@
-{% extends 'shop_base.html' %}
+{% extends 'profile_base.html' %}
 {% load bootstrap3 %}
 {% load shop_tags %}
 
-{% block shop_content %}
+{% block profile_content %}
+
 <div class="panel-group">
     <div class="panel panel-default">
         <div class="panel panel-heading">
@@ -125,8 +126,8 @@
             <div class="alert alert-info" style="margin-top: 5px; margin-bottom: -10px;">* Please consider the alternatives before choosing credit card. Credit cards are expensive and difficult for us to handle. Thank you!</div>
         </div>
         <div class="panel panel-footer">
-            <i>Bank transfers take up to a week to get registered, but the other 
-            payment methods should be more or less instant. Please 
+            <i>Bank transfers take up to a week to get registered, but the other
+            payment methods should be more or less instant. Please
             <a href="{% url 'contact' %}">contact us</a> if your have questions.</i>
         </div>
     </div>

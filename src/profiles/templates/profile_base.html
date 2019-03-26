@@ -46,14 +46,16 @@
       {% if user.orders.exists %}
       <li><b>Shop</b></li>
 
-      <li {% if view.active_menu == "orders" %}class="active"{% endif %}>
-        <a href="{% url 'shop:order_list' %}">
+      {% url 'shop:order_list' as orders_list_url %}
+      <li {% if "shop/order" in request.path %}class="active"{% endif %}>
+        <a href="{{ orders_list_url }}">
           Orders
         </a>
       </li>
 
-      <li {% if view.active_menu == "tickets" %}class="active"{% endif %}>
-        <a href="{% url 'tickets:shopticket_list' %}">
+      {% url 'tickets:shopticket_list' as ticket_list_url %}
+      <li {% if "tickets" in request.path %}class="active"{% endif %}>
+        <a href="{{ ticket_list_url }}">
           Tickets
         </a>
       </li>
@@ -69,7 +71,7 @@
       {% endif %}
 
       <li><b>Misc.</b></li>
-      {% url 'profiles:tokenfind_list' as tokenfind_list_url %}
+      {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
       <li {% if request.path == tokenfind_list_url %}class="active"{% endif %}>
         <a href="{{ tokenfind_list_url }}">
           Secret Tokens

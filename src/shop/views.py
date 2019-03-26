@@ -278,7 +278,7 @@ class ProductDetailView(FormView, DetailView):
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = Order
-    template_name = "order_list.html"
+    template_name = "shop/order_list.html"
     context_object_name = 'orders'
 
     def get_queryset(self):
@@ -288,7 +288,7 @@ class OrderListView(LoginRequiredMixin, ListView):
 
 class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderHasProductsMixin, EnsureOrderIsNotCancelledMixin, DetailView):
     model = Order
-    template_name = 'order_detail.html'
+    template_name = 'shop/order_detail.html'
     context_object_name = 'order'
 
     def post(self, request, *args, **kwargs):
