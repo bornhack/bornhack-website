@@ -61,8 +61,9 @@
       </li>
 
       {% if user.creditnotes.exists %}
-      <li {% if view.active_menu == "credit_notes" %}class="active"{% endif %}>
-        <a href="{% url 'shop:creditnote_list' %}">
+      {% url 'shop:creditnote_list' as creditnote_list_url %}
+      <li {% if 'creditnotes' in request.path %}class="active"{% endif %}>
+        <a href="{{ creditnote_list_url }}">
           Credit Notes
         </a>
       </li>

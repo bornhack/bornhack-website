@@ -369,7 +369,7 @@ class DownloadInvoiceView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsurePa
 
 class CreditNoteListView(LoginRequiredMixin, ListView):
     model = CreditNote
-    template_name = "creditnote_list.html"
+    template_name = "shop/creditnote_list.html"
     context_object_name = 'creditnotes'
 
     def get_queryset(self):
