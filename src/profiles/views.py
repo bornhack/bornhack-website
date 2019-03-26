@@ -3,6 +3,7 @@ from django.views.generic import DetailView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
+from tokens.views import TokenFindListBaseView
 from . import models
 
 
@@ -32,3 +33,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         messages.success(self.request, 'Your profile has been updated.')
         return super().form_valid(form, **kwargs)
 
+
+class ProfileTokenFindsView(TokenFindListBaseView):
+    template_name = "tokenfind_list.html"

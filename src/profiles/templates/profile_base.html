@@ -69,8 +69,9 @@
       {% endif %}
 
       <li><b>Misc.</b></li>
-      <li {% if view.active_menu == "tokens" %}class="active"{% endif %}>
-        <a href="{% url 'tokens:tokenfind_list' %}">
+      {% url 'profiles:tokenfind_list' as tokenfind_list_url %}
+      <li {% if request.path == tokenfind_list_url %}class="active"{% endif %}>
+        <a href="{{ tokenfind_list_url }}">
           Secret Tokens
         </a>
       </li>
