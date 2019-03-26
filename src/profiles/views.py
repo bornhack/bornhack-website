@@ -9,6 +9,7 @@ from . import models
 class ProfileDetail(LoginRequiredMixin, DetailView):
     model = models.Profile
     template_name = 'profile_detail.html'
+    active_menu = 'profile'
 
     def get_object(self, queryset=None):
         return models.Profile.objects.get(user=self.request.user)

@@ -1,26 +1,61 @@
 {% extends 'profile_base.html' %}
 
 {% block profile_content %}
-<p class="lead">If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer. Please also include availability if you are not joining us for the entire week.</p>
-<p class="lead">Apart from Public Credit Name the information in your profile is only visible to team responsible and organisers.</p>
-<h3>Your Profile</h3>
-<table class="table table-horisontal">
-  <tr>
-    <td><b>Name (not visible to the public)</b></td>
-    <td>{{ profile.name|default:"N/A" }}</td>
-  </tr>
-  <tr>
-    <td><b>Description (not visible to the public)</b></td>
-    <td>{{ profile.description|default:"N/A" }}</td>
-  </tr>
-  <tr>
-    <td><b>Public Credit Name (visible to the public, leave empty if you want no credits on this website)</b></td>
-    <td>{{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
-  </tr>
-  <tr>
-    <td><b>NickServ username (visible to the public on IRC, used to handle team channel ACLs)</b></td>
-    <td>{{ profile.nickserv_username|default:"N/A" }}</td>
-  </tr>
-</table>
-<a href="{% url 'profiles:update' %}" class="btn btn-black"><i class="fas fa-edit"></i> Edit Profile</a>
+{% if not profile.description %}
+<div class="alert alert-danger">
+  <p class="lead">
+    Attention!
+  </p>
+  <p>
+    You have not written anything in your "description".
+  </p>
+  <p>
+    If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer. Please also include availability if you are not joining us for the entire week.
+  </p>
+</div>
+{% endif %}
+
+
+
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <a href="{% url 'profiles:update' %}" class="btn btn-primary pull-right clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
+    <h4>Your information</h4>
+  </div>
+  <div class="panel-body">
+    <table class="table table-striped">
+      <tr>
+        <td>
+          <b>Name</b><br />
+          <small>(not visible to the public)</small></td>
+        <td>{{ profile.name|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <td>
+          <b>Description</b><br />
+          <small>(not visible to the public)</small>
+        </td>
+        <td>{{ profile.description|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <td>
+          <b>Public Credit Name</b><br />
+          <small>(visible to the public, leave empty if you want no credits on this website)</small>
+        </td>
+        <td>
+          {{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
+      </tr>
+      <tr>
+        <td>
+          <b>NickServ username</b><br />
+          <small>(visible to the public on IRC, used to handle team channel ACLs)</small>
+        </td>
+        <td>
+          {{ profile.nickserv_username|default:"N/A" }}
+        </td>
+      </tr>
+    </table>
+  </div>
+</div>
 {% endblock profile_content %}

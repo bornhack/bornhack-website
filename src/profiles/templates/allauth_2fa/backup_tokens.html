@@ -2,34 +2,49 @@
 
 {% load account %}
 {% load bootstrap3 %}
-{% load i18n %}
 
 {% block profile_content %}
   <div class="row">
     <div class="col-md-12">
-      <h1>
-        {% trans "Two-Factor Authentication Backup Tokens" %}
-      </h1>
 
-      <ul>
-        {% for token in backup_tokens %}
-        <li>{{ token.token }}</li>
-
-        {% empty %}
-        {% trans 'No tokens. Press the button below to generate some.' %}
-
-        {% endfor %}
-      </ul>
-
-      <form method="post">
-        {% csrf_token %}
-        <div class="buttonHolder">
-          <button class="btn btn-black" type="submit">
-          {% trans 'Generate backup tokens' %}
-          </button>
-          <a class="btn btn-warning" href="{% url 'two-factor-remove' %}">Disable Two-Factor</a>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h4>Two-Factor Authentication Backup Tokens</h4>
         </div>
-      </form>
+        <div class="panel-body">
+            {% if backup_tokens %}
+          <ul>
+            {% for token in backup_tokens %}
+            <li>{{ token.token }}</li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No tokens. Press the button below to generate some.</p>
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="buttonHolder">
+              <button class="btn btn-success" type="submit">
+                {% if backup_tokens %}
+                  Generate new backup tokens
+                {% else %}
+                  Generate new backup tokens
+                {% endif %}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel panel-danger">
+        <div class="panel-heading">
+          <h4>Disable Two-Factor Authenticatoin</h4>
+        </div>
+        <div class="panel-body">
+          <a class="btn btn-danger" href="{% url 'two-factor-remove' %}">Disable Two-Factor</a>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}

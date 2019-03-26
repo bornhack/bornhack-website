@@ -5,64 +5,78 @@
 
 {% block content %}
 
+<div class="page-header">
+  <h2>Your BornHack account</h2>
+</div>
+
 <div class="row">
   <div class="col-md-2">
     <ul class="nav nav-pills nav-stacked">
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
-          <a href="{% url 'profiles:detail' %}">
+
+      <li><b>Profile settings</b></li>
+
+      {% url 'profiles:detail' as profile_detail_url %}
+      <li {% if request.path == profile_detail_url %}class="active"{% endif %}>
+          <a href="{{ profile_detail_url }}">
             Profile
           </a>
       </li>
 
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
-        <a href="{% url 'account_change_password' %}">
+      {% url 'account_change_password' as password_url %}
+      <li {% if request.path == password_url %}class="active"{% endif %}>
+        <a href="{{ password_url }}">
           Password
         </a>
       </li>
 
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
-        <a href="{% url 'two-factor-setup' %}">
-          Two-Factor settings
-        </a>
-      </li>
-
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
-        <a href="{% url 'account_email' %}">
+      {% url 'account_email' as email_url %}
+      <li {% if request.path == email_url %}class="active"{% endif %}>
+        <a href="{{ email_url }}">
           Manage emails
         </a>
       </li>
 
+      {% url 'two-factor-setup' as two_factor_url %}
+      <li {% if "two_factor" in request.path %}class="active"{% endif %}>
+        <a href="{{ two_factor_url }}">
+          Two-Factor settings
+        </a>
+      </li>
+
       {% if user.orders.exists %}
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+      <li><b>Shop</b></li>
+
+      <li {% if view.active_menu == "orders" %}class="active"{% endif %}>
         <a href="{% url 'shop:order_list' %}">
           Orders
         </a>
       </li>
 
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+      <li {% if view.active_menu == "tickets" %}class="active"{% endif %}>
         <a href="{% url 'tickets:shopticket_list' %}">
           Tickets
         </a>
       </li>
 
       {% if user.creditnotes.exists %}
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+      <li {% if view.active_menu == "credit_notes" %}class="active"{% endif %}>
         <a href="{% url 'shop:creditnote_list' %}">
           Credit Notes
         </a>
       </li>
       {% endif %}
+
       {% endif %}
 
-      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+      <li><b>Misc.</b></li>
+      <li {% if view.active_menu == "tokens" %}class="active"{% endif %}>
         <a href="{% url 'tokens:tokenfind_list' %}">
           Secret Tokens
         </a>
       </li>
 
-      <p><b>You are logged in as {{ request.user.email }}</b></p>
-
       <hr />
+      <p><b>You are logged in as {{ request.user.email }}</b></p>
 
     </ul>
   </div>
