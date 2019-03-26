@@ -3,6 +3,7 @@ from django.views.generic import ListView, DetailView
 
 from .models import Token, TokenFind
 
+
 class TokenDetailView(LoginRequiredMixin, DetailView):
     template_name = "token_detail.html"
     model = Token
@@ -19,8 +20,11 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
 
 
 class TokenFindListView(LoginRequiredMixin, ListView):
-    template_name = "tokenfind_list.html"
+    """
+    This class is meant to be extended in other apps like `profiles`.
+    """
     model = TokenFind
+    template_name = "tokens/tokenfind_list.html"
 
     def get_queryset(self):
         return TokenFind.objects.filter(user=self.request.user)

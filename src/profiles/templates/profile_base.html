@@ -4,20 +4,92 @@
 {% load bootstrap3 %}
 
 {% block content %}
-<div class="row">
-  <div class="btn-group btn-group-justified hidden-xs">
-    {% include 'profile_base_buttons.html' %}
-  </div>
-  <div class="btn-group-vertical visible-xs">
-    {% include 'profile_base_buttons.html' %}
-  </div>
+
+<div class="page-header">
+  <h2>Your BornHack Profile</h2>
 </div>
 
-<br>
+<div class="row">
+  <div class="col-md-2">
+    <ul class="nav nav-pills nav-stacked">
 
-  <p><i><b>You are logged in as {{ request.user.email }}</b></i></p>
+      <li><b>Profile settings</b></li>
 
-<hr />
-{% block profile_content %}{% endblock %}
+      {% url 'profiles:detail' as profile_detail_url %}
+      <li {% if request.path == profile_detail_url %}class="active"{% endif %}>
+          <a href="{{ profile_detail_url }}">
+            Profile
+          </a>
+      </li>
+
+      {% url 'account_change_password' as password_url %}
+      <li {% if request.path == password_url %}class="active"{% endif %}>
+        <a href="{{ password_url }}">
+          Password
+        </a>
+      </li>
+
+      {% url 'account_email' as email_url %}
+      <li {% if request.path == email_url %}class="active"{% endif %}>
+        <a href="{{ email_url }}">
+          Manage emails
+        </a>
+      </li>
+
+      {% url 'two-factor-setup' as two_factor_url %}
+      <li {% if "two_factor" in request.path %}class="active"{% endif %}>
+        <a href="{{ two_factor_url }}">
+          Two-Factor settings
+        </a>
+      </li>
+
+      {% if user.orders.exists %}
+      <li><b>Shop</b></li>
+
+      {% url 'shop:order_list' as orders_list_url %}
+      <li {% if "shop/order" in request.path %}class="active"{% endif %}>
+        <a href="{{ orders_list_url }}">
+          Orders
+        </a>
+      </li>
+
+      {% url 'tickets:shopticket_list' as ticket_list_url %}
+      <li {% if "tickets" in request.path %}class="active"{% endif %}>
+        <a href="{{ ticket_list_url }}">
+          Tickets
+        </a>
+      </li>
+
+      {% if user.creditnotes.exists %}
+      {% url 'shop:creditnote_list' as creditnote_list_url %}
+      <li {% if 'creditnotes' in request.path %}class="active"{% endif %}>
+        <a href="{{ creditnote_list_url }}">
+          Credit Notes
+        </a>
+      </li>
+      {% endif %}
+
+      {% endif %}
+
+      <li><b>Misc.</b></li>
+      {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
+      <li {% if request.path == tokenfind_list_url %}class="active"{% endif %}>
+        <a href="{{ tokenfind_list_url }}">
+          Secret Tokens
+        </a>
+      </li>
+
+      <hr />
+      <p><b>You are logged in as {{ request.user.email }}</b></p>
+
+    </ul>
+  </div>
+
+  <div class="col-md-10">
+
+    {% block profile_content %}{% endblock %}
+
+  </div>
+</div>
 
 {% endblock %}

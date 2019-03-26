@@ -16,7 +16,7 @@
       <form class="login" method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button class="form-control btn btn-black" type="submit">{% trans "Login" %}</button>
+        <button class="form-control btn btn-primary" type="submit">{% trans "Login" %}</button>
         {% if redirect_field_value %}
           <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
         {% endif %}

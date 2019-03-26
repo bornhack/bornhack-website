@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views import ProfileDetail, ProfileUpdate
-
+from .views import (
+    ProfileDetail,
+    ProfileUpdate,
+)
 
 app_name = 'profiles'
 urlpatterns = [

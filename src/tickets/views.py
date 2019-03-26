@@ -20,7 +20,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class ShopTicketListView(LoginRequiredMixin, ListView):
     model = ShopTicket
-    template_name = 'ticket_list.html'
+    template_name = 'tickets/ticket_list.html'
     context_object_name = 'tickets'
 
     def get_queryset(self):
@@ -50,7 +50,7 @@ class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
 
 class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     model = ShopTicket
-    template_name = 'ticket_detail.html'
+    template_name = 'tickets/ticket_detail.html'
     context_object_name = 'ticket'
     fields = ['name', 'email']
 
