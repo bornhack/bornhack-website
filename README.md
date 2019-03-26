@@ -120,6 +120,7 @@ You can also specify details like:
 * coral https://github.com/coral
 * Henrik Kramshøj https://github.com/kramse
 * Janus Troelsen https://github.com/ysangkok
+* Jeppe Ernst https://github.com/Ern-st
 * Jonty Wareing https://github.com/Jonty
 * Kasper Christensen https://github.com/fALKENdk
 * klarstrup https://github.com/klarstrup
