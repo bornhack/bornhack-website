@@ -19,10 +19,9 @@ from villages.views import *
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
-    path(
-        'profile/',
-        include('profiles.urls', namespace='profiles')
-    ),
+    path('account/', include('allauth.urls')),
+    path('account/', include('allauth_2fa.urls')),
+    path('account/', include('profiles.urls', namespace='profiles')),
     path(
         'tickets/',
         include('tickets.urls', namespace='tickets')
@@ -65,8 +64,6 @@ urlpatterns = [
         TemplateView.as_view(template_name='legal/general_terms_and_conditions.html'),
         name='general-terms'
     ),
-    path('accounts/', include('allauth.urls')),
-    path('accounts/', include('allauth_2fa.urls')),
     path('admin/', admin.site.urls),
 
     # We don't need CSRF checks for the API

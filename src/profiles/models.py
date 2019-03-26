@@ -1,11 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.conf import settings
-from django.utils import timezone
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-
-from datetime import timedelta
 
 from utils.models import UUIDModel, CreatedUpdatedModel
 

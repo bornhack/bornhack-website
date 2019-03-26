@@ -2,11 +2,17 @@
 {% load bootstrap3 %}
 
 {% block profile_content %}
-<h4>Update Profile</h4>
-<form method="POST">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Submit</button>
-  <a href="{% url 'profiles:detail' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
-</form>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>Update Profile</h4>
+  </div>
+  <div class="panel-body">
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Submit</button>
+      <a href="{% url 'profiles:detail' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
+    </form>
+  </div>
+</div>
 {% endblock profile_content %}
