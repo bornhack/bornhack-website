@@ -10,6 +10,7 @@ asyncio==3.4.3
 bleach==3.1.0
 defusedxml==0.5.0
 django-allauth==0.39.1
+django-allauth-2fa==0.6
 django-bleach==0.5.2
 django-bootstrap3==11.0.0
 django-extensions==2.1.6

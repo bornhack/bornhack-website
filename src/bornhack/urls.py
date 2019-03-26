@@ -1,22 +1,22 @@
-from django.urls import include, path
+from allauth.account.views import LoginView, LogoutView
+from django.conf.urls import include
 from django.contrib import admin
-from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
-
-from allauth.account.views import (
-    LoginView,
-    LogoutView,
-)
 from graphene_django.views import GraphQLView
 
+from bar.views import MenuView
 from camps.views import *
 from feedback.views import FeedbackCreate
 from info.views import *
-from villages.views import *
+from people.views import *
 from program.views import *
 from sponsors.views import *
-from people.views import *
-from bar.views import MenuView
+from villages.views import *
+
+# require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
+admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
     path(
@@ -66,6 +66,7 @@ urlpatterns = [
         name='general-terms'
     ),
     path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth_2fa.urls')),
     path('admin/', admin.site.urls),
 
     # We don't need CSRF checks for the API
