@@ -19,9 +19,9 @@ from villages.views import *
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
-    path('account/', include('allauth.urls')),
-    path('account/', include('allauth_2fa.urls')),
-    path('account/', include('profiles.urls', namespace='profiles')),
+    path('profile/', include('allauth.urls')),
+    path('profile/', include('allauth_2fa.urls')),
+    path('profile/', include('profiles.urls', namespace='profiles')),
     path(
         'tickets/',
         include('tickets.urls', namespace='tickets')
