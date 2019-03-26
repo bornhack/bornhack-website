@@ -6,7 +6,7 @@
 <form method="POST">
   {% csrf_token %}
   {% bootstrap_form form %}
-  <button type="submit" class="btn btn-black"><i class="fas fa-save"></i> Submit</button>
-  <a href="{% url 'profiles:detail' %}" class="btn btn-black"><i class="fas fa-times"></i> Cancel</a>
+  <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Submit</button>
+  <a href="{% url 'profiles:detail' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
 </form>
 {% endblock profile_content %}

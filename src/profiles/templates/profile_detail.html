@@ -24,37 +24,44 @@
     <h4>Your information</h4>
   </div>
   <div class="panel-body">
+
     <table class="table table-striped">
       <tr>
-        <td>
+        <td width="30%">
           <b>Name</b><br />
-          <small>(not visible to the public)</small></td>
-        <td>{{ profile.name|default:"N/A" }}</td>
+          <small>Not visible to the public.</small></td>
+        <td width="70%">
+          {{ profile.name|default:"N/A" }}
+        </td>
       </tr>
+
       <tr>
         <td>
           <b>Description</b><br />
-          <small>(not visible to the public)</small>
+          <small>Not visible to the public.</small>
         </td>
         <td>{{ profile.description|default:"N/A" }}</td>
       </tr>
+
       <tr>
         <td>
           <b>Public Credit Name</b><br />
-          <small>(visible to the public, leave empty if you want no credits on this website)</small>
+          <small>Visible to the public, leave empty if you want no credits on this website.</small>
         </td>
         <td>
           {{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
       </tr>
+
       <tr>
         <td>
           <b>NickServ username</b><br />
-          <small>(visible to the public on IRC, used to handle team channel ACLs)</small>
+          <small>Visible to the public on IRC, used to handle team channel ACLs.</small>
         </td>
         <td>
           {{ profile.nickserv_username|default:"N/A" }}
         </td>
       </tr>
+
     </table>
   </div>
 </div>
