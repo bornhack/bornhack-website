@@ -4,20 +4,74 @@
 {% load bootstrap3 %}
 
 {% block content %}
+
 <div class="row">
-  <div class="btn-group btn-group-justified hidden-xs">
-    {% include 'profile_base_buttons.html' %}
+  <div class="col-md-2">
+    <ul class="nav nav-pills nav-stacked">
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+          <a href="{% url 'profiles:detail' %}">
+            Profile
+          </a>
+      </li>
+
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'account_change_password' %}">
+          Password
+        </a>
+      </li>
+
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'two-factor-setup' %}">
+          Two-Factor settings
+        </a>
+      </li>
+
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'account_email' %}">
+          Manage emails
+        </a>
+      </li>
+
+      {% if user.orders.exists %}
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'shop:order_list' %}">
+          Orders
+        </a>
+      </li>
+
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'tickets:shopticket_list' %}">
+          Tickets
+        </a>
+      </li>
+
+      {% if user.creditnotes.exists %}
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'shop:creditnote_list' %}">
+          Credit Notes
+        </a>
+      </li>
+      {% endif %}
+      {% endif %}
+
+      <li {% if view.active_menu == "profile" %}class="active"{% endif %}>
+        <a href="{% url 'tokens:tokenfind_list' %}">
+          Secret Tokens
+        </a>
+      </li>
+
+      <p><b>You are logged in as {{ request.user.email }}</b></p>
+
+      <hr />
+
+    </ul>
   </div>
-  <div class="btn-group-vertical visible-xs">
-    {% include 'profile_base_buttons.html' %}
+
+  <div class="col-md-10">
+
+    {% block profile_content %}{% endblock %}
+
   </div>
 </div>
-
-<br>
-
-  <p><i><b>You are logged in as {{ request.user.email }}</b></i></p>
-
-<hr />
-{% block profile_content %}{% endblock %}
 
 {% endblock %}
