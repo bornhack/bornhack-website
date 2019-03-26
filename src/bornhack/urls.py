@@ -1,4 +1,5 @@
-from django.conf.urls import include, url
+from allauth.account.views import LoginView, LogoutView
+from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import path
@@ -66,7 +67,7 @@ urlpatterns = [
     ),
     path('accounts/', include('allauth.urls')),
     path('accounts/', include('allauth_2fa.urls')),
-    path('admin/', include(admin.site.urls)),
+    path('admin/', admin.site.urls),
 
     # We don't need CSRF checks for the API
     path('api/', csrf_exempt(GraphQLView.as_view(graphiql=True))),
