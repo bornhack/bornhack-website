@@ -1,11 +1,10 @@
 from django.db import models
-
 from utils.models import CampRelatedModel
 
 
 class ProductCategory(CampRelatedModel):
     name = models.CharField(max_length=255)
-    camp = models.ForeignKey('camps.Camp')
+    camp = models.ForeignKey('camps.Camp', on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -17,7 +16,11 @@ class ProductCategory(CampRelatedModel):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     price = models.IntegerField()
-    category = models.ForeignKey(ProductCategory, related_name="products")
+    category = models.ForeignKey(
+        ProductCategory,
+        related_name="products",
+        on_delete=models.PROTECT
+    )
     in_stock = models.BooleanField(default=True)
 
     class Meta:

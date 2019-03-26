@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('updated', models.DateTimeField(auto_now=True)),
                 ('uuid', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
                 ('date', models.DateField(help_text='What date?', verbose_name='Date')),
-                ('camp', models.ForeignKey(to='camps.Camp', help_text='Which camp does this day belong to.', verbose_name='Camp')),
+                ('camp', models.ForeignKey(on_delete=models.PROTECT, to='camps.Camp', help_text='Which camp does this day belong to.', verbose_name='Camp')),
             ],
             options={
                 'verbose_name_plural': 'Days',
@@ -51,8 +51,8 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=255, help_text='What this expense covers.', verbose_name='Description')),
                 ('amount', models.DecimalField(max_digits=7, help_text='The amount of the expense.', verbose_name='Amount', decimal_places=2)),
                 ('currency', models.CharField(max_length=3, choices=[('btc', 'BTC'), ('dkk', 'DKK'), ('eur', 'EUR'), ('sek', 'SEK')], help_text='What currency the amount is in.', verbose_name='Currency')),
-                ('camp', models.ForeignKey(to='camps.Camp', help_text='The camp to which this expense relates to.', verbose_name='Camp')),
-                ('covered_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, blank=True, help_text='Which user, if any, covered this expense.', verbose_name='Covered by', null=True)),
+                ('camp', models.ForeignKey(on_delete=models.PROTECT, to='camps.Camp', help_text='The camp to which this expense relates to.', verbose_name='Camp')),
+                ('covered_by', models.ForeignKey(on_delete=models.PROTECT, to=settings.AUTH_USER_MODEL, blank=True, help_text='Which user, if any, covered this expense.', verbose_name='Covered by', null=True)),
             ],
             options={
                 'verbose_name_plural': 'Expenses',
@@ -67,8 +67,8 @@ class Migration(migrations.Migration):
                 ('uuid', models.UUIDField(default=uuid.uuid4, serialize=False, editable=False, primary_key=True)),
                 ('cost', models.DecimalField(default=1500.0, decimal_places=2, help_text='What the user should/is willing to pay for this signup.', verbose_name='Cost', max_digits=7)),
                 ('paid', models.BooleanField(help_text='Whether the user has paid.', verbose_name='Paid?', default=False)),
-                ('camp', models.ForeignKey(to='camps.Camp', help_text='The camp that has been signed up for.', verbose_name='Camp')),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, help_text='The user that has signed up.', verbose_name='User')),
+                ('camp', models.ForeignKey(on_delete=models.PROTECT, to='camps.Camp', help_text='The camp that has been signed up for.', verbose_name='Camp')),
+                ('user', models.ForeignKey(on_delete=models.PROTECT, to=settings.AUTH_USER_MODEL, help_text='The user that has signed up.', verbose_name='User')),
             ],
             options={
                 'verbose_name_plural': 'Signups',

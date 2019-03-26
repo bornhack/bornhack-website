@@ -1,5 +1,9 @@
 import os
+import wrapt
+import django.views
+
 from .environment_settings import *
+
 
 def local_dir(entry):
     return os.path.join(
@@ -7,9 +11,21 @@ def local_dir(entry):
         entry
     )
 
+
+# We do this hacky monkeypatching to enable us to define a setup method
+# on class based views for setting up variables without touching the dispatch
+# method.
+@wrapt.patch_function_wrapper(django.views.View, 'dispatch')
+def monkey_patched_dispatch(wrapped, instance, args, kwargs):
+    if hasattr(instance, 'setup'):
+        instance.setup(*args, **kwargs)
+    return wrapped(*args, **kwargs)
+
+
 DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
 
 WSGI_APPLICATION = 'bornhack.wsgi.application'
+ASGI_APPLICATION = 'bornhack.routing.application'
 ROOT_URLCONF = 'bornhack.urls'
 
 ACCOUNT_ADAPTER = 'allauth_2fa.adapter.OTPAdapter'
@@ -29,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
 
+    'graphene_django',
     'channels',
+    'corsheaders',
 
     'profiles',
     'camps',
@@ -46,6 +64,11 @@ INSTALLED_APPS = [
     'tickets',
     'bar',
     'backoffice',
+    'events',
+    'rideshare',
+    'tokens',
+    'feedback',
+    'economy',
 
     'allauth',
     'allauth.account',
@@ -55,6 +78,8 @@ INSTALLED_APPS = [
     'django_otp.plugins.otp_static',
     'bootstrap3',
     'django_extensions',
+    'reversion',
+    'betterforms',
 ]
 
 #MEDIA_URL = '/media/'
@@ -109,6 +134,7 @@ BOOTSTRAP3 = {
     'javascript_url': '/static/js/bootstrap.min.js'
 }
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -118,6 +144,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_URLS_REGEX = r'^/api/*$'
 
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -174,4 +203,6 @@ LOGGING = {
     },
 }
 
-
+GRAPHENE = {
+    'SCHEMA': 'bornhack.schema.schema'
+}

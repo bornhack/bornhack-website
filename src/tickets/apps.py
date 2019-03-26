@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from .signal_handlers import ticket_created
 from django.db.models.signals import post_save
+from .signals import ticket_changed
 import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -9,5 +9,6 @@ class TicketsConfig(AppConfig):
     name = 'tickets'
 
     def ready(self):
-        post_save.connect(ticket_created, sender='tickets.ShopTicket')
+        # connect the post_save signal, including a dispatch_uid to prevent it being called multiple times in corner cases
+        post_save.connect(ticket_changed, sender='tickets.ShopTicket', dispatch_uid='shopticket_save_signal')
 

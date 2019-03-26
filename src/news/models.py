@@ -1,8 +1,7 @@
-
-
 from django.db import models
 from django.utils import encoding
 from django.utils.text import slugify
+from django.urls import reverse
 
 from utils.models import CreatedUpdatedModel
 
@@ -44,3 +43,5 @@ class NewsItem(CreatedUpdatedModel):
 
         super(NewsItem, self).save(**kwargs)
 
+    def get_absolute_url(self):
+        return reverse('news:detail', kwargs={"slug": self.slug})

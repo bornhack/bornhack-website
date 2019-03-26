@@ -1,0 +1,21 @@
+{% extends 'program_base.html' %}
+{% load bootstrap3 %}
+
+{% block program_content %}
+<h3>Delete URL?</h3>
+<p class="lead">Really delete this URL?</p>
+<p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+<p class="lead">This action cannot be undone.</p>
+
+<form method="POST">
+    {% csrf_token %}
+    {% bootstrap_button "<i class='fas fa-times'></i> Delete" button_type="submit" button_class="btn-danger" %}
+    {% if speakerproposal %}
+        <a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary">
+    {% else %}
+        <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary">
+    {% endif %}
+    <i class='fas fa-undo'></i> Cancel</a>
+</form>
+{% endblock program_content %}
+

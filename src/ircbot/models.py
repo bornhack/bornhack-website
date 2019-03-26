@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from utils.models import UUIDModel, CreatedUpdatedModel
+from utils.models import CreatedUpdatedModel
 from django.db import models
 from django.utils import timezone
 
@@ -12,7 +12,7 @@ class OutgoingIrcMessage(CreatedUpdatedModel):
     expired = models.BooleanField(default=False)
 
     def __str__(self):
-        return "PRIVMSG %s %s (%s)" % (self.target, self.message, 'processed' if self.processed else 'unprocessed') 
+        return "PRIVMSG %s %s (%s)" % (self.target, self.message, 'processed' if self.processed else 'unprocessed')
 
     def clean(self):
         if not self.pk:

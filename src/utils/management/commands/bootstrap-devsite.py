@@ -15,7 +15,8 @@ from program.models import (
     Event,
     EventInstance,
     Speaker,
-    EventLocation
+    EventLocation,
+    EventTrack,
 )
 from tickets.models import (
     TicketType
@@ -23,8 +24,11 @@ from tickets.models import (
 from teams.models import (
     Team,
     TeamTask,
-    TeamArea,
     TeamMember
+)
+from events.models import (
+    Type,
+    Routing
 )
 from django.contrib.auth.models import User
 from allauth.account.models import EmailAddress
@@ -44,6 +48,7 @@ class Command(BaseCommand):
             title='BornHack 2016',
             tagline='Initial Commit',
             slug='bornhack-2016',
+            shortslug='bh2016',
             buildup=(
                 timezone.datetime(2016, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2016, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -56,13 +61,14 @@ class Command(BaseCommand):
                 timezone.datetime(2016, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2016, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
-            colour='#000000',
+            colour='#004dff',
         )
 
         camp2017 = Camp.objects.create(
             title='BornHack 2017',
             tagline='Make Tradition',
             slug='bornhack-2017',
+            shortslug='bh2017',
             buildup=(
                 timezone.datetime(2017, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2017, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -75,13 +81,16 @@ class Command(BaseCommand):
                 timezone.datetime(2017, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2017, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
-            colour='#000000',
+            colour='#750787',
         )
 
         camp2018 = Camp.objects.create(
             title='BornHack 2018',
-            tagline='Undecided',
+            tagline='scale it',
             slug='bornhack-2018',
+            shortslug='bh2018',
+            call_for_participation_open=True,
+            call_for_sponsors_open=True,
             buildup=(
                 timezone.datetime(2018, 8, 25, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2018, 8, 27, 11, 59, tzinfo=timezone.utc),
@@ -94,7 +103,7 @@ class Command(BaseCommand):
                 timezone.datetime(2018, 9, 4, 12, 0, tzinfo=timezone.utc),
                 timezone.datetime(2018, 9, 6, 12, 0, tzinfo=timezone.utc),
             ),
-            colour='#000000',
+            colour='#008026',
         )
 
         self.output("Creating users...")
@@ -104,6 +113,8 @@ class Command(BaseCommand):
         )
         user1.profile.name = 'John Doe'
         user1.profile.description = 'one that once was'
+        user1.profile.public_credit_name = 'PublicDoe'
+        user1.profile.public_credit_name_approved = True
         user1.profile.save()
         email = EmailAddress.objects.create(
             user=user1,
@@ -112,10 +123,10 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user2 = User.objects.create_user(
             username='user2',
             password='user2',
-            is_staff=True
         )
         user2.profile.name = 'Jane Doe'
         user2.profile.description = 'one that once was'
@@ -127,13 +138,14 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user3 = User.objects.create_user(
             username='user3',
             password='user3',
-            is_staff=True
         )
         user3.profile.name = 'Lorem Ipsum'
         user3.profile.description = 'just a user'
+        user3.profile.public_credit_name = 'Lorem Ipsum'
         user3.profile.save()
         email = EmailAddress.objects.create(
             user=user3,
@@ -142,13 +154,15 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
         user4 = User.objects.create_user(
             username='user4',
             password='user4',
-            is_staff=True
         )
         user4.profile.name = 'Ethe Reum'
         user4.profile.description = 'I prefer doge'
+        user4.profile.public_credit_name = 'Dogefan'
+        user4.profile.public_credit_name_approved = True
         user4.profile.save()
         email = EmailAddress.objects.create(
             user=user4,
@@ -157,6 +171,91 @@ class Command(BaseCommand):
             verified=True
         )
         email.set_as_primary()
+
+        user5 = User.objects.create_user(
+            username='user5',
+            password='user5',
+        )
+        user5.profile.name = 'Pyra Mid'
+        user5.profile.description = 'This is not a scam'
+        user5.profile.public_credit_name = 'Ponziarne'
+        user5.profile.public_credit_name_approved = True
+        user5.profile.save()
+        email = EmailAddress.objects.create(
+            user=user5,
+            email='user5@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user6 = User.objects.create_user(
+            username='user6',
+            password='user6',
+        )
+        user6.profile.name = 'User Number 6'
+        user6.profile.description = 'some description'
+        user6.profile.public_credit_name = 'bruger 6'
+        user6.profile.public_credit_name_approved = True
+        user6.profile.save()
+        email = EmailAddress.objects.create(
+            user=user6,
+            email='user6@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user7 = User.objects.create_user(
+            username='user7',
+            password='user7',
+        )
+        user7.profile.name = 'Assembly Hacker'
+        user7.profile.description = 'Low level is best level'
+        user7.profile.public_credit_name = 'asm'
+        user7.profile.public_credit_name_approved = True
+        user7.profile.save()
+        email = EmailAddress.objects.create(
+            user=user7,
+            email='user7@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user8 = User.objects.create_user(
+            username='user8',
+            password='user8',
+        )
+        user8.profile.name = 'TCL'
+        user8.profile.description = 'Expect me'
+        user8.profile.public_credit_name = 'TCL lover'
+        user8.profile.public_credit_name_approved = True
+        user8.profile.save()
+        email = EmailAddress.objects.create(
+            user=user8,
+            email='user8@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
+        user9 = User.objects.create_user(
+            username='user9',
+            password='user9',
+        )
+        user9.profile.name = 'John Windows'
+        user9.profile.description = 'Microsoft is best soft'
+        user9.profile.public_credit_name = 'msboy'
+        user9.profile.save()
+        email = EmailAddress.objects.create(
+            user=user9,
+            email='user9@example.com',
+            primary=False,
+            verified=True
+        )
+        email.set_as_primary()
+
         admin = User.objects.create_superuser(
             username='admin',
             email='admin@example.com',
@@ -174,26 +273,68 @@ class Command(BaseCommand):
 
         self.output("Creating event types...")
         workshop = EventType.objects.create(
-            name='Workshops',
-            slug='workshops',
+            name='Workshop',
+            slug='workshop',
             color='#ff9900',
             light_text=False,
-            public=True
+            public=True,
+            description='Workshops actively involve the participants in the learning experience',
+            icon='toolbox',
+            host_title='Host',
         )
 
         talk = EventType.objects.create(
-            name='Talks',
-            slug='talks',
+            name='Talk',
+            slug='talk',
             color='#2D9595',
             light_text=True,
-            public=True
+            public=True,
+            description='A presentation on a stage',
+            icon='chalkboard-teacher',
+            host_title='Speaker',
+        )
+
+        lightning = EventType.objects.create(
+            name='Lightning Talk',
+            slug='lightning-talk',
+            color='#ff0000',
+            light_text=True,
+            public=True,
+            description='A short 5-10 minute presentation',
+            icon='bolt',
+            host_title='Speaker',
+        )
+
+        music = EventType.objects.create(
+            name='Music Act',
+            slug='music',
+            color='#1D0095',
+            light_text=True,
+            public=True,
+            description='A musical performance',
+            icon='music',
+            host_title='Artist',
         )
 
         keynote = EventType.objects.create(
-            name='Keynotes',
-            slug='keynotes',
+            name='Keynote',
+            slug='keynote',
             color='#FF3453',
-            light_text=True
+            light_text=True,
+            description='A keynote presentation',
+            icon='star',
+            host_title='Speaker',
+        )
+
+        debate = EventType.objects.create(
+            name='Debate',
+            slug='debate',
+            color='#F734C3',
+            light_text=True,
+            description='A panel debate with invited guests',
+            icon='users',
+            host_title='Guest',
+            public=True,
         )
 
         facility = EventType.objects.create(
@@ -202,13 +343,20 @@ class Command(BaseCommand):
             color='#cccccc',
             light_text=False,
             include_in_event_list=False,
+            description='Events involving facilities like bathrooms, food area and so on',
+            icon='home',
+            host_title='Host',
         )
 
         slack = EventType.objects.create(
-            name='Slacking Off',
-            slug='slacking-off',
+            name='Recreational Event',
+            slug='recreational-event',
             color='#0000ff',
-            light_text=True
+            light_text=True,
+            public=True,
+            description='Events of a recreational nature',
+            icon='dice',
+            host_title='Host',
         )
 
         self.output("Creating productcategories...")
@@ -321,29 +469,29 @@ class Command(BaseCommand):
                 camp=camp
             )
 
-            name = 'Standard ticket {}'.format(year)
+            name = 'BornHack {} Standard ticket'.format(year)
             ticket1 = Product.objects.create(
                 name=name,
                 description='A ticket',
                 price=1200,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='{}'.format(slugify(name)),
                 ticket_type=adult_full_week
             )
 
-            name = 'Hacker ticket {}'.format(year)
+            name = 'BornHack {} Hacker ticket'.format(year)
             ticket2 = Product.objects.create(
                 name=name,
                 description='Another ticket',
                 price=1337,
                 category=tickets,
                 available_in=(
-                    timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                    timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
+                    timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
                 ),
                 slug='{}'.format(slugify(name)),
                 ticket_type=adult_full_week
@@ -419,6 +567,13 @@ class Command(BaseCommand):
             )
             order3.mark_as_paid(request=None)
 
+            self.output('Creating eventtracks for {}...'.format(year))
+            track = EventTrack.objects.create(
+                camp=camp,
+                name="BornHack",
+                slug=camp.slug,
+            )
+
             self.output('Creating eventlocations for {}...'.format(year))
             speakers_tent = EventLocation.objects.create(
                 name='Speakers Tent',
@@ -462,61 +617,61 @@ class Command(BaseCommand):
                 title='Developing the BornHack website',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev2 = Event.objects.create(
                 title='State of the world',
                 abstract='abstract here, bla bla bla',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev3 = Event.objects.create(
                 title='Welcome to bornhack!',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev4 = Event.objects.create(
                 title='bar is open',
                 abstract='the bar is open, yay',
                 event_type=facility,
-                camp=camp
+                track=track
             )
             ev5 = Event.objects.create(
                 title='Network something',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev6 = Event.objects.create(
                 title='State of outer space',
                 abstract='abstract here, bla bla bla',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev9 = Event.objects.create(
                 title='The Alternative Welcoming',
                 abstract='Why does The Alternative support BornHack? Why does The Alternative think IT is an overlooked topic? A quick runt-hrough of our program and workshops. We will bring an IT political debate to both the stage and the beer tents.',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev10 = Event.objects.create(
                 title='Words and Power - are we making the most of online activism?',
                 abstract='For years, big names like Ed Snowden and Chelsea Manning have given up their lives in order to protect regular people like you and me from breaches of our privacy. But we are still struggling with getting people interested in internet privacy. Why is this, and what can we do? Using experience from communicating privacy issues on multiple levels for a couple of years, I have encountered some deep seated issues in the way we talk about what privacy means. Are we good enough at letting people know whats going on?',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev11 = Event.objects.create(
                 title='r4d1o hacking 101',
                 abstract='Learn how to enable the antenna part of your ccc badge and get started with receiving narrow band FM. In the workshop you will have the opportunity to sneak peak on the organizers radio communications using your SDR. If there is more time we will look at WiFi radar or your protocol of choice.',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev12 = Event.objects.create(
                 title='Introduction to Sustainable Growth in a Digital World',
                 abstract='Free Choice is the underestimated key to secure value creation in a complex economy, where GDP-models only measure commercial profit and ignore the environment. We reconstruct the model thinking about Utility, Production, Security and Environment around the 5 Criteria for Sustainability.',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev13 = Event.objects.create(
                 title='American Fuzzy Lop and Address Sanitizer',
@@ -528,7 +683,7 @@ Code written in C and C++ is often riddled with bugs in the memory management. O
 Slides: [https://www.int21.de/slides/bornhack2016-fuzzing/](https://www.int21.de/slides/bornhack2016-fuzzing/)
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev14 = Event.objects.create(
                 title='PGP Keysigning Party',
@@ -543,7 +698,7 @@ For people who haven't attended a PGP keysigning party before, we will guide you
 2. (Optional) Bring some government-issued identification paper (passport, drivers license, etc.). The ID should contain a picture of yourself. You can leave this out, but then it will be a bit harder for others to verify your key properly.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev15 = Event.objects.create(
                 title='Bluetooth Low Energy',
@@ -573,7 +728,7 @@ of applications you can build on top.  Finally, a low-level
 demonstration of interfacing with a BLE controller is performed.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev16 = Event.objects.create(
                 title='TLS attacks and the burden of faulty TLS implementations',
@@ -595,13 +750,13 @@ underappreciated problem.
 Slides: [https://www.int21.de/slides/bornhack2016-tls/](https://www.int21.de/slides/bornhack2016-tls/)
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev17 = Event.objects.create(
                 title='State of the Network',
                 abstract='Come and meet the network team who will talk about the design and operation of the network at BornHack.',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev18 = Event.objects.create(
                 title='Running Exit Nodes in the North',
@@ -629,19 +784,19 @@ In Finland, Juha Nurmi has been establishing good relationships with ISPs
 and law enforcement agencies to keep Finnish exit nodes online.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev19 = Event.objects.create(
                 title='Hacker Jeopardy Qualifier',
                 abstract='Hacker Jeopardy qualifying',
                 event_type=slack,
-                camp=camp
+                track=track
             )
             ev20 = Event.objects.create(
                 title='Hacker Jeopardy Finals',
                 abstract='Hacker Jeopardy Finals between the winners of the qualifying games',
                 event_type=slack,
-                camp=camp
+                track=track
             )
             ev21 = Event.objects.create(
                 title='Incompleteness Phenomena in Mathematics: From Kurt Gödel to Harvey Friedman',
@@ -659,7 +814,7 @@ discovered and many of these (relative) unprovable sentences are of genuine math
 Note that these (early 20th century) developments also play an important role in developing the theoretical computer.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev22 = Event.objects.create(
                 title='Infocalypse Now - and how to Survive It?',
@@ -676,7 +831,7 @@ herfbombs, solarstorms and intelligence agencies on steroids
 The Beast is unleashed, can it be stopped, or is it anyone for him self?
                 ''',
                 event_type=keynote,
-                camp=camp
+                track=track
             )
             ev23 = Event.objects.create(
                 title='Liquid Democracy (Introduction and Debate)',
@@ -686,7 +841,7 @@ A lot has happened ever since the German pirates developed the first visions abo
 Monday will primarily be focused around The Alternatives experiment with Liquid Democracy and a constructive debate about how liquid democracy can improve The Alternative. Rolf Bjerre leads the process.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev24 = Event.objects.create(
                 title='Badge Workshop',
@@ -694,7 +849,7 @@ Monday will primarily be focused around The Alternatives experiment with Liquid 
 In this workshop you can learn how to solder and get help assembling your badge. We will have soldering irons and other tools to help things along. You can also discuss your ideas for badge hacks and modifications with the other participants and the host, Thomas Flummer.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev25 = Event.objects.create(
                 title='Checking a Distributed Hash Table for Correctness',
@@ -720,7 +875,7 @@ to give people an overview
 of how to attack larger code bases with (semi-) formal methods.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev26 = Event.objects.create(
                 title='GraphQL - A Data Language',
@@ -749,7 +904,7 @@ of the language. The running example is a GraphQL compiler written for
 Erlang.
                 ''',
                 event_type=talk,
-                camp=camp
+                track=track
             )
             ev27 = Event.objects.create(
                 title='Visualisation of Public Datasets',
@@ -761,19 +916,19 @@ I will present some portals where it is possible to get public datasets. Afterwa
 Towards the end we will open up to debate about how to use these resources or if there are other solutions.
                 ''',
                 event_type=workshop,
-                camp=camp
+                track=track
             )
             ev28 = Event.objects.create(
                 title='Local delicacies',
                 abstract='Come taste delicacies from bornholm',
                 event_type=facility,
-                camp=camp
+                track=track
             )
             ev29 = Event.objects.create(
                 title='Local delicacies from the world',
                 abstract='An attempt to create an event where we all prepare local delicacies for each other',
                 event_type=facility,
-                camp=camp
+                track=track
             )
 
             self.output("Creating speakers for {}...".format(year))
@@ -781,56 +936,64 @@ Towards the end we will open up to debate about how to use these resources or if
                 name='Henrik Kramse',
                 biography='Henrik is an internet samurai working in internet and security around the world.',
                 slug='henrik-kramshj',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp1.events.add(ev5)
             sp2 = Speaker.objects.create(
                 name='Thomas Tykling',
                 biography='random danish hacker',
                 slug='thomas-tykling',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp2.events.add(ev3, ev1)
             sp3 = Speaker.objects.create(
                 name='Alex Ahf',
                 biography='functional alcoholic',
                 slug='alex-ahf',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp3.events.add(ev4, ev2)
             sp4 = Speaker.objects.create(
                 name='Jesper Arp',
                 biography='Representative from The Alternative with focus in data visualization.',
                 slug='jesper-arp',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp4.events.add(ev9, ev27)
             sp5 = Speaker.objects.create(
                 name='Rolf Bjerre',
                 biography='The green pirate',
                 slug='rolf-bjerre',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp5.events.add(ev9, ev23)
             sp6 = Speaker.objects.create(
                 name='Emma Holten',
                 biography='Emma Holten is a feminist and human rights activist. She is co-founder and editor of the standard critical magazine Friktion and also a student at the University of Copenhagen. She speaks in both national and global contexts of feminism, digital activism and why privacy on the internet is crucial to a democracy, where everyone is equal.',
                 slug='emma-holten',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp6.events.add(ev10)
             sp7 = Speaker.objects.create(
                 name='Christoffer Jerkeby',
                 biography='Hacker and phone phreaker from Stockholm bent on radio. Researching security and privacy in wireless protocols.',
                 slug='christoffer-jerkeby',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp7.events.add(ev11)
             sp8 = Speaker.objects.create(
                 name='Stephan Engberg',
                 biography='Stephan Engberg is a Computer Scientist specializing in Innovation Strategist working with Digital Business when he realized the Digital World is designed through our approach to security models and economic models. He then dedicated himself to Privacy/Security by Design in Open Business Innovation making numerous breakthroughs in security and engaged in EU research activities he was e.g. member of the Strategic Advisory Board for FP7 Security Research Roadmapping and started manufacturing of RFID computer chips based on Privacy by Design with zero-knowledge based computing in passive chips without battery or ultra-low memory and computational capabilities. In 2003, he was selected by an a transatlantic panel of researchers in ethics as a Moral Example in the Computer Profession.',
                 slug='stephan-engberg',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp8.events.add(ev12)
             sp9 = Speaker.objects.create(
@@ -844,7 +1007,8 @@ security issues for various publications. He is the author of the
 monthly Bulletproof TLS Newsletter.
                 ''',
                 slug='hanno-bock',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp9.events.add(ev13, ev16)
             sp10 = Speaker.objects.create(
@@ -859,7 +1023,8 @@ I also like music, cooking, sci-fi and cats, in an order indistinguishable from
 a truly random sequence by a polynomial-time-bounded computational adversary.
                 ''',
                 slug='ximin-luo',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp10.events.add(ev14)
             sp11 = Speaker.objects.create(
@@ -870,14 +1035,16 @@ His dayjob involves writing firmware for a BT/wifi controller
 for a semiconductor company.
                 ''',
                 slug='michael-knudsen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp11.events.add(ev15)
             sp12 = Speaker.objects.create(
                 name='BornHack Network Team',
                 biography='The team you won\'t notice if everything goes as it should. Please bring them rum or beer if they look too stressed.',
                 slug='bornhack-network-team',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp12.events.add(ev17)
             sp13 = Speaker.objects.create(
@@ -891,7 +1058,8 @@ Valley. Juha is also a noted lecturer and public speaker. Juha's work on
 Ahmia has been in part sponsored by the Google Summer of Code.
                 ''',
                 slug='juha-nurmi',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp13.events.add(ev18)
             sp14 = Speaker.objects.create(
@@ -905,7 +1073,8 @@ programming, machine learning, road engineering.
 Also, I enjoy nature quite a bit. Presently, I work at the Danish Road Directorate with rolling resistance modelling and pavement management as the main focus. Besides doing a lot of programming at work (primarily Python) I also experiment with Erlang in my spare time trying to build peer2peer software.
                 ''',
                 slug='lasse-andersen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp14.events.add(ev21)
             sp15 = Speaker.objects.create(
@@ -919,7 +1088,8 @@ dim future, that lies ahead.
 Website: [aflyttet.dk](https://aflyttet.dk)
                 ''',
                 slug='anders-kjrulff',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp15.events.add(ev22)
             sp16 = Speaker.objects.create(
@@ -928,7 +1098,8 @@ Website: [aflyttet.dk](https://aflyttet.dk)
 Thomas is an electronics engineer, though he is mostly doing software development in his professional life. For the past 7 years Thomas has been a member of the hackerspace Labitat, where he has been doing various projects, mostly with electronics, 3D printing and video documentation.
                 ''',
                 slug='thomas-flummer',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp16.events.add(ev24)
             sp17 = Speaker.objects.create(
@@ -944,7 +1115,8 @@ real world use whenever possible. His dayjob involves functional
 programming for a danish startup.
                 ''',
                 slug='jesper-louis-andersen',
-                camp=camp
+                camp=camp,
+                email="email@email.lol",
             )
             sp17.events.add(ev25, ev26)
 
@@ -1246,20 +1418,185 @@ programming for a danish startup.
                 )
             )
 
+            self.output("Creating villages for {}...".format(year))
+            Village.objects.create(
+                contact=user1,
+                camp=camp,
+                name='Baconsvin',
+                slug='baconsvin',
+                description='The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. A lot of the organizers of BornHack live in Baconsvin village. Come by and squeeze the pig and sign our guestbook!'
+            )
+            Village.objects.create(
+                contact=user2,
+                camp=camp,
+                name='NetworkWarriors',
+                slug='networkwarriors',
+                description='We will have a tent which house the NOC people, various lab equipment people can play with, and have fun. If you want to talk about networking, come by, and if you have trouble with the Bornhack network contact us.'
+            )
+            Village.objects.create(
+                contact=user3,
+                camp=camp,
+                name='TheCamp.dk',
+                slug='the-camp',
+                description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
+            )
+
+            self.output("Creating teams for {}...".format(year))
+            orga_team = Team.objects.create(
+                name="Orga",
+                description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
+                camp=camp
+            )
+            noc_team = Team.objects.create(
+                name="NOC",
+                description="The NOC team is in charge of establishing and running a network onsite.",
+                camp=camp
+            )
+            bar_team = Team.objects.create(
+                name="Bar",
+                description="The Bar team plans, builds and run the IRL bar!",
+                camp=camp
+            )
+
+            self.output("Creating TeamTasks for {}...".format(year))
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Setup private networks",
+                description="All the private networks need to be setup"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Setup public networks",
+                description="All the public networks need to be setup"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Deploy access points",
+                description="All access points need to be deployed"
+            )
+            TeamTask.objects.create(
+                team=noc_team,
+                name="Deploy fiber cables",
+                description="We need the fiber deployed where necessary"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="List of booze",
+                description="A list of the different booze we need to have in the bar durng bornhack"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Chairs",
+                description="We need a solution for chairs"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Taps",
+                description="Taps must be ordered"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Coffee",
+                description="We need to get some coffee for our coffee machine"
+            )
+            TeamTask.objects.create(
+                team=bar_team,
+                name="Ice",
+                description="We need ice cubes and crushed ice in the bar"
+            )
+
+            self.output("Setting team members for {}...".format(year))
+            # noc team
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user4,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user1,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user5,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=noc_team,
+                user=user6,
+            )
+
+            # bar team
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user1,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user3,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user2,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user7,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=bar_team,
+                user=user8,
+            )
+
+            # orga team
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user1,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user3,
+                approved=True,
+                responsible=True
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user8,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user9,
+                approved=True,
+            )
+            TeamMember.objects.create(
+                team=orga_team,
+                user=user4,
+            )
 
             self.output("Creating infocategories for {}...".format(year))
             info_cat1 = InfoCategory.objects.create(
-                camp=camp,
+                team=orga_team,
                 headline='When is BornHack happening?',
                 anchor='when'
             )
             info_cat2 = InfoCategory.objects.create(
-                camp=camp,
+                team=orga_team,
                 headline='Travel Information',
                 anchor='travel'
             )
             info_cat3 = InfoCategory.objects.create(
-                camp=camp,
+                team=orga_team,
                 headline='Where do I sleep?',
                 anchor='sleep'
             )
@@ -1350,146 +1687,21 @@ Please note that sleeping in the parking lot is not permitted. If you want to sl
                 body='We rent out a few cabins at the venue with 8 beds each for people who don\'t want to sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), but the cabins are there if you want them.'
             )
 
-            self.output("Creating villages for {}...".format(year))
-            Village.objects.create(
-                contact=user1,
-                camp=camp,
-                name='Baconsvin',
-                slug='baconsvin',
-                description='The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. A lot of the organizers of BornHack live in Baconsvin village. Come by and squeeze the pig and sign our guestbook!'
-            )
-            Village.objects.create(
-                contact=user2,
-                camp=camp,
-                name='NetworkWarriors',
-                slug='networkwarriors',
-                description='We will have a tent which house the NOC people, various lab equipment people can play with, and have fun. If you want to talk about networking, come by, and if you have trouble with the Bornhack network contact us.'
-            )
-            Village.objects.create(
-                contact=user3,
-                camp=camp,
-                name='TheCamp.dk',
-                slug='the-camp',
-                description='This village is representing TheCamp.dk, an annual danish tech camp held in July. The official subjects for this event is open source software, network and security. In reality we are interested in anything from computers to illumination soap bubbles and irish coffee'
-            )
-
-            self.output("Creating team areas for {}...".format(year))
-            pr_area = TeamArea.objects.create(
-                name='PR',
-                description="The Public Relations area covers website, social media and marketing related tasks.",
-                camp=camp
-            )
-            content_area = TeamArea.objects.create(
-                name='Content',
-                description="The Content area handles talks, A/V and photos.",
-                camp=camp
-            )
-            infrastructure_area = TeamArea.objects.create(
-                name='Infrastructure',
-                description="The Infrastructure area covers network/NOC, power, villages, CERT, logistics.",
-                camp=camp
-            )
-            bar_area = TeamArea.objects.create(
-                name='Bar',
-                description="The Bar area covers building and running the IRL bar, DJ booth and related tasks.",
-                camp=camp
-            )
-
-            self.output("Setting teamarea responsibles for {}...".format(year))
-            pr_area.responsible.add(user2)
-            content_area.responsible.add(user2, user3)
-            infrastructure_area.responsible.add(user3, user4)
-            bar_area.responsible.add(user4)
-
-            self.output("Creating teams for {}...".format(year))
-            noc_team = Team.objects.create(
-                name="NOC",
-                description="The NOC team is in charge of establishing and running a network onsite.".format(year),
-                camp=camp,
-                area=infrastructure_area,
-            )
-            bar_team = Team.objects.create(
-                name="Bar",
-                description="The Bar team plans, builds and run the IRL bar!",
-                camp=camp,
-                area=bar_area
-            )
-
-            self.output("Creating TeamTasks for {}...".format(year))
-            TeamTask.objects.create(
-                team=noc_team,
-                name="Setup private networks",
-                description="All the private networks need to be setup"
-            )
-            TeamTask.objects.create(
-                team=noc_team,
-                name="Setup public networks",
-                description="All the public networks need to be setup"
-            )
-            TeamTask.objects.create(
-                team=noc_team,
-                name="Deploy access points",
-                description="All access points need to be deployed"
-            )
-            TeamTask.objects.create(
-                team=noc_team,
-                name="Deploy fiber cables",
-                description="We need the fiber deployed where necessary"
-            )
-            TeamTask.objects.create(
-                team=bar_team,
-                name="List of booze",
-                description="A list of the different booze we need to have in the bar durng bornhack"
-            )
-            TeamTask.objects.create(
-                team=bar_team,
-                name="Chairs",
-                description="We need a solution for chairs"
-            )
-            TeamTask.objects.create(
-                team=bar_team,
-                name="Taps",
-                description="Taps must be ordered"
-            )
-            TeamTask.objects.create(
-                team=bar_team,
-                name="Coffee",
-                description="We need to get some coffee for our coffee machine"
-            )
-            TeamTask.objects.create(
-                team=bar_team,
-                name="Ice",
-                description="We need ice cubes and crushed ice in the bar"
-            )
-
-            self.output("Setting team members for {}...".format(year))
-            TeamMember.objects.create(
-                team=noc_team,
-                user=user4,
-                approved=True
-            )
-            TeamMember.objects.create(
-                team=noc_team,
-                user=user1
-            )
-            TeamMember.objects.create(
-                team=bar_team,
-                user=user1,
-                approved=True
-            )
-            TeamMember.objects.create(
-                team=bar_team,
-                user=user3,
-                approved=True
-            )
-            TeamMember.objects.create(
-                team=bar_team,
-                user=user2
-            )
+        self.output("Adding event routing...")
+        Routing.objects.create(
+            team=orga_team,
+            eventtype=Type.objects.get(name="public_credit_name_changed")
+        )
+        Routing.objects.create(
+            team=orga_team,
+            eventtype=Type.objects.get(name="ticket_created")
+        )
 
 
-        self.output("marking 2016 as read_only...")
+        self.output("marking 2016 and 2017 as read_only...")
         camp2016.read_only = True
         camp2016.save()
+        camp2017.read_only = True
+        camp2017.save()
         self.output("done!")
 

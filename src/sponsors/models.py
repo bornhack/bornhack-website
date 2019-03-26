@@ -1,6 +1,6 @@
 from django.db import models
 
-from utils.models import CampRelatedModel, CreatedUpdatedModel
+from utils.models import CampRelatedModel
 
 
 def get_sponsor_upload_path(instance, filename):
@@ -13,21 +13,21 @@ def get_sponsor_upload_path(instance, filename):
     )
 
 
-class Sponsor(CreatedUpdatedModel):
+class Sponsor(CampRelatedModel):
     name = models.CharField(
         max_length=150,
         help_text='Name of the sponsor'
     )
 
-    tier = models.ForeignKey('sponsors.SponsorTier')
+    tier = models.ForeignKey('sponsors.SponsorTier', on_delete=models.PROTECT)
 
     description = models.TextField(
         help_text='A short description of the sponsorship'
     )
 
-    logo = models.URLField(
+    logo_filename = models.CharField(
         max_length=255,
-        help_text='A URL to the logo'
+        help_text='Filename of the logo'
     )
 
     url = models.URLField(
@@ -36,8 +36,16 @@ class Sponsor(CreatedUpdatedModel):
         help_text="An URL to the sponsor."
     )
 
+    tickets_generated = models.BooleanField(default=False)
+
     def __str__(self):
         return '{} ({})'.format(self.name, self.tier.camp)
+
+    @property
+    def camp(self):
+        return self.tier.camp
+
+    camp_filter = 'tier__camp'
 
 
 class SponsorTier(CampRelatedModel):
@@ -53,6 +61,7 @@ class SponsorTier(CampRelatedModel):
     camp = models.ForeignKey(
         'camps.Camp',
         null=True,
+        on_delete=models.PROTECT,
         related_name='sponsor_tiers',
         help_text='The camp this sponsor tier belongs to',
     )
@@ -61,6 +70,12 @@ class SponsorTier(CampRelatedModel):
         default=0,
         help_text="""This decides where on the list the tier will be shown. I.e.
         gold should have a lower value than silver."""
+    )
+
+    tickets = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="If set this is the number of tickets generated for a sponsor in this tier."
     )
 
     def __str__(self):

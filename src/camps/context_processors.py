@@ -1,6 +1,4 @@
-from django.conf import settings
 from .models import Camp
-from django.utils import timezone
 
 
 def camp(request):

@@ -49,10 +49,11 @@ def add_new_membership_email(membership):
     return add_outgoing_email(
         text_template='emails/new_membership_email.txt',
         html_template='emails/new_membership_email.html',
-        to_recipients=[resp.email for resp in membership.team.responsible],
+        to_recipients=[resp.email for resp in membership.team.responsible_members.all()],
         formatdict=formatdict,
         subject='New membership request for {} at {}'.format(
             membership.team.name,
             membership.team.camp.title
         )
     )
+

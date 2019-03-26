@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<h2>Reimbursements for {{ camp.title }}</h2>
+
+{% include 'includes/reimbursement_list_panel.html' %}
+
+<a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+{% endblock content %}

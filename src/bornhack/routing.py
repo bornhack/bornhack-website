@@ -1,8 +1,14 @@
+from django.conf.urls import url
+
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.auth import AuthMiddlewareStack
 from program.consumers import ScheduleConsumer
 
 
-channel_routing = [
-    ScheduleConsumer.as_route(path=r"^/schedule/"),
-]
-
-
+application = ProtocolTypeRouter({
+    "websocket": AuthMiddlewareStack(
+        URLRouter([
+            url(r"^schedule/", ScheduleConsumer)
+        ])
+    )
+})

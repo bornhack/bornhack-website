@@ -1,8 +1,4 @@
-import io
 import logging
-import hashlib
-import base64
-import qrcode
 
 from django.conf import settings
 from django.db import models
@@ -12,7 +8,7 @@ from django.contrib.postgres.fields import DateTimeRangeField, JSONField
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 from datetime import timedelta
@@ -20,7 +16,6 @@ from unidecode import unidecode
 from django.utils.dateparse import parse_datetime
 
 from utils.models import UUIDModel, CreatedUpdatedModel
-from tickets.models import ShopTicket
 from .managers import ProductQuerySet, OrderQuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -76,6 +71,7 @@ class Order(CreatedUpdatedModel):
         verbose_name=_('User'),
         help_text=_('The user this shop order belongs to.'),
         related_name='orders',
+        on_delete=models.PROTECT,
     )
 
     paid = models.BooleanField(
@@ -127,6 +123,17 @@ class Order(CreatedUpdatedModel):
     customer_comment = models.TextField(
         verbose_name=_('Customer comment'),
         help_text=_('If you have any comments about the order please enter them here.'),
+        default='',
+        blank=True,
+    )
+
+    invoice_address = models.TextField(
+        help_text=_('The invoice address for this order. Leave blank to use the email associated with the logged in user.'),
+        blank=True
+    )
+
+    notes = models.TextField(
+        help_text='Any internal notes about this order can be entered here. They will not be printed on the invoice or shown to the customer in any way.',
         default='',
         blank=True,
     )
@@ -185,38 +192,76 @@ class Order(CreatedUpdatedModel):
     def get_absolute_url(self):
         return str(reverse_lazy('shop:order_detail', kwargs={'pk': self.pk}))
 
-    def mark_as_paid(self, request):
-        self.paid = True
-        self.open = None
+    def create_tickets(self, request=None):
         for order_product in self.orderproductrelation_set.all():
             # if this is a Ticket product?
             if order_product.product.ticket_type:
+                query_kwargs = dict(
+                    product=order_product.product,
+                    ticket_type=order_product.product.ticket_type,
+                )
+
+                already_created_tickets = self.shoptickets.filter(**query_kwargs).count()
+                tickets_to_create = max(0, order_product.quantity - already_created_tickets)
+
                 # create the number of tickets required
-                for _ in range(0, order_product.quantity):
-                    ticket = ShopTicket(
-                        ticket_type=order_product.product.ticket_type,
-                        order=self,
-                        product=order_product.product,
-                    )
-                    ticket.save()
-                if request:
-                    messages.success(request, "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name))
-                # and mark the OPR as handed_out=True
-                order_product.handed_out=True
-                order_product.save()
+                if tickets_to_create > 0:
+                    for _ in range(0, (order_product.quantity - already_created_tickets)):
+                        self.shoptickets.create(
+                            **query_kwargs
+                        )
+
+                    msg = "Created %s tickets of type: %s" % (order_product.quantity, order_product.product.ticket_type.name)
+                    if request:
+                        messages.success(request, msg)
+                    else:
+                        print(msg)
+
+                    # and mark the OPR as handed_out=True
+                    order_product.handed_out = True
+                    order_product.save()
+
+    def mark_as_paid(self, request=None):
+        self.paid = True
+        self.open = None
+        self.create_tickets(request)
         self.save()
 
-    def mark_as_refunded(self, request):
+    def mark_as_refunded(self, request=None):
         if not self.paid:
-            messages.error(request, "Order %s is not paid, so cannot mark it as refunded!" % self.pk)
-        else:
-            self.refunded=True
-            ### delete any tickets related to this order
-            if self.tickets.all():
-                messages.success(request, "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.tickets.count()))
-                self.tickets.all().delete()
+            msg = "Order %s is not paid, so cannot mark it as refunded!" % self.pk
+            if request:
+                messages.error(request, msg)
             else:
-                messages.success(request, "Order %s marked as refunded, no tickets to delete" % self.pk)
+                print(msg)
+        else:
+            self.refunded = True
+            # delete any tickets related to this order
+            if self.shoptickets.all():
+                msg = "Order %s marked as refunded, deleting %s tickets..." % (self.pk, self.shoptickets.count())
+                if request:
+                    messages.success(request, msg)
+                else:
+                    print(msg)
+                self.shoptickets.all().delete()
+            else:
+                msg = "Order %s marked as refunded, no tickets to delete" % self.pk
+                if request:
+                    messages.success(request, msg)
+                else:
+                    print(msg)
+            self.save()
+
+    def mark_as_cancelled(self, request=None):
+        if self.paid:
+            msg = "Order %s is paid, cannot cancel a paid order!" % self.pk
+            if request:
+                messages.error(request, msg)
+            else:
+                print(msg)
+        else:
+            self.cancelled = True
+            self.open = None
             self.save()
 
     def is_not_handed_out(self):
@@ -249,17 +294,11 @@ class Order(CreatedUpdatedModel):
         else:
             return False
 
-    def mark_as_cancelled(self):
-        self.cancelled = True
-        self.open = None
-        self.save()
-
     @property
     def coinifyapiinvoice(self):
         if not self.coinify_api_invoices.exists():
             return False
 
-        coinifyinvoice = None
         for tempinvoice in self.coinify_api_invoices.all():
             # we already have a coinifyinvoice for this order, check if it expired
             if not tempinvoice.expired:
@@ -295,7 +334,8 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
     category = models.ForeignKey(
         'shop.ProductCategory',
-        related_name='products'
+        related_name='products',
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(max_length=150)
@@ -316,6 +356,16 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
     ticket_type = models.ForeignKey(
         'tickets.TicketType',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
+
+    stock_amount = models.IntegerField(
+        help_text=(
+            'Initial amount available in stock if there is a limited '
+            'supply, e.g. fridge space'
+        ),
         null=True,
         blank=True
     )
@@ -335,8 +385,23 @@ class Product(CreatedUpdatedModel, UUIDModel):
             )
 
     def is_available(self):
+        """ Is the product available or not?
+
+        Checks for the following:
+
+        - Whether now is in the self.available_in
+        - If a stock is defined, that there are items left
+        """
+        predicates = [self.is_time_available]
+        if self.stock_amount:
+            predicates.append(self.is_stock_available)
+        return all(predicates)
+
+    @property
+    def is_time_available(self):
         now = timezone.now()
-        return now in self.available_in
+        time_available = now in self.available_in
+        return time_available
 
     def is_old(self):
         now = timezone.now()
@@ -348,16 +413,43 @@ class Product(CreatedUpdatedModel, UUIDModel):
         now = timezone.now()
         return self.available_in.lower > now
 
+    @property
+    def left_in_stock(self):
+        if self.stock_amount:
+            sold = OrderProductRelation.objects.filter(
+                product=self,
+                order__paid=True,
+            ).aggregate(Sum('quantity'))['quantity__sum']
+
+            total_left = self.stock_amount - (sold or 0)
+
+            return total_left
+        return None
+
+    @property
+    def is_stock_available(self):
+        if self.stock_amount:
+            stock_available = self.left_in_stock > 0
+            return stock_available
+        # If there is no stock defined the product is generally available.
+        return True
+
 
 class OrderProductRelation(CreatedUpdatedModel):
-    order = models.ForeignKey('shop.Order')
-    product = models.ForeignKey('shop.Product')
+    order = models.ForeignKey('shop.Order', on_delete=models.PROTECT)
+    product = models.ForeignKey('shop.Product', on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
     handed_out = models.BooleanField(default=False)
 
     @property
     def total(self):
         return Decimal(self.product.price * self.quantity)
+
+    def clean(self):
+        if self.handed_out and not self.order.paid:
+            raise ValidationError(
+                'Product can not be handed out when order is not paid.'
+            )
 
 
 class EpayCallback(CreatedUpdatedModel, UUIDModel):
@@ -378,8 +470,8 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
         verbose_name = 'Epay Payment'
         verbose_name_plural = 'Epay Payments'
 
-    order = models.OneToOneField('shop.Order')
-    callback = models.ForeignKey('shop.EpayCallback')
+    order = models.OneToOneField('shop.Order', on_delete=models.PROTECT)
+    callback = models.ForeignKey('shop.EpayCallback', on_delete=models.PROTECT)
     txnid = models.IntegerField()
 
 
@@ -407,6 +499,7 @@ class CreditNote(CreatedUpdatedModel):
         verbose_name=_('User'),
         help_text=_('The user this credit note belongs to, if any.'),
         related_name='creditnotes',
+        on_delete=models.PROTECT,
         null=True,
         blank=True
     )
@@ -470,8 +563,18 @@ class CreditNote(CreatedUpdatedModel):
 
 
 class Invoice(CreatedUpdatedModel):
-    order = models.OneToOneField('shop.Order', null=True, blank=True)
-    customorder = models.OneToOneField('shop.CustomOrder', null=True, blank=True)
+    order = models.OneToOneField(
+        'shop.Order',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT
+    )
+    customorder = models.OneToOneField(
+        'shop.CustomOrder',
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT
+    )
     pdf = models.FileField(null=True, blank=True, upload_to='invoices/')
     sent_to_customer = models.BooleanField(default=False)
 
@@ -512,7 +615,7 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
     @property
     def expired(self):
-         return parse_datetime(self.invoicejson['expire_time']) < timezone.now()
+        return parse_datetime(self.invoicejson['expire_time']) < timezone.now()
 
 
 class CoinifyAPICallback(CreatedUpdatedModel):

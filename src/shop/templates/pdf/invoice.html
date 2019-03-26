@@ -14,7 +14,12 @@
         </td>
     </tr>
 </table>
+{% if invoice.order.invoice_address %}
+<h2>CUSTOMER</h2>
+<p class="lead">{{ invoice.order.invoice_address|linebreaks }}</p>
+{% else %}
 <h3>Customer: {{ invoice.order.user.email }}</h3>
+{% endif %}
 <br>
 <h2>INVOICE</h2>
 <table style="width:90%; margin:1em;">

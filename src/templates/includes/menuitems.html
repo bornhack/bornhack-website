@@ -1,0 +1,21 @@
+{% load menubutton %}
+            <a class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
+            <a class="btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
+            <a class="btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
+            <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
+            <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+            <a class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+
+            {% if request.user.is_authenticated %}
+            <a class="btn {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
+            <a class="btn {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
+            {% endif %}
+
+            {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+            <a class="btn {% menubuttonclass 'economy' %}" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a>
+            {% endif %}
+
+            {% if perms.camps.backoffice_permission %}
+            <a class="btn {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
+            {% endif %}
+

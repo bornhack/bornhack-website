@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+Reimbursement Details | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3>Reimbursement Details</h3>
+
+{% include 'includes/reimbursement_detail_panel.html' %}
+
+<a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to list</a>
+
+{% endblock content %}
+

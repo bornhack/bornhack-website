@@ -20,14 +20,6 @@ DEBUG={{ django_debug }}
 # the path to the wkhtmltopdf binary
 WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
 
-# set BACKEND to "asgiref.inmemory.ChannelLayer" and CONFIG to {} for local development
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "{{ django_channels_backend }}",
-        "ROUTING": "bornhack.routing.channel_routing",
-        "CONFIG": {{ django_channels_config }}
-    },
-}
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
@@ -36,6 +28,9 @@ CAMP_REDIRECT_PERCENT=25
 ### changes below here are only needed for production
 
 # email settings
+{% if not django_email_realworld | default(False) %}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+{% endif %}
 EMAIL_HOST='{{ django_email_host }}'
 EMAIL_PORT={{ django_email_port }}
 EMAIL_HOST_USER='{{ django_email_user }}'
@@ -76,13 +71,26 @@ SCHEDULE_EVENT_NOTIFICATION_MINUTES=10
 # irc bot settings
 IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS=10
 IRCBOT_NICK='{{ django_ircbot_nickname }}'
+IRCBOT_CHANSERV_MASK='{{ django_ircbot_chanserv_mask }}'
+IRCBOT_NICKSERV_MASK='{{ django_ircbot_nickserv_mask }}'
 IRCBOT_NICKSERV_PASSWORD='{{ django_ircbot_nickserv_password }}'
+IRCBOT_NICKSERV_EMAIL='{{ django_ircbot_nickserv_email }}'
+IRCBOT_NICKSERV_IDENTIFY_STRING="This nickname is registered. Please choose a different nickname, or identify via \x02/msg NickServ identify <password>\x02."
 IRCBOT_SERVER_HOSTNAME='{{ django_ircbot_server }}'
 IRCBOT_SERVER_PORT=6697
 IRCBOT_SERVER_USETLS=True
-IRCBOT_CHANNELS={
-    'default': '{{ django_ircbot_default_channel }}',
-    'orga': '{{ django_ircbot_orga_channel }}',
-    'public': '{{ django_ircbot_public_channel }}'
+IRCBOT_PUBLIC_CHANNEL='{{ django_ircbot_public_channel }}'
+IRCBOT_VOLUNTEER_CHANNEL='{{ django_ircbot_volunteer_channel }}'
+
+# set BACKEND to "channels.layers.InMemoryChannelLayer" and CONFIG to {} for local development
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "{{ django_channels_backend }}",
+        "CONFIG": {{ django_channels_config }}
+    },
 }
+
+ACCOUNTINGSYSTEM_EMAIL = "{{ django_accountingsystem_email }}"
+ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
+ECONOMYTEAM_NAME = "Economy"
 

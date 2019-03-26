@@ -30,7 +30,7 @@ class Command(BaseCommand):
         files = [
             'sponsors/templates/{camp_slug}_sponsors.html',
             'camps/templates/{camp_slug}_camp_detail.html',
-            'program/templates/{camp_slug}_call_for_speakers.html'
+            'program/templates/{camp_slug}_call_for_participation.html'
         ]
 
         # directories to create, relative to DJANGO_BASE_PATH
@@ -68,3 +68,4 @@ class Command(BaseCommand):
                 'static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png'.format(camp_slug=camp_slug)
             )
         )
+

@@ -1,40 +1,40 @@
 import io
-import logging
 import hashlib
 import base64
 import qrcode
-
-from utils.models import CreatedUpdatedModel, CampRelatedModel
 from django.conf import settings
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from utils.models import (
     UUIDModel,
-    CreatedUpdatedModel
+    CampRelatedModel,
 )
 from utils.pdf import generate_pdf_letter
 from django.db import models
-
+import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 # TicketType can be full week, one day. etc.
 class TicketType(CampRelatedModel, UUIDModel):
     name = models.TextField()
-    camp = models.ForeignKey('camps.Camp')
+    camp = models.ForeignKey('camps.Camp', on_delete=models.PROTECT)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.camp.title)
 
 
-class BaseTicket(CreatedUpdatedModel, UUIDModel):
-    ticket_type = models.ForeignKey('TicketType')
+class BaseTicket(CampRelatedModel, UUIDModel):
+    ticket_type = models.ForeignKey('TicketType', on_delete=models.PROTECT)
     checked_in = models.BooleanField(default=False)
-
     badge_handed_out = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
+
+    @property
+    def camp(self):
+        return self.ticket_type.camp
 
     def _get_token(self):
         return hashlib.sha256(
@@ -56,7 +56,9 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
         return qrcode_base64
 
     def get_qr_code_url(self):
-        return 'data:image/png;base64,{}'.format(self.get_qr_code_base64().decode('utf-8'))
+        return 'data:image/png;base64,{}'.format(
+            self.get_qr_code_base64().decode('utf-8')
+        )
 
     def generate_pdf(self):
         return generate_pdf_letter(
@@ -67,7 +69,7 @@ class BaseTicket(CreatedUpdatedModel, UUIDModel):
 
 
 class SponsorTicket(BaseTicket):
-    sponsor = models.ForeignKey('sponsors.Sponsor')
+    sponsor = models.ForeignKey('sponsors.Sponsor', on_delete=models.PROTECT)
 
     def __str__(self):
         return 'SponsorTicket: {}'.format(self.pk)
@@ -91,8 +93,12 @@ class DiscountTicket(BaseTicket):
 
 
 class ShopTicket(BaseTicket):
-    order = models.ForeignKey('shop.Order', related_name='shoptickets')
-    product = models.ForeignKey('shop.Product')
+    order = models.ForeignKey(
+        'shop.Order',
+        related_name='shoptickets',
+        on_delete=models.PROTECT
+    )
+    product = models.ForeignKey('shop.Product', on_delete=models.PROTECT)
 
     name = models.CharField(
         max_length=100,
@@ -133,4 +139,6 @@ class ShopTicket(BaseTicket):
     @property
     def shortname(self):
         return "shop"
+
+
 

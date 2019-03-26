@@ -1,0 +1,80 @@
+import os
+
+# MODIFY THIS!
+#
+# If you worry about loosing your local development database secrets,
+# then change this for something less well-known. You can use lots of
+# characters!
+SECRET_KEY = "something-very-random"
+
+ALLOWED_HOSTS = "*"
+
+# MODIFY THIS!
+#
+# Database settings - modify to match your database configuration!
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "bornhack",
+        "USER": "bornhack",
+# Comment back in if you are connecting via TCP
+#        "PASSWORD": "bornhack",
+#        "HOST": "localhost",
+    }
+}
+DEBUG = True
+WKHTMLTOPDF_CMD = "wkhtmltopdf"
+CHANNEL_LAYERS = {}
+
+ASGI_APPLICATION = "bornhack.routing.application"
+
+CAMP_REDIRECT_PERCENT = 40
+MEDIA_ROOT = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "media"
+)
+
+# schedule settings
+SCHEDULE_MIDNIGHT_OFFSET_HOURS = 9
+SCHEDULE_TIMESLOT_LENGTH_MINUTES = 30
+SCHEDULE_EVENT_NOTIFICATION_MINUTES = 10
+
+PDF_LETTERHEAD_FILENAME = "bornhack-2017_test_letterhead.pdf"
+PDF_ARCHIVE_PATH = os.path.join(MEDIA_ROOT, "pdf_archive")
+
+SENDFILE_ROOT = MEDIA_ROOT + "/protected"
+SENDFILE_URL = "/protected"
+SENDFILE_BACKEND = "sendfile.backends.development"
+
+IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS = 10
+IRCBOT_NICK = "humankillerbot"
+IRCBOT_NICKSERV_PASSWORD = ""
+IRCBOT_SERVER_HOSTNAME = ""
+IRCBOT_SERVER_PORT = 6697
+IRCBOT_SERVER_USETLS = True
+IRCBOT_CHANNELS = {
+    "default": "#my-bornhack-channel",
+    "orga": "#my-bornhack-channel",
+    "public": "#my-bornhack-channel",
+}
+IRCBOT_PUBLIC_CHANNEL = "#my-bornhack-channel"
+IRCBOT_VOLUNTEER_CHANNEL = "#my-bornhack-channel"
+
+BANKACCOUNT_IBAN = "LOL"
+BANKACCOUNT_SWIFTBIC = "lol"
+BANKACCOUNT_REG = "lol"
+BANKACCOUNT_ACCOUNT = "lol"
+BANKACCOUNT_BANK = "lol"
+
+TIME_ZONE = "Europe/Copenhagen"
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ARCHIVE_EMAIL = "archive@example.com"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+REIMBURSEMENT_MAIL = "reimbursement@example.com"
