@@ -1,9 +1,5 @@
-import logging
-
-from django.conf import settings
-
 from utils.email import add_outgoing_email
-
+import logging
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
