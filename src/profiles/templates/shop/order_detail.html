@@ -12,6 +12,7 @@
         {% if not order.paid %}
         <form method="POST" class="form-inline">
           {% csrf_token %}
+          {{ order_product_formset.management_form }}
         {% endif %}
         <table class="table table-bordered {% if not order.open == None %}table-hover{% endif %}">
 
@@ -25,28 +26,29 @@
                 Price
               <th>
                 Total
+              <th></th>
 
           <tbody>
-        {% for order_product in order.orderproductrelation_set.all %}
+        {% for form in order_product_formset %}
+            {{ form.id }}
           <tr>
             <td>
-              {{ order_product.product.name }}
-            <td>
-              {% if not order.open == None %}
-              <input type="number"
-                     class="form-control"
-                     style="width: 75px;"
-                     min=1
-                     name="{{ order_product.id }}"
-                     value="{{ order_product.quantity }}" />
-                {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
-              {% else %}
-              {{ order_product.quantity }}
+              {{ form.instance.product.name }}
+              {% if form.instance.product.stock_amount %}
+                <br /><small>{{ form.instance.product.left_in_stock }} left in stock</small>
               {% endif %}
             <td>
-              {{ order_product.product.price|currency }}
+              {% if not order.open == None %}
+              {% bootstrap_field form.quantity show_label=False %}
+              {% else %}
+              {{ form.instance.quantity }}
+              {% endif %}
             <td>
-              {{ order_product.total|currency }}
+              {{ form.instance.product.price|currency }}
+            <td>
+              {{ form.instance.total|currency }}
+            <td>
+              {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
 
         {% endfor %}
 

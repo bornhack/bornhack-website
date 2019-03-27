@@ -1,7 +1,9 @@
+import logging
+from collections import OrderedDict
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse, reverse_lazy
 from django.db.models import Count, F
 from django.http import (
     HttpResponse,
@@ -10,6 +12,10 @@ from django.http import (
     Http404
 )
 from django.shortcuts import get_object_or_404
+from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import (
     View,
     ListView,
@@ -18,9 +24,6 @@ from django.views.generic import (
 )
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
 
 from shop.models import (
     Order,
@@ -31,16 +34,15 @@ from shop.models import (
     EpayPayment,
     CreditNote,
 )
-from .forms import AddToOrderForm
-from .epay import calculate_epay_hash, validate_epay_callback
-from collections import OrderedDict
 from vendor.coinify.coinify_callback import CoinifyCallback
 from .coinify import (
     create_coinify_invoice,
     save_coinify_callback,
     process_coinify_invoice_json
 )
-import logging
+from .epay import calculate_epay_hash, validate_epay_callback
+from .forms import AddToOrderForm, OrderProductRelationFormSet
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -291,10 +293,63 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
     template_name = 'shop/order_detail.html'
     context_object_name = 'order'
 
-    def post(self, request, *args, **kwargs):
-        order = self.get_object()
-        payment_method = request.POST.get('payment_method')
+    def get_context_data(self, **kwargs):
+        if 'order_product_formset' not in kwargs:
+            kwargs['order_product_formset'] = OrderProductRelationFormSet(
+                queryset=OrderProductRelation.objects.filter(order=self.get_object()),
+            )
 
+        return super().get_context_data(**kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        order = self.object
+
+        # First check if the user is removing a product from the order.
+        product_remove = request.POST.get('remove_product')
+        if product_remove:
+            order.orderproductrelation_set.filter(pk=product_remove).delete()
+            if not order.products.count() > 0:
+                order.mark_as_cancelled()
+                messages.info(request, 'Order cancelled!')
+                return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        # Then see if the user is cancelling the order.
+        if 'cancel_order' in request.POST:
+            order.mark_as_cancelled()
+            messages.info(request, 'Order cancelled!')
+            return HttpResponseRedirect(reverse_lazy('shop:index'))
+
+        # The user is not removing products or cancelling the order,
+        # so from now on we do stuff that require us to check stock.
+        # We use a formset for this to be able to display exactly
+        # which product is not in stock if that is the case.
+        formset = OrderProductRelationFormSet(
+            request.POST,
+            queryset=OrderProductRelation.objects.filter(order=order),
+        )
+
+        # If the formset is not valid it means that we cannot fulfill the order, so return and inform the user.
+        if not formset.is_valid():
+            messages.error(
+                request,
+                "Some of the products you are ordering are out of stock. Review the order and try again."
+            )
+            return self.render_to_response(
+                self.get_context_data(order_product_formset=formset)
+            )
+
+        # No stock issues, proceed to check if the user is updating the order.
+        if 'update_order' in request.POST:
+            # We have already made sure the formset is valid, so just save it to update quantities.
+            formset.save()
+
+            order.customer_comment = request.POST.get('customer_comment') or ''
+            order.invoice_address = request.POST.get('invoice_address') or ''
+            order.save()
+
+        # Then at last see if the user is paying for the order.
+        payment_method = request.POST.get('payment_method')
         if payment_method in order.PAYMENT_METHODS:
             if not request.POST.get('accept_terms'):
                 messages.error(request, "You need to accept the general terms and conditions before you can continue!")
@@ -329,44 +384,6 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
             }
 
             return HttpResponseRedirect(reverses[payment_method])
-
-        if 'update_order' in request.POST:
-            for order_product in order.orderproductrelation_set.all():
-                order_product_id = str(order_product.pk)
-                if order_product_id in request.POST:
-                    new_quantity = int(request.POST.get(order_product_id))
-
-                    if order_product.quantity < new_quantity:
-                        # We are incrementing and thus need to check stock
-                        incrementing_by = new_quantity - order_product.quantity
-                        if incrementing_by > order_product.product.left_in_stock:
-                            messages.error(
-                                request,
-                                "Sadly we only have {} '{}' left in stock.".format(
-                                    order_product.product.left_in_stock,
-                                    order_product.product.name,
-                                )
-                            )
-                            return super(OrderDetailView, self).get(request, *args, **kwargs)
-
-                    order_product.quantity = new_quantity
-                    order_product.save()
-            order.customer_comment = request.POST.get('customer_comment') or ''
-            order.invoice_address = request.POST.get('invoice_address') or ''
-            order.save()
-
-        product_remove = request.POST.get('remove_product')
-        if product_remove:
-            order.orderproductrelation_set.filter(pk=product_remove).delete()
-            if not order.products.count() > 0:
-                order.mark_as_cancelled()
-                messages.info(request, 'Order cancelled!')
-                return HttpResponseRedirect(reverse_lazy('shop:index'))
-
-        if 'cancel_order' in request.POST:
-            order.mark_as_cancelled()
-            messages.info(request, 'Order cancelled!')
-            return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 

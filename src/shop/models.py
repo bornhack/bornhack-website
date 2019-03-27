@@ -80,6 +80,8 @@ class Order(CreatedUpdatedModel):
         default=False,
     )
 
+    # We are using a NullBooleanField here to ensure that we only have one open order per user at a time.
+    # This "hack" is possible since postgres treats null values as different, and thus we have database level integrity.
     open = models.NullBooleanField(
         verbose_name=_('Open?'),
         help_text=_('Whether this shop order is open or not. "None" means closed.'),
@@ -416,8 +418,15 @@ class Product(CreatedUpdatedModel, UUIDModel):
     @property
     def left_in_stock(self):
         if self.stock_amount:
+            # All orders that are not open and not cancelled count towards what has
+            # been "reserved" from stock.
+            #
+            # This means that an order has either been paid (by card or blockchain)
+            # or is marked to be paid with cash or bank transfer, meaning it is a
+            # "reservation" of the product in question.
             sold = OrderProductRelation.objects.filter(
                 product=self,
+                order__open=None,
                 order__cancelled=False,
             ).aggregate(Sum('quantity'))['quantity__sum']
 
