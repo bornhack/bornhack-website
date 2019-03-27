@@ -78,3 +78,6 @@ CHANNEL_LAYERS = {
 }
 
 REIMBURSEMENT_MAIL = "reimbursement@example.com"
+
+ORDER_TTL = 30
+ORDER_TTL_UNIT = 'minutes'

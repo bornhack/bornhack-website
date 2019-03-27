@@ -94,3 +94,5 @@ ACCOUNTINGSYSTEM_EMAIL = "{{ django_accountingsystem_email }}"
 ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
 ECONOMYTEAM_NAME = "Economy"
 
+ORDER_TTL = 24
+ORDER_TTL_UNIT = 'hours'
