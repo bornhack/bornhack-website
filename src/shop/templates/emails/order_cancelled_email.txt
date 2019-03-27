@@ -1,9 +1,0 @@
-Hello!
-
-Your order number {{ ordernumber }} has been open for more than {{ order_ttl }} {{ order_ttl_unit }} and has been cancelled.
-
-This means you will have to open a new order.
-
-Best regards,
-
-The BornHack Team

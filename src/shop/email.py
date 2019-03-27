@@ -49,25 +49,6 @@ def add_invoice_email(invoice):
     )
 
 
-def add_order_cancelled_email(order):
-    formatdict = {
-        'ordernumber': order.pk,
-        'order_ttl': settings.ORDER_TTL,
-        'order_ttl_unit': settings.ORDER_TTL_UNIT
-    }
-
-    subject = 'Your non-paid BornHack order has been cancelled.'
-
-    # add email to outgoing email queue
-    return add_outgoing_email(
-        text_template='emails/order_cancelled_email.txt',
-        html_template='emails/order_cancelled_email.html',
-        to_recipients=order.user.email,
-        formatdict=formatdict,
-        subject=subject,
-    )
-
-
 def add_test_email(recipient):
     return add_outgoing_email(
         text_template='emails/testmail.txt',
