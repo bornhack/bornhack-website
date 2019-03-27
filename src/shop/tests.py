@@ -23,14 +23,17 @@ class ProductAvailabilityTest(TestCase):
         product = ProductFactory(stock_amount=2)
 
         opr1 = OrderProductRelationFactory(product=product)
+        opr1.order.mark_as_paid()
         opr2 = OrderProductRelationFactory(product=product)
+        opr2.order.mark_as_paid()
 
         self.assertEqual(product.left_in_stock, 0)
         self.assertFalse(product.is_stock_available)
         self.assertFalse(product.is_available())
 
         # Cancel one order
-        opr1.order.mark_as_cancelled()
+        opr1.order.cancelled = True
+        opr1.order.save()
 
         self.assertEqual(product.left_in_stock, 1)
         self.assertTrue(product.is_stock_available)
