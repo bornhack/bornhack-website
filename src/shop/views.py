@@ -41,7 +41,7 @@ from .coinify import (
     process_coinify_invoice_json
 )
 from .epay import calculate_epay_hash, validate_epay_callback
-from .forms import AddToOrderForm, OrderProductRelationFormSet
+from .forms import OrderProductRelationFormSet, OrderProductRelationForm
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -219,11 +219,39 @@ class ShopIndexView(ListView):
 class ProductDetailView(FormView, DetailView):
     model = Product
     template_name = 'product_detail.html'
-    form_class = AddToOrderForm
+    form_class = OrderProductRelationForm
     context_object_name = 'product'
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['instance'] = self.opr
+        return kwargs
+
+    def get_initial(self):
+        return {'quantity': self.opr.quantity}
+
+    def get_context_data(self, **kwargs):
+        if hasattr(self.opr, 'order'):
+            kwargs['already_in_order'] = True
+
+        return super().get_context_data(**kwargs)
+
     def dispatch(self, request, *args, **kwargs):
-        if not self.get_object().category.public:
+        self.object = self.get_object()
+
+        try:
+            self.opr = OrderProductRelation.objects.get(
+                order__user=self.request.user,
+                order__open__isnull=False,
+                product=self.object
+            )
+        except OrderProductRelation.DoesNotExist:
+            self.opr = OrderProductRelation(
+                product=self.get_object(),
+                quantity=1,
+            )
+
+        if not self.object.category.public:
             # this product is not publicly available
             raise Http404("Product not found")
 
@@ -235,31 +263,13 @@ class ProductDetailView(FormView, DetailView):
         product = self.get_object()
         quantity = form.cleaned_data.get('quantity')
 
-        # do we have an open order?
-        try:
-            order = Order.objects.get(
-                user=self.request.user,
-                open__isnull=False
-            )
-        except Order.DoesNotExist:
-            # no open order - open a new one
-            order = Order.objects.create(
+        if not hasattr(self.opr, 'order'):
+            self.opr.order = Order.objects.create(
                 user=self.request.user,
             )
 
-        # get product from kwargs
-        if product in order.products.all():
-            # this product is already added to this order,
-            # increase count by quantity
-            OrderProductRelation.objects.filter(
-                product=product,
-                order=order
-            ).update(quantity=F('quantity') + quantity)
-        else:
-            order.orderproductrelation_set.create(
-                product=product,
-                quantity=quantity,
-            )
+        self.opr.quantity = quantity
+        self.opr.save()
 
         messages.info(
             self.request,

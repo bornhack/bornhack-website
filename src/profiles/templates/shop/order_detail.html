@@ -48,7 +48,7 @@
             <td>
               {{ form.instance.total|currency }}
             <td>
-              {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=order_product.pk %}
+              {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
 
         {% endfor %}
 

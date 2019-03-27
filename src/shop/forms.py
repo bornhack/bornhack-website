@@ -4,11 +4,8 @@ from django.forms import modelformset_factory
 from shop.models import OrderProductRelation
 
 
-class AddToOrderForm(forms.Form):
-    quantity = forms.IntegerField(initial=1)
-
-
 class OrderProductRelationForm(forms.ModelForm):
+
     class Meta:
         model = OrderProductRelation
         fields = ['quantity']

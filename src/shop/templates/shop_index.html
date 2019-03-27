@@ -59,15 +59,13 @@ Shop | {{ block.super }}
 
             {% if product.stock_amount %}
 
-            {% if product.left_in_stock <= 10 %}
-            <div class="label label-info">
-              Only {{ product.left_in_stock }} left!
-            </div>
-            {% endif %}
-
             {% if product.left_in_stock == 0 %}
             <div class="label label-danger">
               Sold out!
+            </div>
+            {% elif product.left_in_stock <= 10 %}
+            <div class="label label-info">
+              Only {{ product.left_in_stock }} left!
             </div>
             {% endif %}
 
