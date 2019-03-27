@@ -22,15 +22,20 @@ class ProductAvailabilityTest(TestCase):
         """ If max orders have been made, the product is NOT available. """
         product = ProductFactory(stock_amount=2)
 
-        for i in range(2):
-            opr = OrderProductRelationFactory(product=product)
-            order = opr.order
-            order.paid = True
-            order.save()
+        opr1 = OrderProductRelationFactory(product=product)
+        opr2 = OrderProductRelationFactory(product=product)
 
         self.assertEqual(product.left_in_stock, 0)
         self.assertFalse(product.is_stock_available)
         self.assertFalse(product.is_available())
+
+        # Cancel one order
+        opr1.order.mark_as_cancelled()
+
+        self.assertEqual(product.left_in_stock, 1)
+        self.assertTrue(product.is_stock_available)
+        self.assertTrue(product.is_available())
+
 
     def test_product_available_by_time(self):
         """ The product is available if now is in the right timeframe. """

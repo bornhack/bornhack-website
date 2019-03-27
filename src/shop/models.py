@@ -418,7 +418,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
         if self.stock_amount:
             sold = OrderProductRelation.objects.filter(
                 product=self,
-                order__paid=True,
+                order__cancelled=False,
             ).aggregate(Sum('quantity'))['quantity__sum']
 
             total_left = self.stock_amount - (sold or 0)
