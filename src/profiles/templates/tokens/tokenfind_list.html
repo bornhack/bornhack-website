@@ -1,6 +1,7 @@
 {% extends 'profile_base.html' %}
 {% load static from staticfiles %}
 {% load commonmark %}$
+{% load token_tags %}
 
 {% block title %}
 Your Secret Tokens | {{ block.super }}
@@ -12,44 +13,42 @@ Your Secret Tokens | {{ block.super }}
     <h4>Your Secret Tokens</h4>
   </div>
   <div class="panel-body">
+
     <p class="lead">You have found the following secret tokens in the BornHack Secret Token Game:</p>
 
     <table class="table">
-      <thead>
+      <tbody>
+        {% for token in object_list %}
+        {% ifchanged token.camp %}
         <tr>
-          <th>Camp</th>
+          <td colspan="4"><h4>{{ token.camp.title }}</h4></td>
+        </tr>
+        <tr>
           <th>Category</th>
           <th>Token</th>
           <th>Description</th>
           <th>Found</th>
         </tr>
-      </thead>
-      <tbody>
-        {% for tokenfind in object_list %}
+        {% endifchanged %}
         <tr>
-          <td>{{ tokenfind.token.camp.title }}</td>
-          <td>{{ tokenfind.token.category }}</td>
-          <td>{{ tokenfind.token.token }}</td>
-          <td>{{ tokenfind.token.description }}</td>
-          <td>{{ tokenfind.created }}</td>
-        </tr>
-        {% endfor %}
-        {% for unfound in unfound_list %}
-        <tr>
-          <td>{{ unfound.camp.title }}</td>
-          <td>{{ unfound.category }}</td>
+          <td>{{ token.category }}</td>
+
+          {% with token|found_by_user:user as user_has_found_token %}
+          {% if user_has_found_token %}
+          <td>{{ token.token }}</td>
+          <td>{{ token.description }}</td>
+          <td>{{ user_has_found_token }}</td>
+          {% else %}
           <td>-</td>
           <td>-</td>
           <td>-</td>
+          {% endif %}
+          {% endwith %}
+
         </tr>
         {% endfor %}
       </tbody>
     </table>
-
-    {% if not unfound_list %}
-    <p class="lead">Congratulations! You've found all tokens we have created right now.</p>
-    {% endif %}
-
   </div>
 {% endblock %}
 

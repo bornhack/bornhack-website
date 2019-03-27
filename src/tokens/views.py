@@ -20,18 +20,13 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
 
 
 class TokenFindListView(LoginRequiredMixin, ListView):
-    """
-    This class is meant to be extended in other apps like `profiles`.
-    """
-    model = TokenFind
+    model = Token
     template_name = "tokens/tokenfind_list.html"
-
-    def get_queryset(self):
-        return TokenFind.objects.filter(user=self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # find the tokens the user still needs to find
-        context['unfound_list'] = Token.objects.all().exclude(id__in=TokenFind.objects.filter(user=self.request.user).values_list('token__id', flat=True))
+        tokenfinds = TokenFind.objects.filter(user=self.request.user).values_list('token__id', flat=True)
+        context['unfound_list'] = Token.objects.all().exclude(id__in=tokenfinds)
         return context
 

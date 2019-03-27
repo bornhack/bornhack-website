@@ -26,6 +26,9 @@ class Token(CampRelatedModel):
     def __str__(self):
         return '%s (%s)' % (self.description, self.camp)
 
+    class Meta:
+        ordering = ["camp"]
+
 
 class TokenFind(CampRelatedModel):
     class Meta:
