@@ -335,6 +335,20 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
                 order_product_id = str(order_product.pk)
                 if order_product_id in request.POST:
                     new_quantity = int(request.POST.get(order_product_id))
+
+                    if order_product.quantity < new_quantity:
+                        # We are incrementing and thus need to check stock
+                        incrementing_by = new_quantity - order_product.quantity
+                        if incrementing_by > order_product.product.left_in_stock:
+                            messages.error(
+                                request,
+                                "Sadly we only have {} '{}' left in stock.".format(
+                                    order_product.product.left_in_stock,
+                                    order_product.product.name,
+                                )
+                            )
+                            return super(OrderDetailView, self).get(request, *args, **kwargs)
+
                     order_product.quantity = new_quantity
                     order_product.save()
             order.customer_comment = request.POST.get('customer_comment') or ''
