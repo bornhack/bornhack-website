@@ -27,6 +27,7 @@ class Chain(CreatedUpdatedModel, UUIDModel):
 
     slug = models.SlugField(
         unique=True,
+        blank=True,
         help_text='The url slug for this Chain. Leave blank to auto generate a slug.'
     )
 
@@ -69,6 +70,7 @@ class Credebtor(CreatedUpdatedModel, UUIDModel):
     )
 
     slug = models.SlugField(
+        blank=True,
         help_text='The url slug for this Credebtor. Leave blank to auto generate a slug.'
     )
 
