@@ -5,21 +5,117 @@ from django.conf import settings
 from django.db import models
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 
-from utils.models import CampRelatedModel, UUIDModel
+from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 from .email import *
+
+
+class Chain(CreatedUpdatedModel, UUIDModel):
+    """
+    A chain of Credebtors. Used to group when several Creditors/Debtors
+    belong to the same Chain/company, like XL Byg stores or Netto stores.
+    """
+    class Meta:
+        ordering = ['name']
+
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text='A short name for this Chain, like "Netto" or "XL Byg". 100 characters or fewer.'
+    )
+
+    slug = models.SlugField(
+        unique=True,
+        help_text='The url slug for this Chain. Leave blank to auto generate a slug.'
+    )
+
+    notes = models.TextField(
+        help_text='Any notes for this Chain. Will be shown to anyone creating Expenses or Revenues for this Chain.',
+        blank=True,
+    )
+
+    def __str__(self):
+        return self.name
+
+    def save(self, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Chain, self).save(**kwargs)
+
+
+class Credebtor(CreatedUpdatedModel, UUIDModel):
+    """
+    The Credebtor model represents the specific "instance" of a Chain,
+    like "XL Byg Rønne" or "Netto Gelsted".
+    The model is used for both creditors and debtors, since there is a
+    lot of overlap between them.
+    """
+    class Meta:
+        ordering = ['name']
+        unique_together=('chain', 'slug')
+
+    chain = models.ForeignKey(
+        'economy.Chain',
+        on_delete=models.PROTECT,
+        related_name='credebtors',
+        help_text='The Chain to which this Credebtor belongs.',
+    )
+
+    name = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text='The name of this Credebtor, like "XL Byg Rønne" or "Netto Gelsted". 100 characters or fewer.'
+    )
+
+    slug = models.SlugField(
+        help_text='The url slug for this Credebtor. Leave blank to auto generate a slug.'
+    )
+
+    address = models.TextField(
+        help_text='The address of this Credebtor.',
+    )
+
+    notes = models.TextField(
+        blank=True,
+        help_text='Any notes for this Credebtor. Shown when creating an Expense or Revenue for this Credebtor.',
+    )
+
+    def __str__(self):
+        return self.name
+
+    def save(self, **kwargs):
+        """
+        Generate slug as needed
+        """
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Credebtor, self).save(**kwargs)
+
 
 class Revenue(CampRelatedModel, UUIDModel):
     """
     The Revenue model represents any type of income for BornHack.
-    Most Revenue objects will have a FK to the Invoice model, but only if the revenue relates directly to an Invoice in our system.
-    Other Revenue objects (such as money returned from bottle deposits) will not have a related BornHack Invoice object.
+
+    Most Revenue objects will have a FK to the Invoice model, 
+    but only if the revenue relates directly to an Invoice in our system.
+
+    Other Revenue objects (such as money returned from bottle deposits) will
+    not have a related BornHack Invoice object.
     """
     camp = models.ForeignKey(
         'camps.Camp',
         on_delete=models.PROTECT,
         related_name='revenues',
         help_text='The camp to which this revenue belongs',
+    )
+
+    debtor = models.ForeignKey(
+        'economy.Credebtor',
+        on_delete=models.PROTECT,
+        related_name='revenues',
+        null=True,
+        help_text='The Debtor to which this revenue belongs',
     )
 
     user = models.ForeignKey(
@@ -47,8 +143,6 @@ class Revenue(CampRelatedModel, UUIDModel):
 
     invoice_date = models.DateField(
         help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.',
-        blank=True,
-        null=True,
     )
 
     invoice_fk = models.ForeignKey(
@@ -140,6 +234,14 @@ class Expense(CampRelatedModel, UUIDModel):
         help_text='The camp to which this expense belongs',
     )
 
+    creditor = models.ForeignKey(
+        'economy.Credebtor',
+        on_delete=models.PROTECT,
+        related_name='expenses',
+        null=True,
+        help_text='The Creditor to which this expense belongs',
+    )
+
     user = models.ForeignKey(
         'auth.User',
         on_delete=models.PROTECT,
@@ -170,8 +272,6 @@ class Expense(CampRelatedModel, UUIDModel):
 
     invoice_date = models.DateField(
         help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.',
-        blank=True,
-        null=True,
     )
 
     responsible_team = models.ForeignKey(

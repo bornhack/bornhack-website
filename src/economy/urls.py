@@ -10,6 +10,52 @@ urlpatterns = [
         name='dashboard'
     ),
 
+    # chains
+    path('chains/',
+        include([
+            path(
+                '',
+                ChainListView.as_view(),
+                name='chain_list',
+            ),
+            path(
+                'add/',
+                ChainCreateView.as_view(),
+                name='chain_create',
+            ),
+            path(
+                '<slug:chain_slug>/',
+                include([
+                    path(
+                        '',
+                        CredebtorListView.as_view(),
+                        name='credebtor_list',
+                    ),
+                    path(
+                        'add/',
+                        CredebtorCreateView.as_view(),
+                        name='credebtor_create',
+                    ),
+                    path(
+                        '<slug:credebtor_slug>/',
+                        include([
+                            path(
+                                'add_expense/',
+                                ExpenseCreateView.as_view(),
+                                name='expense_create',
+                            ),
+                            path(
+                                'add_revenue/',
+                                RevenueCreateView.as_view(),
+                                name='revenue_create',
+                            ),
+                        ]),
+                    ),
+                ]),
+            ),
+        ]),
+    ),
+
     # expenses
     path(
         'expenses/',
@@ -17,12 +63,7 @@ urlpatterns = [
             path(
                 '',
                 ExpenseListView.as_view(),
-                name='expense_list'
-            ),
-            path(
-                'add/',
-                ExpenseCreateView.as_view(),
-                name='expense_create'
+                name='expense_list',
             ),
             path(
                 '<uuid:pk>/',
@@ -77,11 +118,6 @@ urlpatterns = [
                 '',
                 RevenueListView.as_view(),
                 name='revenue_list'
-            ),
-            path(
-                'add/',
-                RevenueCreateView.as_view(),
-                name='revenue_create'
             ),
             path(
                 '<uuid:pk>/',

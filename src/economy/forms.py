@@ -36,7 +36,7 @@ class CleanInvoiceForm(forms.ModelForm):
 class ExpenseCreateForm(CleanInvoiceForm):
     class Meta:
         model = Expense
-        fields = ['description', 'amount', 'invoice', 'invoice_date', 'paid_by_bornhack', 'responsible_team']
+        fields = ['description', 'amount', 'invoice_date', 'invoice', 'paid_by_bornhack', 'responsible_team']
 
 
 class ExpenseUpdateForm(forms.ModelForm):
@@ -48,7 +48,7 @@ class ExpenseUpdateForm(forms.ModelForm):
 class RevenueCreateForm(CleanInvoiceForm):
     class Meta:
         model = Revenue
-        fields = ['description', 'amount', 'invoice', 'invoice_date', 'responsible_team']
+        fields = ['description', 'amount', 'invoice_date', 'invoice', 'responsible_team']
 
 
 class RevenueUpdateForm(forms.ModelForm):

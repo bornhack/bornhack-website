@@ -54,7 +54,83 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         return context
 
 
+########### Chain/Creditor related views ###############
+
+
+class ChainCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
+    model = Chain
+    template_name = 'chain_create.html'
+    permission_required = ("camps.expense_create_permission")
+    fields = ['name', 'notes']
+
+    def form_valid(self, form):
+        chain = form.save()
+
+        # a message for the user
+        messages.success(
+            self.request,
+            "The new Chain %s has been saved. You can now add Creditor(s)/Debtor(s) for it." % chain.name,
+        )
+
+        return HttpResponseRedirect(reverse('economy:credebtor_create', kwargs={
+            'camp_slug': self.camp.slug,
+            'chain_slug': chain.slug,
+        }))
+
+
+class ChainListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
+    model = Chain
+    template_name = 'chain_list.html'
+    permission_required = ("camps.expense_create_permission")
+
+
+class CredebtorCreateView(CampViewMixin, ChainViewMixin, RaisePermissionRequiredMixin, CreateView):
+    model = Credebtor
+    template_name = 'credebtor_create.html'
+    permission_required = ("camps.expense_create_permission")
+    fields = ['name', 'address', 'notes']
+
+    def get_context_data(self, **kwargs):
+        """
+        Add chain to context
+        """
+        context = super().get_context_data(**kwargs)
+        context['chain'] = self.chain
+        return context
+
+    def form_valid(self, form):
+        credebtor = form.save(commit=False)
+        credebtor.chain = self.chain
+        credebtor.save()
+
+        # a message for the user
+        messages.success(
+            self.request,
+            "The Creditor/Debtor %s has been saved. You can now add Expenses/Revenues for it." % credebtor.name,
+        )
+
+        return HttpResponseRedirect(reverse('economy:credebtor_list', kwargs={
+            'camp_slug': self.camp.slug,
+            'chain_slug': self.chain.slug,
+        }))
+
+
+class CredebtorListView(CampViewMixin, ChainViewMixin, RaisePermissionRequiredMixin, ListView):
+    model = Credebtor
+    template_name = 'credebtor_list.html'
+    permission_required = ("camps.expense_create_permission")
+
+    def get_context_data(self, **kwargs):
+        """
+        Add chain to context
+        """
+        context = super().get_context_data(**kwargs)
+        context['chain'] = self.chain
+        return context
+
+
 ########### Expense related views ###############
+
 
 class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
     model = Expense
@@ -70,7 +146,7 @@ class ExpenseDetailView(CampViewMixin, ExpensePermissionMixin, DetailView):
     template_name = 'expense_detail.html'
 
 
-class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
+class ExpenseCreateView(CampViewMixin, CredebtorViewMixin, RaisePermissionRequiredMixin, CreateView):
     model = Expense
     template_name = 'expense_form.html'
     permission_required = ("camps.expense_create_permission")
@@ -82,12 +158,14 @@ class ExpenseCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView)
         """
         context = super().get_context_data(**kwargs)
         context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        context['creditor'] = self.credebtor
         return context
 
     def form_valid(self, form):
         expense = form.save(commit=False)
         expense.user = self.request.user
         expense.camp = self.camp
+        expense.creditor = self.credebtor
         expense.save()
 
         # a message for the user
@@ -126,6 +204,7 @@ class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
         """
         context = super().get_context_data(**kwargs)
         context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        context['creditor'] = self.get_object().creditor
         return context
 
     def get_success_url(self):
@@ -210,7 +289,7 @@ class RevenueDetailView(CampViewMixin, RevenuePermissionMixin, DetailView):
     template_name = 'revenue_detail.html'
 
 
-class RevenueCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
+class RevenueCreateView(CampViewMixin, CredebtorViewMixin, RaisePermissionRequiredMixin, CreateView):
     model = Revenue
     template_name = 'revenue_form.html'
     permission_required = ("camps.revenue_create_permission")
@@ -222,12 +301,14 @@ class RevenueCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView)
         """
         context = super().get_context_data(**kwargs)
         context['form'].fields['responsible_team'].queryset = Team.objects.filter(camp=self.camp)
+        context['debtor'] = self.credebtor
         return context
 
     def form_valid(self, form):
         revenue = form.save(commit=False)
         revenue.user = self.request.user
         revenue.camp = self.camp
+        revenue.debtor = self.credebtor
         revenue.save()
 
         # a message for the user

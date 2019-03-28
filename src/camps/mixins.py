@@ -6,8 +6,7 @@ from django.utils.functional import cached_property
 class CampViewMixin(object):
     """
     This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
-    It also filters out objects that belong to other camps when the queryset has
-    a direct relation to the Camp model.
+    It also filters out objects that belong to other camps when the queryset has a camp_filter
     """
 
     def dispatch(self, request, *args, **kwargs):
@@ -19,6 +18,10 @@ class CampViewMixin(object):
 
         # if this queryset is empty return it right away, because nothing for us to do
         if not queryset:
+            return queryset
+
+        # do we have a camp_filter on this model
+        if not hasattr(self.model, 'camp_filter'):
             return queryset
 
         # get the camp_filter from the model

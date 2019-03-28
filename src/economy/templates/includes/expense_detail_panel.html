@@ -11,6 +11,14 @@
           <td>{{ expense.amount }} DKK</td>
         </tr>
         <tr>
+          <th>Chain</th>
+          <td>{{ expense.creditor.chain.name }}</td>
+        </tr>
+        <tr>
+          <th>Creditor</th>
+          <td>{{ expense.creditor.name }}</td>
+        </tr>
+        <tr>
           <th>Invoice Date</th>
           <td>{{ expense.invoice_date }}</td>
         </tr>

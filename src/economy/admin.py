@@ -1,5 +1,22 @@
 from django.contrib import admin
-from .models import Expense, Reimbursement, Revenue
+
+from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
+
+
+### chains and credebtors
+
+@admin.register(Chain)
+class ChainAdmin(admin.ModelAdmin):
+    list_filter = ['name']
+    list_display = ['name', 'notes']
+    search_fields = ['name', 'notes']
+
+
+@admin.register(Credebtor)
+class ChainAdmin(admin.ModelAdmin):
+    list_filter = ['chain', 'name']
+    list_display = ['chain', 'name', 'notes']
+    search_fields = ['chain', 'name', 'notes']
 
 
 ### expenses
@@ -18,8 +35,8 @@ reject_expenses.short_description = "Reject Expenses"
 
 @admin.register(Expense)
 class ExpenseAdmin(admin.ModelAdmin):
-    list_filter = ['camp', 'responsible_team', 'approved', 'user']
-    list_display = ['user', 'description', 'invoice_date', 'amount', 'camp', 'responsible_team', 'approved', 'reimbursement']
+    list_filter = ['camp', 'creditor__chain', 'creditor', 'responsible_team', 'approved', 'user']
+    list_display = ['user', 'description', 'invoice_date', 'amount', 'camp', 'creditor', 'responsible_team', 'approved', 'reimbursement']
     search_fields = ['description', 'amount', 'uuid']
     actions = [approve_expenses, reject_expenses]
 

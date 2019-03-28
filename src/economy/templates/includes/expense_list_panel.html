@@ -2,12 +2,13 @@
 <table class="table table-hover">
   <thead>
   <tr>
+    <th>Invoice Date</th>
     <th>Created By</th>
     {% if not reimbursement %}
     <th>Paid by</th>
     {% endif %}
+    <th>Creditor</th>
     <th>Amount</th>
-    <th>Invoice Date</th>
     <th>Description</th>
     <th>Responsible Team</th>
     {% if not reimbursement %}
@@ -20,12 +21,13 @@
   <tbody>
     {% for expense in expense_list %}
     <tr>
+      <td>{{ expense.invoice_date }}</td>
       <td>{{ expense.user }}</td>
       {% if not reimbursement %}
       <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
       {% endif %}
+      <td>{{ expense.creditor.name }}</td>
       <td>{{ expense.amount }} DKK</td>
-      <td>{{ expense.invoice_date }}</td>
       <td>{{ expense.description }}</td>
       <td>{{ expense.responsible_team.name }} Team</td>
 

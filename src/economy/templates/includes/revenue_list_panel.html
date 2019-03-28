@@ -3,6 +3,7 @@
   <thead>
   <tr>
     <th>Created By</th>
+    <th>Debtor</th>
     <th>Amount</th>
     <th>Invoice Date</th>
     <th>Description</th>
@@ -15,6 +16,7 @@
     {% for revenue in revenue_list %}
     <tr>
       <td>{{ revenue.user }}</td>
+      <td>{{ revenue.debtor }}</td>
       <td>{{ revenue.amount }} DKK</td>
       <td>{{ revenue.invoice_date }}</td>
       <td>{{ revenue.description }}</td>

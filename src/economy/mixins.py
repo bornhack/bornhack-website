@@ -1,4 +1,33 @@
 from django.http import HttpResponseRedirect, Http404
+from django.shortcuts import redirect, get_object_or_404
+
+from .models import Chain, Credebtor
+
+
+class ChainViewMixin(object):
+    """
+    The ChainViewMixin sets self.chain based on chain_slug from the URL
+    """
+    def setup(self, *args, **kwargs):
+        if hasattr(super(), 'setup'):
+            super().setup(*args, **kwargs)
+        self.chain = get_object_or_404(
+            Chain,
+            slug=self.kwargs["chain_slug"],
+        )
+
+
+class CredebtorViewMixin(object):
+    """
+    The CredebtorViewMixin sets self.credebtor based on credebtor_slug from the URL
+    """
+    def setup(self, *args, **kwargs):
+        if hasattr(super(), 'setup'):
+            super().setup(*args, **kwargs)
+        self.credebtor = get_object_or_404(
+            Credebtor,
+            slug=self.kwargs["credebtor_slug"],
+        )
 
 
 class ExpensePermissionMixin(object):
