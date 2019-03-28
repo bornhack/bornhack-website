@@ -7,6 +7,9 @@ python:
 services:
   - postgresql
 
+addons:
+  postgresql: "9.6"
+
 install:
   - pip install -r src/requirements/dev.txt
 
