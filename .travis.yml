@@ -18,7 +18,7 @@ before_script:
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
-  - cd src; coverage run manage.py test
+  - coverage run manage.py test src/
 
 after_success:
   - coveralls
