@@ -5,7 +5,7 @@ from psycopg2.extras import DateTimeTZRange
 
 from shop.forms import OrderProductRelationForm
 from utils.factories import UserFactory
-from .factories import ProductFactory, OrderProductRelationFactory
+from .factories import ProductFactory, OrderProductRelationFactory, OrderFactory
 
 
 class ProductAvailabilityTest(TestCase):
@@ -111,7 +111,12 @@ class TestProductDetailView(TestCase):
         self.product = ProductFactory()
         self.path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
 
-    def test_product_is_available(self):
+    def test_product_is_available_for_anonymous_user(self):
+        response = self.client.get(self.path)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_product_is_available_for_logged_in_user(self):
         self.client.force_login(self.user)
         response = self.client.get(self.path)
 
@@ -180,3 +185,100 @@ class TestProductDetailView(TestCase):
         self.product.category.save()
         response = self.client.get(self.path)
         self.assertEquals(response.status_code, 404)
+
+
+class TestOrderDetailView(TestCase):
+
+    def setUp(self):
+        self.user = UserFactory()
+        self.order = OrderFactory(user=self.user)
+        self.path = reverse('shop:order_detail', kwargs={'pk': self.order.pk})
+
+        # We are using a formset which means we have to include some "management form" data.
+        self.base_form_data = {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '1',
+            'form-MAX_NUM_FORMS': '',
+        }
+
+    def test_redirects_when_no_products(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.path)
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse('shop:index'))
+
+    def test_redirects_when_cancelled(self):
+        self.client.force_login(self.user)
+
+        OrderProductRelationFactory(order=self.order)
+
+        self.order.cancelled = True
+        self.order.save()
+
+        response = self.client.get(self.path)
+
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse('shop:index'))
+
+    def test_remove_product(self):
+        self.client.force_login(self.user)
+
+        OrderProductRelationFactory(order=self.order)
+        orp = OrderProductRelationFactory(order=self.order)
+
+        order = orp.order
+
+        data = self.base_form_data
+        data['remove_product'] = orp.pk
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 200)
+
+        order.refresh_from_db()
+
+        self.assertEquals(order.products.count(), 1)
+
+    def test_remove_last_product_cancels_order(self):
+        self.client.force_login(self.user)
+
+        orp = OrderProductRelationFactory(order=self.order)
+
+        order = orp.order
+
+        data = self.base_form_data
+        data['remove_product'] = orp.pk
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse('shop:index'))
+
+        order.refresh_from_db()
+
+        self.assertTrue(order.cancelled)
+
+    def test_cancel_order(self):
+        self.client.force_login(self.user)
+
+        orp = OrderProductRelationFactory(order=self.order)
+        order = orp.order
+
+        data = self.base_form_data
+        data['cancel_order'] = None
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(response, reverse('shop:index'))
+
+        order.refresh_from_db()
+
+        self.assertTrue(order.cancelled)
+
+
+class TestOrderListView(TestCase):
+
+    def test_order_list_view_as_logged_in(self):
+        user = UserFactory()
+        self.client.force_login(user)
+        path = reverse('shop:order_list')
+        response = self.client.get(path)
+        self.assertEquals(response.status_code, 200)

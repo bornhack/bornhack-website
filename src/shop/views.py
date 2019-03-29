@@ -224,16 +224,18 @@ class ProductDetailView(FormView, DetailView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['instance'] = self.opr
+        if hasattr(self, 'opr'):
+            kwargs['instance'] = self.opr
         return kwargs
 
     def get_initial(self):
-        if self.opr:
+        if hasattr(self, 'opr'):
             return {'quantity': self.opr.quantity}
-        return super().get_initial()
+        return None
 
     def get_context_data(self, **kwargs):
-        if hasattr(self.opr, 'order'):
+        # If the OrderProductRelation already exists it has a primary key in the database
+        if self.request.user.is_authenticated and self.opr.pk:
             kwargs['already_in_order'] = True
 
         return super().get_context_data(**kwargs)
@@ -241,7 +243,10 @@ class ProductDetailView(FormView, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        self.opr = None
+        if not self.object.category.public:
+            # this product is not publicly available
+            raise Http404("Product not found")
+
         if self.request.user.is_authenticated:
             try:
                 self.opr = OrderProductRelation.objects.get(
@@ -255,31 +260,23 @@ class ProductDetailView(FormView, DetailView):
                     quantity=1,
                 )
 
-        if not self.object.category.public:
-            # this product is not publicly available
-            raise Http404("Product not found")
-
         return super(ProductDetailView, self).dispatch(
             request, *args, **kwargs
         )
 
     def form_valid(self, form):
-        product = self.get_object()
-        quantity = form.cleaned_data.get('quantity')
+        opr = form.save(commit=False)
 
-        if not hasattr(self.opr, 'order'):
-            self.opr.order = Order.objects.create(
-                user=self.request.user,
-            )
+        if not opr.pk:
+            opr.order, _ = Order.objects.get_or_create(user=self.request.user, open=True, cancelled=False)
 
-        self.opr.quantity = quantity
-        self.opr.save()
+        opr.save()
 
         messages.info(
             self.request,
             '{}x {} has been added to your order.'.format(
-                quantity,
-                product.name
+                opr.quantity,
+                opr.product.name
             )
         )
 
@@ -329,7 +326,7 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
                 return HttpResponseRedirect(reverse_lazy('shop:index'))
 
         # Then see if the user is cancelling the order.
-        if 'cancel_order' in request.POST:
+        elif 'cancel_order' in request.POST:
             order.mark_as_cancelled()
             messages.info(request, 'Order cancelled!')
             return HttpResponseRedirect(reverse_lazy('shop:index'))
@@ -338,66 +335,67 @@ class OrderDetailView(LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureOrderH
         # so from now on we do stuff that require us to check stock.
         # We use a formset for this to be able to display exactly
         # which product is not in stock if that is the case.
-        formset = OrderProductRelationFormSet(
-            request.POST,
-            queryset=OrderProductRelation.objects.filter(order=order),
-        )
-
-        # If the formset is not valid it means that we cannot fulfill the order, so return and inform the user.
-        if not formset.is_valid():
-            messages.error(
-                request,
-                "Some of the products you are ordering are out of stock. Review the order and try again."
-            )
-            return self.render_to_response(
-                self.get_context_data(order_product_formset=formset)
+        else:
+            formset = OrderProductRelationFormSet(
+                request.POST,
+                queryset=OrderProductRelation.objects.filter(order=order),
             )
 
-        # No stock issues, proceed to check if the user is updating the order.
-        if 'update_order' in request.POST:
-            # We have already made sure the formset is valid, so just save it to update quantities.
-            formset.save()
-
-            order.customer_comment = request.POST.get('customer_comment') or ''
-            order.invoice_address = request.POST.get('invoice_address') or ''
-            order.save()
-
-        # Then at last see if the user is paying for the order.
-        payment_method = request.POST.get('payment_method')
-        if payment_method in order.PAYMENT_METHODS:
-            if not request.POST.get('accept_terms'):
-                messages.error(request, "You need to accept the general terms and conditions before you can continue!")
-                return HttpResponseRedirect(
-                    reverse_lazy('shop:order_detail', kwargs={'pk': order.pk})
+            # If the formset is not valid it means that we cannot fulfill the order, so return and inform the user.
+            if not formset.is_valid():
+                messages.error(
+                    request,
+                    "Some of the products you are ordering are out of stock. Review the order and try again."
+                )
+                return self.render_to_response(
+                    self.get_context_data(order_product_formset=formset)
                 )
 
-            # Set payment method and mark the order as closed
-            order.payment_method = payment_method
-            order.open = None
-            order.customer_comment = request.POST.get('customer_comment') or ''
-            order.invoice_address = request.POST.get('invoice_address') or ''
-            order.save()
+            # No stock issues, proceed to check if the user is updating the order.
+            if 'update_order' in request.POST:
+                # We have already made sure the formset is valid, so just save it to update quantities.
+                formset.save()
 
-            reverses = {
-                Order.CREDIT_CARD: reverse_lazy(
-                    'shop:epay_form',
-                    kwargs={'pk': order.id}
-                ),
-                Order.BLOCKCHAIN: reverse_lazy(
-                    'shop:coinify_pay',
-                    kwargs={'pk': order.id}
-                ),
-                Order.BANK_TRANSFER: reverse_lazy(
-                    'shop:bank_transfer',
-                    kwargs={'pk': order.id}
-                ),
-                Order.CASH: reverse_lazy(
-                    'shop:cash',
-                    kwargs={'pk': order.id}
-                )
-            }
+                order.customer_comment = request.POST.get('customer_comment') or ''
+                order.invoice_address = request.POST.get('invoice_address') or ''
+                order.save()
 
-            return HttpResponseRedirect(reverses[payment_method])
+            # Then at last see if the user is paying for the order.
+            payment_method = request.POST.get('payment_method')
+            if payment_method in order.PAYMENT_METHODS:
+                if not request.POST.get('accept_terms'):
+                    messages.error(request, "You need to accept the general terms and conditions before you can continue!")
+                    return HttpResponseRedirect(
+                        reverse_lazy('shop:order_detail', kwargs={'pk': order.pk})
+                    )
+
+                # Set payment method and mark the order as closed
+                order.payment_method = payment_method
+                order.open = None
+                order.customer_comment = request.POST.get('customer_comment') or ''
+                order.invoice_address = request.POST.get('invoice_address') or ''
+                order.save()
+
+                reverses = {
+                    Order.CREDIT_CARD: reverse_lazy(
+                        'shop:epay_form',
+                        kwargs={'pk': order.id}
+                    ),
+                    Order.BLOCKCHAIN: reverse_lazy(
+                        'shop:coinify_pay',
+                        kwargs={'pk': order.id}
+                    ),
+                    Order.BANK_TRANSFER: reverse_lazy(
+                        'shop:bank_transfer',
+                        kwargs={'pk': order.id}
+                    ),
+                    Order.CASH: reverse_lazy(
+                        'shop:cash',
+                        kwargs={'pk': order.id}
+                    )
+                }
+
+                return HttpResponseRedirect(reverses[payment_method])
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 
