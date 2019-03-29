@@ -1,8 +1,10 @@
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from psycopg2.extras import DateTimeTZRange
 
+from shop.forms import OrderProductRelationForm
 from .factories import (
     ProductFactory,
     OrderProductRelationFactory,
@@ -81,3 +83,32 @@ class ProductAvailabilityTest(TestCase):
         # The factory defines the timeframe as now and 31 days forward.
         self.assertTrue(product.is_time_available)
         self.assertTrue(product.is_available())
+
+
+class TestOrderProductRelationForm(TestCase):
+
+    def test_clean_quantity_succeeds_when_stock_not_exceeded(self):
+        product = ProductFactory(stock_amount=2)
+
+        # Mark an order as paid/reserved by setting open to None
+        opr1 = OrderProductRelationFactory(product=product, quantity=1)
+        opr1.order.open = None
+        opr1.order.save()
+
+        opr2 = OrderProductRelationFactory(product=product, quantity=1)
+
+        form = OrderProductRelationForm(instance=opr2)
+        self.assertTrue(form.is_valid)
+
+    def test_clean_quantity_fails_when_stock_exceeded(self):
+        product = ProductFactory(stock_amount=2)
+        # Mark an order as paid/reserved by setting open to None
+        opr1 = OrderProductRelationFactory(product=product, quantity=1)
+        opr1.order.open = None
+        opr1.order.save()
+
+        # There should only be 1 product left, since we just reserved 1
+        opr2 = OrderProductRelationFactory(product=product, quantity=2)
+
+        form = OrderProductRelationForm(instance=opr2)
+        self.assertFalse(form.is_valid())
