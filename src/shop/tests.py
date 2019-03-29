@@ -93,9 +93,9 @@ class TestOrderProductRelationForm(TestCase):
         OrderProductRelationFactory(product=product, quantity=1, order__open=None)
 
         # There should only be 1 product left, since we just reserved 1
-        opr2 = OrderProductRelationFactory(product=product, quantity=2)
+        opr2 = OrderProductRelationFactory(product=product)
 
-        form = OrderProductRelationForm(instance=opr2)
+        form = OrderProductRelationForm({'quantity': 2}, instance=opr2)
         self.assertFalse(form.is_valid())
 
     def test_clean_quantity_when_no_stock_amount(self):
