@@ -228,7 +228,9 @@ class ProductDetailView(FormView, DetailView):
         return kwargs
 
     def get_initial(self):
-        return {'quantity': self.opr.quantity}
+        if self.opr:
+            return {'quantity': self.opr.quantity}
+        return super().get_initial()
 
     def get_context_data(self, **kwargs):
         if hasattr(self.opr, 'order'):
@@ -239,17 +241,19 @@ class ProductDetailView(FormView, DetailView):
     def dispatch(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        try:
-            self.opr = OrderProductRelation.objects.get(
-                order__user=self.request.user,
-                order__open__isnull=False,
-                product=self.object
-            )
-        except OrderProductRelation.DoesNotExist:
-            self.opr = OrderProductRelation(
-                product=self.get_object(),
-                quantity=1,
-            )
+        self.opr = None
+        if self.request.user.is_authenticated:
+            try:
+                self.opr = OrderProductRelation.objects.get(
+                    order__user=self.request.user,
+                    order__open__isnull=False,
+                    product=self.object
+                )
+            except OrderProductRelation.DoesNotExist:
+                self.opr = OrderProductRelation(
+                    product=self.get_object(),
+                    quantity=1,
+                )
 
         if not self.object.category.public:
             # this product is not publicly available

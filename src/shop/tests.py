@@ -109,12 +109,11 @@ class TestProductDetailView(TestCase):
     def setUp(self):
         self.user = UserFactory()
         self.product = ProductFactory()
+        self.path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
 
     def test_product_is_available(self):
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        )
+        response = self.client.get(self.path)
 
         self.assertContains(response, "Add to order")
         self.assertEqual(response.status_code, 200)
@@ -126,9 +125,7 @@ class TestProductDetailView(TestCase):
         OrderProductRelationFactory(product=self.product, quantity=1, order__open=None)
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        )
+        response = self.client.get(self.path)
 
         self.assertContains(response, "<bold>1</bold> available")
         self.assertEqual(response.status_code, 200)
@@ -140,9 +137,7 @@ class TestProductDetailView(TestCase):
         OrderProductRelationFactory(product=self.product, quantity=1, order__open=None)
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        )
+        response = self.client.get(self.path)
 
         self.assertContains(response, "Sold out.")
         self.assertEqual(response.status_code, 200)
@@ -150,8 +145,7 @@ class TestProductDetailView(TestCase):
     def test_adding_product_to_new_order(self):
         self.client.force_login(self.user)
 
-        path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        response = self.client.post(path, data={'quantity': 1})
+        response = self.client.post(self.path, data={'quantity': 1})
 
         order = self.user.orders.get()
 
@@ -162,9 +156,7 @@ class TestProductDetailView(TestCase):
         OrderProductRelationFactory(product=self.product, quantity=1, order__open=True, order__user=self.user)
 
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        )
+        response = self.client.get(self.path)
 
         self.assertContains(response, "Update order")
 
@@ -177,9 +169,14 @@ class TestProductDetailView(TestCase):
 
         self.client.force_login(self.user)
 
-        path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
-        response = self.client.post(path, data={'quantity': 2})
+        response = self.client.post(self.path, data={'quantity': 2})
 
         self.assertRedirects(response, reverse('shop:order_detail', kwargs={"pk": opr.order.pk}))
         opr.refresh_from_db()
         self.assertEquals(opr.quantity, 2)
+
+    def test_product_category_not_public(self):
+        self.product.category.public = False
+        self.product.category.save()
+        response = self.client.get(self.path)
+        self.assertEquals(response.status_code, 404)
