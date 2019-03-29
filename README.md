@@ -1,5 +1,8 @@
 # Bornhack
 
+[![Build Status](https://travis-ci.org/bornhack/bornhack-website.svg?branch=master)](https://travis-ci.org/bornhack/bornhack-website)
+[![codecov](https://codecov.io/gh/bornhack/bornhack-website/branch/master/graph/badge.svg)](https://codecov.io/gh/bornhack/bornhack-website)
+
 Django project to power Bornhack. Features include news, villages, webshop, and more.
 
 ## Development setup
