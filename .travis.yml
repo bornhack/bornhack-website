@@ -19,3 +19,6 @@ before_script:
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
   - coverage run --source src/ src/manage.py test src/
+
+after_success:
+  - codecov
