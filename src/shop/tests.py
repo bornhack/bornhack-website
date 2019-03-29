@@ -84,7 +84,7 @@ class TestOrderProductRelationForm(TestCase):
 
         opr = OrderProductRelationFactory(product=product)
 
-        form = OrderProductRelationForm({'quantity': 1}, instance=opr)
+        form = OrderProductRelationForm({"quantity": 1}, instance=opr)
         self.assertTrue(form.is_valid())
 
     def test_clean_quantity_fails_when_stock_exceeded(self):
@@ -95,13 +95,13 @@ class TestOrderProductRelationForm(TestCase):
         # There should only be 1 product left, since we just reserved 1
         opr2 = OrderProductRelationFactory(product=product)
 
-        form = OrderProductRelationForm({'quantity': 2}, instance=opr2)
+        form = OrderProductRelationForm({"quantity": 2}, instance=opr2)
         self.assertFalse(form.is_valid())
 
     def test_clean_quantity_when_no_stock_amount(self):
         product = ProductFactory()
         opr = OrderProductRelationFactory(product=product)
-        form = OrderProductRelationForm({'quantity': 3}, instance=opr)
+        form = OrderProductRelationForm({"quantity": 3}, instance=opr)
         self.assertTrue(form.is_valid())
 
 
@@ -150,15 +150,19 @@ class TestProductDetailView(TestCase):
     def test_adding_product_to_new_order(self):
         self.client.force_login(self.user)
 
-        response = self.client.post(self.path, data={'quantity': 1})
+        response = self.client.post(self.path, data={"quantity": 1})
 
         order = self.user.orders.get()
 
-        self.assertRedirects(response, reverse('shop:order_detail', kwargs={"pk": order.pk}))
+        self.assertRedirects(
+            response, reverse("shop:order_detail", kwargs={"pk": order.pk})
+        )
 
     def test_product_is_in_order(self):
         # Put the product in an order owned by the user
-        OrderProductRelationFactory(product=self.product, quantity=1, order__open=True, order__user=self.user)
+        OrderProductRelationFactory(
+            product=self.product, quantity=1, order__open=True, order__user=self.user
+        )
 
         self.client.force_login(self.user)
         response = self.client.get(self.path)
@@ -170,13 +174,17 @@ class TestProductDetailView(TestCase):
         self.product.save()
 
         # Put the product in an order owned by the user
-        opr = OrderProductRelationFactory(product=self.product, quantity=1, order__open=True, order__user=self.user)
+        opr = OrderProductRelationFactory(
+            product=self.product, quantity=1, order__open=True, order__user=self.user
+        )
 
         self.client.force_login(self.user)
 
-        response = self.client.post(self.path, data={'quantity': 2})
+        response = self.client.post(self.path, data={"quantity": 2})
 
-        self.assertRedirects(response, reverse('shop:order_detail', kwargs={"pk": opr.order.pk}))
+        self.assertRedirects(
+            response, reverse("shop:order_detail", kwargs={"pk": opr.order.pk})
+        )
         opr.refresh_from_db()
         self.assertEquals(opr.quantity, 2)
 
@@ -188,24 +196,23 @@ class TestProductDetailView(TestCase):
 
 
 class TestOrderDetailView(TestCase):
-
     def setUp(self):
         self.user = UserFactory()
         self.order = OrderFactory(user=self.user)
-        self.path = reverse('shop:order_detail', kwargs={'pk': self.order.pk})
+        self.path = reverse("shop:order_detail", kwargs={"pk": self.order.pk})
 
         # We are using a formset which means we have to include some "management form" data.
         self.base_form_data = {
-            'form-TOTAL_FORMS': '1',
-            'form-INITIAL_FORMS': '1',
-            'form-MAX_NUM_FORMS': '',
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MAX_NUM_FORMS": "",
         }
 
     def test_redirects_when_no_products(self):
         self.client.force_login(self.user)
         response = self.client.get(self.path)
         self.assertEquals(response.status_code, 302)
-        self.assertRedirects(response, reverse('shop:index'))
+        self.assertRedirects(response, reverse("shop:index"))
 
     def test_redirects_when_cancelled(self):
         self.client.force_login(self.user)
@@ -218,7 +225,7 @@ class TestOrderDetailView(TestCase):
         response = self.client.get(self.path)
 
         self.assertEquals(response.status_code, 302)
-        self.assertRedirects(response, reverse('shop:index'))
+        self.assertRedirects(response, reverse("shop:index"))
 
     def test_remove_product(self):
         self.client.force_login(self.user)
@@ -229,7 +236,7 @@ class TestOrderDetailView(TestCase):
         order = orp.order
 
         data = self.base_form_data
-        data['remove_product'] = orp.pk
+        data["remove_product"] = orp.pk
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 200)
@@ -246,11 +253,11 @@ class TestOrderDetailView(TestCase):
         order = orp.order
 
         data = self.base_form_data
-        data['remove_product'] = orp.pk
+        data["remove_product"] = orp.pk
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 302)
-        self.assertRedirects(response, reverse('shop:index'))
+        self.assertRedirects(response, reverse("shop:index"))
 
         order.refresh_from_db()
 
@@ -263,11 +270,11 @@ class TestOrderDetailView(TestCase):
         order = orp.order
 
         data = self.base_form_data
-        data['cancel_order'] = None
+        data["cancel_order"] = None
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 302)
-        self.assertRedirects(response, reverse('shop:index'))
+        self.assertRedirects(response, reverse("shop:index"))
 
         order.refresh_from_db()
 
@@ -275,10 +282,9 @@ class TestOrderDetailView(TestCase):
 
 
 class TestOrderListView(TestCase):
-
     def test_order_list_view_as_logged_in(self):
         user = UserFactory()
         self.client.force_login(user)
-        path = reverse('shop:order_list')
+        path = reverse("shop:order_list")
         response = self.client.get(path)
         self.assertEquals(response.status_code, 200)
