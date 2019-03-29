@@ -1,9 +1,6 @@
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-
 from psycopg2.extras import DateTimeTZRange
 
 from shop.forms import OrderProductRelationForm
@@ -111,42 +108,44 @@ class TestOrderProductRelationForm(TestCase):
 class TestProductDetailView(TestCase):
     def setUp(self):
         self.user = UserFactory()
+        self.product = ProductFactory()
 
     def test_product_is_available(self):
-        product = ProductFactory()
         self.client.force_login(self.user)
         response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": product.slug})
+            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
         self.assertIn("Add to order", str(response.content))
         self.assertEqual(response.status_code, 200)
 
     def test_product_is_available_with_stock_left(self):
-        product = ProductFactory(stock_amount=2)
+        self.product.stock_amount = 2
+        self.product.save()
 
-        opr1 = OrderProductRelationFactory(product=product, quantity=1)
+        opr1 = OrderProductRelationFactory(product=self.product, quantity=1)
         opr1.order.open = None
         opr1.order.save()
 
         self.client.force_login(self.user)
         response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": product.slug})
+            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
         self.assertIn("<bold>1</bold> available", str(response.content))
         self.assertEqual(response.status_code, 200)
 
     def test_product_is_sold_out(self):
-        product = ProductFactory(stock_amount=1)
+        self.product.stock_amount = 1
+        self.product.save()
 
-        opr1 = OrderProductRelationFactory(product=product, quantity=1)
+        opr1 = OrderProductRelationFactory(product=self.product, quantity=1)
         opr1.order.open = None
         opr1.order.save()
 
         self.client.force_login(self.user)
         response = self.client.get(
-            reverse("shop:product_detail", kwargs={"slug": product.slug})
+            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
         self.assertIn("Sold out.", str(response.content))
