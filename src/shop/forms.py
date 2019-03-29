@@ -14,7 +14,7 @@ class OrderProductRelationForm(forms.ModelForm):
         product = self.instance.product
         new_quantity = self.cleaned_data['quantity']
 
-        if product.left_in_stock < new_quantity:
+        if product.stock_amount and product.left_in_stock < new_quantity:
             raise forms.ValidationError(
                 "Only {} left in stock.".format(
                     product.left_in_stock,

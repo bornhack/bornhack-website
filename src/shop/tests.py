@@ -21,18 +21,16 @@ class ProductAvailabilityTest(TestCase):
         """ If max orders have been made, the product is NOT available. """
         product = ProductFactory(stock_amount=2)
 
-        opr1 = OrderProductRelationFactory(product=product)
-        opr1.order.mark_as_paid()
-        opr2 = OrderProductRelationFactory(product=product)
-        opr2.order.mark_as_paid()
+        OrderProductRelationFactory(product=product, order__open=None)
+        opr = OrderProductRelationFactory(product=product, order__open=None)
 
         self.assertEqual(product.left_in_stock, 0)
         self.assertFalse(product.is_stock_available)
         self.assertFalse(product.is_available())
 
         # Cancel one order
-        opr1.order.cancelled = True
-        opr1.order.save()
+        opr.order.cancelled = True
+        opr.order.save()
 
         self.assertEqual(product.left_in_stock, 1)
         self.assertTrue(product.is_stock_available)
@@ -82,27 +80,29 @@ class TestOrderProductRelationForm(TestCase):
         product = ProductFactory(stock_amount=2)
 
         # Mark an order as paid/reserved by setting open to None
-        opr1 = OrderProductRelationFactory(product=product, quantity=1)
-        opr1.order.open = None
-        opr1.order.save()
+        OrderProductRelationFactory(product=product, quantity=1, order__open=None)
 
-        opr2 = OrderProductRelationFactory(product=product, quantity=1)
+        opr = OrderProductRelationFactory(product=product)
 
-        form = OrderProductRelationForm(instance=opr2)
-        self.assertTrue(form.is_valid)
+        form = OrderProductRelationForm({'quantity': 1}, instance=opr)
+        self.assertTrue(form.is_valid())
 
     def test_clean_quantity_fails_when_stock_exceeded(self):
         product = ProductFactory(stock_amount=2)
         # Mark an order as paid/reserved by setting open to None
-        opr1 = OrderProductRelationFactory(product=product, quantity=1)
-        opr1.order.open = None
-        opr1.order.save()
+        OrderProductRelationFactory(product=product, quantity=1, order__open=None)
 
         # There should only be 1 product left, since we just reserved 1
         opr2 = OrderProductRelationFactory(product=product, quantity=2)
 
         form = OrderProductRelationForm(instance=opr2)
         self.assertFalse(form.is_valid())
+
+    def test_clean_quantity_when_no_stock_amount(self):
+        product = ProductFactory()
+        opr = OrderProductRelationFactory(product=product)
+        form = OrderProductRelationForm({'quantity': 3}, instance=opr)
+        self.assertTrue(form.is_valid())
 
 
 class TestProductDetailView(TestCase):
@@ -116,37 +116,70 @@ class TestProductDetailView(TestCase):
             reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
-        self.assertIn("Add to order", str(response.content))
+        self.assertContains(response, "Add to order")
         self.assertEqual(response.status_code, 200)
 
     def test_product_is_available_with_stock_left(self):
         self.product.stock_amount = 2
         self.product.save()
 
-        opr1 = OrderProductRelationFactory(product=self.product, quantity=1)
-        opr1.order.open = None
-        opr1.order.save()
+        OrderProductRelationFactory(product=self.product, quantity=1, order__open=None)
 
         self.client.force_login(self.user)
         response = self.client.get(
             reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
-        self.assertIn("<bold>1</bold> available", str(response.content))
+        self.assertContains(response, "<bold>1</bold> available")
         self.assertEqual(response.status_code, 200)
 
     def test_product_is_sold_out(self):
         self.product.stock_amount = 1
         self.product.save()
 
-        opr1 = OrderProductRelationFactory(product=self.product, quantity=1)
-        opr1.order.open = None
-        opr1.order.save()
+        OrderProductRelationFactory(product=self.product, quantity=1, order__open=None)
 
         self.client.force_login(self.user)
         response = self.client.get(
             reverse("shop:product_detail", kwargs={"slug": self.product.slug})
         )
 
-        self.assertIn("Sold out.", str(response.content))
+        self.assertContains(response, "Sold out.")
         self.assertEqual(response.status_code, 200)
+
+    def test_adding_product_to_new_order(self):
+        self.client.force_login(self.user)
+
+        path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
+        response = self.client.post(path, data={'quantity': 1})
+
+        order = self.user.orders.get()
+
+        self.assertRedirects(response, reverse('shop:order_detail', kwargs={"pk": order.pk}))
+
+    def test_product_is_in_order(self):
+        # Put the product in an order owned by the user
+        OrderProductRelationFactory(product=self.product, quantity=1, order__open=True, order__user=self.user)
+
+        self.client.force_login(self.user)
+        response = self.client.get(
+            reverse("shop:product_detail", kwargs={"slug": self.product.slug})
+        )
+
+        self.assertContains(response, "Update order")
+
+    def test_product_is_in_order_update(self):
+        self.product.stock_amount = 2
+        self.product.save()
+
+        # Put the product in an order owned by the user
+        opr = OrderProductRelationFactory(product=self.product, quantity=1, order__open=True, order__user=self.user)
+
+        self.client.force_login(self.user)
+
+        path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
+        response = self.client.post(path, data={'quantity': 2})
+
+        self.assertRedirects(response, reverse('shop:order_detail', kwargs={"pk": opr.order.pk}))
+        opr.refresh_from_db()
+        self.assertEquals(opr.quantity, 2)
