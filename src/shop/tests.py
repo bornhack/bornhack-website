@@ -231,12 +231,12 @@ class TestOrderDetailView(TestCase):
         self.client.force_login(self.user)
 
         OrderProductRelationFactory(order=self.order)
-        orp = OrderProductRelationFactory(order=self.order)
+        opr = OrderProductRelationFactory(order=self.order)
 
-        order = orp.order
+        order = opr.order
 
         data = self.base_form_data
-        data["remove_product"] = orp.pk
+        data["remove_product"] = opr.pk
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 200)
@@ -248,12 +248,12 @@ class TestOrderDetailView(TestCase):
     def test_remove_last_product_cancels_order(self):
         self.client.force_login(self.user)
 
-        orp = OrderProductRelationFactory(order=self.order)
+        opr = OrderProductRelationFactory(order=self.order)
 
-        order = orp.order
+        order = opr.order
 
         data = self.base_form_data
-        data["remove_product"] = orp.pk
+        data["remove_product"] = opr.pk
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 302)
@@ -266,11 +266,11 @@ class TestOrderDetailView(TestCase):
     def test_cancel_order(self):
         self.client.force_login(self.user)
 
-        orp = OrderProductRelationFactory(order=self.order)
-        order = orp.order
+        opr = OrderProductRelationFactory(order=self.order)
+        order = opr.order
 
         data = self.base_form_data
-        data["cancel_order"] = None
+        data["cancel_order"] = ""
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 302)
@@ -279,6 +279,69 @@ class TestOrderDetailView(TestCase):
         order.refresh_from_db()
 
         self.assertTrue(order.cancelled)
+
+    def test_incrementing_product_quantity(self):
+        self.client.force_login(self.user)
+
+        opr = OrderProductRelationFactory(order=self.order)
+        opr.product.stock_amount = 100
+        opr.product.save()
+
+        data = self.base_form_data
+        data["update_order"] = ""
+        data["form-0-id"] = opr.pk
+        data["form-0-quantity"] = 11
+
+        response = self.client.post(self.path, data=data)
+        opr.refresh_from_db()
+        self.assertEquals(response.status_code, 200)
+        self.assertEquals(opr.quantity, 11)
+
+    def test_incrementing_product_quantity_beyond_stock_fails(self):
+        self.client.force_login(self.user)
+
+        opr = OrderProductRelationFactory(order=self.order)
+        opr.product.stock_amount = 10
+        opr.product.save()
+
+        data = self.base_form_data
+        data["update_order"] = ""
+        data["form-0-id"] = opr.pk
+        data["form-0-quantity"] = 11
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 200)
+        self.assertIn("quantity", response.context["order_product_formset"].errors[0])
+
+    def test_terms_have_to_be_accepted(self):
+        self.client.force_login(self.user)
+
+        opr = OrderProductRelationFactory(order=self.order)
+
+        data = self.base_form_data
+        data["form-0-id"] = opr.pk
+        data["form-0-quantity"] = 11
+        data["payment_method"] = "bank_transfer"
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 200)
+
+    def test_accepted_terms_and_chosen_payment_method(self):
+        self.client.force_login(self.user)
+
+        opr = OrderProductRelationFactory(order=self.order)
+
+        data = self.base_form_data
+        data["form-0-id"] = opr.pk
+        data["form-0-quantity"] = 11
+        data["payment_method"] = "bank_transfer"
+        data["accept_terms"] = True
+
+        response = self.client.post(self.path, data=data)
+        self.assertEquals(response.status_code, 302)
+        self.assertRedirects(
+            response, reverse("shop:bank_transfer", kwargs={"pk": self.order.id})
+        )
 
 
 class TestOrderListView(TestCase):
