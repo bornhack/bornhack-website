@@ -55,11 +55,22 @@ Shop | {{ block.super }}
             <a href="{% url 'shop:product_detail' slug=product.slug %}">
             {{ product.name }}
             </a>
-            {% if product.stock_amount and product.left_in_stock <= 10 %}
+
+
+            {% if product.stock_amount %}
+
+            {% if product.left_in_stock == 0 %}
             <div class="label label-danger">
-            Only {{ product.left_in_stock }} left!
+              Sold out!
+            </div>
+            {% elif product.left_in_stock <= 10 %}
+            <div class="label label-info">
+              Only {{ product.left_in_stock }} left!
             </div>
             {% endif %}
+
+            {% endif %}
+
           </td>
           <td>
             <div class="pull-right">

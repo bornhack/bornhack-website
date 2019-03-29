@@ -31,7 +31,7 @@
       {% if product.left_in_stock > 0 %}
       <bold>{{ product.left_in_stock }}</bold> available<br />
       {% else %}
-      <bold>Sold out.</bold>
+      <bold>Sold out.</bold><br />
       {% endif %}
     </h3>
 
@@ -40,7 +40,9 @@
 
     {% if product.is_stock_available %}
 
-    <h3>Add to order</h3>
+    <h3>{% if already_in_order %}Update order{% else %}Add to order{% endif %}</h3>
+
+    {% if already_in_order %}<p>You already have this product in your order.</p>{% endif %}
 
     {% if user.is_authenticated %}
 
@@ -49,7 +51,9 @@
     <form method="POST">
       {% csrf_token %}
       {% bootstrap_form form %}
-      {% bootstrap_button "Add to order" button_type="submit" button_class="btn-primary" %}
+        <button type="submit" class="btn btn-primary">
+          {% if already_in_order %}Update{% else %}Add{% endif %}
+        </button>
     </form>
 
     {% else %}

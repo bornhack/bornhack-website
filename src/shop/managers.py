@@ -17,7 +17,7 @@ class OrderQuerySet(QuerySet):
         return self.filter(cancelled=False)
 
     def open(self):
-        return self.filter(open__isnull=True)
+        return self.filter(open__isnull=False)
 
     def paid(self):
         return self.filter(paid=True)
