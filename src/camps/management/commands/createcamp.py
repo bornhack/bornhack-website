@@ -28,9 +28,7 @@ class Command(BaseCommand):
 
         # files to create, relative to DJANGO_BASE_PATH
         files = [
-            'sponsors/templates/{camp_slug}_sponsors.html',
             'camps/templates/{camp_slug}_camp_detail.html',
-            'program/templates/{camp_slug}_call_for_participation.html'
         ]
 
         # directories to create, relative to DJANGO_BASE_PATH
