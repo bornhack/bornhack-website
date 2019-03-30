@@ -21,7 +21,7 @@ Select Chain | {{ block.super }}
         <h4 class="list-group-item-heading">
             <b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)
         </h4>
-        <p>{{ chain.name }} has {{ chain.expenses.count }} expenses for a total of {{ chain.expenses_total }} DKK, and {{ chain.revenues.count }} revenues for a total of {{ chain.revenues_total }} DKK</p>
+        <p>{{ chain.name }} has <b>{{ chain.expenses.count }} expenses</b> for a total of <b>{{ chain.expenses_total|default:"0" }} DKK</b>, and <b>{{ chain.revenues.count }} revenues</b> for a total of <b>{{ chain.revenues_total|default:"0" }} DKK</b></p>
         {% if chain.notes %}
         <p><b>Notes:</b> {{ chain.notes }}</p>
         {% endif %}
