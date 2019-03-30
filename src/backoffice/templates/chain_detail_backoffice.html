@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<h2>Details for Chain {{ chain.name }}</h2>
+<a href="{% url "backoffice:chain_list" camp_slug=camp.slug %}">Back to Chain list</a>
+
+<h3>{{ chain.credebtors.count }} Credebtors for Chain {{ chain.name }}</h3>
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Credebtor Name</th>
+      <th>Address</th>
+      <th>Notes</th>
+      <th class="text-center">Expenses</th>
+      <th class="text-center">Expenses Total</th>
+      <th class="text-center">Revenues</th>
+      <th class="text-center">Revenues Total</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for credebtor in chain.credebtors.all %}
+    <tr>
+      <td>{{ credebtor.name }}</td>
+      <td><address>{{ credebtor.address }}</address></td>
+      <td>{{ credebtor.notes|default:"N/A" }}</td>
+      <td class="text-center"><span class="badge">{{ credebtor.expenses.count }}</span></td>
+      <td class="text-center">{{ credebtor.expenses_total }} DKK</td>
+      <td class="text-center"><span class="badge">{{ credebtor.revenues.count }}</span></td>
+      <td class="text-center">{{ credebtor.revenues_total }} DKK</td>
+      <td>
+        <a class="btn btn-primary" href="{% url 'backoffice:credebtor_detail' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}"><i class="fas fa-search"></i> Details</a>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h3>{{ chain.expenses.count }} Expenses for Chain {{ chain.name }}</h3>
+{% include 'includes/expense_list_panel.html' with expense_list=chain.expenses.all %}
+
+<h3>{{ chain.revenues.count }} Revenues for Chain {{ chain.name }}</h3>
+{% include 'includes/revenue_list_panel.html' with revenue_list=chain.revenues.all %}
+
+{% endblock content %}
+

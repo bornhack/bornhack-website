@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}
+Select Chain | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h2>Chains</h2>
+<p><a href="{% url "backoffice:index" camp_slug=camp.slug %}">Back to Backoffice Index</a></p>
+
+{% if chain_list %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">Chains</h3>
+  </div>
+  <div class="panel-body">
+     <div class="list-group">
+    {% for chain in chain_list %}
+      <a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">
+            <b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)
+        </h4>
+        <p>{{ chain.name }} has {{ chain.expenses.count }} expenses for a total of {{ chain.expenses_total }} DKK, and {{ chain.revenues.count }} revenues for a total of {{ chain.revenues_total }} DKK</p>
+        {% if chain.notes %}
+        <p><b>Notes:</b> {{ chain.notes }}</p>
+        {% endif %}
+      </a>
+    {% endfor %}
+    </div>
+  </div>
+</div>
+{% else %}
+<p class="lead"><i>No Chains found.</i></p>
+{% endif %}
+
+{% endblock %}

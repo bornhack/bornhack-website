@@ -18,7 +18,7 @@ from shop.models import OrderProductRelation
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
 from program.models import SpeakerProposal, EventProposal
-from economy.models import Expense, Reimbursement, Revenue
+from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from utils.mixins import RaisePermissionRequiredMixin
 from teams.models import Team
 from .mixins import *
@@ -226,6 +226,27 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context['village'] = village_orders
         return context
+
+
+################################
+###### CHAINS & CREDEBTORS #####
+
+
+class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = Chain
+    template_name = 'chain_list_backoffice.html'
+
+
+class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = Chain
+    template_name = 'chain_detail_backoffice.html'
+    slug_url_kwarg = 'chain_slug'
+
+
+class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = Credebtor
+    template_name = 'credebtor_detail_backoffice.html'
+    slug_url_kwarg = 'credebtor_slug'
 
 
 ################################

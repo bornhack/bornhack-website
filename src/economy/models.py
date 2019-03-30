@@ -10,6 +10,16 @@ from django.utils.text import slugify
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 from .email import *
 
+class ChainManager(models.Manager):
+    """
+    ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
+    """
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.annotate(expenses_total=models.Sum('credebtors__expenses__amount'))
+        qs = qs.annotate(revenues_total=models.Sum('credebtors__revenues__amount'))
+        return qs
+
 
 class Chain(CreatedUpdatedModel, UUIDModel):
     """
@@ -18,6 +28,8 @@ class Chain(CreatedUpdatedModel, UUIDModel):
     """
     class Meta:
         ordering = ['name']
+
+    objects = ChainManager()
 
     name = models.CharField(
         max_length=100,
@@ -44,6 +56,25 @@ class Chain(CreatedUpdatedModel, UUIDModel):
             self.slug = slugify(self.name)
         super(Chain, self).save(**kwargs)
 
+    @property
+    def expenses(self):
+        return Expense.objects.filter(creditor__chain__pk=self.pk)
+
+    @property
+    def revenues(self):
+        return Revenue.objects.filter(debtor__chain__pk=self.pk)
+
+
+class CredebtorManager(models.Manager):
+    """
+    CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs
+    """
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.annotate(expenses_total=models.Sum('expenses__amount'))
+        qs = qs.annotate(revenues_total=models.Sum('revenues__amount'))
+        return qs
+
 
 class Credebtor(CreatedUpdatedModel, UUIDModel):
     """
@@ -55,6 +86,8 @@ class Credebtor(CreatedUpdatedModel, UUIDModel):
     class Meta:
         ordering = ['name']
         unique_together=('chain', 'slug')
+
+    objects = CredebtorManager()
 
     chain = models.ForeignKey(
         'economy.Chain',

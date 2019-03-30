@@ -32,6 +32,31 @@ urlpatterns = [
     # economy
     path('economy/',
         include([
+            # chains & credebtors
+            path('chains/',
+                include([
+                    path(
+                        '',
+                        ChainListView.as_view(),
+                        name='chain_list'
+                    ),
+                    path('<slug:chain_slug>/',
+                        include([
+                            path(
+                                '',
+                                ChainDetailView.as_view(),
+                                name='chain_detail'
+                            ),
+                            path(
+                                '<slug:credebtor_slug>/',
+                                CredebtorDetailView.as_view(),
+                                name='credebtor_detail'
+                            ),
+                        ]),
+                    ),
+                ]),
+            ),
+
             # expenses
             path('expenses/',
                 include([
