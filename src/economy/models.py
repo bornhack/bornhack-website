@@ -149,7 +149,6 @@ class Revenue(CampRelatedModel, UUIDModel):
         'economy.Credebtor',
         on_delete=models.PROTECT,
         related_name='revenues',
-        null=True,
         help_text='The Debtor to which this revenue belongs',
     )
 
@@ -273,7 +272,6 @@ class Expense(CampRelatedModel, UUIDModel):
         'economy.Credebtor',
         on_delete=models.PROTECT,
         related_name='expenses',
-        null=True,
         help_text='The Creditor to which this expense belongs',
     )
 
