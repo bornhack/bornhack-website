@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% load bootstrap3 %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
 
 {% block title %}
 Select Chain | {{ block.super }}
@@ -30,9 +36,9 @@ Select Chain | {{ block.super }}
       <td>{{ chain.notes|default:"N/A" }}</td>
       <td class="text-center"><span class="badge">{{ chain.credebtors.count }}</span></td>
       <td class="text-center"><span class="badge">{{ chain.expenses.count }}</span></td>
-      <td class="text-center">{{ chain.expenses_total }}</td>
+      <td class="text-center">{{ chain.expenses_total|default:"0" }} DKK</td>
       <td class="text-center"><span class="badge">{{ chain.revenues.count }}</span></td>
-      <td class="text-center">{{ chain.revenues_total }}</td>
+      <td class="text-center">{{ chain.revenues_total|default:"0" }} DKK</td>
       <td>
         <a class="btn btn-primary" href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}"><i class="fas fa-search"></i> Details</a>
       </td>
