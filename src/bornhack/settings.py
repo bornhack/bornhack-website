@@ -123,9 +123,9 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 BOOTSTRAP4 = {
     "css_url": {"href": "/static/css/bootstrap.min.css"},
-    "javascript_url": {"href": "/static/js/bootstrap.min.js"},
-    "jquery_slim_url": {"href": "/static/js/jquery-3.3.1.slim.min.js"},
-    "popper_url": {"href": "/static/js/popper.min.js"},
+    "javascript_url": {"src": "/static/js/bootstrap.min.js"},
+    "jquery_slim_url": {"src": "/static/js/jquery-3.3.1.slim.min.js"},
+    "popper_url": {"src": "/static/js/popper.min.js"},
 }
 
 MIDDLEWARE = [

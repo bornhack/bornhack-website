@@ -40,75 +40,28 @@
 
   <body>
 
-    <div id="main" class="container container-fluid">
+    <div id="main" class="container-fluid">
 
-    <nav class="navbar navbar-expand-lg fixed-top">
-      <div class="container container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          {% if request.resolver_match.kwargs.camp_slug and camp %}
-            <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" height="50" width="190px" alt="bornhack" class="img-responsive">
-            </a>
-          {% else %}
-            <a class="navbar-brand" href="/">
-              <img src="{% static 'img/logo-small.svg' %}" alt="bornhack" class="img-responsive">
-            </a>
-            {% endif %}
-        </div>
-        <div id="top-navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="{% url 'news:index' %}">News</a></li>
-            <li><a href="{% url 'shop:index' %}">Shop</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2019' %}">BornHack 2019</a></li>
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2018' %}">BornHack 2018</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'camp_list' %}">Camp List</a></li>
-              </ul>
-            </li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-            <li><a href="{% url 'people' %}">People</a></li>
-            {% if request.user.is_staff %}
-            <li><a href="{% url 'admin:index' %}">Django Admin</a></li>
-            {% endif %}
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            {% if user.is_authenticated %}
-            <li><a href="{% url 'profiles:detail' %}">Account</a></li>
-            <li>
-              <a href="{% url 'account_logout' %}">
-                Logout
-              </a>
-            </li>
-            {% else %}
-            <li><a href="{% url 'account_login' %}">Login</a></li>
-            {% endif %}
-         </ul>
-        </div>
-      </div>
-    </nav>
-      {% if camp %}
-        <div class="row">
-          <div class="btn-group btn-group-justified hidden-xs">
-              {% include 'includes/menuitems.html' %}
-          </div>
-          <div class="btn-group-vertical visible-xs">
-              {% include 'includes/menuitems.html' %}
-          </div>
-        <p>
-      </div>
-      {% endif %}
+      {% include "includes/top_menu.html" %}
+
       {% bootstrap_messages %}
-      {% block content %}{% endblock %}
+
+      <div class="row flex-xl-nowrap">
+        {% if camp %}
+        <div class="col-md-auto border-right">
+          {% include 'includes/menuitems.html' %}
+        </div>
+        {% endif %}
+
+        <div class="col-md">
+          {% block content %}{% endblock %}
+        </div>
+
+      </div>
+
+
     </div>
+
     <footer>
       <div class="col-sm-12 col-md-12 col-lg-12">
           {% block footer %}
@@ -119,6 +72,7 @@
           {% endblock %}
       </div>
     </footer>
+
     <!-- Enable all bootstrap tooltips and jquery datatables on the page, only works if the useragent has JS enabled -->
     <script>
         $(document).ready(function(){
