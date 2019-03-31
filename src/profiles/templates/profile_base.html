@@ -72,10 +72,18 @@
       {% endif %}
 
       <li><b>Misc.</b></li>
+
       {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
       <li {% if request.path == tokenfind_list_url %}class="active"{% endif %}>
         <a href="{{ tokenfind_list_url }}">
           Secret Tokens
+        </a>
+      </li>
+
+      {% url 'teams:user_shifts' as user_shifts_url %}
+      <li {% if request.path == user_shifts_url %}class="active"{% endif %}>
+        <a href="{{ user_shifts_url }}">
+          Shifts
         </a>
       </li>
 
