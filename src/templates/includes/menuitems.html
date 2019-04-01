@@ -1,54 +1,51 @@
 {% load menubutton %}
 
-<ul class="nav flex-column position-sticky" style="top: 100px">
-
 <li class="nav-item">
     <a class="nav-link {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
+    <ul>
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+        </li>
+
+        {% if request.user.is_authenticated %}
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
+        </li>
+
+        {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'economy' %}" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a>
+        </li>
+        {% endif %}
+
+        {% if perms.camps.backoffice_permission %}
+        <li class="nav-item">
+            <a class="nav-link {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
+        </li>
+        {% endif %}
+        {% endif %}
+
+    </ul>
 </li>
 
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
-</li>
-
-<li class="nav-item">
-
-{% if request.user.is_authenticated %}
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
-</li>
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
-</li>
-
-{% endif %}
-
-{% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
-
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'economy' %}" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a>
-</li>
-{% endif %}
-
-{% if perms.camps.backoffice_permission %}
-<li class="nav-item">
-<a class="nav-link {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
-</li>
-{% endif %}
-</ul>

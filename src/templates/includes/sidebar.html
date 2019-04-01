@@ -1,5 +1,5 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg fixed-top">
+<nav class="nav flex-column position-sticky" style="top: 50px">
 
     {% if request.resolver_match.kwargs.camp_slug and camp %}
     <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
@@ -11,19 +11,6 @@
     </a>
     {% endif %}
 
-
-    <button class="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#top-navbar"
-            aria-controls="top-navbar"
-            aria-expanded="false"
-            aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-
-    <div id="top-navbar" class="collapse navbar-collapse ">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'news:index' %}">
@@ -70,6 +57,9 @@
                 </a>
             </li>
             {% endif %}
+            {% if camp %}
+            {% include 'includes/menuitems.html' %}
+            {% endif %}
         </ul>
 
         <ul class="nav navbar-nav navbar-right">
@@ -84,5 +74,4 @@
             <li><a href="{% url 'account_login' %}">Login</a></li>
             {% endif %}
         </ul>
-    </div>
 </nav>
