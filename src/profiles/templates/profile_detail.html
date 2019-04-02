@@ -13,14 +13,13 @@
 </div>
 {% endif %}
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <a href="{% url 'profiles:update' %}" class="btn btn-primary pull-right clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
+<div class="card panel-default">
+  <div class="card-header flex">
     <h4>Your information</h4>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
 
-    <table class="table table-striped">
+    <table class="table">
       <tr>
         <td width="30%">
           <b>Name</b><br />
@@ -58,6 +57,7 @@
       </tr>
 
     </table>
+    <a href="{% url 'profiles:update' %}" class="btn btn-primary pull-right clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
   </div>
 </div>
 {% endblock profile_content %}
