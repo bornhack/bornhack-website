@@ -3,7 +3,7 @@ channels==2.1.7
 channels-redis==2.3.2
 
 commonmark==0.8.1
-Pillow==5.4.1
+Pillow==6.0.0
 PyPDF2==1.26.0
 Unidecode==1.0.23
 asyncio==3.4.3
