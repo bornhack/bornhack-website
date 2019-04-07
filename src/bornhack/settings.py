@@ -1,5 +1,6 @@
-from .environment_settings import *
+import os
 
+from .environment_settings import *
 
 def local_dir(entry):
     return os.path.join(os.path.dirname(os.path.dirname(__file__)), entry)
