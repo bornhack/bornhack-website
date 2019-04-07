@@ -395,10 +395,12 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
         expense.responsible_team=economyteam
         expense.approved=True
         expense.reimbursement=reimbursement
+        expense.invoice_date=timezone.now()
+        expense.creditor=Credebtor.objects.get(name='Reimbursement')
         expense.invoice.save("na.jpg", File(open(os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/na.jpg"), "rb")))
         expense.save()
 
-        messages.success(self.request, "Reimbursement %s has been created" % reimbursement.pk)
+        messages.success(self.request, "Reimbursement %s has been created with invoice_date %s" % (reimbursement.pk, timezone.now()))
         return redirect(reverse('backoffice:reimbursement_detail', kwargs={'camp_slug': self.camp.slug, 'pk': reimbursement.pk}))
 
 
