@@ -13,6 +13,11 @@ class SpeakerProposalForm(forms.ModelForm):
     The SpeakerProposalForm. Takes an EventType in __init__ and changes fields accordingly.
     """
 
+    email = forms.EmailField(
+        required=False,
+        help_text="The email of the speaker (defaults to the logged in user if empty).",
+    )
+
     class Meta:
         model = SpeakerProposal
         fields = [
