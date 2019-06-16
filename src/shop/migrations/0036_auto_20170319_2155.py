@@ -7,14 +7,10 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0035_auto_20170222_1629'),
-    ]
+    dependencies = [("shop", "0035_auto_20170222_1629")]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='slug',
-            field=models.SlugField(unique=True),
-        ),
+            model_name="product", name="slug", field=models.SlugField(unique=True)
+        )
     ]

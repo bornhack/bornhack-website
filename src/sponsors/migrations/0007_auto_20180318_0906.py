@@ -8,19 +8,25 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0006_auto_20170715_1110'),
-    ]
+    dependencies = [("sponsors", "0006_auto_20170715_1110")]
 
     operations = [
         migrations.AlterField(
-            model_name='sponsor',
-            name='tier',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='sponsors.SponsorTier'),
+            model_name="sponsor",
+            name="tier",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="sponsors.SponsorTier"
+            ),
         ),
         migrations.AlterField(
-            model_name='sponsortier',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this sponsor tier belongs to', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='sponsor_tiers', to='camps.Camp'),
+            model_name="sponsortier",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this sponsor tier belongs to",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="sponsor_tiers",
+                to="camps.Camp",
+            ),
         ),
     ]

@@ -12,93 +12,169 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0020_camp_read_only'),
+        ("camps", "0020_camp_read_only"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('program', '0032_auto_20170312_1556'),
+        ("program", "0032_auto_20170312_1556"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EventProposal',
+            name="EventProposal",
             fields=[
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('proposal_status', models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50)),
-                ('title', models.CharField(help_text='The title of this event', max_length=255)),
-                ('abstract', models.TextField(help_text='The abstract for this event')),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eventproposals', to='camps.Camp')),
-                ('event_type', models.ForeignKey(help_text='The type of event', on_delete=django.db.models.deletion.CASCADE, to='program.EventType')),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "proposal_status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("pending", "Pending approval"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="draft",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        help_text="The title of this event", max_length=255
+                    ),
+                ),
+                ("abstract", models.TextField(help_text="The abstract for this event")),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eventproposals",
+                        to="camps.Camp",
+                    ),
+                ),
+                (
+                    "event_type",
+                    models.ForeignKey(
+                        help_text="The type of event",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="program.EventType",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='SpeakerProposal',
+            name="SpeakerProposal",
             fields=[
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('proposal_status', models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50)),
-                ('name', models.CharField(help_text='Name or alias of the speaker', max_length=150)),
-                ('biography', models.TextField(help_text='Markdown is supported.')),
-                ('picture_large', models.ImageField(blank=True, help_text='A picture of the speaker', null=True, upload_to=program.models.get_speakerproposal_picture_upload_path)),
-                ('picture_small', models.ImageField(blank=True, help_text='A thumbnail of the speaker picture', null=True, upload_to=program.models.get_speakerproposal_picture_upload_path)),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='speakerproposals', to='camps.Camp')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "proposal_status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("pending", "Pending approval"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="draft",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="Name or alias of the speaker", max_length=150
+                    ),
+                ),
+                ("biography", models.TextField(help_text="Markdown is supported.")),
+                (
+                    "picture_large",
+                    models.ImageField(
+                        blank=True,
+                        help_text="A picture of the speaker",
+                        null=True,
+                        upload_to=program.models.get_speakerproposal_picture_upload_path,
+                    ),
+                ),
+                (
+                    "picture_small",
+                    models.ImageField(
+                        blank=True,
+                        help_text="A thumbnail of the speaker picture",
+                        null=True,
+                        upload_to=program.models.get_speakerproposal_picture_upload_path,
+                    ),
+                ),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="speakerproposals",
+                        to="camps.Camp",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
-        migrations.RemoveField(
-            model_name='eventsubmission',
-            name='camp',
-        ),
-        migrations.RemoveField(
-            model_name='eventsubmission',
-            name='event_type',
-        ),
-        migrations.RemoveField(
-            model_name='eventsubmission',
-            name='speakers',
-        ),
-        migrations.RemoveField(
-            model_name='eventsubmission',
-            name='user',
-        ),
-        migrations.RemoveField(
-            model_name='speakersubmission',
-            name='camp',
-        ),
-        migrations.RemoveField(
-            model_name='speakersubmission',
-            name='user',
-        ),
-        migrations.RemoveField(
-            model_name='speaker',
-            name='submission',
-        ),
-        migrations.DeleteModel(
-            name='EventSubmission',
-        ),
-        migrations.DeleteModel(
-            name='SpeakerSubmission',
+        migrations.RemoveField(model_name="eventsubmission", name="camp"),
+        migrations.RemoveField(model_name="eventsubmission", name="event_type"),
+        migrations.RemoveField(model_name="eventsubmission", name="speakers"),
+        migrations.RemoveField(model_name="eventsubmission", name="user"),
+        migrations.RemoveField(model_name="speakersubmission", name="camp"),
+        migrations.RemoveField(model_name="speakersubmission", name="user"),
+        migrations.RemoveField(model_name="speaker", name="submission"),
+        migrations.DeleteModel(name="EventSubmission"),
+        migrations.DeleteModel(name="SpeakerSubmission"),
+        migrations.AddField(
+            model_name="eventproposal",
+            name="speakers",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Pick the speaker(s) for this event",
+                to="program.SpeakerProposal",
+            ),
         ),
         migrations.AddField(
-            model_name='eventproposal',
-            name='speakers',
-            field=models.ManyToManyField(blank=True, help_text='Pick the speaker(s) for this event', to='program.SpeakerProposal'),
+            model_name="eventproposal",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='eventproposal',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
-        ),
-        migrations.AddField(
-            model_name='speaker',
-            name='proposal',
-            field=models.OneToOneField(blank=True, help_text='The speaker proposal object this speaker was created from', null=True, on_delete=django.db.models.deletion.CASCADE, to='program.SpeakerProposal'),
+            model_name="speaker",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="The speaker proposal object this speaker was created from",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="program.SpeakerProposal",
+            ),
         ),
     ]

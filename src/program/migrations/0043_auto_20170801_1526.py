@@ -7,19 +7,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0042_auto_20170715_1547'),
-    ]
+    dependencies = [("program", "0042_auto_20170715_1547")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventproposal',
-            name='submission_notes',
-            field=models.TextField(blank=True, help_text='Private notes for this event. Only visible to the submitting user and the BornHack organisers.'),
+            model_name="eventproposal",
+            name="submission_notes",
+            field=models.TextField(
+                blank=True,
+                help_text="Private notes for this event. Only visible to the submitting user and the BornHack organisers.",
+            ),
         ),
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='submission_notes',
-            field=models.TextField(blank=True, help_text='Private notes for this speaker. Only visible to the submitting user and the BornHack organisers.'),
+            model_name="speakerproposal",
+            name="submission_notes",
+            field=models.TextField(
+                blank=True,
+                help_text="Private notes for this speaker. Only visible to the submitting user and the BornHack organisers.",
+            ),
         ),
     ]

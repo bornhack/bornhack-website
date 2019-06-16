@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('news', '0006_remove_newsitem_public'),
-    ]
+    dependencies = [("news", "0006_remove_newsitem_public")]
 
     operations = [
         migrations.AlterField(
-            model_name='newsitem',
-            name='published_at',
+            model_name="newsitem",
+            name="published_at",
             field=models.DateTimeField(blank=True, null=True),
-        ),
+        )
     ]

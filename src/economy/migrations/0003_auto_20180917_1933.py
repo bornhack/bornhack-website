@@ -6,14 +6,19 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('economy', '0002_revenue'),
-    ]
+    dependencies = [("economy", "0002_revenue")]
 
     operations = [
         migrations.AlterField(
-            model_name='revenue',
-            name='invoice_fk',
-            field=models.ForeignKey(blank=True, help_text='The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='shop.Invoice'),
-        ),
+            model_name="revenue",
+            name="invoice_fk",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="revenues",
+                to="shop.Invoice",
+            ),
+        )
     ]

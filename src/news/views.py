@@ -9,19 +9,17 @@ def news_items_queryset(kwargs=None):
     if not kwargs:
         archived = False
     else:
-        archived = kwargs['archived']
+        archived = kwargs["archived"]
 
     return NewsItem.objects.filter(
-        published_at__isnull=False,
-        published_at__lt=timezone.now(),
-        archived=archived
+        published_at__isnull=False, published_at__lt=timezone.now(), archived=archived
     )
 
 
 class NewsIndex(ListView):
     model = NewsItem
-    template_name = 'news_index.html'
-    context_object_name = 'news_items'
+    template_name = "news_index.html"
+    context_object_name = "news_items"
 
     def get_queryset(self):
         return news_items_queryset(self.kwargs)
@@ -29,8 +27,8 @@ class NewsIndex(ListView):
 
 class NewsDetail(DetailView):
     model = NewsItem
-    template_name = 'news_detail.html'
-    context_object_name = 'news_item'
+    template_name = "news_detail.html"
+    context_object_name = "news_item"
 
 
 class NewsFeed(Feed):

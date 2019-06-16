@@ -8,20 +8,22 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0003_auto_20160513_0646'),
-    ]
+    dependencies = [("shop", "0003_auto_20160513_0646")]
 
     operations = [
         migrations.AddField(
-            model_name='productcategory',
-            name='slug',
-            field=models.SlugField(default=''),
+            model_name="productcategory",
+            name="slug",
+            field=models.SlugField(default=""),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='products', to='shop.ProductCategory'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="products",
+                to="shop.ProductCategory",
+            ),
         ),
     ]

@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0008_auto_20180325_2022'),
-    ]
+    dependencies = [("profiles", "0008_auto_20180325_2022")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='nickserv_username',
-            field=models.CharField(blank=True, help_text='Your NickServ username is used to manage team IRC channel access lists.', max_length=50),
-        ),
+            model_name="profile",
+            name="nickserv_username",
+            field=models.CharField(
+                blank=True,
+                help_text="Your NickServ username is used to manage team IRC channel access lists.",
+                max_length=50,
+            ),
+        )
     ]

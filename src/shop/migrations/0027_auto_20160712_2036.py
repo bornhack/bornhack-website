@@ -10,68 +10,128 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0005_auto_20160510_2011'),
-        ('shop', '0026_order_refunded'),
+        ("camps", "0005_auto_20160510_2011"),
+        ("shop", "0026_order_refunded"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CustomOrder',
+            name="CustomOrder",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('text', models.TextField()),
-                ('amount', models.IntegerField(help_text='Amount of this custom order (in DKK, including VAT).')),
-                ('paid', models.BooleanField(default=False, help_text='Whether this custom order has been paid.', verbose_name='Paid?')),
-                ('camp', models.ForeignKey(help_text='The camp this custom order is for.', on_delete=django.db.models.deletion.CASCADE, to='camps.Camp', verbose_name='Camp')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("text", models.TextField()),
+                (
+                    "amount",
+                    models.IntegerField(
+                        help_text="Amount of this custom order (in DKK, including VAT)."
+                    ),
+                ),
+                (
+                    "paid",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Whether this custom order has been paid.",
+                        verbose_name="Paid?",
+                    ),
+                ),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        help_text="The camp this custom order is for.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="camps.Camp",
+                        verbose_name="Camp",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AlterModelOptions(
-            name='creditnote',
-            options={'ordering': ['-created']},
+            name="creditnote", options={"ordering": ["-created"]}
         ),
         migrations.AlterField(
-            model_name='creditnote',
-            name='paid',
-            field=models.BooleanField(default=False, help_text='Whether the amount in this creditnote has been paid back to the customer.', verbose_name='Paid?'),
+            model_name="creditnote",
+            name="paid",
+            field=models.BooleanField(
+                default=False,
+                help_text="Whether the amount in this creditnote has been paid back to the customer.",
+                verbose_name="Paid?",
+            ),
         ),
         migrations.AlterField(
-            model_name='invoice',
-            name='order',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='shop.Order'),
+            model_name="invoice",
+            name="order",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="shop.Order",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this shop order is for.', on_delete=django.db.models.deletion.CASCADE, to='camps.Camp', verbose_name='Camp'),
+            model_name="order",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this shop order is for.",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="camps.Camp",
+                verbose_name="Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='open',
-            field=models.NullBooleanField(default=True, help_text='Whether this shop order is open or not. "None" means closed.', verbose_name='Open?'),
+            model_name="order",
+            name="open",
+            field=models.NullBooleanField(
+                default=True,
+                help_text='Whether this shop order is open or not. "None" means closed.',
+                verbose_name="Open?",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='paid',
-            field=models.BooleanField(default=False, help_text='Whether this shop order has been paid.', verbose_name='Paid?'),
+            model_name="order",
+            name="paid",
+            field=models.BooleanField(
+                default=False,
+                help_text="Whether this shop order has been paid.",
+                verbose_name="Paid?",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='user',
-            field=models.ForeignKey(help_text='The user this shop order belongs to.', on_delete=django.db.models.deletion.CASCADE, related_name='orders', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="order",
+            name="user",
+            field=models.ForeignKey(
+                help_text="The user this shop order belongs to.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="orders",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='price',
-            field=models.IntegerField(help_text='Price of the product (in DKK, including VAT).'),
+            model_name="product",
+            name="price",
+            field=models.IntegerField(
+                help_text="Price of the product (in DKK, including VAT)."
+            ),
         ),
         migrations.AddField(
-            model_name='invoice',
-            name='customorder',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='shop.CustomOrder'),
+            model_name="invoice",
+            name="customorder",
+            field=models.OneToOneField(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="shop.CustomOrder",
+            ),
         ),
     ]

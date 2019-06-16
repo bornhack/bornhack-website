@@ -8,19 +8,23 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('bar', '0002_auto_20170916_2128'),
-    ]
+    dependencies = [("bar", "0002_auto_20170916_2128")]
 
     operations = [
         migrations.AlterField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='products', to='bar.ProductCategory'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="products",
+                to="bar.ProductCategory",
+            ),
         ),
         migrations.AlterField(
-            model_name='productcategory',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='camps.Camp'),
+            model_name="productcategory",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="camps.Camp"
+            ),
         ),
     ]

@@ -9,14 +9,16 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0011_auto_20161228_1750'),
-        ('villages', '0006_remove_village_camp'),
+        ("camps", "0011_auto_20161228_1750"),
+        ("villages", "0006_remove_village_camp"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='village',
-            name='camp',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='camps.Camp'),
-        ),
+            model_name="village",
+            name="camp",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to="camps.Camp"
+            ),
+        )
     ]

@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('news', '0007_auto_20161220_1136'),
-    ]
+    dependencies = [("news", "0007_auto_20161220_1136")]
 
     operations = [
         migrations.AddField(
-            model_name='newsitem',
-            name='archived',
+            model_name="newsitem",
+            name="archived",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

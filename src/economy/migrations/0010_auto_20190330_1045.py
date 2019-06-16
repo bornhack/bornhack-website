@@ -6,19 +6,27 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('economy', '0009_auto_20190328_0715'),
-    ]
+    dependencies = [("economy", "0009_auto_20190328_0715")]
 
     operations = [
         migrations.AlterField(
-            model_name='expense',
-            name='creditor',
-            field=models.ForeignKey(help_text='The Creditor to which this expense belongs', on_delete=django.db.models.deletion.PROTECT, related_name='expenses', to='economy.Credebtor'),
+            model_name="expense",
+            name="creditor",
+            field=models.ForeignKey(
+                help_text="The Creditor to which this expense belongs",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="expenses",
+                to="economy.Credebtor",
+            ),
         ),
         migrations.AlterField(
-            model_name='revenue',
-            name='debtor',
-            field=models.ForeignKey(help_text='The Debtor to which this revenue belongs', on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='economy.Credebtor'),
+            model_name="revenue",
+            name="debtor",
+            field=models.ForeignKey(
+                help_text="The Debtor to which this revenue belongs",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="revenues",
+                to="economy.Credebtor",
+            ),
         ),
     ]

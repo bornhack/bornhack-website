@@ -9,14 +9,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0019_auto_20170131_1849'),
+        ("camps", "0019_auto_20170131_1849"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('program', '0026_speaker_user'),
+        ("program", "0026_speaker_user"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='speaker',
-            unique_together=set([('camp', 'user'), ('camp', 'slug'), ('camp', 'name')]),
-        ),
+            name="speaker",
+            unique_together=set([("camp", "user"), ("camp", "slug"), ("camp", "name")]),
+        )
     ]

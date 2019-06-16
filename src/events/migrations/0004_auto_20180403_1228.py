@@ -7,19 +7,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0003_create_another_eventtype'),
-    ]
+    dependencies = [("events", "0003_create_another_eventtype")]
 
     operations = [
         migrations.AddField(
-            model_name='type',
-            name='email_notification',
-            field=models.BooleanField(default=False, help_text='Check to send email notifications for this type of event.'),
+            model_name="type",
+            name="email_notification",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to send email notifications for this type of event.",
+            ),
         ),
         migrations.AddField(
-            model_name='type',
-            name='irc_notification',
-            field=models.BooleanField(default=False, help_text='Check to send IRC notifications for this type of event.'),
+            model_name="type",
+            name="irc_notification",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to send IRC notifications for this type of event.",
+            ),
         ),
     ]

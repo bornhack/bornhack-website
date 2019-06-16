@@ -8,29 +8,35 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('tickets', '0001_initial'),
-    ]
+    dependencies = [("tickets", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='discountticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="discountticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="shopticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='sponsorticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="sponsorticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='tickettype',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='camps.Camp'),
+            model_name="tickettype",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="camps.Camp"
+            ),
         ),
     ]

@@ -1,5 +1,6 @@
 from .models import Team
 
+
 def get_team_from_irc_channel(channel):
     """
     Returns a Team object given an IRC channel name, if possible
@@ -15,4 +16,3 @@ def get_team_from_irc_channel(channel):
         return Team.objects.get(public_irc_channel_name=channel)
     except Team.DoesNotExist:
         return False
-

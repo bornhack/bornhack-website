@@ -7,18 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0030_auto_20170312_1230'),
-    ]
+    dependencies = [("program", "0030_auto_20170312_1230")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='speaker',
-            name='user',
-        ),
+        migrations.RemoveField(model_name="speaker", name="user"),
         migrations.AddField(
-            model_name='eventsubmission',
-            name='speakers',
-            field=models.ManyToManyField(blank=True, help_text='The speaker(s) for this event', to='program.SpeakerSubmission'),
+            model_name="eventsubmission",
+            name="speakers",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="The speaker(s) for this event",
+                to="program.SpeakerSubmission",
+            ),
         ),
     ]

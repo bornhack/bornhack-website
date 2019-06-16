@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0031_auto_20161109_1000'),
-    ]
+    dependencies = [("shop", "0031_auto_20161109_1000")]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='customer_comment',
-            field=models.TextField(default=b'', help_text='If you have any comments about the order please enter them here.', verbose_name='Customer comment'),
-        ),
+            model_name="order",
+            name="customer_comment",
+            field=models.TextField(
+                default=b"",
+                help_text="If you have any comments about the order please enter them here.",
+                verbose_name="Customer comment",
+            ),
+        )
     ]

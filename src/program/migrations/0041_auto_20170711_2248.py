@@ -7,19 +7,37 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0040_eventproposal_allow_video_recording'),
-    ]
+    dependencies = [("program", "0040_eventproposal_allow_video_recording")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventproposal',
-            name='proposal_status',
-            field=models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('modified after approval', 'Modified after approval')], default='draft', max_length=50),
+            model_name="eventproposal",
+            name="proposal_status",
+            field=models.CharField(
+                choices=[
+                    ("draft", "Draft"),
+                    ("pending", "Pending approval"),
+                    ("approved", "Approved"),
+                    ("rejected", "Rejected"),
+                    ("modified after approval", "Modified after approval"),
+                ],
+                default="draft",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='proposal_status',
-            field=models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected'), ('modified after approval', 'Modified after approval')], default='draft', max_length=50),
+            model_name="speakerproposal",
+            name="proposal_status",
+            field=models.CharField(
+                choices=[
+                    ("draft", "Draft"),
+                    ("pending", "Pending approval"),
+                    ("approved", "Approved"),
+                    ("rejected", "Rejected"),
+                    ("modified after approval", "Modified after approval"),
+                ],
+                default="draft",
+                max_length=50,
+            ),
         ),
     ]

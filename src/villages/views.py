@@ -2,7 +2,13 @@ from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from django.views.generic.detail import SingleObjectMixin
 from .models import Village
 from camps.models import Camp
@@ -12,8 +18,8 @@ from .mixins import EnsureWritableCampMixin
 
 class VillageListView(CampViewMixin, ListView):
     model = Village
-    template_name = 'village_list.html'
-    context_object_name = 'villages'
+    template_name = "village_list.html"
+    context_object_name = "villages"
 
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
@@ -21,29 +27,31 @@ class VillageListView(CampViewMixin, ListView):
 
 class VillageDetailView(CampViewMixin, DetailView):
     model = Village
-    template_name = 'village_detail.html'
-    context_object_name = 'village'
+    template_name = "village_detail.html"
+    context_object_name = "village"
 
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
 
 
-class VillageCreateView(CampViewMixin, LoginRequiredMixin, EnsureWritableCampMixin, CreateView):
+class VillageCreateView(
+    CampViewMixin, LoginRequiredMixin, EnsureWritableCampMixin, CreateView
+):
     model = Village
-    template_name = 'village_form.html'
-    fields = ['name', 'description', 'private']
+    template_name = "village_form.html"
+    fields = ["name", "description", "private"]
 
     def form_valid(self, form):
         village = form.save(commit=False)
         village.contact = self.request.user
-        village.camp = Camp.objects.get(slug=self.request.session['campslug'])
+        village.camp = Camp.objects.get(slug=self.request.session["campslug"])
         if not village.name:
             village.name = "noname"
         village.save()
         return HttpResponseRedirect(village.get_absolute_url())
 
     def get_success_url(self):
-        return reverse_lazy('village_list', kwargs={"camp_slug": self.object.camp.slug})
+        return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})
 
 
 class EnsureUserOwnsVillageMixin(SingleObjectMixin):
@@ -60,10 +68,16 @@ class EnsureUserOwnsVillageMixin(SingleObjectMixin):
         )
 
 
-class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, UpdateView):
+class VillageUpdateView(
+    CampViewMixin,
+    EnsureUserOwnsVillageMixin,
+    LoginRequiredMixin,
+    EnsureWritableCampMixin,
+    UpdateView,
+):
     model = Village
-    template_name = 'village_form.html'
-    fields = ['name', 'description', 'private']
+    template_name = "village_form.html"
+    fields = ["name", "description", "private"]
 
     def form_valid(self, form):
         village = form.save(commit=False)
@@ -78,11 +92,16 @@ class VillageUpdateView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequired
         return super().get_queryset().filter(deleted=False)
 
 
-class VillageDeleteView(CampViewMixin, EnsureUserOwnsVillageMixin, LoginRequiredMixin, EnsureWritableCampMixin, DeleteView):
+class VillageDeleteView(
+    CampViewMixin,
+    EnsureUserOwnsVillageMixin,
+    LoginRequiredMixin,
+    EnsureWritableCampMixin,
+    DeleteView,
+):
     model = Village
-    template_name = 'village_confirm_delete.html'
-    context_object_name = 'village'
+    template_name = "village_confirm_delete.html"
+    context_object_name = "village"
 
     def get_success_url(self):
-        return reverse_lazy('village_list', kwargs={"camp_slug": self.object.camp.slug})
-
+        return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})

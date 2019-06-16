@@ -5,14 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0056_auto_20180827_1020'),
-    ]
+    dependencies = [("shop", "0056_auto_20180827_1020")]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='notes',
-            field=models.TextField(blank=True, default='', help_text='Any internal notes about this order can be entered here. They will not be printed on the invoice or shown to the customer in any way.'),
-        ),
+            model_name="order",
+            name="notes",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Any internal notes about this order can be entered here. They will not be printed on the invoice or shown to the customer in any way.",
+            ),
+        )
     ]

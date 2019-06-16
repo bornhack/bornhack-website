@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0024_populate_shortslugs'),
-    ]
+    dependencies = [("teams", "0024_populate_shortslugs")]
 
     operations = [
         migrations.AlterField(
-            model_name='team',
-            name='shortslug',
-            field=models.SlugField(help_text='Abbreviated version of the slug. Used in places like IRC channel names where space is limited'),
-        ),
+            model_name="team",
+            name="shortslug",
+            field=models.SlugField(
+                help_text="Abbreviated version of the slug. Used in places like IRC channel names where space is limited"
+            ),
+        )
     ]

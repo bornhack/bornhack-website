@@ -7,12 +7,13 @@ from wkhtmltopdf.views import PDFTemplateResponse
 from PyPDF2 import PdfFileWriter, PdfFileReader
 from django.test.client import RequestFactory
 from django.conf import settings
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def generate_pdf_letter(filename, template, formatdict):
     # conjure up a fake request for PDFTemplateResponse
-    request = RequestFactory().get('/')
+    request = RequestFactory().get("/")
     request.user = AnonymousUser()
     request.session = {}
 
@@ -21,10 +22,7 @@ def generate_pdf_letter(filename, template, formatdict):
         request=request,
         template=template,
         context=formatdict,
-        cmd_options={
-            'margin-top': 50,
-            'margin-bottom': 50,
-        },
+        cmd_options={"margin-top": 50, "margin-bottom": 50},
     )
     textonlypdf = io.BytesIO()
     textonlypdf.write(pdfgenerator.rendered_content)
@@ -39,11 +37,9 @@ def generate_pdf_letter(filename, template, formatdict):
     watermark = PdfFileReader(
         open(
             os.path.join(
-                settings.STATICFILES_DIRS[0],
-                'pdf',
-                settings.PDF_LETTERHEAD_FILENAME
+                settings.STATICFILES_DIRS[0], "pdf", settings.PDF_LETTERHEAD_FILENAME
             ),
-            'rb'
+            "rb",
         )
     )
 
@@ -60,9 +56,9 @@ def generate_pdf_letter(filename, template, formatdict):
 
     # save the generated pdf to the archive
     fullpath = os.path.join(settings.PDF_ARCHIVE_PATH, filename)
-    with open(fullpath, 'wb') as fh:
+    with open(fullpath, "wb") as fh:
         finalpdf.write(fh)
-        logger.info('Saved pdf to archive: %s' % fullpath)
+        logger.info("Saved pdf to archive: %s" % fullpath)
 
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)

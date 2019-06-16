@@ -7,24 +7,29 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0022_auto_20180318_1135'),
-    ]
+    dependencies = [("teams", "0022_auto_20180318_1135")]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='shortslug',
-            field=models.SlugField(blank=True, help_text='Abbreviated version of the slug. Used in places like IRC channel names where space is limited'),
+            model_name="team",
+            name="shortslug",
+            field=models.SlugField(
+                blank=True,
+                help_text="Abbreviated version of the slug. Used in places like IRC channel names where space is limited",
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='name',
-            field=models.CharField(help_text='The team name', max_length=255),
+            model_name="team",
+            name="name",
+            field=models.CharField(help_text="The team name", max_length=255),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='slug',
-            field=models.SlugField(blank=True, help_text='Url slug for this team. Leave blank to generate based on team name', max_length=255),
+            model_name="team",
+            name="slug",
+            field=models.SlugField(
+                blank=True,
+                help_text="Url slug for this team. Leave blank to generate based on team name",
+                max_length=255,
+            ),
         ),
     ]

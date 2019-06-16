@@ -15,8 +15,9 @@ class CampPropertyListFilter(admin.SimpleListFilter):
     SimpleListFilter to filter models by camp when camp is
     a property and not a real model field.
     """
-    title = 'Camp'
-    parameter_name = 'camp'
+
+    title = "Camp"
+    parameter_name = "camp"
 
     def lookups(self, request, model_admin):
         # get the current queryset

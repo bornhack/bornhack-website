@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0012_ticket'),
-    ]
+    dependencies = [("shop", "0012_ticket")]
 
     operations = [
         migrations.AddField(
-            model_name='ticket',
-            name='qrcode_base64',
+            model_name="ticket",
+            name="qrcode_base64",
             field=models.TextField(blank=True, null=True),
-        ),
+        )
     ]

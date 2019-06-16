@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0050_auto_20170916_1336'),
-    ]
+    dependencies = [("shop", "0050_auto_20170916_1336")]
 
     operations = [
         migrations.AddField(
-            model_name='creditnote',
-            name='danish_vat',
-            field=models.BooleanField(default=True, help_text='Danish VAT?'),
-        ),
+            model_name="creditnote",
+            name="danish_vat",
+            field=models.BooleanField(default=True, help_text="Danish VAT?"),
+        )
     ]

@@ -5,14 +5,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0029_auto_20180815_2018'),
-    ]
+    dependencies = [("camps", "0029_auto_20180815_2018")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='light_text',
-            field=models.BooleanField(default=True, help_text='Check if this camps colour requires white text, uncheck if black text is better'),
-        ),
+            model_name="camp",
+            name="light_text",
+            field=models.BooleanField(
+                default=True,
+                help_text="Check if this camps colour requires white text, uncheck if black text is better",
+            ),
+        )
     ]

@@ -8,19 +8,29 @@ import program.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0033_auto_20170312_1857'),
-    ]
+    dependencies = [("program", "0033_auto_20170312_1857")]
 
     operations = [
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='picture_large',
-            field=models.ImageField(blank=True, help_text='A picture of the speaker', null=True, storage=program.models.CustomUrlStorage(), upload_to=program.models.get_speakerproposal_picture_upload_path),
+            model_name="speakerproposal",
+            name="picture_large",
+            field=models.ImageField(
+                blank=True,
+                help_text="A picture of the speaker",
+                null=True,
+                storage=program.models.CustomUrlStorage(),
+                upload_to=program.models.get_speakerproposal_picture_upload_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='picture_small',
-            field=models.ImageField(blank=True, help_text='A thumbnail of the speaker picture', null=True, storage=program.models.CustomUrlStorage(), upload_to=program.models.get_speakerproposal_picture_upload_path),
+            model_name="speakerproposal",
+            name="picture_small",
+            field=models.ImageField(
+                blank=True,
+                help_text="A thumbnail of the speaker picture",
+                null=True,
+                storage=program.models.CustomUrlStorage(),
+                upload_to=program.models.get_speakerproposal_picture_upload_path,
+            ),
         ),
     ]

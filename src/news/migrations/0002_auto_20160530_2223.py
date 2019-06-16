@@ -7,13 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('news', '0001_initial'),
-    ]
+    dependencies = [("news", "0001_initial")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='newsitem',
-            options={'ordering': ['-published_at']},
-        ),
+            name="newsitem", options={"ordering": ["-published_at"]}
+        )
     ]

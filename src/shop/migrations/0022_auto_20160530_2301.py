@@ -8,24 +8,35 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0021_ticket_email'),
-    ]
+    dependencies = [("shop", "0021_ticket_email")]
 
     operations = [
         migrations.AlterField(
-            model_name='ticket',
-            name='name',
-            field=models.CharField(blank=True, help_text=b'Name of the person this ticket belongs to. This can be different from the buying user.', max_length=100, null=True),
+            model_name="ticket",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text=b"Name of the person this ticket belongs to. This can be different from the buying user.",
+                max_length=100,
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tickets', to='shop.Order'),
+            model_name="ticket",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tickets",
+                to="shop.Order",
+            ),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tickets', to='shop.Product'),
+            model_name="ticket",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tickets",
+                to="shop.Product",
+            ),
         ),
     ]

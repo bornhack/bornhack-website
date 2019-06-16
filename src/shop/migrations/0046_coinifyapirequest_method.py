@@ -7,15 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0045_auto_20170507_1648'),
-    ]
+    dependencies = [("shop", "0045_auto_20170507_1648")]
 
     operations = [
         migrations.AddField(
-            model_name='coinifyapirequest',
-            name='method',
-            field=models.CharField(default='', max_length=100),
+            model_name="coinifyapirequest",
+            name="method",
+            field=models.CharField(default="", max_length=100),
             preserve_default=False,
-        ),
+        )
     ]

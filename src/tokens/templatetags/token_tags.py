@@ -12,4 +12,3 @@ def found_by_user(token, user):
         return tokenfind.created
     except TokenFind.DoesNotExist:
         return False
-

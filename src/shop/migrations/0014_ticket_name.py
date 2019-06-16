@@ -7,15 +7,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0013_ticket_qrcode_base64'),
-    ]
+    dependencies = [("shop", "0013_ticket_qrcode_base64")]
 
     operations = [
         migrations.AddField(
-            model_name='ticket',
-            name='name',
-            field=models.CharField(default='', help_text=b'Name of the person this ticket belongs to. This can be different from the buying user.', max_length=100),
+            model_name="ticket",
+            name="name",
+            field=models.CharField(
+                default="",
+                help_text=b"Name of the person this ticket belongs to. This can be different from the buying user.",
+                max_length=100,
+            ),
             preserve_default=False,
-        ),
+        )
     ]

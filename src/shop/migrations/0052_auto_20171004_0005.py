@@ -7,20 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0051_creditnote_danish_vat'),
-    ]
+    dependencies = [("shop", "0051_creditnote_danish_vat")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='ticket',
-            name='order',
-        ),
-        migrations.RemoveField(
-            model_name='ticket',
-            name='product',
-        ),
-        migrations.DeleteModel(
-            name='Ticket',
-        ),
+        migrations.RemoveField(model_name="ticket", name="order"),
+        migrations.RemoveField(model_name="ticket", name="product"),
+        migrations.DeleteModel(name="Ticket"),
     ]

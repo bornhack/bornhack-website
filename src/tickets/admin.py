@@ -1,53 +1,33 @@
 from django.contrib import admin
 
-from .models import (
-    TicketType,
-    SponsorTicket,
-    DiscountTicket,
-    ShopTicket
-)
+from .models import TicketType, SponsorTicket, DiscountTicket, ShopTicket
 
 
 class BaseTicketAdmin(admin.ModelAdmin):
-    actions = ['generate_pdf']
-    exclude = ['qrcode_base64']
+    actions = ["generate_pdf"]
+    exclude = ["qrcode_base64"]
 
     def generate_pdf(self, request, queryset):
         for ticket in queryset.all():
             ticket.generate_pdf()
-    generate_pdf.description = 'Generate PDF for the ticket'
+
+    generate_pdf.description = "Generate PDF for the ticket"
 
 
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
-    list_display = [
-        'name',
-        'camp',
-    ]
+    list_display = ["name", "camp"]
 
-    list_filter = [
-        'name',
-        'camp',
-    ]
+    list_filter = ["name", "camp"]
 
 
 @admin.register(SponsorTicket)
 class SponsorTicketAdmin(BaseTicketAdmin):
-    list_display = [
-        'pk',
-        'ticket_type',
-        'sponsor',
-        'checked_in',
-    ]
+    list_display = ["pk", "ticket_type", "sponsor", "checked_in"]
 
-    list_filter = [
-        'ticket_type__camp',
-        'checked_in',
-        'ticket_type',
-        'sponsor',
-    ]
+    list_filter = ["ticket_type__camp", "checked_in", "ticket_type", "sponsor"]
 
-    search_fields = ['pk', 'sponsor__name']
+    search_fields = ["pk", "sponsor__name"]
 
 
 @admin.register(DiscountTicket)
@@ -64,24 +44,18 @@ class ShopTicketAdmin(BaseTicketAdmin):
         return obj.order.paid
 
     list_display = [
-        'pk',
-        'user_email',
-        'is_paid',
-        'ticket_type',
-        'order',
-        'product',
-        'checked_in',
+        "pk",
+        "user_email",
+        "is_paid",
+        "ticket_type",
+        "order",
+        "product",
+        "checked_in",
     ]
 
-    list_filter = [
-        'ticket_type__camp',
-        'checked_in',
-        'ticket_type',
-        'order',
-        'product',
-    ]
+    list_filter = ["ticket_type__camp", "checked_in", "ticket_type", "order", "product"]
 
-    search_fields = ['uuid', 'order__id', 'order__user__email', 'name', 'email']
+    search_fields = ["uuid", "order__id", "order__user__email", "name", "email"]
 
 
 class ShopTicketInline(admin.TabularInline):

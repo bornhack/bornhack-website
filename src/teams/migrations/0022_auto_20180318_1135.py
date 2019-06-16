@@ -7,29 +7,40 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0021_auto_20180318_0906'),
-    ]
+    dependencies = [("teams", "0021_auto_20180318_0906")]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='irc_channel',
-            field=models.BooleanField(default=False, help_text='Check to make the IRC bot join the team IRC channel. Leave unchecked to disable IRC bot functionality for this team entirely.'),
+            model_name="team",
+            name="irc_channel",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the IRC bot join the team IRC channel. Leave unchecked to disable IRC bot functionality for this team entirely.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='irc_channel_managed',
-            field=models.BooleanField(default=True, help_text='Check to make the bot manage the team IRC channel. The bot will register the channel with ChanServ if possible, and manage ACLs as needed.'),
+            model_name="team",
+            name="irc_channel_managed",
+            field=models.BooleanField(
+                default=True,
+                help_text="Check to make the bot manage the team IRC channel. The bot will register the channel with ChanServ if possible, and manage ACLs as needed.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='irc_channel_name',
-            field=models.TextField(blank=True, default='', help_text='Team IRC channel. Leave blank to generate channel name automatically, based on camp slug and team slug.'),
+            model_name="team",
+            name="irc_channel_name",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Team IRC channel. Leave blank to generate channel name automatically, based on camp slug and team slug.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='irc_channel_private',
-            field=models.BooleanField(default=True, help_text='Check to make the IRC channel private for team members only, also sets +s. Leave unchecked to make the IRC channel public and open for everyone.'),
+            model_name="team",
+            name="irc_channel_private",
+            field=models.BooleanField(
+                default=True,
+                help_text="Check to make the IRC channel private for team members only, also sets +s. Leave unchecked to make the IRC channel public and open for everyone.",
+            ),
         ),
     ]

@@ -8,25 +8,25 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0012_teammember_responsible'),
-    ]
+    dependencies = [("teams", "0012_teammember_responsible")]
 
     operations = [
         migrations.AddField(
-            model_name='teammember',
-            name='created',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="teammember",
+            name="created",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='teammember',
-            name='deleted',
+            model_name="teammember",
+            name="deleted",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='teammember',
-            name='updated',
+            model_name="teammember",
+            name="updated",
             field=models.DateTimeField(auto_now=True),
         ),
     ]

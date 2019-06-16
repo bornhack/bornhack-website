@@ -9,29 +9,49 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0019_auto_20170131_1849'),
-        ('program', '0018_eventtype_notifications'),
+        ("camps", "0019_auto_20170131_1849"),
+        ("program", "0018_eventtype_notifications"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EventLocation',
+            name="EventLocation",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=100, unique=True)),
-                ('slug', models.SlugField()),
-                ('icon', models.URLField()),
-                ('camp', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='eventlocations', to='camps.Camp')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=100, unique=True)),
+                ("slug", models.SlugField()),
+                ("icon", models.URLField()),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eventlocations",
+                        to="camps.Camp",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AddField(
-            model_name='eventinstance',
-            name='location',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='eventinstances', to='program.EventLocation'),
+            model_name="eventinstance",
+            name="location",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="eventinstances",
+                to="program.EventLocation",
+            ),
         ),
     ]

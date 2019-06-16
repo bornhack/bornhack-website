@@ -7,17 +7,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0032_order_customer_comment'),
-    ]
+    dependencies = [("shop", "0032_order_customer_comment")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='customorder',
-            name='camp',
-        ),
-        migrations.RemoveField(
-            model_name='order',
-            name='camp',
-        ),
+        migrations.RemoveField(model_name="customorder", name="camp"),
+        migrations.RemoveField(model_name="order", name="camp"),
     ]

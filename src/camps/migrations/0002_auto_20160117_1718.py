@@ -8,14 +8,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0001_initial'),
-    ]
+    dependencies = [("camps", "0001_initial")]
 
     operations = [
         migrations.AlterField(
-            model_name='day',
-            name='camp',
-            field=models.ForeignKey(help_text='Which camp does this day belong to.', on_delete=django.db.models.deletion.CASCADE, related_name='days', to='camps.Camp', verbose_name='Camp'),
-        ),
+            model_name="day",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="Which camp does this day belong to.",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="days",
+                to="camps.Camp",
+                verbose_name="Camp",
+            ),
+        )
     ]

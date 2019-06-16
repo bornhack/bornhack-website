@@ -8,14 +8,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0019_auto_20170205_1940'),
-    ]
+    dependencies = [("program", "0019_auto_20170205_1940")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventinstance',
-            name='location',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eventinstances', to='program.EventLocation'),
-        ),
+            model_name="eventinstance",
+            name="location",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="eventinstances",
+                to="program.EventLocation",
+            ),
+        )
     ]

@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db import models
 import logging
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -23,7 +24,7 @@ class CleanedModel(models.Model):
             self.validate_unique(exclude=None)
         except ValidationError as e:
             message = "Got ValidationError while saving: %s" % e
-            if hasattr(self, 'request'):
+            if hasattr(self, "request"):
                 messages.error(self.request, message)
             logger.error(message)
             # dont save, re-raise the exception
@@ -35,11 +36,7 @@ class UUIDModel(CleanedModel):
     class Meta:
         abstract = True
 
-    uuid = models.UUIDField(
-        primary_key=True,
-        default=uuid.uuid4,
-        editable=False,
-    )
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
 
 class CreatedUpdatedModel(CleanedModel):
@@ -52,24 +49,24 @@ class CreatedUpdatedModel(CleanedModel):
 
 class CampRelatedModel(CreatedUpdatedModel):
 
-    camp_filter = 'camp'
+    camp_filter = "camp"
 
     class Meta:
         abstract = True
 
     def save(self, **kwargs):
         if self.camp.read_only:
-            if hasattr(self, 'request'):
-                messages.error(self.request, 'Camp is in read only mode.')
-            raise ValidationError('This camp is in read only mode.')
+            if hasattr(self, "request"):
+                messages.error(self.request, "Camp is in read only mode.")
+            raise ValidationError("This camp is in read only mode.")
 
         super().save(**kwargs)
 
     def delete(self, **kwargs):
         if self.camp.read_only:
-            if hasattr(self, 'request'):
-                messages.error(self.request, 'Camp is in read only mode.')
-            raise ValidationError('This camp is in read only mode.')
+            if hasattr(self, "request"):
+                messages.error(self.request, "Camp is in read only mode.")
+            raise ValidationError("This camp is in read only mode.")
 
         super().delete(**kwargs)
 
@@ -84,30 +81,28 @@ class OutgoingEmail(CreatedUpdatedModel):
     html_template = models.TextField(blank=True)
     sender = models.CharField(max_length=500)
     to_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True),
-        null=True,
-        blank=True
+        models.CharField(max_length=500, blank=True), null=True, blank=True
     )
     cc_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True),
-        null=True,
-        blank=True
+        models.CharField(max_length=500, blank=True), null=True, blank=True
     )
     bcc_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True),
-        null=True,
-        blank=True
+        models.CharField(max_length=500, blank=True), null=True, blank=True
     )
     attachment = models.FileField(blank=True)
     processed = models.BooleanField(default=False)
 
     def __str__(self):
-        return 'OutgoingEmail Object id: {} '.format(self.id)
+        return "OutgoingEmail Object id: {} ".format(self.id)
 
     def clean(self):
-        if not self.to_recipients \
-           and not self.bcc_recipients \
-           and not self.cc_recipients:
+        if (
+            not self.to_recipients
+            and not self.bcc_recipients
+            and not self.cc_recipients
+        ):
             raise ValidationError(
-                {'recipient': 'either to_recipient, bcc_recipient or cc_recipient required.'}
+                {
+                    "recipient": "either to_recipient, bcc_recipient or cc_recipient required."
+                }
             )

@@ -5,13 +5,16 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0028_auto_20180525_1025'),
-    ]
+    dependencies = [("camps", "0028_auto_20180525_1025")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='camp',
-            options={'ordering': ['-title'], 'permissions': (('infodesk_permission', 'Infodesk permission'),), 'verbose_name': 'Camp', 'verbose_name_plural': 'Camps'},
-        ),
+            name="camp",
+            options={
+                "ordering": ["-title"],
+                "permissions": (("infodesk_permission", "Infodesk permission"),),
+                "verbose_name": "Camp",
+                "verbose_name_plural": "Camps",
+            },
+        )
     ]

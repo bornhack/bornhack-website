@@ -8,27 +8,43 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0001_initial'),
-    ]
+    dependencies = [("sponsors", "0001_initial")]
 
     operations = [
         migrations.CreateModel(
-            name='SponsorTier',
+            name="SponsorTier",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='Name of the tier (gold, silver, etc.)', max_length=25)),
-                ('description', models.TextField(help_text='A description of what the tier includes.')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="Name of the tier (gold, silver, etc.)", max_length=25
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        help_text="A description of what the tier includes."
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AlterField(
-            model_name='sponsor',
-            name='tier',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sponsors.SponsorTier'),
+            model_name="sponsor",
+            name="tier",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="sponsors.SponsorTier"
+            ),
         ),
     ]

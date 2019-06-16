@@ -6,18 +6,15 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0058_auto_20180523_0844'),
-    ]
+    dependencies = [("program", "0058_auto_20180523_0844")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='url',
-            name='id',
-        ),
+        migrations.RemoveField(model_name="url", name="id"),
         migrations.AddField(
-            model_name='url',
-            name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False),
+            model_name="url",
+            name="uuid",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+            ),
         ),
     ]

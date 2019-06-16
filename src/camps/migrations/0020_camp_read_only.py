@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0019_auto_20170131_1849'),
-    ]
+    dependencies = [("camps", "0019_auto_20170131_1849")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='read_only',
-            field=models.BooleanField(default=False, help_text='Whether the camp is read only (i.e. in the past)'),
-        ),
+            model_name="camp",
+            name="read_only",
+            field=models.BooleanField(
+                default=False,
+                help_text="Whether the camp is read only (i.e. in the past)",
+            ),
+        )
     ]

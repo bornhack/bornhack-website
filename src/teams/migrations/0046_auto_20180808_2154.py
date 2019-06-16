@@ -5,13 +5,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0045_merge_20180805_1131'),
-    ]
+    dependencies = [("teams", "0045_merge_20180805_1131")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='teamshift',
-            options={'ordering': ('shift_range',)},
-        ),
+            name="teamshift", options={"ordering": ("shift_range",)}
+        )
     ]

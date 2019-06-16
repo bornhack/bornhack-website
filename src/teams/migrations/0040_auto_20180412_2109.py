@@ -7,25 +7,11 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0039_fix_irc_channels'),
-    ]
+    dependencies = [("teams", "0039_fix_irc_channels")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='team',
-            name='irc_channel',
-        ),
-        migrations.RemoveField(
-            model_name='team',
-            name='irc_channel_managed',
-        ),
-        migrations.RemoveField(
-            model_name='team',
-            name='irc_channel_name',
-        ),
-        migrations.RemoveField(
-            model_name='team',
-            name='irc_channel_private',
-        ),
+        migrations.RemoveField(model_name="team", name="irc_channel"),
+        migrations.RemoveField(model_name="team", name="irc_channel_managed"),
+        migrations.RemoveField(model_name="team", name="irc_channel_name"),
+        migrations.RemoveField(model_name="team", name="irc_channel_private"),
     ]

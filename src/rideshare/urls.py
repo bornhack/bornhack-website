@@ -1,43 +1,20 @@
 from django.urls import path, include
 
-from .views import (
-    RideList,
-    RideCreate,
-    RideDetail,
-    RideUpdate,
-    RideDelete,
-)
+from .views import RideList, RideCreate, RideDetail, RideUpdate, RideDelete
 
-app_name = 'rideshare'
+app_name = "rideshare"
 
 urlpatterns = [
+    path("", RideList.as_view(), name="list"),
+    path("create/", RideCreate.as_view(), name="create"),
     path(
-        '',
-        RideList.as_view(),
-        name='list'
+        "<uuid:pk>/",
+        include(
+            [
+                path("", RideDetail.as_view(), name="detail"),
+                path("update/", RideUpdate.as_view(), name="update"),
+                path("delete/", RideDelete.as_view(), name="delete"),
+            ]
+        ),
     ),
-    path(
-        'create/',
-        RideCreate.as_view(),
-        name='create'
-    ),
-    path(
-        '<uuid:pk>/', include([
-            path(
-                '',
-                RideDetail.as_view(),
-                name='detail'
-            ),
-            path(
-                'update/',
-                RideUpdate.as_view(),
-                name='update'
-            ),
-            path(
-                'delete/',
-                RideDelete.as_view(),
-                name='delete'
-            ),
-        ])
-    )
 ]

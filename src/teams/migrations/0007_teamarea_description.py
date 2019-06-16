@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0006_auto_20170402_1331'),
-    ]
+    dependencies = [("teams", "0006_auto_20170402_1331")]
 
     operations = [
         migrations.AddField(
-            model_name='teamarea',
-            name='description',
-            field=models.TextField(default=''),
-        ),
+            model_name="teamarea",
+            name="description",
+            field=models.TextField(default=""),
+        )
     ]

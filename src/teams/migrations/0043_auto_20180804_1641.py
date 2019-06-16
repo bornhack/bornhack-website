@@ -6,19 +6,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0042_auto_20180413_1933'),
-    ]
+    dependencies = [("teams", "0042_auto_20180413_1933")]
 
     operations = [
         migrations.AddField(
-            model_name='teamtask',
-            name='completed',
-            field=models.BooleanField(default=False, help_text='Check to mark this task as completed.'),
+            model_name="teamtask",
+            name="completed",
+            field=models.BooleanField(
+                default=False, help_text="Check to mark this task as completed."
+            ),
         ),
         migrations.AddField(
-            model_name='teamtask',
-            name='when',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(blank=True, help_text='When does this task need to be started and/or finished?', null=True),
+            model_name="teamtask",
+            name="when",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                blank=True,
+                help_text="When does this task need to be started and/or finished?",
+                null=True,
+            ),
         ),
     ]

@@ -5,18 +5,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0010_populate_logo_filename'),
-    ]
+    dependencies = [("sponsors", "0010_populate_logo_filename")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='sponsor',
-            name='logo',
-        ),
+        migrations.RemoveField(model_name="sponsor", name="logo"),
         migrations.AlterField(
-            model_name='sponsor',
-            name='logo_filename',
-            field=models.CharField(help_text='Filename of the logo', max_length=255),
+            model_name="sponsor",
+            name="logo_filename",
+            field=models.CharField(help_text="Filename of the logo", max_length=255),
         ),
     ]

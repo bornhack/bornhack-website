@@ -7,63 +7,136 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('economy', '0007_auto_20190327_0936'),
-    ]
+    dependencies = [("economy", "0007_auto_20190327_0936")]
 
     operations = [
         migrations.CreateModel(
-            name='Chain',
+            name="Chain",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='A short name for this Chain, like "Netto" or "XL Byg". 100 characters or fewer.', max_length=100, unique=True)),
-                ('slug', models.SlugField(help_text='The url slug for this Chain. Leave blank to auto generate a slug.', unique=True)),
-                ('notes', models.TextField(blank=True, help_text='Any notes for this Chain. Will be shown to anyone creating Expenses or Revenues for this Chain.')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(
+                        help_text='A short name for this Chain, like "Netto" or "XL Byg". 100 characters or fewer.',
+                        max_length=100,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "slug",
+                    models.SlugField(
+                        help_text="The url slug for this Chain. Leave blank to auto generate a slug.",
+                        unique=True,
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Any notes for this Chain. Will be shown to anyone creating Expenses or Revenues for this Chain.",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name'],
-            },
+            options={"ordering": ["name"]},
         ),
         migrations.CreateModel(
-            name='Credebtor',
+            name="Credebtor",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='The name of this Credebtor, like "XL Byg Rønne" or "Netto Gelsted". 100 characters or fewer.', max_length=100, unique=True)),
-                ('slug', models.SlugField(help_text='The url slug for this Credebtor. Leave blank to auto generate a slug.')),
-                ('address', models.TextField(help_text='The address of this Credebtor.')),
-                ('notes', models.TextField(blank=True, help_text='Any notes for this Credebtor. Shown when creating an Expense or Revenue for this Credebtor.')),
-                ('chain', models.ForeignKey(help_text='The Chain to which this Credebtor belongs.', on_delete=django.db.models.deletion.PROTECT, related_name='credebtors', to='economy.Chain')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(
+                        help_text='The name of this Credebtor, like "XL Byg Rønne" or "Netto Gelsted". 100 characters or fewer.',
+                        max_length=100,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "slug",
+                    models.SlugField(
+                        help_text="The url slug for this Credebtor. Leave blank to auto generate a slug."
+                    ),
+                ),
+                (
+                    "address",
+                    models.TextField(help_text="The address of this Credebtor."),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Any notes for this Credebtor. Shown when creating an Expense or Revenue for this Credebtor.",
+                    ),
+                ),
+                (
+                    "chain",
+                    models.ForeignKey(
+                        help_text="The Chain to which this Credebtor belongs.",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="credebtors",
+                        to="economy.Chain",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name'],
-            },
+            options={"ordering": ["name"]},
         ),
         migrations.AlterField(
-            model_name='expense',
-            name='invoice_date',
-            field=models.DateField(help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.'),
+            model_name="expense",
+            name="invoice_date",
+            field=models.DateField(
+                help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+            ),
         ),
         migrations.AlterField(
-            model_name='revenue',
-            name='invoice_date',
-            field=models.DateField(help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.'),
+            model_name="revenue",
+            name="invoice_date",
+            field=models.DateField(
+                help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+            ),
         ),
         migrations.AddField(
-            model_name='expense',
-            name='creditor',
-            field=models.ForeignKey(help_text='The Creditor to which this expense belongs', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='expenses', to='economy.Credebtor'),
+            model_name="expense",
+            name="creditor",
+            field=models.ForeignKey(
+                help_text="The Creditor to which this expense belongs",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="expenses",
+                to="economy.Credebtor",
+            ),
         ),
         migrations.AddField(
-            model_name='revenue',
-            name='debtor',
-            field=models.ForeignKey(help_text='The Debtor to which this revenue belongs', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='economy.Credebtor'),
+            model_name="revenue",
+            name="debtor",
+            field=models.ForeignKey(
+                help_text="The Debtor to which this revenue belongs",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="revenues",
+                to="economy.Credebtor",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='credebtor',
-            unique_together={('chain', 'slug')},
+            name="credebtor", unique_together={("chain", "slug")}
         ),
     ]

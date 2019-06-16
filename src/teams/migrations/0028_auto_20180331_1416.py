@@ -8,14 +8,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0027_fixup_teams'),
-    ]
+    dependencies = [("teams", "0027_fixup_teams")]
 
     operations = [
         migrations.AlterField(
-            model_name='team',
-            name='area',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='teams', to='teams.TeamArea'),
-        ),
+            model_name="team",
+            name="area",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="teams",
+                to="teams.TeamArea",
+            ),
+        )
     ]

@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def add_bogus_email(apps, schema_editor):
-    Speaker = apps.get_model('program', 'Speaker')
+    Speaker = apps.get_model("program", "Speaker")
 
     for speaker in Speaker.objects.all():
         if not speaker.email:
@@ -14,10 +14,6 @@ def add_bogus_email(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0068_add_email_to_speaker_and_speaker_proposal'),
-    ]
+    dependencies = [("program", "0068_add_email_to_speaker_and_speaker_proposal")]
 
-    operations = [
-        migrations.RunPython(add_bogus_email)
-    ]
+    operations = [migrations.RunPython(add_bogus_email)]

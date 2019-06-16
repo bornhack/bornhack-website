@@ -9,26 +9,31 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='OutgoingEmail',
+            name="OutgoingEmail",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('subject', models.CharField(max_length=500)),
-                ('text_template', models.TextField()),
-                ('html_template', models.TextField(blank=True)),
-                ('recipient', models.CharField(max_length=500)),
-                ('sender', models.CharField(max_length=500)),
-                ('attachment', models.FileField(blank=True, upload_to='')),
-                ('processed', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("subject", models.CharField(max_length=500)),
+                ("text_template", models.TextField()),
+                ("html_template", models.TextField(blank=True)),
+                ("recipient", models.CharField(max_length=500)),
+                ("sender", models.CharField(max_length=500)),
+                ("attachment", models.FileField(blank=True, upload_to="")),
+                ("processed", models.BooleanField(default=False)),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

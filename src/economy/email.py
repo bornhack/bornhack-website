@@ -6,6 +6,7 @@ from utils.email import add_outgoing_email
 
 # expense emails
 
+
 def send_accountingsystem_expense_email(expense):
     """
     Sends an email to the accountingsystem with the invoice as an attachment,
@@ -44,7 +45,9 @@ def send_expense_rejected_email(expense):
         to_recipients=[expense.user.emailaddress_set.get(primary=True).email],
     )
 
+
 # revenue emails
+
 
 def send_accountingsystem_revenue_email(revenue):
     """
@@ -83,4 +86,3 @@ def send_revenue_rejected_email(revenue):
         subject="Your revenue for %s has been rejected." % revenue.camp.title,
         to_recipients=[revenue.user.emailaddress_set.get(primary=True).email],
     )
-

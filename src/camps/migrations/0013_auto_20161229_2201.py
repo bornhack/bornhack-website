@@ -8,40 +8,36 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0012_auto_20161228_2312'),
-    ]
+    dependencies = [("camps", "0012_auto_20161228_2312")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='camp',
-            name='buildup_start',
-        ),
-        migrations.RemoveField(
-            model_name='camp',
-            name='camp_end',
-        ),
-        migrations.RemoveField(
-            model_name='camp',
-            name='camp_start',
-        ),
-        migrations.RemoveField(
-            model_name='camp',
-            name='teardown_end',
+        migrations.RemoveField(model_name="camp", name="buildup_start"),
+        migrations.RemoveField(model_name="camp", name="camp_end"),
+        migrations.RemoveField(model_name="camp", name="camp_start"),
+        migrations.RemoveField(model_name="camp", name="teardown_end"),
+        migrations.AddField(
+            model_name="camp",
+            name="buildup",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp buildup period.",
+                null=True,
+                verbose_name=b"Buildup Period",
+            ),
         ),
         migrations.AddField(
-            model_name='camp',
-            name='buildup',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp buildup period.', null=True, verbose_name=b'Buildup Period'),
+            model_name="camp",
+            name="camp",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp period.", null=True, verbose_name=b"Camp Period"
+            ),
         ),
         migrations.AddField(
-            model_name='camp',
-            name='camp',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp period.', null=True, verbose_name=b'Camp Period'),
-        ),
-        migrations.AddField(
-            model_name='camp',
-            name='teardown',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp teardown period.', null=True, verbose_name=b'Teardown period'),
+            model_name="camp",
+            name="teardown",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp teardown period.",
+                null=True,
+                verbose_name=b"Teardown period",
+            ),
         ),
     ]

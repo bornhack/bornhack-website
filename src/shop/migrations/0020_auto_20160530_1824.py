@@ -7,18 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0019_invoice_pdf_generated'),
-    ]
+    dependencies = [("shop", "0019_invoice_pdf_generated")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='invoice',
-            name='pdf_generated',
-        ),
+        migrations.RemoveField(model_name="invoice", name="pdf_generated"),
         migrations.AddField(
-            model_name='invoice',
-            name='pdf',
-            field=models.FileField(blank=True, null=True, upload_to=b'invoices/'),
+            model_name="invoice",
+            name="pdf",
+            field=models.FileField(blank=True, null=True, upload_to=b"invoices/"),
         ),
     ]

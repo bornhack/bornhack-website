@@ -8,28 +8,55 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0016_auto_20170711_2247'),
-    ]
+    dependencies = [("teams", "0016_auto_20170711_2247")]
 
     operations = [
         migrations.CreateModel(
-            name='TeamTask',
+            name="TeamTask",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='Short name of this task', max_length=100)),
-                ('slug', models.SlugField(blank=True, help_text='url slug, leave blank to autogenerate', max_length=255)),
-                ('description', models.TextField(help_text='Description of the task. Markdown is supported.')),
-                ('team', models.ForeignKey(help_text='The team this task belongs to', on_delete=django.db.models.deletion.CASCADE, to='teams.Team')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="Short name of this task", max_length=100
+                    ),
+                ),
+                (
+                    "slug",
+                    models.SlugField(
+                        blank=True,
+                        help_text="url slug, leave blank to autogenerate",
+                        max_length=255,
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        help_text="Description of the task. Markdown is supported."
+                    ),
+                ),
+                (
+                    "team",
+                    models.ForeignKey(
+                        help_text="The team this task belongs to",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="teams.Team",
+                    ),
+                ),
             ],
-            options={
-                'ordering': ['name'],
-            },
+            options={"ordering": ["name"]},
         ),
         migrations.AlterUniqueTogether(
-            name='teamtask',
-            unique_together=set([('slug', 'team'), ('name', 'team')]),
+            name="teamtask", unique_together=set([("slug", "team"), ("name", "team")])
         ),
     ]

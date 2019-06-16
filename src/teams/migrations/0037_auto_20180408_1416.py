@@ -9,34 +9,49 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0036_auto_20180403_0201'),
-    ]
+    dependencies = [("teams", "0036_auto_20180403_0201")]
 
     operations = [
         migrations.AddField(
-            model_name='teammember',
-            name='irc_channel_acl_ok',
-            field=models.BooleanField(default=False, help_text='Maintained by the IRC bot, do not edit manually. True if the teammembers NickServ username has been added to the Team IRC channels ACL.'),
+            model_name="teammember",
+            name="irc_channel_acl_ok",
+            field=models.BooleanField(
+                default=False,
+                help_text="Maintained by the IRC bot, do not edit manually. True if the teammembers NickServ username has been added to the Team IRC channels ACL.",
+            ),
         ),
         migrations.AlterField(
-            model_name='teammember',
-            name='approved',
-            field=models.BooleanField(default=False, help_text='True if this membership is approved. False if not.'),
+            model_name="teammember",
+            name="approved",
+            field=models.BooleanField(
+                default=False,
+                help_text="True if this membership is approved. False if not.",
+            ),
         ),
         migrations.AlterField(
-            model_name='teammember',
-            name='responsible',
-            field=models.BooleanField(default=False, help_text='True if this teammember is responsible for this Team. False if not.'),
+            model_name="teammember",
+            name="responsible",
+            field=models.BooleanField(
+                default=False,
+                help_text="True if this teammember is responsible for this Team. False if not.",
+            ),
         ),
         migrations.AlterField(
-            model_name='teammember',
-            name='team',
-            field=models.ForeignKey(help_text='The Team this membership relates to', on_delete=django.db.models.deletion.PROTECT, to='teams.Team'),
+            model_name="teammember",
+            name="team",
+            field=models.ForeignKey(
+                help_text="The Team this membership relates to",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="teams.Team",
+            ),
         ),
         migrations.AlterField(
-            model_name='teammember',
-            name='user',
-            field=models.ForeignKey(help_text='The User object this team membership relates to', on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="teammember",
+            name="user",
+            field=models.ForeignKey(
+                help_text="The User object this team membership relates to",
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

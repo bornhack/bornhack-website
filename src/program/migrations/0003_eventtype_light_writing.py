@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0002_eventtype_color'),
-    ]
+    dependencies = [("program", "0002_eventtype_color")]
 
     operations = [
         migrations.AddField(
-            model_name='eventtype',
-            name='light_writing',
+            model_name="eventtype",
+            name="light_writing",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

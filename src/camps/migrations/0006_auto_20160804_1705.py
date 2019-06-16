@@ -7,13 +7,15 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0005_auto_20160510_2011'),
-    ]
+    dependencies = [("camps", "0005_auto_20160510_2011")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='day',
-            options={'ordering': ['date'], 'verbose_name': 'Day', 'verbose_name_plural': 'Days'},
-        ),
+            name="day",
+            options={
+                "ordering": ["date"],
+                "verbose_name": "Day",
+                "verbose_name_plural": "Days",
+            },
+        )
     ]

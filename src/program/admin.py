@@ -1,7 +1,4 @@
-from django.contrib import (
-    admin,
-    messages
-)
+from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 
 
@@ -16,7 +13,7 @@ from .models import (
     EventProposal,
     Favorite,
     UrlType,
-    Url
+    Url,
 )
 
 
@@ -25,15 +22,20 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
     def mark_speakerproposal_as_approved(self, request, queryset):
         for sp in queryset:
             sp.mark_as_approved(request)
-    mark_speakerproposal_as_approved.description = 'Approve and create Speaker object(s)'
 
-    actions = ['mark_speakerproposal_as_approved']
-    list_filter = ('camp', 'proposal_status', 'user')
+    mark_speakerproposal_as_approved.description = (
+        "Approve and create Speaker object(s)"
+    )
+
+    actions = ["mark_speakerproposal_as_approved"]
+    list_filter = ("camp", "proposal_status", "user")
 
 
 def get_speakers_string(event_proposal):
-    return ', '.join(event_proposal.speakers.all().values_list('email', flat=True))
-get_speakers_string.short_description = 'Speakers'
+    return ", ".join(event_proposal.speakers.all().values_list("email", flat=True))
+
+
+get_speakers_string.short_description = "Speakers"
 
 
 @admin.register(EventProposal)
@@ -42,8 +44,7 @@ class EventProposalAdmin(admin.ModelAdmin):
         for ep in queryset:
             if not ep.speakers.all():
                 messages.error(
-                    request,
-                    'Event cant be approved as it has no speaker(s).'
+                    request, "Event cant be approved as it has no speaker(s)."
                 )
                 return False
             else:
@@ -52,32 +53,34 @@ class EventProposalAdmin(admin.ModelAdmin):
                 except ValidationError as e:
                     messages.error(request, e)
                     return False
-    mark_eventproposal_as_approved.description = 'Approve and create Event object(s)'
+
+    mark_eventproposal_as_approved.description = "Approve and create Event object(s)"
 
     def get_speakers(self):
         return
 
-    actions = ['mark_eventproposal_as_approved']
-    list_filter = ('event_type', 'proposal_status', 'track', 'user',)
-    list_display = ['title', get_speakers_string, 'event_type', 'proposal_status',]
+    actions = ["mark_eventproposal_as_approved"]
+    list_filter = ("event_type", "proposal_status", "track", "user")
+    list_display = ["title", get_speakers_string, "event_type", "proposal_status"]
 
 
 @admin.register(EventLocation)
 class EventLocationAdmin(admin.ModelAdmin):
-    list_filter = ('camp',)
-    list_display = ('name', 'camp')
+    list_filter = ("camp",)
+    list_display = ("name", "camp")
 
 
 @admin.register(EventTrack)
 class EventTrackAdmin(admin.ModelAdmin):
-    list_filter = ('camp',)
-    list_display = ('name', 'camp')
+    list_filter = ("camp",)
+    list_display = ("name", "camp")
+
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
-    list_display = ('event', 'when', 'location')
-    list_filter = ('event__track__camp', 'event')
-    search_fields = ['event__title']
+    list_display = ("event", "when", "location")
+    list_filter = ("event__track__camp", "event")
+    search_fields = ["event__title"]
 
 
 @admin.register(EventType)
@@ -87,13 +90,13 @@ class EventTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
-    list_filter = ('camp',)
-    readonly_fields = ['proposal']
+    list_filter = ("camp",)
+    readonly_fields = ["proposal"]
 
 
 @admin.register(Favorite)
 class FavoriteAdmin(admin.ModelAdmin):
-    raw_id_fields = ('event_instance',)
+    raw_id_fields = ("event_instance",)
 
 
 class SpeakerInline(admin.StackedInline):
@@ -102,23 +105,19 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ('track', 'speakers')
-    list_display = [
-        'title',
-        'event_type',
-    ]
+    list_filter = ("track", "speakers")
+    list_display = ["title", "event_type"]
 
-    inlines = [
-        SpeakerInline
-    ]
+    inlines = [SpeakerInline]
 
-    readonly_fields = ['proposal']
+    readonly_fields = ["proposal"]
+
 
 @admin.register(UrlType)
 class UrlTypeAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Url)
 class UrlAdmin(admin.ModelAdmin):
     pass
-

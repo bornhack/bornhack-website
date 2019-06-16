@@ -7,18 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0040_auto_20180412_2109'),
-    ]
+    dependencies = [("teams", "0040_auto_20180412_2109")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='teammember',
-            name='irc_channel_acl_ok',
-        ),
+        migrations.RemoveField(model_name="teammember", name="irc_channel_acl_ok"),
         migrations.AddField(
-            model_name='teammember',
-            name='irc_acl_fix_needed',
-            field=models.BooleanField(default=False, help_text='Maintained by the IRC bot, manual editing should not be needed. Will be set to true when a teammember sets or changes NickServ username, and back to false after the ACL has been fixed by the bot.'),
+            model_name="teammember",
+            name="irc_acl_fix_needed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Maintained by the IRC bot, manual editing should not be needed. Will be set to true when a teammember sets or changes NickServ username, and back to false after the ACL has been fixed by the bot.",
+            ),
         ),
     ]

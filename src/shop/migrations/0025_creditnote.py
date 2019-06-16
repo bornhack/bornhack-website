@@ -11,25 +11,50 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('shop', '0024_auto_20160605_2126'),
+        ("shop", "0024_auto_20160605_2126"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CreditNote',
+            name="CreditNote",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('text', models.TextField()),
-                ('pdf', models.FileField(blank=True, null=True, upload_to=b'creditnotes/')),
-                ('paid', models.BooleanField(default=False, help_text='Whether this creditnote has been paid.', verbose_name='Paid?')),
-                ('sent_to_customer', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(help_text='The user this credit note belongs to.', on_delete=django.db.models.deletion.CASCADE, related_name='creditnotes', to=settings.AUTH_USER_MODEL, verbose_name='User')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("text", models.TextField()),
+                (
+                    "pdf",
+                    models.FileField(blank=True, null=True, upload_to=b"creditnotes/"),
+                ),
+                (
+                    "paid",
+                    models.BooleanField(
+                        default=False,
+                        help_text="Whether this creditnote has been paid.",
+                        verbose_name="Paid?",
+                    ),
+                ),
+                ("sent_to_customer", models.BooleanField(default=False)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="The user this credit note belongs to.",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="creditnotes",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="User",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

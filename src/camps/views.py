@@ -6,36 +6,37 @@ from .mixins import CampViewMixin
 from django.views import View
 from django.conf import settings
 import logging
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class CampRedirectView(CampViewMixin, View):
-
     def dispatch(self, request, *args, **kwargs):
         now = timezone.now()
 
         try:
-            camp = Camp.objects.get(
-                camp__contains=now
+            camp = Camp.objects.get(camp__contains=now)
+            logger.debug(
+                "Redirecting to camp '%s' for page '%s' because it is now!"
+                % (camp.slug, kwargs["page"])
             )
-            logger.debug("Redirecting to camp '%s' for page '%s' because it is now!" % (camp.slug, kwargs['page']))
-            return redirect(kwargs['page'], camp_slug=camp.slug)
+            return redirect(kwargs["page"], camp_slug=camp.slug)
         except Camp.DoesNotExist:
             pass
 
         # no ongoing camp, find the closest camp in the past
         try:
-            prevcamp = Camp.objects.filter(
-                camp__endswith__lt=now
-            ).order_by('-camp').first()
+            prevcamp = (
+                Camp.objects.filter(camp__endswith__lt=now).order_by("-camp").first()
+            )
         except Camp.DoesNotExist:
             prevcamp = None
 
         # find the closest upcoming camp
         try:
-            nextcamp = Camp.objects.filter(
-                camp__startswith__gt=now
-            ).order_by('camp').first()
+            nextcamp = (
+                Camp.objects.filter(camp__startswith__gt=now).order_by("camp").first()
+            )
         except Camp.DoesNotExist:
             nextcamp = None
 
@@ -59,19 +60,18 @@ class CampRedirectView(CampViewMixin, View):
             camp = prevcamp
 
         # do the redirect
-        return redirect(kwargs['page'], camp_slug=camp.slug)
+        return redirect(kwargs["page"], camp_slug=camp.slug)
 
 
 class CampDetailView(DetailView):
     model = Camp
-    slug_url_kwarg = 'camp_slug'
+    slug_url_kwarg = "camp_slug"
 
     def get_template_names(self):
-        return '%s_camp_detail.html' % self.get_object().slug
+        return "%s_camp_detail.html" % self.get_object().slug
 
 
 class CampListView(ListView):
     model = Camp
-    template_name = 'camp_list.html'
-    queryset = Camp.objects.all().order_by('camp')
-
+    template_name = "camp_list.html"
+    queryset = Camp.objects.all().order_by("camp")

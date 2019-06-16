@@ -7,25 +7,30 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0009_auto_20161220_1645'),
-    ]
+    dependencies = [("camps", "0009_auto_20161220_1645")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='camp',
-            name='name',
-        ),
+        migrations.RemoveField(model_name="camp", name="name"),
         migrations.AddField(
-            model_name='camp',
-            name='tagline',
-            field=models.CharField(default='', help_text=b'Tagline of the camp, ie. "Initial Commit"', max_length=255, verbose_name=b'Tagline'),
+            model_name="camp",
+            name="tagline",
+            field=models.CharField(
+                default="",
+                help_text=b'Tagline of the camp, ie. "Initial Commit"',
+                max_length=255,
+                verbose_name=b"Tagline",
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='camp',
-            name='title',
-            field=models.CharField(default='', help_text=b'Title of the camp, ie. Bornhack 2016.', max_length=255, verbose_name=b'Title'),
+            model_name="camp",
+            name="title",
+            field=models.CharField(
+                default="",
+                help_text=b"Title of the camp, ie. Bornhack 2016.",
+                max_length=255,
+                verbose_name=b"Title",
+            ),
             preserve_default=False,
         ),
     ]

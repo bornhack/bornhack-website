@@ -5,19 +5,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0026_auto_20180506_1633'),
-    ]
+    dependencies = [("camps", "0026_auto_20180506_1633")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='call_for_participation',
-            field=models.TextField(blank=True, help_text='The CFP markdown for this Camp'),
+            model_name="camp",
+            name="call_for_participation",
+            field=models.TextField(
+                blank=True, help_text="The CFP markdown for this Camp"
+            ),
         ),
         migrations.AddField(
-            model_name='camp',
-            name='call_for_sponsors',
-            field=models.TextField(blank=True, help_text='The CFS markdown for this Camp'),
+            model_name="camp",
+            name="call_for_sponsors",
+            field=models.TextField(
+                blank=True, help_text="The CFS markdown for this Camp"
+            ),
         ),
     ]

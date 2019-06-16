@@ -5,18 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0055_order_customer_address'),
-    ]
+    dependencies = [("shop", "0055_order_customer_address")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='order',
-            name='customer_address',
-        ),
+        migrations.RemoveField(model_name="order", name="customer_address"),
         migrations.AddField(
-            model_name='order',
-            name='invoice_address',
-            field=models.TextField(blank=True, help_text='The invoice address for this order. Leave blank to use the email associated with the logged in user.'),
+            model_name="order",
+            name="invoice_address",
+            field=models.TextField(
+                blank=True,
+                help_text="The invoice address for this order. Leave blank to use the email associated with the logged in user.",
+            ),
         ),
     ]

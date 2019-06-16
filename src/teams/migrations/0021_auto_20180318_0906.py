@@ -9,24 +9,31 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0020_auto_20180304_1233'),
-    ]
+    dependencies = [("teams", "0020_auto_20180304_1233")]
 
     operations = [
         migrations.AlterField(
-            model_name='teammember',
-            name='team',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='teams.Team'),
+            model_name="teammember",
+            name="team",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="teams.Team"
+            ),
         ),
         migrations.AlterField(
-            model_name='teammember',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="teammember",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='teamtask',
-            name='team',
-            field=models.ForeignKey(help_text='The team this task belongs to', on_delete=django.db.models.deletion.PROTECT, related_name='tasks', to='teams.Team'),
+            model_name="teamtask",
+            name="team",
+            field=models.ForeignKey(
+                help_text="The team this task belongs to",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="tasks",
+                to="teams.Team",
+            ),
         ),
     ]

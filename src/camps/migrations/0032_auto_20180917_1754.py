@@ -5,13 +5,23 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0031_auto_20180830_0014'),
-    ]
+    dependencies = [("camps", "0031_auto_20180830_0014")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='permission',
-            options={'default_permissions': (), 'managed': False, 'permissions': (('backoffice_permission', 'BackOffice access'), ('orgateam_permission', 'Orga Team permissions set'), ('infoteam_permission', 'Info Team permissions set'), ('economyteam_permission', 'Economy Team permissions set'), ('contentteam_permission', 'Content Team permissions set'), ('expense_create_permission', 'Expense Create permission'), ('revenue_create_permission', 'Revenue Create permission'))},
-        ),
+            name="permission",
+            options={
+                "default_permissions": (),
+                "managed": False,
+                "permissions": (
+                    ("backoffice_permission", "BackOffice access"),
+                    ("orgateam_permission", "Orga Team permissions set"),
+                    ("infoteam_permission", "Info Team permissions set"),
+                    ("economyteam_permission", "Economy Team permissions set"),
+                    ("contentteam_permission", "Content Team permissions set"),
+                    ("expense_create_permission", "Expense Create permission"),
+                    ("revenue_create_permission", "Revenue Create permission"),
+                ),
+            },
+        )
     ]

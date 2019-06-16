@@ -8,19 +8,25 @@ import program.models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0022_auto_20170218_1148'),
-    ]
+    dependencies = [("program", "0022_auto_20170218_1148")]
 
     operations = [
         migrations.AlterField(
-            model_name='speaker',
-            name='picture_large',
-            field=models.ImageField(blank=True, null=True, upload_to=program.models.get_speaker_picture_upload_path),
+            model_name="speaker",
+            name="picture_large",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=program.models.get_speaker_picture_upload_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='picture_small',
-            field=models.ImageField(blank=True, null=True, upload_to=program.models.get_speaker_picture_upload_path),
+            model_name="speaker",
+            name="picture_small",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                upload_to=program.models.get_speaker_picture_upload_path,
+            ),
         ),
     ]

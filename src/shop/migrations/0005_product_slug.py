@@ -7,15 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0004_auto_20160515_1604'),
-    ]
+    dependencies = [("shop", "0004_auto_20160515_1604")]
 
     operations = [
         migrations.AddField(
-            model_name='product',
-            name='slug',
-            field=models.SlugField(default=''),
+            model_name="product",
+            name="slug",
+            field=models.SlugField(default=""),
             preserve_default=False,
-        ),
+        )
     ]

@@ -19,7 +19,9 @@ from .models import Ride
 
 class ContactRideForm(forms.Form):
     message = forms.CharField(
-        widget=forms.Textarea(attrs={"placeholder": "Remember to include your contact information!"}),
+        widget=forms.Textarea(
+            attrs={"placeholder": "Remember to include your contact information!"}
+        ),
         label="Write a message to this rideshare",
         help_text="ATTENTION!: Pressing send will send an email with the above text. It is up to you to include your contact information so the person receiving the email can contact you.",
     )
@@ -34,7 +36,7 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = ContactRideForm()
+        context["form"] = ContactRideForm()
         return context
 
     def post(self, request, **kwargs):
@@ -42,16 +44,16 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
         if form.is_valid():
             ride = self.get_object()
             add_outgoing_email(
-                text_template='rideshare/emails/contact_mail.txt',
+                text_template="rideshare/emails/contact_mail.txt",
                 to_recipients=[ride.user.emailaddress_set.get(primary=True).email],
                 formatdict=dict(
                     rideshare_url="https://bornhack.dk{}".format(
                         reverse(
-                            'rideshare:detail',
-                            kwargs={"camp_slug": self.camp.slug, "pk": ride.pk}
+                            "rideshare:detail",
+                            kwargs={"camp_slug": self.camp.slug, "pk": ride.pk},
                         )
                     ),
-                    message=form.cleaned_data['message'],
+                    message=form.cleaned_data["message"],
                 ),
                 subject="BornHack rideshare message!",
             )
@@ -61,7 +63,7 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Ride
-    fields = ['location', 'when', 'seats', 'description']
+    fields = ["location", "when", "seats", "description"]
 
     def form_valid(self, form, **kwargs):
         ride = form.save(commit=False)
@@ -79,11 +81,11 @@ class IsRideOwnerMixin(UserPassesTestMixin):
 
 class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
     model = Ride
-    fields = ['location', 'when', 'seats', 'description']
+    fields = ["location", "when", "seats", "description"]
 
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
     model = Ride
 
     def get_success_url(self):
-        return reverse('rideshare:list', kwargs={'camp_slug': self.camp.slug})
+        return reverse("rideshare:list", kwargs={"camp_slug": self.camp.slug})

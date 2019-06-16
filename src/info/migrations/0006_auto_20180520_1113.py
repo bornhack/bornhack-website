@@ -6,22 +6,21 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('info', '0005_add_teams_to_categories'),
-    ]
+    dependencies = [("info", "0005_add_teams_to_categories")]
 
     operations = [
         migrations.AlterField(
-            model_name='infocategory',
-            name='team',
-            field=models.ForeignKey(blank=True, help_text='The team responsible for this info category.', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='info_categories', to='teams.Team'),
+            model_name="infocategory",
+            name="team",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="The team responsible for this info category.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="info_categories",
+                to="teams.Team",
+            ),
         ),
-        migrations.AlterUniqueTogether(
-            name='infocategory',
-            unique_together=set(),
-        ),
-        migrations.RemoveField(
-            model_name='infocategory',
-            name='camp',
-        ),
+        migrations.AlterUniqueTogether(name="infocategory", unique_together=set()),
+        migrations.RemoveField(model_name="infocategory", name="camp"),
     ]

@@ -8,14 +8,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0044_auto_20170801_1527'),
-    ]
+    dependencies = [("program", "0044_auto_20170801_1527")]
 
     operations = [
         migrations.AddField(
-            model_name='event',
-            name='proposal',
-            field=models.OneToOneField(blank=True, help_text='The event proposal object this event was created from', null=True, on_delete=django.db.models.deletion.CASCADE, to='program.EventProposal'),
-        ),
+            model_name="event",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="The event proposal object this event was created from",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="program.EventProposal",
+            ),
+        )
     ]

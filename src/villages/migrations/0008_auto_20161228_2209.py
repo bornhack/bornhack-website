@@ -8,14 +8,14 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('villages', '0007_village_camp'),
-    ]
+    dependencies = [("villages", "0007_village_camp")]
 
     operations = [
         migrations.AlterField(
-            model_name='village',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='camps.Camp'),
-        ),
+            model_name="village",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="camps.Camp"
+            ),
+        )
     ]

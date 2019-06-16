@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0043_auto_20170507_1309'),
-    ]
+    dependencies = [("shop", "0043_auto_20170507_1309")]
 
     operations = [
         migrations.AddField(
-            model_name='coinifyapiinvoice',
-            name='coinify_id',
+            model_name="coinifyapiinvoice",
+            name="coinify_id",
             field=models.IntegerField(null=True),
-        ),
+        )
     ]

@@ -8,44 +8,58 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('tickets', '0004_auto_20170823_1228'),
-    ]
+    dependencies = [("tickets", "0004_auto_20170823_1228")]
 
     operations = [
         migrations.AlterField(
-            model_name='discountticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='tickets.TicketType'),
+            model_name="discountticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='shoptickets', to='shop.Order'),
+            model_name="shopticket",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="shoptickets",
+                to="shop.Order",
+            ),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='shop.Product'),
+            model_name="shopticket",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="shop.Product"
+            ),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='tickets.TicketType'),
+            model_name="shopticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='sponsorticket',
-            name='sponsor',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='sponsors.Sponsor'),
+            model_name="sponsorticket",
+            name="sponsor",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="sponsors.Sponsor"
+            ),
         ),
         migrations.AlterField(
-            model_name='sponsorticket',
-            name='ticket_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='tickets.TicketType'),
+            model_name="sponsorticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="tickets.TicketType"
+            ),
         ),
         migrations.AlterField(
-            model_name='tickettype',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='camps.Camp'),
+            model_name="tickettype",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="camps.Camp"
+            ),
         ),
     ]

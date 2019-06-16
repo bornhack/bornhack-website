@@ -10,42 +10,62 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('teams', '0025_auto_20180318_1318'),
-    ]
+    dependencies = [("teams", "0025_auto_20180318_1318")]
 
     operations = [
         migrations.CreateModel(
-            name='Routing',
+            name="Routing",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='Type',
+            name="Type",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.TextField(help_text='The type of event', unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.TextField(help_text="The type of event", unique=True)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AddField(
-            model_name='routing',
-            name='eventtype',
-            field=models.ForeignKey(help_text='The type of event to route', on_delete=django.db.models.deletion.PROTECT, related_name='eventroutes', to='events.Type'),
+            model_name="routing",
+            name="eventtype",
+            field=models.ForeignKey(
+                help_text="The type of event to route",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="eventroutes",
+                to="events.Type",
+            ),
         ),
         migrations.AddField(
-            model_name='routing',
-            name='team',
-            field=models.ForeignKey(help_text='The team which should receive events of this type.', on_delete=django.db.models.deletion.PROTECT, related_name='eventroutes', to='teams.Team'),
+            model_name="routing",
+            name="team",
+            field=models.ForeignKey(
+                help_text="The team which should receive events of this type.",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="eventroutes",
+                to="teams.Team",
+            ),
         ),
     ]

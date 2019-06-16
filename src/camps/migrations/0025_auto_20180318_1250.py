@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0024_populate_camp_shortslugs'),
-    ]
+    dependencies = [("camps", "0024_populate_camp_shortslugs")]
 
     operations = [
         migrations.AlterField(
-            model_name='camp',
-            name='shortslug',
-            field=models.SlugField(help_text='Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.', verbose_name='Short Slug'),
-        ),
+            model_name="camp",
+            name="shortslug",
+            field=models.SlugField(
+                help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
+                verbose_name="Short Slug",
+            ),
+        )
     ]

@@ -8,20 +8,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0015_coinifyapiinvoice_coinifycallback'),
-    ]
+    dependencies = [("shop", "0015_coinifyapiinvoice_coinifycallback")]
 
     operations = [
         migrations.AddField(
-            model_name='coinifycallback',
-            name='headers',
+            model_name="coinifycallback",
+            name="headers",
             field=django.contrib.postgres.fields.jsonb.JSONField(default=None),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='coinifycallback',
-            name='valid',
+            model_name="coinifycallback",
+            name="valid",
             field=models.BooleanField(default=False),
         ),
     ]
