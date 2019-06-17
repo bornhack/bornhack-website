@@ -5,7 +5,7 @@ channels-redis==2.3.2
 commonmark==0.9.0
 Pillow==6.0.0
 PyPDF2==1.26.0
-Unidecode==1.0.23
+Unidecode==1.1.0
 asyncio==3.4.3
 bleach==3.1.0
 defusedxml==0.6.0
