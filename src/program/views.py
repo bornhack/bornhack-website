@@ -806,7 +806,15 @@ class ScheduleView(CampViewMixin, TemplateView):
             event__track__camp=self.camp
         ).exists()
 
-        if not self.camp.show_schedule or not events_exist:
+        redirect_to_event_list = False
+
+        if not events_exist:
+            redirect_to_event_list = True
+
+        if not self.camp.show_schedule and not request.user.is_superuser:
+            redirect_to_event_list = True
+
+        if redirect_to_event_list:
             return redirect(
                 reverse("program:event_index", kwargs={"camp_slug": self.camp.slug})
             )
