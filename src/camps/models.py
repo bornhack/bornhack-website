@@ -104,6 +104,10 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         default="The Call For Sponsors for this Camp has not been written yet",
     )
 
+    show_schedule = models.BooleanField(
+        help_text="Check if the schedule should be shown.", default=True
+    )
+
     def get_absolute_url(self):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 

@@ -801,12 +801,16 @@ class ScheduleView(CampViewMixin, TemplateView):
         If no events are scheduled redirect to the event page
         """
         response = super().dispatch(request, *args, **kwargs)
-        if not models.EventInstance.objects.filter(
+
+        events_exist = models.EventInstance.objects.filter(
             event__track__camp=self.camp
-        ).exists():
+        ).exists()
+
+        if not self.camp.show_schedule or not events_exist:
             return redirect(
                 reverse("program:event_index", kwargs={"camp_slug": self.camp.slug})
             )
+
         return response
 
     def get_context_data(self, *args, **kwargs):
