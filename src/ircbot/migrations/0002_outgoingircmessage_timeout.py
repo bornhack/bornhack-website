@@ -9,15 +9,15 @@ from django.utils.timezone import utc
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('ircbot', '0001_initial'),
-    ]
+    dependencies = [("ircbot", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='outgoingircmessage',
-            name='timeout',
-            field=models.DateTimeField(default=datetime.datetime(2017, 1, 31, 17, 49, 36, 925459, tzinfo=utc)),
+            model_name="outgoingircmessage",
+            name="timeout",
+            field=models.DateTimeField(
+                default=datetime.datetime(2017, 1, 31, 17, 49, 36, 925459, tzinfo=utc)
+            ),
             preserve_default=False,
-        ),
+        )
     ]

@@ -4,79 +4,61 @@ from utils.models import CampRelatedModel
 
 
 def get_sponsor_upload_path(instance, filename):
-    return 'public/sponsors/{camp_slug}/{filename}'.format(
+    return "public/sponsors/{camp_slug}/{filename}".format(
         camp_slug=instance.tier.camp.slug,
-        filename='{}_logo.{}'.format(
-            instance.name.lower(),
-            filename.split('.')[-1]
-        )
+        filename="{}_logo.{}".format(instance.name.lower(), filename.split(".")[-1]),
     )
 
 
 class Sponsor(CampRelatedModel):
-    name = models.CharField(
-        max_length=150,
-        help_text='Name of the sponsor'
-    )
+    name = models.CharField(max_length=150, help_text="Name of the sponsor")
 
-    tier = models.ForeignKey('sponsors.SponsorTier', on_delete=models.PROTECT)
+    tier = models.ForeignKey("sponsors.SponsorTier", on_delete=models.PROTECT)
 
-    description = models.TextField(
-        help_text='A short description of the sponsorship'
-    )
+    description = models.TextField(help_text="A short description of the sponsorship")
 
-    logo_filename = models.CharField(
-        max_length=255,
-        help_text='Filename of the logo'
-    )
+    logo_filename = models.CharField(max_length=255, help_text="Filename of the logo")
 
-    url = models.URLField(
-        null=True,
-        blank=True,
-        help_text="An URL to the sponsor."
-    )
+    url = models.URLField(null=True, blank=True, help_text="An URL to the sponsor.")
 
     tickets_generated = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.tier.camp)
+        return "{} ({})".format(self.name, self.tier.camp)
 
     @property
     def camp(self):
         return self.tier.camp
 
-    camp_filter = 'tier__camp'
+    camp_filter = "tier__camp"
 
 
 class SponsorTier(CampRelatedModel):
     name = models.CharField(
-        max_length=25,
-        help_text='Name of the tier (gold, silver, etc.)'
+        max_length=25, help_text="Name of the tier (gold, silver, etc.)"
     )
 
-    description = models.TextField(
-        help_text='A description of what the tier includes.'
-    )
+    description = models.TextField(help_text="A description of what the tier includes.")
 
     camp = models.ForeignKey(
-        'camps.Camp',
+        "camps.Camp",
         null=True,
         on_delete=models.PROTECT,
-        related_name='sponsor_tiers',
-        help_text='The camp this sponsor tier belongs to',
+        related_name="sponsor_tiers",
+        help_text="The camp this sponsor tier belongs to",
     )
 
     weight = models.IntegerField(
         default=0,
         help_text="""This decides where on the list the tier will be shown. I.e.
-        gold should have a lower value than silver."""
+        gold should have a lower value than silver.""",
     )
 
     tickets = models.IntegerField(
         null=True,
         blank=True,
-        help_text="If set this is the number of tickets generated for a sponsor in this tier."
+        help_text="If set this is the number of tickets generated for a sponsor in this tier.",
     )
 
     def __str__(self):
-        return '{} ({})'.format(self.name, self.camp)
+        return "{} ({})".format(self.name, self.camp)

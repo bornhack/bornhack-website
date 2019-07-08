@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0014_remove_teammember_deleted'),
-    ]
+    dependencies = [("teams", "0014_remove_teammember_deleted")]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='mailing_list',
+            model_name="team",
+            name="mailing_list",
             field=models.EmailField(blank=True, max_length=254),
-        ),
+        )
     ]

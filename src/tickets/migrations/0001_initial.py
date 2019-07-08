@@ -12,83 +12,157 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('camps', '0022_camp_colour'),
-        ('sponsors', '0006_auto_20170715_1110'),
-        ('shop', '0047_auto_20170522_1942'),
+        ("camps", "0022_camp_colour"),
+        ("sponsors", "0006_auto_20170715_1110"),
+        ("shop", "0047_auto_20170522_1942"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='DiscountTicket',
+            name="DiscountTicket",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('qrcode_base64', models.TextField(blank=True, null=True)),
-                ('checked_in', models.BooleanField(default=False)),
-                ('price', models.IntegerField(help_text='Price of the discounted ticket (in DKK, including VAT).')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("qrcode_base64", models.TextField(blank=True, null=True)),
+                ("checked_in", models.BooleanField(default=False)),
+                (
+                    "price",
+                    models.IntegerField(
+                        help_text="Price of the discounted ticket (in DKK, including VAT)."
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='ShopTicket',
+            name="ShopTicket",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('qrcode_base64', models.TextField(blank=True, null=True)),
-                ('checked_in', models.BooleanField(default=False)),
-                ('name', models.CharField(blank=True, help_text='Name of the person this ticket belongs to. This can be different from the buying user.', max_length=100, null=True)),
-                ('email', models.EmailField(blank=True, max_length=254, null=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shoptickets', to='shop.Order')),
-                ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='shop.Product')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("qrcode_base64", models.TextField(blank=True, null=True)),
+                ("checked_in", models.BooleanField(default=False)),
+                (
+                    "name",
+                    models.CharField(
+                        blank=True,
+                        help_text="Name of the person this ticket belongs to. This can be different from the buying user.",
+                        max_length=100,
+                        null=True,
+                    ),
+                ),
+                ("email", models.EmailField(blank=True, max_length=254, null=True)),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="shoptickets",
+                        to="shop.Order",
+                    ),
+                ),
+                (
+                    "product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="shop.Product"
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='SponsorTicket',
+            name="SponsorTicket",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('qrcode_base64', models.TextField(blank=True, null=True)),
-                ('checked_in', models.BooleanField(default=False)),
-                ('sponsor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='sponsors.Sponsor')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("qrcode_base64", models.TextField(blank=True, null=True)),
+                ("checked_in", models.BooleanField(default=False)),
+                (
+                    "sponsor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="sponsors.Sponsor",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='TicketType',
+            name="TicketType",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.TextField()),
-                ('camp', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='camps.Camp')),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.TextField()),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="camps.Camp",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AddField(
-            model_name='sponsorticket',
-            name='ticket_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="sponsorticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="tickets.TicketType",
+            ),
         ),
         migrations.AddField(
-            model_name='shopticket',
-            name='ticket_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="shopticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="tickets.TicketType",
+            ),
         ),
         migrations.AddField(
-            model_name='discountticket',
-            name='ticket_type',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='tickets.TicketType'),
+            model_name="discountticket",
+            name="ticket_type",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="tickets.TicketType",
+            ),
         ),
     ]

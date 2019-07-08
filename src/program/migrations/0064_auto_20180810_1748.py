@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0063_auto_20180809_1525'),
-    ]
+    dependencies = [("program", "0063_auto_20180809_1525")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventproposal',
-            name='allow_video_recording',
-            field=models.BooleanField(default=False, help_text='Uncheck to avoid video recording.'),
-        ),
+            model_name="eventproposal",
+            name="allow_video_recording",
+            field=models.BooleanField(
+                default=False, help_text="Uncheck to avoid video recording."
+            ),
+        )
     ]

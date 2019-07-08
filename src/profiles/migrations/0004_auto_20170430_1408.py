@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0003_auto_20170413_1703'),
-    ]
+    dependencies = [("profiles", "0003_auto_20170413_1703")]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='description',
-            field=models.TextField(blank=True, default='', help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.'),
-        ),
+            model_name="profile",
+            name="description",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.",
+            ),
+        )
     ]

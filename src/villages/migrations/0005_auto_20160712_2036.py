@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('villages', '0004_village_deleted'),
-    ]
+    dependencies = [("villages", "0004_village_deleted")]
 
     operations = [
         migrations.AlterField(
-            model_name='village',
-            name='description',
-            field=models.TextField(help_text='A descriptive text about your village. Markdown is supported.'),
-        ),
+            model_name="village",
+            name="description",
+            field=models.TextField(
+                help_text="A descriptive text about your village. Markdown is supported."
+            ),
+        )
     ]

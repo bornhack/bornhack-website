@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block title %}
+Select Chain | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h2>Chains</h2>
+<p><a href="{% url "backoffice:index" camp_slug=camp.slug %}">Back to Backoffice Index</a></p>
+
+{% if chain_list %}
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>Chain Name</th>
+      <th>Notes</th>
+      <th class="text-center">Credebtors</th>
+      <th class="text-center">Expenses</th>
+      <th class="text-center">Expenses Total</th>
+      <th class="text-center">Revenues</th>
+      <th class="text-center">Revenues Total</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for chain in chain_list %}
+    <tr>
+      <td>{{ chain.name }}</td>
+      <td>{{ chain.notes|default:"N/A" }}</td>
+      <td class="text-center"><span class="badge">{{ chain.credebtors.count }}</span></td>
+      <td class="text-center"><span class="badge">{{ chain.expenses.count }}</span></td>
+      <td class="text-center">{{ chain.expenses_total|default:"0" }} DKK</td>
+      <td class="text-center"><span class="badge">{{ chain.revenues.count }}</span></td>
+      <td class="text-center">{{ chain.revenues_total|default:"0" }} DKK</td>
+      <td>
+        <a class="btn btn-primary" href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}"><i class="fas fa-search"></i> Details</a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="lead"><i>No Chains found.</i></p>
+{% endif %}
+
+{% endblock %}

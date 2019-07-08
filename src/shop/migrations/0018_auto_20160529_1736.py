@@ -7,13 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0017_auto_20160529_1626'),
-    ]
+    dependencies = [("shop", "0017_auto_20160529_1626")]
 
     operations = [
         migrations.RenameModel(
-            old_name='CoinifyCallback',
-            new_name='CoinifyAPICallback',
-        ),
+            old_name="CoinifyCallback", new_name="CoinifyAPICallback"
+        )
     ]

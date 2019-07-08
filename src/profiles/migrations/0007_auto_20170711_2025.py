@@ -4,17 +4,16 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def populate_team_responsible_public_credit_names(apps, schema_editor):
     pass
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('profiles', '0006_auto_20170711_1757'),
-        ('teams', '0014_remove_teammember_deleted'),
+        ("profiles", "0006_auto_20170711_1757"),
+        ("teams", "0014_remove_teammember_deleted"),
     ]
 
-    operations = [
-        migrations.RunPython(populate_team_responsible_public_credit_names),
-    ]
-
+    operations = [migrations.RunPython(populate_team_responsible_public_credit_names)]

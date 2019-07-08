@@ -7,39 +7,61 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0037_auto_20180408_1416'),
-    ]
+    dependencies = [("teams", "0037_auto_20180408_1416")]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='private_irc_channel_bot',
-            field=models.BooleanField(default=False, help_text='Check to make the bot join the teams private IRC channel. Leave unchecked to disable the IRC bot for this channel.'),
+            model_name="team",
+            name="private_irc_channel_bot",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the bot join the teams private IRC channel. Leave unchecked to disable the IRC bot for this channel.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='private_irc_channel_managed',
-            field=models.BooleanField(default=False, help_text='Check to make the bot manage the private IRC channel by registering it with NickServ, setting +I and maintaining the ACL.'),
+            model_name="team",
+            name="private_irc_channel_managed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the bot manage the private IRC channel by registering it with NickServ, setting +I and maintaining the ACL.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='private_irc_channel_name',
-            field=models.CharField(blank=True, help_text='The private IRC channel for this team. Will be shown to team members on the team page. Leave empty if the team has no private IRC channel.', max_length=50, null=True, unique=True),
+            model_name="team",
+            name="private_irc_channel_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The private IRC channel for this team. Will be shown to team members on the team page. Leave empty if the team has no private IRC channel.",
+                max_length=50,
+                null=True,
+                unique=True,
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='public_irc_channel_bot',
-            field=models.BooleanField(default=False, help_text='Check to make the bot join the teams public IRC channel. Leave unchecked to disable the IRC bot for this channel.'),
+            model_name="team",
+            name="public_irc_channel_bot",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the bot join the teams public IRC channel. Leave unchecked to disable the IRC bot for this channel.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='public_irc_channel_managed',
-            field=models.BooleanField(default=False, help_text='Check to make the bot manage the teams public IRC channel by registering it with NickServ.'),
+            model_name="team",
+            name="public_irc_channel_managed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the bot manage the teams public IRC channel by registering it with NickServ.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='public_irc_channel_name',
-            field=models.CharField(blank=True, help_text='The public IRC channel for this team. Will be shown on the team page so people know how to reach the team. Leave empty if the team has no public IRC channel.', max_length=50, null=True, unique=True),
+            model_name="team",
+            name="public_irc_channel_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The public IRC channel for this team. Will be shown on the team page so people know how to reach the team. Leave empty if the team has no public IRC channel.",
+                max_length=50,
+                null=True,
+                unique=True,
+            ),
         ),
     ]

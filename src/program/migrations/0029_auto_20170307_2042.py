@@ -7,19 +7,35 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0028_auto_20170307_2014'),
-    ]
+    dependencies = [("program", "0028_auto_20170307_2014")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='submission_status',
-            field=models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50),
+            model_name="event",
+            name="submission_status",
+            field=models.CharField(
+                choices=[
+                    ("draft", "Draft"),
+                    ("pending", "Pending approval"),
+                    ("approved", "Approved"),
+                    ("rejected", "Rejected"),
+                ],
+                default="draft",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='submission_status',
-            field=models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50),
+            model_name="speaker",
+            name="submission_status",
+            field=models.CharField(
+                choices=[
+                    ("draft", "Draft"),
+                    ("pending", "Pending approval"),
+                    ("approved", "Approved"),
+                    ("rejected", "Rejected"),
+                ],
+                default="draft",
+                max_length=50,
+            ),
         ),
     ]

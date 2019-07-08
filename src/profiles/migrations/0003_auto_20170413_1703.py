@@ -7,19 +7,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0002_profile_description'),
-    ]
+    dependencies = [("profiles", "0002_profile_description")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='name',
-            field=models.CharField(blank=True, default='', help_text='Your name or handle', max_length=200),
+            model_name="profile",
+            name="name",
+            field=models.CharField(
+                blank=True, default="", help_text="Your name or handle", max_length=200
+            ),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='description',
-            field=models.TextField(blank=True, default='', help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience.'),
+            model_name="profile",
+            name="description",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience.",
+            ),
         ),
     ]

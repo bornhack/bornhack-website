@@ -7,16 +7,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0014_auto_20161229_2202'),
-    ]
+    dependencies = [("camps", "0014_auto_20161229_2202")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='expense',
-            name='refund_user',
-        ),
-        migrations.DeleteModel(
-            name='Expense',
-        ),
+        migrations.RemoveField(model_name="expense", name="refund_user"),
+        migrations.DeleteModel(name="Expense"),
     ]

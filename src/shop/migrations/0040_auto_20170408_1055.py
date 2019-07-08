@@ -8,14 +8,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0039_auto_20170403_1752'),
-    ]
+    dependencies = [("shop", "0039_auto_20170403_1752")]
 
     operations = [
         migrations.AlterField(
-            model_name='epaycallback',
-            name='payload',
+            model_name="epaycallback",
+            name="payload",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True),
-        ),
+        )
     ]

@@ -1,2 +1,1 @@
-default_app_config = 'shop.apps.ShopConfig'
-
+default_app_config = "shop.apps.ShopConfig"

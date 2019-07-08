@@ -8,7 +8,8 @@ from . import models
 
 class ProfileDetail(LoginRequiredMixin, DetailView):
     model = models.Profile
-    template_name = 'profile_detail.html'
+    template_name = "profile_detail.html"
+    active_menu = "profile"
 
     def get_object(self, queryset=None):
         return models.Profile.objects.get(user=self.request.user)
@@ -16,18 +17,20 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
 
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = models.Profile
-    fields = ['name', 'description', 'public_credit_name', 'nickserv_username']
-    success_url = reverse_lazy('profiles:detail')
-    template_name = 'profile_form.html'
+    fields = ["name", "description", "public_credit_name", "nickserv_username"]
+    success_url = reverse_lazy("profiles:detail")
+    template_name = "profile_form.html"
 
     def get_object(self, queryset=None):
         return models.Profile.objects.get(user=self.request.user)
 
     def form_valid(self, form, **kwargs):
-        if 'public_credit_name' in form.changed_data and form.cleaned_data['public_credit_name']:
+        if (
+            "public_credit_name" in form.changed_data
+            and form.cleaned_data["public_credit_name"]
+        ):
             # user changed the name (to something non blank)
             form.instance.public_credit_name_approved = False
             form.instance.save()
-        messages.success(self.request, 'Your profile has been updated.')
+        messages.success(self.request, "Your profile has been updated.")
         return super().form_valid(form, **kwargs)
-

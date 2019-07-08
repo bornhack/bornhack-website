@@ -5,19 +5,25 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('economy', '0005_auto_20190120_1532'),
-    ]
+    dependencies = [("economy", "0005_auto_20190120_1532")]
 
     operations = [
         migrations.AlterField(
-            model_name='expense',
-            name='invoice_date',
-            field=models.DateField(blank=True, help_text='The invoice date for this Expense. This must match the invoice date on the documentation uploaded below.', null=True),
+            model_name="expense",
+            name="invoice_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below.",
+                null=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='revenue',
-            name='invoice_date',
-            field=models.DateField(blank=True, help_text='The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below.', null=True),
+            model_name="revenue",
+            name="invoice_date",
+            field=models.DateField(
+                blank=True,
+                help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below.",
+                null=True,
+            ),
         ),
     ]

@@ -7,13 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0034_auto_20180402_2334'),
-    ]
+    dependencies = [("teams", "0034_auto_20180402_2334")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='teammember',
-            options={'ordering': ['-responsible', '-approved']},
-        ),
+            name="teammember", options={"ordering": ["-responsible", "-approved"]}
+        )
     ]

@@ -5,18 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0053_auto_20180519_2325'),
-    ]
+    dependencies = [("program", "0053_auto_20180519_2325")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='eventtype',
-            name='oneday_ticket_possible',
-        ),
+        migrations.RemoveField(model_name="eventtype", name="oneday_ticket_possible"),
         migrations.AddField(
-            model_name='eventtype',
-            name='host_title',
-            field=models.CharField(default='Person', help_text='What to call someone hosting this type of event. Like "Artist" for Music or "Speaker" for talks.', max_length=30),
+            model_name="eventtype",
+            name="host_title",
+            field=models.CharField(
+                default="Person",
+                help_text='What to call someone hosting this type of event. Like "Artist" for Music or "Speaker" for talks.',
+                max_length=30,
+            ),
         ),
     ]

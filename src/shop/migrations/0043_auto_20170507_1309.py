@@ -9,28 +9,43 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0042_auto_20170507_1000'),
-    ]
+    dependencies = [("shop", "0042_auto_20170507_1000")]
 
     operations = [
         migrations.CreateModel(
-            name='CoinifyAPIRequest',
+            name="CoinifyAPIRequest",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('payload', django.contrib.postgres.fields.jsonb.JSONField()),
-                ('response', models.TextField()),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='coinify_api_requests', to='shop.Order')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("payload", django.contrib.postgres.fields.jsonb.JSONField()),
+                ("response", models.TextField()),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="coinify_api_requests",
+                        to="shop.Order",
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AlterField(
-            model_name='coinifyapicallback',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='coinify_api_callbacks', to='shop.Order'),
+            model_name="coinifyapicallback",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="coinify_api_callbacks",
+                to="shop.Order",
+            ),
         ),
     ]

@@ -7,18 +7,13 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0010_auto_20160517_1313'),
-    ]
+    dependencies = [("shop", "0010_auto_20160517_1313")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='product',
-            name='public',
-        ),
+        migrations.RemoveField(model_name="product", name="public"),
         migrations.AddField(
-            model_name='productcategory',
-            name='public',
+            model_name="productcategory",
+            name="public",
             field=models.BooleanField(default=True),
         ),
     ]

@@ -7,13 +7,6 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0028_auto_20180331_1416'),
-    ]
+    dependencies = [("teams", "0028_auto_20180331_1416")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name='team',
-            name='area',
-        ),
-    ]
+    operations = [migrations.RemoveField(model_name="team", name="area")]

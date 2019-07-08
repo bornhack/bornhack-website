@@ -1,11 +1,9 @@
 from django.conf import settings
-from datetime import (
-    timedelta,
-    datetime
-)
+from datetime import timedelta, datetime
 from django.db.models import Count
 from django.utils import timezone
 from events.handler import handle_team_event
+
 
 def ticket_changed(sender, instance, created, **kwargs):
     """
@@ -24,20 +22,16 @@ def ticket_changed(sender, instance, created, **kwargs):
     stats = ", ".join(
         [
             "{}: {}".format(
-                tickettype['product__name'].replace(
-                    "{} ".format(ticket_prefix),
-                    ""
-                ),
-                tickettype['total']
-            ) for tickettype in ShopTicket.objects.filter(
+                tickettype["product__name"].replace("{} ".format(ticket_prefix), ""),
+                tickettype["total"],
+            )
+            for tickettype in ShopTicket.objects.filter(
                 product__name__startswith=ticket_prefix
-            ).exclude(
-                product__name__startswith="{} One Day".format(ticket_prefix)
-            ).values(
-                'product__name'
-            ).annotate(
-                total=Count('product__name')
-            ).order_by('-total')
+            )
+            .exclude(product__name__startswith="{} One Day".format(ticket_prefix))
+            .values("product__name")
+            .annotate(total=Count("product__name"))
+            .order_by("-total")
         ]
     )
 
@@ -50,16 +44,12 @@ def ticket_changed(sender, instance, created, **kwargs):
 
     # queue the messages
     handle_team_event(
-        eventtype='ticket_created',
-        irc_message="%s sold!" % instance.product.name
+        eventtype="ticket_created", irc_message="%s sold!" % instance.product.name
     )
     # limit this one to a length of 200 because IRC is nice
     handle_team_event(
-        eventtype='ticket_created',
+        eventtype="ticket_created",
         irc_message="Totals: {}, 1day: {}, 1day child: {}".format(
-            stats,
-            onedaystats,
-            onedaychildstats
-        )[:200]
+            stats, onedaystats, onedaychildstats
+        )[:200],
     )
-

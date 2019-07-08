@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0024_auto_20170222_1629'),
-    ]
+    dependencies = [("program", "0024_auto_20170222_1629")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='video_recording',
-            field=models.BooleanField(default=True, help_text='Whether the event will be video recorded or not.'),
-        ),
+            model_name="event",
+            name="video_recording",
+            field=models.BooleanField(
+                default=True,
+                help_text="Whether the event will be video recorded or not.",
+            ),
+        )
     ]

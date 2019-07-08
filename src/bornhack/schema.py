@@ -11,19 +11,17 @@ from program.schema import ProgramQuery
 class CampNode(DjangoObjectType):
     class Meta:
         model = Camp
-        interfaces = (relay.Node, )
-        filter_fields = {
-            'title': ['icontains', 'iexact'],
-        }
+        interfaces = (relay.Node,)
+        filter_fields = {"title": ["icontains", "iexact"]}
         only_fields = (
-            'title',
-            'slug',
-            'tagline',
-            'shortslug',
-            'buildup',
-            'camp',
-            'teardown',
-            'colour',
+            "title",
+            "slug",
+            "tagline",
+            "shortslug",
+            "buildup",
+            "camp",
+            "teardown",
+            "colour",
         )
 
     def resolve_buildup(self, info):

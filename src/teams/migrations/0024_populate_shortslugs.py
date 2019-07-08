@@ -4,19 +4,16 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def populate_team_shortslugs(apps, schema_editor):
-    Team = apps.get_model('teams', 'Team')
+    Team = apps.get_model("teams", "Team")
     for team in Team.objects.all():
         if not team.shortslug:
             team.shortslug = team.slug
             team.save()
 
+
 class Migration(migrations.Migration):
-    dependencies = [
-        ('teams', '0023_auto_20180318_1256'),
-    ]
+    dependencies = [("teams", "0023_auto_20180318_1256")]
 
-    operations = [
-        migrations.RunPython(populate_team_shortslugs),
-    ]
-
+    operations = [migrations.RunPython(populate_team_shortslugs)]

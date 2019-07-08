@@ -7,19 +7,19 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0005_sponsor_url'),
-    ]
+    dependencies = [("sponsors", "0005_sponsor_url")]
 
     operations = [
         migrations.AlterField(
-            model_name='sponsor',
-            name='logo',
-            field=models.URLField(help_text='A URL to the logo', max_length=255),
+            model_name="sponsor",
+            name="logo",
+            field=models.URLField(help_text="A URL to the logo", max_length=255),
         ),
         migrations.AlterField(
-            model_name='sponsor',
-            name='url',
-            field=models.URLField(blank=True, help_text='An URL to the sponsor.', null=True),
+            model_name="sponsor",
+            name="url",
+            field=models.URLField(
+                blank=True, help_text="An URL to the sponsor.", null=True
+            ),
         ),
     ]

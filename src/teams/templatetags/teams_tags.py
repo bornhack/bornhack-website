@@ -1,14 +1,13 @@
 from django import template
 from teams.models import TeamMember
 from django.utils.safestring import mark_safe
+
 register = template.Library()
 
 
 @register.filter
 def is_team_member(user, team):
-    return TeamMember.objects.filter(
-        team=team, user=user, approved=True
-    ).exists()
+    return TeamMember.objects.filter(team=team, user=user, approved=True).exists()
 
 
 @register.simple_tag

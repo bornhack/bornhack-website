@@ -5,10 +5,10 @@ from channels.auth import AuthMiddlewareStack
 from program.consumers import ScheduleConsumer
 
 
-application = ProtocolTypeRouter({
-    "websocket": AuthMiddlewareStack(
-        URLRouter([
-            url(r"^schedule/", ScheduleConsumer)
-        ])
-    )
-})
+application = ProtocolTypeRouter(
+    {
+        "websocket": AuthMiddlewareStack(
+            URLRouter([url(r"^schedule/", ScheduleConsumer)])
+        )
+    }
+)

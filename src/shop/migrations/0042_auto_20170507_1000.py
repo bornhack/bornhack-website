@@ -8,14 +8,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0041_auto_20170408_1104'),
-    ]
+    dependencies = [("shop", "0041_auto_20170408_1104")]
 
     operations = [
         migrations.AlterField(
-            model_name='coinifyapiinvoice',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='coinify_api_invoices', to='shop.Order'),
-        ),
+            model_name="coinifyapiinvoice",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="coinify_api_invoices",
+                to="shop.Order",
+            ),
+        )
     ]

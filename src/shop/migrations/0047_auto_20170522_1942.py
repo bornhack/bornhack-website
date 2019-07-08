@@ -8,14 +8,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0046_coinifyapirequest_method'),
-    ]
+    dependencies = [("shop", "0046_coinifyapirequest_method")]
 
     operations = [
         migrations.AlterField(
-            model_name='coinifyapirequest',
-            name='response',
+            model_name="coinifyapirequest",
+            name="response",
             field=django.contrib.postgres.fields.jsonb.JSONField(),
-        ),
+        )
     ]

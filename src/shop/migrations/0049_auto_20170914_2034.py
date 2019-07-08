@@ -7,19 +7,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0048_product_ticket_type'),
-    ]
+    dependencies = [("shop", "0048_product_ticket_type")]
 
     operations = [
         migrations.AddField(
-            model_name='customorder',
-            name='danish_vat',
-            field=models.BooleanField(default=True, help_text='Danish VAT?'),
+            model_name="customorder",
+            name="danish_vat",
+            field=models.BooleanField(default=True, help_text="Danish VAT?"),
         ),
         migrations.AlterField(
-            model_name='customorder',
-            name='paid',
-            field=models.BooleanField(default=False, help_text='Check when this custom order has been paid (or if it gets cancelled out by a Credit Note)', verbose_name='Paid?'),
+            model_name="customorder",
+            name="paid",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check when this custom order has been paid (or if it gets cancelled out by a Credit Note)",
+                verbose_name="Paid?",
+            ),
         ),
     ]

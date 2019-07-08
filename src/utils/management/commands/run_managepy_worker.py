@@ -4,26 +4,25 @@ import signal, sys
 import logging, importlib
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('bornhack.%s' % __name__)
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class Command(BaseCommand):
-    args = 'none'
-    help = 'Run a worker. Takes the worker module as the first positional argument and calls the do_work() function in it. Optional arguments can be seen with -h / --help'
+    args = "none"
+    help = "Run a worker. Takes the worker module as the first positional argument and calls the do_work() function in it. Optional arguments can be seen with -h / --help"
     exit_now = False
-
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'workermodule',
+            "workermodule",
             type=str,
-            help='The dotted path to the module which contains the do_work() function to call periodically.'
+            help="The dotted path to the module which contains the do_work() function to call periodically.",
         )
         parser.add_argument(
-            '--sleep',
+            "--sleep",
             type=int,
             default=60,
-            help='The number of seconds to sleep between calls'
+            help="The number of seconds to sleep between calls",
         )
 
     def reload_worker(self, signum, frame):
@@ -33,16 +32,14 @@ class Command(BaseCommand):
         logger.info("Signal %s (SIGHUP) received, exiting gracefully..." % signum)
         self.exit_now = True
 
-
     def clean_exit(self, signum, frame):
         logger.info("Signal %s (INT or TERM) received, exiting gracefully..." % signum)
         self.exit_now = True
 
-
     def handle(self, *args, **options):
         logger.info("Importing worker module...")
-        self.workermodule = importlib.import_module(options['workermodule'])
-        if not hasattr(self.workermodule, 'do_work'):
+        self.workermodule = importlib.import_module(options["workermodule"])
+        if not hasattr(self.workermodule, "do_work"):
             logger.error("module %s must have a do_work() method to call")
             sys.exit(1)
 
@@ -55,18 +52,19 @@ class Command(BaseCommand):
         while True:
             try:
                 # run worker code
-                getattr(self.workermodule, 'do_work')()
+                getattr(self.workermodule, "do_work")()
             except Exception as E:
-                logger.exception("Got exception inside do_work for %s" % self.workermodule)
+                logger.exception(
+                    "Got exception inside do_work for %s" % self.workermodule
+                )
                 sys.exit(1)
 
             # sleep for N seconds before calling worker code again
             i = 0
-            while i < options['sleep']:
+            while i < options["sleep"]:
                 # but check self.exit_now every second
                 if self.exit_now:
                     sys.exit(0)
                 else:
                     i += 1
                     sleep(1)
-

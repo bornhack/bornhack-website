@@ -1,3 +1,4 @@
+import graphene
 from graphene import relay
 
 from graphene_django import DjangoObjectType
@@ -10,68 +11,85 @@ from .models import (
     EventTrack,
     EventInstance,
     Speaker,
+    Url,
+    UrlType,
 )
 
 
 class EventTypeNode(DjangoObjectType):
     class Meta:
         model = EventType
-        interfaces = (relay.Node, )
-        filter_fields = {
-            'name': ['iexact'],
-        }
+        interfaces = (relay.Node,)
+        filter_fields = {"name": ["iexact"]}
 
 
 class EventLocationNode(DjangoObjectType):
     class Meta:
         model = EventLocation
-        interfaces = (relay.Node, )
-        filter_fields = {
-            'name': ['iexact'],
-        }
+        interfaces = (relay.Node,)
+        filter_fields = {"name": ["iexact"], "camp__slug": ["iexact"]}
 
 
 class EventTrackNode(DjangoObjectType):
     class Meta:
         model = EventTrack
-        interfaces = (relay.Node, )
-        filter_fields = {
-            'name': ['iexact'],
-        }
+        interfaces = (relay.Node,)
+        filter_fields = {"name": ["iexact"], "camp__slug": ["iexact"]}
 
 
 class EventInstanceNode(DjangoObjectType):
 
+    start = graphene.Int(
+        required=True,
+        description="When this instance of the event starts. In posix time.",
+    )
+    end = graphene.Int(
+        required=True,
+        description="When this instance of the event ends. In posix time.",
+    )
+
     class Meta:
         model = EventInstance
-        interfaces = (relay.Node, )
+        interfaces = (relay.Node,)
+        only_fields = ("event", "start", "end", "location")
         filter_fields = {
-            'event__title': ['iexact'],
+            "event__title": ["iexact"],
+            "event__track__camp__slug": ["iexact"],
         }
 
-    def resolve_when(self, info):
-        # We need to resolve this ourselves, graphene-django isn't smart enough
-        return [self.when.lower, self.when.upper]
+    def resolve_start(self, info, **kwargs):
+        return self.when.lower.timestamp()
+
+    def resolve_end(self, info, **kwargs):
+        return self.when.upper.timestamp()
 
 
 class SpeakerNode(DjangoObjectType):
     class Meta:
         model = Speaker
-        interfaces = (relay.Node, )
-        only_fields = ('id', 'name', 'biography', 'slug', 'camp', 'events')
-        filter_fields = {
-            'name': ['iexact'],
-        }
+        interfaces = (relay.Node,)
+        only_fields = ("id", "name", "biography", "slug", "camp", "events")
+        filter_fields = {"name": ["iexact"], "camp__slug": ["iexact"]}
 
 
 class EventNode(DjangoObjectType):
     class Meta:
         model = Event
-        interfaces = (relay.Node, )
-        filter_fields = {
-            'title': ['iexact'],
-            'track__camp__slug': ['iexact'],
-        }
+        interfaces = (relay.Node,)
+        filter_fields = {"title": ["iexact"], "track__camp__slug": ["iexact"]}
+
+
+class UrlNode(DjangoObjectType):
+    class Meta:
+        model = Url
+        interfaces = (relay.Node,)
+        only_fields = ("url", "urltype")
+
+
+class UrlTypeNode(DjangoObjectType):
+    class Meta:
+        model = UrlType
+        interfaces = (relay.Node,)
 
 
 class ProgramQuery(object):
@@ -93,3 +111,5 @@ class ProgramQuery(object):
     speaker = relay.Node.Field(SpeakerNode)
     all_speakers = DjangoFilterConnectionField(SpeakerNode)
 
+    url = relay.Node.Field(UrlNode)
+    url_type = relay.Node.Field(UrlTypeNode)

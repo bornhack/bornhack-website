@@ -5,21 +5,12 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0049_add_event_tracks'),
-    ]
+    dependencies = [("program", "0049_add_event_tracks")]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='event',
-            unique_together={('track', 'title'), ('track', 'slug')},
+            name="event", unique_together={("track", "title"), ("track", "slug")}
         ),
-        migrations.RemoveField(
-            model_name='eventproposal',
-            name='camp',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='camp',
-        ),
+        migrations.RemoveField(model_name="eventproposal", name="camp"),
+        migrations.RemoveField(model_name="event", name="camp"),
     ]

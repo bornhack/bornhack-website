@@ -9,44 +9,71 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0052_auto_20171004_0005'),
-    ]
+    dependencies = [("shop", "0052_auto_20171004_0005")]
 
     operations = [
         migrations.AlterField(
-            model_name='creditnote',
-            name='user',
-            field=models.ForeignKey(blank=True, help_text='The user this credit note belongs to, if any.', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='creditnotes', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="creditnote",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="The user this credit note belongs to, if any.",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="creditnotes",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
         migrations.AlterField(
-            model_name='epaypayment',
-            name='callback',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='shop.EpayCallback'),
+            model_name="epaypayment",
+            name="callback",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="shop.EpayCallback"
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='user',
-            field=models.ForeignKey(help_text='The user this shop order belongs to.', on_delete=django.db.models.deletion.PROTECT, related_name='orders', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="order",
+            name="user",
+            field=models.ForeignKey(
+                help_text="The user this shop order belongs to.",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="orders",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
         migrations.AlterField(
-            model_name='orderproductrelation',
-            name='order',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='shop.Order'),
+            model_name="orderproductrelation",
+            name="order",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="shop.Order"
+            ),
         ),
         migrations.AlterField(
-            model_name='orderproductrelation',
-            name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='shop.Product'),
+            model_name="orderproductrelation",
+            name="product",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="shop.Product"
+            ),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='products', to='shop.ProductCategory'),
+            model_name="product",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="products",
+                to="shop.ProductCategory",
+            ),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='ticket_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='tickets.TicketType'),
+            model_name="product",
+            name="ticket_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="tickets.TicketType",
+            ),
         ),
     ]

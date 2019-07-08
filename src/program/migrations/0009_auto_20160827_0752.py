@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0008_auto_20160808_1747'),
-    ]
+    dependencies = [("program", "0008_auto_20160808_1747")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='days',
-            field=models.ManyToManyField(blank=True, to='camps.Day'),
-        ),
+            model_name="event",
+            name="days",
+            field=models.ManyToManyField(blank=True, to="camps.Day"),
+        )
     ]

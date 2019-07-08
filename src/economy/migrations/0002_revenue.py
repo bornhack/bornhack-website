@@ -9,32 +9,101 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0057_order_notes'),
-        ('teams', '0049_auto_20180815_1119'),
-        ('camps', '0031_auto_20180830_0014'),
+        ("shop", "0057_order_notes"),
+        ("teams", "0049_auto_20180815_1119"),
+        ("camps", "0031_auto_20180830_0014"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('economy', '0001_initial'),
+        ("economy", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Revenue',
+            name="Revenue",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('amount', models.DecimalField(decimal_places=2, help_text='The amount of this revenue in DKK. Must match the amount on the documentation uploaded below.', max_digits=12)),
-                ('description', models.CharField(help_text='A short description of this revenue. Please keep it meningful as it helps the Economy team a lot when categorising revenue. 200 characters or fewer.', max_length=200)),
-                ('invoice', models.ImageField(help_text='The invoice file for this revenue. Please make sure the amount on the invoice matches the amount you entered above. All common image formats are accepted, as well as PDF.', upload_to='revenues/')),
-                ('approved', models.NullBooleanField(default=None, help_text='True if this Revenue has been approved by the responsible team. False if it has been rejected. Blank if noone has decided yet.')),
-                ('notes', models.TextField(blank=True, help_text='Economy Team notes for this revenue. Only visible to the Economy team and the submitting user.')),
-                ('camp', models.ForeignKey(help_text='The camp to which this revenue belongs', on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='camps.Camp')),
-                ('invoice_fk', models.ForeignKey(help_text='The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.', on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='shop.Invoice')),
-                ('responsible_team', models.ForeignKey(help_text='The team to which this revenue belongs. When in doubt pick the Economy team.', on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to='teams.Team')),
-                ('user', models.ForeignKey(help_text='The user who submitted this revenue', on_delete=django.db.models.deletion.PROTECT, related_name='revenues', to=settings.AUTH_USER_MODEL)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        help_text="The amount of this revenue in DKK. Must match the amount on the documentation uploaded below.",
+                        max_digits=12,
+                    ),
+                ),
+                (
+                    "description",
+                    models.CharField(
+                        help_text="A short description of this revenue. Please keep it meningful as it helps the Economy team a lot when categorising revenue. 200 characters or fewer.",
+                        max_length=200,
+                    ),
+                ),
+                (
+                    "invoice",
+                    models.ImageField(
+                        help_text="The invoice file for this revenue. Please make sure the amount on the invoice matches the amount you entered above. All common image formats are accepted, as well as PDF.",
+                        upload_to="revenues/",
+                    ),
+                ),
+                (
+                    "approved",
+                    models.NullBooleanField(
+                        default=None,
+                        help_text="True if this Revenue has been approved by the responsible team. False if it has been rejected. Blank if noone has decided yet.",
+                    ),
+                ),
+                (
+                    "notes",
+                    models.TextField(
+                        blank=True,
+                        help_text="Economy Team notes for this revenue. Only visible to the Economy team and the submitting user.",
+                    ),
+                ),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        help_text="The camp to which this revenue belongs",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="revenues",
+                        to="camps.Camp",
+                    ),
+                ),
+                (
+                    "invoice_fk",
+                    models.ForeignKey(
+                        help_text="The Invoice object to which this Revenue object relates. Can be None if this revenue does not have a related BornHack Invoice.",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="revenues",
+                        to="shop.Invoice",
+                    ),
+                ),
+                (
+                    "responsible_team",
+                    models.ForeignKey(
+                        help_text="The team to which this revenue belongs. When in doubt pick the Economy team.",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="revenues",
+                        to="teams.Team",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="The user who submitted this revenue",
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="revenues",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

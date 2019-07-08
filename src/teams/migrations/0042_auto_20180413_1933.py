@@ -7,24 +7,31 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0041_auto_20180412_2231'),
-    ]
+    dependencies = [("teams", "0041_auto_20180412_2231")]
 
     operations = [
         migrations.AddField(
-            model_name='team',
-            name='private_irc_channel_fix_needed',
-            field=models.BooleanField(default=False, help_text='Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.'),
+            model_name="team",
+            name="private_irc_channel_fix_needed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.",
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='public_irc_channel_fix_needed',
-            field=models.BooleanField(default=False, help_text='Used to indicate to the IRC bot that this teams public IRC channel is in need of a permissions and ACL fix.'),
+            model_name="team",
+            name="public_irc_channel_fix_needed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Used to indicate to the IRC bot that this teams public IRC channel is in need of a permissions and ACL fix.",
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='public_irc_channel_managed',
-            field=models.BooleanField(default=False, help_text='Check to make the bot manage the teams public IRC channel by registering it with NickServ and setting +Oo for all teammembers.'),
+            model_name="team",
+            name="public_irc_channel_managed",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check to make the bot manage the teams public IRC channel by registering it with NickServ and setting +Oo for all teammembers.",
+            ),
         ),
     ]

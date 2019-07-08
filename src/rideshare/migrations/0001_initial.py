@@ -11,26 +11,43 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('camps', '0028_auto_20180525_1025'),
+        ("camps", "0028_auto_20180525_1025"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Ride',
+            name="Ride",
             fields=[
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('seats', models.PositiveIntegerField()),
-                ('location', models.CharField(max_length=100)),
-                ('when', models.DateTimeField()),
-                ('description', models.TextField()),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='camps.Camp')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("seats", models.PositiveIntegerField()),
+                ("location", models.CharField(max_length=100)),
+                ("when", models.DateTimeField()),
+                ("description", models.TextField()),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="camps.Camp"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

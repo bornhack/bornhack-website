@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('villages', '0002_auto_20160705_2154'),
-    ]
+    dependencies = [("villages", "0002_auto_20160705_2154")]
 
     operations = [
         migrations.AlterField(
-            model_name='village',
-            name='private',
-            field=models.BooleanField(default=False, help_text='Check if your village is privately organized'),
-        ),
+            model_name="village",
+            name="private",
+            field=models.BooleanField(
+                default=False, help_text="Check if your village is privately organized"
+            ),
+        )
     ]

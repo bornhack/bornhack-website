@@ -9,14 +9,16 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0045_event_proposal'),
-    ]
+    dependencies = [("program", "0045_event_proposal")]
 
     operations = [
         migrations.AlterField(
-            model_name='favorite',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='favorites', to=settings.AUTH_USER_MODEL),
-        ),
+            model_name="favorite",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="favorites",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        )
     ]

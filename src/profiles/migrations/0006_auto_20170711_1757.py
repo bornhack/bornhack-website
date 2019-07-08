@@ -7,28 +7,35 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0005_auto_20170711_1721'),
-    ]
+    dependencies = [("profiles", "0005_auto_20170711_1721")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='profile',
-            name='public_credits',
-        ),
+        migrations.RemoveField(model_name="profile", name="public_credits"),
         migrations.AddField(
-            model_name='profile',
-            name='public_credit_name_approved',
-            field=models.BooleanField(default=False, help_text='Check this box to approve this users public_credit_name. This will be unchecked automatically when the user edits public_credit_name'),
+            model_name="profile",
+            name="public_credit_name_approved",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check this box to approve this users public_credit_name. This will be unchecked automatically when the user edits public_credit_name",
+            ),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='name',
-            field=models.CharField(blank=True, default='', help_text='Your name or handle (only visible to team responsible and organisers)', max_length=200),
+            model_name="profile",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                default="",
+                help_text="Your name or handle (only visible to team responsible and organisers)",
+                max_length=200,
+            ),
         ),
         migrations.AlterField(
-            model_name='profile',
-            name='public_credit_name',
-            field=models.CharField(blank=True, help_text='The name you want to appear on in the credits section of the public website (the People pages). Leave empty if you want no public credit.', max_length=100),
+            model_name="profile",
+            name="public_credit_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The name you want to appear on in the credits section of the public website (the People pages). Leave empty if you want no public credit.",
+                max_length=100,
+            ),
         ),
     ]

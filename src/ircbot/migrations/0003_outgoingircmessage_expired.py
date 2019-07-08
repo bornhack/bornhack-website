@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('ircbot', '0002_outgoingircmessage_timeout'),
-    ]
+    dependencies = [("ircbot", "0002_outgoingircmessage_timeout")]
 
     operations = [
         migrations.AddField(
-            model_name='outgoingircmessage',
-            name='expired',
+            model_name="outgoingircmessage",
+            name="expired",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

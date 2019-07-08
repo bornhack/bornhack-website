@@ -8,20 +8,20 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0040_auto_20170408_1055'),
-    ]
+    dependencies = [("shop", "0040_auto_20170408_1055")]
 
     operations = [
         migrations.AlterField(
-            model_name='coinifyapicallback',
-            name='payload',
-            field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=''),
+            model_name="coinifyapicallback",
+            name="payload",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                blank=True, default=""
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='epaycallback',
-            name='payload',
+            model_name="epaycallback",
+            name="payload",
             field=django.contrib.postgres.fields.jsonb.JSONField(),
         ),
     ]

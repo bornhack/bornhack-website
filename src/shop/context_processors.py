@@ -6,5 +6,5 @@ def current_order(request):
         if orders:
             order = orders[0]
 
-        return {'current_order': order}
+        return {"current_order": order}
     return {}

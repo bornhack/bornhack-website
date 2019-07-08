@@ -8,27 +8,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0018_auto_20170128_1841'),
-        ('program', '0014_speaker_camp'),
+        ("camps", "0018_auto_20170128_1841"),
+        ("program", "0014_speaker_camp"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='eventtype',
-            name='name',
+            model_name="eventtype",
+            name="name",
             field=models.CharField(max_length=100, unique=True),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='events',
-            field=models.ManyToManyField(blank=True, to='program.Event'),
+            model_name="speaker",
+            name="events",
+            field=models.ManyToManyField(blank=True, to="program.Event"),
         ),
         migrations.AlterUniqueTogether(
-            name='event',
-            unique_together=set([('camp', 'title'), ('camp', 'slug')]),
+            name="event", unique_together=set([("camp", "title"), ("camp", "slug")])
         ),
         migrations.AlterUniqueTogether(
-            name='speaker',
-            unique_together=set([('camp', 'name'), ('camp', 'slug')]),
+            name="speaker", unique_together=set([("camp", "name"), ("camp", "slug")])
         ),
     ]

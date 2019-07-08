@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0043_auto_20170801_1526'),
-    ]
+    dependencies = [("program", "0043_auto_20170801_1526")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventproposal',
-            name='speakers',
-            field=models.ManyToManyField(blank=True, help_text='Pick the speaker(s) for this event. If you cannot see anything here you need to go back and create Speaker Proposal(s) first.', to='program.SpeakerProposal'),
-        ),
+            model_name="eventproposal",
+            name="speakers",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Pick the speaker(s) for this event. If you cannot see anything here you need to go back and create Speaker Proposal(s) first.",
+                to="program.SpeakerProposal",
+            ),
+        )
     ]

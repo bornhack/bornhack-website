@@ -9,24 +9,34 @@ from django.utils import timezone
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0013_auto_20161229_2201'),
-    ]
+    dependencies = [("camps", "0013_auto_20161229_2201")]
 
     operations = [
         migrations.AlterField(
-            model_name='camp',
-            name='buildup',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp buildup period.', verbose_name=b'Buildup Period', default=(timezone.now(),None)),
+            model_name="camp",
+            name="buildup",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp buildup period.",
+                verbose_name=b"Buildup Period",
+                default=(timezone.now(), None),
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='camp',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp period.', verbose_name=b'Camp Period', default=(timezone.now(),None)),
+            model_name="camp",
+            name="camp",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp period.",
+                verbose_name=b"Camp Period",
+                default=(timezone.now(), None),
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='teardown',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp teardown period.', verbose_name=b'Teardown period', default=(timezone.now(),None)),
+            model_name="camp",
+            name="teardown",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp teardown period.",
+                verbose_name=b"Teardown period",
+                default=(timezone.now(), None),
+            ),
         ),
     ]

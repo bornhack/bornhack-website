@@ -7,34 +7,50 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0033_auto_20161212_1756'),
-    ]
+    dependencies = [("shop", "0033_auto_20161212_1756")]
 
     operations = [
         migrations.AlterField(
-            model_name='creditnote',
-            name='pdf',
-            field=models.FileField(blank=True, null=True, upload_to='creditnotes/'),
+            model_name="creditnote",
+            name="pdf",
+            field=models.FileField(blank=True, null=True, upload_to="creditnotes/"),
         ),
         migrations.AlterField(
-            model_name='invoice',
-            name='pdf',
-            field=models.FileField(blank=True, null=True, upload_to='invoices/'),
+            model_name="invoice",
+            name="pdf",
+            field=models.FileField(blank=True, null=True, upload_to="invoices/"),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='customer_comment',
-            field=models.TextField(default='', help_text='If you have any comments about the order please enter them here.', verbose_name='Customer comment'),
+            model_name="order",
+            name="customer_comment",
+            field=models.TextField(
+                default="",
+                help_text="If you have any comments about the order please enter them here.",
+                verbose_name="Customer comment",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='payment_method',
-            field=models.CharField(choices=[('credit_card', 'Credit card'), ('blockchain', 'Blockchain'), ('bank_transfer', 'Bank transfer'), ('cash', 'Cash')], default='', max_length=50),
+            model_name="order",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    ("credit_card", "Credit card"),
+                    ("blockchain", "Blockchain"),
+                    ("bank_transfer", "Bank transfer"),
+                    ("cash", "Cash"),
+                ],
+                default="",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='ticket',
-            name='name',
-            field=models.CharField(blank=True, help_text='Name of the person this ticket belongs to. This can be different from the buying user.', max_length=100, null=True),
+            model_name="ticket",
+            name="name",
+            field=models.CharField(
+                blank=True,
+                help_text="Name of the person this ticket belongs to. This can be different from the buying user.",
+                max_length=100,
+                null=True,
+            ),
         ),
     ]

@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0017_eventinstance_notifications_sent'),
-    ]
+    dependencies = [("program", "0017_eventinstance_notifications_sent")]
 
     operations = [
         migrations.AddField(
-            model_name='eventtype',
-            name='notifications',
+            model_name="eventtype",
+            name="notifications",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

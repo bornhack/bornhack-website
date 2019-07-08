@@ -10,23 +10,53 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Sponsor',
+            name="Sponsor",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(help_text='Name of the sponsor', max_length=150)),
-                ('tier', models.IntegerField(choices=[(1, 'Gold'), (2, 'Silver'), (3, 'Bronze'), (4, 'Sponsor')], help_text='The tier of the sponsorship')),
-                ('description', models.TextField(help_text='A short description of the sponsorship')),
-                ('logo', models.ImageField(help_text='A logo for the sponsor', upload_to=sponsors.models.get_sponsor_upload_path)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(help_text="Name of the sponsor", max_length=150),
+                ),
+                (
+                    "tier",
+                    models.IntegerField(
+                        choices=[
+                            (1, "Gold"),
+                            (2, "Silver"),
+                            (3, "Bronze"),
+                            (4, "Sponsor"),
+                        ],
+                        help_text="The tier of the sponsorship",
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        help_text="A short description of the sponsorship"
+                    ),
+                ),
+                (
+                    "logo",
+                    models.ImageField(
+                        help_text="A logo for the sponsor",
+                        upload_to=sponsors.models.get_sponsor_upload_path,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

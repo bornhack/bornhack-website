@@ -7,20 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0002_auto_20160117_1718'),
-    ]
+    dependencies = [("camps", "0002_auto_20160117_1718")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='signup',
-            name='camp',
-        ),
-        migrations.RemoveField(
-            model_name='signup',
-            name='user',
-        ),
-        migrations.DeleteModel(
-            name='Signup',
-        ),
+        migrations.RemoveField(model_name="signup", name="camp"),
+        migrations.RemoveField(model_name="signup", name="user"),
+        migrations.DeleteModel(name="Signup"),
     ]

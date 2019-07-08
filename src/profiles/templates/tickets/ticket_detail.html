@@ -1,0 +1,24 @@
+{% extends 'profile_base.html' %}
+{% load bootstrap3 %}
+{% load tickets_tags %}
+
+{% block profile_content %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>Your Tickets</h4>
+  </div>
+  <div class="panel-body">
+
+    <h2>{% if ticket.checked_in %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
+    <form method="POST" class="form">
+      {% csrf_token %}
+      {% bootstrap_field form.name %}
+      {% bootstrap_field form.email %}
+      <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-check"></i> Save</button>
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

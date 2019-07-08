@@ -8,39 +8,53 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0018_auto_20170128_1841'),
-    ]
+    dependencies = [("camps", "0018_auto_20170128_1841")]
 
     operations = [
         migrations.AlterField(
-            model_name='camp',
-            name='buildup',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text='The camp buildup period.', verbose_name='Buildup Period'),
+            model_name="camp",
+            name="buildup",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text="The camp buildup period.", verbose_name="Buildup Period"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='camp',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text='The camp period.', verbose_name='Camp Period'),
+            model_name="camp",
+            name="camp",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text="The camp period.", verbose_name="Camp Period"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='slug',
-            field=models.SlugField(help_text='The url slug to use for this camp', verbose_name='Url Slug'),
+            model_name="camp",
+            name="slug",
+            field=models.SlugField(
+                help_text="The url slug to use for this camp", verbose_name="Url Slug"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='tagline',
-            field=models.CharField(help_text='Tagline of the camp, ie. "Initial Commit"', max_length=255, verbose_name='Tagline'),
+            model_name="camp",
+            name="tagline",
+            field=models.CharField(
+                help_text='Tagline of the camp, ie. "Initial Commit"',
+                max_length=255,
+                verbose_name="Tagline",
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='teardown',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text='The camp teardown period.', verbose_name='Teardown period'),
+            model_name="camp",
+            name="teardown",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text="The camp teardown period.", verbose_name="Teardown period"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='title',
-            field=models.CharField(help_text='Title of the camp, ie. Bornhack 2016.', max_length=255, verbose_name='Title'),
+            model_name="camp",
+            name="title",
+            field=models.CharField(
+                help_text="Title of the camp, ie. Bornhack 2016.",
+                max_length=255,
+                verbose_name="Title",
+            ),
         ),
     ]

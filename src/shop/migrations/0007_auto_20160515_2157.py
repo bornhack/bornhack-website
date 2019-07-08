@@ -7,22 +7,20 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0006_ensure_slugs'),
-    ]
+    dependencies = [("shop", "0006_ensure_slugs")]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='open',
-            field=models.NullBooleanField(default=True, help_text='Whether this order is open or not. "None" means closed.', verbose_name='Open?'),
+            model_name="order",
+            name="open",
+            field=models.NullBooleanField(
+                default=True,
+                help_text='Whether this order is open or not. "None" means closed.',
+                verbose_name="Open?",
+            ),
         ),
-        migrations.RemoveField(
-            model_name='order',
-            name='finalized',
-        ),
+        migrations.RemoveField(model_name="order", name="finalized"),
         migrations.AlterUniqueTogether(
-            name='order',
-            unique_together=set([('user', 'open')]),
+            name="order", unique_together=set([("user", "open")])
         ),
     ]

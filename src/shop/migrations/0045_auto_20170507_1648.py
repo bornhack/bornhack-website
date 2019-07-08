@@ -7,14 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0044_coinifyapiinvoice_coinify_id'),
-    ]
+    dependencies = [("shop", "0044_coinifyapiinvoice_coinify_id")]
 
     operations = [
         migrations.RenameField(
-            model_name='coinifyapicallback',
-            old_name='valid',
-            new_name='authenticated',
-        ),
+            model_name="coinifyapicallback", old_name="valid", new_name="authenticated"
+        )
     ]

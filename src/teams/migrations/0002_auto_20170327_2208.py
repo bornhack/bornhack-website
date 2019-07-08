@@ -7,23 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0020_camp_read_only'),
-        ('teams', '0001_initial'),
-    ]
+    dependencies = [("camps", "0020_camp_read_only"), ("teams", "0001_initial")]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='team',
-            options={'ordering': ['name']},
-        ),
+        migrations.AlterModelOptions(name="team", options={"ordering": ["name"]}),
         migrations.AddField(
-            model_name='team',
-            name='slug',
+            model_name="team",
+            name="slug",
             field=models.SlugField(blank=True, max_length=255),
         ),
         migrations.AlterUniqueTogether(
-            name='team',
-            unique_together=set([('slug', 'camp')]),
+            name="team", unique_together=set([("slug", "camp")])
         ),
     ]

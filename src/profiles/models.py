@@ -1,55 +1,50 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.conf import settings
-from django.utils import timezone
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
-
-from datetime import timedelta
 
 from utils.models import UUIDModel, CreatedUpdatedModel
 
 
 class Profile(CreatedUpdatedModel, UUIDModel):
     class Meta:
-        verbose_name = _('Profile')
-        verbose_name_plural = _('Profiles')
+        verbose_name = _("Profile")
+        verbose_name_plural = _("Profiles")
 
     user = models.OneToOneField(
         User,
-        verbose_name=_('User'),
-        help_text=_('The django user this profile belongs to.'),
-        on_delete=models.PROTECT
+        verbose_name=_("User"),
+        help_text=_("The django user this profile belongs to."),
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(
         max_length=200,
-        default='',
+        default="",
         blank=True,
-        help_text='Your name or handle (only visible to team responsible and organisers)'
+        help_text="Your name or handle (only visible to team responsible and organisers)",
     )
 
     description = models.TextField(
-        default='',
+        default="",
         blank=True,
-        help_text='Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.',
+        help_text="Please include any info you think could be relevant, like drivers license, first aid certificates, crafts, skills and previous experience. Please also include availability if you are not there for the full week.",
     )
 
     public_credit_name = models.CharField(
         blank=True,
         max_length=100,
-        help_text='The name you want to appear on in the credits section of the public website (on Team and People pages). Leave this empty if you want your name hidden on the public webpages.'
+        help_text="The name you want to appear on in the credits section of the public website (on Team and People pages). Leave this empty if you want your name hidden on the public webpages.",
     )
 
     public_credit_name_approved = models.BooleanField(
         default=False,
-        help_text='Check this box to approve this users public_credit_name. This will be unchecked automatically when the user edits public_credit_name'
+        help_text="Check this box to approve this users public_credit_name. This will be unchecked automatically when the user edits public_credit_name",
     )
 
     nickserv_username = models.CharField(
         blank=True,
         max_length=50,
-        help_text='Your NickServ username is used to manage team IRC channel access lists. Make sure you register with NickServ _before_ you enter the username here!',
+        help_text="Your NickServ username is used to manage team IRC channel access lists. Make sure you register with NickServ _before_ you enter the username here!",
     )
 
     @property
@@ -77,4 +72,3 @@ class Profile(CreatedUpdatedModel, UUIDModel):
             return self.public_credit_name
         else:
             return "Unnamed"
-

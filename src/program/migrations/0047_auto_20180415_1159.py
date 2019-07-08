@@ -7,79 +7,134 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0046_auto_20180318_0906'),
-    ]
+    dependencies = [("program", "0046_auto_20180318_0906")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this event belongs to', on_delete=django.db.models.deletion.PROTECT, related_name='events', to='camps.Camp'),
+            model_name="event",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this event belongs to",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="events",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='event_type',
-            field=models.ForeignKey(help_text='The type of this event', on_delete=django.db.models.deletion.PROTECT, to='program.EventType'),
+            model_name="event",
+            name="event_type",
+            field=models.ForeignKey(
+                help_text="The type of this event",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.EventType",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='proposal',
-            field=models.OneToOneField(blank=True, help_text='The event proposal object this event was created from', null=True, on_delete=django.db.models.deletion.PROTECT, to='program.EventProposal'),
+            model_name="event",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="The event proposal object this event was created from",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.EventProposal",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventinstance',
-            name='event',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='instances', to='program.Event'),
+            model_name="eventinstance",
+            name="event",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="instances",
+                to="program.Event",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventinstance',
-            name='location',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='eventinstances', to='program.EventLocation'),
+            model_name="eventinstance",
+            name="location",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="eventinstances",
+                to="program.EventLocation",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventlocation',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='eventlocations', to='camps.Camp'),
+            model_name="eventlocation",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="eventlocations",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventproposal',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='eventproposals', to='camps.Camp'),
+            model_name="eventproposal",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="eventproposals",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventproposal',
-            name='event_type',
-            field=models.ForeignKey(help_text='The type of event', on_delete=django.db.models.deletion.PROTECT, to='program.EventType'),
+            model_name="eventproposal",
+            name="event_type",
+            field=models.ForeignKey(
+                help_text="The type of event",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.EventType",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventproposal',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="eventproposal",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AlterField(
-            model_name='favorite',
-            name='event_instance',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='program.EventInstance'),
+            model_name="favorite",
+            name="event_instance",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to="program.EventInstance"
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this speaker belongs to', null=True, on_delete=django.db.models.deletion.PROTECT, related_name='speakers', to='camps.Camp'),
+            model_name="speaker",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this speaker belongs to",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="speakers",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='proposal',
-            field=models.OneToOneField(blank=True, help_text='The speaker proposal object this speaker was created from', null=True, on_delete=django.db.models.deletion.PROTECT, to='program.SpeakerProposal'),
+            model_name="speaker",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="The speaker proposal object this speaker was created from",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.SpeakerProposal",
+            ),
         ),
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='speakerproposals', to='camps.Camp'),
+            model_name="speakerproposal",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="speakerproposals",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='speakerproposal',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL),
+            model_name="speakerproposal",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

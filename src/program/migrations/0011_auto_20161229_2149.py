@@ -8,26 +8,17 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0010_auto_20161212_1809'),
-    ]
+    dependencies = [("program", "0010_auto_20161212_1809")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='eventinstance',
-            options={'ordering': ['when']},
+            name="eventinstance", options={"ordering": ["when"]}
         ),
-        migrations.RemoveField(
-            model_name='eventinstance',
-            name='end',
-        ),
-        migrations.RemoveField(
-            model_name='eventinstance',
-            name='start',
-        ),
+        migrations.RemoveField(model_name="eventinstance", name="end"),
+        migrations.RemoveField(model_name="eventinstance", name="start"),
         migrations.AddField(
-            model_name='eventinstance',
-            name='when',
+            model_name="eventinstance",
+            name="when",
             field=django.contrib.postgres.fields.ranges.DateTimeRangeField(null=True),
         ),
     ]

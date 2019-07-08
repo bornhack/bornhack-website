@@ -7,15 +7,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0021_auto_20170711_2247'),
-    ]
+    dependencies = [("camps", "0021_auto_20170711_2247")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='colour',
-            field=models.CharField(default='#000000', help_text='The primary colour for the camp in hex', max_length=7, verbose_name='Colour'),
+            model_name="camp",
+            name="colour",
+            field=models.CharField(
+                default="#000000",
+                help_text="The primary colour for the camp in hex",
+                max_length=7,
+                verbose_name="Colour",
+            ),
             preserve_default=False,
-        ),
+        )
     ]

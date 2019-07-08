@@ -10,17 +10,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('program', '0038_favorite'),
+        ("program", "0038_favorite"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='speaker',
-            name='events',
-            field=models.ManyToManyField(blank=True, help_text='The event(s) this speaker is anchoring', related_name='speakers', to='program.Event'),
+            model_name="speaker",
+            name="events",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="The event(s) this speaker is anchoring",
+                related_name="speakers",
+                to="program.Event",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='favorite',
-            unique_together=set([('user', 'event_instance')]),
+            name="favorite", unique_together=set([("user", "event_instance")])
         ),
     ]

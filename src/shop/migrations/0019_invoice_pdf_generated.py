@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0018_auto_20160529_1736'),
-    ]
+    dependencies = [("shop", "0018_auto_20160529_1736")]
 
     operations = [
         migrations.AddField(
-            model_name='invoice',
-            name='pdf_generated',
+            model_name="invoice",
+            name="pdf_generated",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

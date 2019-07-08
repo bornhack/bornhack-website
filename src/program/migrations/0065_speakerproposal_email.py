@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0064_auto_20180810_1748'),
-    ]
+    dependencies = [("program", "0064_auto_20180810_1748")]
 
     operations = [
         migrations.AddField(
-            model_name='speakerproposal',
-            name='email',
-            field=models.EmailField(blank=True, help_text='The email of the speaker (defaults to the logged in user if empty.', max_length=150, null=True),
-        ),
+            model_name="speakerproposal",
+            name="email",
+            field=models.EmailField(
+                blank=True,
+                help_text="The email of the speaker (defaults to the logged in user if empty.",
+                max_length=150,
+                null=True,
+            ),
+        )
     ]

@@ -7,13 +7,15 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0020_camp_read_only'),
-    ]
+    dependencies = [("camps", "0020_camp_read_only")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='camp',
-            options={'ordering': ['-title'], 'verbose_name': 'Camp', 'verbose_name_plural': 'Camps'},
-        ),
+            name="camp",
+            options={
+                "ordering": ["-title"],
+                "verbose_name": "Camp",
+                "verbose_name_plural": "Camps",
+            },
+        )
     ]

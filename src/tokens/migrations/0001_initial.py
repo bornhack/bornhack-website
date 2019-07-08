@@ -8,23 +8,38 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ('camps', '0029_auto_20180815_2018'),
-    ]
+    dependencies = [("camps", "0029_auto_20180815_2018")]
 
     operations = [
         migrations.CreateModel(
-            name='Token',
+            name="Token",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('token', models.CharField(help_text='The secret token', max_length=32)),
-                ('description', models.TextField(help_text='The description of the token')),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='camps.Camp')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "token",
+                    models.CharField(help_text="The secret token", max_length=32),
+                ),
+                (
+                    "description",
+                    models.TextField(help_text="The description of the token"),
+                ),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="camps.Camp"
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

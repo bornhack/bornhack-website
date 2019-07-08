@@ -4,8 +4,8 @@ from django.db import migrations
 
 
 def add_email(apps, schema_editor):
-    Speaker = apps.get_model('program', 'Speaker')
-    SpeakerProposal = apps.get_model('program', 'SpeakerProposal')
+    Speaker = apps.get_model("program", "Speaker")
+    SpeakerProposal = apps.get_model("program", "SpeakerProposal")
 
     for speaker in Speaker.objects.all():
         if speaker.proposal and not speaker.email:
@@ -20,10 +20,6 @@ def add_email(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0067_auto_20180818_1634'),
-    ]
+    dependencies = [("program", "0067_auto_20180818_1634")]
 
-    operations = [
-        migrations.RunPython(add_email)
-    ]
+    operations = [migrations.RunPython(add_email)]

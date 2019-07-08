@@ -4,30 +4,26 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def fix_irc_channels(apps, schema_editor):
-    Team = apps.get_model('teams', 'Team')
+    Team = apps.get_model("teams", "Team")
     for team in Team.objects.filter(irc_channel=True):
         print("fixing irc channel for team %s" % team.name)
         if team.irc_channel_private:
-            team.private_irc_channel_name=team.irc_channel_name
+            team.private_irc_channel_name = team.irc_channel_name
             if team.irc_channel_managed:
-                team.private_irc_channel_managed=True
-                team.private_irc_channel_bot=True
+                team.private_irc_channel_managed = True
+                team.private_irc_channel_bot = True
         else:
-            team.public_irc_channel_name=team.irc_channel_name
+            team.public_irc_channel_name = team.irc_channel_name
             if team.irc_channel_managed:
-                team.public_irc_channel_managed=True
-                team.public_irc_channel_bot=True
+                team.public_irc_channel_managed = True
+                team.public_irc_channel_bot = True
         team.save()
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0038_auto_20180412_1844'),
-    ]
+    dependencies = [("teams", "0038_auto_20180412_1844")]
 
-    operations = [
-        migrations.RunPython(fix_irc_channels),
-    ]
-
+    operations = [migrations.RunPython(fix_irc_channels)]

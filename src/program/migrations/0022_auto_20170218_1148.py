@@ -7,19 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0021_auto_20170205_2130'),
-    ]
+    dependencies = [("program", "0021_auto_20170205_2130")]
 
     operations = [
         migrations.RenameField(
-            model_name='speaker',
-            old_name='picture',
-            new_name='picture_large',
+            model_name="speaker", old_name="picture", new_name="picture_large"
         ),
         migrations.AddField(
-            model_name='speaker',
-            name='picture_small',
-            field=models.ImageField(blank=True, null=True, upload_to=''),
+            model_name="speaker",
+            name="picture_small",
+            field=models.ImageField(blank=True, null=True, upload_to=""),
         ),
     ]

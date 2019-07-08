@@ -12,37 +12,69 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('camps', '0020_camp_read_only'),
+        ("camps", "0020_camp_read_only"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Team',
+            name="Team",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField()),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='camps.Camp')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField()),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="camps.Camp"
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='TeamMember',
+            name="TeamMember",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('leader', models.BooleanField(default=False)),
-                ('team', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='teams.Team')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("leader", models.BooleanField(default=False)),
+                (
+                    "team",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="teams.Team"
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='team',
-            name='members',
-            field=models.ManyToManyField(through='teams.TeamMember', to=settings.AUTH_USER_MODEL),
+            model_name="team",
+            name="members",
+            field=models.ManyToManyField(
+                through="teams.TeamMember", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

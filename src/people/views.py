@@ -3,6 +3,5 @@ from camps.models import Camp
 
 
 class PeopleView(ListView):
-    template_name = 'people.html'
+    template_name = "people.html"
     model = Camp
-

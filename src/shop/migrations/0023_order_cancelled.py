@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0022_auto_20160530_2301'),
-    ]
+    dependencies = [("shop", "0022_auto_20160530_2301")]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='cancelled',
+            model_name="order",
+            name="cancelled",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

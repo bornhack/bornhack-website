@@ -12,137 +12,278 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0020_camp_read_only'),
+        ("camps", "0020_camp_read_only"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('program', '0029_auto_20170307_2042'),
+        ("program", "0029_auto_20170307_2042"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EventSubmission',
+            name="EventSubmission",
             fields=[
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('submission_status', models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50)),
-                ('title', models.CharField(help_text='The title of this event', max_length=255)),
-                ('abstract', models.TextField(help_text='The abstract for this event')),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eventsubmissions', to='camps.Camp')),
-                ('event_type', models.ForeignKey(help_text='The type of event', on_delete=django.db.models.deletion.CASCADE, to='program.EventType')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "submission_status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("pending", "Pending approval"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="draft",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        help_text="The title of this event", max_length=255
+                    ),
+                ),
+                ("abstract", models.TextField(help_text="The abstract for this event")),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="eventsubmissions",
+                        to="camps.Camp",
+                    ),
+                ),
+                (
+                    "event_type",
+                    models.ForeignKey(
+                        help_text="The type of event",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="program.EventType",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.CreateModel(
-            name='SpeakerSubmission',
+            name="SpeakerSubmission",
             fields=[
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('uuid', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('submission_status', models.CharField(choices=[('draft', 'Draft'), ('pending', 'Pending approval'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='draft', max_length=50)),
-                ('name', models.CharField(help_text='Name or alias of the speaker', max_length=150)),
-                ('biography', models.TextField(help_text='Markdown is supported.')),
-                ('picture_large', models.ImageField(blank=True, help_text='A picture of the speaker', null=True, upload_to=program.models.get_speakersubmission_picture_upload_path)),
-                ('picture_small', models.ImageField(blank=True, help_text='A thumbnail of the speaker picture', null=True, upload_to=program.models.get_speakersubmission_picture_upload_path)),
-                ('camp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='speakersubmissions', to='camps.Camp')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "uuid",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "submission_status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("pending", "Pending approval"),
+                            ("approved", "Approved"),
+                            ("rejected", "Rejected"),
+                        ],
+                        default="draft",
+                        max_length=50,
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(
+                        help_text="Name or alias of the speaker", max_length=150
+                    ),
+                ),
+                ("biography", models.TextField(help_text="Markdown is supported.")),
+                (
+                    "picture_large",
+                    models.ImageField(
+                        blank=True,
+                        help_text="A picture of the speaker",
+                        null=True,
+                        upload_to=program.models.get_speakersubmission_picture_upload_path,
+                    ),
+                ),
+                (
+                    "picture_small",
+                    models.ImageField(
+                        blank=True,
+                        help_text="A thumbnail of the speaker picture",
+                        null=True,
+                        upload_to=program.models.get_speakersubmission_picture_upload_path,
+                    ),
+                ),
+                (
+                    "camp",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="speakersubmissions",
+                        to="camps.Camp",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
-        migrations.RemoveField(
-            model_name='event',
-            name='submission_status',
+        migrations.RemoveField(model_name="event", name="submission_status"),
+        migrations.AlterField(
+            model_name="event",
+            name="abstract",
+            field=models.TextField(help_text="The abstract for this event"),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='abstract',
-            field=models.TextField(help_text='The abstract for this event'),
+            model_name="event",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this event belongs to",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="events",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this event belongs to', on_delete=django.db.models.deletion.CASCADE, related_name='events', to='camps.Camp'),
+            model_name="event",
+            name="event_type",
+            field=models.ForeignKey(
+                help_text="The type of this event",
+                on_delete=django.db.models.deletion.CASCADE,
+                to="program.EventType",
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='event_type',
-            field=models.ForeignKey(help_text='The type of this event', on_delete=django.db.models.deletion.CASCADE, to='program.EventType'),
+            model_name="event",
+            name="slug",
+            field=models.SlugField(
+                blank=True,
+                help_text="The slug for this event, created automatically",
+                max_length=255,
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='slug',
-            field=models.SlugField(blank=True, help_text='The slug for this event, created automatically', max_length=255),
+            model_name="event",
+            name="title",
+            field=models.CharField(help_text="The title of this event", max_length=255),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='title',
-            field=models.CharField(help_text='The title of this event', max_length=255),
+            model_name="event",
+            name="video_recording",
+            field=models.BooleanField(
+                default=True, help_text="Do we intend to record video of this event?"
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='video_recording',
-            field=models.BooleanField(default=True, help_text='Do we intend to record video of this event?'),
+            model_name="event",
+            name="video_url",
+            field=models.URLField(
+                blank=True, help_text="URL to the recording", max_length=1000, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='event',
-            name='video_url',
-            field=models.URLField(blank=True, help_text='URL to the recording', max_length=1000, null=True),
+            model_name="eventlocation",
+            name="camp",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="eventlocations",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventlocation',
-            name='camp',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='eventlocations', to='camps.Camp'),
+            model_name="speaker",
+            name="biography",
+            field=models.TextField(help_text="Markdown is supported."),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='biography',
-            field=models.TextField(help_text='Markdown is supported.'),
+            model_name="speaker",
+            name="camp",
+            field=models.ForeignKey(
+                help_text="The camp this speaker belongs to",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="speakers",
+                to="camps.Camp",
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='camp',
-            field=models.ForeignKey(help_text='The camp this speaker belongs to', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='speakers', to='camps.Camp'),
+            model_name="speaker",
+            name="events",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="The event(s) this speaker is anchoring",
+                to="program.Event",
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='events',
-            field=models.ManyToManyField(blank=True, help_text='The event(s) this speaker is anchoring', to='program.Event'),
+            model_name="speaker",
+            name="name",
+            field=models.CharField(
+                help_text="Name or alias of the speaker", max_length=150
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='name',
-            field=models.CharField(help_text='Name or alias of the speaker', max_length=150),
+            model_name="speaker",
+            name="picture_large",
+            field=models.ImageField(
+                blank=True,
+                help_text="A picture of the speaker",
+                null=True,
+                upload_to=program.models.get_speaker_picture_upload_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='picture_large',
-            field=models.ImageField(blank=True, help_text='A picture of the speaker', null=True, upload_to=program.models.get_speaker_picture_upload_path),
+            model_name="speaker",
+            name="picture_small",
+            field=models.ImageField(
+                blank=True,
+                help_text="A thumbnail of the speaker picture",
+                null=True,
+                upload_to=program.models.get_speaker_picture_upload_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='picture_small',
-            field=models.ImageField(blank=True, help_text='A thumbnail of the speaker picture', null=True, upload_to=program.models.get_speaker_picture_upload_path),
+            model_name="speaker",
+            name="slug",
+            field=models.SlugField(
+                blank=True,
+                help_text="The slug for this speaker, will be autocreated",
+                max_length=255,
+            ),
         ),
-        migrations.AlterField(
-            model_name='speaker',
-            name='slug',
-            field=models.SlugField(blank=True, help_text='The slug for this speaker, will be autocreated', max_length=255),
-        ),
-        migrations.RemoveField(
-            model_name='speaker',
-            name='submission_status',
-        ),
+        migrations.RemoveField(model_name="speaker", name="submission_status"),
         migrations.AddField(
-            model_name='speaker',
-            name='submission',
-            field=models.OneToOneField(blank=True, help_text='The speaker submission object this speaker was created from', null=True, on_delete=django.db.models.deletion.CASCADE, to='program.SpeakerSubmission'),
+            model_name="speaker",
+            name="submission",
+            field=models.OneToOneField(
+                blank=True,
+                help_text="The speaker submission object this speaker was created from",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="program.SpeakerSubmission",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='speaker',
-            unique_together=set([('camp', 'slug'), ('camp', 'name')]),
+            name="speaker", unique_together=set([("camp", "slug"), ("camp", "name")])
         ),
     ]

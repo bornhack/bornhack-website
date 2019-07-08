@@ -17,6 +17,9 @@
 {% endif %}
 
 <br>
+{% if request.user.is_staff %}
+  <a href="{% url 'admin:index' %}economy/expense/{{ expense.uuid }}/change/" class="btn btn-primary"><i class="fas fa-edit"></i> Open in Admin</a>
+{% endif %}
 <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Expense List</a>
 
 {% endblock content %}

@@ -9,44 +9,47 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0007_auto_20161212_1803'),
-        ('program', '0009_auto_20160827_0752'),
+        ("camps", "0007_auto_20161212_1803"),
+        ("program", "0009_auto_20160827_0752"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='EventInstance',
+            name="EventInstance",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('start', models.DateTimeField()),
-                ('end', models.DateTimeField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("start", models.DateTimeField()),
+                ("end", models.DateTimeField()),
             ],
-            options={
-                'ordering': ['start'],
-            },
+            options={"ordering": ["start"]},
         ),
-        migrations.RemoveField(
-            model_name='event',
-            name='days',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='end',
-        ),
-        migrations.RemoveField(
-            model_name='event',
-            name='start',
+        migrations.RemoveField(model_name="event", name="days"),
+        migrations.RemoveField(model_name="event", name="end"),
+        migrations.RemoveField(model_name="event", name="start"),
+        migrations.AddField(
+            model_name="event",
+            name="camp",
+            field=models.ForeignKey(
+                null=True, on_delete=django.db.models.deletion.CASCADE, to="camps.Camp"
+            ),
         ),
         migrations.AddField(
-            model_name='event',
-            name='camp',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='camps.Camp'),
-        ),
-        migrations.AddField(
-            model_name='eventinstance',
-            name='event',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='instances', to='program.Event'),
+            model_name="eventinstance",
+            name="event",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="instances",
+                to="program.Event",
+            ),
         ),
     ]

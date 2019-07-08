@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def add_team_camp(apps, schema_editor):
-    Team = apps.get_model('teams', 'Team')
-    TeamArea = apps.get_model('teams', 'TeamArea')
-    TeamMember = apps.get_model('teams', 'TeamMember')
+    Team = apps.get_model("teams", "Team")
+    TeamArea = apps.get_model("teams", "TeamArea")
+    TeamMember = apps.get_model("teams", "TeamMember")
 
     for team in Team.objects.all():
         print("camp processing team %s..." % team.name)
@@ -15,10 +16,11 @@ def add_team_camp(apps, schema_editor):
         team.save()
         print("set camp %s for team %s" % (team.camp.slug, team.name))
 
+
 def add_missing_team_responsibles(apps, schema_editor):
-    Team = apps.get_model('teams', 'Team')
-    TeamArea = apps.get_model('teams', 'TeamArea')
-    TeamMember = apps.get_model('teams', 'TeamMember')
+    Team = apps.get_model("teams", "Team")
+    TeamArea = apps.get_model("teams", "TeamArea")
+    TeamMember = apps.get_model("teams", "TeamMember")
 
     for team in Team.objects.all():
         print("responsible processing team %s..." % team.name)
@@ -34,27 +36,22 @@ def add_missing_team_responsibles(apps, schema_editor):
                 membership = TeamMember.objects.get(team=team, user=responsible)
                 if not membership.responsible:
                     # already a member of the team, but not responsible
-                    membership.responsible=True
+                    membership.responsible = True
                     membership.save()
                     print("%s is now marked as responsible" % membership.user.username)
             except TeamMember.DoesNotExist:
                 # add the responsible as a member of the team
                 membership = TeamMember.objects.create(
-                    team=team,
-                    user=responsible,
-                    responsible=True,
-                    approved=True
+                    team=team, user=responsible, responsible=True, approved=True
                 )
                 print("new membership has been created for team %s" % team.name)
 
+
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0026_team_camp'),
-    ]
+    dependencies = [("teams", "0026_team_camp")]
 
     operations = [
         migrations.RunPython(add_team_camp),
         migrations.RunPython(add_missing_team_responsibles),
     ]
-

@@ -11,7 +11,7 @@ from .models import Feedback
 
 class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Feedback
-    fields = ['feedback']
+    fields = ["feedback"]
 
     def form_valid(self, form):
         feedback = form.save(commit=False)
@@ -20,14 +20,15 @@ class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         feedback.save()
         thanks_message = "Thank you! Your feedback is highly appreciated!"
         try:
-            token = Token.objects.get(
-                camp=self.camp,
-                description="Feedback thanks"
+            token = Token.objects.get(camp=self.camp, description="Feedback thanks")
+            thanks_message += " And for your efforts, here is a token: {}".format(
+                token.token
             )
-            thanks_message += " And for your efforts, here is a token: {}".format(token.token)
         except Token.DoesNotExist:
             pass
 
         messages.success(self.request, thanks_message)
 
-        return HttpResponseRedirect(reverse("feedback", kwargs={"camp_slug": self.camp.slug}))
+        return HttpResponseRedirect(
+            reverse("feedback", kwargs={"camp_slug": self.camp.slug})
+        )

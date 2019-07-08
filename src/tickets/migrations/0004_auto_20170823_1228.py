@@ -7,24 +7,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('tickets', '0003_auto_20170819_2309'),
-    ]
+    dependencies = [("tickets", "0003_auto_20170819_2309")]
 
     operations = [
         migrations.AddField(
-            model_name='discountticket',
-            name='badge_handed_out',
+            model_name="discountticket",
+            name="badge_handed_out",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='shopticket',
-            name='badge_handed_out',
+            model_name="shopticket",
+            name="badge_handed_out",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='sponsorticket',
-            name='badge_handed_out',
+            model_name="sponsorticket",
+            name="badge_handed_out",
             field=models.BooleanField(default=False),
         ),
     ]

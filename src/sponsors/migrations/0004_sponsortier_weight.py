@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0003_sponsortier_camp'),
-    ]
+    dependencies = [("sponsors", "0003_sponsortier_camp")]
 
     operations = [
         migrations.AddField(
-            model_name='sponsortier',
-            name='weight',
-            field=models.IntegerField(default=0, help_text='This decides where on the list the tier will be shown. I.e.\n        gold should have a lower value than silver.'),
-        ),
+            model_name="sponsortier",
+            name="weight",
+            field=models.IntegerField(
+                default=0,
+                help_text="This decides where on the list the tier will be shown. I.e.\n        gold should have a lower value than silver.",
+            ),
+        )
     ]

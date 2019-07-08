@@ -8,24 +8,28 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0017_remove_camp_description'),
-    ]
+    dependencies = [("camps", "0017_remove_camp_description")]
 
     operations = [
         migrations.AlterField(
-            model_name='camp',
-            name='buildup',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp buildup period.', verbose_name=b'Buildup Period'),
+            model_name="camp",
+            name="buildup",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp buildup period.", verbose_name=b"Buildup Period"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='camp',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp period.', verbose_name=b'Camp Period'),
+            model_name="camp",
+            name="camp",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp period.", verbose_name=b"Camp Period"
+            ),
         ),
         migrations.AlterField(
-            model_name='camp',
-            name='teardown',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text=b'The camp teardown period.', verbose_name=b'Teardown period'),
+            model_name="camp",
+            name="teardown",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text=b"The camp teardown period.", verbose_name=b"Teardown period"
+            ),
         ),
     ]

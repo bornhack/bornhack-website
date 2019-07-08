@@ -4,17 +4,14 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def create_eventtype(apps, schema_editor):
-    Type = apps.get_model('events', 'Type')
-    Type.objects.create(name='ticket_created')
+    Type = apps.get_model("events", "Type")
+    Type.objects.create(name="ticket_created")
 
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('events', '0002_create_eventtype'),
-    ]
+    dependencies = [("events", "0002_create_eventtype")]
 
-    operations = [
-        migrations.RunPython(create_eventtype),
-    ]
+    operations = [migrations.RunPython(create_eventtype)]

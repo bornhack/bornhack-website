@@ -13,4 +13,3 @@ def truefalseicon(value):
         return mark_safe("<span class='text-success glyphicon glyphicon-ok'></span>")
     else:
         return mark_safe("<span class='text-danger glyphicon glyphicon-remove'></span>")
-

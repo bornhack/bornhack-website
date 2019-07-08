@@ -1,5 +1,8 @@
 # Bornhack
 
+[![Build Status](https://travis-ci.org/bornhack/bornhack-website.svg?branch=master)](https://travis-ci.org/bornhack/bornhack-website)
+[![codecov](https://codecov.io/gh/bornhack/bornhack-website/branch/master/graph/badge.svg)](https://codecov.io/gh/bornhack/bornhack-website)
+
 Django project to power Bornhack. Features include news, villages, webshop, and more.
 
 ## Development setup
@@ -120,6 +123,7 @@ You can also specify details like:
 * coral https://github.com/coral
 * Henrik Kramshøj https://github.com/kramse
 * Janus Troelsen https://github.com/ysangkok
+* Jeppe Ernst https://github.com/Ern-st
 * Jonty Wareing https://github.com/Jonty
 * Kasper Christensen https://github.com/fALKENdk
 * klarstrup https://github.com/klarstrup

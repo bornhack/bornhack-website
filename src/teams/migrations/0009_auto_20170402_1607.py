@@ -11,35 +11,53 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('teams', '0008_team_needs_members'),
+        ("teams", "0008_team_needs_members"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TeamMember',
+            name="TeamMember",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('approved', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("approved", models.BooleanField(default=False)),
             ],
         ),
         migrations.AlterField(
-            model_name='team',
-            name='members',
-            field=models.ManyToManyField(related_name='teamsold', to=settings.AUTH_USER_MODEL),
+            model_name="team",
+            name="members",
+            field=models.ManyToManyField(
+                related_name="teamsold", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='teammember',
-            name='team',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='teams.Team'),
+            model_name="teammember",
+            name="team",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="teams.Team"
+            ),
         ),
         migrations.AddField(
-            model_name='teammember',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="teammember",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='team',
-            name='membersnew',
-            field=models.ManyToManyField(related_name='teams', through='teams.TeamMember', to=settings.AUTH_USER_MODEL),
+            model_name="team",
+            name="membersnew",
+            field=models.ManyToManyField(
+                related_name="teams",
+                through="teams.TeamMember",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

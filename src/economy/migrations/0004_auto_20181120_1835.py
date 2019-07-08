@@ -7,14 +7,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('economy', '0003_auto_20180917_1933'),
-    ]
+    dependencies = [("economy", "0003_auto_20180917_1933")]
 
     operations = [
         migrations.AlterField(
-            model_name='reimbursement',
-            name='user',
-            field=models.ForeignKey(help_text='The economy team member who created this reimbursement.', on_delete=django.db.models.deletion.PROTECT, related_name='created_reimbursements', to=settings.AUTH_USER_MODEL),
-        ),
+            model_name="reimbursement",
+            name="user",
+            field=models.ForeignKey(
+                help_text="The economy team member who created this reimbursement.",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="created_reimbursements",
+                to=settings.AUTH_USER_MODEL,
+            ),
+        )
     ]

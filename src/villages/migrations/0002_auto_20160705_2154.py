@@ -7,18 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('villages', '0001_initial'),
-    ]
+    dependencies = [("villages", "0001_initial")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='village',
-            name='open',
-        ),
+        migrations.RemoveField(model_name="village", name="open"),
         migrations.AddField(
-            model_name='village',
-            name='private',
-            field=models.BooleanField(default=True, help_text='Check if your village is privately organized'),
+            model_name="village",
+            name="private",
+            field=models.BooleanField(
+                default=True, help_text="Check if your village is privately organized"
+            ),
         ),
     ]

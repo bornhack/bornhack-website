@@ -6,19 +6,31 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0060_auto_20180603_1455'),
-    ]
+    dependencies = [("program", "0060_auto_20180603_1455")]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='proposal',
-            field=models.OneToOneField(blank=True, editable=False, help_text='The event proposal object this event was created from', null=True, on_delete=django.db.models.deletion.PROTECT, to='program.EventProposal'),
+            model_name="event",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                editable=False,
+                help_text="The event proposal object this event was created from",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.EventProposal",
+            ),
         ),
         migrations.AlterField(
-            model_name='speaker',
-            name='proposal',
-            field=models.OneToOneField(blank=True, editable=False, help_text='The speaker proposal object this speaker was created from', null=True, on_delete=django.db.models.deletion.PROTECT, to='program.SpeakerProposal'),
+            model_name="speaker",
+            name="proposal",
+            field=models.OneToOneField(
+                blank=True,
+                editable=False,
+                help_text="The speaker proposal object this speaker was created from",
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.SpeakerProposal",
+            ),
         ),
     ]

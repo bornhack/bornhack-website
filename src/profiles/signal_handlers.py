@@ -1,9 +1,7 @@
-from django.db.models.signals import (
-    post_save,
-    pre_save
-)
+from django.db.models.signals import post_save, pre_save
 from events.handler import handle_team_event
 import logging
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -13,6 +11,7 @@ def create_profile(sender, created, instance, **kwargs):
     Creates a Profile object when the User object was just created.
     """
     from .models import Profile
+
     if created:
         Profile.objects.create(user=instance)
 
@@ -38,21 +37,21 @@ def public_credit_name_changed(instance, original):
         # public_credit_name has not been changed
         return
 
-    if original and original.public_credit_name and not original.public_credit_name_approved:
+    if (
+        original
+        and original.public_credit_name
+        and not original.public_credit_name_approved
+    ):
         # the original.public_credit_name was not approved, no need to notify again
         return
 
     # put the message together
-    message='User {username} changed public credit name. please review and act accordingly: https://bornhack.dk/admin/profiles/profile/{uuid}/change/'.format(
-        username=instance.name,
-        uuid=instance.uuid
+    message = "User {username} changed public credit name. please review and act accordingly: https://bornhack.dk/admin/profiles/profile/{uuid}/change/".format(
+        username=instance.name, uuid=instance.uuid
     )
 
     # trigger the event
-    handle_team_event(
-        eventtype='public_credit_name_changed',
-        irc_message=message,
-    )
+    handle_team_event(eventtype="public_credit_name_changed", irc_message=message)
 
 
 def nickserv_username_changed(instance, original):
@@ -60,26 +59,36 @@ def nickserv_username_changed(instance, original):
     Check if profile.nickserv_username was changed, and check irc_acl_fix_needed if so
     This will be picked up by the IRC bot and fixed as needed
     """
-    if instance.nickserv_username and original and instance.nickserv_username != original.nickserv_username:
-        logger.debug("profile.nickserv_username changed for user %s, setting membership.irc_acl_fix_needed=True" % instance.user.username)
+    if (
+        instance.nickserv_username
+        and original
+        and instance.nickserv_username != original.nickserv_username
+    ):
+        logger.debug(
+            "profile.nickserv_username changed for user %s, setting membership.irc_acl_fix_needed=True"
+            % instance.user.username
+        )
 
         # find team memberships for this user
         from teams.models import TeamMember
-        memberships = TeamMember.objects.filter(
-            user=instance.user,
-            approved=True,
-        )
+
+        memberships = TeamMember.objects.filter(user=instance.user, approved=True)
 
         # loop over memberships
         for membership in memberships:
-            if not membership.team.public_irc_channel_name and not membership.team.private_irc_channel_name:
+            if (
+                not membership.team.public_irc_channel_name
+                and not membership.team.private_irc_channel_name
+            ):
                 # no irc channels for this team
                 continue
-            if not membership.team.public_irc_channel_managed and not membership.team.private_irc_channel_managed:
+            if (
+                not membership.team.public_irc_channel_managed
+                and not membership.team.private_irc_channel_managed
+            ):
                 # irc channel(s) are not managed for this team
                 continue
 
             # ok, mark this membership as in need of fixing
             membership.irc_acl_fix_needed = True
             membership.save()
-

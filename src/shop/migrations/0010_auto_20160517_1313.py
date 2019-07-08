@@ -8,31 +8,47 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0009_epaycallback_md5valid'),
-    ]
+    dependencies = [("shop", "0009_epaycallback_md5valid")]
 
     operations = [
         migrations.CreateModel(
-            name='Invoice',
+            name="Invoice",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('sent_to_customer', models.BooleanField(default=False)),
-                ('order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='shop.Order')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                ("sent_to_customer", models.BooleanField(default=False)),
+                (
+                    "order",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE, to="shop.Order"
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
+            options={"abstract": False},
         ),
         migrations.AlterModelOptions(
-            name='epaycallback',
-            options={'ordering': ['-created'], 'verbose_name': 'Epay Callback', 'verbose_name_plural': 'Epay Callbacks'},
+            name="epaycallback",
+            options={
+                "ordering": ["-created"],
+                "verbose_name": "Epay Callback",
+                "verbose_name_plural": "Epay Callbacks",
+            },
         ),
         migrations.AddField(
-            model_name='product',
-            name='public',
-            field=models.BooleanField(default=True, help_text=b'Is this product publicly available in the webshop?'),
+            model_name="product",
+            name="public",
+            field=models.BooleanField(
+                default=True,
+                help_text=b"Is this product publicly available in the webshop?",
+            ),
         ),
     ]

@@ -8,12 +8,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0010_auto_20161212_1809'),
-        ('camps', '0007_auto_20161212_1803'),
+        ("program", "0010_auto_20161212_1809"),
+        ("camps", "0007_auto_20161212_1803"),
     ]
 
-    operations = [
-        migrations.DeleteModel(
-            name='Day',
-        ),
-    ]
+    operations = [migrations.DeleteModel(name="Day")]

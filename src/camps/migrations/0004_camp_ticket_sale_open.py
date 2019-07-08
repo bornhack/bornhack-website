@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0003_auto_20160422_2019'),
-    ]
+    dependencies = [("camps", "0003_auto_20160422_2019")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='ticket_sale_open',
-            field=models.BooleanField(default=False, help_text='Whether tickets are for sale or not.', verbose_name='Ticket sale open?'),
-        ),
+            model_name="camp",
+            name="ticket_sale_open",
+            field=models.BooleanField(
+                default=False,
+                help_text="Whether tickets are for sale or not.",
+                verbose_name="Ticket sale open?",
+            ),
+        )
     ]

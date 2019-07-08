@@ -7,23 +7,30 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('info', '0001_initial'),
-    ]
+    dependencies = [("info", "0001_initial")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='infocategory',
-            options={'ordering': ['-weight', 'headline'], 'verbose_name_plural': 'Info Categories'},
+            name="infocategory",
+            options={
+                "ordering": ["-weight", "headline"],
+                "verbose_name_plural": "Info Categories",
+            },
         ),
         migrations.AlterField(
-            model_name='infocategory',
-            name='weight',
-            field=models.PositiveIntegerField(default=100, help_text='Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically. Defaults to 100.'),
+            model_name="infocategory",
+            name="weight",
+            field=models.PositiveIntegerField(
+                default=100,
+                help_text="Determines sorting/ordering. Heavier categories sink to the bottom. Categories with the same weight are ordered alphabetically. Defaults to 100.",
+            ),
         ),
         migrations.AlterField(
-            model_name='infoitem',
-            name='weight',
-            field=models.PositiveIntegerField(default=100, help_text='Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.'),
+            model_name="infoitem",
+            name="weight",
+            field=models.PositiveIntegerField(
+                default=100,
+                help_text="Determines sorting/ordering. Heavier items sink to the bottom. Items with the same weight are ordered alphabetically. Defaults to 100.",
+            ),
         ),
     ]

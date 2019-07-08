@@ -5,14 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0061_auto_20180603_1525'),
-    ]
+    dependencies = [("program", "0061_auto_20180603_1525")]
 
     operations = [
         migrations.AlterField(
-            model_name='urltype',
-            name='icon',
-            field=models.CharField(default='fas fa-link', help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.", max_length=100),
-        ),
+            model_name="urltype",
+            name="icon",
+            field=models.CharField(
+                default="fas fa-link",
+                help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
+                max_length=100,
+            ),
+        )
     ]

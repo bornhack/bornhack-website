@@ -6,12 +6,7 @@ from camps.utils import CampPropertyListFilter
 
 @admin.register(TeamTask)
 class TeamTaskAdmin(admin.ModelAdmin):
-    list_display = [
-        'id',
-        'team',
-        'name',
-        'description',
-    ]
+    list_display = ["id", "team", "name", "description"]
 
 
 class TeamMemberInline(admin.TabularInline):
@@ -21,45 +16,44 @@ class TeamMemberInline(admin.TabularInline):
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     def get_responsible(self, obj):
-        return ", ".join([resp.profile.public_credit_name for resp in obj.responsible_members.all()])
-    get_responsible.short_description = 'Responsible'
+        return ", ".join(
+            [resp.profile.public_credit_name for resp in obj.responsible_members.all()]
+        )
+
+    get_responsible.short_description = "Responsible"
 
     list_display = [
-        'name',
-        'camp',
-        'get_responsible',
-        'needs_members',
-        'public_irc_channel_name',
-        'public_irc_channel_bot',
-        'public_irc_channel_managed',
-        'private_irc_channel_name',
-        'private_irc_channel_bot',
-        'private_irc_channel_managed',
+        "name",
+        "camp",
+        "get_responsible",
+        "needs_members",
+        "public_irc_channel_name",
+        "public_irc_channel_bot",
+        "public_irc_channel_managed",
+        "private_irc_channel_name",
+        "private_irc_channel_bot",
+        "private_irc_channel_managed",
     ]
 
     list_filter = [
         CampPropertyListFilter,
-        'needs_members',
-        'public_irc_channel_bot',
-        'public_irc_channel_managed',
-        'private_irc_channel_bot',
-        'private_irc_channel_managed',
+        "needs_members",
+        "public_irc_channel_bot",
+        "public_irc_channel_managed",
+        "private_irc_channel_bot",
+        "private_irc_channel_managed",
     ]
     inlines = [TeamMemberInline]
 
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
-    list_filter = [
-        CampPropertyListFilter,
-        'team',
-        'approved',
-    ]
+    list_filter = [CampPropertyListFilter, "team", "approved"]
 
-    actions = ['approve_membership', 'remove_member']
+    actions = ["approve_membership", "remove_member"]
 
     def approve_membership(self, request, queryset):
-        teams_count = queryset.values('team').distinct().count()
+        teams_count = queryset.values("team").distinct().count()
         updated = 0
 
         for membership in queryset:
@@ -70,15 +64,15 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            'Membership(s) approved: Added {} user(s) to {} team(s).'.format(
-                updated,
-                teams_count
-            )
+            "Membership(s) approved: Added {} user(s) to {} team(s).".format(
+                updated, teams_count
+            ),
         )
-    approve_membership.description = 'Approve membership.'
+
+    approve_membership.description = "Approve membership."
 
     def remove_member(self, request, queryset):
-        teams_count = queryset.values('team').distinct().count()
+        teams_count = queryset.values("team").distinct().count()
         updated = 0
 
         for membership in queryset:
@@ -87,18 +81,12 @@ class TeamMemberAdmin(admin.ModelAdmin):
             updated += 1
 
         self.message_user(
-            request,
-            'Removed {} user(s) from {} team(s).'.format(
-                updated,
-                teams_count
-            )
+            request, "Removed {} user(s) from {} team(s).".format(updated, teams_count)
         )
-    remove_member.description = 'Remove a user from the team.'
 
+    remove_member.description = "Remove a user from the team."
 
 
 @admin.register(TeamShift)
 class TeamShiftAdmin(admin.ModelAdmin):
-    list_filter = [
-        'team',
-    ]
+    list_filter = ["team"]

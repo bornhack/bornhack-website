@@ -5,19 +5,23 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0025_auto_20180318_1250'),
-    ]
+    dependencies = [("camps", "0025_auto_20180318_1250")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='call_for_participation_open',
-            field=models.BooleanField(default=False, help_text='Check if the Call for Participation is open for this camp'),
+            model_name="camp",
+            name="call_for_participation_open",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check if the Call for Participation is open for this camp",
+            ),
         ),
         migrations.AddField(
-            model_name='camp',
-            name='call_for_sponsors_open',
-            field=models.BooleanField(default=False, help_text='Check if the Call for Sponsors is open for this camp'),
+            model_name="camp",
+            name="call_for_sponsors_open",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check if the Call for Sponsors is open for this camp",
+            ),
         ),
     ]

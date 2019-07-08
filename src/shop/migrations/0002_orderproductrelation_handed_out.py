@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0001_initial'),
-    ]
+    dependencies = [("shop", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='orderproductrelation',
-            name='handed_out',
+            model_name="orderproductrelation",
+            name="handed_out",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

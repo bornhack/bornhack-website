@@ -7,21 +7,10 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('tickets', '0002_auto_20170819_2222'),
-    ]
+    dependencies = [("tickets", "0002_auto_20170819_2222")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='discountticket',
-            name='qrcode_base64',
-        ),
-        migrations.RemoveField(
-            model_name='shopticket',
-            name='qrcode_base64',
-        ),
-        migrations.RemoveField(
-            model_name='sponsorticket',
-            name='qrcode_base64',
-        ),
+        migrations.RemoveField(model_name="discountticket", name="qrcode_base64"),
+        migrations.RemoveField(model_name="shopticket", name="qrcode_base64"),
+        migrations.RemoveField(model_name="sponsorticket", name="qrcode_base64"),
     ]

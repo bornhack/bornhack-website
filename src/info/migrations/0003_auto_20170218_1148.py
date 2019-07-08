@@ -7,17 +7,17 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('info', '0002_auto_20161228_2312'),
-    ]
+    dependencies = [("info", "0002_auto_20161228_2312")]
 
     operations = [
         migrations.AlterModelOptions(
-            name='infocategory',
-            options={'ordering': ['weight', 'headline'], 'verbose_name_plural': 'Info Categories'},
+            name="infocategory",
+            options={
+                "ordering": ["weight", "headline"],
+                "verbose_name_plural": "Info Categories",
+            },
         ),
         migrations.AlterModelOptions(
-            name='infoitem',
-            options={'ordering': ['weight', 'headline']},
+            name="infoitem", options={"ordering": ["weight", "headline"]}
         ),
     ]

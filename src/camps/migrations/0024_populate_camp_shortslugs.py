@@ -4,19 +4,16 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 def populate_camp_shortslugs(apps, schema_editor):
-    Camp = apps.get_model('camps', 'Camp')
+    Camp = apps.get_model("camps", "Camp")
     for camp in Camp.objects.all():
         if not camp.shortslug:
             camp.shortslug = camp.slug
             camp.save()
 
+
 class Migration(migrations.Migration):
-    dependencies = [
-        ('camps', '0023_camp_shortslug'),
-    ]
+    dependencies = [("camps", "0023_camp_shortslug")]
 
-    operations = [
-        migrations.RunPython(populate_camp_shortslugs),
-    ]
-
+    operations = [migrations.RunPython(populate_camp_shortslugs)]

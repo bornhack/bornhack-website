@@ -12,11 +12,14 @@ class OutgoingIrcMessage(CreatedUpdatedModel):
     expired = models.BooleanField(default=False)
 
     def __str__(self):
-        return "PRIVMSG %s %s (%s)" % (self.target, self.message, 'processed' if self.processed else 'unprocessed')
+        return "PRIVMSG %s %s (%s)" % (
+            self.target,
+            self.message,
+            "processed" if self.processed else "unprocessed",
+        )
 
     def clean(self):
         if not self.pk:
             # this is a new outgoing message being saved
             if self.timeout < timezone.now():
-                raise ValidationError({'timeout': 'The timeout can not be in the past'})
-
+                raise ValidationError({"timeout": "The timeout can not be in the past"})

@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('news', '0004_auto_20160610_1743'),
-    ]
+    dependencies = [("news", "0004_auto_20160610_1743")]
 
     operations = [
         migrations.AlterField(
-            model_name='newsitem',
-            name='slug',
+            model_name="newsitem",
+            name="slug",
             field=models.SlugField(blank=True, max_length=255),
-        ),
+        )
     ]

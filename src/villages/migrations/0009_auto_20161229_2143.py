@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('villages', '0008_auto_20161228_2209'),
-    ]
+    dependencies = [("villages", "0008_auto_20161228_2209")]
 
     operations = [
         migrations.AlterField(
-            model_name='village',
-            name='private',
-            field=models.BooleanField(default=False, help_text='Check if your village is invite only. Leave unchecked to welcome strangers.'),
-        ),
+            model_name="village",
+            name="private",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check if your village is invite only. Leave unchecked to welcome strangers.",
+            ),
+        )
     ]

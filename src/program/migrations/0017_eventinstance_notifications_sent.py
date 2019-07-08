@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0016_auto_20170131_1849'),
-    ]
+    dependencies = [("program", "0016_auto_20170131_1849")]
 
     operations = [
         migrations.AddField(
-            model_name='eventinstance',
-            name='notifications_sent',
+            model_name="eventinstance",
+            name="notifications_sent",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

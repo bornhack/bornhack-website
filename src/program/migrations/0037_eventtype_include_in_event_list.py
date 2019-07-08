@@ -7,14 +7,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0036_auto_20170316_0004'),
-    ]
+    dependencies = [("program", "0036_auto_20170316_0004")]
 
     operations = [
         migrations.AddField(
-            model_name='eventtype',
-            name='include_in_event_list',
-            field=models.BooleanField(default=True, help_text='Include events of this type in the event list?'),
-        ),
+            model_name="eventtype",
+            name="include_in_event_list",
+            field=models.BooleanField(
+                default=True, help_text="Include events of this type in the event list?"
+            ),
+        )
     ]

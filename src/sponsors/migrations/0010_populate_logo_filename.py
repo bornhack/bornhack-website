@@ -2,18 +2,16 @@
 
 from django.db import migrations
 
+
 def populate_logo_filename(apps, schema_editor):
-    Sponsor = apps.get_model('sponsors', 'Sponsor')
+    Sponsor = apps.get_model("sponsors", "Sponsor")
     for sponsor in Sponsor.objects.all():
         sponsor.logo_filename = sponsor.logo.split("/")[-1]
         sponsor.save()
 
+
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0009_sponsor_logo_filename'),
-    ]
+    dependencies = [("sponsors", "0009_sponsor_logo_filename")]
 
-    operations = [
-        migrations.RunPython(populate_logo_filename),
-    ]
+    operations = [migrations.RunPython(populate_logo_filename)]

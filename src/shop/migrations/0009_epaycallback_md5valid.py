@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0008_auto_20160516_0954'),
-    ]
+    dependencies = [("shop", "0008_auto_20160516_0954")]
 
     operations = [
         migrations.AddField(
-            model_name='epaycallback',
-            name='md5valid',
+            model_name="epaycallback",
+            name="md5valid",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

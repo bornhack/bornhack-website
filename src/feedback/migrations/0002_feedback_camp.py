@@ -6,16 +6,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0030_camp_light_text'),
-        ('feedback', '0001_initial'),
-    ]
+    dependencies = [("camps", "0030_camp_light_text"), ("feedback", "0001_initial")]
 
     operations = [
         migrations.AddField(
-            model_name='feedback',
-            name='camp',
-            field=models.ForeignKey(default='30fd754f-dae4-460f-8128-6638fb29ab2d', on_delete=django.db.models.deletion.PROTECT, to='camps.Camp'),
+            model_name="feedback",
+            name="camp",
+            field=models.ForeignKey(
+                default="30fd754f-dae4-460f-8128-6638fb29ab2d",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="camps.Camp",
+            ),
             preserve_default=False,
-        ),
+        )
     ]

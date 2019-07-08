@@ -7,19 +7,24 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('profiles', '0004_auto_20170430_1408'),
-    ]
+    dependencies = [("profiles", "0004_auto_20170430_1408")]
 
     operations = [
         migrations.AddField(
-            model_name='profile',
-            name='public_credit_name',
-            field=models.CharField(blank=True, help_text='The name used on the public list of volunteers for this event. Only used if public_credits is True. Not editable by users (to avoid getting junk on the website).', max_length=100),
+            model_name="profile",
+            name="public_credit_name",
+            field=models.CharField(
+                blank=True,
+                help_text="The name used on the public list of volunteers for this event. Only used if public_credits is True. Not editable by users (to avoid getting junk on the website).",
+                max_length=100,
+            ),
         ),
         migrations.AddField(
-            model_name='profile',
-            name='public_credits',
-            field=models.BooleanField(default=False, help_text='Check this box if you want your name to appear in the list of volunteers for this event. Please inform your team responsible what you would like to be credited as.'),
+            model_name="profile",
+            name="public_credits",
+            field=models.BooleanField(
+                default=False,
+                help_text="Check this box if you want your name to appear in the list of volunteers for this event. Please inform your team responsible what you would like to be credited as.",
+            ),
         ),
     ]

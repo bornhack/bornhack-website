@@ -8,29 +8,41 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0002_orderproductrelation_handed_out'),
-    ]
+    dependencies = [("shop", "0002_orderproductrelation_handed_out")]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='finalized',
-            field=models.BooleanField(default=False, help_text='Whether this order has been finalized.', verbose_name='Finalized?'),
+            model_name="order",
+            name="finalized",
+            field=models.BooleanField(
+                default=False,
+                help_text="Whether this order has been finalized.",
+                verbose_name="Finalized?",
+            ),
         ),
         migrations.AlterField(
-            model_name='order',
-            name='payment_method',
-            field=models.CharField(choices=[(b'credit_card', b'Credit card'), (b'blockchain', b'Blockchain'), (b'bank_transfer', b'Bank transfer')], default=b'blockchain', max_length=50),
+            model_name="order",
+            name="payment_method",
+            field=models.CharField(
+                choices=[
+                    (b"credit_card", b"Credit card"),
+                    (b"blockchain", b"Blockchain"),
+                    (b"bank_transfer", b"Bank transfer"),
+                ],
+                default=b"blockchain",
+                max_length=50,
+            ),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='available_in',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(help_text='Which period is this product available for purchase? | (Format: YYYY-MM-DD HH:MM) | Only one of start/end is required'),
+            model_name="product",
+            name="available_in",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                help_text="Which period is this product available for purchase? | (Format: YYYY-MM-DD HH:MM) | Only one of start/end is required"
+            ),
         ),
         migrations.AlterField(
-            model_name='product',
-            name='price',
-            field=models.IntegerField(help_text='Price of the product (in DKK).'),
+            model_name="product",
+            name="price",
+            field=models.IntegerField(help_text="Price of the product (in DKK)."),
         ),
     ]

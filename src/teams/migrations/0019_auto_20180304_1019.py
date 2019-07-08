@@ -7,17 +7,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0018_auto_20171122_2204'),
-    ]
+    dependencies = [("teams", "0018_auto_20171122_2204")]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='team',
-            unique_together=set([]),
-        ),
-        migrations.RemoveField(
-            model_name='team',
-            name='camp',
-        ),
+        migrations.AlterUniqueTogether(name="team", unique_together=set([])),
+        migrations.RemoveField(model_name="team", name="camp"),
     ]

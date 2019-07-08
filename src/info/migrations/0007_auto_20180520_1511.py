@@ -6,14 +6,17 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('info', '0006_auto_20180520_1113'),
-    ]
+    dependencies = [("info", "0006_auto_20180520_1113")]
 
     operations = [
         migrations.AlterField(
-            model_name='infocategory',
-            name='team',
-            field=models.ForeignKey(help_text='The team responsible for this info category.', on_delete=django.db.models.deletion.PROTECT, related_name='info_categories', to='teams.Team'),
-        ),
+            model_name="infocategory",
+            name="team",
+            field=models.ForeignKey(
+                help_text="The team responsible for this info category.",
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="info_categories",
+                to="teams.Team",
+            ),
+        )
     ]

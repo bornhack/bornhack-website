@@ -7,14 +7,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0022_camp_colour'),
-    ]
+    dependencies = [("camps", "0022_camp_colour")]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='shortslug',
-            field=models.SlugField(blank=True, help_text='Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.', verbose_name='Short Slug'),
-        ),
+            model_name="camp",
+            name="shortslug",
+            field=models.SlugField(
+                blank=True,
+                help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
+                verbose_name="Short Slug",
+            ),
+        )
     ]

@@ -8,6 +8,7 @@ from datetime import timedelta
 from django.utils import timezone
 from django.urls import reverse
 import logging
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -15,9 +16,10 @@ class Permission(models.Model):
     """
     An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
     """
+
     class Meta:
         managed = False
-        default_permissions=()
+        default_permissions = ()
         permissions = (
             ("backoffice_permission", "BackOffice access"),
             ("orgateam_permission", "Orga Team permissions set"),
@@ -31,102 +33,98 @@ class Permission(models.Model):
 
 class Camp(CreatedUpdatedModel, UUIDModel):
     class Meta:
-        verbose_name = 'Camp'
-        verbose_name_plural = 'Camps'
-        ordering = ['-title']
+        verbose_name = "Camp"
+        verbose_name_plural = "Camps"
+        ordering = ["-title"]
 
     title = models.CharField(
-        verbose_name='Title',
-        help_text='Title of the camp, ie. Bornhack 2016.',
+        verbose_name="Title",
+        help_text="Title of the camp, ie. Bornhack 2016.",
         max_length=255,
     )
 
     tagline = models.CharField(
-        verbose_name='Tagline',
+        verbose_name="Tagline",
         help_text='Tagline of the camp, ie. "Initial Commit"',
         max_length=255,
     )
 
     slug = models.SlugField(
-        verbose_name='Url Slug',
-        help_text='The url slug to use for this camp'
+        verbose_name="Url Slug", help_text="The url slug to use for this camp"
     )
 
     shortslug = models.SlugField(
-        verbose_name='Short Slug',
-        help_text='Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.',
+        verbose_name="Short Slug",
+        help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
     )
 
     buildup = DateTimeRangeField(
-        verbose_name='Buildup Period',
-        help_text='The camp buildup period.',
+        verbose_name="Buildup Period", help_text="The camp buildup period."
     )
 
-    camp = DateTimeRangeField(
-        verbose_name='Camp Period',
-        help_text='The camp period.',
-    )
+    camp = DateTimeRangeField(verbose_name="Camp Period", help_text="The camp period.")
 
     teardown = DateTimeRangeField(
-        verbose_name='Teardown period',
-        help_text='The camp teardown period.',
+        verbose_name="Teardown period", help_text="The camp teardown period."
     )
 
     read_only = models.BooleanField(
-        help_text='Whether the camp is read only (i.e. in the past)',
-        default=False
+        help_text="Whether the camp is read only (i.e. in the past)", default=False
     )
 
     colour = models.CharField(
-        verbose_name='Colour',
-        help_text='The primary colour for the camp in hex',
-        max_length=7
+        verbose_name="Colour",
+        help_text="The primary colour for the camp in hex",
+        max_length=7,
     )
 
     light_text = models.BooleanField(
         default=True,
-        help_text='Check if this camps colour requires white text, uncheck if black text is better',
+        help_text="Check if this camps colour requires white text, uncheck if black text is better",
     )
 
     call_for_participation_open = models.BooleanField(
-        help_text='Check if the Call for Participation is open for this camp',
+        help_text="Check if the Call for Participation is open for this camp",
         default=False,
     )
 
     call_for_participation = models.TextField(
         blank=True,
-        help_text='The CFP markdown for this Camp',
-        default='The Call For Participation for this Camp has not been written yet',
+        help_text="The CFP markdown for this Camp",
+        default="The Call For Participation for this Camp has not been written yet",
     )
 
     call_for_sponsors_open = models.BooleanField(
-        help_text='Check if the Call for Sponsors is open for this camp',
-        default=False,
+        help_text="Check if the Call for Sponsors is open for this camp", default=False
     )
 
     call_for_sponsors = models.TextField(
         blank=True,
-        help_text='The CFS markdown for this Camp',
-        default='The Call For Sponsors for this Camp has not been written yet',
+        help_text="The CFS markdown for this Camp",
+        default="The Call For Sponsors for this Camp has not been written yet",
+    )
+
+    show_schedule = models.BooleanField(
+        help_text="Check if the schedule should be shown.", default=True
     )
 
     def get_absolute_url(self):
-        return reverse('camp_detail', kwargs={'camp_slug': self.slug})
+        return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 
     def clean(self):
-        ''' Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown '''
+        """ Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown """
         errors = []
         # check for overlaps buildup vs. camp
         if self.buildup.upper > self.camp.lower:
             msg = "End of buildup must not be after camp start"
-            errors.append(ValidationError({'buildup', msg}))
-            errors.append(ValidationError({'camp', msg}))
+            errors.append(ValidationError({"buildup", msg}))
+            errors.append(ValidationError({"camp", msg}))
 
         # check for overlaps camp vs. teardown
         if self.camp.upper > self.teardown.lower:
             msg = "End of camp must not be after teardown start"
-            errors.append(ValidationError({'camp', msg}))
-            errors.append(ValidationError({'teardown', msg}))
+            errors.append(ValidationError({"camp", msg}))
+            errors.append(ValidationError({"teardown", msg}))
 
         if errors:
             raise ValidationError(errors)
@@ -137,40 +135,48 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     @property
     def event_types(self):
         """ Return all event types with at least one event in this camp """
-        return EventType.objects.filter(event__instances__isnull=False, event__camp=self).distinct()
+        return EventType.objects.filter(
+            event__instances__isnull=False, event__camp=self
+        ).distinct()
 
     @property
     def event_locations(self):
-        ''' Return all event locations with at least one event in this camp'''
-        return EventLocation.objects.filter(eventinstances__isnull=False, camp=self).distinct()
+        """ Return all event locations with at least one event in this camp"""
+        return EventLocation.objects.filter(
+            eventinstances__isnull=False, camp=self
+        ).distinct()
 
     @property
     def logo_small(self):
-        return 'img/%(slug)s/logo/%(slug)s-logo-s.png' % {'slug': self.slug}
+        return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
 
     @property
     def logo_small_svg(self):
-        return 'img/%(slug)s/logo/%(slug)s-logo-small.svg' % {'slug': self.slug}
+        return "img/%(slug)s/logo/%(slug)s-logo-small.svg" % {"slug": self.slug}
 
     @property
     def logo_large(self):
-        return 'img/%(slug)s/logo/%(slug)s-logo-l.png' % {'slug': self.slug}
+        return "img/%(slug)s/logo/%(slug)s-logo-l.png" % {"slug": self.slug}
 
     @property
     def logo_large_svg(self):
-        return 'img/%(slug)s/logo/%(slug)s-logo-large.svg' % {'slug': self.slug}
+        return "img/%(slug)s/logo/%(slug)s-logo-large.svg" % {"slug": self.slug}
 
     def get_days(self, camppart):
-        '''
+        """
         Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
-        '''
+        """
         if not hasattr(self, camppart):
             logger.error("nonexistant field/attribute")
             return False
 
         field = getattr(self, camppart)
 
-        if not hasattr(field, '__class__') or not hasattr(field.__class__, '__name__') or not field.__class__.__name__ == 'DateTimeTZRange':
+        if (
+            not hasattr(field, "__class__")
+            or not hasattr(field.__class__, "__name__")
+            or not field.__class__.__name__ == "DateTimeTZRange"
+        ):
             logger.error("this attribute is not a datetimetzrange field: %s" % field)
             return False
 
@@ -182,45 +188,44 @@ class Camp(CreatedUpdatedModel, UUIDModel):
                 days.append(
                     DateTimeTZRange(
                         field.lower,
-                        (field.lower+timedelta(days=i+1)).replace(hour=0)
+                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
                     )
                 )
-            elif i == daycount-1:
+            elif i == daycount - 1:
                 # on the last day use actual end time instead of midnight
                 days.append(
                     DateTimeTZRange(
-                        (field.lower+timedelta(days=i)).replace(hour=0),
-                        field.lower+timedelta(days=i+1)
+                        (field.lower + timedelta(days=i)).replace(hour=0),
+                        field.lower + timedelta(days=i + 1),
                     )
                 )
             else:
                 # neither first nor last day, goes from midnight to midnight
                 days.append(
                     DateTimeTZRange(
-                        (field.lower+timedelta(days=i)).replace(hour=0),
-                        (field.lower+timedelta(days=i+1)).replace(hour=0)
+                        (field.lower + timedelta(days=i)).replace(hour=0),
+                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
                     )
                 )
         return days
 
     @property
     def buildup_days(self):
-        '''
+        """
         Returns a list of DateTimeTZRanges representing the days during the buildup.
-        '''
-        return self.get_days('buildup')
+        """
+        return self.get_days("buildup")
 
     @property
     def camp_days(self):
-        '''
+        """
         Returns a list of DateTimeTZRanges representing the days during the camp.
-        '''
-        return self.get_days('camp')
+        """
+        return self.get_days("camp")
 
     @property
     def teardown_days(self):
-        '''
+        """
         Returns a list of DateTimeTZRanges representing the days during the buildup.
-        '''
-        return self.get_days('teardown')
-
+        """
+        return self.get_days("teardown")

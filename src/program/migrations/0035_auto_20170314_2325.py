@@ -7,14 +7,15 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('program', '0034_auto_20170314_2012'),
-    ]
+    dependencies = [("program", "0034_auto_20170314_2012")]
 
     operations = [
         migrations.AlterField(
-            model_name='eventlocation',
-            name='icon',
-            field=models.CharField(help_text="hex for the unicode character in the fontawesome icon set to use, like 'f000' for 'fa-glass'", max_length=100),
-        ),
+            model_name="eventlocation",
+            name="icon",
+            field=models.CharField(
+                help_text="hex for the unicode character in the fontawesome icon set to use, like 'f000' for 'fa-glass'",
+                max_length=100,
+            ),
+        )
     ]

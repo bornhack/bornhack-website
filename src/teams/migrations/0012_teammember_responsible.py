@@ -7,14 +7,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0011_auto_20170402_1608'),
-    ]
+    dependencies = [("teams", "0011_auto_20170402_1608")]
 
     operations = [
         migrations.AddField(
-            model_name='teammember',
-            name='responsible',
+            model_name="teammember",
+            name="responsible",
             field=models.BooleanField(default=False),
-        ),
+        )
     ]

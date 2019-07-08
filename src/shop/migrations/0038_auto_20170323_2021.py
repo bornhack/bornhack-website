@@ -7,14 +7,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0037_auto_20170319_2204'),
-    ]
+    dependencies = [("shop", "0037_auto_20170319_2204")]
 
     operations = [
         migrations.AlterField(
-            model_name='order',
-            name='payment_method',
-            field=models.CharField(blank=True, choices=[('credit_card', 'Credit card'), ('blockchain', 'Blockchain'), ('bank_transfer', 'Bank transfer'), ('cash', 'Cash')], default='', max_length=50),
-        ),
+            model_name="order",
+            name="payment_method",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("credit_card", "Credit card"),
+                    ("blockchain", "Blockchain"),
+                    ("bank_transfer", "Bank transfer"),
+                    ("cash", "Cash"),
+                ],
+                default="",
+                max_length=50,
+            ),
+        )
     ]

@@ -6,8 +6,8 @@ from django.db import migrations
 
 
 def ensure_slugs(apps, schema_editor):
-    ProductCategory = apps.get_model('shop', 'ProductCategory')
-    Product = apps.get_model('shop', 'Product')
+    ProductCategory = apps.get_model("shop", "ProductCategory")
+    Product = apps.get_model("shop", "Product")
 
     for category in ProductCategory.objects.all():
         category.save()
@@ -18,10 +18,6 @@ def ensure_slugs(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0005_product_slug'),
-    ]
+    dependencies = [("shop", "0005_product_slug")]
 
-    operations = [
-        migrations.RunPython(ensure_slugs, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(ensure_slugs, migrations.RunPython.noop)]

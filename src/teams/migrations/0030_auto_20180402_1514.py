@@ -7,24 +7,32 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('teams', '0029_remove_team_area'),
-    ]
+    dependencies = [("teams", "0029_remove_team_area")]
 
     operations = [
         migrations.AlterField(
-            model_name='team',
-            name='irc_channel_name',
-            field=models.TextField(blank=True, default='', help_text='Team IRC channel. Leave blank to generate channel name automatically, based on camp shortslug and team shortslug.'),
+            model_name="team",
+            name="irc_channel_name",
+            field=models.TextField(
+                blank=True,
+                default="",
+                help_text="Team IRC channel. Leave blank to generate channel name automatically, based on camp shortslug and team shortslug.",
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='irc_channel_private',
-            field=models.BooleanField(default=True, help_text='Check to make the IRC channel secret and +i (private for team members only using an ACL). Leave unchecked to make the IRC channel public and open for everyone.'),
+            model_name="team",
+            name="irc_channel_private",
+            field=models.BooleanField(
+                default=True,
+                help_text="Check to make the IRC channel secret and +i (private for team members only using an ACL). Leave unchecked to make the IRC channel public and open for everyone.",
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='needs_members',
-            field=models.BooleanField(default=True, help_text='Check to indicate that this team needs more members'),
+            model_name="team",
+            name="needs_members",
+            field=models.BooleanField(
+                default=True,
+                help_text="Check to indicate that this team needs more members",
+            ),
         ),
     ]

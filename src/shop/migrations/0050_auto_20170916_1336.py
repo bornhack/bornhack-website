@@ -9,24 +9,34 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('shop', '0049_auto_20170914_2034'),
-    ]
+    dependencies = [("shop", "0049_auto_20170914_2034")]
 
     operations = [
         migrations.AddField(
-            model_name='creditnote',
-            name='customer',
-            field=models.TextField(blank=True, default='', help_text='Customer info if no user is selected'),
+            model_name="creditnote",
+            name="customer",
+            field=models.TextField(
+                blank=True, default="", help_text="Customer info if no user is selected"
+            ),
         ),
         migrations.AlterField(
-            model_name='creditnote',
-            name='text',
-            field=models.TextField(help_text='Description of what this credit note covers'),
+            model_name="creditnote",
+            name="text",
+            field=models.TextField(
+                help_text="Description of what this credit note covers"
+            ),
         ),
         migrations.AlterField(
-            model_name='creditnote',
-            name='user',
-            field=models.ForeignKey(blank=True, help_text='The user this credit note belongs to, if any.', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='creditnotes', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            model_name="creditnote",
+            name="user",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="The user this credit note belongs to, if any.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="creditnotes",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="User",
+            ),
         ),
     ]

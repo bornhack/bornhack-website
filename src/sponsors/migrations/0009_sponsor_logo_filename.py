@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('sponsors', '0008_auto_20180815_1119'),
-    ]
+    dependencies = [("sponsors", "0008_auto_20180815_1119")]
 
     operations = [
         migrations.AddField(
-            model_name='sponsor',
-            name='logo_filename',
-            field=models.CharField(blank=True, help_text='Filename of the logo', max_length=255, null=True),
-        ),
+            model_name="sponsor",
+            name="logo_filename",
+            field=models.CharField(
+                blank=True, help_text="Filename of the logo", max_length=255, null=True
+            ),
+        )
     ]

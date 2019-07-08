@@ -7,17 +7,9 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('camps', '0011_auto_20161228_1750'),
-    ]
+    dependencies = [("camps", "0011_auto_20161228_1750")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='camp',
-            name='logo_large',
-        ),
-        migrations.RemoveField(
-            model_name='camp',
-            name='logo_small',
-        ),
+        migrations.RemoveField(model_name="camp", name="logo_large"),
+        migrations.RemoveField(model_name="camp", name="logo_small"),
     ]
