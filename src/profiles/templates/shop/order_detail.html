@@ -89,6 +89,11 @@
         {% if not order.paid %}
           {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
         {% endif %}
+        {% if not order.paid %}
+        <a href="{% url "shop:order_review_and_pay" pk=order.pk %}" class="btn btn-success btn-lg pull-right">
+            Review and pay
+        </a>
+        {% endif %}
 
     </div>
     {% if order.paid %}
@@ -97,48 +102,5 @@
     </div>
     {% endif %}
 </div>
-
-
-{% if not order.paid %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Terms and Payment Options</h4><i class="icon-btc"></i>
-    </div>
-    <div class="panel-body">
-        <form method="POST" class="form-inline">
-          {% csrf_token %}
-            <div class="checkbox" style="margin-top: -10px;">
-              <label>
-                  <input type="checkbox" name="accept_terms" />
-                  I accept the <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>.
-                  Finally I accept to adhere to our <a href="{% url 'conduct' %}">Code of Conduct</a>
-                  during events as well as in BornHack online channels.
-              </label>
-            </div>
-
-            <div class="btn-group btn-group-justified">
-              <div class="btn-group">
-                {% bootstrap_button "<i class='glyphicon glyphicon-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
-              </div>
-              <div class="btn-group">
-                {% bootstrap_button "<i class='glyphicon glyphicon-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
-              </div>
-              <div class="btn-group">
-                {% bootstrap_button "<i class='glyphicon glyphicon-menu-hamburger'></i> Cash" button_type="submit" button_class="btn-primary" name="payment_method" value="cash" %}
-              </div>
-              <div class="btn-group">
-                {% bootstrap_button "<i class='glyphicon glyphicon-credit-card'></i> Credit card*" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
-              </div>
-            </div>
-        </form>
-        <div class="alert alert-info" style="margin-top: 5px; margin-bottom: -10px;">* Please consider the alternatives before choosing credit card. Credit cards are expensive and difficult for us to handle. Thank you!</div>
-    </div>
-    <div class="panel-footer">
-        <i>Bank transfers take up to a week to get registered, but the other
-        payment methods should be more or less instant. Please
-        <a href="{% url 'contact' %}">contact us</a> if your have questions.</i>
-    </div>
-</div>
-{% endif %}
 
 {% endblock %}
