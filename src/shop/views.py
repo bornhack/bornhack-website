@@ -345,41 +345,53 @@ class OrderDetailView(
                 order.invoice_address = request.POST.get("invoice_address") or ""
                 order.save()
 
-            # Then at last see if the user is paying for the order.
-            payment_method = request.POST.get("payment_method")
-            if payment_method in order.PAYMENT_METHODS:
-                if not request.POST.get("accept_terms"):
-                    messages.error(
-                        request,
-                        "You need to accept the general terms and conditions before you can continue!",
-                    )
-                    return self.render_to_response(
-                        self.get_context_data(order_product_formset=formset)
-                    )
-
-                # Set payment method and mark the order as closed
-                order.payment_method = payment_method
-                order.open = None
-                order.customer_comment = request.POST.get("customer_comment") or ""
-                order.invoice_address = request.POST.get("invoice_address") or ""
-                order.save()
-
-                reverses = {
-                    Order.CREDIT_CARD: reverse_lazy(
-                        "shop:epay_form", kwargs={"pk": order.id}
-                    ),
-                    Order.BLOCKCHAIN: reverse_lazy(
-                        "shop:coinify_pay", kwargs={"pk": order.id}
-                    ),
-                    Order.BANK_TRANSFER: reverse_lazy(
-                        "shop:bank_transfer", kwargs={"pk": order.id}
-                    ),
-                    Order.CASH: reverse_lazy("shop:cash", kwargs={"pk": order.id}),
-                }
-
-                return HttpResponseRedirect(reverses[payment_method])
-
         return super(OrderDetailView, self).get(request, *args, **kwargs)
+
+
+class OrderReviewAndPayView(
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureOrderHasProductsMixin,
+    EnsureOrderIsNotCancelledMixin,
+    DetailView,
+):
+    template_name = "shop/order_review.html"
+    context_object_name = "order"
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        order = self.object
+
+        payment_method = request.POST.get("payment_method")
+        if payment_method in order.PAYMENT_METHODS:
+            if not request.POST.get("accept_terms"):
+                messages.error(
+                    request,
+                    "You need to accept the general terms and conditions before you can continue!",
+                )
+                return self.render_to_response(self.get_context_data())
+
+            # Set payment method and mark the order as closed
+            order.payment_method = payment_method
+            order.open = None
+            order.customer_comment = request.POST.get("customer_comment") or ""
+            order.invoice_address = request.POST.get("invoice_address") or ""
+            order.save()
+
+            reverses = {
+                Order.CREDIT_CARD: reverse_lazy(
+                    "shop:epay_form", kwargs={"pk": order.id}
+                ),
+                Order.BLOCKCHAIN: reverse_lazy(
+                    "shop:coinify_pay", kwargs={"pk": order.id}
+                ),
+                Order.BANK_TRANSFER: reverse_lazy(
+                    "shop:bank_transfer", kwargs={"pk": order.id}
+                ),
+                Order.CASH: reverse_lazy("shop:cash", kwargs={"pk": order.id}),
+            }
+
+            return HttpResponseRedirect(reverses[payment_method])
 
 
 class DownloadInvoiceView(

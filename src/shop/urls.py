@@ -13,6 +13,11 @@ urlpatterns = [
             [
                 path("", OrderDetailView.as_view(), name="order_detail"),
                 path(
+                    "review/",
+                    OrderReviewAndPayView.as_view(),
+                    name="order_review_and_pay",
+                ),
+                path(
                     "invoice/", DownloadInvoiceView.as_view(), name="download_invoice"
                 ),
                 path(

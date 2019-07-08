@@ -313,15 +313,19 @@ class TestOrderDetailView(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn("quantity", response.context["order_product_formset"].errors[0])
 
+
+class TestOrderReviewAndPay(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.order = OrderFactory(user=self.user)
+        # Add order
+        OrderProductRelationFactory(order=self.order)
+        self.path = reverse("shop:order_review_and_pay", kwargs={"pk": self.order.pk})
+
     def test_terms_have_to_be_accepted(self):
         self.client.force_login(self.user)
 
-        opr = OrderProductRelationFactory(order=self.order)
-
-        data = self.base_form_data
-        data["form-0-id"] = opr.pk
-        data["form-0-quantity"] = 11
-        data["payment_method"] = "bank_transfer"
+        data = {"payment_method": "bank_transfer"}
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 200)
@@ -329,13 +333,7 @@ class TestOrderDetailView(TestCase):
     def test_accepted_terms_and_chosen_payment_method(self):
         self.client.force_login(self.user)
 
-        opr = OrderProductRelationFactory(order=self.order)
-
-        data = self.base_form_data
-        data["form-0-id"] = opr.pk
-        data["form-0-quantity"] = 11
-        data["payment_method"] = "bank_transfer"
-        data["accept_terms"] = True
+        data = {"payment_method": "bank_transfer", "accept_terms": True}
 
         response = self.client.post(self.path, data=data)
         self.assertEquals(response.status_code, 302)
