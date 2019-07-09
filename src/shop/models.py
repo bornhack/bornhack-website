@@ -128,6 +128,8 @@ class Order(CreatedUpdatedModel):
         blank=True,
     )
 
+    pdf = models.FileField(null=True, blank=True, upload_to="proforma_invoices/")
+
     objects = OrderQuerySet.as_manager()
 
     def __str__(self):
@@ -333,6 +335,10 @@ class Order(CreatedUpdatedModel):
 
         # nope
         return False
+
+    @property
+    def filename(self):
+        return "bornhack_proforma_invoice_order_%s.pdf" % self.pk
 
 
 class ProductCategory(CreatedUpdatedModel, UUIDModel):

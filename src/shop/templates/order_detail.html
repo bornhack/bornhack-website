@@ -84,15 +84,28 @@
         {% endif %}
 
         {% if order.open %}
-          {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary" name="update_order" %}
-        {% endif %}
-        {% if not order.paid %}
-          {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
-        {% endif %}
-        {% if not order.paid %}
-          {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg pull-right" name="review_and_pay" %}
+          {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary btn-lg" name="update_order" icon="edit" %}
         {% endif %}
 
+        {% if not order.paid %}
+          {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
+        {% endif %}
+
+        {% if not order.paid %}
+        {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg pull-right" name="review_and_pay" icon="check" %}
+        {% endif %}
+
+        {% if order.paid %}
+            {% if order.invoice.pdf %}
+                {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+                {% bootstrap_button "Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
+            {% endif %}
+        {% else %}
+            {% if order.pdf %}
+                {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+                {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
+            {% endif %}
+        {% endif %}
     </div>
     {% if order.paid %}
     <div class="panel-footer">

@@ -12,6 +12,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def generate_pdf_letter(filename, template, formatdict):
+    logger.debug("Generating PDF with filename %s and template %s" % (filename, template))
+
     # conjure up a fake request for PDFTemplateResponse
     request = RequestFactory().get("/")
     request.user = AnonymousUser()
@@ -63,3 +65,4 @@ def generate_pdf_letter(filename, template, formatdict):
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)
     return returnfile
+

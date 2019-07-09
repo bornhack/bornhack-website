@@ -14,7 +14,29 @@ def do_work():
         The invoice worker creates Invoice objects for shop orders and
         for custom orders. It also generates PDF files for Invoice objects
         that have no PDF. It also emails invoices for shop orders.
+        It also generates proforma invoices for all closed orders.
     """
+
+    # check if we need to generate any proforma invoices for shop orders
+    for order in Order.objects.filter(pdf="", open__isnull=True):
+        # generate proforma invoice for this Order
+        pdffile = generate_pdf_letter(
+            filename=order.filename,
+            template="pdf/proforma_invoice.html",
+            formatdict={
+                "hostname": settings.ALLOWED_HOSTS[0],
+                "order": order,
+                "bank": settings.BANKACCOUNT_BANK,
+                "bank_iban": settings.BANKACCOUNT_IBAN,
+                "bank_bic": settings.BANKACCOUNT_SWIFTBIC,
+                "bank_dk_reg": settings.BANKACCOUNT_REG,
+                "bank_dk_accno": settings.BANKACCOUNT_ACCOUNT,
+            },
+        )
+        # update order object with the file
+        order.pdf.save(order.filename, File(pdffile))
+        order.save()
+        logger.info("Generated proforma invoice PDF for order %s" % order)
 
     # check if we need to generate any invoices for shop orders
     for order in Order.objects.filter(paid=True, invoice__isnull=True):

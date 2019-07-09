@@ -148,21 +148,6 @@ class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
         )
 
 
-class EnsureOrderHasInvoicePDFMixin(SingleObjectMixin):
-    model = Order
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.get_object().invoice.pdf:
-            messages.error(request, "This order has no invoice yet!")
-            return HttpResponseRedirect(
-                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
-            )
-
-        return super(EnsureOrderHasInvoicePDFMixin, self).dispatch(
-            request, *args, **kwargs
-        )
-
-
 # Shop views
 class ShopIndexView(ListView):
     model = Product
@@ -402,19 +387,32 @@ class OrderReviewAndPayView(
 class DownloadInvoiceView(
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
-    EnsurePaidOrderMixin,
-    EnsureOrderHasInvoicePDFMixin,
     SingleObjectMixin,
     View,
 ):
     model = Order
 
     def get(self, request, *args, **kwargs):
+        """
+        The file we return is determined by the orders paid status.
+        If the order is unpaid we return a proforma invoice PDF
+        If the order is paid we return a normal Invoice PDF
+        """
+        if self.get_object().paid:
+            pdfobj = self.get_object().invoice
+        else:
+            pdfobj = self.get_object()
+
+        if not pdfobj.pdf:
+            messages.error(request, "No PDF has been generated yet!")
+            return HttpResponseRedirect(
+                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
+            )
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
-            'attachment; filename="%s"' % self.get_object().invoice.filename
+            'attachment; filename="%s"' % pdfobj.filename
         )
-        response.write(self.get_object().invoice.pdf.read())
+        response.write(pdfobj.pdf.read())
         return response
 
 
