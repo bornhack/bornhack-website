@@ -275,6 +275,14 @@ class OrderDetailView(
     template_name = "order_detail.html"
     context_object_name = "order"
 
+    def dispatch(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order.open is None and not order.paid:
+            return HttpResponseRedirect(
+                reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+            )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         if "order_product_formset" not in kwargs:
             kwargs["order_product_formset"] = OrderProductRelationFormSet(

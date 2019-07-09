@@ -26,7 +26,9 @@
                 Price
               <th>
                 Total
+              {% if not order.open == None %}
               <th></th>
+              {% endif %}
 
           <tbody>
         {% for form in order_product_formset %}
@@ -47,8 +49,10 @@
               {{ form.instance.product.price|currency }}
             <td>
               {{ form.instance.total|currency }}
+            {% if not order.open == None %}
             <td>
-              {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
+                {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
+            {% endif %}
 
         {% endfor %}
 

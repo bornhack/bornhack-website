@@ -4,12 +4,13 @@
 
 {% block profile_content %}
 
+    {% if order.open is not None %}
     <div>
         Not ready to pay for your order yet?
         <a href="{% url "shop:order_detail" pk=order.pk %}">Go back and edit it</a>
     </div>
-
     <hr />
+    {% endif %}
 
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -18,7 +19,11 @@
         <div class="panel-body">
 
             <p>
-                Please review your order to make sure the quantities are right.
+                {% if order.open is not None %}
+                    Please review your order to make sure the quantities are right.
+                {% else %}
+                    This order is closed, but not paid.
+                {% endif %}
             </p>
 
             <table class="table table-bordered">
