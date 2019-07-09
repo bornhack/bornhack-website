@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.files import File
+from django.db.models import Q
 from utils.pdf import generate_pdf_letter
 from shop.email import add_invoice_email, add_creditnote_email
 from shop.models import Order, CustomOrder, Invoice, CreditNote
@@ -18,7 +19,7 @@ def do_work():
     """
 
     # check if we need to generate any proforma invoices for shop orders
-    for order in Order.objects.filter(pdf="", open__isnull=True):
+    for order in Order.objects.filter(Q(pdf="") | Q(pdf__isnull=True), open__isnull=True):
         # generate proforma invoice for this Order
         pdffile = generate_pdf_letter(
             filename=order.filename,
@@ -51,7 +52,7 @@ def do_work():
         logger.info("Generated Invoice object for %s" % customorder)
 
     # check if we need to generate any pdf invoices
-    for invoice in Invoice.objects.filter(pdf=""):
+    for invoice in Invoice.objects.filter(Q(pdf="") | Q(pdf__isnull=True)):
         # generate the pdf
         try:
             if invoice.customorder:
@@ -104,7 +105,7 @@ def do_work():
             )
 
     # check if we need to generate any pdf creditnotes?
-    for creditnote in CreditNote.objects.filter(pdf=""):
+    for creditnote in CreditNote.objects.filter(Q(pdf="") | Q(pdf__isnull=True)):
         # generate the pdf
         try:
             pdffile = generate_pdf_letter(
@@ -140,3 +141,4 @@ def do_work():
                 "Unable to add creditnote email for creditnote %s to %s"
                 % (creditnote.pk, creditnote.user.email)
             )
+
