@@ -271,7 +271,7 @@ class ProductDetailView(FormView, DetailView):
 
 class OrderListView(LoginRequiredMixin, ListView):
     model = Order
-    template_name = "shop/order_list.html"
+    template_name = "order_list.html"
     context_object_name = "orders"
 
     def get_queryset(self):
@@ -287,7 +287,7 @@ class OrderDetailView(
     DetailView,
 ):
     model = Order
-    template_name = "shop/order_detail.html"
+    template_name = "order_detail.html"
     context_object_name = "order"
 
     def get_context_data(self, **kwargs):
@@ -336,14 +336,19 @@ class OrderDetailView(
                     self.get_context_data(order_product_formset=formset)
                 )
 
-            # No stock issues, proceed to check if the user is updating the order.
-            if "update_order" in request.POST:
+            # No stock issues, proceed to check if the user is updating or proceeding to review and pay the order.
+            if "update_order" or "review_and_pay" in request.POST:
                 # We have already made sure the formset is valid, so just save it to update quantities.
                 formset.save()
 
                 order.customer_comment = request.POST.get("customer_comment") or ""
                 order.invoice_address = request.POST.get("invoice_address") or ""
                 order.save()
+
+                if "review_and_pay" in request.POST:
+                    return HttpResponseRedirect(
+                        reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+                    )
 
         return super(OrderDetailView, self).get(request, *args, **kwargs)
 
@@ -355,7 +360,7 @@ class OrderReviewAndPayView(
     EnsureOrderIsNotCancelledMixin,
     DetailView,
 ):
-    template_name = "shop/order_review.html"
+    template_name = "order_review.html"
     context_object_name = "order"
 
     def post(self, request, *args, **kwargs):
@@ -415,7 +420,7 @@ class DownloadInvoiceView(
 
 class CreditNoteListView(LoginRequiredMixin, ListView):
     model = CreditNote
-    template_name = "shop/creditnote_list.html"
+    template_name = "creditnote_list.html"
     context_object_name = "creditnotes"
 
     def get_queryset(self):

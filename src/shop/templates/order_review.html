@@ -63,9 +63,9 @@
 
             </table>
 
-            {% if order.comment %}
+            {% if order.customer_comment %}
                 <h4>Comment:</h4>
-                <div class="alert alert-info">{{ order.comment|linebreaks }}</div>
+                <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
             {% endif %}
 
             {% if order.invoice_address %}

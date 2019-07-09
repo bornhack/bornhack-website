@@ -313,6 +313,32 @@ class TestOrderDetailView(TestCase):
         self.assertEquals(response.status_code, 200)
         self.assertIn("quantity", response.context["order_product_formset"].errors[0])
 
+    def test_review_and_pay_saves_and_redirects(self):
+        self.client.force_login(self.user)
+
+        opr = OrderProductRelationFactory(order=self.order)
+
+        data = self.base_form_data
+        data["review_and_pay"] = ""
+        data["form-0-id"] = opr.pk
+        data["form-0-quantity"] = 5
+        data["customer_comment"] = "A comment"
+        data["invoice_address"] = "An invoice address"
+
+        response = self.client.post(self.path, data=data)
+        self.assertRedirects(
+            response, reverse("shop:order_review_and_pay", kwargs={"pk": self.order.pk})
+        )
+
+        # Get the updated objects
+        opr.refresh_from_db()
+        self.order.refresh_from_db()
+
+        # Check them
+        self.assertEqual(opr.quantity, 5)
+        self.assertEqual(self.order.invoice_address, "An invoice address")
+        self.assertEqual(self.order.customer_comment, "A comment")
+
 
 class TestOrderReviewAndPay(TestCase):
     def setUp(self):

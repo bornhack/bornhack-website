@@ -71,8 +71,8 @@
         {% if not order.open == None %}
           <h4>Comment:</h4>
           <textarea class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments or shipping address here...">{{ order.customer_comment }}</textarea></p>
-        {% elif order.open == None and order.comment %}
-          <div class="alert alert-info">{{ order.comment|linebreaks }}</div>
+        {% elif order.open == None and order.customer_comment %}
+          <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
         {% endif %}
 
         {% if not order.open == None %}
@@ -90,9 +90,7 @@
           {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger" name="cancel_order" %}
         {% endif %}
         {% if not order.paid %}
-        <a href="{% url "shop:order_review_and_pay" pk=order.pk %}" class="btn btn-success btn-lg pull-right">
-            Review and pay
-        </a>
+          {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg pull-right" name="review_and_pay" %}
         {% endif %}
 
     </div>
