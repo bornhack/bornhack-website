@@ -275,14 +275,6 @@ class OrderDetailView(
     template_name = "order_detail.html"
     context_object_name = "order"
 
-    def dispatch(self, request, *args, **kwargs):
-        order = self.get_object()
-        if order.open is None and not order.paid:
-            return HttpResponseRedirect(
-                reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
-            )
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         if "order_product_formset" not in kwargs:
             kwargs["order_product_formset"] = OrderProductRelationFormSet(
@@ -290,6 +282,14 @@ class OrderDetailView(
             )
 
         return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order.open is None and not order.paid:
+            return HttpResponseRedirect(
+                reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+            )
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -393,10 +393,7 @@ class OrderReviewAndPayView(
 
 
 class DownloadInvoiceView(
-    LoginRequiredMixin,
-    EnsureUserOwnsOrderMixin,
-    SingleObjectMixin,
-    View,
+    LoginRequiredMixin, EnsureUserOwnsOrderMixin, SingleObjectMixin, View
 ):
     model = Order
 
@@ -417,9 +414,7 @@ class DownloadInvoiceView(
                 reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
             )
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            'attachment; filename="%s"' % pdfobj.filename
-        )
+        response["Content-Disposition"] = 'attachment; filename="%s"' % pdfobj.filename
         response.write(pdfobj.pdf.read())
         return response
 

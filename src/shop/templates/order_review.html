@@ -78,6 +78,19 @@
                 <div class="alert alert-info">{{ order.invoice_address|linebreaks }}</div>
             {% endif %}
 
+            {% if not order.paid and order.open is None %}
+                <form action="{% url "shop:order_detail" pk=order.pk %}" method="POST">
+                  {% csrf_token %}
+                  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
+
+                {% if order.pdf %}
+                    {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+                    {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
+                {% endif %}
+                </form>
+
+            {% endif %}
+
         </div>
     </div>
 
