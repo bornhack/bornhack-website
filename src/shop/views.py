@@ -372,8 +372,6 @@ class OrderReviewAndPayView(
             # Set payment method and mark the order as closed
             order.payment_method = payment_method
             order.open = None
-            order.customer_comment = request.POST.get("customer_comment") or ""
-            order.invoice_address = request.POST.get("invoice_address") or ""
             order.save()
 
             reverses = {
