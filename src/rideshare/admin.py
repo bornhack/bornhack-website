@@ -5,5 +5,5 @@ from .models import Ride
 
 @admin.register(Ride)
 class RideModelAdmin(admin.ModelAdmin):
-    list_display = ("location", "when", "seats", "user")
+    list_display = ("camp", "user", "from_location", "to_location", "when", "seats")
     list_filter = ("camp", "user")

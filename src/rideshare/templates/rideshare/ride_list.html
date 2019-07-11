@@ -6,8 +6,8 @@
     <h1>Ridesharing</h1>
 </div>
 
-<p>
-On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival.
+<p class="lead">
+On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival. Press "Details" to send a message to the author of the entry.
 </p>
 
 <a class="btn btn-success pull-right" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
@@ -21,20 +21,32 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
 <table class="table table-condensed table-striped">
     <thead>
         <th>
-            When
+            Type
         <th>
-            Location
+            Leaving When
         <th>
-            Seats
+            From Location
+        <th>
+            To Location
+        <th>
+            Seats Free/Needed
         <th>
     <tbody>
 
 {% for ride in ride_list %}
         <tr>
             <td>
+                {% if ride.has_car %}
+                    <i class="fas fa-car"></i> Has car
+                {% else %}
+                    <i class="fas fa-thumbs-up"></i> Needs ride
+                {% endif %}
+            <td>
                 {{ ride.when|date:"c" }}
             <td>
-                {{ ride.location }}
+                {{ ride.from_location }}
+            <td>
+                {{ ride.to_location }}
             <td>
                 {{ ride.seats }}
             <td>

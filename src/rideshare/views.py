@@ -63,7 +63,7 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Ride
-    fields = ["location", "when", "seats", "description"]
+    fields = ["has_car", "from_location", "to_location", "when", "seats", "description"]
 
     def form_valid(self, form, **kwargs):
         ride = form.save(commit=False)
@@ -81,7 +81,7 @@ class IsRideOwnerMixin(UserPassesTestMixin):
 
 class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
     model = Ride
-    fields = ["location", "when", "seats", "description"]
+    fields = ["has_car", "from_location", "to_location", "when", "seats", "description"]
 
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):

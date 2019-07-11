@@ -16,7 +16,9 @@
         <h4>
             <strong>{{ object.seats }}</strong>
             seats free, going from
-            <strong>{{ object.location }}</strong>
+            <strong>{{ object.from_location }}</strong>
+            to
+            <strong>{{ object.to_location }}</strong>
             at
             <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
         </h4>
