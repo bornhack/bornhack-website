@@ -50,7 +50,7 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
             <td>
                 {{ ride.seats }}
             <td>
-                <a class="btn btn-primary" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
+                <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
                     <i class="fas fa-eye"></i> Details
                 </a>
 
