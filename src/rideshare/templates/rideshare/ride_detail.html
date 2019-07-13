@@ -14,6 +14,8 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <h4>
+            <strong>{{ object.author }}</strong>
+            {% if object.has_car %}has {% else %}needs {% endif %}
             <strong>{{ object.seats }}</strong>
             seats free, going from
             <strong>{{ object.from_location }}</strong>

@@ -27,6 +27,8 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
 <table class="table table-condensed table-striped">
     <thead>
         <th>
+            Author
+        <th>
             Type
         <th>
             Leaving When
@@ -37,10 +39,13 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
         <th>
             Seats Free/Needed
         <th>
+            Actions
     <tbody>
 
 {% for ride in ride_list %}
         <tr>
+            <td>
+                {{ ride.author }}
             <td>
                 {% if ride.has_car %}
                     <i class="fas fa-car"></i> Has car
@@ -53,9 +58,17 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
                 {{ ride.from_location }}
             <td>
                 {{ ride.to_location }}
+            <td class="text-center">
+                <span class="badge">{{ ride.seats }}</span>
             <td>
-                {{ ride.seats }}
-            <td>
+                {% if request.user == ride.user %}
+                <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
+                    <i class="fas fa-times"></i> Delete
+                </a>
+                <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
+                    <i class="fas fa-edit"></i> Update
+                </a>
+                {% endif %}
                 <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
                     <i class="fas fa-eye"></i> Details
                 </a>
