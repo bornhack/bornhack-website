@@ -26,6 +26,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
     checked_in = models.BooleanField(default=False)
     badge_handed_out = models.BooleanField(default=False)
+    token = models.CharField(max_length=64)
 
     class Meta:
         abstract = True
@@ -34,10 +35,14 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     def camp(self):
         return self.ticket_type.camp
 
+    def save(self, **kwargs):
+        self.token = self._get_token()
+        super().save(**kwargs)
+
     def _get_token(self):
         return hashlib.sha256(
             "{_id}{secret_key}".format(
-                _id=self.pk, secret_key=settings.SECRET_KEY
+                _id=self.uuid, secret_key=settings.SECRET_KEY
             ).encode("utf-8")
         ).hexdigest()
 

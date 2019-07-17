@@ -1,6 +1,7 @@
 import logging, os
 from itertools import chain
 
+import qrcode
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView, ListView, DetailView
@@ -14,7 +15,7 @@ from django.conf import settings
 from django.core.files import File
 
 from camps.mixins import CampViewMixin
-from shop.models import OrderProductRelation
+from shop.models import OrderProductRelation, Invoice, Order
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
 from profiles.models import Profile
 from program.models import SpeakerProposal, EventProposal
@@ -345,7 +346,6 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
 
     def dispatch(self, request, *args, **kwargs):
         """ Get the user from kwargs """
-        print("inside dispatch() with method %s" % request.method)
         self.reimbursement_user = get_object_or_404(User, pk=kwargs["user_id"])
 
         # get response now so we have self.camp available below
@@ -544,3 +544,30 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         return redirect(
             reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug})
         )
+
+
+class SearchForUser(TemplateView):
+    template_name = "user/search.html"
+
+    def post(self, request, **kwargs):
+        check_in_ticket_id = request.POST.get("check_in_ticket_id")
+        if check_in_ticket_id:
+            ticket_to_check_in = ShopTicket.objects.get(pk=check_in_ticket_id)
+            ticket_to_check_in.checked_in = True
+            ticket_to_check_in.save()
+            messages.info(request, "Ticket checked-in!")
+
+        return super().get(request, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        ticket_token = self.request.POST.get("ticket_token")
+        if ticket_token:
+            try:
+                ticket = ShopTicket.objects.get(token=ticket_token[1:])
+                context["ticket"] = ticket
+            except ShopTicket.DoesNotExist:
+                messages.warning(self.request, "Ticket not found!")
+
+        return context
