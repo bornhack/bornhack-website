@@ -78,18 +78,10 @@
   <li>Please remember to add Order number in the transfer notes, and pay the transfer fees in your end.</li>
 </ul>
 
-<h4>Credit Card</h4>
+<h4>Other Payment Methods</h4>
 <ul>
-    <li>https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
-</ul>
-
-<h4>Blockchain (multiple currencies)</h4>
-<ul>
-    <li>https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
-</ul>
-
-<h4>Cash</h4>
-<ul>
-    <li>https://{{ hostname }}{% url 'shop:cash' pk=order.pk %} (requires geographical proximity to an organiser)</li>
+    <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
+    <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
+    <li><b>Cash:</b> https://{{ hostname }}{% url 'shop:cash' pk=order.pk %} (requires geographical proximity to an organiser)</li>
 </ul>
 
