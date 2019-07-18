@@ -64,9 +64,9 @@ class TicketCheckinView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     context_object_name = "tickets"
 
     def get_queryset(self, **kwargs):
-        shoptickets = ShopTicket.objects.filter(checked_in=False)
-        sponsortickets = SponsorTicket.objects.filter(checked_in=False)
-        discounttickets = DiscountTicket.objects.filter(checked_in=False)
+        shoptickets = ShopTicket.objects.filter(used=False)
+        sponsortickets = SponsorTicket.objects.filter(used=False)
+        discounttickets = DiscountTicket.objects.filter(used=False)
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
@@ -553,7 +553,7 @@ class SearchForUser(TemplateView):
         check_in_ticket_id = request.POST.get("check_in_ticket_id")
         if check_in_ticket_id:
             ticket_to_check_in = ShopTicket.objects.get(pk=check_in_ticket_id)
-            ticket_to_check_in.checked_in = True
+            ticket_to_check_in.used = True
             ticket_to_check_in.save()
             messages.info(request, "Ticket checked-in!")
 

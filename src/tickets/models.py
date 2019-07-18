@@ -24,7 +24,7 @@ class TicketType(CampRelatedModel, UUIDModel):
 
 class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
-    checked_in = models.BooleanField(default=False)
+    used = models.BooleanField(default=False)
     badge_handed_out = models.BooleanField(default=False)
     token = models.CharField(max_length=64)
 

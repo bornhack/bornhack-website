@@ -25,8 +25,8 @@
   <h3>Sponsor: {{ ticket.sponsor.name }} </h3>
   <img src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}"></img>
 {% endif %}
-{% if ticket.checked_in %}
-  <h2>This ticket has been checked in.</h2>
+{% if ticket.used %}
+  <h2>This ticket has been used.</h2>
 {% endif %}
 
 <center>

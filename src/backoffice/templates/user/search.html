@@ -24,7 +24,7 @@
 {% if ticket %}
     {{ ticket }}<br />
     <br />
-    Checked in?: {{ ticket.checked_in }}
+    Used?: {{ ticket.used }}
 
     <hr />
     <form id="check_in_form" method="POST" action="">{% csrf_token %}

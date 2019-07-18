@@ -239,8 +239,8 @@ class Order(CreatedUpdatedModel):
                     else:
                         print(msg)
 
-                    # and mark the OPR as handed_out=True
-                    order_product.handed_out = True
+                    # and mark the OPR as ticket_generated=True
+                    order_product.ticket_generated = True
                     order_product.save()
 
     def mark_as_paid(self, request=None):
@@ -466,7 +466,7 @@ class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    handed_out = models.BooleanField(default=False)
+    ticket_generated = models.BooleanField(default=False)
 
     @property
     def total(self):
