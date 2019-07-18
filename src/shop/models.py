@@ -289,35 +289,35 @@ class Order(CreatedUpdatedModel):
             self.open = None
             self.save()
 
-    def is_not_handed_out(self):
-        if self.orderproductrelation_set.filter(handed_out=True).count() == 0:
+    def is_not_ticket_generated(self):
+        if self.orderproductrelation_set.filter(tic=True).count() == 0:
             return True
         else:
             return False
 
-    def is_partially_handed_out(self):
+    def is_partially_ticket_generated(self):
         if (
-            self.orderproductrelation_set.filter(handed_out=True).count() != 0
-            and self.orderproductrelation_set.filter(handed_out=False).count() != 0
+            self.orderproductrelation_set.filter(ticket_generated=True).count() != 0
+            and self.orderproductrelation_set.filter(ticket_generated=False).count() != 0
         ):
             # some products are handed out, others are not
             return True
         else:
             return False
 
-    def is_fully_handed_out(self):
-        if self.orderproductrelation_set.filter(handed_out=False).count() == 0:
+    def is_fully_ticket_generated(self):
+        if self.orderproductrelation_set.filter(ticket_generated=False).count() == 0:
             return True
         else:
             return False
 
     @property
-    def handed_out_status(self):
-        if self.is_not_handed_out():
+    def ticket_generated_status(self):
+        if self.is_not_ticket_generated():
             return "no"
-        elif self.is_partially_handed_out():
+        elif self.is_partially_ticket_generated():
             return "partially"
-        elif self.is_fully_handed_out():
+        elif self.is_fully_ticket_generated():
             return "fully"
         else:
             return False
@@ -473,7 +473,7 @@ class OrderProductRelation(CreatedUpdatedModel):
         return Decimal(self.product.price * self.quantity)
 
     def clean(self):
-        if self.handed_out and not self.order.paid:
+        if self.ticket_generated and not self.order.paid:
             raise ValidationError(
                 "Product can not be handed out when order is not paid."
             )

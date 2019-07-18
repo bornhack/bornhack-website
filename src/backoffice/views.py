@@ -41,7 +41,7 @@ class ProductHandoutView(CampViewMixin, InfoTeamPermissionMixin, ListView):
 
     def get_queryset(self, **kwargs):
         return OrderProductRelation.objects.filter(
-            handed_out=False,
+            ticket_generated=False,
             order__paid=True,
             order__refunded=False,
             order__cancelled=False,
@@ -53,9 +53,9 @@ class BadgeHandoutView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     context_object_name = "tickets"
 
     def get_queryset(self, **kwargs):
-        shoptickets = ShopTicket.objects.filter(badge_handed_out=False)
-        sponsortickets = SponsorTicket.objects.filter(badge_handed_out=False)
-        discounttickets = DiscountTicket.objects.filter(badge_handed_out=False)
+        shoptickets = ShopTicket.objects.filter(badge_ticket_generated=False)
+        sponsortickets = SponsorTicket.objects.filter(badge_ticket_generated=False)
+        discounttickets = DiscountTicket.objects.filter(badge_ticket_generated=False)
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
@@ -152,7 +152,7 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
         return (
             OrderProductRelation.objects.filter(
-                handed_out=False,
+                ticket_generated=False,
                 order__paid=True,
                 order__refunded=False,
                 order__cancelled=False,
@@ -170,7 +170,7 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
         camp_prefix = "BornHack {}".format(timezone.now().year)
 
         order_relations = OrderProductRelation.objects.filter(
-            handed_out=False,
+            ticket_generated=False,
             order__paid=True,
             order__refunded=False,
             order__cancelled=False,
@@ -198,7 +198,7 @@ class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
         return (
             OrderProductRelation.objects.filter(
-                handed_out=False,
+                ticket_generated=False,
                 order__paid=True,
                 order__refunded=False,
                 order__cancelled=False,
@@ -216,7 +216,7 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
         camp_prefix = "BornHack {}".format(timezone.now().year)
 
         order_relations = OrderProductRelation.objects.filter(
-            handed_out=False,
+            ticket_generated=False,
             order__paid=True,
             order__refunded=False,
             order__cancelled=False,
