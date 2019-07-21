@@ -249,9 +249,7 @@ class ProductDetailView(FormView, DetailView):
         return super(ProductDetailView, self).form_valid(form)
 
     def get_success_url(self):
-        return Order.objects.get(
-            user=self.request.user, open__isnull=False
-        ).get_absolute_url()
+        return reverse("shop:index")
 
 
 class OrderListView(LoginRequiredMixin, ListView):
