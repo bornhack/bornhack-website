@@ -25,11 +25,17 @@ Info | {{ block.super }}
       margin-top: -94px; /*same height as header*/
       visibility: hidden;
     }
+
+    .sticky {
+      position: sticky;
+      top: 100px;
+    }
+
   </style>
 
   {% if categories %}
     <div class="row">
-      <div class="col-md-12">
+      <div class="col-md-3 sticky">
         <h3>Table of Contents</h3>
         <p class="list-group">
           {% for category in categories %}
@@ -37,13 +43,10 @@ Info | {{ block.super }}
           {% endfor %}
         </p>
       </div>
-    </div>
 
+      <div class="col-md-9">
     {% for category in categories %}
-
-      <span class="anchor" id="{{ category.anchor }}"></span>
-      <div class="row">
-        <div class="col-md-12">
+        <span class="anchor" id="{{ category.anchor }}"></span>
         <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
           <div class="panel-group">
             {% for item in category.infoitems.all %}
@@ -69,9 +72,9 @@ Info | {{ block.super }}
               </div>
             {% endfor %}
           </div>
-        </div>
-      </div>
     {% endfor %}
+      </div>
+    </div>
   {% else %}
     <h3>No info found for {{ camp.title }}</h3>
   {% endif %}
