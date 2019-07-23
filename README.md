@@ -128,6 +128,7 @@ You can also specify details like:
 * Kasper Christensen https://github.com/fALKENdk
 * klarstrup https://github.com/klarstrup
 * kugg https://github.com/kugg
+* lgandersen https://github.com/lgandersen
 * RadicalPet https://github.com/RadicalPet
 * Reynir Björnsson https://github.com/reynir
 * Ronni Elken Lindsgaard https://github.com/rlindsgaard

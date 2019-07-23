@@ -212,7 +212,8 @@ class SpeakerProposalUpdateView(
             for ep in self.get_object().eventproposals.all():
                 eventtypes.add(ep.event_type)
             if len(eventtypes) == 1:
-                eventtype = self.get_object().eventproposals.get().event_type
+                # only one eventtype found
+                eventtype = ep.event_type
             else:
                 # more than one type of event for this person, return the generic speakerproposal form
                 eventtype = None

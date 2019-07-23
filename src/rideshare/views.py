@@ -22,8 +22,8 @@ class ContactRideForm(forms.Form):
         widget=forms.Textarea(
             attrs={"placeholder": "Remember to include your contact information!"}
         ),
-        label="Write a message to this rideshare",
-        help_text="ATTENTION!: Pressing send will send an email with the above text. It is up to you to include your contact information so the person receiving the email can contact you.",
+        label="Write a message to the author of this rideshare",
+        help_text="ATTENTION!: Pressing send will send an email to the author with the above text. It is up to you to include your contact information in the message so the person receiving the email can contact you.",
     )
 
 
@@ -63,9 +63,20 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Ride
-    fields = ["location", "when", "seats", "description"]
+    fields = ["author", "has_car", "from_location", "to_location", "when", "seats", "description"]
+
+    def get_initial(self):
+        """
+        Default 'author' to users public_credit_name where relevant
+        """
+        return {
+            "author": self.request.user.profile.get_public_credit_name
+        }
 
     def form_valid(self, form, **kwargs):
+        """
+        Set camp and user before saving
+        """
         ride = form.save(commit=False)
         ride.camp = self.camp
         ride.user = self.request.user
@@ -81,7 +92,7 @@ class IsRideOwnerMixin(UserPassesTestMixin):
 
 class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
     model = Ride
-    fields = ["location", "when", "seats", "description"]
+    fields = ["author", "has_car", "from_location", "to_location", "when", "seats", "description"]
 
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):

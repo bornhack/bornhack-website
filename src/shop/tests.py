@@ -154,9 +154,7 @@ class TestProductDetailView(TestCase):
 
         order = self.user.orders.get()
 
-        self.assertRedirects(
-            response, reverse("shop:order_detail", kwargs={"pk": order.pk})
-        )
+        self.assertRedirects(response, reverse("shop:index"))
 
     def test_product_is_in_order(self):
         # Put the product in an order owned by the user
@@ -182,9 +180,7 @@ class TestProductDetailView(TestCase):
 
         response = self.client.post(self.path, data={"quantity": 2})
 
-        self.assertRedirects(
-            response, reverse("shop:order_detail", kwargs={"pk": opr.order.pk})
-        )
+        self.assertRedirects(response, reverse("shop:index"))
         opr.refresh_from_db()
         self.assertEquals(opr.quantity, 2)
 

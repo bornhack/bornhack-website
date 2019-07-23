@@ -16,21 +16,14 @@
         {% if user.creditnotes.exists %}
           <li class="pull-right"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
         {% endif %}
-        <li class="pull-right"><a href="{% url 'shop:order_list' %}">Orders</a></li>
+        {% if current_order %}
         <li class="pull-right no-before">
-
-          {% if current_order and current_order.get_number_of_items %}
           <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
-          {% endif %}
-
-            <i class="glyphicon glyphicon-shopping-cart"></i>
-                      <span class="badge">
-                      {{ current_order.get_number_of_items|default:0 }}
-                      </span>
-          {% if current_order and current_order.get_number_of_items %}
-          </a>
-          {% endif %}
+            <i class="glyphicon glyphicon-shopping-cart"></i> Shopping Cart ({{ current_order.get_number_of_items|default:0 }} items)</a>
         </li>
+        {% else %}
+        <li class="pull-right no-before"><a href="{% url 'shop:order_list' %}">Show Orders</a></li>
+        {% endif %}
       {% endif %}
     </ol>
   </div>

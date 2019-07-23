@@ -1,6 +1,6 @@
 Hello!
 
-Speaker {{ proposal.name }} was just submitted as a new proposal for {{ proposal.camp }}.
+Speaker "{{ proposal.name }}" was just submitted as a new proposal for {{ proposal.camp }}.
 
 More info: https://bornhack.dk/admin/program/speakerproposal/{{ proposal.uuid }}/change/
 
