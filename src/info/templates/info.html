@@ -26,9 +26,11 @@ Info | {{ block.super }}
       visibility: hidden;
     }
 
-    .sticky {
-      position: sticky;
-      top: 100px;
+    @media (min-width: 992px) {
+      .sticky {
+        position: sticky;
+        top: 100px;
+      }
     }
 
   </style>
