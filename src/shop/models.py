@@ -298,7 +298,8 @@ class Order(CreatedUpdatedModel):
     def is_partially_ticket_generated(self):
         if (
             self.orderproductrelation_set.filter(ticket_generated=True).count() != 0
-            and self.orderproductrelation_set.filter(ticket_generated=False).count() != 0
+            and self.orderproductrelation_set.filter(ticket_generated=False).count()
+            != 0
         ):
             # some products are handed out, others are not
             return True

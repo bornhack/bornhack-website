@@ -1,6 +1,5 @@
 {% load static from staticfiles %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
 <table style="width:100%;">
     <tr>
         <td style="width: 75%;">&nbsp;</td>
@@ -25,11 +24,38 @@
   <h3>Sponsor: {{ ticket.sponsor.name }} </h3>
   <img src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}"></img>
 {% endif %}
+
 {% if ticket.used %}
   <h2>This ticket has been used.</h2>
 {% endif %}
 
 <center>
   <img src="{{ ticket.get_qr_code_url }}"></img>
-  <p>Ticket #{{ ticket.pk }}</p>
+  <p>{{ ticket.token }}</p>
 </center>
+
+{% if ticket.ticket_type.includes_badge %}
+<div style="display:block; clear:both; page-break-after:always;"></div>
+
+<table style="width:100%;">
+    <tr>
+        <td style="width: 75%;">&nbsp;</td>
+        <td>
+            <h3>
+                {{ ticket.created|date:"b jS, Y" }}<br>
+            </h3>
+        </td>
+    </tr>
+</table>
+<br />
+
+<h2>Badge voucher</h2>
+
+<center>
+    <img src="{{ ticket.get_qr_badge_code_url }}"></img>
+    <p>{{ ticket.badge_token }}</p>
+</center>
+
+{% endif %}
+
+
