@@ -101,6 +101,8 @@ class ProductAdmin(admin.ModelAdmin):
         available_to,
     ]
 
+    list_editable = ["ticket_type"]
+
     list_filter = ["category", "ticket_type"]
 
     search_fields = ["name"]
