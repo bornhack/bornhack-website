@@ -10,7 +10,7 @@
   </div>
   <div class="panel-body">
 
-    <h2>{% if ticket.checked_in %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
+    <h2>{% if ticket.used %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
     <form method="POST" class="form">
       {% csrf_token %}
       {% bootstrap_field form.name %}

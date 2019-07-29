@@ -19,7 +19,7 @@ class ShopTicketListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         tickets = super(ShopTicketListView, self).get_queryset()
         user = self.request.user
-        return tickets.filter(order__user=user)
+        return tickets.filter(order__user=user).order_by("ticket_type__camp")
 
 
 class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):

@@ -23,9 +23,13 @@
               Checked in
             <th>
               Actions
-
         <tbody>
           {% for ticket in tickets %}
+          {% ifchanged ticket.ticket_type.camp %}
+          <tr>
+            <td colspan="5">
+              <strong>{{ ticket.ticket_type.camp }}</strong>
+          {% endifchanged %}
           <tr>
             <td>
                 {% if ticket.name %}
@@ -38,7 +42,7 @@
             <td>
               {{ ticket.product.price|currency }}
             <td>
-              {% if ticket.checked_in %}
+              {% if ticket.used %}
               Yes
               {% else %}
               Not yet

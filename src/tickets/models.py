@@ -17,15 +17,32 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class TicketType(CampRelatedModel, UUIDModel):
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
+    includes_badge = models.BooleanField(default=False)
 
     def __str__(self):
         return "{} ({})".format(self.name, self.camp.title)
 
 
+def create_ticket_token(string):
+    return hashlib.sha256(string).hexdigest()
+
+
+def qr_code_base64(token):
+    qr = qrcode.make(
+        token, version=1, error_correction=qrcode.constants.ERROR_CORRECT_H
+    ).resize((250, 250))
+    file_like = io.BytesIO()
+    qr.save(file_like, format="png")
+    qrcode_base64 = base64.b64encode(file_like.getvalue())
+    return qrcode_base64
+
+
 class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
-    checked_in = models.BooleanField(default=False)
+    used = models.BooleanField(default=False)
     badge_handed_out = models.BooleanField(default=False)
+    token = models.CharField(max_length=64)
+    badge_token = models.CharField(max_length=64)
 
     class Meta:
         abstract = True
@@ -34,27 +51,33 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     def camp(self):
         return self.ticket_type.camp
 
-    def _get_token(self):
-        return hashlib.sha256(
-            "{_id}{secret_key}".format(
-                _id=self.pk, secret_key=settings.SECRET_KEY
-            ).encode("utf-8")
-        ).hexdigest()
+    def save(self, **kwargs):
+        self.token = self._get_token()
+        self.badge_token = self._get_token()
+        super().save(**kwargs)
 
-    def get_qr_code_base64(self):
-        qr = qrcode.make(
-            self._get_token(),
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_H,
-        ).resize((250, 250))
-        file_like = io.BytesIO()
-        qr.save(file_like, format="png")
-        qrcode_base64 = base64.b64encode(file_like.getvalue())
-        return qrcode_base64
+    def _get_token(self):
+        return create_ticket_token(
+            "{_id}{secret_key}".format(
+                _id=self.uuid, secret_key=settings.SECRET_KEY
+            ).encode("utf-8")
+        )
+
+    def _get_badge_token(self):
+        return create_ticket_token(
+            "{_id}{secret_key}-badge".format(
+                _id=self.uuid, secret_key=settings.SECRET_KEY
+            ).encode("utf-8")
+        )
 
     def get_qr_code_url(self):
         return "data:image/png;base64,{}".format(
-            self.get_qr_code_base64().decode("utf-8")
+            qr_code_base64(self._get_token()).decode("utf-8")
+        )
+
+    def get_qr_badge_code_url(self):
+        return "data:image/png;base64,{}".format(
+            qr_code_base64(self._get_badge_token()).decode("utf-8")
         )
 
     def generate_pdf(self):
