@@ -290,7 +290,7 @@ class Order(CreatedUpdatedModel):
             self.save()
 
     def is_not_ticket_generated(self):
-        if self.orderproductrelation_set.filter(tic=True).count() == 0:
+        if self.orderproductrelation_set.filter(ticket_generated=True).count() == 0:
             return True
         else:
             return False
