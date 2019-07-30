@@ -208,6 +208,7 @@ class Order(CreatedUpdatedModel):
         return str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
     def create_tickets(self, request=None):
+        tickets = []
         for order_product in self.orderproductrelation_set.all():
             # if this is a Ticket product?
             if order_product.product.ticket_type:
@@ -216,32 +217,57 @@ class Order(CreatedUpdatedModel):
                     ticket_type=order_product.product.ticket_type,
                 )
 
-                already_created_tickets = self.shoptickets.filter(
-                    **query_kwargs
-                ).count()
-                tickets_to_create = max(
-                    0, order_product.quantity - already_created_tickets
-                )
+                if order_product.product.ticket_type.single_ticket_per_product:
+                    # This ticket type is one where we only create one ticket
+                    ticket, created = self.shoptickets.get_or_create(**query_kwargs)
 
-                # create the number of tickets required
-                if tickets_to_create > 0:
-                    for _ in range(
-                        0, (order_product.quantity - already_created_tickets)
-                    ):
-                        self.shoptickets.create(**query_kwargs)
+                    if created:
+                        msg = (
+                            "Created ticket for product %s on order %s (quantity: %s)"
+                            % (
+                                order_product.product,
+                                order_product.order.pk,
+                                order_product.quantity,
+                            )
+                        )
+                        tickets.append(ticket)
+                    else:
+                        msg = "Ticket already created for product %s on order %s" % (
+                            order_product.product,
+                            order_product.order.pk,
+                        )
 
-                    msg = "Created %s tickets of type: %s" % (
-                        order_product.quantity,
-                        order_product.product.ticket_type.name,
-                    )
                     if request:
                         messages.success(request, msg)
-                    else:
-                        print(msg)
+                else:
+                    # We should create a number of tickets equal to OrderProductRelation quantity
+                    already_created_tickets = self.shoptickets.filter(
+                        **query_kwargs
+                    ).count()
+                    tickets_to_create = max(
+                        0, order_product.quantity - already_created_tickets
+                    )
 
-                    # and mark the OPR as ticket_generated=True
-                    order_product.ticket_generated = True
-                    order_product.save()
+                    # create the number of tickets required
+                    if tickets_to_create > 0:
+                        for _ in range(
+                            0, (order_product.quantity - already_created_tickets)
+                        ):
+                            ticket = self.shoptickets.create(**query_kwargs)
+                            tickets.append(ticket)
+
+                        msg = "Created %s tickets of type: %s" % (
+                            order_product.quantity,
+                            order_product.product.ticket_type.name,
+                        )
+                        if request:
+                            messages.success(request, msg)
+
+                        # and mark the OPR as ticket_generated=True
+                        order_product.ticket_generated = True
+                        order_product.save()
+
+        return tickets
 
     def mark_as_paid(self, request=None):
         self.paid = True

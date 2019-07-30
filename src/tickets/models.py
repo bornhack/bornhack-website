@@ -18,6 +18,13 @@ class TicketType(CampRelatedModel, UUIDModel):
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
     includes_badge = models.BooleanField(default=False)
+    single_ticket_per_product = models.BooleanField(
+        default=False,
+        help_text=(
+            "Only create one ticket for a product/order pair no matter the quantity. "
+            "Useful for products which are bought in larger quantity (ie. village chairs)"
+        ),
+    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.camp.title)
