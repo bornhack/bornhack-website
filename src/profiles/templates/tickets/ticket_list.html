@@ -40,6 +40,7 @@
             <td>
                 {{ ticket.product.name }}
             <td>
+              {% if ticket.ticket_type.single_ticket_per_product %}{{ ticket.get_orp.quantity }} &times; {% endif %}
               {{ ticket.product.price|currency }}
             <td>
               {% if ticket.used %}

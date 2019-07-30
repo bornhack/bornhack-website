@@ -5,6 +5,8 @@ import qrcode
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+
+from shop.models import OrderProductRelation
 from utils.models import UUIDModel, CampRelatedModel
 from utils.pdf import generate_pdf_letter
 from django.db import models
@@ -88,9 +90,15 @@ class BaseTicket(CampRelatedModel, UUIDModel):
         )
 
     def generate_pdf(self):
+        formatdict = {"ticket": self}
+
+        if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
+            orp = self.get_orp()
+            formatdict["quantity"] = orp.quantity
+
         return generate_pdf_letter(
             filename="{}_ticket_{}.pdf".format(self.shortname, self.pk),
-            formatdict={"ticket": self},
+            formatdict=formatdict,
             template="pdf/ticket.html",
         )
 
@@ -156,3 +164,6 @@ class ShopTicket(BaseTicket):
     @property
     def shortname(self):
         return "shop"
+
+    def get_orp(self):
+        return OrderProductRelation.objects.get(product=self.product, order=self.order)
