@@ -30,6 +30,7 @@ class ProductFactory(DjangoModelFactory):
             lower=timezone.now(), upper=timezone.now() + timezone.timedelta(31)
         )
     )
+    ticket_type = factory.SubFactory("tickets.factories.TicketTypeFactory")
 
 
 class OrderFactory(DjangoModelFactory):

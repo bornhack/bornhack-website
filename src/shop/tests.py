@@ -4,6 +4,8 @@ from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
 from shop.forms import OrderProductRelationForm
+from tickets.factories import TicketTypeFactory
+from tickets.models import ShopTicket
 from utils.factories import UserFactory
 from .factories import ProductFactory, OrderProductRelationFactory, OrderFactory
 
@@ -371,3 +373,27 @@ class TestOrderListView(TestCase):
         path = reverse("shop:order_list")
         response = self.client.get(path)
         self.assertEquals(response.status_code, 200)
+
+
+class TestTicketCreation(TestCase):
+    def test_multiple_tickets_created(self):
+        user = UserFactory()
+        ticket_type = TicketTypeFactory(single_ticket_per_product=False)
+        product = ProductFactory(ticket_type=ticket_type)
+        order = OrderFactory(user=user)
+        OrderProductRelationFactory(order=order, product=product, quantity=5)
+        order.mark_as_paid()
+        self.assertEquals(
+            ShopTicket.objects.filter(product=product, order=order).count(), 5
+        )
+
+    def test_single_ticket_created(self):
+        user = UserFactory()
+        ticket_type = TicketTypeFactory(single_ticket_per_product=True)
+        product = ProductFactory(ticket_type=ticket_type)
+        order = OrderFactory(user=user)
+        OrderProductRelationFactory(order=order, product=product, quantity=5)
+        order.mark_as_paid()
+        self.assertEquals(
+            ShopTicket.objects.filter(product=product, order=order).count(), 1
+        )
