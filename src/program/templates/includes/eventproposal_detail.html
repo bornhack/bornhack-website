@@ -6,6 +6,9 @@
         <strong>ID</strong>: {{ eventproposal.uuid }}<br />
         <strong>Status</strong>: {{ eventproposal.proposal_status }}<br />
         <strong>Duration</strong>: {{ eventproposal.duration|default:"Not defined" }}<br />
+        {% if eventproposal.event_type.name == "Lightning Talk" %}
+        <strong>Use provided laptop?</strong>: {{ eventproposal.use_provided_speaker_laptop }}<br />
+        {% endif %}
     </div>
 </div>
 
