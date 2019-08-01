@@ -341,7 +341,7 @@ class EventProposal(UserSubmittedModel):
     )
 
     use_provided_speaker_laptop = models.BooleanField(
-        help_text="Will you be using the provided speaker laptop?", default=False
+        help_text="Will you be using the provided speaker laptop?", default=True
     )
 
     @property
