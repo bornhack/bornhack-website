@@ -26,7 +26,7 @@
   <br>
 {% elif ticket.sponsor %}
   <h3>Sponsor: {{ ticket.sponsor.name }} </h3>
-  <img src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}"></img>
+  <img src="{% static 'img/sponsors/' %}{{ ticket.sponsor.logo_filename }}" />
 {% endif %}
 
 {% if ticket.used %}

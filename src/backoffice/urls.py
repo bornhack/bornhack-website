@@ -8,7 +8,7 @@ urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
     # infodesk
     path(
-        "user/", include([path("", SearchForUser.as_view(), name="user_interaction")])
+        "tickets/", include([path("", ScanTicketsView.as_view(), name="scan_tickets")])
     ),
     path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),
     path("badge_handout/", BadgeHandoutView.as_view(), name="badge_handout"),

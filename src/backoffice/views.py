@@ -546,28 +546,71 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         )
 
 
-class SearchForUser(TemplateView):
-    template_name = "user/search.html"
+def _ticket_getter_by_token(token):
+    for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
+        try:
+            return ticket_class.objects.get(token=token), False
+        except ticket_class.DoesNotExist:
+            try:
+                return ticket_class.objects.get(badge_token=token), True
+            except ticket_class.DoesNotExist:
+                pass
 
-    def post(self, request, **kwargs):
-        check_in_ticket_id = request.POST.get("check_in_ticket_id")
-        if check_in_ticket_id:
-            ticket_to_check_in = ShopTicket.objects.get(pk=check_in_ticket_id)
-            ticket_to_check_in.used = True
-            ticket_to_check_in.save()
-            messages.info(request, "Ticket checked-in!")
 
-        return super().get(request, **kwargs)
+def _ticket_getter_by_pk(pk):
+    for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
+        try:
+            return ticket_class.objects.get(pk=pk)
+        except ticket_class.DoesNotExist:
+            pass
+
+
+class ScanTicketsView(TemplateView):
+    template_name = "tickets/scan.html"
+
+    ticket = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        ticket_token = self.request.POST.get("ticket_token")
-        if ticket_token:
-            try:
-                ticket = ShopTicket.objects.get(token=ticket_token[1:])
+        if self.ticket:
+            context["ticket"] = self.ticket
+
+        elif "ticket_token" in self.request.POST:
+
+            # Slice to get rid of the first character which is a '#'
+            ticket_token = self.request.POST.get("ticket_token")[1:]
+
+            ticket, is_badge = _ticket_getter_by_token(ticket_token)
+
+            if ticket:
                 context["ticket"] = ticket
-            except ShopTicket.DoesNotExist:
+                context["is_badge"] = is_badge
+            else:
                 messages.warning(self.request, "Ticket not found!")
 
         return context
+
+    def post(self, request, **kwargs):
+        if 'check_in_ticket_id' in request.POST:
+            self.ticket = self.check_in_ticket(request)
+        elif 'badge_ticket_id' in request.POST:
+            self.ticket = self.hand_out_badge(request)
+
+        return super().get(request, **kwargs)
+
+    def check_in_ticket(self, request):
+        check_in_ticket_id = request.POST.get("check_in_ticket_id")
+        ticket_to_check_in = _ticket_getter_by_pk(check_in_ticket_id)
+        ticket_to_check_in.used = True
+        ticket_to_check_in.save()
+        messages.info(request, "Ticket checked-in!")
+        return ticket_to_check_in
+
+    def hand_out_badge(self, request):
+        badge_ticket_id = request.POST.get('badge_ticket_id')
+        ticket_to_handout_badge_for = _ticket_getter_by_pk(badge_ticket_id)
+        ticket_to_handout_badge_for.badge_handed_out = True
+        ticket_to_handout_badge_for.save()
+        messages.info(request, "Badge marked as handed out!")
+        return ticket_to_handout_badge_for
