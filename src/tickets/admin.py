@@ -7,6 +7,7 @@ from .models import TicketType, SponsorTicket, DiscountTicket, ShopTicket
 class BaseTicketAdmin(admin.ModelAdmin):
     actions = ["generate_pdf"]
     exclude = ["qrcode_base64"]
+    readonly_fields = ['token', 'badge_token']
 
     def generate_pdf(self, request, queryset):
         for ticket in queryset.all():

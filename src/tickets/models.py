@@ -50,8 +50,8 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
     used = models.BooleanField(default=False)
     badge_handed_out = models.BooleanField(default=False)
-    token = models.CharField(max_length=64)
-    badge_token = models.CharField(max_length=64)
+    token = models.CharField(max_length=64, blank=True)
+    badge_token = models.CharField(max_length=64, blank=True)
 
     class Meta:
         abstract = True
@@ -62,7 +62,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 
     def save(self, **kwargs):
         self.token = self._get_token()
-        self.badge_token = self._get_token()
+        self.badge_token = self._get_badge_token()
         super().save(**kwargs)
 
     def _get_token(self):
