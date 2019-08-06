@@ -1399,7 +1399,8 @@ class Command(BaseCommand):
             camp=camp,
             user=users[1],
             seats=2,
-            location="From Copenhagen",
+            from_location="Copenhagen",
+            to_location="BornHack",
             when=timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
             description="I have space for two people and a little bit of luggage",
         )
@@ -1407,7 +1408,8 @@ class Command(BaseCommand):
             camp=camp,
             user=users[1],
             seats=2,
-            location="To Copenhagen",
+            from_location="BornHack",
+            to_location="Copenhagen",
             when=timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
             description="I have space for two people and a little bit of luggage",
         )
@@ -1415,7 +1417,8 @@ class Command(BaseCommand):
             camp=camp,
             user=users[4],
             seats=1,
-            location="From Aarhus",
+            from_location="Aarhus",
+            to_location="BornHack",
             when=timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
             description="I need a ride and have a large backpack",
         )

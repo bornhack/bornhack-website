@@ -1,22 +1,28 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 
 from camps.mixins import CampViewMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 
-from ..models import Team
+from ..models import Team, TeamMember
 
 
-class TeamGuideView(LoginRequiredMixin, CampViewMixin, DetailView):
+class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, DetailView):
     template_name = "team_guide.html"
     context_object_name = "team"
     model = Team
     slug_url_kwarg = "team_slug"
     active_menu = "guide"
 
-    def get_queryset(self):
-        qs = CampViewMixin.get_queryset(self)
-        qs.filter(teammember__approved=True, teammember__user=self.request.user)
-        return qs
+    def test_func(self):
+        # Make sure that the user is an approved member of the team
+        try:
+            TeamMember.objects.get(
+                user=self.request.user, team=self.get_object(), approved=True
+            )
+        except TeamMember.DoesNotExist:
+            return False
+        else:
+            return True
 
 
 class TeamGuidePrintView(TeamGuideView):

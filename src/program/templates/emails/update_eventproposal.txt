@@ -1,6 +1,6 @@
 Hello!
 
-Event "{{ proposal.name }}" for {{ proposal.camp }} was just updated!
+Event "{{ proposal.title }}" for {{ proposal.camp }} was just updated!
 
 More info: https://bornhack.dk/admin/program/eventproposal/{{ proposal.uuid }}/change/
 

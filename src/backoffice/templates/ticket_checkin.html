@@ -13,7 +13,7 @@
       Use this view to check in participants. Use the search field to search for username, email, products, order ID, ticket UUID, etc. To hand out badges go to the <a href="{% url 'backoffice:badge_handout' camp_slug=camp.slug %}">Badge Handout view</a> instead. To hand out other products go to the <a href="{% url 'backoffice:product_handout' camp_slug=camp.slug %}">Hand Out Products</a> view instead.
   </div>
   <div>
-      This table shows all (Shop|Discount|Sponsor)Tickets which are checked_in=False.
+      This table shows all (Shop|Discount|Sponsor)Tickets which are used=False.
   </div>
 </div>
 <br>

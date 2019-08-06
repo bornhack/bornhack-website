@@ -208,6 +208,7 @@ class Order(CreatedUpdatedModel):
         return str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
     def create_tickets(self, request=None):
+        tickets = []
         for order_product in self.orderproductrelation_set.all():
             # if this is a Ticket product?
             if order_product.product.ticket_type:
@@ -216,32 +217,57 @@ class Order(CreatedUpdatedModel):
                     ticket_type=order_product.product.ticket_type,
                 )
 
-                already_created_tickets = self.shoptickets.filter(
-                    **query_kwargs
-                ).count()
-                tickets_to_create = max(
-                    0, order_product.quantity - already_created_tickets
-                )
+                if order_product.product.ticket_type.single_ticket_per_product:
+                    # This ticket type is one where we only create one ticket
+                    ticket, created = self.shoptickets.get_or_create(**query_kwargs)
 
-                # create the number of tickets required
-                if tickets_to_create > 0:
-                    for _ in range(
-                        0, (order_product.quantity - already_created_tickets)
-                    ):
-                        self.shoptickets.create(**query_kwargs)
+                    if created:
+                        msg = (
+                            "Created ticket for product %s on order %s (quantity: %s)"
+                            % (
+                                order_product.product,
+                                order_product.order.pk,
+                                order_product.quantity,
+                            )
+                        )
+                        tickets.append(ticket)
+                    else:
+                        msg = "Ticket already created for product %s on order %s" % (
+                            order_product.product,
+                            order_product.order.pk,
+                        )
 
-                    msg = "Created %s tickets of type: %s" % (
-                        order_product.quantity,
-                        order_product.product.ticket_type.name,
-                    )
                     if request:
                         messages.success(request, msg)
-                    else:
-                        print(msg)
+                else:
+                    # We should create a number of tickets equal to OrderProductRelation quantity
+                    already_created_tickets = self.shoptickets.filter(
+                        **query_kwargs
+                    ).count()
+                    tickets_to_create = max(
+                        0, order_product.quantity - already_created_tickets
+                    )
 
-                    # and mark the OPR as handed_out=True
-                    order_product.handed_out = True
-                    order_product.save()
+                    # create the number of tickets required
+                    if tickets_to_create > 0:
+                        for _ in range(
+                            0, (order_product.quantity - already_created_tickets)
+                        ):
+                            ticket = self.shoptickets.create(**query_kwargs)
+                            tickets.append(ticket)
+
+                        msg = "Created %s tickets of type: %s" % (
+                            order_product.quantity,
+                            order_product.product.ticket_type.name,
+                        )
+                        if request:
+                            messages.success(request, msg)
+
+                        # and mark the OPR as ticket_generated=True
+                        order_product.ticket_generated = True
+                        order_product.save()
+
+        return tickets
 
     def mark_as_paid(self, request=None):
         self.paid = True
@@ -289,35 +315,36 @@ class Order(CreatedUpdatedModel):
             self.open = None
             self.save()
 
-    def is_not_handed_out(self):
-        if self.orderproductrelation_set.filter(handed_out=True).count() == 0:
+    def is_not_ticket_generated(self):
+        if self.orderproductrelation_set.filter(ticket_generated=True).count() == 0:
             return True
         else:
             return False
 
-    def is_partially_handed_out(self):
+    def is_partially_ticket_generated(self):
         if (
-            self.orderproductrelation_set.filter(handed_out=True).count() != 0
-            and self.orderproductrelation_set.filter(handed_out=False).count() != 0
+            self.orderproductrelation_set.filter(ticket_generated=True).count() != 0
+            and self.orderproductrelation_set.filter(ticket_generated=False).count()
+            != 0
         ):
             # some products are handed out, others are not
             return True
         else:
             return False
 
-    def is_fully_handed_out(self):
-        if self.orderproductrelation_set.filter(handed_out=False).count() == 0:
+    def is_fully_ticket_generated(self):
+        if self.orderproductrelation_set.filter(ticket_generated=False).count() == 0:
             return True
         else:
             return False
 
     @property
-    def handed_out_status(self):
-        if self.is_not_handed_out():
+    def ticket_generated_status(self):
+        if self.is_not_ticket_generated():
             return "no"
-        elif self.is_partially_handed_out():
+        elif self.is_partially_ticket_generated():
             return "partially"
-        elif self.is_fully_handed_out():
+        elif self.is_fully_ticket_generated():
             return "fully"
         else:
             return False
@@ -466,14 +493,14 @@ class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
-    handed_out = models.BooleanField(default=False)
+    ticket_generated = models.BooleanField(default=False)
 
     @property
     def total(self):
         return Decimal(self.product.price * self.quantity)
 
     def clean(self):
-        if self.handed_out and not self.order.paid:
+        if self.ticket_generated and not self.order.paid:
             raise ValidationError(
                 "Product can not be handed out when order is not paid."
             )

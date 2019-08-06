@@ -340,6 +340,10 @@ class EventProposal(UserSubmittedModel):
         blank=True,
     )
 
+    use_provided_speaker_laptop = models.BooleanField(
+        help_text="Will you be using the provided speaker laptop?", default=True
+    )
+
     @property
     def camp(self):
         return self.track.camp

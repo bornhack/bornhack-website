@@ -25,13 +25,13 @@
           <tbody>
         {% for order in orders %}
             {% if order.products.exists %}
-            <tr {% if not order.open and order.paid and order.is_fully_handed_out %}style="color: lightgrey"{% endif %}>
+            <tr {% if not order.open and order.paid and order.is_fully_ticket_generated %}style="color: lightgrey"{% endif %}>
                 <td>{{ order.id }}</td>
                 <td>{{ order.get_number_of_items }}</td>
                 <td>{{ order.total|currency }}</td>
                 <td class="text-center">{{ order.open|truefalseicon }}</td>
                 <td class="text-center">{{ order.paid|truefalseicon }}</td>
-                <td class="text-center">{{ order.handed_out_status }}</td>
+                <td class="text-center">{{ order.ticket_generated_status }}</td>
                 <td>
                 {% if order.paid %}
                     {% if order.invoice.pdf %}

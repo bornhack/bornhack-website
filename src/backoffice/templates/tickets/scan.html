@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static from staticfiles %}
+{% load qrcode %}
+
+{% block content %}
+
+<form id="search_form" method="POST" action="">
+    {% csrf_token %}
+
+    <div class="row">
+
+        <div class="col-md-12">
+            <h3>Scan the ticket!</h3>
+            <input type="text" name="ticket_token" id="ticket_token_input" autocomplete="off" style="color: #fff; background: #fff; border: 0; height: 0; width: 0;"/>
+
+            <div id="scan_again" hidden>
+                Scan again!
+                <hr />
+            </div>
+
+        </div>
+
+    </div>
+
+</form>
+
+
+{% if ticket %}
+
+
+    <br />
+
+    <table class="table">
+        <tr>
+            <td>
+                <strong>Type:</strong>
+            <td>
+                {{ ticket.ticket_type }}
+
+        <tr>
+            <td>
+                <strong>Used?:</strong>
+            <td>
+                {{ ticket.used }}
+
+        {% if ticket.ticket_type.includes_badge %}
+        <tr>
+            <td>
+                <strong>Badge handed out?:</strong>
+            <td>
+                {{ ticket.badge_handed_out }}
+        {% endif %}
+
+        {% if ticket.product %}
+        <tr>
+            <td>
+                <strong>Product:</strong>
+            <td>
+                {{ ticket.product }}
+        <tr>
+            <td>
+                <strong>Order:</strong>
+            <td>
+                {{ ticket.order }}
+        {% endif %}
+
+        {% if ticket.sponsor %}
+        <tr>
+            <td>
+                <strong>Sponsor</strong>
+            <td>
+                {{ ticket.sponsor }}
+        {% endif %}
+
+
+    </table>
+
+    <hr />
+
+    <form id="check_in_form" method="POST" action="">{% csrf_token %}
+        <input type="checkbox"
+               name="check_in_ticket_id"
+               id="check_in_input"
+               value="{{ ticket.pk }}"
+               style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+
+        <input type="checkbox"
+               name="badge_ticket_id"
+               id="hand_out_badge_input"
+               value="{{ ticket.pk }}"
+               style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+    </form>
+
+    <div class="row">
+        <div class="col-md-4">
+            {% qr_code "clear" %}
+        </div>
+
+        {% if not ticket.used %}
+        <div class="col-md-4">
+            {% qr_code "check-in" %}
+        </div>
+        {% endif %}
+
+        {% if ticket.ticket_type.includes_badge and not ticket.badge_handed_out %}
+        <div class="col-md-4">
+            {% qr_code "hand-out-badge" %}
+        </div>
+        {% endif %}
+    </div>
+{% endif %}
+
+
+
+<script src="{% static 'js/ticket_scan.js' %}"></script>
+
+{% endblock content %}
+

@@ -101,6 +101,8 @@ class ProductAdmin(admin.ModelAdmin):
         available_to,
     ]
 
+    list_editable = ["ticket_type"]
+
     list_filter = ["category", "ticket_type"]
 
     search_fields = ["name"]
@@ -142,6 +144,7 @@ class OrderAdmin(admin.ModelAdmin):
         "mark_order_as_paid",
         "mark_order_as_refunded",
         "mark_order_as_cancelled",
+        "create_tickets",
     ]
 
     def mark_order_as_paid(self, request, queryset):
@@ -161,6 +164,12 @@ class OrderAdmin(admin.ModelAdmin):
             order.mark_as_cancelled(request)
 
     mark_order_as_cancelled.description = "Mark order(s) as cancelled"
+
+    def create_tickets(self, request, queryset):
+        for order in queryset.filter(paid=True):
+            order.create_tickets(request)
+
+    create_tickets.description = "Create tickets for order(s) (paid only)"
 
 
 def get_user_email(obj):

@@ -12,7 +12,9 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def generate_pdf_letter(filename, template, formatdict):
-    logger.debug("Generating PDF with filename %s and template %s" % (filename, template))
+    logger.debug(
+        "Generating PDF with filename %s and template %s" % (filename, template)
+    )
 
     # conjure up a fake request for PDFTemplateResponse
     request = RequestFactory().get("/")
@@ -47,9 +49,9 @@ def generate_pdf_letter(filename, template, formatdict):
 
     # add the watermark to all pages
     for pagenum in range(pdfreader.getNumPages()):
-        page = watermark.getPage(0)
+        page = pdfreader.getPage(pagenum)
         try:
-            page.mergePage(pdfreader.getPage(pagenum))
+            page.mergePage(watermark.getPage(0))
         except ValueError:
             # watermark pdf might be broken?
             return False
@@ -65,4 +67,3 @@ def generate_pdf_letter(filename, template, formatdict):
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)
     return returnfile
-
