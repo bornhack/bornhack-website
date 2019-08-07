@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from django.core.mail import EmailMultiAlternatives
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -11,7 +9,6 @@ import logging, magic
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
-Attachment = namedtuple('Attachment', field_names=['filename', 'content'])
 
 def _send_email(
     text_template,
@@ -21,7 +18,9 @@ def _send_email(
     bcc_recipients=[],
     html_template="",
     sender="BornHack <info@bornhack.dk>",
-    attachments=[],
+    attachment=None,
+    attachment_filename="",
+    attachments=None,
 ):
     if not isinstance(to_recipients, list):
         to_recipients = [to_recipients]
@@ -43,12 +42,15 @@ def _send_email(
         if html_template:
             msg.attach_alternative(html_template, "text/html")
 
+        if not attachments and attachment:
+            attachments = [(attachment, attachment_filename)]
+
         # is there an attachment to this mail?
         if attachments:
-            for attachment in attachments:
+            for content, filename in attachments:
                 # figure out the mimetype
-                mimetype = magic.from_buffer(attachment.content, mime=True)
-                msg.attach(attachment.filename, attachment.content, mimetype)
+                mimetype = magic.from_buffer(content, mime=True)
+                msg.attach(filename, content, mimetype)
     except Exception as e:
         logger.exception("exception while rendering email: {}".format(e))
         return False
