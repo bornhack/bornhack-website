@@ -20,6 +20,7 @@ def _send_email(
     sender="BornHack <info@bornhack.dk>",
     attachment=None,
     attachment_filename="",
+    attachments=None,
 ):
     if not isinstance(to_recipients, list):
         to_recipients = [to_recipients]
@@ -41,11 +42,15 @@ def _send_email(
         if html_template:
             msg.attach_alternative(html_template, "text/html")
 
+        if not attachments and attachment:
+            attachments = [(attachment, attachment_filename)]
+
         # is there an attachment to this mail?
-        if attachment:
-            # figure out the mimetype
-            mimetype = magic.from_buffer(attachment, mime=True)
-            msg.attach(attachment_filename, attachment, mimetype)
+        if attachments:
+            for content, filename in attachments:
+                # figure out the mimetype
+                mimetype = magic.from_buffer(content, mime=True)
+                msg.attach(filename, content, mimetype)
     except Exception as e:
         logger.exception("exception while rendering email: {}".format(e))
         return False
