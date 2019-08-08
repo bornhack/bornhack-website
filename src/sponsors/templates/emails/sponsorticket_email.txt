@@ -1,6 +1,6 @@
 Hello!
 
-This email contains the {{ sponsor.name }} sponsor tickets for {{ sponsor.camp.title }}
+This email contains a {{ ticket.sponsor.name }} sponsor ticket for {{ ticket.sponsor.camp.title }}
 Thank you for helping out! :)
 
 Best regards,

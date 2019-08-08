@@ -31,12 +31,14 @@ class Command(BaseCommand):
                 sponsor.ticket_ready and
                 not sponsor.tickets_sent
             ):
-                self.output("# Generating outgoing email to send tickets for {}:".format(sponsor))
-                # send the email
-                if add_sponsorticket_email(sponsor=sponsor):
-                    logger.info("OK: email to %s added" % sponsor)
-                    sponsor.tickets_sent = True
-                    sponsor.save()
-                else:
-                    logger.error("Unable to send sponsor ticket email to %s" % sponsor)
+                self.output("# Generating outgoing emails to send tickets for {}:".format(sponsor))
+                for ticket in sponsor.sponsorticket_set.all():
+                    # send the email
+                    if add_sponsorticket_email(ticket=ticket):
+                        logger.info("OK: email to %s added" % sponsor)
+                    else:
+                        logger.error("Unable to send sponsor ticket email to %s" % sponsor)
+
+                sponsor.tickets_sent = True
+                sponsor.save()
 
