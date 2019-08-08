@@ -13,8 +13,9 @@ def add_sponsorticket_email(ticket):
         "ticket": ticket,
     }
 
-    subject = "BornHack %s Sponsor Ticket %s" % (
+    subject = "%s %s Sponsor Ticket %s" % (
         ticket.sponsor.camp.title,
+        ticket.sponsor.name,
         ticket.uuid,
     )
 
