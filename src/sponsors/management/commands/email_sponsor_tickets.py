@@ -24,7 +24,13 @@ class Command(BaseCommand):
         sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=False)
 
         for sponsor in sponsors:
-            if sponsor.tier.tickets and sponsor.ticket_email and sponsor.ticket_ready and not sponsor.tickets_sent:
+            if (
+                sponsor.tier.tickets and
+                sponsor.tickets_generated and
+                sponsor.ticket_email and
+                sponsor.ticket_ready and
+                not sponsor.tickets_sent
+            ):
                 self.output("# Generating outgoing email to send tickets for {}:".format(sponsor))
                 # send the email
                 if add_sponsorticket_email(sponsor=sponsor):
