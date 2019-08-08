@@ -1,0 +1,11 @@
+Hello!
+
+This email contains the {{ sponsor.name }} sponsor tickets for {{ sponsor.camp.title }}
+Thank you for helping out! :)
+
+Best regards,
+
+BornHack
+
+(This email is automatically generated)
+
