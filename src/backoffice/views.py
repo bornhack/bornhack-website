@@ -2,7 +2,7 @@ import logging, os
 from itertools import chain
 
 import qrcode
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -565,10 +565,12 @@ def _ticket_getter_by_pk(pk):
             pass
 
 
-class ScanTicketsView(TemplateView):
-    template_name = "tickets/scan.html"
+class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin,TemplateView):
+    template_name = "info_desk/scan.html"
 
     ticket = None
+    order = None
+    order_search = False
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -589,6 +591,9 @@ class ScanTicketsView(TemplateView):
             else:
                 messages.warning(self.request, "Ticket not found!")
 
+        elif self.order_search:
+            context['order'] = self.order
+
         return context
 
     def post(self, request, **kwargs):
@@ -596,6 +601,15 @@ class ScanTicketsView(TemplateView):
             self.ticket = self.check_in_ticket(request)
         elif 'badge_ticket_id' in request.POST:
             self.ticket = self.hand_out_badge(request)
+        elif 'find_order_id' in request.POST:
+            self.order_search = True
+            try:
+                order_id = self.request.POST.get('find_order_id')
+                self.order = Order.objects.get(id=order_id)
+            except Order.DoesNotExist:
+                pass
+        elif 'mark_as_paid' in request.POST:
+            self.mark_order_as_paid(request)
 
         return super().get(request, **kwargs)
 
@@ -614,3 +628,8 @@ class ScanTicketsView(TemplateView):
         ticket_to_handout_badge_for.save()
         messages.info(request, "Badge marked as handed out!")
         return ticket_to_handout_badge_for
+
+    def mark_order_as_paid(self, request):
+        order = Order.objects.get(id=request.POST.get('mark_as_paid'))
+        order.mark_as_paid()
+        messages.success(request, "Order #{} has been marked as paid!".format(order.id))

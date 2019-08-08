@@ -27,7 +27,6 @@
 
 {% if ticket %}
 
-
     <br />
 
     <table class="table">
@@ -110,7 +109,61 @@
     </div>
 {% endif %}
 
+<hr />
 
+<form method="POST"
+      class="form-inline">
+    {% csrf_token %}
+
+    <input type="text" class="form-control input-lg" name="find_order_id" />
+
+    <button type="submit" class="btn btn-lg btn-primary">
+        Find an order
+    </button>
+</form>
+
+{% if view.order_search %}
+
+    {% if order %}
+
+        <h3>Order #{{ order.id }}</h3>
+
+        <table class="table">
+            <tr>
+                <td>
+                    <strong>Total</strong>
+                <td>
+                    {{ order.total }} DKK
+            <tr>
+                <td>
+                    <strong>Paid?</strong>
+                <td>
+                    {{ order.paid }}
+
+            <tr>
+                <td>
+                    <strong>Payment type</strong>
+                <td>
+                    {{ order.get_payment_method_display }}
+
+        </table>
+
+        {% if not order.paid and order.payment_method == order.CASH %}
+        <form method="POST">
+            {% csrf_token %}
+            <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as paid!</button>
+        </form>
+        {% endif %}
+
+    {% else %}
+
+        Order not found...
+
+    {% endif %}
+
+    <a href="" class="btn btn-primary">Clear</a>
+
+{% endif %}
 
 <script src="{% static 'js/ticket_scan.js' %}"></script>
 

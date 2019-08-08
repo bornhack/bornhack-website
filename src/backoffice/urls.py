@@ -7,9 +7,11 @@ app_name = "backoffice"
 urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
     # infodesk
-    path(
-        "tickets/", include([path("", ScanTicketsView.as_view(), name="scan_tickets")])
-    ),
+    path("infodesk/", include(
+        [
+            path("", ScanTicketsView.as_view(), name="scan_tickets"),
+        ]
+    )),
     path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),
     path("badge_handout/", BadgeHandoutView.as_view(), name="badge_handout"),
     path("ticket_checkin/", TicketCheckinView.as_view(), name="ticket_checkin"),
