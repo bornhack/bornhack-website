@@ -11,7 +11,7 @@ register = template.Library()
 @register.simple_tag
 def qr_code(value):
     stream = io.BytesIO()
-    img = qrcode.make("#" + value, box_size=7)
+    img = qrcode.make(value, box_size=7)
     img.save(stream, "PNG")
     data = base64.b64encode(stream.getvalue())
 

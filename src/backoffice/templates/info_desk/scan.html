@@ -97,13 +97,13 @@
 
         {% if not ticket.used %}
         <div class="col-md-4">
-            {% qr_code "check-in" %}
+            {% qr_code "checkin" %}
         </div>
         {% endif %}
 
         {% if ticket.ticket_type.includes_badge and not ticket.badge_handed_out %}
         <div class="col-md-4">
-            {% qr_code "hand-out-badge" %}
+            {% qr_code "handoutbadge" %}
         </div>
         {% endif %}
     </div>

@@ -16,10 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (ticket_token_input.value === "#clear") {
       window.location.replace(window.location.pathname);
-    } else if (ticket_token_input.value === "#check-in") {
+    } else if (ticket_token_input.value === "#checkin") {
       check_in_input.checked = true;
       check_in_form.submit();
-    } else if (ticket_token_input.value === "#hand-out-badge") {
+    } else if (ticket_token_input.value === "#handoutbadge") {
       hand_out_badge_input.checked = true;
       check_in_form.submit();
     } else if (ticket_token_input.value.length === 65) {
