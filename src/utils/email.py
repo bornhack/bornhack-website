@@ -71,7 +71,6 @@ def add_outgoing_email(
     sender="BornHack <info@bornhack.dk>",
     attachment=None,
     attachment_filename="",
-    attachments=None,
 ):
     """ adds an email to the outgoing queue
         recipients is a list of to recipients
@@ -99,5 +98,10 @@ def add_outgoing_email(
         cc_recipients=cc_recipients,
         bcc_recipients=bcc_recipients,
     )
+
+    if attachment:
+        django_file = ContentFile(attachment)
+        django_file.name = attachment_filename
+        email.attachment.save(attachment_filename, django_file, save=True)
 
     return True
