@@ -1,5 +1,11 @@
+import os
+import logging
+
+from django.conf import settings
+
 from utils.email import add_outgoing_email
 
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 def add_sponsorticket_email(ticket):
     # put formatdict together
@@ -18,10 +24,10 @@ def add_sponsorticket_email(ticket):
         return add_outgoing_email(
             text_template="emails/sponsorticket_email.txt",
             html_template="emails/sponsorticket_email.html",
-            to_recipients=sponsor.ticket_email,
+            to_recipients=ticket.sponsor.ticket_email,
             formatdict=formatdict,
             subject=subject,
-            attachment=f.read(),
+            attachment=f,
             attachment_filename=filename,
         )
 
