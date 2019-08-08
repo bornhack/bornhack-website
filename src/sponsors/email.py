@@ -27,7 +27,7 @@ def add_sponsorticket_email(ticket):
             to_recipients=ticket.sponsor.ticket_email,
             formatdict=formatdict,
             subject=subject,
-            attachment=f,
+            attachment=f.read(),
             attachment_filename=filename,
         )
 
