@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         camp = Camp.objects.get(slug=options["camp_slug"])
-        sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=False)
+        sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=True)
 
         for sponsor in sponsors:
             if (
