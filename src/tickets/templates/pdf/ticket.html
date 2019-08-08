@@ -13,7 +13,9 @@
 <br>
 <h2>{{ ticket.ticket_type.camp.title }} Ticket</h2>
 <h3>Type: {{ ticket.ticket_type.name }}</h3>
+{% if ticket.product %}
 <h3>Product: {{ ticket.product.name }}</h3>
+{% endif %}
 {% if quantity %}
 <h3>Quantity: {{ quantity }}</h3>
 {% endif %}
