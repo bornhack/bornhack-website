@@ -19,7 +19,7 @@ def add_sponsorticket_email(ticket):
     )
 
     filename = "sponsor_ticket_{}.pdf".format(ticket.pk)
-    with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename)) as f:
+    with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:
         # add email to outgoing email queue
         return add_outgoing_email(
             text_template="emails/sponsorticket_email.txt",
