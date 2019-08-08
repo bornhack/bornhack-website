@@ -42,7 +42,7 @@ def _send_email(
             msg.attach_alternative(html_template, "text/html")
 
         # is there an attachment to this mail?
-        if attachment
+        if attachment:
             # figure out the mimetype
             mimetype = magic.from_buffer(attachment, mime=True)
             msg.attach(attachment_filename, attachment, mimetype)
