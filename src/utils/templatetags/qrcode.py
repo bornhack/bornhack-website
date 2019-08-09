@@ -17,7 +17,7 @@ def qr_code(value):
 
     return mark_safe(
         "<figure style='text-align: center;'>"
-        "<figcaption style='text-align: center;'>{}</figcaption>"
         '<img src="data:image/png;base64,{}" alt="">'
+        "<figcaption style='text-align: center;'>{}</figcaption>"
         "</figure>".format(data.decode(), value)
     )
