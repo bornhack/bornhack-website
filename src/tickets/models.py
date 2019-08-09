@@ -93,8 +93,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
         formatdict = {"ticket": self}
 
         if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
-            orp = self.get_orp()
-            formatdict["quantity"] = orp.quantity
+            formatdict["quantity"] = self.orp.quantity
 
         return generate_pdf_letter(
             filename="{}_ticket_{}.pdf".format(self.shortname, self.pk),
@@ -165,5 +164,6 @@ class ShopTicket(BaseTicket):
     def shortname(self):
         return "shop"
 
-    def get_orp(self):
+    @property
+    def orp(self):
         return OrderProductRelation.objects.get(product=self.product, order=self.order)
