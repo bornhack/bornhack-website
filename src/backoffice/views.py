@@ -1,27 +1,26 @@
-import logging, os
+import logging
+import os
 from itertools import chain
 
-import qrcode
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin, LoginRequiredMixin
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.views.generic import TemplateView, ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.core.files import File
+from django.db.models import Sum
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
-from django.contrib import messages
 from django.utils import timezone
-from django.db.models import Sum
-from django.conf import settings
-from django.core.files import File
+from django.views.generic import TemplateView, ListView, DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 
 from camps.mixins import CampViewMixin
-from shop.models import OrderProductRelation, Invoice, Order
-from tickets.models import ShopTicket, SponsorTicket, DiscountTicket
+from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from profiles.models import Profile
 from program.models import SpeakerProposal, EventProposal
-from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
-from utils.mixins import RaisePermissionRequiredMixin
+from shop.models import OrderProductRelation, Order
 from teams.models import Team
+from tickets.models import ShopTicket, SponsorTicket, DiscountTicket, TicketType
 from .mixins import *
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -633,3 +632,17 @@ class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin
         order = Order.objects.get(id=request.POST.get('mark_as_paid'))
         order.mark_as_paid()
         messages.success(request, "Order #{} has been marked as paid!".format(order.id))
+
+
+class ShopTicketOverview(LoginRequiredMixin, CampViewMixin, ListView):
+
+    model = ShopTicket
+
+    template_name = "shop_ticket_overview.html"
+
+    context_object_name = "shop_tickets"
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        kwargs['ticket_types'] = TicketType.objects.filter(camp=self.camp)
+        return super().get_context_data(object_list=object_list, **kwargs)
+

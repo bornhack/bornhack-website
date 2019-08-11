@@ -56,9 +56,12 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     class Meta:
         abstract = True
 
+    camp_filter = 'ticket_type__camp'
+
     @property
     def camp(self):
         return self.ticket_type.camp
+
 
     def save(self, **kwargs):
         self.token = self._get_token()

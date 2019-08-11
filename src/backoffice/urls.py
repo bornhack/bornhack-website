@@ -12,6 +12,7 @@ urlpatterns = [
             path("", ScanTicketsView.as_view(), name="scan_tickets"),
         ]
     )),
+    path("shop_tickets/", ShopTicketOverview.as_view(), name="shop_ticket_overview"),
     path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),
     path("badge_handout/", BadgeHandoutView.as_view(), name="badge_handout"),
     path("ticket_checkin/", TicketCheckinView.as_view(), name="ticket_checkin"),
