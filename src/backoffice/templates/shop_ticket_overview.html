@@ -21,6 +21,8 @@
           <th>Ticket Type</th>
           <th>Product</th>
           <th>Order comment</th>
+          <th>User / Email</th>
+          <th>Used?</th>
           <th>Paid?</th>
        </tr>
       </thead>
@@ -30,6 +32,10 @@
         <td>{{ ticket.ticket_type.name }}</td>
         <td>{{ ticket.product.name }}</td>
         <td>{{ ticket.order.comment|default:"None" }}</td>
+        <td>{{ ticket.order.user.profile.name }}
+         / {{ ticket.order.user.email }}</td>
+        <td>{{ ticket.used }}</td>
+        <td>{{ ticket.order.payment_method }}</td>
         <td>{{ ticket.order.paid }}</td>
       </tr>
       {% endfor %}
