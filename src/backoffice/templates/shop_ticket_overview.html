@@ -32,7 +32,7 @@
       <tr>
         <td>{{ ticket.ticket_type.name }}</td>
         <td>{{ ticket.product.name }}</td>
-        <td>{{ ticket.order.comment|default:"None" }}</td>
+        <td>{{ ticket.order.customer_comment|default:"None" }}</td>
         <td>{{ ticket.order.user.profile.name }}
          / {{ ticket.order.user.email }}</td>
         <td>{{ ticket.used }}</td>
