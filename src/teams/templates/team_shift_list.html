@@ -47,7 +47,7 @@
                 {{ shift.people_required }}
             <td>
                 {% for member in shift.team_members.all %}
-                {{ member.user }}{% if not forloop.last %},{% endif %}
+		{{ member.user.profile.get_public_credit_name }}{% if not forloop.last %},{% endif %}
                 {% empty %}
                     None!
                 {% endfor %}
