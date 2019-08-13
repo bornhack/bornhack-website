@@ -47,6 +47,10 @@ class CreatedUpdatedModel(CleanedModel):
     updated = models.DateTimeField(auto_now=True)
 
 
+class CampReadOnlyModeError(ValidationError):
+    pass
+
+
 class CampRelatedModel(CreatedUpdatedModel):
 
     camp_filter = "camp"
@@ -58,7 +62,7 @@ class CampRelatedModel(CreatedUpdatedModel):
         if self.camp.read_only:
             if hasattr(self, "request"):
                 messages.error(self.request, "Camp is in read only mode.")
-            raise ValidationError("This camp is in read only mode.")
+            raise CampReadOnlyModeError("This camp is in read only mode.")
 
         super().save(**kwargs)
 
@@ -66,7 +70,7 @@ class CampRelatedModel(CreatedUpdatedModel):
         if self.camp.read_only:
             if hasattr(self, "request"):
                 messages.error(self.request, "Camp is in read only mode.")
-            raise ValidationError("This camp is in read only mode.")
+            raise CampReadOnlyModeError("This camp is in read only mode.")
 
         super().delete(**kwargs)
 

@@ -7,10 +7,18 @@ Secret Token Found! | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3 class="text-center">Secret Token Found!</h3>
-<p class="lead text-center">You found a secret token:</p>
-<p class="lead text-center"><span class="badge">{{ token.description }}</span></p>
-<p class="lead text-center">Your visit has been registered! Keep hunting, there might be more tokens out there.</p>
-<p class="lead text-center"><a href="{% url 'tokens:tokenfind_list' %}">List All Found Tokens</a></p>
+
+{% if view.older_code %}
+    <h3 class="text-center">It's an older code, sir, but it checks out!</h3>
+    <p class="lead text-center">You have tried to use an older token, so here have a token for your efforts!</p>
+    <pre class="lead text-center">{{ view.older_token_token }}</pre>
+{% else %}
+    <h3 class="text-center">Secret Token Found!</h3>
+    <p class="lead text-center">You found a secret token:</p>
+    <p class="lead text-center"><span class="badge">{{ token.description }}</span></p>
+    <p class="lead text-center">Your visit has been registered! Keep hunting, there might be more tokens out there.</p>
+    <p class="lead text-center"><a href="{% url 'tokens:tokenfind_list' %}">List All Found Tokens</a></p>
+{% endif %}
+
 {% endblock %}
 
