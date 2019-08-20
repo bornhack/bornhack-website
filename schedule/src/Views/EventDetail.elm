@@ -178,9 +178,9 @@ eventInstanceItem eventInstance model =
     let
         toFormat =
             if Date.day eventInstance.from == Date.day eventInstance.to then
-                "HH:mm"
+                "HH:mm x"
             else
-                "E HH:mm"
+                "E HH:mm x"
 
         ( locationName, _ ) =
             model.eventLocations
