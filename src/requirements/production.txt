@@ -23,7 +23,7 @@ docopt==0.6.2
 future==0.17.1
 html5lib==1.0.1
 icalendar==4.0.3
-ipython==7.7.0
+ipython==7.10.1
 irc3==1.1.2
 oauthlib==3.1.0
 olefile==0.46
