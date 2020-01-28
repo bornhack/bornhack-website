@@ -29,4 +29,4 @@ PyPDF2==1.26.0
 python-magic==0.4.15
 service-identity==18.1.0
 Unidecode==1.1.1
-wheel==0.33.6
+wheel==0.34.1
