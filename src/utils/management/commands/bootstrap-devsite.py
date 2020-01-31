@@ -73,7 +73,7 @@ class Command(BaseCommand):
         fake_text += "## " + fake.sentence(nb_words=3) + "\n"
         fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
         fake_text += "\n\n"
-        fake_text += '![The image is not awailable](/static/img/na.jpg "not awailable")'
+        fake_text += '![The image is not awailable](/static/img/na.jpg "not available")'
         fake_text += "\n\n"
         fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
         fake_text += "\n\n"
@@ -1594,7 +1594,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS("----------[ Bornhack {} ]----------".format(year))
             )
 
-            if year < 2020:
+            if year < 2021:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
