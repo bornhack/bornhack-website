@@ -1,12 +1,10 @@
 from django.db import models
-from django.utils import encoding
 from django.utils.text import slugify
 from django.urls import reverse
 
 from utils.models import CreatedUpdatedModel
 
 
-@encoding.python_2_unicode_compatible
 class NewsItem(CreatedUpdatedModel):
     class Meta:
         ordering = ["-published_at"]
