@@ -1,4 +1,4 @@
-Django==2.2.8 # 3.0 is waiting for graphene-django
+Django==2.2.9 # 3.0 is waiting for https://github.com/bornhack/bornhack-website/issues/435
 channels==2.4.0
 channels-redis==2.4.1
 
