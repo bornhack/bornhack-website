@@ -19,7 +19,7 @@ graphene-django==2.8.0
 html5lib==1.0.1
 icalendar==4.0.4
 ipython==7.10.2
-irc3==1.1.4
+irc3==1.1.5
 olefile==0.46
 Pillow==6.2.1
 pipdeptree==0.13.2
