@@ -24,13 +24,15 @@
     {% bootstrap_javascript jquery=1 %}
 
     <!-- favicon.ico stuff -->
-    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon/favicon.ico' %}" sizes="16x16">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
-    <link rel="icon" type="image/png" href="{% static 'img/favicon/favicon-32x32.png' %}" sizes="32x32">
-    <link rel="icon" type="image/png" href="{% static 'img/favicon/favicon-16x16.png' %}" sizes="16x16">
-    <link rel="manifest" href="{% static 'img/favicon/manifest.json' %}">
-    <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#5bbad5">
-    <meta name="theme-color" content="#ffffff">
+	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
+	<link rel="manifest" href="{% static 'img/favicon/site.webmanifest' %}">
+	<link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#000000">
+	<link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="msapplication-config" content="{% static 'img/favicon/browserconfig.xml' %}">
+	<meta name="theme-color" content="#000000">
 
     {% block extra_head %}
     {% endblock %}
@@ -50,11 +52,11 @@
           </button>
           {% if request.resolver_match.kwargs.camp_slug and camp %}
             <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" height="50" width="190px" alt="bornhack" class="img-responsive">
+                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
             </a>
           {% else %}
             <a class="navbar-brand" href="/">
-              <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width=200>
+              <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
             </a>
             {% endif %}
         </div>
