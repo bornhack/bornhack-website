@@ -13,7 +13,6 @@ from django.urls import reverse, reverse_lazy
 from django.template import Engine, Context
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
-from betterforms.multiform import MultiModelForm
 import icalendar
 
 from camps.mixins import CampViewMixin
@@ -31,6 +30,7 @@ from .email import (
     add_eventproposal_updated_email,
 )
 from . import models
+from .multiform import MultiModelForm
 from .forms import SpeakerProposalForm, EventProposalForm
 
 
