@@ -5,8 +5,7 @@ channels-redis==2.4.1
 
 asyncio==3.4.3
 commonmark==0.9.1
-#django-allauth-2fa==0.7
--e git://github.com/percipient/django-allauth-2fa.git@fd6a92bed942942d7bb4c4ed0cd4b8d6aa7c907b#egg=django-allauth-2fa
+django-allauth-2fa==0.8
 django-bleach==0.6.1
 django-bootstrap3==12.0.3
 django-cors-headers==3.2.1
