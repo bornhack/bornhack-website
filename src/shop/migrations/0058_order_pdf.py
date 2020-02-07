@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0057_order_notes'),
+        ("shop", "0057_order_notes"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='order',
-            name='pdf',
-            field=models.FileField(blank=True, null=True, upload_to='proforma_invoices/'),
+            model_name="order",
+            name="pdf",
+            field=models.FileField(
+                blank=True, null=True, upload_to="proforma_invoices/"
+            ),
         ),
     ]

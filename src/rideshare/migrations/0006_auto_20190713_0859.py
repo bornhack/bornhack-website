@@ -6,38 +6,51 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rideshare', '0005_ride_to_location'),
+        ("rideshare", "0005_ride_to_location"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ride',
-            name='description',
-            field=models.TextField(help_text='Include any details you want, like luggage space/requirements, contact info and so on.'),
+            model_name="ride",
+            name="description",
+            field=models.TextField(
+                help_text="Include any details you want, like luggage space/requirements, contact info and so on."
+            ),
         ),
         migrations.AlterField(
-            model_name='ride',
-            name='from_location',
-            field=models.CharField(help_text='Where does this ride begin?', max_length=100),
+            model_name="ride",
+            name="from_location",
+            field=models.CharField(
+                help_text="Where does this ride begin?", max_length=100
+            ),
         ),
         migrations.AlterField(
-            model_name='ride',
-            name='has_car',
-            field=models.BooleanField(default=True, help_text='Leave checked if you are offering a ride, uncheck if you need a ride.'),
+            model_name="ride",
+            name="has_car",
+            field=models.BooleanField(
+                default=True,
+                help_text="Leave checked if you are offering a ride, uncheck if you need a ride.",
+            ),
         ),
         migrations.AlterField(
-            model_name='ride',
-            name='seats',
-            field=models.PositiveIntegerField(help_text='How many seats are you offering/how many seats do you need?'),
+            model_name="ride",
+            name="seats",
+            field=models.PositiveIntegerField(
+                help_text="How many seats are you offering/how many seats do you need?"
+            ),
         ),
         migrations.AlterField(
-            model_name='ride',
-            name='to_location',
-            field=models.CharField(help_text='What is the destination of this ride?', max_length=100),
+            model_name="ride",
+            name="to_location",
+            field=models.CharField(
+                help_text="What is the destination of this ride?", max_length=100
+            ),
         ),
         migrations.AlterField(
-            model_name='ride',
-            name='when',
-            field=models.DateTimeField(help_text='When does this ride leave? Format is YYYY-MM-DD HH:mm'),
+            model_name="ride",
+            name="when",
+            field=models.DateTimeField(
+                help_text="When does this ride leave? Format is YYYY-MM-DD HH:mm"
+            ),
         ),
     ]

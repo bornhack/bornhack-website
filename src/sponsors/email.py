@@ -7,6 +7,7 @@ from utils.email import add_outgoing_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
+
 def add_sponsorticket_email(ticket):
     # put formatdict together
     formatdict = {
@@ -31,4 +32,3 @@ def add_sponsorticket_email(ticket):
             attachment=f.read(),
             attachment_filename=filename,
         )
-

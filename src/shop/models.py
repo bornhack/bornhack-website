@@ -376,7 +376,9 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
     name = models.CharField(max_length=150)
     slug = models.SlugField()
     public = models.BooleanField(default=True)
-    weight = models.IntegerField(default=100, help_text="Sorting weight. Heavier items sink to the bottom.")
+    weight = models.IntegerField(
+        default=100, help_text="Sorting weight. Heavier items sink to the bottom."
+    )
 
     def __str__(self):
         return self.name

@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('shop', '0059_auto_20190718_2051'),
+        ("shop", "0059_auto_20190718_2051"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='productcategory',
-            name='weight',
-            field=models.IntegerField(default=100, help_text='Sorting weight. Heavier items sink to the bottom.'),
+            model_name="productcategory",
+            name="weight",
+            field=models.IntegerField(
+                default=100,
+                help_text="Sorting weight. Heavier items sink to the bottom.",
+            ),
         ),
     ]

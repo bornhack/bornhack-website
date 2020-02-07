@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tickets', '0013_tickettype_single_ticket_per_product'),
+        ("tickets", "0013_tickettype_single_ticket_per_product"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='discountticket',
-            name='badge_token',
+            model_name="discountticket",
+            name="badge_token",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='discountticket',
-            name='token',
+            model_name="discountticket",
+            name="token",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='badge_token',
+            model_name="shopticket",
+            name="badge_token",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='shopticket',
-            name='token',
+            model_name="shopticket",
+            name="token",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='sponsorticket',
-            name='badge_token',
+            model_name="sponsorticket",
+            name="badge_token",
             field=models.CharField(blank=True, max_length=64),
         ),
         migrations.AlterField(
-            model_name='sponsorticket',
-            name='token',
+            model_name="sponsorticket",
+            name="token",
             field=models.CharField(blank=True, max_length=64),
         ),
     ]

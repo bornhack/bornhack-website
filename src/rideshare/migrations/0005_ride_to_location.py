@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rideshare', '0004_auto_20190711_2036'),
+        ("rideshare", "0004_auto_20190711_2036"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ride',
-            name='to_location',
-            field=models.CharField(default='BornHack', max_length=100),
+            model_name="ride",
+            name="to_location",
+            field=models.CharField(default="BornHack", max_length=100),
             preserve_default=False,
         ),
     ]

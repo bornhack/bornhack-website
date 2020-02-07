@@ -19,7 +19,9 @@ def do_work():
     """
 
     # check if we need to generate any proforma invoices for shop orders
-    for order in Order.objects.filter(Q(pdf="") | Q(pdf__isnull=True), open__isnull=True):
+    for order in Order.objects.filter(
+        Q(pdf="") | Q(pdf__isnull=True), open__isnull=True
+    ):
         # generate proforma invoice for this Order
         pdffile = generate_pdf_letter(
             filename=order.filename,
@@ -141,4 +143,3 @@ def do_work():
                 "Unable to add creditnote email for creditnote %s to %s"
                 % (creditnote.pk, creditnote.user.email)
             )
-

@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('camps', '0032_auto_20180917_1754'),
+        ("camps", "0032_auto_20180917_1754"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='camp',
-            name='show_schedule',
-            field=models.BooleanField(default=True, help_text='Check if the schedule should be shown.'),
+            model_name="camp",
+            name="show_schedule",
+            field=models.BooleanField(
+                default=True, help_text="Check if the schedule should be shown."
+            ),
         ),
     ]

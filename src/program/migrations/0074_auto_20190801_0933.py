@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0073_eventproposal_use_provided_speaker_laptop'),
+        ("program", "0073_eventproposal_use_provided_speaker_laptop"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='eventproposal',
-            name='use_provided_speaker_laptop',
-            field=models.BooleanField(default=True, help_text='Will you be using the provided speaker laptop?'),
+            model_name="eventproposal",
+            name="use_provided_speaker_laptop",
+            field=models.BooleanField(
+                default=True, help_text="Will you be using the provided speaker laptop?"
+            ),
         ),
     ]

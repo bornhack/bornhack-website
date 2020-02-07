@@ -564,7 +564,9 @@ def _ticket_getter_by_pk(pk):
             pass
 
 
-class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin,TemplateView):
+class ScanTicketsView(
+    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, TemplateView
+):
     template_name = "info_desk/scan.html"
 
     ticket = None
@@ -591,23 +593,23 @@ class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin
                 messages.warning(self.request, "Ticket not found!")
 
         elif self.order_search:
-            context['order'] = self.order
+            context["order"] = self.order
 
         return context
 
     def post(self, request, **kwargs):
-        if 'check_in_ticket_id' in request.POST:
+        if "check_in_ticket_id" in request.POST:
             self.ticket = self.check_in_ticket(request)
-        elif 'badge_ticket_id' in request.POST:
+        elif "badge_ticket_id" in request.POST:
             self.ticket = self.hand_out_badge(request)
-        elif 'find_order_id' in request.POST:
+        elif "find_order_id" in request.POST:
             self.order_search = True
             try:
-                order_id = self.request.POST.get('find_order_id')
+                order_id = self.request.POST.get("find_order_id")
                 self.order = Order.objects.get(id=order_id)
             except Order.DoesNotExist:
                 pass
-        elif 'mark_as_paid' in request.POST:
+        elif "mark_as_paid" in request.POST:
             self.mark_order_as_paid(request)
 
         return super().get(request, **kwargs)
@@ -621,7 +623,7 @@ class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin
         return ticket_to_check_in
 
     def hand_out_badge(self, request):
-        badge_ticket_id = request.POST.get('badge_ticket_id')
+        badge_ticket_id = request.POST.get("badge_ticket_id")
         ticket_to_handout_badge_for = _ticket_getter_by_pk(badge_ticket_id)
         ticket_to_handout_badge_for.badge_handed_out = True
         ticket_to_handout_badge_for.save()
@@ -629,7 +631,7 @@ class ScanTicketsView(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin
         return ticket_to_handout_badge_for
 
     def mark_order_as_paid(self, request):
-        order = Order.objects.get(id=request.POST.get('mark_as_paid'))
+        order = Order.objects.get(id=request.POST.get("mark_as_paid"))
         order.mark_as_paid()
         messages.success(request, "Order #{} has been marked as paid!".format(order.id))
 
@@ -643,6 +645,5 @@ class ShopTicketOverview(LoginRequiredMixin, CampViewMixin, ListView):
     context_object_name = "shop_tickets"
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        kwargs['ticket_types'] = TicketType.objects.filter(camp=self.camp)
+        kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
-

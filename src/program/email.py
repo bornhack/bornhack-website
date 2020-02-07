@@ -24,6 +24,7 @@ def add_new_speakerproposal_email(speakerproposal):
         subject="New speaker proposal '%s' was just submitted" % speakerproposal.name,
     )
 
+
 def add_new_eventproposal_email(eventproposal):
     formatdict = {"proposal": eventproposal}
 
@@ -40,6 +41,7 @@ def add_new_eventproposal_email(eventproposal):
         formatdict=formatdict,
         subject="New event proposal '%s' was just submitted" % eventproposal.title,
     )
+
 
 def add_speakerproposal_updated_email(speakerproposal):
     formatdict = {"proposal": speakerproposal}
@@ -58,6 +60,7 @@ def add_speakerproposal_updated_email(speakerproposal):
         subject="Speaker proposal '%s' was just updated" % speakerproposal.name,
     )
 
+
 def add_eventproposal_updated_email(eventproposal):
     formatdict = {"proposal": eventproposal}
 
@@ -74,4 +77,3 @@ def add_eventproposal_updated_email(eventproposal):
         formatdict=formatdict,
         subject="Event proposal '%s' was just updated" % eventproposal.title,
     )
-

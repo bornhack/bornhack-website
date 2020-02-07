@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rideshare', '0007_ride_author'),
+        ("rideshare", "0007_ride_author"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='ride',
-            name='author',
-            field=models.CharField(default='Anonymous', help_text='Let people know who posted this', max_length=100),
+            model_name="ride",
+            name="author",
+            field=models.CharField(
+                default="Anonymous",
+                help_text="Let people know who posted this",
+                max_length=100,
+            ),
         ),
     ]

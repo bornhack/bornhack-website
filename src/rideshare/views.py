@@ -63,15 +63,21 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Ride
-    fields = ["author", "has_car", "from_location", "to_location", "when", "seats", "description"]
+    fields = [
+        "author",
+        "has_car",
+        "from_location",
+        "to_location",
+        "when",
+        "seats",
+        "description",
+    ]
 
     def get_initial(self):
         """
         Default 'author' to users public_credit_name where relevant
         """
-        return {
-            "author": self.request.user.profile.get_public_credit_name
-        }
+        return {"author": self.request.user.profile.get_public_credit_name}
 
     def form_valid(self, form, **kwargs):
         """
@@ -92,7 +98,15 @@ class IsRideOwnerMixin(UserPassesTestMixin):
 
 class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
     model = Ride
-    fields = ["author", "has_car", "from_location", "to_location", "when", "seats", "description"]
+    fields = [
+        "author",
+        "has_car",
+        "from_location",
+        "to_location",
+        "when",
+        "seats",
+        "description",
+    ]
 
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):

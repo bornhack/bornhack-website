@@ -5,7 +5,14 @@ from .models import Sponsor, SponsorTier
 
 @admin.register(Sponsor)
 class SponsorAdmin(admin.ModelAdmin):
-    list_display = ("name", "tier", "ticket_email", "ticket_ready", "tickets_sent", "tickets_generated")
+    list_display = (
+        "name",
+        "tier",
+        "ticket_email",
+        "ticket_ready",
+        "tickets_sent",
+        "tickets_generated",
+    )
     list_filter = ("tier__camp",)
 
 

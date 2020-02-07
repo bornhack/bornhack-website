@@ -43,17 +43,17 @@ class MultiForm(object):
     button.  MultiForm imitates the Form API so that it is invisible to anybody
     else that you are using a MultiForm.
     """
+
     form_classes = {}
 
     def __init__(self, data=None, files=None, *args, **kwargs):
         # Some things, such as the WizardView expect these to exist.
         self.data, self.files = data, files
         kwargs.update(
-            data=data,
-            files=files,
+            data=data, files=files,
         )
 
-        self.initials = kwargs.pop('initial', None)
+        self.initials = kwargs.pop("initial", None)
         if self.initials is None:
             self.initials = {}
         self.forms = OrderedDict()
@@ -68,14 +68,13 @@ class MultiForm(object):
         Returns the args and kwargs for initializing one of our form children.
         """
         fkwargs = kwargs.copy()
-        prefix = kwargs.get('prefix')
+        prefix = kwargs.get("prefix")
         if prefix is None:
             prefix = key
         else:
-            prefix = '{0}__{1}'.format(key, prefix)
+            prefix = "{0}__{1}".format(key, prefix)
         fkwargs.update(
-            initial=self.initials.get(key),
-            prefix=prefix,
+            initial=self.initials.get(key), prefix=prefix,
         )
         return args, fkwargs
 
@@ -134,19 +133,20 @@ class MultiForm(object):
 
     def non_field_errors(self):
         form_errors = (
-            form.non_field_errors() for form in self.forms.values()
-            if hasattr(form, 'non_field_errors')
+            form.non_field_errors()
+            for form in self.forms.values()
+            if hasattr(form, "non_field_errors")
         )
         return ErrorList(chain(self.crossform_errors, *form_errors))
 
     def as_table(self):
-        return mark_safe(''.join(form.as_table() for form in self.forms.values()))
+        return mark_safe("".join(form.as_table() for form in self.forms.values()))
 
     def as_ul(self):
-        return mark_safe(''.join(form.as_ul() for form in self.forms.values()))
+        return mark_safe("".join(form.as_ul() for form in self.forms.values()))
 
     def as_p(self):
-        return mark_safe(''.join(form.as_p() for form in self.forms.values()))
+        return mark_safe("".join(form.as_p() for form in self.forms.values()))
 
     def is_multipart(self):
         return any(form.is_multipart() for form in self.forms.values())
@@ -167,14 +167,15 @@ class MultiForm(object):
     def cleaned_data(self):
         return OrderedDict(
             (key, form.cleaned_data)
-            for key, form in self.forms.items() if form.is_valid()
+            for key, form in self.forms.items()
+            if form.is_valid()
         )
 
     @cleaned_data.setter
     def cleaned_data(self, data):
         for key, value in data.items():
             child_form = self[key]
-            if hasattr(child_form, 'forms'):
+            if hasattr(child_form, "forms"):
                 for formlet, formlet_data in zip(child_form.forms, value):
                     formlet.cleaned_data = formlet_data
             else:
@@ -187,33 +188,37 @@ class MultiModelForm(MultiForm):
     means that it includes support for the instance parameter in initialization
     and adds a save method.
     """
+
     def __init__(self, *args, **kwargs):
-        self.instances = kwargs.pop('instance', None)
+        self.instances = kwargs.pop("instance", None)
         if self.instances is None:
             self.instances = {}
         super(MultiModelForm, self).__init__(*args, **kwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(key, args, kwargs)
+        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(
+            key, args, kwargs
+        )
         try:
             # If we only pass instance when there was one specified, we make it
             # possible to use non-ModelForms together with ModelForms.
-            fkwargs['instance'] = self.instances[key]
+            fkwargs["instance"] = self.instances[key]
         except KeyError:
             pass
         return fargs, fkwargs
 
     def save(self, commit=True):
         objects = OrderedDict(
-            (key, form.save(commit))
-            for key, form in self.forms.items()
+            (key, form.save(commit)) for key, form in self.forms.items()
         )
 
-        if any(hasattr(form, 'save_m2m') for form in self.forms.values()):
+        if any(hasattr(form, "save_m2m") for form in self.forms.values()):
+
             def save_m2m():
                 for form in self.forms.values():
-                    if hasattr(form, 'save_m2m'):
+                    if hasattr(form, "save_m2m"):
                         form.save_m2m()
+
             self.save_m2m = save_m2m
 
         return objects

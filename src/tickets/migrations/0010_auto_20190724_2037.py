@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('tickets', '0009_tickettype_includes_badge'),
+        ("tickets", "0009_tickettype_includes_badge"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='discountticket',
-            name='badge_token',
+            model_name="discountticket",
+            name="badge_token",
             field=models.CharField(max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='shopticket',
-            name='badge_token',
+            model_name="shopticket",
+            name="badge_token",
             field=models.CharField(max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='sponsorticket',
-            name='badge_token',
+            model_name="sponsorticket",
+            name="badge_token",
             field=models.CharField(max_length=64, null=True),
         ),
     ]

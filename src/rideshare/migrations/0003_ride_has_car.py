@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('rideshare', '0002_auto_20180814_1942'),
+        ("rideshare", "0002_auto_20180814_1942"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='ride',
-            name='has_car',
-            field=models.BooleanField(default=True, help_text='Leave checked if you are offering a ride, uncheck if you need a ride'),
+            model_name="ride",
+            name="has_car",
+            field=models.BooleanField(
+                default=True,
+                help_text="Leave checked if you are offering a ride, uncheck if you need a ride",
+            ),
         ),
     ]

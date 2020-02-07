@@ -6,13 +6,16 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0072_auto_20190616_1746'),
+        ("program", "0072_auto_20190616_1746"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='eventproposal',
-            name='use_provided_speaker_laptop',
-            field=models.BooleanField(default=False, help_text='Will you be using the provided speaker laptop?'),
+            model_name="eventproposal",
+            name="use_provided_speaker_laptop",
+            field=models.BooleanField(
+                default=False,
+                help_text="Will you be using the provided speaker laptop?",
+            ),
         ),
     ]

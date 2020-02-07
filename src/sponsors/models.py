@@ -23,11 +23,19 @@ class Sponsor(CampRelatedModel):
 
     tickets_generated = models.BooleanField(default=False)
 
-    ticket_email = models.EmailField(null=True, blank=True, help_text="The email to send the tickets to")
+    ticket_email = models.EmailField(
+        null=True, blank=True, help_text="The email to send the tickets to"
+    )
 
-    ticket_ready = models.BooleanField(default=False, help_text="Check when we are ready to send tickets to this sponsor.")
+    ticket_ready = models.BooleanField(
+        default=False,
+        help_text="Check when we are ready to send tickets to this sponsor.",
+    )
 
-    tickets_sent = models.BooleanField(default=False, help_text="True when the tickets have been emailed to the sponsor")
+    tickets_sent = models.BooleanField(
+        default=False,
+        help_text="True when the tickets have been emailed to the sponsor",
+    )
 
     def __str__(self):
         return "{} ({})".format(self.name, self.tier.camp)
