@@ -1,7 +1,7 @@
-from django.views.generic.detail import SingleObjectMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views.generic.detail import SingleObjectMixin
 
 
 class EnsureWritableCampMixin(SingleObjectMixin):

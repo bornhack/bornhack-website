@@ -1,12 +1,13 @@
-import irc3
+import logging
 import re
-from ircbot.models import OutgoingIrcMessage
-from teams.models import Team, TeamMember
+
+import irc3
 from django.conf import settings
 from django.utils import timezone
-from teams.utils import get_team_from_irc_channel
 
-import logging
+from ircbot.models import OutgoingIrcMessage
+from teams.models import Team, TeamMember
+from teams.utils import get_team_from_irc_channel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

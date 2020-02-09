@@ -1,7 +1,9 @@
+import logging
+
 from django.apps import AppConfig
 from django.db.models.signals import post_save
+
 from .signals import ticket_changed
-import logging
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

@@ -1,6 +1,7 @@
-from django.conf import settings
 import logging
+
 import irc3
+from django.conf import settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bornhack.%s" % __name__)

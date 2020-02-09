@@ -1,7 +1,8 @@
-from django.urls import reverse_lazy
 from django.db import models
+from django.urls import reverse_lazy
 from django.utils.text import slugify
-from utils.models import UUIDModel, CampRelatedModel
+
+from utils.models import CampRelatedModel, UUIDModel
 
 
 class Village(UUIDModel, CampRelatedModel):

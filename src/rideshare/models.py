@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
-from utils.models import UUIDModel, CampRelatedModel
+from utils.models import CampRelatedModel, UUIDModel
 
 
 class Ride(UUIDModel, CampRelatedModel):

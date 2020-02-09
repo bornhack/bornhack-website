@@ -1,5 +1,6 @@
-from ircbot.utils import add_irc_message
 import logging
+
+from ircbot.utils import add_irc_message
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

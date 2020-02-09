@@ -1,7 +1,8 @@
-import magic
 import copy
 
+import magic
 from django import forms
+
 from .models import Expense, Revenue
 
 

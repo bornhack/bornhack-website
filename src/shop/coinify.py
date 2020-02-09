@@ -1,9 +1,12 @@
-from vendor.coinify.coinify_api import CoinifyAPI
-from .models import CoinifyAPIRequest, CoinifyAPIInvoice, CoinifyAPICallback
-from django.conf import settings
 import json
 import logging
+
 import requests
+from django.conf import settings
+
+from vendor.coinify.coinify_api import CoinifyAPI
+
+from .models import CoinifyAPICallback, CoinifyAPIInvoice, CoinifyAPIRequest
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

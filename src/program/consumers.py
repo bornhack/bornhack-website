@@ -1,13 +1,14 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from camps.models import Camp
+
 from .models import (
     Event,
     EventInstance,
-    Favorite,
     EventLocation,
-    EventType,
     EventTrack,
+    EventType,
+    Favorite,
     Speaker,
 )
 

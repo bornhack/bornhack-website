@@ -7,7 +7,8 @@ from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
 from utils.factories import UserFactory
-from .factories import ProductFactory, OrderProductRelationFactory, OrderFactory
+
+from .factories import OrderFactory, OrderProductRelationFactory, ProductFactory
 
 
 class ProductAvailabilityTest(TestCase):

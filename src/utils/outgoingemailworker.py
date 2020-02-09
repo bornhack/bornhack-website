@@ -1,6 +1,7 @@
-from .models import OutgoingEmail
-from .email import _send_email
 import logging
+
+from .email import _send_email
+from .models import OutgoingEmail
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bornhack.%s" % __name__)

@@ -1,12 +1,14 @@
-from django.db import models
-from utils.models import UUIDModel, CreatedUpdatedModel
-from program.models import EventType, EventLocation
-from django.contrib.postgres.fields import DateTimeRangeField
-from psycopg2.extras import DateTimeTZRange
-from django.core.exceptions import ValidationError
-from datetime import timedelta
-from django.urls import reverse
 import logging
+from datetime import timedelta
+
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.urls import reverse
+from psycopg2.extras import DateTimeTZRange
+
+from program.models import EventLocation, EventType
+from utils.models import CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

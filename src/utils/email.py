@@ -1,12 +1,14 @@
-from django.core.mail import EmailMultiAlternatives
-from django.core.validators import validate_email
+import logging
+
+import magic
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.core.validators import validate_email
 from django.template.loader import render_to_string
+
 from .models import OutgoingEmail
-import logging
-import magic
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

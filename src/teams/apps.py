@@ -1,6 +1,7 @@
 from django.apps import AppConfig
-from django.db.models.signals import post_save, post_delete
-from .signal_handlers import teammember_saved, teammember_deleted
+from django.db.models.signals import post_delete, post_save
+
+from .signal_handlers import teammember_deleted, teammember_saved
 
 
 class TeamsConfig(AppConfig):

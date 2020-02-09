@@ -1,20 +1,19 @@
-import uuid
-import icalendar
 import logging
+import uuid
 from datetime import timedelta
 
-from django.contrib.postgres.fields import DateTimeRangeField
-from django.contrib import messages
-from django.db import models
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.utils.text import slugify
-from django.conf import settings
-from django.urls import reverse_lazy
-from django.core.files.storage import FileSystemStorage
+import icalendar
 from django.apps import apps
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.files.storage import FileSystemStorage
+from django.db import models
+from django.urls import reverse_lazy
+from django.utils.text import slugify
 
-from utils.models import CreatedUpdatedModel, CampRelatedModel
-
+from utils.models import CampRelatedModel, CreatedUpdatedModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

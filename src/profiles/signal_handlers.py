@@ -1,5 +1,6 @@
-from events.handler import handle_team_event
 import logging
+
+from events.handler import handle_team_event
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

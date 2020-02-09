@@ -8,26 +8,26 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.db.models import Sum
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import TemplateView, ListView, DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from camps.mixins import CampViewMixin
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from profiles.models import Profile
-from program.models import SpeakerProposal, EventProposal
-from shop.models import OrderProductRelation, Order
+from program.models import EventProposal, SpeakerProposal
+from shop.models import Order, OrderProductRelation
 from teams.models import Team
-from tickets.models import ShopTicket, SponsorTicket, DiscountTicket, TicketType
+from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
 
 from .mixins import (
-    RaisePermissionRequiredMixin,
-    InfoTeamPermissionMixin,
-    OrgaTeamPermissionMixin,
     ContentTeamPermissionMixin,
     EconomyTeamPermissionMixin,
+    InfoTeamPermissionMixin,
+    OrgaTeamPermissionMixin,
+    RaisePermissionRequiredMixin,
 )
 
 logger = logging.getLogger("bornhack.%s" % __name__)

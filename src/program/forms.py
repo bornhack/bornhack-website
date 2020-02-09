@@ -3,7 +3,7 @@ import logging
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-from .models import SpeakerProposal, EventProposal, EventTrack, Url, UrlType
+from .models import EventProposal, EventTrack, SpeakerProposal, Url, UrlType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

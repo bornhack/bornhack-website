@@ -1,7 +1,8 @@
 from django.contrib import admin
 
 from shop.models import OrderProductRelation
-from .models import TicketType, SponsorTicket, DiscountTicket, ShopTicket
+
+from .models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
 
 
 class BaseTicketAdmin(admin.ModelAdmin):

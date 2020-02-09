@@ -1,8 +1,8 @@
-from django.db import models
-from utils.models import CampRelatedModel
-from django.core.exceptions import ValidationError
-
 import reversion
+from django.core.exceptions import ValidationError
+from django.db import models
+
+from utils.models import CampRelatedModel
 
 
 class InfoCategory(CampRelatedModel):

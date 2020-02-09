@@ -1,40 +1,40 @@
 import os
-import magic
 
-from django.shortcuts import redirect
+import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.db.models import Sum
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import (
     CreateView,
-    ListView,
     DetailView,
+    ListView,
     TemplateView,
     UpdateView,
 )
-from django.db.models import Sum
 
 from camps.mixins import CampViewMixin
+from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
-from teams.models import Team
 
-from .models import Expense, Revenue, Reimbursement, Chain, Credebtor
-from .mixins import (
-    ChainViewMixin,
-    ExpensePermissionMixin,
-    CredebtorViewMixin,
-    ReimbursementPermissionMixin,
-    RevenuePermissionMixin,
-)
 from .forms import (
     ExpenseCreateForm,
     ExpenseUpdateForm,
     RevenueCreateForm,
     RevenueUpdateForm,
 )
+from .mixins import (
+    ChainViewMixin,
+    CredebtorViewMixin,
+    ExpensePermissionMixin,
+    ReimbursementPermissionMixin,
+    RevenuePermissionMixin,
+)
+from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
 
 
 class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):

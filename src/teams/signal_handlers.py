@@ -1,5 +1,6 @@
-from .email import add_new_membership_email
 import logging
+
+from .email import add_new_membership_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

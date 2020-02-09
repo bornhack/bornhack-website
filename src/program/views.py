@@ -1,37 +1,36 @@
 import logging
 from collections import OrderedDict
 
-from django.views.generic import ListView, TemplateView, DetailView, View
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+import icalendar
 from django.conf import settings
-from django.http import Http404, HttpResponse
-from django.utils.decorators import method_decorator
+from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.template import Context, Engine
 from django.urls import reverse, reverse_lazy
-from django.template import Engine, Context
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
-import icalendar
+from django.utils.decorators import method_decorator
+from django.views.generic import DetailView, ListView, TemplateView, View
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from camps.mixins import CampViewMixin
-from .mixins import (
-    EnsureUserOwnsProposalMixin,
-    EnsureWritableCampMixin,
-    EnsureCFPOpenMixin,
-    UrlViewMixin,
-)
+
+from . import models
 from .email import (
+    add_eventproposal_updated_email,
     add_new_eventproposal_email,
     add_new_speakerproposal_email,
     add_speakerproposal_updated_email,
-    add_eventproposal_updated_email,
 )
-from . import models
+from .forms import EventProposalForm, SpeakerProposalForm
+from .mixins import (
+    EnsureCFPOpenMixin,
+    EnsureUserOwnsProposalMixin,
+    EnsureWritableCampMixin,
+    UrlViewMixin,
+)
 from .multiform import MultiModelForm
-from .forms import SpeakerProposalForm, EventProposalForm
-
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

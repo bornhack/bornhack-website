@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand
-from time import sleep
+import importlib
+import logging
 import signal
 import sys
-import logging
-import importlib
+from time import sleep
+
+from django.core.management.base import BaseCommand
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bornhack.%s" % __name__)

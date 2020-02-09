@@ -1,6 +1,6 @@
-from django.urls import path, include
+from django.urls import include, path
 
-from .views import RideList, RideCreate, RideDetail, RideUpdate, RideDelete
+from .views import RideCreate, RideDelete, RideDetail, RideList, RideUpdate
 
 app_name = "rideshare"
 

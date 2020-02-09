@@ -6,37 +6,38 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
 from django.http import (
-    HttpResponse,
-    HttpResponseRedirect,
-    HttpResponseBadRequest,
     Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import View, ListView, DetailView, FormView
+from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
 from shop.models import (
-    Order,
-    Product,
-    OrderProductRelation,
-    ProductCategory,
+    CreditNote,
     EpayCallback,
     EpayPayment,
-    CreditNote,
+    Order,
+    OrderProductRelation,
+    Product,
+    ProductCategory,
 )
 from vendor.coinify.coinify_callback import CoinifyCallback
+
 from .coinify import (
     create_coinify_invoice,
-    save_coinify_callback,
     process_coinify_invoice_json,
+    save_coinify_callback,
 )
 from .epay import calculate_epay_hash, validate_epay_callback
-from .forms import OrderProductRelationFormSet, OrderProductRelationForm
+from .forms import OrderProductRelationForm, OrderProductRelationFormSet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

@@ -1,12 +1,14 @@
-from django.core.management.base import BaseCommand
-from django.conf import settings
-from django.utils import timezone
-from time import sleep
-from ircbot.models import OutgoingIrcMessage
-from camps.utils import get_current_camp
-from program.models import EventInstance
-from datetime import timedelta
 import logging
+from datetime import timedelta
+from time import sleep
+
+from django.conf import settings
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from camps.utils import get_current_camp
+from ircbot.models import OutgoingIrcMessage
+from program.models import EventInstance
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

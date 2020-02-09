@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
 
-
 ###############################
 # chains and credebtors
 

@@ -1,38 +1,35 @@
-from django.urls import path, include
-from .views import ICSView
-from .views import ProposalListView
+from django.urls import include, path
+
 from .views import (
-    SpeakerProposalCreateView,
-    SpeakerProposalUpdateView,
-    SpeakerProposalDeleteView,
-    SpeakerProposalDetailView,
-)
-from .views import (
-    EventProposalTypeSelectView,
-    EventProposalSelectPersonView,
-    EventProposalAddPersonView,
-    EventProposalRemovePersonView,
-    EventProposalCreateView,
-    EventProposalUpdateView,
-    EventProposalDeleteView,
-    EventProposalDetailView,
-)
-from .views import (
-    CombinedProposalTypeSelectView,
+    CallForParticipationView,
     CombinedProposalPersonSelectView,
     CombinedProposalSubmitView,
-)
-from .views import (
+    CombinedProposalTypeSelectView,
+    EventDetailView,
+    EventListView,
+    EventProposalAddPersonView,
+    EventProposalCreateView,
+    EventProposalDeleteView,
+    EventProposalDetailView,
+    EventProposalRemovePersonView,
+    EventProposalSelectPersonView,
+    EventProposalTypeSelectView,
+    EventProposalUpdateView,
+    ICSView,
+    NoScriptScheduleView,
+    ProgramControlCenter,
+    ProposalListView,
+    ScheduleView,
     SpeakerDetailView,
     SpeakerListView,
-    EventListView,
-    EventDetailView,
-    NoScriptScheduleView,
-    ScheduleView,
-    CallForParticipationView,
-    ProgramControlCenter,
+    SpeakerProposalCreateView,
+    SpeakerProposalDeleteView,
+    SpeakerProposalDetailView,
+    SpeakerProposalUpdateView,
+    UrlCreateView,
+    UrlDeleteView,
+    UrlUpdateView,
 )
-from .views import UrlCreateView, UrlUpdateView, UrlDeleteView
 
 app_name = "program"
 

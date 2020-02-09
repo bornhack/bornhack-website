@@ -1,12 +1,12 @@
-import logging
 import io
+import logging
 import os
 
-from django.contrib.auth.models import AnonymousUser
-from wkhtmltopdf.views import PDFTemplateResponse
-from PyPDF2 import PdfFileWriter, PdfFileReader
-from django.test.client import RequestFactory
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.test.client import RequestFactory
+from PyPDF2 import PdfFileReader, PdfFileWriter
+from wkhtmltopdf.views import PDFTemplateResponse
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

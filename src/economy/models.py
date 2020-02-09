@@ -1,19 +1,19 @@
 import os
 
-from django.db import models
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.text import slugify
 
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 from .email import (
-    send_accountingsystem_revenue_email,
-    send_revenue_approved_email,
-    send_revenue_rejected_email,
     send_accountingsystem_expense_email,
+    send_accountingsystem_revenue_email,
     send_expense_approved_email,
     send_expense_rejected_email,
+    send_revenue_approved_email,
+    send_revenue_rejected_email,
 )
 
 

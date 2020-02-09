@@ -1,7 +1,9 @@
-from django.apps import AppConfig
-from django.db.models.signals import pre_save, post_save
-from .signal_handlers import create_profile, profile_pre_save
 import logging
+
+from django.apps import AppConfig
+from django.db.models.signals import post_save, pre_save
+
+from .signal_handlers import create_profile, profile_pre_save
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

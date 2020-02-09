@@ -1,6 +1,7 @@
 from django.contrib import admin
 from reversion.admin import VersionAdmin
-from .models import InfoItem, InfoCategory
+
+from .models import InfoCategory, InfoItem
 
 
 @admin.register(InfoItem)
