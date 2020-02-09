@@ -5,7 +5,6 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from psycopg2.extras import DateTimeTZRange
 from django.core.exceptions import ValidationError
 from datetime import timedelta
-from django.utils import timezone
 from django.urls import reverse
 import logging
 

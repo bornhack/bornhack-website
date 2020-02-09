@@ -31,7 +31,7 @@ from functools import reduce
 from operator import add
 
 from collections import OrderedDict
-from django.forms.utils import ErrorDict, ErrorList
+from django.forms.utils import ErrorList
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
 

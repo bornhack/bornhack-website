@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ValidationError
 from django.views.generic import ListView, DetailView
 
 from utils.models import CampReadOnlyModeError

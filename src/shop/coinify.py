@@ -91,7 +91,8 @@ def handle_coinify_api_response(apireq, order, request):
         return False
 
 
-################### API CALLS ################################################
+#################################################################
+# API CALLS
 
 
 def get_coinify_invoice(coinify_invoiceid, order, request):

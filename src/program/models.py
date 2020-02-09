@@ -1,10 +1,9 @@
 import uuid
-import os
 import icalendar
 import logging
 from datetime import timedelta
 
-from django.contrib.postgres.fields import DateTimeRangeField, ArrayField
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib import messages
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
@@ -12,11 +11,7 @@ from django.utils.text import slugify
 from django.conf import settings
 from django.urls import reverse_lazy
 from django.core.files.storage import FileSystemStorage
-from django.urls import reverse
 from django.apps import apps
-from django.core.files.base import ContentFile
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 
 from utils.models import CreatedUpdatedModel, CampRelatedModel
 
@@ -170,7 +165,7 @@ class UserSubmittedModel(CampRelatedModel):
     PROPOSAL_APPROVED = "approved"
     PROPOSAL_REJECTED = "rejected"
 
-    PROPOSAL_STATUSES = [PROPOSAL_PENDING, PROPOSAL_APPROVED, PROPOSAL_REJECTED]
+    ROPOSAL_STATUSES = [PROPOSAL_PENDING, PROPOSAL_APPROVED, PROPOSAL_REJECTED]
 
     PROPOSAL_STATUS_CHOICES = [
         (PROPOSAL_PENDING, "Pending approval"),

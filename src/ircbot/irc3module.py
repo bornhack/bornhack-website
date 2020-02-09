@@ -1,9 +1,9 @@
-import irc3, re
+import irc3
+import re
 from ircbot.models import OutgoingIrcMessage
 from teams.models import Team, TeamMember
 from django.conf import settings
 from django.utils import timezone
-from events.models import Routing
 from teams.utils import get_team_from_irc_channel
 
 import logging
@@ -24,7 +24,7 @@ class Plugin(object):
         self.bot = bot
 
     ###############################################################################################
-    ### builtin irc3 event methods
+    # builtin irc3 event methods
 
     def server_ready(self, **kwargs):
         """triggered after the server sent the MOTD (require core plugin)"""
@@ -54,7 +54,7 @@ class Plugin(object):
         logger.debug("inside connection_made(), kwargs: %s" % kwargs)
 
     ###############################################################################################
-    ### decorated irc3 event methods
+    # decorated irc3 event methods
 
     @irc3.event(irc3.rfc.JOIN_PART_QUIT)
     def on_join_part_quit(self, **kwargs):
@@ -104,7 +104,7 @@ class Plugin(object):
         logger.debug("inside on_kick(), kwargs: %s" % kwargs)
 
     ###############################################################################################
-    ### custom irc3 methods below here
+    # custom irc3 methods below here
 
     @irc3.extend
     def do_stuff(self):
@@ -158,7 +158,7 @@ class Plugin(object):
                 logger.warning("skipping message to %s" % msg.target)
 
     ###############################################################################################
-    ### irc channel methods
+    # irc channel methods
 
     @irc3.extend
     def check_irc_channels(self):
@@ -377,7 +377,7 @@ class Plugin(object):
             self.bot.setup_public_channel(team.public_irc_channel_name)
 
     ###############################################################################################
-    ### services (ChanServ & NickServ) methods
+    # services (ChanServ & NickServ) methods
 
     @irc3.extend
     def handle_chanserv_privmsg(self, **kwargs):
@@ -429,7 +429,6 @@ class Plugin(object):
         if match:
             # the irc channel is now registered
             channel = match.group(1)
-            botnick = match.group(2)
             logger.debug(
                 "Channel %s was registered with ChanServ, looking up Team..." % channel
             )

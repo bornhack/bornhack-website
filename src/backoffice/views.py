@@ -21,7 +21,14 @@ from program.models import SpeakerProposal, EventProposal
 from shop.models import OrderProductRelation, Order
 from teams.models import Team
 from tickets.models import ShopTicket, SponsorTicket, DiscountTicket, TicketType
-from .mixins import *
+
+from .mixins import (
+    RaisePermissionRequiredMixin,
+    InfoTeamPermissionMixin,
+    OrgaTeamPermissionMixin,
+    ContentTeamPermissionMixin,
+    EconomyTeamPermissionMixin,
+)
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -236,7 +243,7 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
 
 
 ################################
-###### CHAINS & CREDEBTORS #####
+# CHAINS & CREDEBTORS
 
 
 class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
@@ -257,7 +264,7 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
 
 
 ################################
-########### EXPENSES ###########
+# EXPENSES
 
 
 class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
@@ -306,7 +313,7 @@ class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
 
 
 ######################################
-########### REIMBURSEMENTS ###########
+# REIMBURSEMENTS
 
 
 class ReimbursementListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
@@ -497,7 +504,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
 
 
 ################################
-########### REVENUES ###########
+# REVENUES
 
 
 class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):

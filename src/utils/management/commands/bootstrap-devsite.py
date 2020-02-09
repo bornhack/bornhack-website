@@ -1601,7 +1601,7 @@ class Command(BaseCommand):
                     camp, product_categories, ticket_types
                 )
 
-                orders = self.create_orders(users, global_products, camp_products)
+                self.create_orders(users, global_products, camp_products)
 
                 tracks = self.create_camp_tracks(camp)
 
@@ -1611,7 +1611,7 @@ class Command(BaseCommand):
 
                 events = self.create_camp_events(camp, tracks, event_types)
 
-                speakers = self.create_camp_speakers(camp, events)
+                self.create_camp_speakers(camp, events)
 
                 self.create_camp_scheduling(camp, events, locations)
 

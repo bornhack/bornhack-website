@@ -1,6 +1,4 @@
 from .email import add_new_membership_email
-from ircbot.utils import add_irc_message
-from django.conf import settings
 import logging
 
 logger = logging.getLogger("bornhack.%s" % __name__)

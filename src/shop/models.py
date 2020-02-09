@@ -250,7 +250,7 @@ class Order(CreatedUpdatedModel):
 
                     # create the number of tickets required
                     if tickets_to_create > 0:
-                        for _ in range(
+                        for i in range(
                             0, (order_product.quantity - already_created_tickets)
                         ):
                             ticket = self.shoptickets.create(**query_kwargs)

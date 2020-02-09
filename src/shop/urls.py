@@ -1,5 +1,24 @@
 from django.urls import path, include
-from .views import *
+
+from .views import (
+    ShopIndexView,
+    ProductDetailView,
+    OrderListView,
+    OrderDetailView,
+    OrderReviewAndPayView,
+    DownloadInvoiceView,
+    OrderMarkAsPaidView,
+    EpayFormView,
+    EpayCallbackView,
+    EpayThanksView,
+    CoinifyRedirectView,
+    CoinifyCallbackView,
+    CoinifyThanksView,
+    BankTransferView,
+    CashView,
+    CreditNoteListView,
+    DownloadCreditNoteView,
+)
 
 app_name = "shop"
 

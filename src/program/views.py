@@ -16,7 +16,6 @@ from django.shortcuts import get_object_or_404
 import icalendar
 
 from camps.mixins import CampViewMixin
-from program.models import Url, UrlType
 from .mixins import (
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
@@ -884,7 +883,7 @@ class UrlCreateView(
         if hasattr(self, "eventproposal") and self.eventproposal:
             # this URL belongs to an eventproposal
             form.instance.eventproposal = self.eventproposal
-            url = form.save()
+            form.save()
             if (
                 self.eventproposal.proposal_status
                 != models.SpeakerProposal.PROPOSAL_PENDING
@@ -901,7 +900,7 @@ class UrlCreateView(
         else:
             # this URL belongs to a speakerproposal
             form.instance.speakerproposal = self.speakerproposal
-            url = form.save()
+            form.save()
             if (
                 self.speakerproposal.proposal_status
                 != models.SpeakerProposal.PROPOSAL_PENDING
@@ -943,7 +942,7 @@ class UrlUpdateView(
         """
         if hasattr(self, "eventproposal") and self.eventproposal:
             # this URL belongs to a speakerproposal
-            url = form.save()
+            form.save()
             if (
                 self.eventproposal.proposal_status
                 != models.SpeakerProposal.PROPOSAL_PENDING
@@ -959,7 +958,7 @@ class UrlUpdateView(
                 )
         else:
             # this URL belongs to a speakerproposal
-            url = form.save()
+            form.save()
             if (
                 self.speakerproposal.proposal_status
                 != models.SpeakerProposal.PROPOSAL_PENDING

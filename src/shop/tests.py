@@ -154,8 +154,6 @@ class TestProductDetailView(TestCase):
 
         response = self.client.post(self.path, data={"quantity": 1})
 
-        order = self.user.orders.get()
-
         self.assertRedirects(response, reverse("shop:index"))
 
     def test_product_is_in_order(self):

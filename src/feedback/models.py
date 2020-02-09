@@ -1,6 +1,6 @@
 from django.db import models
 
-from utils.models import UUIDModel, CreatedUpdatedModel, CampRelatedModel
+from utils.models import UUIDModel, CampRelatedModel
 
 
 class Feedback(CampRelatedModel, UUIDModel):

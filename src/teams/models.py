@@ -4,10 +4,8 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from django.contrib.postgres.fields import DateTimeRangeField
-from django.contrib.auth.models import User
 from django.urls import reverse_lazy
 from django.conf import settings
-from django.contrib.postgres.fields import DateTimeRangeField
 
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 

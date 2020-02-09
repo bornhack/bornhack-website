@@ -7,7 +7,6 @@ from django.utils import timezone
 from camps.models import Camp
 from sponsors.models import Sponsor
 from sponsors.email import add_sponsorticket_email
-from tickets.models import SponsorTicket, TicketType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

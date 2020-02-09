@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.views.generic import DetailView, CreateView, UpdateView
 from django import forms
-from django.views.generic.edit import ProcessFormView
 
 from camps.mixins import CampViewMixin
 from ..models import Team, TeamTask, TaskComment, TeamMember

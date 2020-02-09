@@ -3,7 +3,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from . import models
 from django.contrib import messages
-from django.http import Http404, HttpResponse
+from django.http import Http404
 
 
 class EnsureCFPOpenMixin(object):

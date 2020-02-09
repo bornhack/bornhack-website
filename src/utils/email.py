@@ -5,7 +5,8 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.template.loader import render_to_string
 from .models import OutgoingEmail
-import logging, magic
+import logging
+import magic
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

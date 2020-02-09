@@ -1,7 +1,5 @@
-from django.conf import settings
-from datetime import timedelta, datetime
+from datetime import datetime
 from django.db.models import Count
-from django.utils import timezone
 from events.handler import handle_team_event
 
 
