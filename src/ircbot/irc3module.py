@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 
 import irc3
 from django.conf import settings
@@ -308,6 +309,9 @@ class Plugin(object):
         if invite:
             # also add autoinvite for this username
             self.bot.mode(channel, "+I", "$a:%s" % username)
+
+        # add a delay so the bot doesn't flood itself off, irc3 antiflood settings do not help here, why?
+        time.sleep(1)
 
     @irc3.extend
     def fix_missing_acls(self):
