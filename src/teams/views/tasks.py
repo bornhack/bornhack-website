@@ -1,12 +1,12 @@
+from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponseNotAllowed
-from django.views.generic import DetailView, CreateView, UpdateView
-from django import forms
-from django.views.generic.edit import ProcessFormView
+from django.http import HttpResponseNotAllowed, HttpResponseRedirect
+from django.views.generic import CreateView, DetailView, UpdateView
 
 from camps.mixins import CampViewMixin
-from ..models import Team, TeamTask, TaskComment, TeamMember
+
+from ..models import TaskComment, Team, TeamMember, TeamTask
 from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
 
 

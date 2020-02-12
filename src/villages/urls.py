@@ -1,6 +1,12 @@
 from django.urls import path
-from .views import *
 
+from .views import (
+    VillageCreateView,
+    VillageDeleteView,
+    VillageDetailView,
+    VillageListView,
+    VillageUpdateView,
+)
 
 app_name = "villages"
 

@@ -1,22 +1,23 @@
 import logging
+from datetime import timedelta
+from decimal import Decimal
 
 from django.conf import settings
-from django.db import models
-from django.db.models.aggregates import Sum
 from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField, JSONField
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models.aggregates import Sum
+from django.urls import reverse_lazy
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
-from django.urls import reverse_lazy
-from django.core.exceptions import ValidationError
-from decimal import Decimal
-from datetime import timedelta
 from unidecode import unidecode
-from django.utils.dateparse import parse_datetime
 
-from utils.models import UUIDModel, CreatedUpdatedModel
-from .managers import ProductQuerySet, OrderQuerySet
+from utils.models import CreatedUpdatedModel, UUIDModel
+
+from .managers import OrderQuerySet, ProductQuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -250,7 +251,7 @@ class Order(CreatedUpdatedModel):
 
                     # create the number of tickets required
                     if tickets_to_create > 0:
-                        for _ in range(
+                        for i in range(
                             0, (order_product.quantity - already_created_tickets)
                         ):
                             ticket = self.shoptickets.create(**query_kwargs)

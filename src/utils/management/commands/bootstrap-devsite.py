@@ -1,34 +1,35 @@
 # coding: utf-8
+import factory
+from allauth.account.models import EmailAddress
+from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.db.models.signals import post_save
 from django.utils import timezone
+from django.utils.crypto import get_random_string
+from django.utils.text import slugify
+from faker import Faker
+
 from camps.models import Camp
-from news.models import NewsItem
-from info.models import InfoCategory, InfoItem
-from villages.models import Village
+from events.models import Routing, Type
 from feedback.models import Feedback
-from rideshare.models import Ride
-from shop.models import ProductCategory, Product, Order
+from info.models import InfoCategory, InfoItem
+from news.models import NewsItem
+from profiles.models import Profile
 from program.models import (
-    EventType,
     Event,
     EventInstance,
-    Speaker,
     EventLocation,
     EventTrack,
+    EventType,
+    Speaker,
 )
+from rideshare.models import Ride
+from shop.models import Order, Product, ProductCategory
+from sponsors.models import Sponsor, SponsorTier
+from teams.models import Team, TeamMember, TeamShift, TeamTask
 from tickets.models import TicketType
-from teams.models import Team, TeamTask, TeamMember, TeamShift
-from events.models import Type, Routing
-from profiles.models import Profile
-from sponsors.models import SponsorTier, Sponsor
 from tokens.models import Token, TokenFind
-from django.contrib.auth.models import User
-from allauth.account.models import EmailAddress
-from django.utils.text import slugify
-from django.utils.crypto import get_random_string
-from django.db.models.signals import post_save
-import factory
-from faker import Faker
+from villages.models import Village
 
 fake = Faker()
 
@@ -1601,7 +1602,7 @@ class Command(BaseCommand):
                     camp, product_categories, ticket_types
                 )
 
-                orders = self.create_orders(users, global_products, camp_products)
+                self.create_orders(users, global_products, camp_products)
 
                 tracks = self.create_camp_tracks(camp)
 
@@ -1611,7 +1612,7 @@ class Command(BaseCommand):
 
                 events = self.create_camp_events(camp, tracks, event_types)
 
-                speakers = self.create_camp_speakers(camp, events)
+                self.create_camp_speakers(camp, events)
 
                 self.create_camp_scheduling(camp, events, locations)
 

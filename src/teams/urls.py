@@ -1,46 +1,41 @@
-from django.urls import path, include
+from django.urls import include, path
 
 from teams.views.base import (
-    TeamListView,
-    TeamGeneralView,
-    TeamManageView,
     FixIrcAclView,
+    TeamGeneralView,
+    TeamListView,
+    TeamManageView,
 )
-
-from teams.views.members import (
-    TeamMembersView,
-    TeamMemberRemoveView,
-    TeamMemberApproveView,
-    TeamJoinView,
-    TeamLeaveView,
-)
-
+from teams.views.guide import TeamGuidePrintView, TeamGuideView
 from teams.views.info import (
     InfoCategoriesListView,
-    InfoItemUpdateView,
     InfoItemCreateView,
     InfoItemDeleteView,
+    InfoItemUpdateView,
 )
-
+from teams.views.members import (
+    TeamJoinView,
+    TeamLeaveView,
+    TeamMemberApproveView,
+    TeamMemberRemoveView,
+    TeamMembersView,
+)
+from teams.views.shifts import (
+    MemberDropsShift,
+    MemberTakesShift,
+    ShiftCreateMultipleView,
+    ShiftCreateView,
+    ShiftDeleteView,
+    ShiftListView,
+    ShiftUpdateView,
+    UserShifts,
+)
 from teams.views.tasks import (
-    TeamTasksView,
     TaskCreateView,
     TaskDetailView,
     TaskUpdateView,
+    TeamTasksView,
 )
-
-from teams.views.shifts import (
-    ShiftListView,
-    ShiftCreateView,
-    ShiftCreateMultipleView,
-    ShiftUpdateView,
-    ShiftDeleteView,
-    MemberTakesShift,
-    MemberDropsShift,
-    UserShifts,
-)
-
-from teams.views.guide import TeamGuideView, TeamGuidePrintView
 
 app_name = "teams"
 

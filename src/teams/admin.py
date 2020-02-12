@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import Team, TeamMember, TeamTask, TeamShift
-from .email import add_added_membership_email, add_removed_membership_email
+
 from camps.utils import CampPropertyListFilter
+
+from .email import add_added_membership_email, add_removed_membership_email
+from .models import Team, TeamMember, TeamShift, TeamTask
 
 
 @admin.register(TeamTask)

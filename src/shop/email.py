@@ -1,5 +1,6 @@
-from utils.email import add_outgoing_email
 import logging
+
+from utils.email import add_outgoing_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

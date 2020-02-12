@@ -1,19 +1,18 @@
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 
-
 from .models import (
     Event,
-    Speaker,
-    EventType,
     EventInstance,
     EventLocation,
-    EventTrack,
-    SpeakerProposal,
     EventProposal,
+    EventTrack,
+    EventType,
     Favorite,
-    UrlType,
+    Speaker,
+    SpeakerProposal,
     Url,
+    UrlType,
 )
 
 

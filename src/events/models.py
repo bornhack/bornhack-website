@@ -1,6 +1,7 @@
 from django.db import models
-from utils.models import CreatedUpdatedModel
+
 from teams.models import Team
+from utils.models import CreatedUpdatedModel
 
 
 class Type(CreatedUpdatedModel):

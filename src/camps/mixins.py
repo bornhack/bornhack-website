@@ -1,6 +1,6 @@
-from camps.models import Camp
 from django.shortcuts import get_object_or_404
-from django.utils.functional import cached_property
+
+from camps.models import Camp
 
 
 class CampViewMixin(object):

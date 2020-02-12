@@ -26,13 +26,13 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from itertools import chain
+from collections import OrderedDict
 from functools import reduce
+from itertools import chain
 from operator import add
 
-from collections import OrderedDict
-from django.forms.utils import ErrorDict, ErrorList
-from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
 
 

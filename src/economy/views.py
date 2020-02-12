@@ -1,29 +1,40 @@
-import os, magic
+import os
 
-from django.shortcuts import render, redirect
+import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.db.models import Sum
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import (
     CreateView,
-    ListView,
     DetailView,
+    ListView,
     TemplateView,
     UpdateView,
-    DeleteView,
 )
-from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Sum
 
 from camps.mixins import CampViewMixin
+from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
-from teams.models import Team
-from .models import *
-from .mixins import *
-from .forms import *
+
+from .forms import (
+    ExpenseCreateForm,
+    ExpenseUpdateForm,
+    RevenueCreateForm,
+    RevenueUpdateForm,
+)
+from .mixins import (
+    ChainViewMixin,
+    CredebtorViewMixin,
+    ExpensePermissionMixin,
+    ReimbursementPermissionMixin,
+    RevenuePermissionMixin,
+)
+from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
 
 
 class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
@@ -89,7 +100,8 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         return context
 
 
-########### Chain/Creditor related views ###############
+############################################
+# Chain/Credebtor related views
 
 
 class ChainCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
@@ -174,7 +186,8 @@ class CredebtorListView(
         return context
 
 
-########### Expense related views ###############
+############################################
+# Expense related views
 
 
 class ExpenseListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -322,7 +335,8 @@ class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
         return response
 
 
-########### Reimbursement related views ###############
+############################################
+# Reimbursement related views
 
 
 class ReimbursementListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -339,7 +353,8 @@ class ReimbursementDetailView(CampViewMixin, ReimbursementPermissionMixin, Detai
     template_name = "reimbursement_detail.html"
 
 
-########### Revenue related views ###############
+############################################
+# Revenue related views
 
 
 class RevenueListView(LoginRequiredMixin, CampViewMixin, ListView):

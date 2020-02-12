@@ -1,13 +1,6 @@
 import logging
 
-from datetime import timedelta
-
 from django.core.exceptions import ValidationError
-from django.utils import timezone
-from django.conf import settings
-
-from .email import add_new_speakerproposal_email, add_new_eventproposal_email
-from .models import EventProposal, SpeakerProposal
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

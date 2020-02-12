@@ -1,7 +1,7 @@
-from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
 import logging
+from datetime import timedelta
+
+from django.utils import timezone
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

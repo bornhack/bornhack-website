@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Type, Routing
+
+from .models import Routing, Type
 
 
 @admin.register(Type)

@@ -1,5 +1,35 @@
-from django.urls import path, include
-from .views import *
+from django.urls import include, path
+
+from .views import (
+    CallForParticipationView,
+    CombinedProposalPersonSelectView,
+    CombinedProposalSubmitView,
+    CombinedProposalTypeSelectView,
+    EventDetailView,
+    EventListView,
+    EventProposalAddPersonView,
+    EventProposalCreateView,
+    EventProposalDeleteView,
+    EventProposalDetailView,
+    EventProposalRemovePersonView,
+    EventProposalSelectPersonView,
+    EventProposalTypeSelectView,
+    EventProposalUpdateView,
+    ICSView,
+    NoScriptScheduleView,
+    ProgramControlCenter,
+    ProposalListView,
+    ScheduleView,
+    SpeakerDetailView,
+    SpeakerListView,
+    SpeakerProposalCreateView,
+    SpeakerProposalDeleteView,
+    SpeakerProposalDetailView,
+    SpeakerProposalUpdateView,
+    UrlCreateView,
+    UrlDeleteView,
+    UrlUpdateView,
+)
 
 app_name = "program"
 

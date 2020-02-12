@@ -1,15 +1,14 @@
 import graphene
 from graphene import relay
-
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
 from .models import (
     Event,
-    EventType,
+    EventInstance,
     EventLocation,
     EventTrack,
-    EventInstance,
+    EventType,
     Speaker,
     Url,
     UrlType,

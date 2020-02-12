@@ -6,7 +6,7 @@ class ProgramConfig(AppConfig):
     name = "program"
 
     def ready(self):
-        from .models import Speaker, SpeakerProposal, EventProposal
+        from .models import Speaker
         from .signal_handlers import (
             check_speaker_event_camp_consistency,
             check_speaker_camp_change,

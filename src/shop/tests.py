@@ -7,7 +7,8 @@ from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
 from utils.factories import UserFactory
-from .factories import ProductFactory, OrderProductRelationFactory, OrderFactory
+
+from .factories import OrderFactory, OrderProductRelationFactory, ProductFactory
 
 
 class ProductAvailabilityTest(TestCase):
@@ -153,8 +154,6 @@ class TestProductDetailView(TestCase):
         self.client.force_login(self.user)
 
         response = self.client.post(self.path, data={"quantity": 1})
-
-        order = self.user.orders.get()
 
         self.assertRedirects(response, reverse("shop:index"))
 

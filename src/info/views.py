@@ -1,6 +1,8 @@
 from django.views.generic import ListView
-from .models import *
+
 from camps.mixins import CampViewMixin
+
+from .models import InfoCategory
 
 
 class CampInfoView(CampViewMixin, ListView):

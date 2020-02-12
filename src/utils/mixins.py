@@ -1,6 +1,6 @@
 from django.contrib import messages
-from django.http import HttpResponseForbidden
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import HttpResponseForbidden
 
 
 class StaffMemberRequiredMixin(object):

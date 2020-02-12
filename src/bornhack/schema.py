@@ -1,10 +1,8 @@
-from graphene import relay, Schema, ObjectType
-
+from graphene import ObjectType, Schema, relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
 from camps.models import Camp
-
 from program.schema import ProgramQuery
 
 

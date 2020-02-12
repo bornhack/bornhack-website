@@ -1,14 +1,20 @@
 import os
 
-from django.db import models
-from django.conf import settings
-from django.db import models
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.text import slugify
 
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
-from .email import *
+
+from .email import (
+    send_accountingsystem_expense_email,
+    send_accountingsystem_revenue_email,
+    send_expense_approved_email,
+    send_expense_rejected_email,
+    send_revenue_approved_email,
+    send_revenue_rejected_email,
+)
 
 
 class ChainManager(models.Manager):
@@ -135,7 +141,7 @@ class Revenue(CampRelatedModel, UUIDModel):
     """
     The Revenue model represents any type of income for BornHack.
 
-    Most Revenue objects will have a FK to the Invoice model, 
+    Most Revenue objects will have a FK to the Invoice model,
     but only if the revenue relates directly to an Invoice in our system.
 
     Other Revenue objects (such as money returned from bottle deposits) will
@@ -219,9 +225,9 @@ class Revenue(CampRelatedModel, UUIDModel):
 
     @property
     def approval_status(self):
-        if self.approved == None:
+        if self.approved is None:
             return "Pending approval"
-        elif self.approved == True:
+        elif self.approved:
             return "Approved"
         else:
             return "Rejected"
@@ -350,9 +356,9 @@ class Expense(CampRelatedModel, UUIDModel):
 
     @property
     def approval_status(self):
-        if self.approved == None:
+        if self.approved is None:
             return "Pending approval"
-        elif self.approved == True:
+        elif self.approved:
             return "Approved"
         else:
             return "Rejected"
@@ -400,7 +406,7 @@ class Expense(CampRelatedModel, UUIDModel):
 
 class Reimbursement(CampRelatedModel, UUIDModel):
     """
-    A reimbursement covers one or more expenses. 
+    A reimbursement covers one or more expenses.
     """
 
     camp = models.ForeignKey(

@@ -1,11 +1,13 @@
-from django.views.generic import ListView, DetailView
-from django.utils import timezone
-from .models import Camp
-from django.shortcuts import redirect
-from .mixins import CampViewMixin
-from django.views import View
-from django.conf import settings
 import logging
+
+from django.conf import settings
+from django.shortcuts import redirect
+from django.utils import timezone
+from django.views import View
+from django.views.generic import DetailView, ListView
+
+from .mixins import CampViewMixin
+from .models import Camp
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

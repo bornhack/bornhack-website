@@ -1,7 +1,6 @@
-from django.utils import timezone
-from datetime import timedelta
-from ircbot.utils import add_irc_message
 import logging
+
+from ircbot.utils import add_irc_message
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -93,3 +92,4 @@ def team_email_notification(
         recipient_list = [resp.email for resp in team.responsible_members.all()]
 
     # TODO: actually send the email here
+    logger.debug(f"sending test email to {recipient_list}")

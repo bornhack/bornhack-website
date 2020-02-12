@@ -1,6 +1,6 @@
-from django.db.models.signals import post_save, pre_save
-from events.handler import handle_team_event
 import logging
+
+from events.handler import handle_team_event
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

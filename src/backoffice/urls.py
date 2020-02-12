@@ -1,6 +1,34 @@
-from django.urls import path, include
-from .views import *
+from django.urls import include, path
 
+from .views import (
+    ApproveNamesView,
+    BackofficeIndexView,
+    BadgeHandoutView,
+    ChainDetailView,
+    ChainListView,
+    CredebtorDetailView,
+    EventProposalManageView,
+    ExpenseDetailView,
+    ExpenseListView,
+    ManageProposalsView,
+    MerchandiseOrdersView,
+    MerchandiseToOrderView,
+    ProductHandoutView,
+    ReimbursementCreateUserSelectView,
+    ReimbursementCreateView,
+    ReimbursementDeleteView,
+    ReimbursementDetailView,
+    ReimbursementListView,
+    ReimbursementUpdateView,
+    RevenueDetailView,
+    RevenueListView,
+    ScanTicketsView,
+    ShopTicketOverview,
+    SpeakerProposalManageView,
+    TicketCheckinView,
+    VillageOrdersView,
+    VillageToOrderView,
+)
 
 app_name = "backoffice"
 
@@ -9,7 +37,7 @@ urlpatterns = [
     # infodesk
     path(
         "infodesk/",
-        include([path("", ScanTicketsView.as_view(), name="scan_tickets"),]),
+        include([path("", ScanTicketsView.as_view(), name="scan_tickets")]),
     ),
     path("shop_tickets/", ShopTicketOverview.as_view(), name="shop_ticket_overview"),
     path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),

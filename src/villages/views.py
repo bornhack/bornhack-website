@@ -1,19 +1,20 @@
-from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.http import HttpResponseRedirect
 from django.views.generic import (
-    ListView,
-    DetailView,
     CreateView,
-    UpdateView,
     DeleteView,
+    DetailView,
+    ListView,
+    UpdateView,
 )
 from django.views.generic.detail import SingleObjectMixin
-from .models import Village
-from camps.models import Camp
+
 from camps.mixins import CampViewMixin
+from camps.models import Camp
+
 from .mixins import EnsureWritableCampMixin
+from .models import Village
 
 
 class VillageListView(CampViewMixin, ListView):

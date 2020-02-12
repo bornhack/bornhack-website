@@ -1,19 +1,20 @@
 from django.contrib import admin
 
 from tickets.admin import ShopTicketInline
+
 from .models import (
     CoinifyAPICallback,
     CoinifyAPIInvoice,
     CoinifyAPIRequest,
+    CreditNote,
+    CustomOrder,
     EpayCallback,
     EpayPayment,
     Invoice,
-    CreditNote,
-    CustomOrder,
-    ProductCategory,
-    Product,
     Order,
     OrderProductRelation,
+    Product,
+    ProductCategory,
 )
 
 admin.site.register(EpayCallback)

@@ -1,16 +1,17 @@
-import io
-import hashlib
 import base64
+import hashlib
+import io
+import logging
+
 import qrcode
 from django.conf import settings
+from django.db import models
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from shop.models import OrderProductRelation
-from utils.models import UUIDModel, CampRelatedModel
+from utils.models import CampRelatedModel, UUIDModel
 from utils.pdf import generate_pdf_letter
-from django.db import models
-import logging
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

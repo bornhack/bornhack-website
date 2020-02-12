@@ -1,6 +1,7 @@
 from django import template
-from teams.models import TeamMember
 from django.utils.safestring import mark_safe
+
+from teams.models import TeamMember
 
 register = template.Library()
 

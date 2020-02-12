@@ -2,8 +2,8 @@ from django.contrib import admin
 
 from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
 
-
-### chains and credebtors
+###############################
+# chains and credebtors
 
 
 @admin.register(Chain)
@@ -14,13 +14,14 @@ class ChainAdmin(admin.ModelAdmin):
 
 
 @admin.register(Credebtor)
-class ChainAdmin(admin.ModelAdmin):
+class CredebtorAdmin(admin.ModelAdmin):
     list_filter = ["chain", "name"]
     list_display = ["chain", "name", "notes"]
     search_fields = ["chain", "name", "notes"]
 
 
-### expenses
+###############################
+# expenses
 
 
 def approve_expenses(modeladmin, request, queryset):
@@ -64,7 +65,8 @@ class ExpenseAdmin(admin.ModelAdmin):
     actions = [approve_expenses, reject_expenses]
 
 
-### revenues
+###############################
+# revenues
 
 
 def approve_revenues(modeladmin, request, queryset):
@@ -99,7 +101,8 @@ class RevenueAdmin(admin.ModelAdmin):
     actions = [approve_revenues, reject_revenues]
 
 
-### reimbursements
+###############################
+# reimbursements
 
 
 @admin.register(Reimbursement)

@@ -7,8 +7,6 @@ from django.db import migrations
 
 def add_team_camp(apps, schema_editor):
     Team = apps.get_model("teams", "Team")
-    TeamArea = apps.get_model("teams", "TeamArea")
-    TeamMember = apps.get_model("teams", "TeamMember")
 
     for team in Team.objects.all():
         print("camp processing team %s..." % team.name)
@@ -19,7 +17,6 @@ def add_team_camp(apps, schema_editor):
 
 def add_missing_team_responsibles(apps, schema_editor):
     Team = apps.get_model("teams", "Team")
-    TeamArea = apps.get_model("teams", "TeamArea")
     TeamMember = apps.get_model("teams", "TeamMember")
 
     for team in Team.objects.all():

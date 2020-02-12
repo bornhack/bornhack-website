@@ -1,19 +1,26 @@
 from allauth.account.views import LoginView, LogoutView
+from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import TemplateView
 from graphene_django.views import GraphQLView
 
 from bar.views import MenuView
-from camps.views import *
+from camps.views import CampDetailView, CampListView, CampRedirectView
 from feedback.views import FeedbackCreate
-from info.views import *
-from people.views import *
-from program.views import *
-from sponsors.views import *
-from villages.views import *
+from info.views import CampInfoView
+from people.views import PeopleView
+from sponsors.views import SponsorsView
+from villages.views import (
+    VillageCreateView,
+    VillageDeleteView,
+    VillageDetailView,
+    VillageListView,
+    VillageUpdateView,
+)
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)

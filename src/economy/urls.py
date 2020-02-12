@@ -1,5 +1,26 @@
-from django.urls import path, include
-from .views import *
+from django.urls import include, path
+
+from .views import (
+    ChainCreateView,
+    ChainListView,
+    CredebtorCreateView,
+    CredebtorListView,
+    EconomyDashboardView,
+    ExpenseCreateView,
+    ExpenseDeleteView,
+    ExpenseDetailView,
+    ExpenseInvoiceView,
+    ExpenseListView,
+    ExpenseUpdateView,
+    ReimbursementDetailView,
+    ReimbursementListView,
+    RevenueCreateView,
+    RevenueDeleteView,
+    RevenueDetailView,
+    RevenueInvoiceView,
+    RevenueListView,
+    RevenueUpdateView,
+)
 
 app_name = "economy"
 

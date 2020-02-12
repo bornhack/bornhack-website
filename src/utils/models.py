@@ -1,9 +1,10 @@
+import logging
 import uuid
+
+from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
-from django.contrib import messages
 from django.db import models
-import logging
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

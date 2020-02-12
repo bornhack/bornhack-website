@@ -1,7 +1,10 @@
-from django.core.management.base import BaseCommand
+import importlib
+import logging
+import signal
+import sys
 from time import sleep
-import signal, sys
-import logging, importlib
+
+from django.core.management.base import BaseCommand
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -53,7 +56,7 @@ class Command(BaseCommand):
             try:
                 # run worker code
                 getattr(self.workermodule, "do_work")()
-            except Exception as E:
+            except Exception:
                 logger.exception(
                     "Got exception inside do_work for %s" % self.workermodule
                 )

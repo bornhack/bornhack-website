@@ -2,9 +2,9 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, HttpResponse
+from django.views.generic import DetailView, ListView, UpdateView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic import DetailView, UpdateView, ListView, View
-from django.http import HttpResponse, Http404
 
 from .models import ShopTicket
 

@@ -1,6 +1,5 @@
 import factory
 from django.utils import timezone
-
 from factory.django import DjangoModelFactory
 from psycopg2._range import DateTimeTZRange
 

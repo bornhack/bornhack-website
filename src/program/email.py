@@ -1,8 +1,9 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 
-from utils.email import add_outgoing_email
 from teams.models import Team
-import logging
+from utils.email import add_outgoing_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

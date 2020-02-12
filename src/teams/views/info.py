@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from reversion.views import RevisionMixin
 
 from camps.mixins import CampViewMixin
-from info.models import InfoItem, InfoCategory
+from info.models import InfoCategory, InfoItem
+
 from ..models import Team
 from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
 

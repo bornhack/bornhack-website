@@ -1,16 +1,16 @@
 import logging
 
-from django.views.generic import DetailView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
+from django.views.generic import DetailView, UpdateView
 
-from ..models import Team, TeamMember
-from profiles.models import Profile
 from camps.mixins import CampViewMixin
+from profiles.models import Profile
 
-from .mixins import EnsureTeamMemberResponsibleMixin, TeamViewMixin
 from ..email import add_added_membership_email, add_removed_membership_email
+from ..models import Team, TeamMember
+from .mixins import EnsureTeamMemberResponsibleMixin, TeamViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

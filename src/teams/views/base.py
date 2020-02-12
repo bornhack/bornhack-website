@@ -1,16 +1,17 @@
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import UpdateView
-from camps.mixins import CampViewMixin
+import logging
+
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.contrib import messages
 from django.urls import reverse_lazy
-from django.conf import settings
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import UpdateView
 
-from .mixins import EnsureTeamResponsibleMixin
+from camps.mixins import CampViewMixin
+
 from ..models import Team, TeamMember
-
-import logging
+from .mixins import EnsureTeamResponsibleMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
