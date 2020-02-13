@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "tokens",
     "feedback",
     "economy",
+    "wishlist",
     "allauth",
     "allauth.account",
     "allauth_2fa",
@@ -69,10 +70,10 @@ LANGUAGE_CODE = "en-us"
 # USE_I18N = True
 # USE_L10N = True
 USE_TZ = True
-SHORT_DATE_FORMAT = "d/m-Y"
-DATE_FORMAT = "d/m-Y"
-DATETIME_FORMAT = "d/m-Y H:i"
-TIME_FORMAT = "H:i"
+SHORT_DATE_FORMAT = "Ymd"
+DATE_FORMAT = "l, M jS, Y"
+DATETIME_FORMAT = "l, M jS, Y, H:i (e)"
+TIME_FORMAT = "H:i (e)"
 
 TEMPLATES = [
     {

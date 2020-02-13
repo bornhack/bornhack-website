@@ -63,7 +63,7 @@ urlpatterns = [
     path(
         "program/",
         CampRedirectView.as_view(),
-        kwargs={"page": "schedule_index"},
+        kwargs={"page": "program:schedule_index"},
         name="schedule_index_redirect",
     ),
     path(
@@ -83,6 +83,12 @@ urlpatterns = [
         CampRedirectView.as_view(),
         kwargs={"page": "village_list"},
         name="village_list_redirect",
+    ),
+    path(
+        "wishlist/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "wishlist:list"},
+        name="wish_list_redirect",
     ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
@@ -129,6 +135,7 @@ urlpatterns = [
                 path("backoffice/", include("backoffice.urls", namespace="backoffice")),
                 path("feedback/", FeedbackCreate.as_view(), name="feedback"),
                 path("economy/", include("economy.urls", namespace="economy")),
+                path("wishlist/", include("wishlist.urls", namespace="wishlist")),
             ]
         ),
     ),
