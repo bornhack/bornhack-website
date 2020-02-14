@@ -52,7 +52,6 @@ class Wish(CampRelatedModel):
         return self.name
 
     def save(self, **kwargs):
-        print("inside save()")
         if not self.slug:
             self.slug = slugify(self.name)
         if not self.slug:
