@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponseForbidden
 
 
@@ -25,3 +25,9 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
     """
 
     raise_exception = True
+
+
+class UserIsObjectOwnerMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.get_object().user == self.request.user
+

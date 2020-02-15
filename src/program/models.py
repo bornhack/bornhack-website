@@ -10,10 +10,10 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
 
-from utils.models import CampRelatedModel, CreatedUpdatedModel
+from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -594,7 +594,7 @@ class Event(CampRelatedModel):
     def get_absolute_url(self):
         return reverse_lazy(
             "program:event_detail",
-            kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
+            kwargs={"camp_slug": self.camp.slug, "event_slug": self.slug},
         )
 
     def serialize(self):
@@ -795,7 +795,59 @@ class Favorite(models.Model):
         unique_together = ["user", "event_instance"]
 
 
-# classes and functions below here was used by picture handling for speakers before it was removed in May 2018 by tyk
+###############################################################################
+
+
+class EventFeedback(CampRelatedModel, UUIDModel):
+    """
+    This model contains all feedback for Events
+    Each user can submit exactly one feedback per Event
+    """
+    class Meta:
+        unique_together = [("user", "event")]
+
+    YESNO_CHOICES = [(True, 'Yes'), (False, 'No')]
+
+    user = models.ForeignKey("auth.User", on_delete=models.PROTECT, help_text="The User who wrote this feedback")
+
+    event = models.ForeignKey(
+        "program.event", related_name="feedbacks", on_delete=models.PROTECT, help_text="The Event this feedback is about",
+    )
+
+    expectations_fulfilled = models.BooleanField(
+        choices=YESNO_CHOICES,
+        help_text="Did the event live up to your expectations?",
+    )
+
+    attend_speaker_again = models.BooleanField(
+        choices=YESNO_CHOICES,
+        help_text="Would you attend another event with the same speaker?",
+    )
+
+    RATING_CHOICES = [(n, f"{n}") for n in range(0,6)]
+
+    rating = models.IntegerField(
+        choices=RATING_CHOICES,
+        help_text="Rating/Score (5 is best)",
+    )
+
+    comment = models.TextField(blank=True, help_text="Any other comments or feedback?")
+
+    approved = models.NullBooleanField(
+        help_text="Approve feedback? It will not be visible to the Event owner before it is approved."
+    )
+
+    @property
+    def camp(self):
+        return self.event.camp
+
+    camp_filter = "event__track__camp"
+
+    def get_absolute_url(self):
+        return reverse("program:eventfeedback_detail", kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug})
+
+
+ # classes and functions below here was used by picture handling for speakers before it was removed in May 2018 by tyk
 
 
 class CustomUrlStorage(FileSystemStorage):

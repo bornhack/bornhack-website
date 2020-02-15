@@ -12,12 +12,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
+from django.forms import modelformset_factory
 
 from camps.mixins import CampViewMixin
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from profiles.models import Profile
-from program.models import EventProposal, SpeakerProposal
+from program.models import EventProposal, SpeakerProposal, EventFeedback
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -107,6 +108,53 @@ class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
         return context
 
 
+class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
+    """
+    This view shows a list of EventFeedback objects which are pending approval.
+    """
+    model = EventFeedback
+    template_name = "approve_feedback.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.queryset = EventFeedback.objects.filter(
+            event__track__camp=self.camp,
+            approved__isnull=True
+        )
+
+    def get_form(self, *args, **kwargs):
+        factory = modelformset_factory(EventFeedback, fields=('approved',), extra=0)
+        return factory(queryset=self.queryset)
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Include the queryset used for the modelformset_factory so we have
+        some idea which object is which in the template
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["eventfeedback_list"] = self.queryset
+        return context
+
+    def form_valid(self, form):
+        print("inside form_valid()")
+        feedbacks = form.save()
+        print(feedbacks)
+        return redirect(reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug}))
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests: instantiate a form instance with the passed
+        POST variables and then check if it's valid.
+        """
+        print("inside post()")
+        form = self.get_form()
+        if form.is_valid():
+            print("calling form_valid()")
+            return self.form_valid(form)
+        else:
+            print("calling form_invalid()")
+            return self.form_invalid(form)
+
 class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
     """
     This class contains the shared logic between SpeakerProposalManageView and EventProposalManageView
@@ -118,7 +166,6 @@ class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateVi
         """
         We have two submit buttons in this form, Approve and Reject
         """
-        logger.debug(form.data)
         if "approve" in form.data:
             # approve button was pressed
             form.instance.mark_as_approved(self.request)

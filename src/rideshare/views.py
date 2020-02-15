@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import (
@@ -13,6 +13,7 @@ from django.views.generic import (
 
 from camps.mixins import CampViewMixin
 from utils.email import add_outgoing_email
+from utils.mixins import UserIsObjectOwnerMixin
 
 from .models import Ride
 
@@ -91,12 +92,7 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class IsRideOwnerMixin(UserPassesTestMixin):
-    def test_func(self):
-        return self.get_object().user == self.request.user
-
-
-class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView):
+class RideUpdate(LoginRequiredMixin, CampViewMixin, UserIsObjectOwnerMixin, UpdateView):
     model = Ride
     fields = [
         "author",
@@ -109,7 +105,7 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, UpdateView
     ]
 
 
-class RideDelete(LoginRequiredMixin, CampViewMixin, IsRideOwnerMixin, DeleteView):
+class RideDelete(LoginRequiredMixin, CampViewMixin, UserIsObjectOwnerMixin, DeleteView):
     model = Ride
 
     def get_success_url(self):
