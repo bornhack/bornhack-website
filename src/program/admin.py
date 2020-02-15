@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 
 from .models import (
     Event,
+    EventFeedback,
     EventInstance,
     EventLocation,
     EventProposal,
@@ -13,7 +14,6 @@ from .models import (
     SpeakerProposal,
     Url,
     UrlType,
-    EventFeedback,
 )
 
 
@@ -125,7 +125,23 @@ class UrlAdmin(admin.ModelAdmin):
 
 @admin.register(EventFeedback)
 class EventFeedbackAdmin(admin.ModelAdmin):
-    list_display = ["camp", "user", "event", "expectations_fulfilled", "attend_speaker_again", "rating", "created", "updated", "approved", "comment"]
-    list_filter = ["event__track__camp", "expectations_fulfilled", "attend_speaker_again", "rating", "approved"]
+    list_display = [
+        "camp",
+        "user",
+        "event",
+        "expectations_fulfilled",
+        "attend_speaker_again",
+        "rating",
+        "created",
+        "updated",
+        "approved",
+        "comment",
+    ]
+    list_filter = [
+        "event__track__camp",
+        "expectations_fulfilled",
+        "attend_speaker_again",
+        "rating",
+        "approved",
+    ]
     search_fields = ["event__title", "user__username"]
-

@@ -6,6 +6,7 @@ class RedirectException(Exception):
     An exception class meant to be used to redirect from places where
     we cannot just return a HTTPResponse directly (like view setup() methods)
     """
+
     def __init__(self, url):
         self.url = url
 
@@ -15,6 +16,7 @@ class RedirectExceptionMiddleware:
     A simple middleware to catch exceptions of type RedirectException
     and redirect to the url
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -26,4 +28,3 @@ class RedirectExceptionMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         return response
-

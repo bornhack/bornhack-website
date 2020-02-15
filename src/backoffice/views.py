@@ -2,23 +2,22 @@ import logging
 import os
 from itertools import chain
 
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.db.models import Sum
+from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
-from django.forms import modelformset_factory
-
-from camps.mixins import CampViewMixin
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from profiles.models import Profile
-from program.models import EventProposal, SpeakerProposal, EventFeedback
+from program.models import EventFeedback, EventProposal, SpeakerProposal
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -112,18 +111,18 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     """
     This view shows a list of EventFeedback objects which are pending approval.
     """
+
     model = EventFeedback
     template_name = "approve_feedback.html"
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.queryset = EventFeedback.objects.filter(
-            event__track__camp=self.camp,
-            approved__isnull=True
+            event__track__camp=self.camp, approved__isnull=True
         )
 
     def get_form(self, *args, **kwargs):
-        factory = modelformset_factory(EventFeedback, fields=('approved',), extra=0)
+        factory = modelformset_factory(EventFeedback, fields=("approved",), extra=0)
         return factory(queryset=self.queryset)
 
     def get_context_data(self, *args, **kwargs):
@@ -139,7 +138,9 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         print("inside form_valid()")
         feedbacks = form.save()
         print(feedbacks)
-        return redirect(reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug}))
+        return redirect(
+            reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})
+        )
 
     def post(self, request, *args, **kwargs):
         """
@@ -154,6 +155,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         else:
             print("calling form_invalid()")
             return self.form_invalid(form)
+
 
 class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
     """

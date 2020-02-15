@@ -6,18 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('program', '0077_auto_20200214_0246'),
+        ("program", "0077_auto_20200214_0246"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='eventfeedback',
-            name='approved',
-            field=models.NullBooleanField(help_text='Approve feedback? It will not be visible to the Event owner before it is approved.'),
+            model_name="eventfeedback",
+            name="approved",
+            field=models.NullBooleanField(
+                help_text="Approve feedback? It will not be visible to the Event owner before it is approved."
+            ),
         ),
         migrations.AlterField(
-            model_name='eventfeedback',
-            name='comment',
-            field=models.TextField(blank=True, help_text='Any other comments or feedback?'),
+            model_name="eventfeedback",
+            name="comment",
+            field=models.TextField(
+                blank=True, help_text="Any other comments or feedback?"
+            ),
         ),
     ]

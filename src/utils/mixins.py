@@ -30,4 +30,3 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
 class UserIsObjectOwnerMixin(UserPassesTestMixin):
     def test_func(self):
         return self.get_object().user == self.request.user
-

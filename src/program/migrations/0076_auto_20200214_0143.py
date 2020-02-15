@@ -8,22 +8,27 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('program', '0075_eventfeedback'),
+        ("program", "0075_eventfeedback"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='eventfeedback',
-            name='approved',
-            field=models.BooleanField(default=False, help_text='Approve feedback? It will not be visible to Event owner before it is approved.'),
+            model_name="eventfeedback",
+            name="approved",
+            field=models.BooleanField(
+                default=False,
+                help_text="Approve feedback? It will not be visible to Event owner before it is approved.",
+            ),
         ),
         migrations.AlterField(
-            model_name='eventfeedback',
-            name='rating',
-            field=models.IntegerField(choices=[(0, '0'), (1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], help_text='Rating/Score (5 is best)'),
+            model_name="eventfeedback",
+            name="rating",
+            field=models.IntegerField(
+                choices=[(0, "0"), (1, "1"), (2, "2"), (3, "3"), (4, "4"), (5, "5")],
+                help_text="Rating/Score (5 is best)",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='eventfeedback',
-            unique_together={('user', 'event')},
+            name="eventfeedback", unique_together={("user", "event")},
         ),
     ]

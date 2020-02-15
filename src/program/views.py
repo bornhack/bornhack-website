@@ -2,6 +2,7 @@ import logging
 from collections import OrderedDict
 
 import icalendar
+from camps.mixins import CampViewMixin
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -14,10 +15,8 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
-from camps.mixins import CampViewMixin
-from utils.mixins import UserIsObjectOwnerMixin
 from utils.middleware import RedirectException
+from utils.mixins import UserIsObjectOwnerMixin
 
 from . import models
 from .email import (
@@ -31,9 +30,9 @@ from .mixins import (
     EnsureCFPOpenMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
-    UrlViewMixin,
-    EventViewMixin,
     EventFeedbackViewMixin,
+    EventViewMixin,
+    UrlViewMixin,
 )
 from .multiform import MultiModelForm
 
@@ -1056,6 +1055,7 @@ class UrlDeleteView(
             reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
         )
 
+
 ###################################################################################################
 # Feedback views
 
@@ -1064,6 +1064,7 @@ class FeedbackListView(LoginRequiredMixin, EventViewMixin, ListView):
     """
     The FeedbackListView is used by the event owner to see approved Feedback for the Event.
     """
+
     model = models.EventFeedback
     template_name = "eventfeedback_list.html"
 
@@ -1074,10 +1075,7 @@ class FeedbackListView(LoginRequiredMixin, EventViewMixin, ListView):
             raise RedirectException(
                 reverse(
                     "program:event_detail",
-                    kwargs={
-                        "camp_slug": self.camp.slug,
-                        "event_slug": self.event.slug
-                    }
+                    kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
                 )
             )
 
@@ -1089,32 +1087,32 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
     """
     Used by users to create Feedback for an Event. Available to all logged in users.
     """
+
     model = models.EventFeedback
     fields = ["expectations_fulfilled", "attend_speaker_again", "rating", "comment"]
     template_name = "eventfeedback_form.html"
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
-        if models.EventFeedback.objects.filter(event=self.event, user=self.request.user).exists():
+        if models.EventFeedback.objects.filter(
+            event=self.event, user=self.request.user
+        ).exists():
             raise RedirectException(
                 reverse(
                     "program:eventfeedback_detail",
-                    kwargs={
-                        "camp_slug": self.camp.slug,
-                        "event_slug": self.event.slug
-                    }
+                    kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
                 )
             )
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        form.fields['expectations_fulfilled'].widget = forms.RadioSelect(
+        form.fields["expectations_fulfilled"].widget = forms.RadioSelect(
             choices=models.EventFeedback.YESNO_CHOICES,
         )
-        form.fields['attend_speaker_again'].widget = forms.RadioSelect(
+        form.fields["attend_speaker_again"].widget = forms.RadioSelect(
             choices=models.EventFeedback.YESNO_CHOICES,
         )
-        form.fields['rating'].widget = forms.RadioSelect(
+        form.fields["rating"].widget = forms.RadioSelect(
             choices=models.EventFeedback.RATING_CHOICES,
         )
         print(models.EventFeedback.RATING_CHOICES)
@@ -1125,22 +1123,30 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
         feedback.user = self.request.user
         feedback.event = self.event
         feedback.save()
-        messages.success(self.request, "Your feedback was submitted, it is now pending approval.")
+        messages.success(
+            self.request, "Your feedback was submitted, it is now pending approval."
+        )
         return redirect(feedback.get_absolute_url())
 
 
-class FeedbackDetailView(LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DetailView):
+class FeedbackDetailView(
+    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DetailView
+):
     """
     Used by the EventFeedback owner to see their own feedback.
     """
+
     model = models.EventFeedback
     template_name = "eventfeedback_detail.html"
 
 
-class FeedbackUpdateView(LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, UpdateView):
+class FeedbackUpdateView(
+    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, UpdateView
+):
     """
     Used by the EventFeedback owner to update their feedback.
     """
+
     model = models.EventFeedback
     fields = ["expectations_fulfilled", "attend_speaker_again", "rating", "comment"]
     template_name = "eventfeedback_form.html"
@@ -1153,10 +1159,13 @@ class FeedbackUpdateView(LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjec
         return redirect(feedback.get_absolute_url())
 
 
-class FeedbackDeleteView(LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DeleteView):
+class FeedbackDeleteView(
+    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DeleteView
+):
     """
     Used by the EventFeedback owner to delete their own feedback.
     """
+
     model = models.EventFeedback
     template_name = "eventfeedback_delete.html"
 

@@ -3,9 +3,10 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
-@register.filter(name='zip')
+
+@register.filter(name="zip")
 def zip_lists(a, b):
-  return zip(a, b)
+    return zip(a, b)
 
 
 @register.filter()

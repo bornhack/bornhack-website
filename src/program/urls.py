@@ -15,11 +15,11 @@ from .views import (
     EventProposalSelectPersonView,
     EventProposalTypeSelectView,
     EventProposalUpdateView,
-    FeedbackListView,
-    FeedbackDetailView,
     FeedbackCreateView,
-    FeedbackUpdateView,
     FeedbackDeleteView,
+    FeedbackDetailView,
+    FeedbackListView,
+    FeedbackUpdateView,
     ICSView,
     NoScriptScheduleView,
     ProgramControlCenter,
@@ -202,42 +202,45 @@ urlpatterns = [
         name="call_for_participation",
     ),
     path("calendar", ICSView.as_view(), name="ics_calendar"),
-
     # this must be the last URL here or the slug will overrule the others
     path(
         "<slug:event_slug>/",
-        include([
-            path("", EventDetailView.as_view(), name="event_detail"),
-            path(
-                "feedback/",
-                include([
-                    path(
-                        "",
-                        FeedbackListView.as_view(),
-                        name="eventfeedback_list",
+        include(
+            [
+                path("", EventDetailView.as_view(), name="event_detail"),
+                path(
+                    "feedback/",
+                    include(
+                        [
+                            path(
+                                "",
+                                FeedbackListView.as_view(),
+                                name="eventfeedback_list",
+                            ),
+                            path(
+                                "show/",
+                                FeedbackDetailView.as_view(),
+                                name="eventfeedback_detail",
+                            ),
+                            path(
+                                "create/",
+                                FeedbackCreateView.as_view(),
+                                name="eventfeedback_create",
+                            ),
+                            path(
+                                "update/",
+                                FeedbackUpdateView.as_view(),
+                                name="eventfeedback_update",
+                            ),
+                            path(
+                                "delete/",
+                                FeedbackDeleteView.as_view(),
+                                name="eventfeedback_delete",
+                            ),
+                        ]
                     ),
-                    path(
-                        "show/",
-                        FeedbackDetailView.as_view(),
-                        name="eventfeedback_detail",
-                    ),
-                    path(
-                        "create/",
-                        FeedbackCreateView.as_view(),
-                        name="eventfeedback_create",
-                    ),
-                    path(
-                        "update/",
-                        FeedbackUpdateView.as_view(),
-                        name="eventfeedback_update",
-                    ),
-                    path(
-                        "delete/",
-                        FeedbackDeleteView.as_view(),
-                        name="eventfeedback_delete",
-                    ),
-                ]),
-            )
-        ])
+                ),
+            ]
+        ),
     ),
 ]

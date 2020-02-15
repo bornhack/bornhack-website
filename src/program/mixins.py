@@ -1,9 +1,10 @@
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
-from camps.mixins import CampViewMixin
+
 from . import models
 
 
@@ -115,9 +116,12 @@ class EventViewMixin(CampViewMixin):
     """
     A mixin to get the Event object based on event_uuid in url kwargs
     """
+
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
-        self.event = get_object_or_404(models.Event, track__camp=self.camp, slug=self.kwargs["event_slug"])
+        self.event = get_object_or_404(
+            models.Event, track__camp=self.camp, slug=self.kwargs["event_slug"]
+        )
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -129,14 +133,12 @@ class EventFeedbackViewMixin(EventViewMixin):
     """
     A mixin to get the EventFeedback object based on self.event and self.request.user
     """
+
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.eventfeedback = get_object_or_404(
-            models.EventFeedback,
-            event=self.event,
-            user=self.request.user,
+            models.EventFeedback, event=self.event, user=self.request.user,
         )
 
     def get_object(self):
         return self.eventfeedback
-
