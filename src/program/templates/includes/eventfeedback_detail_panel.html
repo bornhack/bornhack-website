@@ -6,6 +6,12 @@
   </div>
   <div class="panel-body">
     <table class="table table-bordered">
+      {% if request.resolver_match.url_name == "approve_eventfeedback" %}
+      <tr>
+        <th>Username (feedback submitter)</th>
+        <td>{{ eventfeedback.user.username }}</td>
+      </tr>
+      {% endif %}
       <tr>
         <th>Were Your Expectations Fulfilled?</th>
         <td>{{ eventfeedback.expectations_fulfilled|yesno }}</td>
