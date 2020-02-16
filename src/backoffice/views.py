@@ -86,6 +86,55 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         )
 
 
+class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
+    """
+    This view shows a list of EventFeedback objects which are pending approval.
+    """
+
+    model = EventFeedback
+    template_name = "approve_feedback.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.queryset = EventFeedback.objects.filter(
+            event__track__camp=self.camp, approved__isnull=True
+        )
+
+        self.form_class = modelformset_factory(
+            EventFeedback,
+            fields=("approved",),
+            min_num=self.queryset.count(),
+            validate_min=True,
+            max_num=self.queryset.count(),
+            validate_max=True,
+            extra=0,
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Include the queryset used for the modelformset_factory so we have
+        some idea which object is which in the template
+        Why the hell do the forms in the formset not include the object?
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["eventfeedback_list"] = self.queryset
+        context["formset"] = self.form_class(queryset=self.queryset)
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        if form.changed_objects:
+            messages.success(
+                self.request, f"Updated {len(form.changed_objects)} EventFeedbacks"
+            )
+        return redirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse(
+            "backoffice:approve_eventfeedback", kwargs={"camp_slug": self.camp.slug}
+        )
+
+
 class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     """
     This view shows a list of pending SpeakerProposal and EventProposals.
@@ -105,56 +154,6 @@ class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
             track__camp=self.camp, proposal_status=EventProposal.PROPOSAL_PENDING
         )
         return context
-
-
-class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of EventFeedback objects which are pending approval.
-    """
-
-    model = EventFeedback
-    template_name = "approve_feedback.html"
-
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.queryset = EventFeedback.objects.filter(
-            event__track__camp=self.camp, approved__isnull=True
-        )
-
-    def get_form(self, *args, **kwargs):
-        factory = modelformset_factory(EventFeedback, fields=("approved",), extra=0)
-        return factory(queryset=self.queryset)
-
-    def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
-        some idea which object is which in the template
-        """
-        context = super().get_context_data(*args, **kwargs)
-        context["eventfeedback_list"] = self.queryset
-        return context
-
-    def form_valid(self, form):
-        print("inside form_valid()")
-        feedbacks = form.save()
-        print(feedbacks)
-        return redirect(
-            reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})
-        )
-
-    def post(self, request, *args, **kwargs):
-        """
-        Handle POST requests: instantiate a form instance with the passed
-        POST variables and then check if it's valid.
-        """
-        print("inside post()")
-        form = self.get_form()
-        if form.is_valid():
-            print("calling form_valid()")
-            return self.form_valid(form)
-        else:
-            print("calling form_invalid()")
-            return self.form_invalid(form)
 
 
 class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
