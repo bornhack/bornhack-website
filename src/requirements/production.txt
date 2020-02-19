@@ -12,7 +12,7 @@ django-bootstrap3==12.0.3
 django-cors-headers==3.2.1
 django-extensions==2.2.8
 django-filter==2.2.0
-django-reversion==3.0.5
+django-reversion==3.0.7
 django-wkhtmltopdf==3.3.0
 future==0.18.2
 graphene-django==2.8.2
