@@ -2,7 +2,7 @@ cache: pip
 
 language: python
 python:
-  - "3.7"
+  - "3.6"
 
 services:
   - postgresql
@@ -15,7 +15,6 @@ install:
 
 before_script:
   - psql -c "CREATE ROLE bornhack WITH CREATEDB LOGIN PASSWORD 'bornhack';"
-  - psql -c "CREATE EXTENSION postgis;"
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
