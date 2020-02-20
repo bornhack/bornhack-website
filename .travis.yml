@@ -19,9 +19,7 @@ install:
   - pip install -r src/requirements/dev.txt
 
 before_script:
-  - psql -c "CREATE ROLE bornhack WITH CREATEDB LOGIN PASSWORD 'bornhack';"
-  - createdb -O bornhack bornhack
-  - sudo -u postgres -- psql -c "CREATE EXTENSION postgis;" bornhack
+  - psql -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
