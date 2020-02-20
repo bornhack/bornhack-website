@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView, ListView
 
 from .models import Wish
 
@@ -13,4 +12,3 @@ class WishDetailView(DetailView):
     model = Wish
     template_name = "wish_detail.html"
     slug_url_kwarg = "wish_slug"
-

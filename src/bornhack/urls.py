@@ -1,4 +1,6 @@
 from allauth.account.views import LoginView, LogoutView
+from bar.views import MenuView
+from camps.views import CampDetailView, CampListView, CampRedirectView
 from django.conf import settings
 from django.conf.urls import include
 from django.contrib import admin
@@ -6,11 +8,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-from graphene_django.views import GraphQLView
-
-from bar.views import MenuView
-from camps.views import CampDetailView, CampListView, CampRedirectView
 from feedback.views import FeedbackCreate
+from graphene_django.views import GraphQLView
 from info.views import CampInfoView
 from people.views import PeopleView
 from sponsors.views import SponsorsView
@@ -90,6 +89,12 @@ urlpatterns = [
         kwargs={"page": "wishlist:list"},
         name="wish_list_redirect",
     ),
+    path(
+        "backoffice/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "backoffice:index"},
+        name="backoffice_redirect",
+    ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
     path(
@@ -136,6 +141,7 @@ urlpatterns = [
                 path("feedback/", FeedbackCreate.as_view(), name="feedback"),
                 path("economy/", include("economy.urls", namespace="economy")),
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
+                path("facilities/", include("facilities.urls", namespace="facilities")),
             ]
         ),
     ),

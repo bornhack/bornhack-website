@@ -1,6 +1,6 @@
 import os
 
-from .environment_settings import *
+from .environment_settings import *  # noqa: F403
 
 
 def local_dir(entry):
@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "feedback",
     "economy",
     "wishlist",
+    "facilities",
     "allauth",
     "allauth.account",
     "allauth_2fa",
@@ -128,7 +129,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/api/*$"
 
-if DEBUG:
+if DEBUG:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE

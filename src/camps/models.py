@@ -5,9 +5,8 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from psycopg2.extras import DateTimeTZRange
-
 from program.models import EventLocation, EventType
+from psycopg2.extras import DateTimeTZRange
 from utils.models import CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -23,10 +22,31 @@ class Permission(models.Model):
         default_permissions = ()
         permissions = (
             ("backoffice_permission", "BackOffice access"),
-            ("orgateam_permission", "Orga Team permissions set"),
-            ("infoteam_permission", "Info Team permissions set"),
-            ("economyteam_permission", "Economy Team permissions set"),
+            ("badgeteam_permission", "Badge Team permissions set"),
+            ("barteam_permission", "Bar Team permissions set"),
+            ("certteam_permission", "CERT Team permissions set"),
+            ("constructionteam_permission", "Construction Team permissions set"),
             ("contentteam_permission", "Content Team permissions set"),
+            ("economyteam_permission", "Economy Team permissions set"),
+            ("foodareateam_permission", "Foodarea Team permissions set"),
+            ("infoteam_permission", "Info Team permissions set"),
+            ("lightteam_permission", "Light Team permissions set"),
+            ("logisticsteam_permission", "Logistics Team permissions set"),
+            ("metricsteam_permission", "Metrics Team permissions set"),
+            ("nocteam_permission", "NOC Team permissions set"),
+            ("orgateam_permission", "Orga Team permissions set"),
+            ("pocteam_permission", "POC Team permissions set"),
+            ("prteam_permission", "PR Team permissions set"),
+            ("phototeam_permission", "Photo Team permissions set"),
+            ("powerteam_permission", "Power Team permissions set"),
+            ("rocteam_permission", "ROC Team permissions set"),
+            ("sanitationteam_permission", "Sanitation Team permissions set"),
+            ("shuttleteam_permission", "Shuttle Team permissions set"),
+            ("sponsorsteam_permission", "Sponsors Team permissions set"),
+            ("sysadminteam_permission", "Sysadmin Team permissions set"),
+            ("videoteam_permission", "Video Team permissions set"),
+            ("websiteteam_permission", "Website Team permissions set"),
+            ("wellnessteam_permission", "Wellness Team permissions set"),
             ("expense_create_permission", "Expense Create permission"),
             ("revenue_create_permission", "Revenue Create permission"),
         )

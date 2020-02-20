@@ -1,0 +1,19 @@
+{% extends 'program_base.html' %}
+
+{% block title %}
+{{ facility.facility_type.name }} - Facilities | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">{{ facility.facility_type.name }}: {{ facility.name }}</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">{{ facility.description }}</p>
+    <a href="{% url "facilities:facility_feedback" camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-comment-dots"></i> Submit Feedback</a>
+    <a href="{% url "facilities:facility_list" camp_slug=camp.slug facility_type_slug=facilitytype.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Back to {{ facilitytype.name }} list</a>
+  </div>
+</div>
+{% endblock %}
+

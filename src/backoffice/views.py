@@ -2,20 +2,22 @@ import logging
 import os
 from itertools import chain
 
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.db.models import Sum
+from django.forms import modelformset_factory
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
-from camps.mixins import CampViewMixin
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
+from facilities.models import FacilityFeedback
 from profiles.models import Profile
 from program.models import EventProposal, SpeakerProposal
 from shop.models import Order, OrderProductRelation
@@ -40,6 +42,73 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
 
     permission_required = "camps.backoffice_permission"
     template_name = "index.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["facilityfeedback_teams"] = Team.objects.filter(
+            id__in=set(
+                FacilityFeedback.objects.filter(
+                    facility__facility_type__responsible_team__camp=self.camp,
+                    handled=False,
+                ).values_list(
+                    "facility__facility_type__responsible_team__id", flat=True
+                )
+            )
+        )
+        return context
+
+
+class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView):
+    template_name = "facilityfeedback_backoffice.html"
+
+    def get_permission_required(self):
+        """
+        This view requires two permissions, camps.backoffice_permission and
+        the permission_set for the team in question.
+        """
+        if not self.team.permission_set:
+            raise PermissionDenied("No permissions set defined for this team")
+        return ["camps.backoffice_permission", self.team.permission_set]
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.team = get_object_or_404(
+            Team, camp=self.camp, slug=self.kwargs["team_slug"]
+        )
+        self.queryset = FacilityFeedback.objects.filter(
+            facility__facility_type__responsible_team=self.team, handled=False
+        )
+        self.form_class = modelformset_factory(
+            FacilityFeedback,
+            fields=("handled",),
+            min_num=self.queryset.count(),
+            validate_min=True,
+            max_num=self.queryset.count(),
+            validate_max=True,
+            extra=0,
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["team"] = self.team
+        context["feedback_list"] = self.queryset
+        context["formset"] = self.form_class(queryset=self.queryset)
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        if form.changed_objects:
+            messages.success(
+                self.request,
+                f"Marked {len(form.changed_objects)} FacilityFeedbacks as handled!",
+            )
+        return redirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse(
+            "backoffice:facilityfeedback",
+            kwargs={"camp_slug": self.camp.slug, "team_slug": self.team.slug},
+        )
 
 
 class ProductHandoutView(CampViewMixin, InfoTeamPermissionMixin, ListView):

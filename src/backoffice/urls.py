@@ -10,6 +10,7 @@ from .views import (
     EventProposalManageView,
     ExpenseDetailView,
     ExpenseListView,
+    FacilityFeedbackView,
     ManageProposalsView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
@@ -34,6 +35,10 @@ app_name = "backoffice"
 
 urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
+    path(
+        "feedback/facilities/<slug:team_slug>/",
+        include([path("", FacilityFeedbackView.as_view(), name="facilityfeedback")]),
+    ),
     # infodesk
     path(
         "infodesk/",

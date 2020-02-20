@@ -1,16 +1,21 @@
 # coding: utf-8
 import factory
 from allauth.account.models import EmailAddress
+from camps.models import Camp
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.text import slugify
-from faker import Faker
-
-from camps.models import Camp
 from events.models import Routing, Type
+from facilities.models import (
+    Facility,
+    FacilityFeedback,
+    FacilityQuickFeedback,
+    FacilityType,
+)
+from faker import Faker
 from feedback.models import Feedback
 from info.models import InfoCategory, InfoItem
 from news.models import NewsItem
@@ -167,6 +172,120 @@ class Command(BaseCommand):
     def create_news(self):
         NewsItem.objects.create(
             title="unpublished news item", content="unpublished news body here"
+        )
+
+    def create_quickfeedback_options(self):
+        options = {}
+        self.output("Creating quickfeedback options")
+        options["na"] = FacilityQuickFeedback.objects.create(
+            feedback="N/A", icon="fas fa-times"
+        )
+        options["attention"] = FacilityQuickFeedback.objects.create(
+            feedback="Needs attention"
+        )
+        options["toiletpaper"] = FacilityQuickFeedback.objects.create(
+            feedback="Needs more toiletpaper", icon="fas fa-toilet-paper"
+        )
+        options["cleaning"] = FacilityQuickFeedback.objects.create(
+            feedback="Needs cleaning", icon="fas fa-broom"
+        )
+        options["power"] = FacilityQuickFeedback.objects.create(
+            feedback="No power", icon="fas fa-bolt"
+        )
+        return options
+
+    def create_facility_types(self, camp, teams, options):
+        types = {}
+        self.output("Creating facility types...")
+        types["toilet"] = FacilityType.objects.create(
+            name="Toilets",
+            description="All the toilets",
+            icon="fas fa-toilet",
+            responsible_team=teams["shit"],
+        )
+        types["toilet"].quickfeedback_options.add(options["na"])
+        types["toilet"].quickfeedback_options.add(options["attention"])
+        types["toilet"].quickfeedback_options.add(options["toiletpaper"])
+        types["toilet"].quickfeedback_options.add(options["cleaning"])
+
+        types["power"] = FacilityType.objects.create(
+            name="Power Infrastructure",
+            description="Power related infrastructure, distribution points, distribution cables, and so on.",
+            icon="fas fa-plug",
+            responsible_team=teams["power"],
+        )
+        types["power"].quickfeedback_options.add(options["attention"])
+        types["power"].quickfeedback_options.add(options["power"])
+        return types
+
+    def create_facilities(self, facility_types):
+        facilities = {}
+        self.output("Creating facilities...")
+        facilities["toilet1"] = Facility.objects.create(
+            facility_type=facility_types["toilet"],
+            name="Toilet A1",
+            description="Toilet on the left side in the NOC building",
+        )
+        facilities["toilet2"] = Facility.objects.create(
+            facility_type=facility_types["toilet"],
+            name="Toilet A2",
+            description="Toilet on the right side in the NOC building",
+        )
+        facilities["pdp1"] = Facility.objects.create(
+            facility_type=facility_types["power"],
+            name="PDP1",
+            description="In orga area",
+        )
+        facilities["pdp2"] = Facility.objects.create(
+            facility_type=facility_types["power"],
+            name="PDP2",
+            description="In bar area",
+        )
+        facilities["pdp3"] = Facility.objects.create(
+            facility_type=facility_types["power"],
+            name="PDP3",
+            description="In speaker tent",
+        )
+        facilities["pdp4"] = Facility.objects.create(
+            facility_type=facility_types["power"],
+            name="PDP4",
+            description="In food area",
+        )
+        return facilities
+
+    def create_facility_feedbacks(self, facilities, options, users):
+        self.output("Creating facility feedbacks...")
+        FacilityFeedback.objects.create(
+            user=users[1],
+            facility=facilities["toilet1"],
+            quick_feedback=options["attention"],
+            comment="Something smells wrong",
+            urgent=True,
+        )
+        FacilityFeedback.objects.create(
+            user=users[2],
+            facility=facilities["toilet1"],
+            quick_feedback=options["toiletpaper"],
+            urgent=False,
+        )
+        FacilityFeedback.objects.create(
+            facility=facilities["toilet2"],
+            quick_feedback=options["cleaning"],
+            comment="This place needs cleaning please. Anonymous feedback.",
+            urgent=False,
+        )
+        FacilityFeedback.objects.create(
+            facility=facilities["pdp1"],
+            quick_feedback=options["attention"],
+            comment="Rain cover needs some work, and we need more free plugs! This feedback is submitted anonymously.",
+            urgent=False,
+        )
+        FacilityFeedback.objects.create(
+            user=users[5],
+            facility=facilities["pdp2"],
+            quick_feedback=options["power"],
+            comment="No power, please help",
+            urgent=True,
         )
 
     def create_event_types(self):
@@ -1144,21 +1263,37 @@ class Command(BaseCommand):
             description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
             camp=camp,
             needs_members=False,
+            permission_set="orgateam_permission",
         )
         teams["noc"] = Team.objects.create(
             name="NOC",
             description="The NOC team is in charge of establishing and running a network onsite.",
             camp=camp,
+            permission_set="nocteam_permission",
         )
         teams["bar"] = Team.objects.create(
             name="Bar",
             description="The Bar team plans, builds and run the IRL bar!",
             camp=camp,
+            permission_set="barteam_permission",
         )
         teams["shuttle"] = Team.objects.create(
             name="Shuttle",
             description="The shuttle team drives people to and from the trainstation or the supermarket",
             camp=camp,
+            permission_set="shuttleteam_permission",
+        )
+        teams["power"] = Team.objects.create(
+            name="Power",
+            description="The power team makes sure we have power all over the venue",
+            camp=camp,
+            permission_set="powerteam_permission",
+        )
+        teams["shit"] = Team.objects.create(
+            name="Sanitation",
+            description="Team shit takes care of the toilets",
+            camp=camp,
+            permission_set="sanitationteam_permission",
         )
 
         return teams
@@ -1588,6 +1723,8 @@ class Command(BaseCommand):
 
         global_products = self.create_global_products(product_categories)
 
+        quickfeedback_options = self.create_quickfeedback_options()
+
         for (camp, read_only) in camps:
             year = camp.camp.lower.year
 
@@ -1625,6 +1762,14 @@ class Command(BaseCommand):
                 team_memberships = self.create_camp_team_memberships(camp, teams, users)
 
                 self.create_camp_team_shifts(camp, teams, team_memberships)
+
+                facility_types = self.create_facility_types(
+                    camp, teams, quickfeedback_options
+                )
+
+                facilities = self.create_facilities(facility_types)
+
+                self.create_facility_feedbacks(facilities, quickfeedback_options, users)
 
                 info_categories = self.create_camp_info_categories(camp, teams)
 

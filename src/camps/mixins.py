@@ -1,6 +1,5 @@
-from django.shortcuts import get_object_or_404
-
 from camps.models import Camp
+from django.shortcuts import get_object_or_404
 
 
 class CampViewMixin(object):
@@ -9,9 +8,9 @@ class CampViewMixin(object):
     It also filters out objects that belong to other camps when the queryset has a camp_filter
     """
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
         self.camp = get_object_or_404(Camp, slug=self.kwargs["camp_slug"])
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = super().get_queryset()
