@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "django.contrib.gis",
     "graphene_django",
     "channels",
     "corsheaders",
@@ -61,6 +62,7 @@ INSTALLED_APPS = [
     "bootstrap3",
     "django_extensions",
     "reversion",
+    "leaflet",
 ]
 
 # MEDIA_URL = '/media/'

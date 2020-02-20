@@ -1,7 +1,13 @@
 {% extends 'program_base.html' %}
+{% load leaflet_tags %}
+
+{% block extra_head %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock extra_head %}
 
 {% block title %}
-{{ facility.facility_type.name }} - Facilities | {{ block.super }}
+{{ facility.name }} - Facilities | {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -13,7 +19,21 @@
     <p class="lead">{{ facility.description }}</p>
     <a href="{% url "facilities:facility_feedback" camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-comment-dots"></i> Submit Feedback</a>
     <a href="{% url "facilities:facility_list" camp_slug=camp.slug facility_type_slug=facilitytype.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Back to {{ facilitytype.name }} list</a>
+    <p>{% leaflet_map "facility_detail" %}</p>
   </div>
 </div>
+
+<script type="text/javascript">
+// add a listener to add the marker for the facility on the leaflet map after it inits
+window.addEventListener("map:init", function (e) {
+    var detail = e.detail;
+    {% url "facilities:facility_feedback" camp_slug=facility.camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid as feedback %}
+    marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}]);
+    marker.addTo(detail.map);
+marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p><p><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>");
+    detail.map.setView([{{ facility_list.0.location.y }}, {{ facility_list.0.location.x }}], 15);
+}, false);
+</script>
+
 {% endblock %}
 

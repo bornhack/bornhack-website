@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.text import slugify
@@ -96,6 +97,8 @@ class Facility(CampRelatedModel, UUIDModel):
     )
 
     description = models.TextField(help_text="Description of this facility")
+
+    location = PointField(help_text="The location of this facility")
 
     @property
     def team(self):

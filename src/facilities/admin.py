@@ -1,4 +1,5 @@
 from django.contrib import admin
+from leaflet.admin import LeafletGeoAdmin
 
 from .models import Facility, FacilityFeedback, FacilityQuickFeedback, FacilityType
 
@@ -15,8 +16,8 @@ class FacilityTypeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Facility)
-class FacilityAdmin(admin.ModelAdmin):
-    list_display = ["name", "description", "facility_type", "camp", "team"]
+class FacilityAdmin(LeafletGeoAdmin):
+    list_display = ["name", "description", "facility_type", "camp", "team", "location"]
     list_filter = [
         "facility_type__responsible_team__camp",
         "facility_type",

@@ -3,6 +3,7 @@ import factory
 from allauth.account.models import EmailAddress
 from camps.models import Camp
 from django.contrib.auth.models import User
+from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
@@ -225,31 +226,37 @@ class Command(BaseCommand):
             facility_type=facility_types["toilet"],
             name="Toilet A1",
             description="Toilet on the left side in the NOC building",
+            location=Point(1, 2),
         )
         facilities["toilet2"] = Facility.objects.create(
             facility_type=facility_types["toilet"],
             name="Toilet A2",
             description="Toilet on the right side in the NOC building",
+            location=Point(3, 4),
         )
         facilities["pdp1"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP1",
             description="In orga area",
+            location=Point(5, 6),
         )
         facilities["pdp2"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP2",
             description="In bar area",
+            location=Point(7, 8),
         )
         facilities["pdp3"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP3",
             description="In speaker tent",
+            location=Point(9, 10),
         )
         facilities["pdp4"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP4",
             description="In food area",
+            location=Point(11, 12),
         )
         return facilities
 

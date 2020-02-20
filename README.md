@@ -57,9 +57,7 @@ Install pip packages:
 
 ### Postgres
 
-You need to have a running Postgres instance (we use Postgres-specific datetime range fields). Install Postgress, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password.
-
-You can also use Unix socket connections if you know how to. It's faster, easier and perhaps more secure.
+You need to have a running Postgres instance (we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`.
 
 ### Configuration file
 
