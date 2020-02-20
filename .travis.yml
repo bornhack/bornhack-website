@@ -20,6 +20,7 @@ install:
 
 before_script:
   - psql -c "CREATE ROLE bornhack WITH CREATEDB LOGIN PASSWORD 'bornhack';"
+  - createdb -O bornhack bornhack
   - sudo -u postgres -- psql -c "CREATE EXTENSION postgis;" bornhack
 
 script:
