@@ -14,7 +14,7 @@ ALLOWED_HOSTS = "*"
 # Database settings - modify to match your database configuration!
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": 'django.contrib.gis.db.backends.postgis',
         "NAME": "bornhack",
         "USER": "bornhack",
 # Comment back in if you are connecting via TCP
