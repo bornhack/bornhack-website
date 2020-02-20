@@ -8,12 +8,10 @@ services:
   - postgresql
 
 addons:
-  postgresql: "11"
+  postgresql: "9.6"
   apt:
     packages:
-    - postgresql-11
-    - postgresql-client-11
-    - postgresql-11-postgis-2.5
+    - postgresql-9.6-postgis-2.5
 
 install:
   - pip install -r src/requirements/dev.txt
