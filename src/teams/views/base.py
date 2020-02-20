@@ -1,5 +1,6 @@
 import logging
 
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -7,8 +8,6 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import UpdateView
-
-from camps.mixins import CampViewMixin
 
 from ..models import Team, TeamMember
 from .mixins import EnsureTeamResponsibleMixin
@@ -20,6 +19,16 @@ class TeamListView(CampViewMixin, ListView):
     template_name = "team_list.html"
     model = Team
     context_object_name = "teams"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related("members")
+        qs = qs.prefetch_related("members__profile")
+        # FIXME: there is more to be gained here but the templatetag we use to see if
+        # the logged-in user is a member of the current team does not benefit from the prefetching,
+        # also the getting of team responsible members and their profiles do not use the prefetching
+        # :( /tyk
+        return qs
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
