@@ -1,7 +1,6 @@
 from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
@@ -11,12 +10,12 @@ from .mixins import FacilityTypeViewMixin, FacilityViewMixin
 from .models import Facility, FacilityFeedback, FacilityType
 
 
-class FacilityTypeListView(LoginRequiredMixin, CampViewMixin, ListView):
+class FacilityTypeListView(CampViewMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list.html"
 
 
-class FacilityListView(LoginRequiredMixin, FacilityTypeViewMixin, ListView):
+class FacilityListView(FacilityTypeViewMixin, ListView):
     model = Facility
     template_name = "facility_list.html"
 
@@ -25,7 +24,7 @@ class FacilityListView(LoginRequiredMixin, FacilityTypeViewMixin, ListView):
         return qs.filter(facility_type=self.facility_type)
 
 
-class FacilityDetailView(LoginRequiredMixin, FacilityTypeViewMixin, DetailView):
+class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     model = Facility
     template_name = "facility_detail.html"
     pk_url_kwarg = "facility_uuid"

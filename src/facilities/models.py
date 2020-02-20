@@ -1,8 +1,12 @@
+import base64
+import io
 import logging
 
+import qrcode
 from django.contrib.gis.db.models import PointField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.shortcuts import reverse
 from django.utils.text import slugify
 from utils.models import CampRelatedModel, UUIDModel
 
@@ -112,6 +116,29 @@ class Facility(CampRelatedModel, UUIDModel):
 
     def __str__(self):
         return self.name
+
+    def get_feedback_url(self, request):
+        return request.build_absolute_uri(
+            reverse(
+                "facilities:facility_feedback",
+                kwargs={
+                    "camp_slug": self.facility_type.responsible_team.camp.slug,
+                    "facility_type_slug": self.facility_type.slug,
+                    "facility_uuid": self.uuid,
+                },
+            )
+        )
+
+    def get_feedback_qr(self, request):
+        qr = qrcode.make(
+            self.get_feedback_url(request),
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_H,
+        ).resize((250, 250))
+        file_like = io.BytesIO()
+        qr.save(file_like, format="png")
+        qrcode_base64 = base64.b64encode(file_like.getvalue()).decode("utf-8")
+        return f"data:image/png;base64,{qrcode_base64}"
 
 
 class FacilityFeedback(CampRelatedModel):

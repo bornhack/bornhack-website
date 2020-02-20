@@ -18,12 +18,20 @@ Facilities of type {{ facilitytype }} | {{ block.super }}
   <div class="panel-body">
     <div class="list-group">
     {% for facility in facility_list %}
+      {% if request.user.is_authenticated %}
       <a href="{% url 'facilities:facility_detail' camp_slug=camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid %}" class="list-group-item">
+      {% else %}
+      <div class="list-group-item">
+      {% endif %}
       <h4 class="list-group-item-heading">
       <i class="{{ facility.facility_type.icon }} fa-2x fa-pull-left fa-fw"></i> {{ facility.name }}
       </h4>
       <p class="list-group-item-text">{{ facility.description }}</p>
+      {% if request.user.is_authenticated %}
       </a>
+      {% else %}
+      </div>
+      {% endif %}
     {% endfor %}
     </div>
     <p>{% leaflet_map "facility_list" %}</p>
@@ -40,7 +48,7 @@ window.addEventListener("map:init", function (e) {
     {% url "facilities:facility_feedback" camp_slug=facility.camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid as feedback %}
     marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}]);
     marker.addTo(detail.map);
-marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p><p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>");
+marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>{% endif %}");
 {% endfor %}
     detail.map.setView([{{ facility_list.0.location.y }}, {{ facility_list.0.location.x }}], 15);
 }, false);
