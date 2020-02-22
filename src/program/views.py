@@ -1,5 +1,4 @@
 import logging
-import uuid
 from collections import OrderedDict
 
 import icalendar
@@ -854,7 +853,6 @@ class FrabXmlView(CampViewMixin, View):
     """
     This view returns an XML schedule in Frab format
     XSD is from https://raw.githubusercontent.com/wiki/frab/frab/images/schedule.xsd
-    FIXME: We use a random UUID(guid) for each event, make an uuid field because why not
     """
 
     def get(self, *args, **kwargs):
@@ -909,7 +907,7 @@ class FrabXmlView(CampViewMixin, View):
                             E.links(*urls),
                             E.attachments,
                             id=str(instance.id),
-                            guid=str(uuid.uuid4()),
+                            guid=str(instance.uuid),
                         ),
                     )
                 if instances:

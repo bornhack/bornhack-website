@@ -621,6 +621,13 @@ class Event(CampRelatedModel):
 class EventInstance(CampRelatedModel):
     """ An instance of an event """
 
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        help_text="This field is mostly here to keep Frab happy, it is not the PK of the model",
+    )
+
     event = models.ForeignKey(
         "program.event", related_name="instances", on_delete=models.PROTECT
     )
