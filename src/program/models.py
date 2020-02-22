@@ -318,7 +318,8 @@ class EventProposal(UserSubmittedModel):
     )
 
     allow_video_recording = models.BooleanField(
-        default=False, help_text="Uncheck to avoid video recording."
+        default=False,
+        help_text="Uncheck to avoid video recording. Recordings are made available under the CC BY-SA 4.0 license. Uncheck if you can not accept this license.",
     )
 
     duration = models.IntegerField(
