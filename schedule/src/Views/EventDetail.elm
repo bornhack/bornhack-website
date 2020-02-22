@@ -154,6 +154,9 @@ eventMetaDataSidebar event eventInstances model =
                         []
                         (List.map (\ei -> li [] <| eventInstanceItem ei model) instances)
                     ]
+
+        feedbackUrl =
+            [a [href <| "https://bornhack.dk/" ++ model.flags.camp_slug ++ "/program/" ++ event.slug ++ "/feedback/create/" ] [text "Give feedback"]]
     in
         div []
             ([ h4 [] [ text "Metadata" ]
@@ -170,6 +173,7 @@ eventMetaDataSidebar event eventInstances model =
                 )
              ]
                 ++ eventInstanceMetaData
+                ++ feedbackUrl
             )
 
 

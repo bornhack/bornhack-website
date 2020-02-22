@@ -19,7 +19,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from facilities.models import FacilityFeedback
 from profiles.models import Profile
-from program.models import EventProposal, SpeakerProposal
+from program.models import EventFeedback, EventProposal, SpeakerProposal
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -155,6 +155,55 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         )
 
 
+class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
+    """
+    This view shows a list of EventFeedback objects which are pending approval.
+    """
+
+    model = EventFeedback
+    template_name = "approve_feedback.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.queryset = EventFeedback.objects.filter(
+            event__track__camp=self.camp, approved__isnull=True
+        )
+
+        self.form_class = modelformset_factory(
+            EventFeedback,
+            fields=("approved",),
+            min_num=self.queryset.count(),
+            validate_min=True,
+            max_num=self.queryset.count(),
+            validate_max=True,
+            extra=0,
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Include the queryset used for the modelformset_factory so we have
+        some idea which object is which in the template
+        Why the hell do the forms in the formset not include the object?
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["eventfeedback_list"] = self.queryset
+        context["formset"] = self.form_class(queryset=self.queryset)
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        if form.changed_objects:
+            messages.success(
+                self.request, f"Updated {len(form.changed_objects)} EventFeedbacks"
+            )
+        return redirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse(
+            "backoffice:approve_eventfeedback", kwargs={"camp_slug": self.camp.slug}
+        )
+
+
 class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     """
     This view shows a list of pending SpeakerProposal and EventProposals.
@@ -187,7 +236,6 @@ class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateVi
         """
         We have two submit buttons in this form, Approve and Reject
         """
-        logger.debug(form.data)
         if "approve" in form.data:
             # approve button was pressed
             form.instance.mark_as_approved(self.request)

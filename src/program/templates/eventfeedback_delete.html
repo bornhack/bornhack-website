@@ -1,0 +1,18 @@
+{% extends 'program_base.html' %}
+{% load commonmark %}
+{% load bootstrap3 %}
+
+{% block program_content %}
+<h2>Delete Your Feedback?</h2>
+
+{% include 'includes/eventfeedback_detail_panel.html' %}
+
+<form method="POST">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">
+    <i class="fas fa-times"></i>
+    Delete Feedback
+  </button>
+  <a href="{% url 'program:eventfeedback_detail' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+</form>
+{% endblock program_content %}

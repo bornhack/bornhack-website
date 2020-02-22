@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    ApproveFeedbackView,
     ApproveNamesView,
     BackofficeIndexView,
     BadgeHandoutView,
@@ -84,6 +85,10 @@ urlpatterns = [
                 ),
             ]
         ),
+    ),
+    # approve eventfeedback objects
+    path(
+        "approve_feedback", ApproveFeedbackView.as_view(), name="approve_eventfeedback",
     ),
     # economy
     path(
