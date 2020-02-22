@@ -1,6 +1,6 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
-
+{% load program %} 
 {% block program_content %}
 
 <div class="row">
@@ -14,7 +14,7 @@
 
 <div class="row">
   <div class="panel panel-default">
-      <div class="panel-heading" ><span style="font-size: x-large"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}</span></div>
+      <div class="panel-heading" ><span style="font-size: x-large"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}</span><span class="pull-right">{% feedbackbutton %}</span></div>
     <div class="panel-body">
       <p>
       {{ event.abstract|untrustedcommonmark }}

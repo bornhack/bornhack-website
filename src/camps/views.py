@@ -6,13 +6,12 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from .mixins import CampViewMixin
 from .models import Camp
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class CampRedirectView(CampViewMixin, View):
+class CampRedirectView(View):
     def dispatch(self, request, *args, **kwargs):
         now = timezone.now()
 
