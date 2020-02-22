@@ -52,11 +52,12 @@ class FacilityFeedbackView(FacilityViewMixin, CreateView):
             help_text=form.fields["quick_feedback"].help_text,
         )
 
-        form.fields["anonymous"] = forms.BooleanField(
-            label="Anonymous",
-            required=False,
-            help_text="Check if you prefer to submit this feedback without associating it with your bornhack.dk username",
-        )
+        if self.request.user.is_authenticated:
+            form.fields["anonymous"] = forms.BooleanField(
+                label="Anonymous",
+                required=False,
+                help_text="Check if you prefer to submit this feedback without associating it with your bornhack.dk username",
+            )
         return form
 
     def get_context_data(self, *args, **kwargs):
