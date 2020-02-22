@@ -15,7 +15,9 @@
           <th>Title</th>
           <th>Speakers</th>
           <th>Scheduled</th>
-          <th>Feedback</th>
+          {% if not user.is_anonymous %}
+            <th>Feedback</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -44,7 +46,9 @@
               <i>No instances scheduled yet</i>
             {% endfor %}
           </td>
-          <td>{% feedbackbutton %}</td> 
+          {% if not user.is_anonymous %}
+            <td>{% feedbackbutton %}</td>
+          {% endif %}
         </tr>
       {% endif %}
       {% endfor %}

@@ -1115,7 +1115,6 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
         form.fields["rating"].widget = forms.RadioSelect(
             choices=models.EventFeedback.RATING_CHOICES,
         )
-        print(models.EventFeedback.RATING_CHOICES)
         return form
 
     def form_valid(self, form):

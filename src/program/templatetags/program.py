@@ -8,6 +8,10 @@ register = template.Library()
 @register.simple_tag(takes_context=True)
 def feedbackbutton(context):
     """ A templatetag to show a suitable button for EventFeedback """
+
+    if context.request.user.is_anonymous:
+        return None
+
     event = context["event"]
     if event.proposal and event.proposal.user == context.request.user:
         # current user is the event owner, show a link to EventFeedbackList
