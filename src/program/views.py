@@ -866,7 +866,7 @@ class FrabXmlView(CampViewMixin, View):
                             E.date(instance.when.lower.isoformat()),
                             E.start(instance.when.lower.time()),
                             E.duration(instance.when.upper - instance.when.lower),
-                            E.room(location),
+                            E.room(location.name),
                             E.slug(f"{instance.pk}-{instance.event.slug}"),
                             E.url(
                                 self.request.build_absolute_uri(
