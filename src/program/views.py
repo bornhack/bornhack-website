@@ -1,20 +1,21 @@
 import logging
+import uuid
 from collections import OrderedDict
 
 import icalendar
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, HttpResponseServerError
 from django.shortcuts import get_object_or_404, redirect
 from django.template import Context, Engine
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import DetailView, ListView, TemplateView, View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
-from camps.mixins import CampViewMixin
+from lxml import etree, objectify
 
 from . import models
 from .email import (
@@ -830,6 +831,109 @@ class ScheduleView(CampViewMixin, TemplateView):
 
 class CallForParticipationView(CampViewMixin, TemplateView):
     template_name = "call_for_participation.html"
+
+
+class FrabXmlView(CampViewMixin, View):
+    """
+    This view returns an XML schedule in Frab format
+    XSD is from https://raw.githubusercontent.com/wiki/frab/frab/images/schedule.xsd
+    FIXME: We use a random UUID(guid) for each event, make an uuid field because why not
+    """
+
+    def get(self, *args, **kwargs):
+        qs = models.EventInstance.objects.filter(event__track__camp=self.camp).order_by(
+            "when", "location"
+        )
+        E = objectify.ElementMaker(annotate=False)
+        days = ()
+        i = 0
+        for day in self.camp.get_days("camp")[:-1]:
+            i += 1
+            locations = ()
+            for location in models.EventLocation.objects.filter(
+                id__in=qs.values_list("location_id", flat=True)
+            ):
+                instances = ()
+                for instance in qs.filter(when__contained_by=day, location=location):
+                    speakers = ()
+                    for speaker in instance.event.speakers.all():
+                        speakers += (E.person(speaker.name, id=str(speaker.pk)),)
+                    urls = ()
+                    for url in instance.event.urls.all():
+                        urls += (E.link(url.urltype.name, href=url.url),)
+                    instances += (
+                        E.event(
+                            E.date(instance.when.lower.isoformat()),
+                            E.start(instance.when.lower.time()),
+                            E.duration(instance.when.upper - instance.when.lower),
+                            E.room(location),
+                            E.slug(f"{instance.pk}-{instance.event.slug}"),
+                            E.url(
+                                self.request.build_absolute_uri(
+                                    instance.event.get_absolute_url()
+                                )
+                            ),
+                            E.recording(
+                                E.license("CC BY-SA 4.0"),
+                                E.optout(
+                                    "false"
+                                    if instance.event.video_recording
+                                    else "true"
+                                ),
+                            ),
+                            E.title(instance.event.title),
+                            E.subtitle(""),
+                            E.track(instance.event.track),
+                            E.type(instance.event.event_type),
+                            E.language("en"),
+                            E.abstract(instance.event.abstract),
+                            E.description(""),
+                            E.persons(*speakers),
+                            E.links(*urls),
+                            E.attachments,
+                            id=str(instance.id),
+                            guid=str(uuid.uuid4()),
+                        ),
+                    )
+                if instances:
+                    locations += (E.room(*instances, name=location.name),)
+            days += (
+                E.day(
+                    *locations,
+                    index=str(i),
+                    date=str(day.lower.date()),
+                    start=day.lower.isoformat(),
+                    end=day.upper.isoformat(),
+                ),
+            )
+
+        xml = E.schedule(
+            E.version("BornHack Frab XML Generator v0.9"),
+            E.conference(
+                E.title(self.camp.title),
+                E.acronym(str(self.camp.camp.lower.year)),
+                E.start(self.camp.camp.lower.date().isoformat()),
+                E.end(self.camp.camp.upper.date().isoformat()),
+                E.days(len(self.camp.get_days("camp"))),
+                E.timeslot_duration("00:30"),
+                E.base_url(self.request.build_absolute_uri("/")),
+            ),
+            *days,
+        )
+        xml = etree.tostring(xml, pretty_print=True, xml_declaration=True)
+
+        # let's play nice - validate the XML before returning it
+        schema = etree.XMLSchema(file="program/xsd/schedule.xml.xsd")
+        parser = objectify.makeparser(schema=schema)
+        try:
+            _ = objectify.fromstring(xml, parser)
+        except etree.XMLSyntaxError:
+            # we are generating invalid XML
+            logger.exception("Something went sideways when validating frab xml :(")
+            return HttpResponseServerError()
+        response = HttpResponse(content_type="application/xml")
+        response.write(xml)
+        return response
 
 
 ###################################################################################################

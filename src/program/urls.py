@@ -15,6 +15,7 @@ from .views import (
     EventProposalSelectPersonView,
     EventProposalTypeSelectView,
     EventProposalUpdateView,
+    FrabXmlView,
     ICSView,
     NoScriptScheduleView,
     ProgramControlCenter,
@@ -37,6 +38,7 @@ urlpatterns = [
     path("", ScheduleView.as_view(), name="schedule_index"),
     path("noscript/", NoScriptScheduleView.as_view(), name="noscript_schedule_index"),
     path("ics/", ICSView.as_view(), name="ics_view"),
+    path("frab.xml", FrabXmlView.as_view(), name="frab_view"),
     path("control/", ProgramControlCenter.as_view(), name="program_control_center"),
     path(
         "proposals/",

@@ -10,9 +10,8 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
-
 from utils.models import CampRelatedModel, CreatedUpdatedModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -592,7 +591,7 @@ class Event(CampRelatedModel):
         return False
 
     def get_absolute_url(self):
-        return reverse_lazy(
+        return reverse(
             "program:event_detail",
             kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
         )
