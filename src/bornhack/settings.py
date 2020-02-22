@@ -123,6 +123,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "utils.middleware.RedirectExceptionMiddleware",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True

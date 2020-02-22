@@ -1,4 +1,5 @@
 {% extends 'program_base.html' %}
+{% load program %}
 
 {% block program_content %}
 {% if event_list %}
@@ -14,6 +15,9 @@
           <th>Title</th>
           <th>Speakers</th>
           <th>Scheduled</th>
+          {% if not user.is_anonymous %}
+            <th>Feedback</th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -26,7 +30,7 @@
             </a>
           </td>
           <td>
-              <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
           </td>
           <td>
             {% for speaker in event.speakers.all %}
@@ -42,6 +46,9 @@
               <i>No instances scheduled yet</i>
             {% endfor %}
           </td>
+          {% if not user.is_anonymous %}
+            <td>{% feedbackbutton %}</td>
+          {% endif %}
         </tr>
       {% endif %}
       {% endfor %}

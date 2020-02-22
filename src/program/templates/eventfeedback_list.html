@@ -1,0 +1,11 @@
+{% extends 'program_base.html' %}
+{% load program %}
+
+{% block program_content %}
+<h2>Feedback List</h2>
+<p class="lead">This is a list of all the approved feedback for your {{ camp.title }} event <b>{{ event.title }}</b>. We currently have feedback from {{ eventfeedback_list|length }} users.</p>
+
+{% for eventfeedback in eventfeedback_list %}
+{% include 'includes/eventfeedback_detail_panel.html' %}
+{% endfor %}
+{% endblock program_content %}

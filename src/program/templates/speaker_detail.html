@@ -30,7 +30,7 @@
             <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
                 {{ event.event_type.name }}
             </small>
-            <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
         </h3>
         {{ event.abstract|untrustedcommonmark }}
 
