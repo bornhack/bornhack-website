@@ -29,7 +29,7 @@
       <td>{{ instance.when.lower|date:"H:i" }}-{{ instance.when.upper|date:"H:i" }}</td>
       <td>
         <i class="fas fa-video{% if not instance.event.video_recording %}-slash{% endif %}"></i>
-        <a href="{% url 'program:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a>
+        <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=instance.event.slug %}">{{ instance.event.title }}</a>
       </td>
       <td>{{ instance.location.name }}</td>
       <td>{{ instance.event.event_type }}</td>
