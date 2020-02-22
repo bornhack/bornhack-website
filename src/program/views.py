@@ -923,7 +923,7 @@ class FrabXmlView(CampViewMixin, View):
             )
 
         xml = E.schedule(
-            E.version("BornHack Frab XML Generator v0.9"),
+            E.version("BornHack Frab XML Generator v1.0"),
             E.conference(
                 E.title(self.camp.title),
                 E.acronym(str(self.camp.camp.lower.year)),
