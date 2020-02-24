@@ -803,9 +803,11 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["eventinstances"] = models.EventInstance.objects.filter(
-            event__track__camp=self.camp
-        ).order_by("when")
+        context["eventinstances"] = (
+            models.EventInstance.objects.filter(event__track__camp=self.camp)
+            .prefetch_related("location", "event__event_type")
+            .order_by("when")
+        )
         return context
 
 
@@ -923,7 +925,7 @@ class FrabXmlView(CampViewMixin, View):
             )
 
         xml = E.schedule(
-            E.version("BornHack Frab XML Generator v0.9"),
+            E.version("BornHack Frab XML Generator v1.0"),
             E.conference(
                 E.title(self.camp.title),
                 E.acronym(str(self.camp.camp.lower.year)),

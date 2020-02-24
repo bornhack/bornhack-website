@@ -30,7 +30,7 @@
             </a>
           </td>
           <td>
-              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
+              <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/event/{{ event.slug }}">{{ event.title }}</a>
           </td>
           <td>
             {% for speaker in event.speakers.all %}

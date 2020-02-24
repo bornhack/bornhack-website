@@ -3,6 +3,7 @@ import re
 import time
 
 import irc3
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
 
@@ -116,9 +117,10 @@ class Plugin(object):
         # logger.debug("inside do_stuff()")
 
         # call the methods we need to
-        self.bot.check_irc_channels()
-        self.bot.fix_missing_acls()
-        self.bot.get_outgoing_messages()
+        # call them with sync_to_async to be able to access database
+        sync_to_async(self.bot.check_irc_channels)()
+        sync_to_async(self.bot.fix_missing_acls)()
+        sync_to_async(self.bot.get_outgoing_messages)()
 
         # schedule a call of this function again in N seconds
         self.bot.loop.call_later(
