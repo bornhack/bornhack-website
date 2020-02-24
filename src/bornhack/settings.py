@@ -1,6 +1,6 @@
 import os
 
-from .environment_settings import *
+from .environment_settings import *  # noqa: F403
 
 
 def local_dir(entry):
@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.sites",
+    "django.contrib.gis",
     "graphene_django",
     "channels",
     "corsheaders",
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     "feedback",
     "economy",
     "wishlist",
+    "facilities",
     "allauth",
     "allauth.account",
     "allauth_2fa",
@@ -60,6 +62,7 @@ INSTALLED_APPS = [
     "bootstrap3",
     "django_extensions",
     "reversion",
+    "leaflet",
 ]
 
 # MEDIA_URL = '/media/'
@@ -129,7 +132,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/api/*$"
 
-if DEBUG:
+if DEBUG:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE

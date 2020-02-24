@@ -7,7 +7,7 @@ ALLOWED_HOSTS = {{ django_allowed_hostnames }}
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': '{{ django_postgres_dbname }}',
         'USER': '{{ django_postgres_user }}',
         'PASSWORD': '{{ django_postgres_password }}',

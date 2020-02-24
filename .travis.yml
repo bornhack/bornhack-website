@@ -1,20 +1,25 @@
+dist: bionic
+
 cache: pip
 
 language: python
 python:
-  - "3.6"
+  - "3.7"
 
 services:
   - postgresql
 
 addons:
   postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6-postgis-2.5
 
 install:
   - pip install -r src/requirements/dev.txt
 
 before_script:
-  - psql -c "CREATE ROLE bornhack WITH CREATEDB LOGIN PASSWORD 'bornhack';"
+  - psql -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py

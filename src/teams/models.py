@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -54,6 +53,13 @@ class Team(CampRelatedModel):
     )
 
     description = models.TextField()
+
+    permission_set = models.CharField(
+        max_length=100,
+        blank=True,
+        default="",
+        help_text="The name of this Teams set of permissions. Must be a value from camps.models.Permission.Meta.permissions.",
+    )
 
     needs_members = models.BooleanField(
         default=True, help_text="Check to indicate that this team needs more members"
@@ -268,7 +274,6 @@ class Team(CampRelatedModel):
 
 
 class TeamMember(CampRelatedModel):
-
     user = models.ForeignKey(
         "auth.User",
         on_delete=models.PROTECT,

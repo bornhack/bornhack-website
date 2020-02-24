@@ -11,11 +11,16 @@
             <a class="btn {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
             {% endif %}
 
-            {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
-            <a class="btn {% menubuttonclass 'economy' %}" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a>
-            {% endif %}
-
-            {% if perms.camps.backoffice_permission %}
-            <a class="btn {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
-            {% endif %}
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></button>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
+              {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+                <li><a href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
+              {% endif %}
+              {% if perms.camps.backoffice_permission %}
+                <li><a href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
+              {% endif %}
+              </ul>
+            </div>
 
