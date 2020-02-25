@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "economy",
     "wishlist",
     "facilities",
+    "phonebook",
     "allauth",
     "allauth.account",
     "allauth_2fa",
