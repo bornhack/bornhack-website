@@ -47,7 +47,10 @@ Your DECT Registrations | {{ block.super }}
     </table>
     {% else %}
     <p class="lead"><i>No DECT registrations found. Go create one!</i></p>
-    <p><a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a></p>
+    <p>
+      <a href="{% url 'phonebook:list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Phonebook</a>
+      <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
+    </p>
     {% endif %}
   </div>
 </div>
