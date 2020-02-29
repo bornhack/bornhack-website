@@ -7,6 +7,7 @@
             <th>People</th>
             <th>Track</th>
             <th>Status</th>
+            <th>Published</th>
             {% if request.resolver_match.app_name == "program" %}
                 <th class='text-right'>Available Actions</th>
             {% endif %}
@@ -30,6 +31,13 @@
             </span></td>
             <td><span class="h4">{{ eventproposal.track.name }}</span></td>
             <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>
+            <td>
+              {% if eventproposal.event %}
+              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=eventproposal.event.slug %}" class="btn btn-default btn-sm"><i class="fas fa-{{ eventproposal.event_type.icon }} fa-lg" style="color: {{ eventproposal.event_type.color }};"></i> Show Event</a>
+              {% else %}
+              <i class="fas fa-times"></i>
+              {% endif %}
+            </td>
             {% if request.resolver_match.app_name == "program" %}
                 <td class='text-right'>
                     <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-sm">
