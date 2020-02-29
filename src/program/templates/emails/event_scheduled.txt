@@ -1,0 +1,8 @@
+Hello,
+
+The {{ eventinstance.camp.title }} event "{{ eventinstance.event.title }}" has been {% if rescheduled %}re{% endif %}scheduled to begin {{ eventinstance.when.lower }} and end at {{ eventinstance.when.upper }}.
+
+Best regards,
+
+The BornHack Content Team
+

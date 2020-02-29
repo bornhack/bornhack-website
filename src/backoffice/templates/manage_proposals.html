@@ -69,7 +69,7 @@
           <td>{{ proposal.title }}</td>
           <td>{{ proposal.track }}</td>
           <td><i class="fas fa-{{ proposal.event_type.icon }} fa-lg" style="color: {{ proposal.event_type.color }};"></i> {{ proposal.event_type }}</td>
-          <td>{% for speaker in proposal.speakers.all %}<i class="fas fa-user" data-toggle="tooltip" title="{{ speaker.name }}"></i> {% endfor %}</td>
+          <td>{% for speaker in proposal.speakers.all %}<i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-toggle="tooltip" title="{{ speaker.name }} ({{ speaker.proposal_status }})"></i> {% endfor %}</td>
           <td class="text-center">{{ proposal.speaker|truefalseicon }}</td>
           <td>{{ proposal.user }}</td>
           <td><a href="{% url 'backoffice:eventproposal_manage' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a></td>

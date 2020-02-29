@@ -1,0 +1,10 @@
+Hello,
+
+We have reviewed your speaker proposal "{{ proposal.name }}" and have decided to accept it.
+
+{% if proposal.reason %}{{ proposal.reason }}{% endif %}
+
+Best regards,
+
+The BornHack Content Team
+
