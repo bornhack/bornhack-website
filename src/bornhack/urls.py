@@ -25,6 +25,7 @@ from villages.views import (
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
+    path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("profile/", include("allauth.urls")),
     path("profile/", include("allauth_2fa.urls")),
     path("profile/", include("profiles.urls", namespace="profiles")),

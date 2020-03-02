@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    DectExportView,
     DectRegistrationCreateView,
     DectRegistrationDeleteView,
     DectRegistrationListView,
@@ -11,6 +12,7 @@ from .views import (
 app_name = "phonebook"
 urlpatterns = [
     path("", PhonebookListView.as_view(), name="list"),
+    path("csv/", DectExportView.as_view(), name="csv"),
     path(
         "dectregistrations/",
         include(
