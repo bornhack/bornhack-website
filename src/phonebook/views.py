@@ -1,4 +1,5 @@
 import csv
+import logging
 import secrets
 import string
 
@@ -16,6 +17,8 @@ from utils.mixins import RaisePermissionRequiredMixin, UserIsObjectOwnerMixin
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class DectExportView(
