@@ -73,20 +73,20 @@ Edit the configuration file, setting up `DATABASES` matching your Postgres setti
 Is this a new installation? Initialize the database:
 
 ```
-(venv) $ src/manage.py migrate
+(venv) $ python src/manage.py migrate
 ```
 
 Is this for local development? Bootstrap the database with dummy data and users:
 
 ```
-(venv) $ src/manage.py bootstrap-devsite
+(venv) $ python src/manage.py bootstrap-devsite
 ```
 
 
 ### Done
 Is this for local development? Start the Django devserver:
 ```
-(venv) $ src/manage.py runserver
+(venv) $ python src/manage.py runserver
 ```
 
 Otherwise start uwsgi or similar to serve the application.
@@ -100,7 +100,7 @@ Enjoy!
 Add a new camp by running:
 
 ```
-(venv) $ src/manage.py createcamp {camp-slug}
+(venv) $ python src/manage.py createcamp {camp-slug}
 ```
 
 Then go to the admin interface to edit the camp details, adding the same slug
