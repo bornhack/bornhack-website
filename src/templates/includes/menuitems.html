@@ -6,21 +6,27 @@
             <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
             <a class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
 
-            {% if request.user.is_authenticated %}
-            <a class="btn {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
-            <a class="btn {% menubuttonclass 'feedback' %}" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a>
-            {% endif %}
-
             <div class="btn-group" role="group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></button>
               <ul class="dropdown-menu">
-                <li><a href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
-              {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
-                <li><a href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
-              {% endif %}
-              {% if perms.camps.backoffice_permission %}
-                <li><a href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
-              {% endif %}
+                {% if perms.camps.backoffice_permission %}
+                <li class="{% menudropdownclass 'backoffice' %}"><a href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
+                {% endif %}
+
+                {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+                  <li class="{% menudropdownclass 'economy' %}"><a href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
+                {% endif %}
+
+                <li class="{% menudropdownclass 'facilities' %}"><a href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
+
+                {% if request.user.is_authenticated %}
+                  <li class="{% menudropdownclass 'feedback' %}"><a href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a></li>
+                {% endif %}
+
+                <li class="{% menudropdownclass 'phonebook' %}"><a href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a></li>
+
+                {% if request.user.is_authenticated %}
+                  <li class="{% menudropdownclass 'rideshare' %}"><a href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a></li>
+                {% endif %}
               </ul>
             </div>
-

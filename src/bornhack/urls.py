@@ -25,6 +25,7 @@ from villages.views import (
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
+    path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("profile/", include("allauth.urls")),
     path("profile/", include("allauth_2fa.urls")),
     path("profile/", include("profiles.urls", namespace="profiles")),
@@ -95,6 +96,12 @@ urlpatterns = [
         kwargs={"page": "backoffice:index"},
         name="backoffice_redirect",
     ),
+    path(
+        "phonebook/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "phonebook:list"},
+        name="phone_book_redirect",
+    ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
     path(
@@ -142,6 +149,7 @@ urlpatterns = [
                 path("economy/", include("economy.urls", namespace="economy")),
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
                 path("facilities/", include("facilities.urls", namespace="facilities")),
+                path("phonebook/", include("phonebook.urls", namespace="phonebook")),
             ]
         ),
     ),

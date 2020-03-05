@@ -4,7 +4,7 @@ from .models import Profile
 
 
 @admin.register(Profile)
-class OrderAdmin(admin.ModelAdmin):
+class ProfileAdmin(admin.ModelAdmin):
     actions = ["approve_public_credit_names"]
 
     list_display = [

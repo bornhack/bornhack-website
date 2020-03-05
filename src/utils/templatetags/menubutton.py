@@ -12,3 +12,12 @@ def menubuttonclass(context, appname):
         return "btn-primary"
     else:
         return "btn-default"
+
+
+@register.simple_tag(takes_context=True)
+def menudropdownclass(context, appname):
+    if (
+        appname
+        == context["request"].resolver_match.func.view_class.__module__.split(".")[0]
+    ):
+        return "active"

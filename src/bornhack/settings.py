@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "economy",
     "wishlist",
     "facilities",
+    "phonebook",
     "allauth",
     "allauth.account",
     "allauth_2fa",
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     "django_extensions",
     "reversion",
     "leaflet",
+    "oauth2_provider",
 ]
 
 # MEDIA_URL = '/media/'
@@ -98,6 +100,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = (
+    "oauth2_provider.backends.OAuth2Backend",
     "django.contrib.auth.backends.ModelBackend",  # Handles login to admin with username
     "allauth.account.auth_backends.AuthenticationBackend",  # Handles regular logins
 )
@@ -127,6 +130,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "utils.middleware.RedirectExceptionMiddleware",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True

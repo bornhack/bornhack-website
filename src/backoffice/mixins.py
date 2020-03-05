@@ -35,5 +35,5 @@ class ContentTeamPermissionMixin(RaisePermissionRequiredMixin):
 
     permission_required = (
         "camps.backoffice_permission",
-        "program.contentteam_permission",
+        "camps.contentteam_permission",
     )

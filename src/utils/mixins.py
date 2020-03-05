@@ -1,6 +1,10 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class StaffMemberRequiredMixin(object):
@@ -12,7 +16,7 @@ class StaffMemberRequiredMixin(object):
         # only permit staff users
         if not request.user.is_staff:
             messages.error(request, "No thanks")
-            return HttpResponseForbidden()
+            raise PermissionDenied()
 
         # continue with the request
         return super().dispatch(request, *args, **kwargs)
