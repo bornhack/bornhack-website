@@ -1,0 +1,11 @@
+{% load commonmark %}
+Hello,<br>
+<br>
+We have reviewed your event proposal "{{ proposal.title }}" and have decided to reject it.<br>
+<br>
+{% if proposal.reason %}{{ proposal.reason|untrustedcommonmark }}{% endif %}
+<br>
+Best regards,<br>
+<br>
+The BornHack Content Team<br>
+<br>

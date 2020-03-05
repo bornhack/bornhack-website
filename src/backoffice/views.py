@@ -230,7 +230,7 @@ class ProposalManageBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateVi
     This class contains the shared logic between SpeakerProposalManageView and EventProposalManageView
     """
 
-    fields = []
+    fields = ["reason"]
 
     def form_valid(self, form):
         """

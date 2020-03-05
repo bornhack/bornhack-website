@@ -14,6 +14,13 @@ from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
+from .email import (
+    add_eventproposal_accepted_email,
+    add_eventproposal_rejected_email,
+    add_speakerproposal_accepted_email,
+    add_speakerproposal_rejected_email,
+)
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -175,6 +182,10 @@ class UserSubmittedModel(CampRelatedModel):
         max_length=50, choices=PROPOSAL_STATUS_CHOICES, default=PROPOSAL_PENDING
     )
 
+    reason = models.TextField(
+        blank=True, help_text="The reason this proposal was accepted or rejected.",
+    )
+
     def __str__(self):
         return "%s (submitted by: %s, status: %s)" % (
             self.headline,
@@ -214,8 +225,9 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     email = models.EmailField(
+        blank=True,
         max_length=150,
-        help_text="The email of the speaker (defaults to the logged in user if empty).",
+        help_text="The email of the speaker/artist/host. Defaults to the logged in users email if empty.",
     )
 
     biography = models.TextField(
@@ -278,12 +290,14 @@ class SpeakerProposal(UserSubmittedModel):
         messages.success(
             request, "Speaker object %s has been created/updated" % speaker
         )
+        add_speakerproposal_accepted_email(self)
 
     def mark_as_rejected(self, request):
         speakerproposalmodel = apps.get_model("program", "speakerproposal")
         self.proposal_status = speakerproposalmodel.PROPOSAL_REJECTED
         self.save()
         messages.success(request, "SpeakerProposal %s has been rejected" % self.name)
+        add_speakerproposal_rejected_email(self)
 
 
 class EventProposal(UserSubmittedModel):
@@ -319,7 +333,7 @@ class EventProposal(UserSubmittedModel):
 
     allow_video_recording = models.BooleanField(
         default=False,
-        help_text="Uncheck to avoid video recording. Recordings are made available under the CC BY-SA 4.0 license. Uncheck if you can not accept this license.",
+        help_text="Recordings are made available under the <b>CC BY-SA 4.0</b> license. Uncheck if you do not want the event recorded, or if you cannot accept the license.",
     )
 
     duration = models.IntegerField(
@@ -397,12 +411,14 @@ class EventProposal(UserSubmittedModel):
             Url.objects.create(url=url.url, urltype=url.urltype, event=event)
 
         messages.success(request, "Event object %s has been created/updated" % event)
+        add_eventproposal_accepted_email(self)
 
     def mark_as_rejected(self, request):
         eventproposalmodel = apps.get_model("program", "eventproposal")
         self.proposal_status = eventproposalmodel.PROPOSAL_REJECTED
         self.save()
         messages.success(request, "EventProposal %s has been rejected" % self.title)
+        add_eventproposal_rejected_email(self)
 
 
 ###############################################################################

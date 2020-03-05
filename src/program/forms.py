@@ -13,11 +13,6 @@ class SpeakerProposalForm(forms.ModelForm):
     The SpeakerProposalForm. Takes an EventType in __init__ and changes fields accordingly.
     """
 
-    email = forms.EmailField(
-        required=False,
-        help_text="The email of the speaker (defaults to the logged in user if empty).",
-    )
-
     class Meta:
         model = SpeakerProposal
         fields = [
@@ -43,6 +38,12 @@ class SpeakerProposalForm(forms.ModelForm):
                 "name"
             ].help_text = "The name of a debate guest. Can be a real name or an alias."
 
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Guest Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for this guest. Will default to the logged-in users email if left empty."
+
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Guest Biography"
             self.fields["biography"].help_text = "The biography of the guest."
@@ -62,6 +63,12 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields[
                 "name"
             ].help_text = "The name of the speaker. Can be a real name or an alias."
+
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Speaker Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
@@ -83,6 +90,12 @@ class SpeakerProposalForm(forms.ModelForm):
                 "name"
             ].help_text = "The name of the artist. Can be a real name or artist alias."
 
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Artist Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for this artist. Will default to the logged-in users email if left empty."
+
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Artist Description"
             self.fields["biography"].help_text = "The description of the artist."
@@ -102,6 +115,12 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields[
                 "name"
             ].help_text = "The name of the event host. Can be a real name or an alias."
+
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Host Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
@@ -123,6 +142,12 @@ class SpeakerProposalForm(forms.ModelForm):
                 "name"
             ].help_text = "The name of the speaker. Can be a real name or an alias."
 
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Speaker Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty."
+
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
             self.fields["biography"].help_text = "The biography of the speaker."
@@ -142,6 +167,12 @@ class SpeakerProposalForm(forms.ModelForm):
                 "The name of the workshop host. Can be a real name or an alias."
             )
 
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Host Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
+
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
             self.fields["biography"].help_text = "The biography of the host."
@@ -159,6 +190,12 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields["name"].help_text = "Can be a real name or an alias."
+
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Host Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
@@ -179,6 +216,12 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields[
                 "name"
             ].help_text = "The name of the meetup host. Can be a real name or an alias."
+
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Host Email"
+            self.fields[
+                "email"
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
