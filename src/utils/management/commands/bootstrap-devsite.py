@@ -29,6 +29,7 @@ from program.models import (
     EventType,
     Speaker,
 )
+from program.signal_handlers import eventinstance_post_save
 from rideshare.models import Ride
 from shop.models import Order, Product, ProductCategory
 from sponsors.models import Sponsor, SponsorTier
@@ -937,6 +938,7 @@ class Command(BaseCommand):
         return speakers
 
     def create_camp_scheduling(self, camp, events, locations):
+        post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
         year = camp.camp.lower.year
         self.output("Creating eventinstances for {}...".format(year))
         EventInstance.objects.create(
