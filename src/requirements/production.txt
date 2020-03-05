@@ -1,4 +1,4 @@
-Django==3.0.3
+Django==3.0.4
 channels==2.4.0
 channels-redis==2.4.2
 
@@ -20,7 +20,7 @@ future==0.18.2
 graphene-django==2.8.2
 html5lib==1.0.1
 icalendar==4.0.4
-ipython==7.12.0
+ipython==7.13.0
 irc3==1.1.5
 lxml==4.5.0
 olefile==0.46

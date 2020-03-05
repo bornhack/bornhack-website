@@ -2,9 +2,11 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Email</th>
             <th class="text-center">Events</th>
             <th class="text-center">URLs</th>
             <th>Status</th>
+            <th>Published</th>
             {% if request.resolver_match.app_name == "program" %}
                 <th class="text-right">Available Actions</th>
             {% endif %}
@@ -14,6 +16,7 @@
         {% for speakerproposal in speakerproposals %}
         <tr>
             <td><span class="h4">{{ speakerproposal.name }}</span></td>
+            <td><span class="h4">{{ speakerproposal.email }}</span></td>
             <td class="text-center">
                 {% if speakerproposal.eventproposals.all %}
                     {% for ep in speakerproposal.eventproposals.all %}
@@ -31,6 +34,13 @@
                 {% endfor %}
             </td>
             <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>
+            <td>
+              {% if speakerproposal.speaker %}
+              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speakerproposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+              {% else %}
+              <i class="fas fa-times"></i>
+              {% endif %}
+            </td>
             {% if request.resolver_match.app_name == "program" %}
                 <td class="text-right">
                     <a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm">

@@ -86,10 +86,14 @@ def add_outgoing_email(
     if not isinstance(to_recipients, list):
         to_recipients = [to_recipients]
 
-    for recipient in to_recipients:
+    # loop over recipients and validate each
+    for recipient in to_recipients + cc_recipients + bcc_recipients:
         try:
             validate_email(recipient)
         except ValidationError:
+            logger.error(
+                f"There was a problem validating the email {recipient} - returning False"
+            )
             return False
 
     email = OutgoingEmail.objects.create(

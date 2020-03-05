@@ -62,8 +62,8 @@ a, a:active, a:focus {
   margin-top: 6px;
 }
 
-#top-navbar > .nav li a {
-   padding: 30px 7px;
+#top-navbar > .nav > li > a {
+  padding: 30px 7px;
 }
 
 .nav .dropdown-menu  {
@@ -98,7 +98,11 @@ a, a:active, a:focus {
     border-top: 1px solid #ccc;
   }
   .navbar .nav li a {
-    padding: 15px;
+    padding: 20px !important;
+  }
+
+  .btn-group-vertical > .btn{
+    padding: 20px;
   }
 }
 
