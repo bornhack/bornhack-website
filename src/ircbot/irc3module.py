@@ -118,9 +118,9 @@ class Plugin(object):
 
         # call the methods we need to
         # call them with sync_to_async to be able to access database
-        sync_to_async(self.bot.check_irc_channels)()
-        sync_to_async(self.bot.fix_missing_acls)()
-        sync_to_async(self.bot.get_outgoing_messages)()
+        await sync_to_async(self.bot.check_irc_channels)()
+        await sync_to_async(self.bot.fix_missing_acls)()
+        await sync_to_async(self.bot.get_outgoing_messages)()
 
         # schedule a call of this function again in N seconds
         self.bot.loop.call_later(
