@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from program.models import EventLocation, EventType
 from psycopg2.extras import DateTimeTZRange
 from utils.models import CreatedUpdatedModel, UUIDModel
@@ -212,27 +213,35 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         days = []
         for i in range(0, daycount):
             if i == 0:
-                # on the first day use actual start time instead of midnight
+                # on the first day use actual start time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        field.lower,
-                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
+                        timezone.localtime(field.lower),
+                        timezone.localtime(
+                            (field.lower + timedelta(days=i + 1))
+                        ).replace(hour=0),
                     )
                 )
             elif i == daycount - 1:
-                # on the last day use actual end time instead of midnight
+                # on the last day use actual end time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        (field.lower + timedelta(days=i)).replace(hour=0),
-                        field.lower + timedelta(days=i),
+                        timezone.localtime((field.lower + timedelta(days=i))).replace(
+                            hour=0
+                        ),
+                        timezone.localtime(field.lower + timedelta(days=i)),
                     )
                 )
             else:
-                # neither first nor last day, goes from midnight to midnight
+                # neither first nor last day, goes from midnight to midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        (field.lower + timedelta(days=i)).replace(hour=0),
-                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
+                        timezone.localtime((field.lower + timedelta(days=i))).replace(
+                            hour=0
+                        ),
+                        timezone.localtime(
+                            (field.lower + timedelta(days=i + 1))
+                        ).replace(hour=0),
                     )
                 )
         return days
