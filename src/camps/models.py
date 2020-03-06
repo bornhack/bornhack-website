@@ -201,9 +201,17 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             logger.error("this attribute is not a datetimetzrange field: %s" % field)
             return False
 
-        daycount = (field.upper - field.lower).days
+        # count how many unique dates we have in this range
+        daycount = 1
+        while True:
+            if field.lower.date() + timedelta(days=daycount) > field.upper.date():
+                break
+            daycount += 1
+
+        # loop through the required number of days, append to list as we go
         days = []
         for i in range(0, daycount):
+            print(f"processing day {i} daycount is {daycount}")
             if i == 0:
                 # on the first day use actual start time instead of midnight
                 days.append(
@@ -217,7 +225,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
                 days.append(
                     DateTimeTZRange(
                         (field.lower + timedelta(days=i)).replace(hour=0),
-                        field.lower + timedelta(days=i + 1),
+                        field.lower + timedelta(days=i),
                     )
                 )
             else:
