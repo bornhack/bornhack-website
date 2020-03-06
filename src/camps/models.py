@@ -211,7 +211,6 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         # loop through the required number of days, append to list as we go
         days = []
         for i in range(0, daycount):
-            print(f"processing day {i} daycount is {daycount}")
             if i == 0:
                 # on the first day use actual start time instead of midnight
                 days.append(
