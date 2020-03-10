@@ -110,7 +110,7 @@ class Plugin(object):
     # custom irc3 methods below here
 
     @irc3.extend
-    def do_stuff(self):
+    async def do_stuff(self):
         """
         Main periodic method called every N seconds.
         """
