@@ -51,5 +51,5 @@ class DectUtils:
         """
         result = ""
         for letter in letters:
-            result += self.REVERSE_DECT_MATRIX[letter]
+            result += self.REVERSE_DECT_MATRIX[letter.upper()]
         return result
