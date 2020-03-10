@@ -53,6 +53,7 @@ urlpatterns = [
     path("api/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path("camps/", CampListView.as_view(), name="camp_list"),
     path("token/", include("tokens.urls", namespace="tokens")),
+    path("maps/", include("maps.urls", namespace="maps")),
     # camp redirect views here
     path(
         "",

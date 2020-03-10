@@ -8,6 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import reverse
 from django.utils.text import slugify
+from maps.utils import LeafletMarkerChoices
 from utils.models import CampRelatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -57,6 +58,13 @@ class FacilityType(CampRelatedModel):
         default="fas fa-list",
         blank=True,
         help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
+    )
+
+    marker = models.CharField(
+        max_length=10,
+        choices=LeafletMarkerChoices.choices,
+        default=LeafletMarkerChoices.BLUE,
+        help_text="The name/colour of the Leaflet marker to use for this facility type.",
     )
 
     responsible_team = models.ForeignKey(
