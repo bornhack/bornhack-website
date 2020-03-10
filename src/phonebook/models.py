@@ -29,18 +29,18 @@ class DectRegistration(CampRelatedModel):
     )
 
     number = models.CharField(
-        max_length=9, help_text="The DECT number, numeric or as letters",
+        max_length=9, help_text="The DECT phonenumber, four digits or more.",
     )
 
     letters = models.CharField(
         max_length=9,
         blank=True,
-        help_text="The letters chosen to represent this DECT number in the phonebook. Optional.",
+        help_text="The letters or numbers chosen to represent this DECT number in the phonebook. Optional.",
     )
 
     description = models.TextField(
         blank=True,
-        help_text="Description of this registration, like a name or a location or a service.",
+        help_text="Description of this registration, like a name/handle, or a location or service name.",
     )
 
     activation_code = models.CharField(
@@ -65,6 +65,12 @@ class DectRegistration(CampRelatedModel):
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """
+        # First of all, check that number is numeric
+        try:
+            int(self.number)
+        except ValueError:
+            raise ValidationError("Phonenumber must be numeric!")
+
         # check for conflicts with the same number
         if (
             DectRegistration.objects.filter(camp=self.camp, number=self.number)
