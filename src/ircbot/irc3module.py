@@ -30,7 +30,7 @@ class Plugin(object):
     ###############################################################################################
     # builtin irc3 event methods
 
-    def server_ready(self, **kwargs):
+    async def server_ready(self, **kwargs):
         """triggered after the server sent the MOTD (require core plugin)"""
         logger.debug("inside server_ready(), kwargs: %s" % kwargs)
 
