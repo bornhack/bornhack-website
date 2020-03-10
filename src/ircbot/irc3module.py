@@ -1,6 +1,7 @@
 import logging
 import re
 import time
+import asyncio
 
 import irc3
 from asgiref.sync import sync_to_async
@@ -44,9 +45,8 @@ class Plugin(object):
             "Calling self.bot.do_stuff() in %s seconds.."
             % settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS
         )
-        self.bot.loop.call_later(
-            settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.do_stuff
-        )
+        await asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
+        await self.bot.do_stuff()
 
     def connection_lost(self, **kwargs):
         """triggered when connection is lost"""
@@ -123,9 +123,8 @@ class Plugin(object):
         await sync_to_async(self.bot.get_outgoing_messages)()
 
         # schedule a call of this function again in N seconds
-        self.bot.loop.call_later(
-            settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.do_stuff
-        )
+        await asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
+        await self.bot.do_stuff()
 
     @irc3.extend
     def get_outgoing_messages(self):
