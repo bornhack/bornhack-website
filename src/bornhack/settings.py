@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "wishlist",
     "facilities",
     "phonebook",
+    "maps",
     "allauth",
     "allauth.account",
     "allauth_2fa",

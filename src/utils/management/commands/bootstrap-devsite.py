@@ -203,6 +203,7 @@ class Command(BaseCommand):
             name="Toilets",
             description="All the toilets",
             icon="fas fa-toilet",
+            marker="greyIcon",
             responsible_team=teams["shit"],
         )
         types["toilet"].quickfeedback_options.add(options["na"])
@@ -214,6 +215,7 @@ class Command(BaseCommand):
             name="Power Infrastructure",
             description="Power related infrastructure, distribution points, distribution cables, and so on.",
             icon="fas fa-plug",
+            marker="goldIcon",
             responsible_team=teams["power"],
         )
         types["power"].quickfeedback_options.add(options["attention"])
@@ -225,39 +227,39 @@ class Command(BaseCommand):
         self.output("Creating facilities...")
         facilities["toilet1"] = Facility.objects.create(
             facility_type=facility_types["toilet"],
-            name="Toilet A1",
-            description="Toilet on the left side in the NOC building",
-            location=Point(1, 2),
+            name="Toilet NOC East",
+            description="Toilet on the east side of the NOC building",
+            location=Point(9.939783, 55.387217),
         )
         facilities["toilet2"] = Facility.objects.create(
             facility_type=facility_types["toilet"],
-            name="Toilet A2",
-            description="Toilet on the right side in the NOC building",
-            location=Point(3, 4),
+            name="Toilet NOC West",
+            description="Toilet on the west side of the NOC building",
+            location=Point(9.93967, 55.387197),
         )
         facilities["pdp1"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP1",
             description="In orga area",
-            location=Point(5, 6),
+            location=Point(9.94079, 55.388022),
         )
         facilities["pdp2"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP2",
             description="In bar area",
-            location=Point(7, 8),
+            location=Point(9.942036, 55.387891),
         )
         facilities["pdp3"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP3",
             description="In speaker tent",
-            location=Point(9, 10),
+            location=Point(9.938416, 55.387109),
         )
         facilities["pdp4"] = Facility.objects.create(
             facility_type=facility_types["power"],
             name="PDP4",
             description="In food area",
-            location=Point(11, 12),
+            location=Point(9.940146, 55.386983),
         )
         return facilities
 

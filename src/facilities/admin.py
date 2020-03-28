@@ -12,8 +12,8 @@ class FacilityQuickFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(FacilityType)
 class FacilityTypeAdmin(admin.ModelAdmin):
-    list_display = ["name", "description", "responsible_team", "camp"]
-    list_filter = ["responsible_team__camp", "responsible_team"]
+    list_display = ["name", "description", "icon", "marker", "responsible_team", "camp"]
+    list_filter = ["responsible_team__camp", "icon", "marker", "responsible_team"]
 
 
 @admin.register(Facility)
