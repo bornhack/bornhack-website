@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Calculate AutoSchedule {{ object.id }}</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">Calculate AutoSchedule {{ object.id }} for EventType <b>{{ object.event_type }}</b>?</p>
+    <p>A schedule can be solved/calculated by itself or it can be based on another schedule. If the calculation is based on another schedule the autoscheduler will minimise changes between the two.</p>
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-plus"></i> Calculate Schedule
+      </button>
+      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="btn btn-default">
+        <i class="fas fa-undo"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+{% endblock content %}

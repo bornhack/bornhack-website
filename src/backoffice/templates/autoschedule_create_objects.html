@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Recreate AutoSchedule Objects</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">Recreate AutoEvent and AutoSlot objects for AutoSchedule {{ object.id  }}?</p>
+    <p>The autoscheduler works with AutoEvent and AutoSlot objects which are generated when the schedule is first created. The following changes in the system will require recreating the related objects:</p>
+    <p>
+      <ul>
+        <li>If any Event objects are added or removed (for the EventType of this AutoSchedule)</li>
+        <li>If EventSessions change (for the EventType of this AutoSchedule)</li>
+        <li>If SpeakerAvailability changes for any speakers in this AutoSchedule</li>
+        <li>If any SpeakerEventConflicts are added or removed (coming soon)</li>
+      </ul>
+    </p>
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-check"></i> Recreate AutoSchedule Objects
+      </button>
+      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="btn btn-default">
+        <i class="fas fa-undo"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+{% endblock content %}

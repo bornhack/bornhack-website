@@ -2,12 +2,14 @@ import logging
 import os
 from itertools import chain
 
+from autoscheduler.models import AutoSchedule
 from camps.mixins import CampViewMixin
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files import File
 from django.db.models import Sum
 from django.forms import modelformset_factory
@@ -19,7 +21,14 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from facilities.models import FacilityFeedback
 from profiles.models import Profile
-from program.models import EventFeedback, EventProposal, SpeakerProposal
+from program.models import (
+    EventFeedback,
+    EventLocation,
+    EventProposal,
+    EventSession,
+    EventType,
+    SpeakerProposal,
+)
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -204,6 +213,10 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
 
 
+#######################################
+# MANAGE SPEAKER/EVENT PROPOSAL VIEWS
+
+
 class ManageProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     """
     This view shows a list of pending SpeakerProposal and EventProposals.
@@ -267,6 +280,471 @@ class EventProposalManageView(ProposalManageBaseView):
     template_name = "manage_eventproposal.html"
 
 
+################################
+# MANAGE EVENTSESSION VIEWS
+
+
+class EventSessionTypeSelectView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+    """
+    This view is shown first when creating a new EventSession
+    """
+
+    model = EventType
+    template_name = "eventsession_typeselect.html"
+
+
+class EventSessionLocationSelectView(
+    CampViewMixin, ContentTeamPermissionMixin, ListView
+):
+    """
+    This view is shown second when creating a new EventSession
+    """
+
+    model = EventLocation
+    template_name = "eventsession_locationselect.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.event_type = get_object_or_404(EventType, slug=kwargs["eventtype_slug"])
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Add eventtype to context
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["event_type"] = self.event_type
+        return context
+
+
+class EventSessionFormViewMixin:
+    """
+    A mixin with the stuff shared between EventSession{Create|Update}View
+    """
+
+    def get_form(self, *args, **kwargs):
+        """
+        The default range widgets are a bit shit because they eat the help_text and
+        have no indication of which field is for what. So we add a nice placeholder.
+        We also limit the event_location dropdown to only the current camps locations.
+        """
+        form = super().get_form(*args, **kwargs)
+        form.fields["when"].widget.widgets[0].attrs = {
+            "placeholder": f"Start Date and Time (YYYY-MM-DD HH:MM). Time zone is {settings.TIME_ZONE}.",
+        }
+        form.fields["when"].widget.widgets[1].attrs = {
+            "placeholder": f"End Date and Time (YYYY-MM-DD HH:MM). Time zone is {settings.TIME_ZONE}.",
+        }
+        if hasattr(form.fields, "event_location"):
+            form.fields["event_location"].queryset = EventLocation.objects.filter(
+                camp=self.camp
+            )
+        return form
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Add eventtype and location and existing sessions to context
+        """
+        context = super().get_context_data(*args, **kwargs)
+        if not hasattr(self, "event_type"):
+            self.event_type = self.get_object().event_type
+        context["event_type"] = self.event_type
+
+        if not hasattr(self, "event_location"):
+            self.event_location = self.get_object().event_location
+        context["event_location"] = self.event_location
+
+        context["sessions"] = self.event_type.eventsessions.filter(camp=self.camp)
+        return context
+
+
+class EventSessionCreateView(
+    CampViewMixin, ContentTeamPermissionMixin, EventSessionFormViewMixin, CreateView
+):
+    """
+    This view is used by the Content Team to create EventSession objects
+    """
+
+    model = EventSession
+    fields = ["description", "when"]
+    template_name = "eventsession_form.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.event_type = get_object_or_404(EventType, slug=kwargs["eventtype_slug"])
+        self.event_location = get_object_or_404(
+            EventLocation, camp=self.camp, slug=kwargs["eventlocation_slug"]
+        )
+
+    def form_valid(self, form):
+        """
+        Set camp and event_type, check for overlaps and save
+        """
+        session = form.save(commit=False)
+        session.event_type = self.event_type
+        session.event_location = self.event_location
+        session.camp = self.camp
+        # check for overlaps with other sessions
+        try:
+            session.clean_when()
+        except ValidationError as E:
+            form.add_error("when", E)
+            return self.form_invalid(form)
+        # ok, save and redirect
+        session.save()
+        messages.success(self.request, f"{session} has been created successfully!")
+        return redirect(
+            reverse(
+                "backoffice:eventsession_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class EventSessionListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+    """
+    This view is used by the Content Team to see EventSession objects.
+    """
+
+    model = EventSession
+    template_name = "eventsession_list.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related("event_type", "event_location")
+        return qs
+
+
+class EventSessionDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    """
+    This view is used by the Content Team to see details for EventSession objects
+    """
+
+    model = EventSession
+    template_name = "eventsession_detail.html"
+    context_object_name = "session"
+
+
+class EventSessionUpdateView(
+    CampViewMixin, ContentTeamPermissionMixin, EventSessionFormViewMixin, UpdateView
+):
+    """
+    This view is used by the Content Team to update EventSession objects
+    """
+
+    model = EventSession
+    fields = ["event_type", "event_location", "when", "description"]
+    template_name = "eventsession_form.html"
+
+    def setup(self, *args, **kwargs):
+        """ Show a warning if we have existing EventInstance objects in this session """
+        super().setup(*args, **kwargs)
+        if self.get_object().events.exists():
+            messages.warning(
+                self.request,
+                "NOTE: One or more EventInstances exists (partially or fully) inside this EventSession. Make sure you are updating the correct session!",
+            )
+
+    def form_valid(self, form):
+        """
+        Check for overlaps and save
+        """
+        session = form.save(commit=False)
+        # check for overlaps with other sessions
+        try:
+            session.clean_when()
+        except ValidationError as E:
+            form.add_error("when", E)
+            return self.form_invalid(form)
+        # ok, save and redirect
+        session.save()
+        messages.success(self.request, f"{session} has been updated successfully!")
+        return redirect(
+            reverse(
+                "backoffice:eventsession_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
+    """
+    This view is used by the Content Team to delete EventSession objects
+    """
+
+    model = EventSession
+    template_name = "eventsession_delete.html"
+    context_object_name = "session"
+
+    def get(self, *args, **kwargs):
+        """ Show a warning if we have existing EventInstance objects in this session """
+        if self.get_object().events.exists():
+            messages.warning(
+                self.request,
+                "NOTE: One or more EventInstances exists (partially or fully) inside this EventSession. Make sure you are deleting the correct session!",
+            )
+        return super().get(*args, **kwargs)
+
+    def get_success_url(self):
+        messages.success(self.request, "EventSession was deleted successfully!")
+        return reverse(
+            "backoffice:eventsession_list", kwargs={"camp_slug": self.camp.slug}
+        )
+
+
+################################
+# AUTOSCHEDULER VIEWS
+
+
+class AutoScheduleCreateEventTypeSelectView(
+    CampViewMixin, ContentTeamPermissionMixin, ListView
+):
+    """ This view is shown first when creating a new Schedule for the autoscheduler """
+
+    model = EventType
+    template_name = "autoschedule_create_typeselect.html"
+
+
+class AutoScheduleCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateView):
+    """ This view is used by the Content Team to create Schedule objects for the autoscheduler"""
+
+    model = AutoSchedule
+    fields = []
+    template_name = "autoschedule_create.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.event_type = get_object_or_404(EventType, slug=kwargs["eventtype_slug"])
+
+    def get_context_data(self, *args, **kwargs):
+        """ Add eventtype to context """
+        context = super().get_context_data(*args, **kwargs)
+        context["event_type"] = self.event_type
+        return context
+
+    def form_valid(self, form):
+        """ Set camp and event_type and user and save """
+        schedule = form.save(commit=False)
+        schedule.event_type = self.event_type
+        schedule.camp = self.camp
+        schedule.user = self.request.user
+        schedule.save()
+
+        # create the related Event and Slot objects
+        start = timezone.now()
+        sd, ed, sc, ec = schedule.create_autoscheduler_objects()
+        duration = timezone.now() - start
+
+        # all good, return to user
+        messages.success(
+            self.request,
+            f"AutoSchedule {schedule.id} has been created successfully! Also created {sc} slots and {ec} events with it. It took {duration.total_seconds()} seconds",
+        )
+        return redirect(
+            reverse(
+                "backoffice:autoschedule_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class AutoScheduleCreateObjectsView(
+    CampViewMixin, ContentTeamPermissionMixin, UpdateView
+):
+    """ This view is used by the Content Team to (re)create related objects for
+    an AutoSchedule object. This means deleting all related AutoEvent and AutoSlot
+    objects and creating them based on the current Events, EventSessions,
+    SpeakerAvailability, and SpeakerEventConflict objects.
+    """
+
+    model = AutoSchedule
+    fields = []
+    template_name = "autoschedule_create_objects.html"
+
+    def form_valid(self, form):
+        sd, ed, sc, ec = self.get_object().create_autoscheduler_objects()
+        if not sd and not ed:
+            # nothing was deleted
+            messages.success(
+                self.request,
+                f"AutoScheduler objects created OK! No existing objects deleted, {sc} AutoSlots created, {ec} AutoEvents created.",
+            )
+        else:
+            messages.success(
+                self.request,
+                f"AutoScheduler objects recreated OK! {sd} AutoSlots deleted, {ed} AutoEvents deleted, {sc} AutoSlots created, {ec} AutoEvents created.",
+            )
+        return redirect(
+            reverse(
+                "backoffice:autoschedule_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class AutoScheduleCalculateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
+    """ This view is used by the Content Team to calculate autoschedules """
+
+    model = AutoSchedule
+    fields = []
+    template_name = "autoschedule_calculate.html"
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["original_schedule"] = forms.ModelChoiceField(
+            queryset=AutoSchedule.objects.filter(
+                camp=form.instance.camp, event_type=form.instance.event_type,
+            ).exclude(id=form.instance.id),
+            help_text="Optimise this calculation to have as few changes from the selected schedule as possible",
+        )
+        return form
+
+    def form_valid(self, form):
+        self.get_object().calculate_autoschedule(form.cleaned_data["original_schedule"])
+        messages.success(self.request, "AutoSchedule has been calculated!")
+        return redirect(
+            reverse(
+                "backoffice:autoschedule_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class AutoScheduleDiffView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    model = AutoSchedule
+    fields = []
+    template_name = "autoschedule_diff.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "events",
+            "slots",
+            "events__unavailability_slots",
+            "events__unavailability_events",
+        )
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        # show all other autoschedules from the same camp and eventtype,
+        # and where matrix is not null (meaning the schedule has been calculated)
+        context["schedules"] = AutoSchedule.objects.filter(
+            camp=self.camp,
+            event_type=self.get_object().event_type,
+            matrix__isnull=False,
+        ).exclude(pk=self.get_object().pk)
+
+        # do we have a schedule to diff with
+        if "original_schedule_id" in self.kwargs:
+            context["original_schedule"] = get_object_or_404(
+                AutoSchedule,
+                camp=self.camp,
+                event_type=self.get_object().event_type,
+                pk=self.kwargs["original_schedule_id"],
+            )
+            context["diff"] = self.get_object().diff(context["original_schedule"])
+        return context
+
+
+class AutoScheduleApplyView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
+    """ This view is used by the Content Team to apply autoschedules
+    by deleting all EventInstance objects of the EventType of the AutoSchedule,
+    and creating new EventInstance objects for each AutoEvent put in an AutoSlot.
+    TODO: see comment in autoscheduler.models.AutoSchedule.apply() method.
+    """
+
+    model = AutoSchedule
+    fields = []
+    template_name = "autoschedule_apply.html"
+
+    def form_valid(self, form):
+        deleted, created = self.get_object().apply()
+        messages.success(
+            self.request,
+            f"{self.get_object()} has been applied! Deleted {deleted} EventInstances and created {created} new EventInstances.",
+        )
+        return redirect(
+            reverse(
+                "backoffice:autoschedule_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class AutoScheduleListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+    """ This view is used by the Content Team to see EventSession objects """
+
+    model = AutoSchedule
+    template_name = "autoschedule_list.html"
+
+
+class AutoScheduleDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    """ This view is used by the Content Team to see details for Schedule objects """
+
+    model = AutoSchedule
+    template_name = "autoschedule_detail.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "events",
+            "slots",
+            "events__unavailability_slots",
+            "events__unavailability_events",
+        )
+        return qs
+
+
+class AutoScheduleDebugSlotsView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    """ This view shows a matrix of Event/Slot availability for an AutoSchedule object """
+
+    model = AutoSchedule
+    template_name = "autoschedule_debug_slots.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "events",
+            "slots",
+            "events__unavailability_slots",
+            "events__unavailability_events",
+        )
+        return qs
+
+
+class AutoScheduleDebugEventsView(
+    CampViewMixin, ContentTeamPermissionMixin, DetailView
+):
+    """ This view shows a matrix of conflicts between events for an AutoSchedule object """
+
+    model = AutoSchedule
+    template_name = "autoschedule_debug_events.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "events",
+            "slots",
+            "events__unavailability_slots",
+            "events__unavailability_events",
+        )
+        return qs
+
+
+class AutoScheduleDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
+    """ This view is used by the Content Team to delete AutoSchedule objects """
+
+    model = AutoSchedule
+    template_name = "autoschedule_delete.html"
+
+    def get_success_url(self):
+        messages.success(
+            self.request, f"AutoSchedule {self.kwargs['pk']} was deleted successfully!"
+        )
+        return reverse(
+            "backoffice:autoschedule_list", kwargs={"camp_slug": self.camp.slug}
+        )
+
+
+################################
+# MERCHANDISE VIEWS
+
+
 class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_merchandise.html"
 
@@ -311,6 +789,10 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
         return context
+
+
+################################
+# VILLAGE VIEWS
 
 
 class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):

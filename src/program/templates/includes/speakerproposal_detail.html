@@ -1,13 +1,22 @@
 {% load commonmark %}
+{% load program %}
 <div class="panel panel-default">
     <div class="panel-heading">{{ speakerproposal.name }}</div>
     <div class="panel-body">
         {{ speakerproposal.biography|untrustedcommonmark }}
         {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-        <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Modify</span></a>
+        <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Details</span></a>
         {% endif %}
     </div>
     <div class="panel-footer">Status: <span class="badge">{{ speakerproposal.proposal_status }}</span> | ID: <span class="badge">{{ speakerproposal.uuid }}</span></div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-heading">Availability for {{ speakerproposal.name }}</div>
+    <div class="panel-body">
+      {% availabilitytable matrix=matrix %}
+      <a href="{% url 'program:speakerproposal_update' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Availability</span></a>
+    </div>
 </div>
 
 <div class="panel panel-default">

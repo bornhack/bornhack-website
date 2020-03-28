@@ -13,10 +13,10 @@
 {% include 'includes/eventproposal_detail.html' %}
 
 <p>
-    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
-    {% if camp.call_for_participation_open and not camp.read_only %}
-      <a href="{% url 'program:eventproposal_delete' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
-    {% endif %}
+  <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to List</a>
+  {% if camp.call_for_participation_open and not camp.read_only %}
+    <a href="{% url 'program:eventproposal_delete' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
+  {% endif %}
 </p>
 
 {% endblock program_content %}

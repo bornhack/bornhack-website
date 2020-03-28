@@ -39,6 +39,7 @@
   </head>
 
   <body>
+  {% block body %}
 
     <div id="main" class="container container-fluid">
     <nav class="navbar navbar-fixed-top">
@@ -141,5 +142,6 @@
             $('.table').DataTable();
         });
     </script>
+  {% endblock body %}
   </body>
 </html>

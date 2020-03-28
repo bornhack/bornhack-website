@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">EventSession Details</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table">
+      <tr>
+        <th>Event Type</th>
+        <td><i class="fas fa-{{ session.event_type.icon }}" style="color: {{ session.event_type.color }};"></i> {{ session.event_type }}</td>
+      </tr>
+      <tr>
+        <th>Event Location</th>
+        <td><i class="fas fa-{{ session.event_location.icon }}"></i> {{ session.event_location.name }}</td>
+      </tr>
+      <tr>
+        <th>Session Start</th>
+        <td>{{ session.when.lower }}</td>
+      </tr>
+      <tr>
+        <th>Session End</th>
+        <td>{{ session.when.upper }}</td>
+      </tr>
+      <tr>
+        <th>Session Duration</th>
+        <td>{{ session.duration }}</td>
+      </tr>
+      <tr>
+        <th>Events</th>
+        <td>{{ session.event_count }}</td>
+      </tr>
+      <tr>
+        <th>Free Time</th>
+        <td>{{ session.free_time }}</td>
+      </tr>
+    </table>
+    <a href="{% url 'backoffice:eventsession_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Session</a>
+    <a href="{% url 'backoffice:eventsession_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Session</a>
+    <a href="{% url 'backoffice:eventsession_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-list"></i> List Sessions</a>
+    {% if session.events.all %}
+    <hr>
+    <p class="lead">The following events fall partially or fully inside this session at the location {{ session.event_location.name }}:</p>
+    {% include "includes/event_list_table.html" with event_list=session.events.all %}
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

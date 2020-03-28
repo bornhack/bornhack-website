@@ -1,5 +1,8 @@
 import os
 
+# monkeypatch postgres Range object to support lookups
+from utils import range_fields  # noqa: F401
+
 from .environment_settings import *  # noqa: F403
 
 
@@ -54,6 +57,7 @@ INSTALLED_APPS = [
     "wishlist",
     "facilities",
     "phonebook",
+    "autoscheduler",
     "allauth",
     "allauth.account",
     "allauth_2fa",
@@ -78,7 +82,7 @@ USE_TZ = True
 SHORT_DATE_FORMAT = "Ymd"
 DATE_FORMAT = "l, M jS, Y"
 DATETIME_FORMAT = "l, M jS, Y, H:i (e)"
-TIME_FORMAT = "H:i (e)"
+TIME_FORMAT = "H:i"
 
 TEMPLATES = [
     {

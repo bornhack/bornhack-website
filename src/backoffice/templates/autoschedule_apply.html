@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Apply AutoSchedule {{ schedule.id }}</h3>
+  </div>
+  <div class="panel-body">
+      <p class="lead">Apply AutoSchedule {{ schedule.id }}?</p>
+    <p>Applying the schedule will create EventInstance objects matching the schedule. Any existing EventInstance objects for the current EventType which are marked as autoscheduled=True will be deleted.</P>
+    <p><b>Note:</b> Once the schedule has been <b>applied</b> it will be marked as read-only and can no longer be modified - if additional changes are needed you must create a new schedule!</p>
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-check"></i> Apply AutoSchedule
+      </button>
+      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="btn btn-default">
+        <i class="fas fa-undo"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+{% endblock content %}

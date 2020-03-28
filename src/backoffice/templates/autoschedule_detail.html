@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">AutoSchedule {{ object.id }} Details</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">AutoSchedule {{ object.id }} was created by {{ object.user }} at {{ object.created }}.
+    {% if object.applied %}It was applied at {{ object.applied }}{% else %}It has never been applied.{% endif %}
+    </p>
+    <div class="btn-group">
+       <a href="{% url 'backoffice:autoschedule_diff' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-random"></i> Diff</a>
+       {% if not object.readonly %}
+       <a href="{% url 'backoffice:autoschedule_create_objects' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-cubes"></i> Recreate</a>
+       <a href="{% url 'backoffice:autoschedule_calculate' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-cogs"></i> Calculate</a>
+       <a href="{% url 'backoffice:autoschedule_apply' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-check"></i> Apply</a>
+       {% endif %}
+       <a href="{% url 'backoffice:autoschedule_delete' camp_slug=camp.slug pk=object.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+    </div>
+    <br>
+    <div class="btn-group">
+       <a href="{% url 'backoffice:autoschedule_debug_slots' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-chess-board"></i> Debug Slots</a>
+       <a href="{% url 'backoffice:autoschedule_debug_events' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-chess-board"></i> Debug Event Conflicts</a>
+    </div>
+  </div>
+</div>
+{% endblock content %}

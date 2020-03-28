@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
+from program.utils import get_slots
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 from .email import (
@@ -48,13 +49,14 @@ class UrlType(CreatedUpdatedModel):
 
 class Url(CampRelatedModel):
     """
-        This model contains URLs related to
-        - SpeakerProposals
-        - EventProposals
-        - Speakers
-        - Events
-        Each URL has a UrlType and a GenericForeignKey to the model to which it belongs.
-        When a SpeakerProposal or EventProposal is approved the related URLs will be copied with FK to the new Speaker/Event objects.
+    This model contains URLs related to
+    - SpeakerProposals
+    - EventProposals
+    - Speakers
+    - Events
+    Each URL has a UrlType and a ForeignKey to the model to which it belongs.
+    When a SpeakerProposal or EventProposal is approved the related URLs will
+    be copied with FK to the new Speaker/Event objects.
     """
 
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -115,11 +117,9 @@ class Url(CampRelatedModel):
             fks += 1
         if self.event:
             fks += 1
-        if fks > 1:
-            raise (
-                ValidationError(
-                    "Url objects must have maximum one FK, this has %s" % fks
-                )
+        if fks != 1:
+            raise ValidationError(
+                f"Url objects must have exactly one FK, this has {fks}"
             )
 
     @property
@@ -153,6 +153,83 @@ class Url(CampRelatedModel):
 ###############################################################################
 
 
+class Availability(CampRelatedModel, UUIDModel):
+    """
+    This model contains all the availability info for speakerproposals and
+    speakers. It is inherited by SpeakerProposalAvailability and SpeakerAvailability
+    models.
+    This model contains 1 hour ranges of availability/unavailability, enforced
+    by the clean() method.
+    """
+
+    class Meta:
+        abstract = True
+
+    when = DateTimeRangeField(
+        db_index=True,
+        help_text="The period when this speaker is available or unavailable. Must be 1 hour!",
+    )
+
+    available = models.BooleanField(
+        db_index=True,
+        help_text="Is the speaker available or unavailable during this hour? Check for available, uncheck for unavailable.",
+    )
+
+    def clean(self):
+        """
+        For UI and complexity reasons we limit these to 1 hour length, regardless
+        of the value of settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS.
+        This means we save 3 instances of this model for each checked checkbox if
+        settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3.
+        """
+        delta = self.when.upper - self.when.lower
+        if int(delta.total_seconds()) != 3600:
+            raise ValidationError(
+                f"Instances must be 1 hour long (3600 seconds), this is {int(delta.total_seconds())}!"
+            )
+
+
+class SpeakerProposalAvailability(Availability):
+    """ Availability info for SpeakerProposal objects """
+
+    speakerproposal = models.ForeignKey(
+        "program.SpeakerProposal",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="availabilities",
+        help_text="The speaker proposal object this availability belongs to",
+    )
+
+    @property
+    def camp(self):
+        return self.speakerproposal.camp
+
+    camp_filter = "speakerproposal__camp"
+
+
+class SpeakerAvailability(Availability):
+    """ Availability info for Speaker objects """
+
+    speaker = models.ForeignKey(
+        "program.Speaker",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="availabilities",
+        help_text="The speaker object this availability belongs to (if any)",
+    )
+
+    @property
+    def camp(self):
+        return self.speaker.camp
+
+    camp_filter = "speaker__camp"
+
+
+###############################################################################
+
+
 class UserSubmittedModel(CampRelatedModel):
     """
         An abstract model containing the stuff that is shared
@@ -170,7 +247,7 @@ class UserSubmittedModel(CampRelatedModel):
     PROPOSAL_APPROVED = "approved"
     PROPOSAL_REJECTED = "rejected"
 
-    ROPOSAL_STATUSES = [PROPOSAL_PENDING, PROPOSAL_APPROVED, PROPOSAL_REJECTED]
+    PROPOSAL_STATUSES = [PROPOSAL_PENDING, PROPOSAL_APPROVED, PROPOSAL_REJECTED]
 
     PROPOSAL_STATUS_CHOICES = [
         (PROPOSAL_PENDING, "Pending approval"),
@@ -254,7 +331,7 @@ class SpeakerProposal(UserSubmittedModel):
             kwargs={"camp_slug": self.camp.slug, "pk": self.uuid},
         )
 
-    def mark_as_approved(self, request):
+    def mark_as_approved(self, request=None):
         """ Marks a SpeakerProposal as approved, including creating/updating the related Speaker object """
         speakerproposalmodel = apps.get_model("program", "speakerproposal")
         # create a Speaker if we don't have one
@@ -263,19 +340,25 @@ class SpeakerProposal(UserSubmittedModel):
             speaker = speakermodel()
             speaker.proposal = self
         else:
+            # this proposal has been approved before, update the existing speaker
             speaker = self.speaker
 
         # set Speaker data
         speaker.camp = self.camp
-        if self.email:
-            email = self.email
-        else:
-            email = request.user.email
-        speaker.email = email
+        speaker.email = self.email if self.email else self.user.email
         speaker.name = self.name
         speaker.biography = self.biography
         speaker.needs_oneday_ticket = self.needs_oneday_ticket
         speaker.save()
+
+        # save speaker availability, start with a clean slate
+        speaker.availabilities.all().delete()
+        for availability in self.availabilities.all():
+            SpeakerAvailability.objects.create(
+                speaker=speaker,
+                when=availability.when,
+                available=availability.available,
+            )
 
         # mark as approved and save
         self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
@@ -286,18 +369,29 @@ class SpeakerProposal(UserSubmittedModel):
         for url in self.urls.all():
             Url.objects.create(url=url.url, urltype=url.urltype, speaker=speaker)
 
-        # a message to the admin
-        messages.success(
-            request, "Speaker object %s has been created/updated" % speaker
-        )
+        # a message to the admin (if we have a request)
+        if request:
+            messages.success(
+                request, "Speaker object %s has been created/updated" % speaker
+            )
         add_speakerproposal_accepted_email(self)
 
-    def mark_as_rejected(self, request):
+    def mark_as_rejected(self, request=None):
         speakerproposalmodel = apps.get_model("program", "speakerproposal")
         self.proposal_status = speakerproposalmodel.PROPOSAL_REJECTED
         self.save()
-        messages.success(request, "SpeakerProposal %s has been rejected" % self.name)
+        if request:
+            messages.success(
+                request, "SpeakerProposal %s has been rejected" % self.name
+            )
         add_speakerproposal_rejected_email(self)
+
+    @property
+    def eventtypes(self):
+        """ Return a queryset of the EventType objects for the EventProposals """
+        return EventType.objects.filter(
+            id__in=self.eventproposals.all().values_list("event_type", flat=True)
+        )
 
 
 class EventProposal(UserSubmittedModel):
@@ -321,7 +415,10 @@ class EventProposal(UserSubmittedModel):
     )
 
     event_type = models.ForeignKey(
-        "program.EventType", help_text="The type of event", on_delete=models.PROTECT
+        "program.EventType",
+        help_text="The type of event",
+        on_delete=models.PROTECT,
+        related_name="eventproposals",
     )
 
     speakers = models.ManyToManyField(
@@ -377,7 +474,7 @@ class EventProposal(UserSubmittedModel):
             camp=self.track.camp, user=self.user
         ).exclude(uuid__in=self.speakers.all().values_list("uuid"))
 
-    def mark_as_approved(self, request):
+    def mark_as_approved(self, request=None):
         eventmodel = apps.get_model("program", "event")
         eventproposalmodel = apps.get_model("program", "eventproposal")
         # use existing event if we have one
@@ -410,14 +507,18 @@ class EventProposal(UserSubmittedModel):
         for url in self.urls.all():
             Url.objects.create(url=url.url, urltype=url.urltype, event=event)
 
-        messages.success(request, "Event object %s has been created/updated" % event)
+        if request:
+            messages.success(
+                request, "Event object %s has been created/updated" % event
+            )
         add_eventproposal_accepted_email(self)
 
-    def mark_as_rejected(self, request):
+    def mark_as_rejected(self, request=None):
         eventproposalmodel = apps.get_model("program", "eventproposal")
         self.proposal_status = eventproposalmodel.PROPOSAL_REJECTED
         self.save()
-        messages.success(request, "EventProposal %s has been rejected" % self.title)
+        if request:
+            messages.success(request, "EventProposal %s has been rejected" % self.title)
         add_eventproposal_rejected_email(self)
 
 
@@ -446,7 +547,7 @@ class EventTrack(CampRelatedModel):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.camp.title})"
 
     class Meta:
         unique_together = (("camp", "slug"), ("camp", "name"))
@@ -471,6 +572,11 @@ class EventLocation(CampRelatedModel):
         "camps.Camp", related_name="eventlocations", on_delete=models.PROTECT
     )
 
+    capacity = models.PositiveIntegerField(
+        default=20,
+        help_text="The capacity of this location. Used by the autoscheduler.",
+    )
+
     def __str__(self):
         return "{} ({})".format(self.name, self.camp)
 
@@ -482,7 +588,7 @@ class EventLocation(CampRelatedModel):
 
 
 class EventType(CreatedUpdatedModel):
-    """ Every event needs to have a type. """
+    """  Every event needs to have a type. """
 
     name = models.CharField(
         max_length=100, unique=True, help_text="The name of this event type"
@@ -528,6 +634,12 @@ class EventType(CreatedUpdatedModel):
         default="Person",
     )
 
+    event_duration_minutes = models.PositiveIntegerField(
+        default=None,
+        blank=True,
+        help_text="The duration of an event of this type, in minutes. Leave this empty if events of this type can have different durations. Required for autoscheduling.",
+    )
+
     def __str__(self):
         return self.name
 
@@ -538,6 +650,108 @@ class EventType(CreatedUpdatedModel):
             "color": self.color,
             "light_text": self.light_text,
         }
+
+
+class EventSession(CampRelatedModel):
+    """
+    Sessions define the "opening hours" where we can create EventInstance
+    objects for Events of a given EventType on a given EventLocation.
+    This information is then used to allow submitters to specify speaker availability
+    when submitting, and to assist (but not restrict!) event scheduling in backoffice.
+    """
+
+    class Meta:
+        ordering = ["when", "event_type", "event_location"]
+
+    camp = models.ForeignKey(
+        "camps.Camp",
+        related_name="eventsessions",
+        on_delete=models.PROTECT,
+        help_text="The Camp this EventSession belongs to",
+    )
+
+    event_type = models.ForeignKey(
+        "program.EventType",
+        on_delete=models.PROTECT,
+        related_name="eventsessions",
+        help_text="The type of event this session is for",
+    )
+
+    event_location = models.ForeignKey(
+        "program.EventLocation",
+        on_delete=models.PROTECT,
+        related_name="eventsessions",
+        help_text="The event location this session is for",
+    )
+
+    when = DateTimeRangeField(
+        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>"
+    )
+
+    description = models.TextField(
+        blank=True, help_text="Description of this session (optional).",
+    )
+
+    def __str__(self):
+        return f"EventSession for {self.event_type} in {self.event_location.name}: {self.when}"
+
+    def clean_when(self):
+        """ Make sure we have lower and upper, and that upper is after lower, and make sure we have no overlaps between sessions """
+        if (
+            self.when.lower > self.when.upper
+            or not self.when.lower
+            or not self.when.upper
+        ):
+            raise ValidationError(
+                "Both start and end are required, and end must be after start"
+            )
+        if (
+            EventSession.objects.filter(
+                camp=self.camp,
+                event_type=self.event_type,
+                event_location=self.event_location,
+                when__overlap=self.when,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                "This EventSession overlaps with another at the same location for the same type of event!"
+            )
+
+    @property
+    def duration(self):
+        """ Just return a timedelta of the lenght of this Session """
+        return self.when.upper - self.when.lower
+
+    @property
+    def event_count(self):
+        """ Returns the number of EventInstances which fall within this Session """
+        return self.events.count()
+
+    @property
+    def events(self):
+        """ Return a queryset of the EventInstances which fall in this session """
+        return EventInstance.objects.filter(
+            event__track__camp=self.camp,
+            location=self.event_location,
+            when__contained_by=self.when,
+        )
+
+    @property
+    def free_time(self):
+        """ Returns a timedelta of the free time in this Session, meaning time not already taken up by an EventInstance """
+        used = timedelta()
+        for i in self.events:
+            # add the duration of this EventInstance
+            used += i.when.upper - i.when.lower
+        # the free time is the whole session minus the used time
+        return (self.when.upper - self.when.lower) - used
+
+    @property
+    def slots(self):
+        """ Return a list of DateTimeTZRange objects representing the Slots in this Session """
+        return get_slots(self.when, self.event_type.event_duration_minutes)
 
 
 class Event(CampRelatedModel):
@@ -583,6 +797,18 @@ class Event(CampRelatedModel):
         editable=False,
     )
 
+    duration_minutes = models.PositiveIntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text="The duration of this event. Leave this blank to use the default from the eventtype. Note: Leave this blank to support autoscheduling.",
+    )
+
+    demand = models.PositiveIntegerField(
+        default=0,
+        help_text="The estimated demand for this event. Used by the autoscheduler to pick the optimal location for events. Set to 0 to disable demand constraints for this event.",
+    )
+
     class Meta:
         ordering = ["title"]
         unique_together = (("track", "slug"), ("track", "title"))
@@ -593,7 +819,9 @@ class Event(CampRelatedModel):
     def save(self, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
-        super(Event, self).save(**kwargs)
+        if not self.slug:
+            raise ValidationError("Unable to slugify")
+        super().save(**kwargs)
 
     @property
     def camp(self):
@@ -634,6 +862,12 @@ class Event(CampRelatedModel):
 
         return data
 
+    def get_duration(self):
+        if self.duration_minutes:
+            return self.duration_minutes
+        else:
+            return self.event_type.event_duration_minutes
+
 
 class EventInstance(CampRelatedModel):
     """ An instance of an event """
@@ -657,6 +891,10 @@ class EventInstance(CampRelatedModel):
         "program.EventLocation", related_name="eventinstances", on_delete=models.PROTECT
     )
 
+    autoscheduled = models.BooleanField(
+        default=False, help_text="True if this was created by the autoscheduler.",
+    )
+
     class Meta:
         ordering = ["when"]
 
@@ -664,10 +902,30 @@ class EventInstance(CampRelatedModel):
         return "%s (%s)" % (self.event, self.when)
 
     def clean(self):
+        """ Check consistency, check for overlaps, and check speaker availability """
         if self.location.camp != self.event.camp:
             raise ValidationError(
                 {"location": "Error: This location belongs to a different camp"}
             )
+
+        if EventInstance.objects.filter(
+            when__overlap=self.when, location=self.location
+        ):
+            raise ValidationError(
+                {
+                    "when": "Error: An existing EventInstance on the same location overlaps with this one!"
+                }
+            )
+
+        for speaker in self.event.speakers.all():
+            if speaker.availabilities.filter(
+                available=False, when__overlap=self.when
+            ).exists():
+                raise ValidationError(
+                    {
+                        "when": f"Error: The speaker {speaker} is not available at this time"
+                    }
+                )
 
     @property
     def camp(self):
@@ -737,6 +995,11 @@ class EventInstance(CampRelatedModel):
             data["is_favorited"] = is_favorited
 
         return data
+
+    @property
+    def duration(self):
+        """ Return a timedelta of the lenght of this EventInstance """
+        return self.when.upper - self.when.lower
 
 
 class Speaker(CampRelatedModel):

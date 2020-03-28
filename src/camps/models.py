@@ -1,6 +1,7 @@
 import logging
 from datetime import timedelta
 
+from django.apps import apps
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -167,6 +168,16 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return EventLocation.objects.filter(
             eventinstances__isnull=False, camp=self
         ).distinct()
+
+    @property
+    def eventproposals(self):
+        EventProposal = apps.get_model("program", "eventproposal")
+        return EventProposal.objects.filter(track__camp=self)
+
+    @property
+    def events(self):
+        Event = apps.get_model("program", "event")
+        return Event.objects.filter(track__camp=self)
 
     @property
     def logo_small(self):

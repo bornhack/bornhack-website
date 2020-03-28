@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bornhack %}
+
+{% block extra_head %}
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="h3">BackOffice - AutoSchedules</span>
+  </div>
+  <div class="panel-body">
+      <p><i>AutoSchedules</i> and their related <i>AutoEvent</i> and <i>AutoSlot</i> objects are concepts used by the autoscheduler. The first step to using the autoscheduler is to define an AutoSchedule object for a given EventType.</p>
+  {% if not autoschedule_list %}
+      <p class="lead">No AutoSchedules found. Go create one!</p>
+  {% else %}
+  <p>
+    <a class="btn btn-success" href="{% url 'backoffice:autoschedule_create_typeselect' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New AutoSchedule</a>
+    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+  </p>
+  <table class="table table-hover">
+    <thead>
+    <tr>
+        <th>Schedule ID</th>
+        <th>Event Type</th>
+        <th class="text-center">Events</th>
+        <th class="text-center">Slots</th>
+        <th>Calculated?</th>
+        <th>Applied</th>
+        <th>Read Only?</th>
+        <th>Created</th>
+        <th>Created By</th>
+        <th>Action</th>
+     </tr>
+    </thead>
+    <tbody>
+    {% for schedule in autoschedule_list %}
+    <tr>
+        <td>{{ schedule.id }}</td>
+        <td><i class="fas fa-{{ schedule.event_type.icon }}" style="color: {{ schedule.event_type.color }};"></i> {{ schedule.event_type }}</td>
+        <td class="text-center"><span class="badge">{{ schedule.events.count }}</span></td>
+        <td class="text-center"><span class="badge">{{ schedule.slots.count }}</span></td>
+        <td class="text-center"><i class="fas fa-{% if schedule.matrix %}check{% else %}times{% endif %}"></i></td>
+        <td>{{ schedule.applied }}</td>
+        <td class="text-center"><i class="fas fa-{% if schedule.readonly %}check{% else %}times{% endif %}"></i></td>
+        <td>{{ schedule.created }}</td>
+        <td>{{ schedule.user }}</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:autoschedule_detail' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            <a href="{% url 'backoffice:autoschedule_diff' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-primary"><i class="fas fa-random"></i> Diff</a>
+            {% if not schedule.readonly %}
+            <a href="{% url 'backoffice:autoschedule_create_objects' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-primary"><i class="fas fa-cubes"></i> Recreate</a>
+            <a href="{% url 'backoffice:autoschedule_calculate' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-primary"><i class="fas fa-chess-board"></i> Calculate</a>
+            <a href="{% url 'backoffice:autoschedule_apply' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-primary"><i class="fas fa-check"></i> Apply</a>
+            {% endif %}
+            <a href="{% url 'backoffice:autoschedule_delete' camp_slug=camp.slug pk=schedule.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+          </div>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+  <p>
+    <a class="btn btn-success" href="{% url 'backoffice:autoschedule_create_typeselect' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New AutoSchedule</a>
+    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+  </p>
+  </div>
+</div>
+{% endblock content %}

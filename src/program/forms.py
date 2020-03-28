@@ -10,7 +10,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class SpeakerProposalForm(forms.ModelForm):
     """
-    The SpeakerProposalForm. Takes an EventType in __init__ and changes fields accordingly.
+    The SpeakerProposalForm. Takes a list of EventTypes in __init__,
+    and changes fields accordingly if the list has 1 element.
     """
 
     class Meta:
@@ -23,12 +24,30 @@ class SpeakerProposalForm(forms.ModelForm):
             "submission_notes",
         ]
 
-    def __init__(self, camp, eventtype=None, *args, **kwargs):
-        # initialise the form
+    def __init__(self, camp, eventtype=None, matrix={}, *args, **kwargs):
+        """
+        initialise the form and adapt based on eventtype
+        """
         super().__init__(*args, **kwargs)
+
+        if matrix:
+            # add speaker availability fields
+            for date in matrix.keys():
+                # do we need a column for this day?
+                if matrix[date]:
+                    # loop over the daychunks for this day
+                    for daychunk in matrix[date]:
+                        if matrix[date][daychunk]:
+                            # add the field
+                            self.fields[
+                                matrix[date][daychunk]["fieldname"]
+                            ] = forms.BooleanField(required=False)
+                            # add it to Meta.fields too
+                            self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
 
         # adapt form based on EventType?
         if not eventtype:
+            # we have no eventtype to customize the form, use the default form
             return
 
         if eventtype.name == "Debate":
@@ -54,7 +73,7 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this guest. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
 
         elif eventtype.name == "Lightning Talk":
@@ -105,32 +124,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this artist. Only visible to yourself and the BornHack organisers."
-
-            # no oneday tickets for music acts
-            del self.fields["needs_oneday_ticket"]
-
-        elif eventtype.name == "Recreational Event":
-            # fix label and help_text for the name field
-            self.fields["name"].label = "Host Name"
-            self.fields[
-                "name"
-            ].help_text = "The name of the event host. Can be a real name or an alias."
-
-            # fix label and help_text for the email field
-            self.fields["email"].label = "Host Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
-
-            # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host."
-
-            # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Host Notes"
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
 
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
@@ -186,7 +179,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Slacking Off":
+        elif eventtype.name == "Recreational Event":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields["name"].help_text = "Can be a real name or an alias."
@@ -207,7 +200,7 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for recreational events
             del self.fields["needs_oneday_ticket"]
 
         elif eventtype.name == "Meetup":
@@ -233,7 +226,7 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
 
         else:
@@ -302,7 +295,7 @@ class EventProposalForm(forms.ModelForm):
 
         return eventproposal
 
-    def __init__(self, camp, eventtype=None, *args, **kwargs):
+    def __init__(self, camp, eventtype=None, matrix=None, *args, **kwargs):
         # initialise form
         super().__init__(*args, **kwargs)
 

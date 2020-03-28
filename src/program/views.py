@@ -36,6 +36,11 @@ from .mixins import (
     UrlViewMixin,
 )
 from .multiform import MultiModelForm
+from .utils import (
+    add_matrix_availability,
+    get_speaker_availability_form_matrix,
+    save_speaker_availability,
+)
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -109,14 +114,19 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
 
     def get_queryset(self, **kwargs):
         # only show speaker proposals for the current user
-        return super().get_queryset().filter(user=self.request.user)
+        return (
+            super()
+            .get_queryset()
+            .filter(user=self.request.user)
+            .prefetch_related("eventproposals", "eventproposals__event_type")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # also add eventproposals to the context
         context["eventproposal_list"] = models.EventProposal.objects.filter(
             track__camp=self.camp, user=self.request.user
-        )
+        ).prefetch_related("event_type", "track")
         context["eventtype_list"] = models.EventType.objects.filter(public=True)
         return context
 
@@ -138,12 +148,18 @@ class SpeakerProposalCreateView(
     template_name = "speakerproposal_form.html"
     form_class = SpeakerProposalForm
 
-    def dispatch(self, request, *args, **kwargs):
-        """ Get the eventproposal object """
+    def setup(self, *args, **kwargs):
+        """ Get the eventproposal object and speaker availability matrix"""
+        super().setup(*args, **kwargs)
         self.eventproposal = get_object_or_404(
             models.EventProposal, pk=kwargs["event_uuid"]
         )
-        return super().dispatch(request, *args, **kwargs)
+        # get the form field matrix for speaker availability
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(
+                event_type=self.eventproposal.event_type
+            )
+        )
 
     def get_success_url(self):
         return reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
@@ -153,23 +169,48 @@ class SpeakerProposalCreateView(
         Set camp and eventtype for the form
         """
         kwargs = super().get_form_kwargs()
-        kwargs.update({"camp": self.camp, "eventtype": self.eventproposal.event_type})
+        kwargs.update(
+            {
+                "camp": self.camp,
+                "eventtype": self.eventproposal.event_type,
+                "matrix": self.matrix,
+            }
+        )
         return kwargs
+
+    def get_initial(self, *args, **kwargs):
+        """ Populate the speakeravailability checkboxes """
+        initial = super().get_initial(*args, **kwargs)
+        # loop over dates in the matrix
+        for date in self.matrix.keys():
+            # loop over daychunks and check if we need a checkbox
+            for daychunk in self.matrix[date].keys():
+                if self.matrix[date][daychunk]:
+                    # default to checked for new speakers
+                    initial[self.matrix[date][daychunk]["fieldname"]] = True
+        return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["eventproposal"] = self.eventproposal
+        context["matrix"] = self.matrix
         return context
 
     def form_valid(self, form):
-        # set user before saving
-        form.instance.user = self.request.user
-        form.instance.camp = self.camp
+        # set user and camp before saving
+        speakerproposal = form.save(commit=False)
+        speakerproposal.user = self.request.user
+        speakerproposal.camp = self.camp
 
-        if not form.instance.email:
-            form.instance.email = self.request.user.email
+        if not form.cleaned_data["email"]:
+            # default to submitters email
+            speakerproposal.email = self.request.user.email
 
+        # save speakerproposal
         speakerproposal = form.save()
+
+        # then save speaker availability objects
+        save_speaker_availability(form, speakerproposal)
 
         # add speakerproposal to eventproposal
         self.eventproposal.speakers.add(speakerproposal)
@@ -189,50 +230,98 @@ class SpeakerProposalUpdateView(
     LoginRequiredMixin,
     CampViewMixin,
     EnsureWritableCampMixin,
-    EnsureUserOwnsProposalMixin,
+    UserIsObjectOwnerMixin,
     EnsureCFPOpenMixin,
     UpdateView,
 ):
-    """
-    This view allows a user to update an existing SpeakerProposal.
-    """
+    """ This view allows a user to update an existing SpeakerProposal. """
 
     model = models.SpeakerProposal
     template_name = "speakerproposal_form.html"
     form_class = SpeakerProposalForm
 
+    def setup(self, *args, **kwargs):
+        """ Get speakeravailability matrix """
+        super().setup(*args, **kwargs)
+        self.speakerproposal = self.get_object()
+        # get eventtypes for all eventproposals for this speakerproposal
+        self.eventtypes = models.EventType.objects.filter(
+            eventproposals__in=self.speakerproposal.eventproposals.all()
+        ).distinct()
+        # get the form field matrix for speaker availability
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(
+                event_type__in=self.eventtypes,
+            ).prefetch_related("event_type")
+        )
+
+    def get_object(self, queryset=None):
+        """ Prefetch availabilities for this SpeakerProposal """
+        qs = self.model.objects.filter(pk=self.kwargs.get(self.pk_url_kwarg))
+        qs = qs.prefetch_related("availabilities")
+        return qs.get()
+
     def get_form_kwargs(self):
-        """
-        Set camp and eventtype for the form
-        """
+        """ Set camp and eventtype for the form """
         kwargs = super().get_form_kwargs()
-        if self.get_object().eventproposals.count() == 1:
-            # determine which form to use based on the type of event associated with the proposal
-            eventtype = self.get_object().eventproposals.get().event_type
+        if len(self.eventtypes) == 1:
+            # use the eventtype to customise the speaker form
+            eventtype = self.eventtypes[0]
         else:
-            # more than one eventproposal. If all events are the same type we can still show a non-generic form here
-            eventtypes = set()
-            for ep in self.get_object().eventproposals.all():
-                eventtypes.add(ep.event_type)
-            if len(eventtypes) == 1:
-                # only one eventtype found
-                eventtype = ep.event_type
-            else:
-                # more than one type of event for this person, return the generic speakerproposal form
-                eventtype = None
+            # more than one eventtype for this speaker, show a non-generic form
+            eventtype = None
 
         # add camp and eventtype to form kwargs
-        kwargs.update({"camp": self.camp, "eventtype": eventtype})
+        kwargs.update(
+            {"camp": self.camp, "eventtype": eventtype, "matrix": self.matrix}
+        )
 
         return kwargs
 
+    def get_initial(self, *args, **kwargs):
+        """ Populate the speakeravailability checkboxes """
+        initial = super().get_initial(*args, **kwargs)
+
+        # add availability info to the matrix
+        add_matrix_availability(self.matrix, self.get_object())
+
+        # add initial checkbox states
+        for date in self.matrix.keys():
+            # loop over daychunks and check if we need a checkbox
+            for daychunk in self.matrix[date].keys():
+                if not self.matrix[date][daychunk]:
+                    # we have no eventsession here, carry on
+                    continue
+                if self.matrix[date][daychunk]["initial"] in [True, None]:
+                    initial[self.matrix[date][daychunk]["fieldname"]] = True
+                else:
+                    initial[self.matrix[date][daychunk]["fieldname"]] = False
+
+        # we are ready to render the form
+        return initial
+
+    def get_context_data(self, **kwargs):
+        """ Add matrix to template context """
+        context = super().get_context_data(**kwargs)
+        context["matrix"] = self.matrix
+        return context
+
     def form_valid(self, form):
-        """
-        Change the speakerproposal status to pending
-        """
+        """ Change status and save availability """
+        speakerproposal = form.save(commit=False)
+
         # set proposal status to pending
-        form.instance.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
-        speakerproposal = form.save()
+        speakerproposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
+
+        if not speakerproposal.email:
+            # default to submitters email
+            speakerproposal.email = self.request.user.email
+
+        # ok save() for real
+        speakerproposal.save()
+
+        # then save speaker availability objects
+        save_speaker_availability(form, speakerproposal)
 
         # send mail to content team
         if not add_speakerproposal_updated_email(speakerproposal):
@@ -242,7 +331,8 @@ class SpeakerProposalUpdateView(
 
         # message user and redirect
         messages.info(
-            self.request, "Your proposal is now pending approval by the content team."
+            self.request,
+            f"Changes to your proposal is now pending approval by the content team.",
         )
         return redirect(
             reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
@@ -278,6 +368,11 @@ class SpeakerProposalDeleteView(
         # continue with the request
         return super().get(request, *args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        """ Delete availabilities before deleting the proposal """
+        self.availabilities.delete()
+        return super().delete(*args, **kwargs)
+
     def get_success_url(self):
         messages.success(
             self.request, "Proposal '%s' has been deleted." % self.object.name
@@ -290,6 +385,24 @@ class SpeakerProposalDetailView(
 ):
     model = models.SpeakerProposal
     template_name = "speakerproposal_detail.html"
+
+    def setup(self, *args, **kwargs):
+        """ Get the speaker availability matrix"""
+        super().setup(*args, **kwargs)
+        # get the form field matrix for speaker availability
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(
+                event_type__in=models.EventType.objects.filter(
+                    eventproposals__in=self.get_object().eventproposals.all()
+                ).distinct()
+            )
+        )
+        add_matrix_availability(self.matrix, self.get_object())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["matrix"] = self.matrix
+        return context
 
 
 ###################################################################################################
@@ -659,21 +772,24 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
     """
     This view is used by users to submit CFP proposals.
     It allows the user to submit an EventProposal and a SpeakerProposal together.
-    It can also be used with a preselected SpeakerProposal uuid in url kwargs
     """
 
     template_name = "combined_proposal_submit.html"
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, *args, **kwargs):
         """
-        Check that we have a valid EventType
+        Check that we have a valid EventType in url kwargs
         """
-        # get EventType from url kwargs
+        super().setup(*args, **kwargs)
         self.eventtype = get_object_or_404(
             models.EventType, slug=self.kwargs["event_type_slug"]
         )
 
-        return super().dispatch(request, *args, **kwargs)
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(
+                event_type=self.eventtype
+            ).prefetch_related("event_type")
+        )
 
     def get_context_data(self, **kwargs):
         """
@@ -681,34 +797,34 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         """
         context = super().get_context_data(**kwargs)
         context["eventtype"] = self.eventtype
+        context["matrix"] = self.matrix
         return context
 
     def form_valid(self, form):
         """
         Save the object(s) here before redirecting
         """
-        if hasattr(self, "speakerproposal"):
-            eventproposal = form.save(user=self.request.user, event_type=self.eventtype)
-            eventproposal.speakers.add(self.speakerproposal)
-        else:
-            # first save the SpeakerProposal
-            speakerproposal = form["speakerproposal"].save(commit=False)
-            speakerproposal.camp = self.camp
-            speakerproposal.user = self.request.user
-            if not speakerproposal.email:
-                speakerproposal.email = self.request.user.email
-            speakerproposal.save()
+        # first save the SpeakerProposal
+        speakerproposal = form["speakerproposal"].save(commit=False)
+        speakerproposal.camp = self.camp
+        speakerproposal.user = self.request.user
+        if not speakerproposal.email:
+            speakerproposal.email = self.request.user.email
+        speakerproposal.save()
 
-            # then save the eventproposal
-            eventproposal = form["eventproposal"].save(
-                user=self.request.user, event_type=self.eventtype
-            )
-            eventproposal.user = self.request.user
-            eventproposal.event_type = self.eventtype
-            eventproposal.save()
+        # then save speaker availability objects
+        save_speaker_availability(form["speakerproposal"], speakerproposal)
 
-            # add the speakerproposal to the eventproposal
-            eventproposal.speakers.add(speakerproposal)
+        # then save the eventproposal
+        eventproposal = form["eventproposal"].save(
+            user=self.request.user, event_type=self.eventtype
+        )
+        eventproposal.user = self.request.user
+        eventproposal.event_type = self.eventtype
+        eventproposal.save()
+
+        # add the speakerproposal to the eventproposal
+        eventproposal.speakers.add(speakerproposal)
 
         # send mail(s) to content team
         if not add_new_eventproposal_email(eventproposal):
@@ -719,6 +835,11 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
                     "Unable to send email to content team after new speakerproposal"
                 )
 
+        messages.success(
+            self.request,
+            f"Your {self.eventtype.host_title} proposal and {self.eventtype.name} proposal have been submitted for review. You will receive an email when they have been accepted or rejected.",
+        )
+
         # all good
         return redirect(
             reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
@@ -726,13 +847,9 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
 
     def get_form_class(self):
         """
-        Unless we have an existing SpeakerProposal we must show two forms on the page.
-        We use betterforms.MultiModelForm to combine two forms on the page
+        We must show two forms on the page.
+        We use betterforms.MultiModelForm to combine two forms
         """
-        if hasattr(self, "speakerproposal"):
-            # we already have a speakerproposal, just show an eventproposal form
-            return EventProposalForm
-
         # build our MultiModelForm
         class CombinedProposalSubmitForm(MultiModelForm):
             form_classes = OrderedDict(
@@ -747,11 +864,36 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
 
     def get_form_kwargs(self):
         """
-        Set camp and eventtype for the form
+        Set camp and eventtype and matrix for the form
         """
         kwargs = super().get_form_kwargs()
-        kwargs.update({"camp": self.camp, "eventtype": self.eventtype})
+        kwargs.update(
+            {"camp": self.camp, "eventtype": self.eventtype, "matrix": self.matrix}
+        )
         return kwargs
+
+    def get_initial(self):
+        """
+        We default to True for all daychunks in the speaker availability table
+        when submitting a new speaker
+        """
+        initial = super().get_initial()
+        # we use betterforms.MultiModelForm so our initial dict has to be nested,
+        # make sure we have a speakerproposal dict to work with
+        if "speakerproposal" not in initial:
+            initial["speakerproposal"] = {}
+        # loop over days in the matrix
+        for date in self.matrix.keys():
+            # loop over the daychunks on this day
+            for daychunk in self.matrix[date].keys():
+                # do we have/want a checkbox here?
+                if self.matrix[date][daychunk]:
+                    # all initial values for news speakers should be True/checked
+                    initial["speakerproposal"][
+                        self.matrix[date][daychunk]["fieldname"]
+                    ] = True
+                    self.matrix[date][daychunk]["initial"] = True
+        return initial
 
 
 ###################################################################################################

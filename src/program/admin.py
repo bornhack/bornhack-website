@@ -7,14 +7,30 @@ from .models import (
     EventInstance,
     EventLocation,
     EventProposal,
+    EventSession,
     EventTrack,
     EventType,
     Favorite,
     Speaker,
+    SpeakerAvailability,
     SpeakerProposal,
+    SpeakerProposalAvailability,
     Url,
     UrlType,
 )
+
+
+@admin.register(SpeakerProposalAvailability)
+class SpeakerProposalAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ["speakerproposal", "available", "when"]
+    list_filter = ["speakerproposal__camp", "available", "speakerproposal"]
+
+
+@admin.register(SpeakerAvailability)
+class SpeakerAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ["speaker", "available", "when"]
+    list_filter = ["speaker__camp", "available", "speaker"]
+    readonly_fields = ["speaker"]
 
 
 @admin.register(SpeakerProposal)
@@ -74,6 +90,13 @@ class EventLocationAdmin(admin.ModelAdmin):
 class EventTrackAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
     list_display = ("name", "camp")
+
+
+@admin.register(EventSession)
+class EventSessionAdmin(admin.ModelAdmin):
+    list_display = ("camp", "event_type", "event_location", "when")
+    list_filter = ("camp", "event_type", "event_location")
+    search_fields = ["event__type", "event__location"]
 
 
 @admin.register(EventInstance)

@@ -3,12 +3,30 @@ from django.urls import include, path
 from .views import (
     ApproveFeedbackView,
     ApproveNamesView,
+    AutoScheduleApplyView,
+    AutoScheduleCalculateView,
+    AutoScheduleCreateEventTypeSelectView,
+    AutoScheduleCreateObjectsView,
+    AutoScheduleCreateView,
+    AutoScheduleDebugEventsView,
+    AutoScheduleDebugSlotsView,
+    AutoScheduleDeleteView,
+    AutoScheduleDetailView,
+    AutoScheduleDiffView,
+    AutoScheduleListView,
     BackofficeIndexView,
     BadgeHandoutView,
     ChainDetailView,
     ChainListView,
     CredebtorDetailView,
     EventProposalManageView,
+    EventSessionCreateView,
+    EventSessionDeleteView,
+    EventSessionDetailView,
+    EventSessionListView,
+    EventSessionLocationSelectView,
+    EventSessionTypeSelectView,
+    EventSessionUpdateView,
     ExpenseDetailView,
     ExpenseListView,
     FacilityFeedbackView,
@@ -82,6 +100,144 @@ urlpatterns = [
                     "events/<uuid:pk>/",
                     EventProposalManageView.as_view(),
                     name="eventproposal_manage",
+                ),
+            ]
+        ),
+    ),
+    # manage eventsession objects
+    path(
+        "eventsessions/",
+        include(
+            [
+                path("", EventSessionListView.as_view(), name="eventsession_list"),
+                path(
+                    "create/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSessionTypeSelectView.as_view(),
+                                name="eventsession_typeselect",
+                            ),
+                            path(
+                                "<slug:eventtype_slug>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            EventSessionLocationSelectView.as_view(),
+                                            name="eventsession_locationselect",
+                                        ),
+                                        path(
+                                            "<slug:eventlocation_slug>/",
+                                            EventSessionCreateView.as_view(),
+                                            name="eventsession_create",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSessionDetailView.as_view(),
+                                name="eventsession_detail",
+                            ),
+                            path(
+                                "update/",
+                                EventSessionUpdateView.as_view(),
+                                name="eventsession_update",
+                            ),
+                            path(
+                                "delete/",
+                                EventSessionDeleteView.as_view(),
+                                name="eventsession_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage autoschedule objects
+    path(
+        "autoscheduler/",
+        include(
+            [
+                path("", AutoScheduleListView.as_view(), name="autoschedule_list"),
+                path(
+                    "create/",
+                    include(
+                        [
+                            path(
+                                "",
+                                AutoScheduleCreateEventTypeSelectView.as_view(),
+                                name="autoschedule_create_typeselect",
+                            ),
+                            path(
+                                "<slug:eventtype_slug>/",
+                                AutoScheduleCreateView.as_view(),
+                                name="autoschedule_create",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                AutoScheduleDetailView.as_view(),
+                                name="autoschedule_detail",
+                            ),
+                            path(
+                                "create_objects/",
+                                AutoScheduleCreateObjectsView.as_view(),
+                                name="autoschedule_create_objects",
+                            ),
+                            path(
+                                "calculate/",
+                                AutoScheduleCalculateView.as_view(),
+                                name="autoschedule_calculate",
+                            ),
+                            path(
+                                "diff/",
+                                AutoScheduleDiffView.as_view(),
+                                name="autoschedule_diff",
+                            ),
+                            path(
+                                "diff/<int:original_schedule_id>/",
+                                AutoScheduleDiffView.as_view(),
+                                name="autoschedule_diff",
+                            ),
+                            path(
+                                "debug-slots/",
+                                AutoScheduleDebugSlotsView.as_view(),
+                                name="autoschedule_debug_slots",
+                            ),
+                            path(
+                                "debug-events/",
+                                AutoScheduleDebugEventsView.as_view(),
+                                name="autoschedule_debug_events",
+                            ),
+                            path(
+                                "apply/",
+                                AutoScheduleApplyView.as_view(),
+                                name="autoschedule_apply",
+                            ),
+                            path(
+                                "delete/",
+                                AutoScheduleDeleteView.as_view(),
+                                name="autoschedule_delete",
+                            ),
+                        ]
+                    ),
                 ),
             ]
         ),

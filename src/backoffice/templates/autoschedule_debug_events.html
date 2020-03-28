@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<p class="lead">The following conflicts have been found between events in AutoSchedule {{ object.id }}:</p>
+<table class="table table-condensed table-bordered">
+  <thead>
+    <th>fedt nok</th>
+    {% for event in object.events.all %}
+    <th>{{ event.event.title }}</th>
+    {% endfor %}
+  </thead>
+  <tbody>
+    {% for rowevent in object.events.all %}
+    <tr>
+      <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=rowevent.event.slug %}">{{ rowevent.event.title }}</a></th>
+      {% for event in object.events.all %}
+        {% if event in rowevent.unavailability_events.all or event == rowevent %}
+          <td class="text-center danger"><i class="fas fa-times"></i></td>
+        {% else %}
+          <td class="text-center success"><i class="fas fa-check"></i></td>
+        {% endif %}
+    {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+{% endblock body %}

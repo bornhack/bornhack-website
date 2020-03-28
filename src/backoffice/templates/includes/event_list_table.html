@@ -1,0 +1,23 @@
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Start</th>
+          <th>End</th>
+          <th>Length</th>
+          <th>Title</th>
+          <th>People</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in event_list %}
+        <tr>
+          <td>{{ event.when.lower }}</td>
+          <td>{{ event.when.upper }}</td>
+          <td>{{ event.duration }}</td>
+          <td>{{ event.event.title }}</td>
+          <td>{{ event.event.speakers.all|join:"<br>" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+

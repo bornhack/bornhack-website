@@ -1,7 +1,18 @@
 {% extends 'program_base.html' %}
 {% load bootstrap3 %}
+{% load program %}
 
 {% block program_content %}
+<script>
+function toggleclass(checkboxid) {
+    checkbox = $("#" + checkboxid);
+    if (checkbox.prop("checked")) {
+        checkbox.parent().parent().removeClass("danger warning active").addClass("success");
+    } else {
+        checkbox.parent().parent().removeClass("success warning active").addClass("danger");
+    };
+};
+</script>
 
 <h3>
     {% if object %}
@@ -11,11 +22,19 @@
     {% endif %}
 </h3>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_button "Submit for review" button_type="submit" button_class="btn-primary" %}
+<form method="POST">
+  {% csrf_token %}
+  {% for field in form %}
+    {% if field.id_for_label == "id_submission_notes" %}
+      {% availabilitytable form=form matrix=matrix %}
+      {% bootstrap_field field %}
+    {% else %}
+    {% if field.name|slice:":12" != "availability" %}
+      {% bootstrap_field field %}
+    {% endif %}
+    {% endif %}
+  {% endfor %}
+  {% bootstrap_button "Submit for review" button_type="submit" button_class="btn-primary" %}
 </form>
-
 {% endblock program_content %}
 

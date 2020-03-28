@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<p class="lead">The following availability matrix has been generated for the Event/Slot combinations in AutoSchedule {{ object.id }}:</p>
+<table class="table table-condensed table-bordered">
+  <thead>
+    <th>fedt nok</th>
+    {% for slot in object.slots.all %}
+    <th>{{ slot.starts_at }}</th>
+    {% endfor %}
+  </thead>
+  <tbody>
+    {% for event in object.events.all %}
+      <tr>
+          <th{% if event.unavailability_slots.count == object.slots.count %} class="danger"{% endif %}><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a></th>
+        {% for slot in object.slots.all %}
+          {% if slot in event.unavailability_slots.all %}
+            <td class="text-center danger"><i class="fas fa-times"></i></td>
+          {% else %}
+            <td class="text-center success"><i class="fas fa-check"></i></td>
+          {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock body %}

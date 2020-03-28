@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Create new AutoSchedule</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">Create new AutoSchedule for EventType <b>{{ event_type }}</b>?</p>
+    <p>Creating an AutoSchedule object is the first step in using the autoscheduler. Creating an AutoSchedule will also create all the related <b>AutoEvent</b> and <b>AutoSlot</b> objects used by the autoscheduler, which might <b>take a while (up to 30 secs in dry weather)</b>. The related objects can later be re-created and the schedule can be re-calculated as many times as needed.</p>
+    <p><b>Note:</b> Creating a schedule will not affect the published EventInstances in any way. The schedule has to be <b>applied</b> before any EventInstances are touched. It is completely safe to play around with creating and calculating new schedules. Only applying a schedule changes EventInstances!</p>
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-plus"></i> Create AutoSchedule
+      </button>
+      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="btn btn-default">
+        <i class="fas fa-undo"></i> Cancel
+      </a>
+    </form>
+  </div>
+</div>
+{% endblock content %}
