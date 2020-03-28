@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "facilities",
     "phonebook",
     "autoscheduler",
+    "maps",
     "allauth",
     "allauth.account",
     "allauth_2fa",

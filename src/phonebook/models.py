@@ -8,6 +8,7 @@ from utils.models import CampRelatedModel
 from .dectutils import DectUtils
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+dectutil = DectUtils()
 
 
 class DectRegistration(CampRelatedModel):
@@ -29,18 +30,20 @@ class DectRegistration(CampRelatedModel):
     )
 
     number = models.CharField(
-        max_length=9, help_text="The DECT number, numeric or as letters",
+        max_length=9,
+        blank=True,
+        help_text="The DECT phonenumber, four digits or more. Optional if you specify letters.",
     )
 
     letters = models.CharField(
         max_length=9,
         blank=True,
-        help_text="The letters chosen to represent this DECT number in the phonebook. Optional.",
+        help_text="The letters or numbers chosen to represent this DECT number in the phonebook. Optional if you specify a number.",
     )
 
     description = models.TextField(
         blank=True,
-        help_text="Description of this registration, like a name or a location or a service.",
+        help_text="Description of this registration, like a name/handle, or a location or service name.",
     )
 
     activation_code = models.CharField(
@@ -55,6 +58,7 @@ class DectRegistration(CampRelatedModel):
         """
         This is just here so we get the validation in the admin as well.
         """
+        # validate that the phonenumber and letters are valid and then save()
         self.clean_number()
         self.clean_letters()
         super().save(*args, **kwargs)
@@ -65,13 +69,29 @@ class DectRegistration(CampRelatedModel):
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """
+        # first check if we have a phonenumber...
+        if not self.number:
+            # we have no phonenumber, do we have some letters at least?
+            if not self.letters:
+                raise ValidationError(
+                    "You must enter either a phonenumber or a letter representation of the phonenumber!"
+                )
+            # we have letters but not a number, let's deduce the numbers
+            self.number = dectutil.letters_to_number(self.letters)
+
+        # First of all, check that number is numeric
+        try:
+            int(self.number)
+        except ValueError:
+            raise ValidationError("Phonenumber must be numeric!")
+
         # check for conflicts with the same number
         if (
             DectRegistration.objects.filter(camp=self.camp, number=self.number)
             .exclude(pk=self.pk)
             .exists()
         ):
-            raise ValidationError("This DECT number is in use")
+            raise ValidationError(f"The DECT number {self.number} is in use")
 
         # check for conflicts with a longer number
         if (
@@ -82,7 +102,7 @@ class DectRegistration(CampRelatedModel):
             .exists()
         ):
             raise ValidationError(
-                "This DECT number is not available, it conflicts with a longer number."
+                f"The DECT number {self.number} is not available, it conflicts with a longer number."
             )
 
         # check if a shorter number is blocking
@@ -94,7 +114,7 @@ class DectRegistration(CampRelatedModel):
                 .exists()
             ):
                 raise ValidationError(
-                    "This DECT number is not available, it conflicts with a shorter number."
+                    f"The DECT number {self.number} is not available, it conflicts with a shorter number."
                 )
             i -= 1
 
@@ -112,14 +132,13 @@ class DectRegistration(CampRelatedModel):
                 )
 
             # loop over the digits in the phonenumber
-            dectutil = DectUtils()
             combinations = list(dectutil.get_dect_letter_combinations(self.number))
             if not combinations:
                 raise ValidationError(
                     "Numbers with 0 and 1 in them can not be expressed as letters"
                 )
 
-            if self.letters not in list(combinations):
+            if self.letters.upper() not in list(combinations):
                 # something is fucky, loop over letters to give a better error message
                 i = 0
                 for digit in self.number:

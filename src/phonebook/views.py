@@ -82,16 +82,6 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         dect.camp = self.camp
         dect.user = self.request.user
 
-        # this check needs to be in this form, but not in model.save(), because then we cant save service numbers from the admin
-        if len(dect.number) < 4:
-            form.add_error(
-                "number",
-                ValidationError(
-                    "Numbers with fewer than 4 digits are reserved for special use"
-                ),
-            )
-            return super().form_invalid(form)
-
         try:
             dect.clean_number()
         except ValidationError as E:
@@ -102,6 +92,16 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
             dect.clean_letters()
         except ValidationError as E:
             form.add_error("letters", E)
+            return super().form_invalid(form)
+
+        # this check needs to be in this form, but not in model.save(), because then we cant save service numbers from the admin
+        if len(dect.number) < 4:
+            form.add_error(
+                "number",
+                ValidationError(
+                    "Numbers with fewer than 4 digits are reserved for special use"
+                ),
+            )
             return super().form_invalid(form)
 
         # generate a 10 digit activation code for this dect registration?

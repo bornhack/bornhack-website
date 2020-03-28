@@ -96,4 +96,4 @@ ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
 ECONOMYTEAM_NAME = "Economy"
 
 BORNHACK_2019_OLD_TOKEN_TOKEN = "{{ bornhack_2019_old_token_token }}"
-
+KORTFORSYNINGEN_TOKEN = "{{ kortforsyningen_token }}"

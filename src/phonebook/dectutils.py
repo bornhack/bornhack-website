@@ -9,14 +9,16 @@ class DectUtils:
     """
 
     DECT_MATRIX = {
-        "2": ["A", "B", "C"],
-        "3": ["D", "E", "F"],
-        "4": ["G", "H", "I"],
-        "5": ["J", "K", "L"],
-        "6": ["M", "N", "O"],
-        "7": ["P", "Q", "R", "S"],
-        "8": ["T", "U", "V"],
-        "9": ["W", "X", "Y", "Z"],
+        "0": ["0"],
+        "1": ["1"],
+        "2": ["2", "A", "B", "C"],
+        "3": ["3", "D", "E", "F"],
+        "4": ["4", "G", "H", "I"],
+        "5": ["5", "J", "K", "L"],
+        "6": ["6", "M", "N", "O"],
+        "7": ["7", "P", "Q", "R", "S"],
+        "8": ["8", "T", "U", "V"],
+        "9": ["9", "W", "X", "Y", "Z"],
     }
 
     def __init__(self):
@@ -32,11 +34,6 @@ class DectUtils:
         """
         Generator to recursively get all combinations of letters for this number
         """
-        if "0" in numbers or "1" in numbers:
-            logger.error(
-                "Numbers with 0 or 1 in them are not expressible as letters, bail out"
-            )
-            return False
         # loop over the possible letters for the first digit
         for letter in self.DECT_MATRIX[numbers[0]]:
             # if we have more digits..
@@ -54,5 +51,5 @@ class DectUtils:
         """
         result = ""
         for letter in letters:
-            result += self.REVERSE_DECT_MATRIX[letter]
+            result += self.REVERSE_DECT_MATRIX[letter.upper()]
         return result
