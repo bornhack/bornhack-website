@@ -20,7 +20,7 @@ install:
 
 before_script:
   - psql -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
-  - psql -c "CREATE EXTENSION btree_gist;"
+  - psql -c "CREATE EXTENSION btree_gist;" bornhack
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
