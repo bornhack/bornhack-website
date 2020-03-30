@@ -742,10 +742,12 @@ class Command(BaseCommand):
         for ep in eventproposals:
             sp = SpeakerProposalFactory(camp=camp, user=ep.user)
             ep.speakers.add(sp)
+            # 20% chance we add an extra speaker
             if random.randint(1, 10) > 8:
                 other_speakers = SpeakerProposal.objects.filter(camp=camp).exclude(
                     uuid=sp.uuid
                 )
+                # ... if we have any...
                 if other_speakers.exists():
                     # add an extra speaker
                     ep.speakers.add(random.choice(other_speakers))
@@ -803,7 +805,7 @@ class Command(BaseCommand):
             for date, daychunks in matrix.items():
                 # 90% chance we have info for any given day
                 if random.randint(1, 100) > 90:
-                    # no availability info for this day, sorry
+                    # no availability info for this entire day, sorry
                     continue
                 for daychunk, data in daychunks.items():
                     if not data:

@@ -132,9 +132,12 @@ class AutoSchedule(CampRelatedModel):
                 for session in self.camp.eventsessions.filter(
                     event_type=self.event_type
                 ):
+                    # loop over all slots in this session, add unavailability as we go
                     for slot in session.slots:
                         if not speaker.availabilities.filter(
-                            available=True, when__overlap=slot
+                            # we want to add unavailability unless we have a SpeakerAvailability object which contains all of this slot
+                            available=True,
+                            when__contains=slot,
                         ).exists():
                             # either we have no SpeakerAvailability for this slot, or the speaker is unavailable
                             autoevent.unavailability_slots.add(

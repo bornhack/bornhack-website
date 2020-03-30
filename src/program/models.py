@@ -6,10 +6,12 @@ import icalendar
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.db.models import F
 from django.urls import reverse, reverse_lazy
 from django.utils.text import slugify
 from program.utils import get_slots
@@ -158,8 +160,6 @@ class Availability(CampRelatedModel, UUIDModel):
     This model contains all the availability info for speakerproposals and
     speakers. It is inherited by SpeakerProposalAvailability and SpeakerAvailability
     models.
-    This model contains 1 hour ranges of availability/unavailability, enforced
-    by the clean() method.
     """
 
     class Meta:
@@ -175,22 +175,23 @@ class Availability(CampRelatedModel, UUIDModel):
         help_text="Is the speaker available or unavailable during this hour? Check for available, uncheck for unavailable.",
     )
 
-    def clean(self):
-        """
-        For UI and complexity reasons we limit these to 1 hour length, regardless
-        of the value of settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS.
-        This means we save 3 instances of this model for each checked checkbox if
-        settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3.
-        """
-        delta = self.when.upper - self.when.lower
-        if int(delta.total_seconds()) != 3600:
-            raise ValidationError(
-                f"Instances must be 1 hour long (3600 seconds), this is {int(delta.total_seconds())}!"
-            )
-
 
 class SpeakerProposalAvailability(Availability):
     """ Availability info for SpeakerProposal objects """
+
+    class Meta:
+        """ Add ExclusionConstraint preventing overlaps """
+
+        constraints = [
+            # we do not want overlapping ranges
+            ExclusionConstraint(
+                name="prevent_speakerproposalavailability_overlaps",
+                expressions=[
+                    (F("speakerproposal"), RangeOperators.EQUAL),
+                    ("when", RangeOperators.OVERLAPS),
+                ],
+            ),
+        ]
 
     speakerproposal = models.ForeignKey(
         "program.SpeakerProposal",
@@ -207,9 +208,33 @@ class SpeakerProposalAvailability(Availability):
 
     camp_filter = "speakerproposal__camp"
 
+    def clean(self):
+        if SpeakerProposalAvailability.objects.filter(
+            speakerproposal=self.speakerproposal,
+            when__adjacent_to=self.when,
+            available=self.available,
+        ).exists():
+            raise ValidationError(
+                f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}"
+            )
+
 
 class SpeakerAvailability(Availability):
     """ Availability info for Speaker objects """
+
+    class Meta:
+        """ Add ExclusionConstraint preventing overlaps """
+
+        constraints = [
+            # we do not want overlapping ranges
+            ExclusionConstraint(
+                name="prevent_speakeravailability_overlaps",
+                expressions=[
+                    (F("speaker"), RangeOperators.EQUAL),
+                    ("when", RangeOperators.OVERLAPS),
+                ],
+            ),
+        ]
 
     speaker = models.ForeignKey(
         "program.Speaker",
@@ -225,6 +250,15 @@ class SpeakerAvailability(Availability):
         return self.speaker.camp
 
     camp_filter = "speaker__camp"
+
+    def clean(self):
+        # this should be an ExclusionConstraint but the boolean condition isn't conditioning :/
+        if SpeakerAvailability.objects.filter(
+            speaker=self.speaker, when__adjacent_to=self.when, available=self.available,
+        ).exists():
+            raise ValidationError(
+                "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()"
+            )
 
 
 ###############################################################################

@@ -370,7 +370,7 @@ class SpeakerProposalDeleteView(
 
     def delete(self, *args, **kwargs):
         """ Delete availabilities before deleting the proposal """
-        self.availabilities.delete()
+        self.get_object().availabilities.all().delete()
         return super().delete(*args, **kwargs)
 
     def get_success_url(self):

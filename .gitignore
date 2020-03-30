@@ -1,5 +1,6 @@
 .dev
 .idea/
+.hypothesis/
 __pycache__/
 db.sqlite3
 *.sw*

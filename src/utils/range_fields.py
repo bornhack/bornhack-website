@@ -216,7 +216,6 @@ def deconstruct(self):
     )
 
 
-print("patching Range ...")
 Range.__add__ = range_merge
 Range.__and__ = __and__
 Range.__eq__ = __eq__

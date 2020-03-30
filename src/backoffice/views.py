@@ -590,6 +590,7 @@ class AutoScheduleCalculateView(CampViewMixin, ContentTeamPermissionMixin, Updat
             queryset=AutoSchedule.objects.filter(
                 camp=form.instance.camp, event_type=form.instance.event_type,
             ).exclude(id=form.instance.id),
+            required=False,
             help_text="Optimise this calculation to have as few changes from the selected schedule as possible",
         )
         return form

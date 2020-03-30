@@ -6,7 +6,7 @@ from datetime import timedelta
 import pytz
 from django.apps import apps
 from django.conf import settings
-from psycopg2._range import DateTimeTZRange
+from psycopg2.extras import DateTimeTZRange
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -73,7 +73,7 @@ def get_speaker_availability_form_matrix(sessions):
             eventtypes = set()
             for session in sessions:
                 # add the eventtype if this session overlaps with daychunk
-                if daychunk in session.when:
+                if daychunk & session.when:
                     eventtypes.add(session.event_type)
 
             # make sure we already have an OrderedDict for this day in the matrix
@@ -130,13 +130,21 @@ def save_speaker_availability(form, speakerproposal):
     # all the entered data is in the users local TIME_ZONE, interpret it as such
     tz = pytz.timezone(settings.TIME_ZONE)
 
-    # loop over form fields
+    # count availability form fields
+    fieldcounter = 0
     for field in form.cleaned_data.keys():
+        if field[:13] == "availability_":
+            fieldcounter += 1
+
+    # loop over form fields, and make sure we get them in sorted order
+    formerchunk = None
+    fields = list(form.cleaned_data.keys())
+    fields.sort()
+    for field in fields:
         if field[:13] != "availability_":
             continue
 
-        # this is a speakeravailability field, create one SpeakerAvailability object per hour
-        # first split the fieldname to get the tzrange for this daychunk
+        # this is a speakeravailability field, first split the fieldname to get the tzrange for this daychunk
         elements = field.split("_")
         # format is "availability_2020_08_28_18_00_to_2020_08_28_21_00"
         daychunk = DateTimeTZRange(
@@ -158,21 +166,52 @@ def save_speaker_availability(form, speakerproposal):
                     int(elements[11]),
                 )
             ),
+            # we want the bounds exclusive so adjacent SpeakerAvailability ranges can exist
+            # without violating our ExclusionConstraint, which is there to make sure
+            # this is neccesary because Django doesn't directly supports setting bounds on RangeFields, so postgres returns the bound "[)"
+            # causing a conflict when ranges are adjacent. See https://code.djangoproject.com/ticket/27147 for a better way down the line.
+            # bounds="()",
         )
+        available = form.cleaned_data[field]
 
-        # loop over hours in this daychunk and create SpeakerAvailability objects.
-        # We always create SpeakerAvailability objects of 1 hour duration, regardless
-        # of settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS, this means we can change
-        # settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS later with no issues.
-        for i in range(0, settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS):
+        if fieldcounter == 1:
+            # we only have one field in the form, no field merging to be done
+            SpeakerProposalAvailability.objects.create(
+                speakerproposal=speakerproposal, when=daychunk, available=available,
+            )
+            continue
+
+        # we have more than one form field, but we want to save continuous ranges
+        # as one SpeakerAvailability object, so we might need to merge this field with
+        # the next one, so we can't save it yet
+        if not formerchunk:
+            # this is the first loop or we changed availability,
+            # remember the current chunk for the next loop
+            formerchunk = daychunk
+            formeravailable = available
+            continue
+
+        # this is not the first chunk
+        if formeravailable == available and formerchunk.upper == daychunk.lower:
+            # we have the same value for "available" and adjacent times,
+            # merge with the former chunk
+            formerchunk = formerchunk + daychunk
+        else:
+            # "available" changed or daychunk is not adjacent to formerchunk
             SpeakerProposalAvailability.objects.create(
                 speakerproposal=speakerproposal,
-                when=DateTimeTZRange(
-                    daychunk.lower + datetime.timedelta(hours=i),
-                    daychunk.lower + datetime.timedelta(hours=i + 1),
-                ),
-                available=form.cleaned_data[field],
+                when=formerchunk,
+                available=formeravailable,
             )
+            # and remember the current chunk for next iteration
+            formerchunk = daychunk
+            formeravailable = available
+
+    # save the last chunk?
+    if formerchunk:
+        SpeakerProposalAvailability.objects.create(
+            speakerproposal=speakerproposal, when=formerchunk, available=available,
+        )
 
 
 def add_matrix_availability(matrix, speakerproposal):
@@ -182,7 +221,6 @@ def add_matrix_availability(matrix, speakerproposal):
     This is used to populate initial form field values and to set <td> background
     colours in the html table.
     """
-    SpeakerAvailability = apps.get_model("program", "speakeravailability")
     # loop over dates in the matrix
     for date in matrix.keys():
         # loop over daychunks and check if we need a checkbox
@@ -190,40 +228,11 @@ def add_matrix_availability(matrix, speakerproposal):
             if not matrix[date][daychunk]:
                 # we have no eventsession here, carry on
                 continue
-
-            # do we have availability info for this speaker for the entire chunk?
-            # loop over the hours in this daychunk, checking as we go
-            # whether the speaker is available, unavailable, or unkown for that hour
-            availabilities = set()
-            for i in range(0, settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS):
-                hour = DateTimeTZRange(
-                    daychunk.lower + datetime.timedelta(hours=i),
-                    daychunk.lower + datetime.timedelta(hours=i + 1),
+            if speakerproposal.availabilities.filter(when__contains=daychunk).exists():
+                availability = speakerproposal.availabilities.get(
+                    when__contains=daychunk
                 )
-                try:
-                    availabilities.add(
-                        speakerproposal.availabilities.get(when=hour).available
-                    )
-                    if len(availabilities) > 1:
-                        # conflicting availability info, no need to check further
-                        break
-                except SpeakerAvailability.DoesNotExist:
-                    # no availability info for this hour, no need to check further
-                    availabilities.add(None)
-                    break
-
-            # availabilities is now a set() of True/False/None representing the
-            # speakers existing availability status for each hour in this daychunk.
-            # If we have the same availability status for the whole daychunk
-            # we can use that status (available/unavailable/unknown) as the
-            # initial form value
-            availability = availabilities.pop()
-            if availability is None or len(availabilities) > 1:
-                # we have no info or inconsistent info
-                matrix[date][daychunk]["initial"] = None
-            else:
-                # we have existing consistent availability info
-                matrix[date][daychunk]["initial"] = availability
+                matrix[date][daychunk]["initial"] = availability.available
 
 
 def get_slots(period, duration):
@@ -236,13 +245,17 @@ def get_slots(period, duration):
         return slots
 
     # create the first slot
-    slot = DateTimeTZRange(period.lower, period.lower + timedelta(minutes=duration))
+    slot = DateTimeTZRange(
+        period.lower, period.lower + timedelta(minutes=duration), bounds="()"
+    )
 
     # loop until we pass the end
     while slot.upper < period.upper:
         slots.append(slot)
         # the next slot starts when this one ends
-        slot = DateTimeTZRange(slot.upper, slot.upper + timedelta(minutes=duration))
+        slot = DateTimeTZRange(
+            slot.upper, slot.upper + timedelta(minutes=duration), bounds="()"
+        )
 
     # append the final slot to the list
     slots.append(slot)
