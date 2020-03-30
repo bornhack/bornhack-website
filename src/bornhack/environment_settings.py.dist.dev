@@ -17,9 +17,9 @@ DATABASES = {
         "ENGINE": 'django.contrib.gis.db.backends.postgis',
         "NAME": "bornhack",
         "USER": "bornhack",
-        "PASSWORD": "bornhack",
-        "HOST": "localhost",
-        "PORT": 5433,
+        #"PASSWORD": "bornhack",
+        #"HOST": "localhost",
+        #"PORT": 5433,
     }
 }
 DEBUG = True
