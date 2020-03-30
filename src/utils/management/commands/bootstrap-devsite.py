@@ -1412,22 +1412,16 @@ class Command(BaseCommand):
 
                 self.create_camp_eventsessions(camp, event_types, locations)
 
-                try:
-                    self.create_camp_proposals(camp, event_types)
-                except ValidationError:
-                    # there is a chance we hit the same speaker name twice,
-                    # just try again if it happens
-                    try:
-                        self.create_camp_proposals(camp, event_types)
-                    except ValidationError:
-                        # twice in a row?
-                        self.output(
-                            "Bad luck. flush and run the bootstrap script again!"
-                        )
+                self.create_camp_proposals(camp, event_types)
 
                 self.generate_speaker_availability(camp)
 
-                self.approve_speakerproposals(camp)
+                try:
+                    self.approve_speakerproposals(camp)
+                except ValidationError:
+                    self.output(
+                        "Name collision, bad luck. Run 'manage.py flush' and run the bootstrap script again!"
+                    )
 
                 self.approve_eventproposals(camp)
 
