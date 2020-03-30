@@ -10,17 +10,21 @@ services:
   - postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: "10"
   apt:
     packages:
-    - postgresql-9.6-postgis-2.5
+    - postgresql-10
+    - postgresql-client-10
+    - postgresql-10-postgis-2.5
+env:
+  global:
+  - PGPORT=5433
 
 install:
   - pip install -r src/requirements/dev.txt
 
 before_script:
   - psql -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
-  - psql -c "CREATE EXTENSION btree_gist;" template1
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
