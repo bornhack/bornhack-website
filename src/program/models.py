@@ -611,6 +611,11 @@ class EventLocation(CampRelatedModel):
         help_text="The capacity of this location. Used by the autoscheduler.",
     )
 
+    conflicts = models.ManyToManyField(
+        "self",
+        help_text="Select the locations which this location conflicts with. Nothing can be scheduled in a location if a conflicting location has an EventInstance at the same time. Example: If one room can be split into two, then the big room would conflict with each of the two small rooms (but the small rooms would not conflict with eachother).",
+    )
+
     def __str__(self):
         return "{} ({})".format(self.name, self.camp)
 
@@ -674,6 +679,10 @@ class EventType(CreatedUpdatedModel):
         help_text="The duration of an event of this type, in minutes. Leave this empty if events of this type can have different durations. Required for autoscheduling.",
     )
 
+    support_autoscheduling = models.BooleanField(
+        default=False, help_text="Check to enable this EventType in the autoscheduler",
+    )
+
     def __str__(self):
         return self.name
 
@@ -684,6 +693,12 @@ class EventType(CreatedUpdatedModel):
             "color": self.color,
             "light_text": self.light_text,
         }
+
+    def clean(self):
+        if self.support_autoscheduling and not self.event_duration_minutes:
+            raise ValidationError(
+                "You must specify event_duration_minutes to support autoscheduling"
+            )
 
 
 class EventSession(CampRelatedModel):

@@ -79,20 +79,20 @@ def availabilitytable(matrix, form=None):
                         if matrix[date][daychunk]["initial"]:
                             tdclass = "success"
                             tdicon = "check"
-                            popup += "<p>You previously indicated that you are <b>available</b> during this time slot.</p>"
+                            popup += "<p>Our records indicate that this person is <b>available</b> during this time slot.</p>"
                         elif matrix[date][daychunk]["initial"] is None:
                             tdclass = "warning"
                             tdicon = "question"
                             needsinfo = True
                             if form:
-                                popup += "<p>We have no existing records about your availability during this time slot.</p>"
+                                popup += "<p>We have no existing records about this persons availability during this time slot.</p>"
                             else:
-                                popup += "<p>We have no existing records about your availability during this time slot. Please update your availability information!</p>"
+                                popup += "<p>We have no existing records about this persons availability during this time slot. Please update your availability information!</p>"
 
                         else:
                             tdclass = "danger"
                             tdicon = "times"
-                            popup += "<p>You previously indicated that you are <b>not available</b> during this time slot.</p>"
+                            popup += "<p>Our records indicate that this person is <b>not available</b> during this time slot.</p>"
 
                         # ok finish the popup and add it to the td
                         popup += "</div>"

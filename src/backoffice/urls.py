@@ -5,7 +5,6 @@ from .views import (
     ApproveNamesView,
     AutoScheduleApplyView,
     AutoScheduleCalculateView,
-    AutoScheduleCreateEventTypeSelectView,
     AutoScheduleCreateObjectsView,
     AutoScheduleCreateView,
     AutoScheduleDebugEventsView,
@@ -20,12 +19,12 @@ from .views import (
     ChainListView,
     CredebtorDetailView,
     EventProposalManageView,
+    EventSessionCreateLocationSelectView,
+    EventSessionCreateTypeSelectView,
     EventSessionCreateView,
     EventSessionDeleteView,
     EventSessionDetailView,
     EventSessionListView,
-    EventSessionLocationSelectView,
-    EventSessionTypeSelectView,
     EventSessionUpdateView,
     ExpenseDetailView,
     ExpenseListView,
@@ -116,7 +115,7 @@ urlpatterns = [
                         [
                             path(
                                 "",
-                                EventSessionTypeSelectView.as_view(),
+                                EventSessionCreateTypeSelectView.as_view(),
                                 name="eventsession_typeselect",
                             ),
                             path(
@@ -125,7 +124,7 @@ urlpatterns = [
                                     [
                                         path(
                                             "",
-                                            EventSessionLocationSelectView.as_view(),
+                                            EventSessionCreateLocationSelectView.as_view(),
                                             name="eventsession_locationselect",
                                         ),
                                         path(
@@ -172,20 +171,8 @@ urlpatterns = [
                 path("", AutoScheduleListView.as_view(), name="autoschedule_list"),
                 path(
                     "create/",
-                    include(
-                        [
-                            path(
-                                "",
-                                AutoScheduleCreateEventTypeSelectView.as_view(),
-                                name="autoschedule_create_typeselect",
-                            ),
-                            path(
-                                "<slug:eventtype_slug>/",
-                                AutoScheduleCreateView.as_view(),
-                                name="autoschedule_create",
-                            ),
-                        ]
-                    ),
+                    AutoScheduleCreateView.as_view(),
+                    name="autoschedule_create",
                 ),
                 path(
                     "<int:pk>/",

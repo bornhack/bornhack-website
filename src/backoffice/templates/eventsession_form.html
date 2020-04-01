@@ -41,8 +41,8 @@
         {% for session in sessions %}
         <tr>
           <td>{{ session.id }}</td>
-          <td>{{ session.session.lower }}</td>
-          <td>{{ session.session.upper }}</td>
+          <td>{{ session.when.lower }}</td>
+          <td>{{ session.when.upper }}</td>
           <td>{{ session.duration }}</td>
           <td>{{ session.event_count }}</td>
           <td>{{ session.free_time }}</td>

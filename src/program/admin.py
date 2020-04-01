@@ -83,7 +83,7 @@ class EventProposalAdmin(admin.ModelAdmin):
 @admin.register(EventLocation)
 class EventLocationAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
-    list_display = ("name", "camp")
+    list_display = ("name", "camp", "capacity")
 
 
 @admin.register(EventTrack)
@@ -101,8 +101,8 @@ class EventSessionAdmin(admin.ModelAdmin):
 
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
-    list_display = ("event", "when", "location")
-    list_filter = ("event__track__camp", "event")
+    list_display = ("event", "when", "location", "autoscheduled")
+    list_filter = ("event__track__camp", "event", "autoscheduled")
     search_fields = ["event__title"]
 
 
@@ -128,8 +128,8 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ("track", "speakers")
-    list_display = ["title", "event_type"]
+    list_display = ["title", "event_type", "duration_minutes", "demand"]
+    list_filter = ("track", "event_type", "speakers")
 
     inlines = [SpeakerInline]
 

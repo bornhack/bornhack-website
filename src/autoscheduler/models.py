@@ -1,16 +1,19 @@
+import logging
 from datetime import timedelta
 
 import program.models
 from conference_scheduler import converter, resources, scheduler
 from conference_scheduler.lp_problem import objective_functions
 from django.contrib import messages
-from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.fields import ArrayField, DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from program.utils import get_slots
 from psycopg2._range import DateTimeTZRange
 from utils.models import CampRelatedModel
+
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class AutoSchedule(CampRelatedModel):
@@ -37,11 +40,10 @@ class AutoSchedule(CampRelatedModel):
         help_text="The Camp this schedule belongs to",
     )
 
-    event_type = models.ForeignKey(
+    event_types = models.ManyToManyField(
         "program.EventType",
         related_name="autoschedules",
-        on_delete=models.PROTECT,
-        help_text="The EventType this schedule is for",
+        help_text="The EventTypes this schedule is for",
     )
 
     matrix = ArrayField(
@@ -77,15 +79,19 @@ class AutoSchedule(CampRelatedModel):
 
         # loop over camp sessions, creatint Slots in the database as we go
         unavailable_slots = set()
-        for session in self.camp.eventsessions.filter(event_type=self.event_type):
-            for slot in get_slots(session.when, self.event_type.event_duration_minutes):
-                # create slot in database
+        for session in self.camp.eventsessions.filter(
+            event_type__in=self.event_types.all()
+        ).prefetch_related("event_type", "event_location"):
+            for slot in get_slots(
+                session.when, session.event_type.event_duration_minutes
+            ):
+                # create AutoSlot in database
                 dbslot = AutoSlot.objects.create(
                     schedule=self,
                     venue=session.event_location.id,
-                    starts_at=slot.lower,
-                    duration=int((slot.upper - slot.lower).total_seconds() / 60),
+                    when=slot,
                     session=session.id,
+                    event_type=session.event_type.id,
                     capacity=session.event_location.capacity,
                 )
 
@@ -99,10 +105,21 @@ class AutoSchedule(CampRelatedModel):
                     # something has been manually scheduled on this location in this slot
                     unavailable_slots.add(dbslot)
 
-        # loop over all Events of the current eventtype and create an AutoEvent object for each
-        for event in self.camp.events.filter(event_type=self.event_type).order_by(
-            "created"
-        ):
+                # check if anything is scheduled in another location which conflicts with this one
+                if program.models.EventInstance.objects.filter(
+                    location__in=session.event_location.conflicts.all(),
+                    when__overlap=slot,
+                    autoscheduled=False,
+                ).exists():
+                    # something has been manually scheduled on a location which conflicts with
+                    # this location during this slot, slot is unavailable
+                    unavailable_slots.add(dbslot)
+
+        # loop over all Events create an AutoEvent object for each,
+        # excluding events which have EventInstances that are not autoscheduled
+        for event in self.camp.events.filter(
+            event_type__in=self.event_types.all()
+        ).exclude(instances__isnull=False, instances__autoscheduled=False):
             autoevent = AutoEvent.objects.create(
                 schedule=self,
                 name=event.id,
@@ -111,38 +128,54 @@ class AutoSchedule(CampRelatedModel):
                 tags=[],
                 demand=event.demand,
             )
-            for slot in unavailable_slots:
-                autoevent.unavailability_slots.add(slot)
+
+        # Do we have more than one EventType in this schedule?
+        if self.event_types.count() > 1:
+            # We have AutoSlot objects based on EventSessions for multiple EventTypes.
+            # First build a dict of all slots for each eventtype...
+            eventtype_slots = {}
+            for et in self.event_types.all():
+                eventtype_slots[et] = [
+                    slot for slot in self.slots.filter(event_type=et.id)
+                ]
+            # then loop over all events...
+            for event in self.events.all():
+                # loop over all other eventtypes...
+                for et in self.event_types.all().exclude(pk=event.event.event_type.pk):
+                    # and add all slots as unavailable for this event,
+                    # this means we don't schedule a talk in a workshop slot and vice versa.
+                    event.unavailability_slots.add(*eventtype_slots[et])
 
         # loop over events again, this time to look for speaker conflicts and unavailability
-        # (we have to do this in a seperate loop because we need all the events to exist in db)
-        for event in self.camp.events.filter(event_type=self.event_type):
-            autoevent = AutoEvent.objects.get(schedule=self, name=event.id)
+        # (we have to do this in a seperate loop because we need all the autoevents to exist)
+        for autoevent in self.events.all():
+            # add the slots we already know are unavailable
+            autoevent.unavailability_slots.add(*unavailable_slots)
             # loop over speakers for this event and add unavailability
-            for speaker in event.speakers.all():
+            for speaker in autoevent.event.speakers.all():
                 # loop over other events featuring this speaker, register each conflict
-                for conflict in self.camp.events.filter(speakers=speaker).exclude(
-                    id=event.id
-                ):
-                    # conflict has the same speaker as the current event, register unavailability
-                    autoevent.unavailability_events.add(
-                        self.events.get(name=conflict.id)
+                conflictevents = speaker.events.exclude(
+                    id=autoevent.event.id
+                ).values_list("id", flat=True)
+                conflictautoevents = [
+                    x for x in self.events.filter(event__id__in=conflictevents)
+                ]
+                autoevent.unavailability_events.add(*conflictautoevents)
+
+                # Register all slots where we have no positive availability
+                # for this speaker as unavailable
+                unavailableslots = self.slots.all()
+                for availability in speaker.availabilities.filter(
+                    available=True
+                ).values_list("when", flat=True):
+                    availability = DateTimeTZRange(
+                        availability.lower, availability.upper, "()"
                     )
-                # loop over SpeakerAvailability for this speaker (unavailability really)
-                for session in self.camp.eventsessions.filter(
-                    event_type=self.event_type
-                ):
-                    # loop over all slots in this session, add unavailability as we go
-                    for slot in session.slots:
-                        if not speaker.availabilities.filter(
-                            # we want to add unavailability unless we have a SpeakerAvailability object which contains all of this slot
-                            available=True,
-                            when__contains=slot,
-                        ).exists():
-                            # either we have no SpeakerAvailability for this slot, or the speaker is unavailable
-                            autoevent.unavailability_slots.add(
-                                self.slots.get(starts_at=slot.lower)
-                            )
+                    unavailableslots = unavailableslots.exclude(
+                        when__contained_by=availability
+                    )
+                autoevent.unavailability_slots.add(*[slot for slot in unavailableslots])
+
         # done - return some stats
         if "autoscheduler.AutoSlot" in slotdetails:
             slotsdeleted = slotdetails["autoscheduler.AutoSlot"]
@@ -203,7 +236,7 @@ class AutoSchedule(CampRelatedModel):
 
             # we use the starttime as lookup key here, so build a list of all the
             # starttimes for easy lookups in the loop
-            starttime_list = self.slots.all().values_list("starts_at", flat=True)
+            starttime_list = [s.when.lower for s in self.slots.all()]
 
             # loop over slots in the original schedule and see if any were removed
             slotindex = 0
@@ -274,7 +307,7 @@ class AutoSchedule(CampRelatedModel):
         # FRAB clients still work after a schedule "re"apply. We might need a smaller hammer here.
         deleted, details = program.models.EventInstance.objects.filter(
             event__track__camp=self.camp,
-            event__event_type=self.event_type,
+            event__event_type__in=self.event_types.all(),
             autoscheduled=True,
         ).delete()
 
@@ -467,9 +500,11 @@ class AutoEvent(CampRelatedModel):
         return event
 
     def save(self, **kwargs):
-        if self.schedule.applied:
-            # this schedule has already been applied, no changes allowed
-            message = "This schedule to which this Slot belongs has been applied and can no longer be modified (including related Slots)"
+        if self.schedule.readonly:
+            # this schedule is marked as readonly
+            message = (
+                "This schedule to which this Slot belongs has been marked as readonly"
+            )
             if hasattr(self, "request"):
                 messages.error(self.request, message)
             raise ValidationError(message)
@@ -498,14 +533,14 @@ class AutoSlot(CampRelatedModel):
         help_text="The ID of the EventLocation this Slot is for"
     )
 
-    starts_at = models.DateTimeField(help_text="The start time of this Slot")
-
-    duration = models.PositiveIntegerField(
-        help_text="The duration of this Slot (in minutes)",
-    )
+    when = DateTimeRangeField(help_text="When is this slot?",)
 
     session = models.PositiveIntegerField(
         help_text="The ID of the EventSession object this Slot is part of"
+    )
+
+    event_type = models.PositiveIntegerField(
+        help_text="The ID of the EventType object of the EventSession this Slot is part of"
     )
 
     capacity = models.PositiveIntegerField(
@@ -531,10 +566,21 @@ class AutoSlot(CampRelatedModel):
         )
 
     def save(self, **kwargs):
-        if self.schedule.applied:
-            # this schedule has already been applied, no changes allowed
-            message = "This schedule to which this Event belongs has been applied and can no longer be modified (including related Events)"
+        if self.schedule.readonly:
+            # no changes allowed
+            message = (
+                "This schedule to which this Event belongs has been marked as readonly"
+            )
             if hasattr(self, "request"):
                 messages.error(self.request, message)
             raise ValidationError(message)
         super().save(**kwargs)
+
+    @property
+    def starts_at(self):
+        return self.when.lower
+
+    @property
+    def duration(self):
+        """ The autoscheduler needs the duration in minutes """
+        return int((self.when.upper - self.when.lower).total_seconds() / 60)

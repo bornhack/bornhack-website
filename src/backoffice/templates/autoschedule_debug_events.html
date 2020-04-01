@@ -6,7 +6,7 @@
   <thead>
     <th>fedt nok</th>
     {% for event in object.events.all %}
-    <th>{{ event.event.title }}</th>
+    <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a></th>
     {% endfor %}
   </thead>
   <tbody>

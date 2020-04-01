@@ -29,6 +29,7 @@ from program.models import (
     EventType,
     SpeakerProposal,
 )
+from program.utils import add_matrix_availability, get_speaker_availability_form_matrix
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -270,6 +271,24 @@ class SpeakerProposalManageView(ProposalManageBaseView):
     model = SpeakerProposal
     template_name = "manage_speakerproposal.html"
 
+    def setup(self, *args, **kwargs):
+        """ Get the speaker availability matrix"""
+        super().setup(*args, **kwargs)
+        # get the form field matrix for speaker availability
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(
+                event_type__in=EventType.objects.filter(
+                    eventproposals__in=self.get_object().eventproposals.all()
+                ).distinct()
+            )
+        )
+        add_matrix_availability(self.matrix, self.get_object())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["matrix"] = self.matrix
+        return context
+
 
 class EventProposalManageView(ProposalManageBaseView):
     """
@@ -284,7 +303,9 @@ class EventProposalManageView(ProposalManageBaseView):
 # MANAGE EVENTSESSION VIEWS
 
 
-class EventSessionTypeSelectView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+class EventSessionCreateTypeSelectView(
+    CampViewMixin, ContentTeamPermissionMixin, ListView
+):
     """
     This view is shown first when creating a new EventSession
     """
@@ -293,7 +314,7 @@ class EventSessionTypeSelectView(CampViewMixin, ContentTeamPermissionMixin, List
     template_name = "eventsession_typeselect.html"
 
 
-class EventSessionLocationSelectView(
+class EventSessionCreateLocationSelectView(
     CampViewMixin, ContentTeamPermissionMixin, ListView
 ):
     """
@@ -431,7 +452,7 @@ class EventSessionUpdateView(
     """
 
     model = EventSession
-    fields = ["event_type", "event_location", "when", "description"]
+    fields = ["when", "description"]
     template_name = "eventsession_form.html"
 
     def setup(self, *args, **kwargs):
@@ -493,39 +514,27 @@ class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteVi
 # AUTOSCHEDULER VIEWS
 
 
-class AutoScheduleCreateEventTypeSelectView(
-    CampViewMixin, ContentTeamPermissionMixin, ListView
-):
-    """ This view is shown first when creating a new Schedule for the autoscheduler """
-
-    model = EventType
-    template_name = "autoschedule_create_typeselect.html"
-
-
 class AutoScheduleCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateView):
     """ This view is used by the Content Team to create Schedule objects for the autoscheduler"""
 
     model = AutoSchedule
-    fields = []
+    fields = ["event_types"]
     template_name = "autoschedule_create.html"
 
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.event_type = get_object_or_404(EventType, slug=kwargs["eventtype_slug"])
-
-    def get_context_data(self, *args, **kwargs):
-        """ Add eventtype to context """
-        context = super().get_context_data(*args, **kwargs)
-        context["event_type"] = self.event_type
-        return context
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["event_types"].queryset = EventType.objects.filter(
+            support_autoscheduling=True
+        )
+        return form
 
     def form_valid(self, form):
         """ Set camp and event_type and user and save """
         schedule = form.save(commit=False)
-        schedule.event_type = self.event_type
         schedule.camp = self.camp
         schedule.user = self.request.user
         schedule.save()
+        form.save_m2m()
 
         # create the related Event and Slot objects
         start = timezone.now()
@@ -558,17 +567,19 @@ class AutoScheduleCreateObjectsView(
     template_name = "autoschedule_create_objects.html"
 
     def form_valid(self, form):
-        sd, ed, sc, ec = self.get_object().create_autoscheduler_objects()
+        start = timezone.now()
+        sd, ed, sc, ec = form.instance.create_autoscheduler_objects()
+        duration = timezone.now() - start
         if not sd and not ed:
             # nothing was deleted
             messages.success(
                 self.request,
-                f"AutoScheduler objects created OK! No existing objects deleted, {sc} AutoSlots created, {ec} AutoEvents created.",
+                f"AutoScheduler objects created OK! No existing objects deleted, {sc} AutoSlots created, {ec} AutoEvents created. It took {duration}.",
             )
         else:
             messages.success(
                 self.request,
-                f"AutoScheduler objects recreated OK! {sd} AutoSlots deleted, {ed} AutoEvents deleted, {sc} AutoSlots created, {ec} AutoEvents created.",
+                f"AutoScheduler objects recreated OK! {sd} AutoSlots deleted, {ed} AutoEvents deleted, {sc} AutoSlots created, {ec} AutoEvents created. It took {duration}.",
             )
         return redirect(
             reverse(
@@ -587,9 +598,9 @@ class AutoScheduleCalculateView(CampViewMixin, ContentTeamPermissionMixin, Updat
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         form.fields["original_schedule"] = forms.ModelChoiceField(
-            queryset=AutoSchedule.objects.filter(
-                camp=form.instance.camp, event_type=form.instance.event_type,
-            ).exclude(id=form.instance.id),
+            queryset=AutoSchedule.objects.filter(camp=form.instance.camp).exclude(
+                id=form.instance.id
+            ),
             required=False,
             help_text="Optimise this calculation to have as few changes from the selected schedule as possible",
         )
@@ -626,18 +637,13 @@ class AutoScheduleDiffView(CampViewMixin, ContentTeamPermissionMixin, DetailView
         # show all other autoschedules from the same camp and eventtype,
         # and where matrix is not null (meaning the schedule has been calculated)
         context["schedules"] = AutoSchedule.objects.filter(
-            camp=self.camp,
-            event_type=self.get_object().event_type,
-            matrix__isnull=False,
+            camp=self.camp, matrix__isnull=False,
         ).exclude(pk=self.get_object().pk)
 
         # do we have a schedule to diff with
         if "original_schedule_id" in self.kwargs:
             context["original_schedule"] = get_object_or_404(
-                AutoSchedule,
-                camp=self.camp,
-                event_type=self.get_object().event_type,
-                pk=self.kwargs["original_schedule_id"],
+                AutoSchedule, camp=self.camp, pk=self.kwargs["original_schedule_id"],
             )
             context["diff"] = self.get_object().diff(context["original_schedule"])
         return context

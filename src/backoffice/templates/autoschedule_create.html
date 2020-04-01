@@ -12,6 +12,7 @@
     <p><b>Note:</b> Creating a schedule will not affect the published EventInstances in any way. The schedule has to be <b>applied</b> before any EventInstances are touched. It is completely safe to play around with creating and calculating new schedules. Only applying a schedule changes EventInstances!</p>
     <form method="POST">
       {% csrf_token %}
+      {% bootstrap_form form %}
       <button type="submit" class="btn btn-success">
         <i class="fas fa-plus"></i> Create AutoSchedule
       </button>

@@ -144,7 +144,8 @@ def save_speaker_availability(form, speakerproposal):
         if field[:13] != "availability_":
             continue
 
-        # this is a speakeravailability field, first split the fieldname to get the tzrange for this daychunk
+        # this is a speakeravailability field, first split the
+        # fieldname to get the tzrange for this daychunk
         elements = field.split("_")
         # format is "availability_2020_08_28_18_00_to_2020_08_28_21_00"
         daychunk = DateTimeTZRange(
@@ -166,11 +167,6 @@ def save_speaker_availability(form, speakerproposal):
                     int(elements[11]),
                 )
             ),
-            # we want the bounds exclusive so adjacent SpeakerAvailability ranges can exist
-            # without violating our ExclusionConstraint, which is there to make sure
-            # this is neccesary because Django doesn't directly supports setting bounds on RangeFields, so postgres returns the bound "[)"
-            # causing a conflict when ranges are adjacent. See https://code.djangoproject.com/ticket/27147 for a better way down the line.
-            # bounds="()",
         )
         available = form.cleaned_data[field]
 
@@ -257,6 +253,7 @@ def get_slots(period, duration):
             slot.upper, slot.upper + timedelta(minutes=duration), bounds="()"
         )
 
-    # append the final slot to the list
-    slots.append(slot)
+    # append the final slot to the list unless it continues past the end
+    if not slot.upper > period.upper:
+        slots.append(slot)
     return slots

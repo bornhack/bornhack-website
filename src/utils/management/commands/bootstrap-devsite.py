@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import factory
 import pytz
 from allauth.account.models import EmailAddress
-from autoscheduler.utils import create_autoschedule
+from autoscheduler.models import AutoSchedule
 from camps.models import Camp
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
@@ -353,6 +353,7 @@ class Command(BaseCommand):
             icon="toolbox",
             host_title="Host",
             event_duration_minutes="180",
+            support_autoscheduling=True,
         )
 
         types["talk"] = EventType.objects.create(
@@ -365,6 +366,7 @@ class Command(BaseCommand):
             icon="chalkboard-teacher",
             host_title="Speaker",
             event_duration_minutes="60",
+            support_autoscheduling=True,
         )
 
         types["lightning"] = EventType.objects.create(
@@ -389,6 +391,7 @@ class Command(BaseCommand):
             icon="music",
             host_title="Artist",
             event_duration_minutes="60",
+            support_autoscheduling=True,
         )
 
         types["keynote"] = EventType.objects.create(
@@ -400,6 +403,7 @@ class Command(BaseCommand):
             icon="star",
             host_title="Speaker",
             event_duration_minutes="90",
+            support_autoscheduling=True,
         )
 
         types["debate"] = EventType.objects.create(
@@ -412,6 +416,7 @@ class Command(BaseCommand):
             host_title="Guest",
             public=True,
             event_duration_minutes="120",
+            support_autoscheduling=True,
         )
 
         types["facility"] = EventType.objects.create(
@@ -436,6 +441,7 @@ class Command(BaseCommand):
             icon="dice",
             host_title="Host",
             event_duration_minutes="180",
+            support_autoscheduling=True,
         )
 
         return types
@@ -674,7 +680,7 @@ class Command(BaseCommand):
             slug="workshop-room-3",
             icon="briefcase",
             camp=camp,
-            capacity=50,
+            capacity=25,
         )
         locations["bar_area"] = EventLocation.objects.create(
             name="Bar Area",
@@ -689,6 +695,11 @@ class Command(BaseCommand):
         locations["infodesk"] = EventLocation.objects.create(
             name="Infodesk", slug="infodesk", icon="info", camp=camp, capacity=20,
         )
+
+        # add workshop room conflicts (the big root can not be used while either
+        # of the small rooms are in use, and vice versa)
+        locations["workshop_room_1"].conflicts.add(locations["workshop_room_2"])
+        locations["workshop_room_1"].conflicts.add(locations["workshop_room_3"])
 
         return locations
 
@@ -729,17 +740,51 @@ class Command(BaseCommand):
                     + timedelta(hours=2),
                 ),
             )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_1"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_2"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_3"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                ),
+            )
 
     def create_camp_proposals(self, camp, event_types):
         year = camp.camp.lower.year
         self.output("Creating event- and speakerproposals for {}...".format(year))
 
-        eventproposals = EventProposalFactory.create_batch(
+        # add 40 talks
+        talkproposals = EventProposalFactory.create_batch(
             40,
             track=factory.Iterator(camp.eventtracks.all()),
             event_type=event_types["talk"],
         )
-        for ep in eventproposals:
+        # and 10 workshops
+        workshopproposals = EventProposalFactory.create_batch(
+            10,
+            track=factory.Iterator(camp.eventtracks.all()),
+            event_type=event_types["workshop"],
+        )
+        for ep in talkproposals + workshopproposals:
             sp = SpeakerProposalFactory(camp=camp, user=ep.user)
             ep.speakers.add(sp)
             # 20% chance we add an extra speaker
@@ -835,6 +880,13 @@ class Command(BaseCommand):
                 else:
                     ep.mark_as_rejected()
 
+        # set demand for workshops to see the autoscheduler in action
+        for event in camp.events.filter(event_type__name="Workshop"):
+            # this should put about half the workshops in the big room
+            # (since the small rooms have max. 25 ppl capacity)
+            event.demand = random.randint(10, 40)
+            event.save()
+
     def create_camp_scheduling(self, camp):
         post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
         year = camp.camp.lower.year
@@ -877,10 +929,17 @@ class Command(BaseCommand):
                 ),
             )
             i += 1
-        self.output("Running talk autoscheduler for {}...".format(year))
+        schedule = AutoSchedule.objects.create(camp=camp)
+        schedule.event_types.set(EventType.objects.filter(support_autoscheduling=True))
+        self.output("Creating autoscheduler objects for {}...".format(year))
+        schedule.create_autoscheduler_objects()
         try:
-            create_autoschedule(
-                camp=camp, event_type=EventType.objects.get(name="Talk")
+            schedulestart = timezone.now()
+            self.output("Running autoscheduler for {}...".format(year))
+            schedule.apply()
+            scheduleduration = timezone.now() - schedulestart
+            self.output(
+                f"Done running autoscheduler for {year}... It took {scheduleduration}"
             )
         except Exception:
             logger.exception(
@@ -1370,6 +1429,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        start = timezone.now()
         self.output("----------[ Global stuff ]----------")
 
         camps = self.create_camps()
@@ -1480,3 +1540,5 @@ class Command(BaseCommand):
         )
 
         self.output("done!")
+        duration = timezone.now() - start
+        self.output(f"bootstrap-devsite took {duration}!")

@@ -10,6 +10,13 @@
     <p class="lead">AutoSchedule {{ object.id }} was created by {{ object.user }} at {{ object.created }}.
     {% if object.applied %}It was applied at {{ object.applied }}{% else %}It has never been applied.{% endif %}
     </p>
+    <p>
+    This AutoSchedule includes the following EventTypes:
+    <ul>
+    {% for et in object.event_types.all %}
+    <li>{{ et.name }}</li>
+    {% endfor %}
+    </ul>
     <div class="btn-group">
        <a href="{% url 'backoffice:autoschedule_diff' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-random"></i> Diff</a>
        {% if not object.readonly %}

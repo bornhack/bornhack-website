@@ -6,22 +6,27 @@
   <thead>
     <th>fedt nok</th>
     {% for slot in object.slots.all %}
-    <th>{{ slot.starts_at }}</th>
+    <th>{{ slot.starts_at }} (EL {{ slot.venue }}, cap {{ slot.capacity }})</th>
     {% endfor %}
   </thead>
   <tbody>
     {% for event in object.events.all %}
       <tr>
-          <th{% if event.unavailability_slots.count == object.slots.count %} class="danger"{% endif %}><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a></th>
+          <th{% if event.unavailability_slots.count == object.slots.count %} class="danger"{% endif %}><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a> ({{ event.event.event_type }}, demand {{ event.demand }})</th>
         {% for slot in object.slots.all %}
           {% if slot in event.unavailability_slots.all %}
-            <td class="text-center danger"><i class="fas fa-times"></i></td>
+          <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.event.title }}" will not be scheduled in the slot {{ slot.when.lower }}-{{ slot.when.upper }}'></i></td>
           {% else %}
-            <td class="text-center success"><i class="fas fa-check"></i></td>
+          <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.event.title }}" might be scheduled in the slot {{ slot.when.lower }}-{{ slot.when.upper }}'></i></td>
           {% endif %}
         {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
 </table>
+<script>
+    $(document).ready(function(){
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>
 {% endblock body %}

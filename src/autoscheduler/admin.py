@@ -5,8 +5,8 @@ from .models import AutoEvent, AutoSchedule, AutoSlot
 
 @admin.register(AutoSchedule)
 class AutoScheduleAdmin(admin.ModelAdmin):
-    list_display = ["id", "camp", "event_type", "created", "applied"]
-    list_filter = ["camp", "event_type"]
+    list_display = ["id", "camp", "created", "user", "applied"]
+    list_filter = ["camp", "user"]
 
     actions = [
         "create_autoscheduler_objects",
@@ -53,15 +53,14 @@ class AutoSlotAdmin(admin.ModelAdmin):
         "id",
         "schedule",
         "venue",
-        "starts_at",
-        "duration",
+        "when",
         "session",
         "capacity",
     ]
-    list_filter = ["schedule", "venue", "starts_at", "duration", "session", "capacity"]
+    list_filter = ["schedule", "venue", "session", "capacity"]
 
 
 @admin.register(AutoEvent)
 class AutoEventAdmin(admin.ModelAdmin):
-    list_display = ["id", "schedule", "name", "duration", "tags", "demand"]
+    list_display = ["id", "schedule", "name", "duration", "tags", "demand", "event"]
     list_filter = ["schedule", "name", "duration", "tags", "demand"]
