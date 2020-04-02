@@ -24,7 +24,7 @@ ipython==7.13.0
 irc3==1.1.5
 lxml==4.5.0
 olefile==0.46
-Pillow==6.2.1
+Pillow==7.1.0
 pipdeptree==0.13.2
 psycopg2-binary==2.8.4
 pyOpenSSL==19.1.0
