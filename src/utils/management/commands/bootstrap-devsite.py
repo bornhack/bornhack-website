@@ -719,7 +719,8 @@ class Command(BaseCommand):
 
     def create_camp_eventsessions(self, camp, event_types, event_locations):
         self.output(f"Creating eventsesions for {camp}...")
-        for day in camp.get_days(camppart="camp")[1:-1]:
+        days = camp.get_days(camppart="camp")[1:-1]
+        for day in days:
             start = day.lower
             EventSession.objects.create(
                 camp=camp,
@@ -767,6 +768,21 @@ class Command(BaseCommand):
                     tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
                 ),
             )
+        # create sessions for the keynotes
+        for day in [days[1], days[3], days[5]]:
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["keynote"],
+                event_location=event_locations["speakers_tent"],
+                when=(
+                    tz.localize(
+                        datetime(day.lower.year, day.lower.month, day.lower.day, 20, 0)
+                    ),
+                    tz.localize(
+                        datetime(day.lower.year, day.lower.month, day.lower.day, 21, 30)
+                    ),
+                ),
+            )
 
     def create_camp_proposals(self, camp, event_types):
         year = camp.camp.lower.year
@@ -784,7 +800,15 @@ class Command(BaseCommand):
             track=factory.Iterator(camp.eventtracks.all()),
             event_type=event_types["workshop"],
         )
-        for ep in talkproposals + workshopproposals:
+        # and 3 keynotes
+        # (in the real world these are submitted as talks
+        # and promoted to keynotes by the content team)
+        keynoteproposals = EventProposalFactory.create_batch(
+            3,
+            track=factory.Iterator(camp.eventtracks.all()),
+            event_type=event_types["keynote"],
+        )
+        for ep in talkproposals + workshopproposals + keynoteproposals:
             sp = SpeakerProposalFactory(camp=camp, user=ep.user)
             ep.speakers.add(sp)
             # 20% chance we add an extra speaker
@@ -796,17 +820,6 @@ class Command(BaseCommand):
                 if other_speakers.exists():
                     # add an extra speaker
                     ep.speakers.add(random.choice(other_speakers))
-
-        # add and approve a few keynotes
-        for i in range(3):
-            ep = EventProposalFactory(
-                track=factory.Iterator(camp.eventtracks.all()),
-                event_type=event_types["keynote"],
-            )
-            sp = SpeakerProposalFactory(camp=camp, user=ep.user)
-            ep.speakers.add(sp)
-            sp.mark_as_approved()
-            ep.mark_as_approved()
 
         EventProposal.objects.create(
             user=random.choice(User.objects.all()),
@@ -857,9 +870,16 @@ class Command(BaseCommand):
                         continue
                     # 90% chance this speaker is available for any given chunk
                     form.cleaned_data[data["fieldname"]] = random.randint(1, 100) < 90
+            # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
     def approve_speakerproposals(self, camp):
+        # approve all keynotes
+        for sp in camp.speakerproposals.filter(
+            eventproposals__event_type__name="Keynote"
+        ):
+            sp.mark_as_approved()
+
         for sp in camp.speakerproposals.filter(proposal_status="pending"):
             # we do not approve all speakers
             if random.randint(1, 100) < 90:
@@ -874,8 +894,8 @@ class Command(BaseCommand):
                 if not hasattr(sp, "speaker"):
                     break
             else:
-                # all speakers are approved, approve the event?
-                if random.randint(1, 100) < 90:
+                # all speakers are approved, approve the event? always approve keynotes!
+                if random.randint(1, 100) < 90 or ep.event_type.name == "Keynote":
                     ep.mark_as_approved()
                 else:
                     ep.mark_as_rejected()
@@ -914,21 +934,7 @@ class Command(BaseCommand):
                 when=(start, start + timedelta(hours=1),),
             )
 
-        # schedule the keynotes
-        i = 1
-        for keynote in camp.events.filter(
-            event_type=EventType.objects.get(name="Keynote")
-        ):
-            day = camp.get_days("camp")[i * 2].lower.date()
-            EventInstance.objects.create(
-                event=keynote,
-                location=camp.eventlocations.get(name="Speakers Tent"),
-                when=(
-                    tz.localize(datetime(day.year, day.month, day.day, 20, 0)),
-                    tz.localize(datetime(day.year, day.month, day.day, 21, 30)),
-                ),
-            )
-            i += 1
+        # exercise the autoscheduler a bit
         schedule = AutoSchedule.objects.create(camp=camp)
         schedule.event_types.set(EventType.objects.filter(support_autoscheduling=True))
         self.output("Creating autoscheduler objects for {}...".format(year))
@@ -1470,9 +1476,9 @@ class Command(BaseCommand):
 
                 self.create_camp_cfp(camp)
 
-                self.create_camp_eventsessions(camp, event_types, locations)
-
                 self.create_camp_proposals(camp, event_types)
+
+                self.create_camp_eventsessions(camp, event_types, locations)
 
                 self.generate_speaker_availability(camp)
 

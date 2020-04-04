@@ -9,7 +9,6 @@ from django.contrib.postgres.fields import ArrayField, DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
-from program.utils import get_slots
 from psycopg2._range import DateTimeTZRange
 from utils.models import CampRelatedModel
 
@@ -77,16 +76,14 @@ class AutoSchedule(CampRelatedModel):
         slotsdeleted, slotdetails = self.slots.all().delete()
         eventsdeleted, eventdetails = self.events.all().delete()
 
-        # loop over camp sessions, creatint Slots in the database as we go
-        unavailable_slots = set()
+        # loop over camp sessions, creating AutoSlots in the database as we go
+        unavailable_autoslots = list()
         for session in self.camp.eventsessions.filter(
             event_type__in=self.event_types.all()
         ).prefetch_related("event_type", "event_location"):
-            for slot in get_slots(
-                session.when, session.event_type.event_duration_minutes
-            ):
+            for slot in session.get_slots():
                 # create AutoSlot in database
-                dbslot = AutoSlot.objects.create(
+                AutoSlot.objects.create(
                     schedule=self,
                     venue=session.event_location.id,
                     when=slot,
@@ -95,28 +92,15 @@ class AutoSchedule(CampRelatedModel):
                     capacity=session.event_location.capacity,
                 )
 
-                # check if this slot at this location is taken by something else
-                # (something could be manually scheduled)
-                if program.models.EventInstance.objects.filter(
-                    location=session.event_location,
-                    when__overlap=slot,
-                    autoscheduled=False,
-                ).exists():
-                    # something has been manually scheduled on this location in this slot
-                    unavailable_slots.add(dbslot)
+            # get a list of unavailable autoslots in this session
+            unavailable_autoslots += [
+                self.slots.get(when=s, venue=session.event_location.id)
+                for s in session.get_unavailable_slots()
+            ]
 
-                # check if anything is scheduled in another location which conflicts with this one
-                if program.models.EventInstance.objects.filter(
-                    location__in=session.event_location.conflicts.all(),
-                    when__overlap=slot,
-                    autoscheduled=False,
-                ).exists():
-                    # something has been manually scheduled on a location which conflicts with
-                    # this location during this slot, slot is unavailable
-                    unavailable_slots.add(dbslot)
-
-        # loop over all Events create an AutoEvent object for each,
-        # excluding events which have EventInstances that are not autoscheduled
+        # loop over all Events, create an AutoEvent object for each,
+        # excluding Events which have EventInstances that are not autoscheduled
+        # (meaning we skip an event if it has been manually scheduled at least once)
         for event in self.camp.events.filter(
             event_type__in=self.event_types.all()
         ).exclude(instances__isnull=False, instances__autoscheduled=False):
@@ -150,7 +134,7 @@ class AutoSchedule(CampRelatedModel):
         # (we have to do this in a seperate loop because we need all the autoevents to exist)
         for autoevent in self.events.all():
             # add the slots we already know are unavailable
-            autoevent.unavailability_slots.add(*unavailable_slots)
+            autoevent.unavailability_slots.add(*unavailable_autoslots)
             # loop over speakers for this event and add unavailability
             for speaker in autoevent.event.speakers.all():
                 # loop over other events featuring this speaker, register each conflict

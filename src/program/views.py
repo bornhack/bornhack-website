@@ -926,7 +926,9 @@ class EventListView(CampViewMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related("event_type", "track", "instances", "speakers")
+        qs = qs.prefetch_related(
+            "event_type", "track", "instances", "speakers", "instances__location"
+        )
         return qs
 
 

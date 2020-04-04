@@ -41,7 +41,7 @@
           </td>
           <td>
             {% for instance in event.instances.all %}
-              {{ instance.when.lower }}<br>
+            {{ instance.when.lower }} at {{ instance.location.name }}<br>
             {% empty %}
               <i>No instances scheduled yet</i>
             {% endfor %}

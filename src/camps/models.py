@@ -180,6 +180,16 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return Event.objects.filter(track__camp=self)
 
     @property
+    def event_sessions(self):
+        EventSession = apps.get_model("program", "eventsession")
+        return EventSession.objects.filter(camp=self)
+
+    @property
+    def event_instances(self):
+        EventInstance = apps.get_model("program", "eventinstance")
+        return EventInstance.objects.filter(event__track__camp=self)
+
+    @property
     def logo_small(self):
         return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
 

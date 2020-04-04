@@ -121,7 +121,7 @@ LOGIN_URL = "/login/"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 BOOTSTRAP3 = {
-    "jquery_url": "/static/js/jquery.min.js",
+    "jquery_url": "/static/js/jquery-3.3.1.min.js",
     "javascript_url": "/static/js/bootstrap.min.js",
 }
 MIDDLEWARE = [

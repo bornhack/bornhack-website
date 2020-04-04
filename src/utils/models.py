@@ -30,7 +30,7 @@ class CleanedModel(models.Model):
             logger.error(message)
             # dont save, re-raise the exception
             raise
-        super(CleanedModel, self).save(**kwargs)
+        super().save(**kwargs)
 
 
 class UUIDModel(CleanedModel):

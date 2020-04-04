@@ -218,6 +218,9 @@ class SpeakerProposalAvailability(Availability):
                 f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}"
             )
 
+    def __str__(self):
+        return f"SpeakerProposalAvailability: {self.speakerproposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
+
 
 class SpeakerAvailability(Availability):
     """ Availability info for Speaker objects """
@@ -625,6 +628,17 @@ class EventLocation(CampRelatedModel):
     def serialize(self):
         return {"name": self.name, "slug": self.slug, "icon": self.icon}
 
+    def is_available(self, when):
+        """ Determine if a location is available """
+        if not self.camp.event_instances.filter(
+            location=self, when__overlap=when,
+        ).exists():
+            # nothing scheduled at this time on this location
+            return True
+        else:
+            # something is scheduled, no dice
+            return False
+
 
 class EventType(CreatedUpdatedModel):
     """  Every event needs to have a type. """
@@ -797,10 +811,48 @@ class EventSession(CampRelatedModel):
         # the free time is the whole session minus the used time
         return (self.when.upper - self.when.lower) - used
 
-    @property
-    def slots(self):
+    def get_slots(self):
         """ Return a list of DateTimeTZRange objects representing the Slots in this Session """
         return get_slots(self.when, self.event_type.event_duration_minutes)
+
+    def get_available_slots(self, count_autoscheduled_as_free=False):
+        slots = []
+        for slot in self.get_slots():
+            # check if this slot at this location is taken by something else
+            # (something could be manually scheduled)
+            kwargs = dict(location=self.event_location, when__overlap=slot,)
+            if count_autoscheduled_as_free:
+                # only consider manually scheduled instances
+                kwargs["autoscheduled"] = False
+
+            if self.camp.event_instances.filter(**kwargs).exists():
+                # something has been manually scheduled on this location in this slot
+                continue
+
+            # check if anything is scheduled in another location which conflicts with this one
+            kwargs = dict(
+                location__in=self.event_location.conflicts.all(), when__overlap=slot,
+            )
+            if count_autoscheduled_as_free:
+                # only consider manually scheduled instances
+                kwargs["autoscheduled"] = False
+            if self.camp.event_instances.filter(**kwargs).exists():
+                # something has been scheduled on a location which conflicts with
+                # this location during this slot, slot is unavailable
+                continue
+
+            # all good
+            slots.append(slot)
+
+        # return all available slots
+        return slots
+
+    def get_unavailable_slots(self, count_autoscheduled_as_free=False):
+        return [
+            x
+            for x in self.get_slots()
+            if x not in self.get_available_slots(count_autoscheduled_as_free)
+        ]
 
 
 class Event(CampRelatedModel):
@@ -946,35 +998,46 @@ class EventInstance(CampRelatedModel):
 
     class Meta:
         ordering = ["when"]
+        # we do not want overlapping instances in the same location
+        constraints = [
+            ExclusionConstraint(
+                name="prevent_eventinstance_location_overlaps",
+                expressions=[
+                    ("when", RangeOperators.OVERLAPS),
+                    ("location", RangeOperators.EQUAL),
+                ],
+            ),
+        ]
 
     def __str__(self):
         return "%s (%s)" % (self.event, self.when)
 
-    def clean(self):
-        """ Check consistency, check for overlaps, and check speaker availability """
-        if self.location.camp != self.event.camp:
-            raise ValidationError(
-                {"location": "Error: This location belongs to a different camp"}
-            )
-
-        if EventInstance.objects.filter(
-            when__overlap=self.when, location=self.location
-        ):
-            raise ValidationError(
-                {
-                    "when": "Error: An existing EventInstance on the same location overlaps with this one!"
-                }
-            )
-
+    def clean_speakers(self):
+        """ Check if all speakers are available """
         for speaker in self.event.speakers.all():
-            if speaker.availabilities.filter(
-                available=False, when__overlap=self.when
-            ).exists():
+            if not speaker.is_available(
+                when=self.when, ignore_eventinstances=[self.pk]
+            ):
                 raise ValidationError(
-                    {
-                        "when": f"Error: The speaker {speaker} is not available at this time"
-                    }
+                    f"The speaker {speaker} is not available at this time"
                 )
+
+    def clean_location(self):
+        """ check that the location is available """
+        if not self.location.is_available(self.when):
+            raise ValidationError(
+                f"The location {self.location.name} is not available at this time"
+            )
+
+    def save(self, *args, clean_speakers=True, clean_location=True, **kwargs):
+        """ Validate speakers and location (unless we are asked not to) """
+        if "commit" not in kwargs or kwargs["commit"]:
+            # we are saving for real
+            if clean_speakers:
+                self.clean_speakers()
+            if clean_location:
+                self.clean_location()
+        super().save(*args, **kwargs)
 
     @property
     def camp(self):
@@ -1105,7 +1168,7 @@ class Speaker(CampRelatedModel):
     def save(self, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
-        super(Speaker, self).save(**kwargs)
+        super().save(**kwargs)
 
     def get_absolute_url(self):
         return reverse_lazy(
@@ -1116,6 +1179,21 @@ class Speaker(CampRelatedModel):
     def serialize(self):
         data = {"name": self.name, "slug": self.slug, "biography": self.biography}
         return data
+
+    def is_available(self, when, ignore_eventinstances=[]):
+        """ A speaker is available if the person has positive availability for the period and
+        if the speaker is not in another event at the time """
+        if not self.availabilities.filter(when__contains=when, available=True).exists():
+            print("the speaker has not indicated they are available at this time")
+            return False
+        if (
+            self.camp.event_instances.filter(event__speakers=self, when__overlap=when)
+            .exclude(pk__in=ignore_eventinstances)
+            .exists()
+        ):
+            print("the speaker has another event at this time")
+            return False
+        return True
 
 
 class Favorite(models.Model):

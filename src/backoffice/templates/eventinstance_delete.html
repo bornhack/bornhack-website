@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h2 class="panel-title">Delete EventInstance?</h2>
+  </div>
+  <div class="panel-body">
+    <p class="lead">This EventInstance schedules event <b>{{ object.event.title }}</b> to happen at location <b>{{ object.location.name }}</b> from <b>{{ object.when.lower }}</b> to <b>{{ object.when.upper }}</b>.</p>
+    <p class="lead">Deleting the EventInstance will remove it from the schedule!</p>
+    <form method="POST">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Delete it</button>
+      <a href="{% url 'backoffice:eventsession_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+

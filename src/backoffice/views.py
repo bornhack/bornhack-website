@@ -22,7 +22,9 @@ from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from facilities.models import FacilityFeedback
 from profiles.models import Profile
 from program.models import (
+    Event,
     EventFeedback,
+    EventInstance,
     EventLocation,
     EventProposal,
     EventSession,
@@ -30,6 +32,7 @@ from program.models import (
     SpeakerProposal,
 )
 from program.utils import add_matrix_availability, get_speaker_availability_form_matrix
+from psycopg2.extras import DateTimeTZRange
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -297,6 +300,215 @@ class EventProposalManageView(ProposalManageBaseView):
 
     model = EventProposal
     template_name = "manage_eventproposal.html"
+
+
+################################
+# MANAGE EVENT VIEWS
+
+
+class EventListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+    """ This view is used by the Content Team to see Event objects. """
+
+    model = Event
+    template_name = "event_list.html"
+
+
+class EventDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    """ This view is used by the Content Team to see details for Event objects """
+
+    model = Event
+    template_name = "event_detail.html"
+
+
+class EventUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
+    """ This view is used by the Content Team to update Event objects """
+
+    model = Event
+    fields = ["when", "description"]
+    template_name = "event_form.html"
+
+
+class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
+    """ This view is used by the Content Team to delete Event objects """
+
+    model = Event
+    template_name = "event_delete.html"
+
+
+################################
+# MANAGE EVENTINSTANCE VIEWS
+
+
+class EventInstanceCreateEventSelectView(
+    CampViewMixin, ContentTeamPermissionMixin, ListView
+):
+    """
+    This view is shown first when creating a new EventInstance. It shows a
+    list of events which can be sorted and filtered and searched, and an
+    event can be chosen for the EventInstance creation.
+    """
+
+    model = Event
+    template_name = "eventinstancecreate_eventselect.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related("event_type", "speakers__events", "instances")
+        return qs
+
+
+class EventInstanceCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateView):
+    """ This view is used by the Content Team to create EventInstance objects """
+
+    model = EventInstance
+    fields = []
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "event", "location", "event__speakers", "event__event_type"
+        )
+        return qs
+
+    def get_template_names(self):
+        if self.kwargs["manual"]:
+            return "eventinstance_form_manual.html"
+        else:
+            return "eventinstance_form_slots.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.event = get_object_or_404(Event, pk=kwargs["event_id"])
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        if self.kwargs["manual"]:
+            form.fields["start_time"] = forms.DateTimeField(
+                help_text="Start time (format is YYYY-MM-DD HH:MM)"
+            )
+            form.fields["end_time"] = forms.DateTimeField(
+                help_text="End time (format is YYYY-MM-DD HH:MM)"
+            )
+            form.fields["event_location"] = forms.ChoiceField(
+                choices=self.camp.event_locations.all().values_list("id", "name"),
+                help_text="The location to schedule the event in",
+            )
+        else:
+            self.slots = []
+            slotindex = 0
+            # loop over sessions, get free slots, add to list
+            for session in self.camp.event_sessions.filter(
+                event_type=self.event.event_type
+            ):
+                for slot in session.get_available_slots():
+                    self.slots.append(
+                        {"index": slotindex, "session": session, "slot": slot}
+                    )
+                    slotindex += 1
+            form.fields["slot"] = forms.ChoiceField(
+                widget=forms.RadioSelect,
+                choices=[(s["index"], s["index"]) for s in self.slots],
+            )
+        form.fields["check_speaker_availabilities"] = forms.BooleanField(
+            required=False,
+            help_text="Check that speakers are available before saving. Uncheck to bypass validation.",
+        )
+        return form
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["check_speaker_availabilities"] = True
+        return initial
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Add event to context
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["event"] = self.event
+        if not self.kwargs["manual"]:
+            context["slots"] = self.slots
+        return context
+
+    def form_valid(self, form):
+        """
+        Set needed values, save and return
+        """
+        if self.kwargs["manual"]:
+            when = DateTimeTZRange(
+                form.cleaned_data["start_time"], form.cleaned_data["end_time"]
+            )
+            location = self.camp.event_locations.get(
+                id=form.cleaned_data["event_location"]
+            )
+        else:
+            slot = self.slots[int(form.cleaned_data["slot"])]
+            when = slot["slot"]
+            location = slot["session"].event_location
+        eventinstance = form.save(commit=False)
+        eventinstance.event = self.event
+        eventinstance.location = location
+        eventinstance.when = when
+        eventinstance.autoscheduled = False
+
+        # validate speakers and location
+        try:
+            if form.cleaned_data["check_speaker_availabilities"]:
+                eventinstance.clean_speakers()
+            if form.cleaned_data["check_location_availability"]:
+                eventinstance.clean_location()
+        except ValidationError as E:
+            form.add_error(None, E)
+            return self.form_invalid(form)
+
+        # ok, save and redirect
+        eventinstance.save(
+            clean_speakers=form.cleaned_data["check_speaker_availabilities"],
+            clean_location=form.cleaned_data["check_location_availability"],
+        )
+        messages.success(
+            self.request,
+            f"{self.event.title} has been scheduled to begin at {eventinstance.when.lower} at location {eventinstance.location} successfully!",
+        )
+        return redirect(
+            reverse(
+                "backoffice:eventinstance_list", kwargs={"camp_slug": self.camp.slug}
+            )
+        )
+
+
+class EventInstanceListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
+    """ This view is used by the Content Team to see EventInstance objects. """
+
+    model = EventInstance
+    template_name = "eventinstance_list.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.prefetch_related(
+            "event", "location", "event__speakers", "event__event_type"
+        )
+        return qs
+
+
+class EventInstanceDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
+    """ This view is used by the Content Team to see details for EventInstance objects """
+
+    model = EventSession
+    template_name = "eventinstance_detail.html"
+
+
+class EventInstanceDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
+    """ This view is used by the Content Team to delete EventInstance objects """
+
+    model = EventInstance
+    template_name = "eventinstance_delete.html"
+
+    def get_success_url(self):
+        messages.success(self.request, "EventInstance was deleted successfully!")
+        return reverse(
+            "backoffice:eventinstance_list", kwargs={"camp_slug": self.camp.slug}
+        )
 
 
 ################################
@@ -729,6 +941,7 @@ class AutoScheduleDebugEventsView(
             "slots",
             "events__unavailability_slots",
             "events__unavailability_events",
+            "events__event",
         )
         return qs
 

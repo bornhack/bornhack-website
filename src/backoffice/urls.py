@@ -18,6 +18,14 @@ from .views import (
     ChainDetailView,
     ChainListView,
     CredebtorDetailView,
+    EventDeleteView,
+    EventDetailView,
+    EventInstanceCreateEventSelectView,
+    EventInstanceCreateView,
+    EventInstanceDeleteView,
+    EventInstanceDetailView,
+    EventInstanceListView,
+    EventListView,
     EventProposalManageView,
     EventSessionCreateLocationSelectView,
     EventSessionCreateTypeSelectView,
@@ -26,6 +34,7 @@ from .views import (
     EventSessionDetailView,
     EventSessionListView,
     EventSessionUpdateView,
+    EventUpdateView,
     ExpenseDetailView,
     ExpenseListView,
     FacilityFeedbackView,
@@ -156,6 +165,83 @@ urlpatterns = [
                                 "delete/",
                                 EventSessionDeleteView.as_view(),
                                 name="eventsession_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage event objects
+    path(
+        "events/",
+        include(
+            [
+                path("", EventListView.as_view(), name="event_list"),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path("", EventDetailView.as_view(), name="event_detail",),
+                            path(
+                                "update/",
+                                EventUpdateView.as_view(),
+                                name="event_update",
+                            ),
+                            path(
+                                "delete/",
+                                EventDeleteView.as_view(),
+                                name="event_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage eventinstance objects
+    path(
+        "scheduling/",
+        include(
+            [
+                path("", EventInstanceListView.as_view(), name="eventinstance_list"),
+                path(
+                    "create/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventInstanceCreateEventSelectView.as_view(),
+                                name="eventinstancecreate_eventselect",
+                            ),
+                            path(
+                                "<int:event_id>/pick_slot/",
+                                EventInstanceCreateView.as_view(),
+                                name="eventinstance_create",
+                                kwargs={"manual": False},
+                            ),
+                            path(
+                                "<int:event_id>/manual/",
+                                EventInstanceCreateView.as_view(),
+                                name="eventinstance_create_manual",
+                                kwargs={"manual": True},
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventInstanceDetailView.as_view(),
+                                name="eventinstance_detail",
+                            ),
+                            path(
+                                "delete/",
+                                EventInstanceDeleteView.as_view(),
+                                name="eventinstance_delete",
                             ),
                         ]
                     ),

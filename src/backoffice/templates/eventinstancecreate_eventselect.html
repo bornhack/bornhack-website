@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load static %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Create New EventInstance - Select Event</h3>
+  </div>
+  <div class="panel-body">
+    <p class="lead">Select Event to be scheduled</p>
+    <table class="table table-hover datatable">
+      <thead>
+        <tr>
+          <th>Event</th>
+          <th>Event Type</th>
+          <th>People</th>
+          <th class="text-center">Instances</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for event in event_list %}
+        <tr>
+          <td>{{ event.title }}</td>
+          <td>
+            <i class="fas fa-{{ event.event_type.icon }} fa-fw" style="color: {{ event.event_type.color }};"></i> {{ event.event_type.name }}
+          </td>
+          <td>
+            <ul class="list-group">
+              {% for speaker in event.speakers.all %}
+              <li class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}<span class="badge">{{ speaker.events.count }}</span></li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td class="text-center"><span class="badge">{{ event.instances.count }}</span></td>
+          <td>
+            <div class="button-group-vertical">
+              <a href="{%url 'backoffice:eventinstance_create' camp_slug=camp.slug event_id=event.id %}" class="btn btn-success"><i class="fas fa-plus"></i> Pick Slot</a>
+              <a href="{%url 'backoffice:eventinstance_create_manual' camp_slug=camp.slug event_id=event.id %}" class="btn btn-success"><i class="fas fa-plus"></i> Schedule Manually</a>
+            </div>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th>Event</th>
+          <th>Event Type</th>
+          <th>People</th>
+          <th class="text-center">Instances</th>
+          <th>Actions</th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
+{% endblock content %}
+
