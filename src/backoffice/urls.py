@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    AddRecordingView,
     ApproveFeedbackView,
     ApproveNamesView,
     BackofficeIndexView,
@@ -89,6 +90,10 @@ urlpatterns = [
     # approve eventfeedback objects
     path(
         "approve_feedback", ApproveFeedbackView.as_view(), name="approve_eventfeedback",
+    ),
+    # add recording url objects
+    path(
+        "add_recording", AddRecordingView.as_view(), name="add_eventrecording",
     ),
     # economy
     path(

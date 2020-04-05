@@ -1,0 +1,49 @@
+{% load bootstrap3 %}
+{% load commonmark %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="h3">Recording for Event: {{ event.title }}</span>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      <tr>
+        <th>Camp</th>
+        <td>{{ event.track.camp.title }}</td>
+      </tr>
+
+      <tr>
+        <th>Track</th>
+        <td>{{ event.track.name }}</td>
+      </tr>
+
+      <tr>
+        <th>Type</th>
+        <td>{{ event.event_type.name }}</td>
+      </tr>
+
+      <tr>
+        <th>URLs</th>
+        <td>
+        {% if event.urls.exists %}
+          {% for url in event.urls.all %}
+            <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
+          {% endfor %}
+        {% else %}
+          <p><i>No URLs found.</i></p>
+        {% endif %}
+        </td>
+      </tr>
+
+      <tr>
+        <th>Video URL (legacy)</th>
+        <td>{{ event.video_url }}</td>
+      </tr>
+    </table>
+    {% if form %}
+      {% bootstrap_form form %}
+    {% elif buttoninclude %}
+      {% include buttoninclude %}
+    {% endif %}
+  </div>
+</div>
+

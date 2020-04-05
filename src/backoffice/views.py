@@ -19,10 +19,12 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from facilities.models import FacilityFeedback
 from profiles.models import Profile
-from program.models import EventFeedback, EventProposal, SpeakerProposal
+from program.models import Url, UrlType, Event, EventFeedback, EventProposal, SpeakerProposal
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
+
+from .forms import AddRecordingForm
 
 from .mixins import (
     ContentTeamPermissionMixin,
@@ -265,6 +267,68 @@ class EventProposalManageView(ProposalManageBaseView):
 
     model = EventProposal
     template_name = "manage_eventproposal.html"
+
+
+class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
+    """
+    This view shows a list of events that is set to be recorded, but without a recording URL attached.
+    """
+
+    model = Event
+    template_name = "add_recording.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.queryset = Event.objects.filter(
+            track__camp=self.camp, video_recording=True
+        ).exclude(
+            urls__urltype__name="Recording"
+        )
+
+        self.form_class = modelformset_factory(
+            Event,
+            form=AddRecordingForm,
+            min_num=self.queryset.count(),
+            validate_min=True,
+            max_num=self.queryset.count(),
+            validate_max=True,
+            extra=0,
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        """
+        Include the queryset used for the modelformset_factory so we have
+        some idea which object is which in the template
+        Why the hell do the forms in the formset not include the object?
+        """
+        context = super().get_context_data(*args, **kwargs)
+        context["event_list"] = self.queryset
+        context["formset"] = self.form_class(queryset=self.queryset)
+        return context
+
+    def form_valid(self, form):
+        form.save()
+
+        for event_data in form.cleaned_data:
+            if event_data['recording_url']:
+                url = event_data['recording_url']
+                if not event_data['id'].urls.filter(url=url).exists():
+                    recording_url = Url()
+                    recording_url.event = event_data['id']
+                    recording_url.url = url
+                    recording_url.urltype = UrlType.objects.get(name="Recording")
+                    recording_url.save()
+
+        if form.changed_objects:
+            messages.success(
+                self.request, f"Updated {len(form.changed_objects)} Event"
+            )
+        return redirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        return reverse(
+            "backoffice:add_eventrecording", kwargs={"camp_slug": self.camp.slug}
+        )
 
 
 class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):

@@ -22,6 +22,8 @@ from info.models import InfoCategory, InfoItem
 from news.models import NewsItem
 from profiles.models import Profile
 from program.models import (
+    Url,
+    UrlType,
     Event,
     EventInstance,
     EventLocation,
@@ -195,6 +197,19 @@ class Command(BaseCommand):
             feedback="No power", icon="fas fa-bolt"
         )
         return options
+
+    def create_url_types(self):
+        t, created = UrlType.objects.get_or_create(name="Other", defaults={'icon': 'fas fa-link'})
+        t, created = UrlType.objects.get_or_create(name="Homepage", defaults={'icon': 'fas fa-link'})
+        t, created = UrlType.objects.get_or_create(name="Slides", defaults={'icon': 'fas fa-chalkboard-teacher'})
+        t, created = UrlType.objects.get_or_create(name="Twitter", defaults={'icon': 'fab fa-twitter'})
+        t, created = UrlType.objects.get_or_create(name="Mastodon", defaults={'icon': 'fab fa-mastodon'})
+        t, created = UrlType.objects.get_or_create(name="Facebook", defaults={'icon': 'fab fa-facebook'})
+        t, created = UrlType.objects.get_or_create(name="Project", defaults={'icon': 'fas fa-link'})
+        t, created = UrlType.objects.get_or_create(name="Blog", defaults={'icon': 'fas fa-link'})
+        t, created = UrlType.objects.get_or_create(name="Github", defaults={'icon': 'fab fa-github'})
+        t, created = UrlType.objects.get_or_create(name="Keybase", defaults={'icon': 'fab fa-keybase'})
+        t, created = UrlType.objects.get_or_create(name="Recording", defaults={'icon': 'fas fa-film'})
 
     def create_facility_types(self, camp, teams, options):
         types = {}
@@ -589,7 +604,7 @@ class Command(BaseCommand):
         year = camp.camp.lower.year
         self.output("Creating eventtracks for {}...".format(year))
         tracks[1] = EventTrack.objects.create(
-            camp=camp, name="BornHack", slug=camp.slug
+            camp=camp, name="BornHack {}".format(year), slug=camp.slug
         )
 
         return tracks
@@ -1727,6 +1742,8 @@ class Command(BaseCommand):
         users = self.create_users()
 
         self.create_news()
+
+        self.create_url_types()
 
         event_types = self.create_event_types()
 
