@@ -1,6 +1,6 @@
 {% extends 'program_base.html' %}
 
-{% block program_content %}
+{% block content %}
 
 {% if speaker_list %}
 <div class="panel panel-default">
@@ -43,11 +43,11 @@
           </div>
         </td>
       </tr>
-  {% endfor %}
+      {% endfor %}
     </tbody>
   </table>
 </div>
 {% else %}
 <p class="lead">No speakers found for {{ camp.title }}</p>
 {% endif %}
-{% endblock program_content %}
+{% endblock content %}
