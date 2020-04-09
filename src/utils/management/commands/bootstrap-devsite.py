@@ -940,9 +940,9 @@ class Command(BaseCommand):
             scheduler.apply(autoschedule)
         except ValueError as E:
             self.output(f"Got exception while calculating similar autoschedule: {E}")
+            autoschedule = None
         scheduleduration = timezone.now() - schedulestart
         self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
-        return autoschedule
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
