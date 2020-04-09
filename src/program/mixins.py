@@ -4,6 +4,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
+from program.utils import add_matrix_availability, get_speaker_availability_form_matrix
 
 from . import models
 
@@ -142,3 +143,55 @@ class EventFeedbackViewMixin(EventViewMixin):
 
     def get_object(self):
         return self.eventfeedback
+
+
+class AvailabilityMatrixViewMixin(CampViewMixin):
+    """ Mixin with shared code between all availability matrix views """
+
+    def setup(self, *args, **kwargs):
+        """ Get the availability matrix"""
+        super().setup(*args, **kwargs)
+        if hasattr(self.get_object(), "events"):
+            event_types = models.EventType.objects.filter(
+                event__in=self.get_object().events.all()
+            ).distinct()
+        else:
+            event_types = models.EventType.objects.filter(
+                event__in=self.get_object().eventproposals.all()
+            ).distinct()
+        self.matrix = get_speaker_availability_form_matrix(
+            sessions=self.camp.eventsessions.filter(event_type__in=event_types)
+        )
+        # add availability info to the matrix
+        add_matrix_availability(self.matrix, self.get_object())
+
+    def get_form_kwargs(self):
+        """ Add the matrix to form kwargs, only used if the view has a form """
+        kwargs = super().get_form_kwargs()
+        kwargs["matrix"] = self.matrix
+        return kwargs
+
+    def get_initial(self, *args, **kwargs):
+        """ Populate the speakeravailability checkboxes, only used if the view has a form """
+        initial = super().get_initial(*args, **kwargs)
+
+        # add initial checkbox states
+        for date in self.matrix.keys():
+            # loop over daychunks and check if we need a checkbox
+            for daychunk in self.matrix[date].keys():
+                if not self.matrix[date][daychunk]:
+                    # we have no eventsession here, carry on
+                    continue
+                if self.matrix[date][daychunk]["initial"] in [True, None]:
+                    initial[self.matrix[date][daychunk]["fieldname"]] = True
+                else:
+                    initial[self.matrix[date][daychunk]["fieldname"]] = False
+
+        # we are ready to render the form
+        return initial
+
+    def get_context_data(self, **kwargs):
+        """ Add the matrix to context """
+        context = super().get_context_data(**kwargs)
+        context["matrix"] = self.matrix
+        return context

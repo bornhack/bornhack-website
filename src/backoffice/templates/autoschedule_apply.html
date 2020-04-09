@@ -8,14 +8,14 @@
   </div>
   <div class="panel-body">
       <p class="lead">Apply AutoSchedule {{ schedule.id }}?</p>
-    <p>Applying the schedule will create EventInstance objects matching the schedule. Any existing EventInstance objects for the current EventType which are marked as autoscheduled=True will be deleted.</P>
-    <p><b>Note:</b> Once the schedule has been <b>applied</b> it will be marked as read-only and can no longer be modified - if additional changes are needed you must create a new schedule!</p>
+    <p>Applying the schedule will create EventInstance objects matching the schedule. Any existing autoscheduled EventInstance objects will be deleted.</P>
     <form method="POST">
       {% csrf_token %}
+      {% bootstrap_form form %}
       <button type="submit" class="btn btn-success">
-        <i class="fas fa-check"></i> Apply AutoSchedule
+        <i class="fas fa-check"></i> Apply Schedule
       </button>
-      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="btn btn-default">
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default">
         <i class="fas fa-undo"></i> Cancel
       </a>
     </form>

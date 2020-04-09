@@ -114,7 +114,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
-    readonly_fields = ["proposal"]
+    readonly_fields = ["proposal", "camp"]
 
 
 @admin.register(Favorite)

@@ -12,7 +12,6 @@
 </div>
 
 <div class="row">
-    <p>
     <div class="list-group">
       {% for team in facilityfeedback_teams %}
       {% if "camps."|add:team.permission_set in perms %}
@@ -53,24 +52,32 @@
       {% if perms.camps.contentteam_permission %}
       <h3>Content Team</h3>
       <a href="{% url 'backoffice:eventsession_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Manage Event Sessions</h4>
-        <p class="list-group-item-text">Use this view to view, create, update or delete EventSession objects</p>
-      </a>
-      <a href="{% url 'backoffice:eventinstance_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Manage Schedule</h4>
-        <p class="list-group-item-text">Use this view to schedule Events and manage EventInstances</p>
+        <h4 class="list-group-item-heading">EventSessions</h4>
+        <p class="list-group-item-text">Use these views to manage <i>EventSession</i> objects. <i>EventSessions</i> define periods of time where <i>EventInstances</i> of a certain <i>EventType</i> can be scheduled at an <i>EventLocation</i>.</p>
       </a>
       <a href="{% url 'backoffice:manage_proposals' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Manage Proposals</h4>
-        <p class="list-group-item-text">Use this view to manage SpeakerProposals and EventProposals</p>
+        <h4 class="list-group-item-heading">Proposals</h4>
+        <p class="list-group-item-text">Use these views to manage SpeakerProposals and EventProposals</p>
       </a>
-      <a href="{% url 'backoffice:autoschedule_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Manage AutoSchedules</h4>
-        <p class="list-group-item-text">Use this view to manage the AutoSchedules used by the autoscheduler</p>
+      <a href="{% url 'backoffice:speaker_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Speakers</h4>
+        <p class="list-group-item-text">Use these views to manage Speakers</p>
+      </a>
+      <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Events</h4>
+        <p class="list-group-item-text">Use these views to manage Events</p>
+      </a>
+      <a href="{% url 'backoffice:eventinstance_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Schedule</h4>
+        <p class="list-group-item-text">Use these views to manage EventInstances and schedule Events</p>
+      </a>
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">AutoScheduler</h4>
+        <p class="list-group-item-text">Use these views to manage the AutoScheduler</p>
       </a>
       <a href="{% url 'backoffice:approve_eventfeedback' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Approve Feedback</h4>
-        <p class="list-group-item-text">Use this view to approve or reject EventFeedback</p>
+        <p class="list-group-item-text">Use these views to approve or reject EventFeedback</p>
       </a>
       {% endif %}
 

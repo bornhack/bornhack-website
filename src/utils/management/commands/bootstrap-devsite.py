@@ -1,12 +1,12 @@
 # coding: utf-8
 import logging
 import random
+import sys
 from datetime import datetime, timedelta
 
 import factory
 import pytz
 from allauth.account.models import EmailAddress
-from autoscheduler.models import AutoSchedule
 from camps.models import Camp
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
@@ -28,6 +28,7 @@ from feedback.models import Feedback
 from info.models import InfoCategory, InfoItem
 from news.models import NewsItem
 from profiles.models import Profile
+from program.autoscheduler import AutoScheduler
 from program.models import (
     Event,
     EventInstance,
@@ -823,22 +824,6 @@ class Command(BaseCommand):
 
         EventProposal.objects.create(
             user=random.choice(User.objects.all()),
-            title="The infodesk is open",
-            abstract="The infodesk is open",
-            event_type=event_types["facility"],
-            track=random.choice(camp.eventtracks.all()),
-        ).mark_as_approved()
-
-        EventProposal.objects.create(
-            user=random.choice(User.objects.all()),
-            title="The bar is open",
-            abstract="The bar is open",
-            event_type=event_types["facility"],
-            track=random.choice(camp.eventtracks.all()),
-        ).mark_as_approved()
-
-        EventProposal.objects.create(
-            user=random.choice(User.objects.all()),
             title="Lunch break",
             abstract="Daily lunch break. Remember to drink water.",
             event_type=event_types["slack"],
@@ -847,6 +832,10 @@ class Command(BaseCommand):
 
     def generate_speaker_availability(self, camp):
         """ Create SpeakerAvailability objects for the SpeakerProposals """
+        year = camp.camp.lower.year
+        self.output(
+            "Generating random SpeakerProposalAvailability for {}...".format(year)
+        )
         for sp in camp.speakerproposals.all():
             # generate a matrix for this speakerproposals eventtypes
             matrix = get_speaker_availability_form_matrix(
@@ -874,7 +863,7 @@ class Command(BaseCommand):
             save_speaker_availability(form, sp)
 
     def approve_speakerproposals(self, camp):
-        # approve all keynotes
+        """ Approve all keynotes but reject 10% of other events """
         for sp in camp.speakerproposals.filter(
             eventproposals__event_type__name="Keynote"
         ):
@@ -911,23 +900,11 @@ class Command(BaseCommand):
         post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
         year = camp.camp.lower.year
         self.output("Creating eventinstances for {}...".format(year))
-        info = Event.objects.get(track__camp=camp, title="The infodesk is open")
-        bar = Event.objects.get(track__camp=camp, title="The bar is open")
         lunch = Event.objects.get(track__camp=camp, title="Lunch break")
         for day in camp.get_days("camp"):
             date = day.lower.date()
             # everything conveniently begins at noon
             start = tz.localize(datetime(date.year, date.month, date.day, 12, 0))
-            EventInstance.objects.create(
-                event=info,
-                location=camp.eventlocations.get(name="Infodesk"),
-                when=(start, start + timedelta(hours=8),),
-            )
-            EventInstance.objects.create(
-                event=bar,
-                location=camp.eventlocations.get(name="Bar Area"),
-                when=(start, start + timedelta(hours=17),),
-            )
             EventInstance.objects.create(
                 event=lunch,
                 location=camp.eventlocations.get(name="Speakers Tent"),
@@ -935,22 +912,37 @@ class Command(BaseCommand):
             )
 
         # exercise the autoscheduler a bit
-        schedule = AutoSchedule.objects.create(camp=camp)
-        schedule.event_types.set(EventType.objects.filter(support_autoscheduling=True))
-        self.output("Creating autoscheduler objects for {}...".format(year))
-        schedule.create_autoscheduler_objects()
+        scheduler = AutoScheduler(camp=camp)
+        schedulestart = timezone.now()
         try:
-            schedulestart = timezone.now()
-            self.output("Running autoscheduler for {}...".format(year))
-            schedule.apply()
-            scheduleduration = timezone.now() - schedulestart
-            self.output(
-                f"Done running autoscheduler for {year}... It took {scheduleduration}"
-            )
-        except Exception:
-            logger.exception(
-                "Got an exception while running the autoscheduler, skipping autoscheduling for this camp"
-            )
+            autoschedule = scheduler.calculate_autoschedule()
+            if autoschedule:
+                scheduler.apply(autoschedule)
+        except ValueError as E:
+            self.output(f"Got exception while calculating autoschedule: {E}")
+        scheduleduration = timezone.now() - schedulestart
+        self.output(
+            f"Done running autoscheduler for {year}... It took {scheduleduration}"
+        )
+
+    def create_camp_rescheduling(self, camp):
+        post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
+        year = camp.camp.lower.year
+        # reapprove all speakerproposals so the new availability takes effect
+        for prop in camp.speakerproposals.filter(proposal_status="approved"):
+            prop.mark_as_approved()
+        # exercise the autoscheduler a bit
+        self.output("Rescheduling {}...".format(year))
+        scheduler = AutoScheduler(camp=camp)
+        schedulestart = timezone.now()
+        try:
+            autoschedule, diff = scheduler.calculate_similar_autoschedule()
+            scheduler.apply(autoschedule)
+        except ValueError as E:
+            self.output(f"Got exception while calculating similar autoschedule: {E}")
+        scheduleduration = timezone.now() - schedulestart
+        self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
+        return autoschedule
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
@@ -1488,10 +1480,17 @@ class Command(BaseCommand):
                     self.output(
                         "Name collision, bad luck. Run 'manage.py flush' and run the bootstrap script again!"
                     )
+                    sys.exit(1)
 
                 self.approve_eventproposals(camp)
 
                 self.create_camp_scheduling(camp)
+
+                # shuffle it up - delete and create new random availability
+                self.generate_speaker_availability(camp)
+
+                # recalculate the autoschedule
+                self.create_camp_rescheduling(camp)
 
                 self.create_camp_villages(camp, users)
 

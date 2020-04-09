@@ -151,10 +151,10 @@ class SpeakerProposalCreateView(
     def setup(self, *args, **kwargs):
         """ Get the eventproposal object and speaker availability matrix"""
         super().setup(*args, **kwargs)
+        """ Get the eventproposal and availability matrix """
         self.eventproposal = get_object_or_404(
             models.EventProposal, pk=kwargs["event_uuid"]
         )
-        # get the form field matrix for speaker availability
         self.matrix = get_speaker_availability_form_matrix(
             sessions=self.camp.eventsessions.filter(
                 event_type=self.eventproposal.event_type
@@ -165,9 +165,7 @@ class SpeakerProposalCreateView(
         return reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
 
     def get_form_kwargs(self):
-        """
-        Set camp and eventtype for the form
-        """
+        """ Set camp and eventtype for the form """
         kwargs = super().get_form_kwargs()
         kwargs.update(
             {
@@ -197,7 +195,7 @@ class SpeakerProposalCreateView(
         return context
 
     def form_valid(self, form):
-        # set user and camp before saving
+        """ Set user and camp before saving, then save availability """
         speakerproposal = form.save(commit=False)
         speakerproposal.user = self.request.user
         speakerproposal.camp = self.camp
@@ -1087,7 +1085,7 @@ class FrabXmlView(CampViewMixin, View):
         schema = etree.XMLSchema(file="program/xsd/schedule.xml.xsd")
         parser = objectify.makeparser(schema=schema)
         try:
-            _ = objectify.fromstring(xml, parser)
+            objectify.fromstring(xml, parser)
         except etree.XMLSyntaxError:
             # we are generating invalid XML
             logger.exception("Something went sideways when validating frab xml :(")

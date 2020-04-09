@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "wishlist",
     "facilities",
     "phonebook",
-    "autoscheduler",
     "maps",
     "allauth",
     "allauth.account",

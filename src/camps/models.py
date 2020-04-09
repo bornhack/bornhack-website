@@ -159,15 +159,13 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     def event_types(self):
         """ Return all event types with at least one event in this camp """
         return EventType.objects.filter(
-            event__instances__isnull=False, event__camp=self
+            event__instances__isnull=False, event__track__camp=self
         ).distinct()
 
     @property
     def event_locations(self):
-        """ Return all event locations with at least one event in this camp"""
-        return EventLocation.objects.filter(
-            eventinstances__isnull=False, camp=self
-        ).distinct()
+        """ Return all event locations """
+        return EventLocation.objects.all()
 
     @property
     def eventproposals(self):

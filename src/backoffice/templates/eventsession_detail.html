@@ -40,10 +40,10 @@
     <a href="{% url 'backoffice:eventsession_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Session</a>
     <a href="{% url 'backoffice:eventsession_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Session</a>
     <a href="{% url 'backoffice:eventsession_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-list"></i> List Sessions</a>
-    {% if session.events.all %}
+    {% if session.eventinstances.all %}
     <hr>
-    <p class="lead">The following events fall partially or fully inside this session at the location {{ session.event_location.name }}:</p>
-    {% include "includes/event_list_table.html" with event_list=session.events.all %}
+    <p class="lead">The following EventSessions fall partially or fully inside this session at the location {{ session.event_location.name }}:</p>
+    {% include "includes/event_list_table.html" with event_list=session.eventinstances.all %}
     {% endif %}
   </div>
 </div>

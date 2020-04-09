@@ -114,18 +114,26 @@ def get_speaker_availability_form_matrix(sessions):
     return new_matrix
 
 
-def save_speaker_availability(form, speakerproposal):
+def save_speaker_availability(form, obj):
     """
     Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
-    and CombinedProposalSubmitView to create SpeakerAvailability objects
-    based on the submitted form.
-    Starts out by deleting all existing SpeakerAvailability for the proposal.
+    and CombinedProposalSubmitView to create SpeakerProposalAvailability
+    objects based on the submitted form.
+    Also called from SpeakerUpdateView in backoffice to update
+    SpeakerAvailability.
+    Starts out by deleting all existing availability before saving form.
     """
+    if hasattr(obj, "proposal"):
+        # obj is a Speaker
+        AvailabilityModel = apps.get_model("program", "speakeravailability")
+        kwargs = {"speaker": obj}
+    else:
+        # obj is a SpeakerProposal
+        AvailabilityModel = apps.get_model("program", "speakerproposalavailability")
+        kwargs = {"speakerproposal": obj}
+
     # start with a clean slate
-    SpeakerProposalAvailability = apps.get_model(
-        "program", "speakerproposalavailability"
-    )
-    SpeakerProposalAvailability.objects.filter(speakerproposal=speakerproposal).delete()
+    AvailabilityModel.objects.filter(**kwargs).delete()
 
     # all the entered data is in the users local TIME_ZONE, interpret it as such
     tz = pytz.timezone(settings.TIME_ZONE)
@@ -172,8 +180,8 @@ def save_speaker_availability(form, speakerproposal):
 
         if fieldcounter == 1:
             # we only have one field in the form, no field merging to be done
-            SpeakerProposalAvailability.objects.create(
-                speakerproposal=speakerproposal, when=daychunk, available=available,
+            AvailabilityModel.objects.create(
+                when=daychunk, available=available, **kwargs
             )
             continue
 
@@ -194,10 +202,8 @@ def save_speaker_availability(form, speakerproposal):
             formerchunk = formerchunk + daychunk
         else:
             # "available" changed or daychunk is not adjacent to formerchunk
-            SpeakerProposalAvailability.objects.create(
-                speakerproposal=speakerproposal,
-                when=formerchunk,
-                available=formeravailable,
+            AvailabilityModel.objects.create(
+                when=formerchunk, available=formeravailable, **kwargs,
             )
             # and remember the current chunk for next iteration
             formerchunk = daychunk
@@ -205,8 +211,8 @@ def save_speaker_availability(form, speakerproposal):
 
     # save the last chunk?
     if formerchunk:
-        SpeakerProposalAvailability.objects.create(
-            speakerproposal=speakerproposal, when=formerchunk, available=available,
+        AvailabilityModel.objects.create(
+            when=formerchunk, available=available, **kwargs
         )
 
 

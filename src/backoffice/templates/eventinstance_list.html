@@ -12,7 +12,7 @@
       <p><i>EventInstances</i> define the scheduling of <i>Events</i> at <i>EventLocations</i>. Search for an Event, Speaker, EventType, EventLocation, or day to filter the list.</p>
   {% if not eventinstance_list %}
       <p class="lead">
-        No EventInstances found. Go create one!
+        No EventInstances found. Go create schedule something!
         <a href="{% url 'backoffice:eventinstancecreate_eventselect' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Schedule Event</a>
       </p>
   {% else %}
@@ -27,6 +27,7 @@
         <th>People</th>
         <th>Event Type</th>
         <th>Location</th>
+        <th>Overflow</th>
         <th>Start</th>
         <th>End</th>
         <th>Scheduled</th>
@@ -36,7 +37,7 @@
     <tbody>
     {% for instance in eventinstance_list %}
     <tr>
-      <td><b>{{ instance.event.title }}</b></td>
+        <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
       <td>
         {% if instance.event.speakers.exists %}
         <ul class="list-group">
@@ -49,6 +50,7 @@
         </ul>
       <td><i class="fas fa-{{ instance.event.event_type.icon }}" style="color: {{ instance.event.event_type.color }};"></i> {{ instance.event.event_type }}</td>
       <td><i class="fas fa-{{ instance.location.icon }}"></i> {{ instance.location.name }}</td>
+      <td class="text-center {% if instance.overflow %}danger{% endif %}"><span class="badge">{{ instance.overflow }}</span></td>
       <td>{{ instance.when.lower }}</td>
       <td>{{ instance.when.upper }}</td>
       <td>{% if instance.autoscheduled %}Auto{% else %}Manual{% endif %}</td>

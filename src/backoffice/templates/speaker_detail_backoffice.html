@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load bornhack %}
+{% load program %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Details for Speaker: {{ speaker.name }}</h3>
+  </div>
+  <div class="panel-body">
+    <table class="table">
+      <tr>
+        <th>Name</th>
+        <td>{{ speaker.name }}</td>
+      </tr>
+      <tr>
+        <th>Email</th>
+        <td>{{ speaker.email }}</td>
+      </tr>
+      <tr>
+        <th>Availability</th>
+        <td>{% availabilitytable matrix=matrix %}</td>
+      </tr>
+      <tr>
+        <th>Events</th>
+        <td>
+          {% if speaker.events.all %}
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Event Type</th>
+                <th>Video Recording</th>
+                <th>Duration</th>
+                <th>Demand</th>
+                <th>Instances</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for event in speaker.events.all %}
+              <tr>
+                <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
+                <td>{{ event.event_type.icon_html }} {{ event.event_type.name }}</td>
+                <td>{{ event.video_recording|truefalseicon }}</td>
+                <td>{{ event.get_duration }} minutes</td>
+                <td>{{ event.demand }} people</td>
+                <td class="text-center"><span class="badge">{{ event.instances.count }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          N/A
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <th>Scheduled EventInstances</th>
+        <td>
+          {% if speaker.event_instances.exists %}
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Location</th>
+                <th class="text-center">Overflow</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for event in speaker.events.all %}
+              {% for instance in event.instances.all %}
+              <tr>
+                <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=instance.event.slug %}">{{ instance.event.title }}</a></td>
+                <td>{{ instance.location.icon_html }} {{ instance.location.name }}</td>
+                <td class="text-center"><span class="badge">{{ instance.overflow }}</span></td>
+                <td>{{ instance.when.lower }}</td>
+                <td>{{ instance.when.upper }}</td>
+                <td>{{ instance.duration }}</td>
+              </tr>
+              {% endfor %}
+            {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          N/A
+          {% endif %}
+        </td>
+      </tr>
+    </table>
+    <a href="{% url 'backoffice:speaker_update' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+    <a href="{% url 'backoffice:speaker_delete' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+    <a href="{% url 'backoffice:speaker_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Speaker List</a>
+  </div>
+</div>
+{% endblock content %}

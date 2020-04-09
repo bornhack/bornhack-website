@@ -8,10 +8,10 @@
   </div>
   <div class="panel-body">
     <p class="lead">This EventSession runs from <b>{{ session.when.lower }}</b> to <b>{{ session.when.upper }}</b>. We currently have <b>{{ session.event_count }}</b> EventInstances scheduled in this session, leaving <b>{{ session.free_time }}</b> time unused.</p>
-    {% if session.events.all %}
+    {% if session.eventinstances.all %}
     <hr>
-    <p class="lead">The following events exists (partially or fully) inside this session:</p>
-    {% include "includes/event_list_table.html" with event_list=session.events.all %}
+    <p class="lead">The following EventInstances exists (partially or fully) inside this session:</p>
+    {% include "includes/event_list_table.html" with event_list=session.eventinstances.all %}
     {% endif %}
     <form method="POST">
       {% csrf_token %}

@@ -5,15 +5,15 @@
 <table class="table table-condensed table-bordered">
   <thead>
     <th>fedt nok</th>
-    {% for event in object.events.all %}
-    <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a></th>
+    {% for event in object.autoevents.all %}
+    <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event_fk.slug %}">{{ event.event_title }}</a></th>
     {% endfor %}
   </thead>
   <tbody>
-    {% for rowevent in object.events.all %}
+    {% for rowevent in object.autoevents.all %}
     <tr>
-      <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=rowevent.event.slug %}">{{ rowevent.event.title }}</a></th>
-      {% for event in object.events.all %}
+      <th><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=rowevent.event_fk.slug %}">{{ rowevent.event_title }}</a></th>
+      {% for event in object.autoevents.all %}
         {% if event in rowevent.unavailability_events.all or event == rowevent %}
           <td class="text-center danger"><i class="fas fa-times"></i></td>
         {% else %}

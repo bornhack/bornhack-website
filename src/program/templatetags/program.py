@@ -85,9 +85,9 @@ def availabilitytable(matrix, form=None):
                             tdicon = "question"
                             needsinfo = True
                             if form:
-                                popup += "<p>We have no existing records about this persons availability during this time slot.</p>"
-                            else:
                                 popup += "<p>We have no existing records about this persons availability during this time slot. Please update your availability information!</p>"
+                            else:
+                                popup += "<p>We have no existing records about this persons availability during this time slot.</p>"
 
                         else:
                             tdclass = "danger"
@@ -122,7 +122,7 @@ def availabilitytable(matrix, form=None):
     if form:
         output += "<div class='help-block'>Please uncheck any boxes where this person is not available</div>"
     elif needsinfo:
-        output += '<div class="alert alert-warning" role="alert"><i class="fas fa-exclamation-triangle"></i> We have missing availability information for this person - please update!</div>'
+        output += '<div class="alert alert-warning" role="alert"><i class="fas fa-exclamation-triangle"></i> We have missing availability information for this person!</div>'
 
     output += "</div>"
     return mark_safe(output)

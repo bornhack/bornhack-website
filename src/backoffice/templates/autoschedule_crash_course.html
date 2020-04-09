@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">AutoScheduler Crash Course</h3>
+  </div>
+  <div class="panel-body">
+    <p>The AutoScheduler needs a list of <i>AutoScheduler Slots</i> and a list of <i>AutoScheduler Events</i> to do it's thing.</p>
+    <p>To get the <i>AutoScheduler Slots</i> we divide each <i>EventSession</i> into <i>Slots</i> of a length determined by the <i>EventType</i> of the <i>EventSession</i>.</p>
+    <p>To get the <i>AutoScheduler Events</i> we create one per Event for each <i>EventType</i> which support autoscheduling, exluding Events which have been scheduled manually.</p>
+    <p>All scheduling constraints are attached to <i>AutoScheduler Events</i> and they come from many sources:
+      <ul>
+        <li><b>Slot Conflicts</b>: If a Slot is unavailable because something else has been scheduled in that EventLocation at that time the Slot is removed and not considered by the AutoScheduler.</li>
+        <li><b>SpeakerAvailability</b>: For each Event we mark any Slots as unavailable if one or more speakers are unavailable for any part of the Slot.</li>
+        <li><b>Speaker Conflicts</b>: For each Event we check for each speaker if they are also hosting other Events, and register conflicts as needed, so noone has to be in two places at the same time.</li>
+        <li><b>SpeakerEventConflicts</b>: If a speaker has expressed desire to attend another Event we register conflicts as needed.</li>
+        <li><b>Event Tags</b>: Events with the same tags are scheduled in the same sessions, and may not overlap.</li>
+      </ul>
+    </p>
+
+    <p>We use the term <i>published schedule</i> when referring the existing EventInstances (meaning the current schedule on the live site). We use the term <i>draft schedule</i> when referring to the "potential" schedule calculated based on the current objects (EventSessions, Events, Speakers, SpeakerAvailability, Event conflicts, SpeakerEventConflicts, Event Tags) in the database.</p>
+
+    <p>The <i>draft schedule</i> can optionally be created similar to the <i>published schedule</i>. This makes the solver keep the number of schedule changes as low as possible.</p>
+    <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> AutoSchedule Management</a>
+  </div>
+</div>
+{% endblock content %}

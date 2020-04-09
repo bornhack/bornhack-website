@@ -1,32 +1,37 @@
 {% extends 'base.html' %}
+{% load bornhack %}
 
 {% block body %}
 <p class="lead">The following availability matrix has been generated for the Event/Slot combinations in AutoSchedule {{ object.id }}:</p>
 <table class="table table-condensed table-bordered">
   <thead>
     <th>fedt nok</th>
-    {% for slot in object.slots.all %}
-    <th>{{ slot.starts_at }} (EL {{ slot.venue }}, cap {{ slot.capacity }})</th>
+    {% for slot in scheduler.autoslots %}
+    <th>{{ slot.starts_at }} (venue {{ slot.venue }}, cap {{ slot.capacity }})</th>
     {% endfor %}
   </thead>
   <tbody>
-    {% for event in object.events.all %}
+    {% for autoevent, event in scheduler.autoevents|zip:scheduler.events.all %}
       <tr>
-          <th{% if event.unavailability_slots.count == object.slots.count %} class="danger"{% endif %}><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.event.slug %}">{{ event.event.title }}</a> ({{ event.event.event_type }}, demand {{ event.demand }})</th>
-        {% for slot in object.slots.all %}
-          {% if slot in event.unavailability_slots.all %}
-          <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.event.title }}" will not be scheduled in the slot {{ slot.when.lower }}-{{ slot.when.upper }}'></i></td>
+          <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a> (demand {{ autoevent.demand }})</th>
+        {% for slot in scheduler.autoslots %}
+          {% if slot in autoevent.unavailability %}
+          <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.title }}" will not be scheduled in the slot {{ slot.starts_at }}'></i></td>
           {% else %}
-          <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.event.title }}" might be scheduled in the slot {{ slot.when.lower }}-{{ slot.when.upper }}'></i></td>
+          <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.title }}" might be scheduled in the slot {{ slot.starts_at }}'></i></td>
           {% endif %}
         {% endfor %}
       </tr>
     {% endfor %}
   </tbody>
 </table>
-<script>
-    $(document).ready(function(){
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-</script>
+
+<table class="table">
+  {% for autoevent, event in scheduler.autoevents|zip:scheduler.events.all %}
+  <tr>
+    <th>{{ event.title }}</th>
+    <td>{% for u in autoevent.unavailability %}{{ u }}<br>{% endfor %}</td>
+  </tr>
+  {% endfor %}
+</table>
 {% endblock body %}

@@ -36,17 +36,6 @@ def check_speaker_event_camp_consistency(sender, instance, **kwargs):
                     )
 
 
-def check_speaker_camp_change(sender, instance, **kwargs):
-    if instance.pk:
-        for event in instance.events.all():
-            if event.camp != instance.camp:
-                raise ValidationError(
-                    {
-                        "camp": "You cannot change the camp a speaker belongs to if the speaker is associated with one or more events."
-                    }
-                )
-
-
 def eventinstance_pre_save(sender, instance, **kwargs):
     """ Save the old instance.when value so we can later determine if it changed """
     try:

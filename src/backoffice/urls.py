@@ -4,15 +4,12 @@ from .views import (
     ApproveFeedbackView,
     ApproveNamesView,
     AutoScheduleApplyView,
-    AutoScheduleCalculateView,
-    AutoScheduleCreateObjectsView,
-    AutoScheduleCreateView,
-    AutoScheduleDebugEventsView,
-    AutoScheduleDebugSlotsView,
-    AutoScheduleDeleteView,
-    AutoScheduleDetailView,
+    AutoScheduleCrashCourseView,
+    AutoScheduleDebugEventConflictsView,
+    AutoScheduleDebugEventSlotUnavailabilityView,
     AutoScheduleDiffView,
-    AutoScheduleListView,
+    AutoScheduleManageView,
+    AutoScheduleValidateView,
     BackofficeIndexView,
     BadgeHandoutView,
     ChainDetailView,
@@ -52,7 +49,11 @@ from .views import (
     RevenueListView,
     ScanTicketsView,
     ShopTicketOverview,
+    SpeakerDeleteView,
+    SpeakerDetailView,
+    SpeakerListView,
     SpeakerProposalManageView,
+    SpeakerUpdateView,
     TicketCheckinView,
     VillageOrdersView,
     VillageToOrderView,
@@ -172,6 +173,35 @@ urlpatterns = [
             ]
         ),
     ),
+    # manage speaker objects
+    path(
+        "speakers/",
+        include(
+            [
+                path("", SpeakerListView.as_view(), name="speaker_list"),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path(
+                                "", SpeakerDetailView.as_view(), name="speaker_detail",
+                            ),
+                            path(
+                                "update/",
+                                SpeakerUpdateView.as_view(),
+                                name="speaker_update",
+                            ),
+                            path(
+                                "delete/",
+                                SpeakerDeleteView.as_view(),
+                                name="speaker_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
     # manage event objects
     path(
         "events/",
@@ -179,7 +209,7 @@ urlpatterns = [
             [
                 path("", EventListView.as_view(), name="event_list"),
                 path(
-                    "<int:pk>/",
+                    "<slug:slug>/",
                     include(
                         [
                             path("", EventDetailView.as_view(), name="event_detail",),
@@ -254,63 +284,34 @@ urlpatterns = [
         "autoscheduler/",
         include(
             [
-                path("", AutoScheduleListView.as_view(), name="autoschedule_list"),
+                path("", AutoScheduleManageView.as_view(), name="autoschedule_manage",),
                 path(
-                    "create/",
-                    AutoScheduleCreateView.as_view(),
-                    name="autoschedule_create",
+                    "crashcourse/",
+                    AutoScheduleCrashCourseView.as_view(),
+                    name="autoschedule_crash_course",
                 ),
                 path(
-                    "<int:pk>/",
-                    include(
-                        [
-                            path(
-                                "",
-                                AutoScheduleDetailView.as_view(),
-                                name="autoschedule_detail",
-                            ),
-                            path(
-                                "create_objects/",
-                                AutoScheduleCreateObjectsView.as_view(),
-                                name="autoschedule_create_objects",
-                            ),
-                            path(
-                                "calculate/",
-                                AutoScheduleCalculateView.as_view(),
-                                name="autoschedule_calculate",
-                            ),
-                            path(
-                                "diff/",
-                                AutoScheduleDiffView.as_view(),
-                                name="autoschedule_diff",
-                            ),
-                            path(
-                                "diff/<int:original_schedule_id>/",
-                                AutoScheduleDiffView.as_view(),
-                                name="autoschedule_diff",
-                            ),
-                            path(
-                                "debug-slots/",
-                                AutoScheduleDebugSlotsView.as_view(),
-                                name="autoschedule_debug_slots",
-                            ),
-                            path(
-                                "debug-events/",
-                                AutoScheduleDebugEventsView.as_view(),
-                                name="autoschedule_debug_events",
-                            ),
-                            path(
-                                "apply/",
-                                AutoScheduleApplyView.as_view(),
-                                name="autoschedule_apply",
-                            ),
-                            path(
-                                "delete/",
-                                AutoScheduleDeleteView.as_view(),
-                                name="autoschedule_delete",
-                            ),
-                        ]
-                    ),
+                    "validate/",
+                    AutoScheduleValidateView.as_view(),
+                    name="autoschedule_validate",
+                ),
+                path(
+                    "diff/", AutoScheduleDiffView.as_view(), name="autoschedule_diff",
+                ),
+                path(
+                    "apply/",
+                    AutoScheduleApplyView.as_view(),
+                    name="autoschedule_apply",
+                ),
+                path(
+                    "debug-event-slot-unavailability/",
+                    AutoScheduleDebugEventSlotUnavailabilityView.as_view(),
+                    name="autoschedule_debug_event_slot_unavailability",
+                ),
+                path(
+                    "debug-event-conflicts/",
+                    AutoScheduleDebugEventConflictsView.as_view(),
+                    name="autoschedule_debug_event_conflicts",
                 ),
             ]
         ),
