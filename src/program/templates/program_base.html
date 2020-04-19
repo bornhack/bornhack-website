@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block title %}
+Program | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 {% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speakerproposal_create,speakerproposal_detail,speakerproposal_update,speakerproposal_submit,speakerproposal_picture,eventproposal_create,eventproposal_detail,eventproposal_update,eventproposal_submit" %}

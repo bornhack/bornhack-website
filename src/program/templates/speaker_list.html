@@ -1,5 +1,9 @@
 {% extends 'program_base.html' %}
 
+{% block title %}
+Speakers and hosts at {{ camp.title }} | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 
 {% if speaker_list %}

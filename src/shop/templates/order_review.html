@@ -2,6 +2,10 @@
 {% load bootstrap3 %}
 {% load shop_tags %}
 
+{% block title %}
+Details for Order #{{ order.id }} | {{ block.super }}
+{% endblock %}
+
 {% block profile_content %}
 
     {% if order.open is not None %}

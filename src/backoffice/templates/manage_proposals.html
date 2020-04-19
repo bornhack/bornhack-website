@@ -4,6 +4,10 @@
 {% load imageutils %}
 {% load bornhack %}
 
+{% block title %}
+BackOffice - Manage Speaker+EventProposals | {{ block.super }}
+{% endblock %}
+
 {% block extra_head %}
 <script src="{% static "js/jquery.dataTables.min.js" %}"></script>
 <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">

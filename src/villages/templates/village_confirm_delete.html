@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 
+{% block title %}
+Are you sure you want to delete the village "{{ village }}"? | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <form action="" method="post" class="col-md-6 col-md-offset-3">{% csrf_token %}

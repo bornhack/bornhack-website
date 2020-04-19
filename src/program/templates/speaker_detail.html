@@ -1,6 +1,10 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
 
+{% block title %}
+{{ speaker.name }} | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 
 <h3>{{ speaker.name }}</h3>

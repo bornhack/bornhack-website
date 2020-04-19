@@ -1,5 +1,9 @@
 {% extends 'program_base.html' %}
 
+{% block title %}
+Details for {{ speakerproposal.name }} | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 
 {% if not camp.call_for_participation_open %}

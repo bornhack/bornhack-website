@@ -2,6 +2,10 @@
 {% load static %}
 {% load qrcode %}
 
+{% block title %}
+Scan | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <form id="search_form" method="POST" action="">

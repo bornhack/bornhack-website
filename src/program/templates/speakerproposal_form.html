@@ -1,6 +1,10 @@
 {% extends 'program_base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}
+{% if object %}Update {{ object.name }} Details{% else %}Add {{ eventproposal.event_type.host_title }} to {{ eventproposal.title }}{% endif %}| {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 
 <h3>
