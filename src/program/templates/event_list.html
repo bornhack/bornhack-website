@@ -1,60 +1,10 @@
 {% extends 'program_base.html' %}
-{% load program %}
 
 {% block program_content %}
 {% if event_list %}
-    <p class="lead">
-      An alphabetical list of all talks, workshops, keynotes and other events
-      at {{ camp.title }}. The list does not include facilities like bar opening hours.
-    </p>
-
-    <table class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Title</th>
-          <th>Speakers</th>
-          <th>Scheduled</th>
-          {% if not user.is_anonymous %}
-            <th>Feedback</th>
-          {% endif %}
-        </tr>
-      </thead>
-      <tbody>
-      {% for event in event_list %}
-      {% if event.event_type.include_in_event_list %}
-        <tr>
-          <td>
-            <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}">
-                <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>
-            </a>
-          </td>
-          <td>
-              <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/event/{{ event.slug }}">{{ event.title }}</a>
-          </td>
-          <td>
-            {% for speaker in event.speakers.all %}
-              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
-            {% empty %}
-              N/A
-            {% endfor %}
-          </td>
-          <td>
-            {% for instance in event.instances.all %}
-            {{ instance.when.lower }} at {{ instance.location.name }}<br>
-            {% empty %}
-              <i>No instances scheduled yet</i>
-            {% endfor %}
-          </td>
-          {% if not user.is_anonymous %}
-            <td>{% feedbackbutton %}</td>
-          {% endif %}
-        </tr>
-      {% endif %}
-      {% endfor %}
-      </tbody>
-    </table>
+  <p class="lead">A list of all talks, workshops, keynotes and other events at {{ camp.title }}.</p>
+  {% include "includes/event_list_table.html" %}
 {% else %}
-      <h2>No events for {{ camp.title }} yet!</h2>
+  <h2>No events for {{ camp.title }} yet!</h2>
 {% endif %}
 {% endblock program_content %}

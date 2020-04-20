@@ -54,7 +54,7 @@ def get_speaker_availability_form_matrix(sessions):
     representing a full camp "day" (as returned by camp.get_days("camp")), and the
     value is an OrderedDict of chunks based on settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS
     with the daychunk DateTimeTZRange as key and a value which is None if we don't want a checkbox,
-    or a dict with "fieldname" (string) and "eventtypes" (list) and "available" (bool) if we do.
+    or a dict with "fieldname" (string) and "event_types" (list) and "available" (bool) if we do.
 
     For example, with a 2 day camp and settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=12
     and 24h EventSessions for both days he matrix dict would have 2 members (one per day),
@@ -70,27 +70,27 @@ def get_speaker_availability_form_matrix(sessions):
     for day in sessions[0].camp.get_days(camppart="camp"):
         # loop over the daychunks in this day
         for daychunk in get_daychunks(day):
-            eventtypes = set()
+            event_types = set()
             for session in sessions:
-                # add the eventtype if this session overlaps with daychunk
+                # add the event_type if this session overlaps with daychunk
                 if daychunk & session.when:
-                    eventtypes.add(session.event_type)
+                    event_types.add(session.event_type)
 
             # make sure we already have an OrderedDict for this day in the matrix
             if day not in matrix:
                 matrix[day] = OrderedDict()
 
             # skip this chunk if we found no sessions
-            if eventtypes:
+            if event_types:
                 # build the dict for this daychunk
                 matrix[day][daychunk] = dict()
                 matrix[day][daychunk][
                     "fieldname"
                 ] = f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
-                matrix[day][daychunk]["eventtypes"] = []
+                matrix[day][daychunk]["event_types"] = []
                 # pass a list of dicts instead of the queryset to avoid one million lookups
-                for et in eventtypes:
-                    matrix[day][daychunk]["eventtypes"].append(
+                for et in event_types:
+                    matrix[day][daychunk]["event_types"].append(
                         {"name": et.name, "icon": et.icon, "color": et.color,}
                     )
                 matrix[day][daychunk]["initial"] = None
@@ -125,12 +125,12 @@ def save_speaker_availability(form, obj):
     """
     if hasattr(obj, "proposal"):
         # obj is a Speaker
-        AvailabilityModel = apps.get_model("program", "speakeravailability")
+        AvailabilityModel = apps.get_model("program", "SpeakerAvailability")
         kwargs = {"speaker": obj}
     else:
         # obj is a SpeakerProposal
-        AvailabilityModel = apps.get_model("program", "speakerproposalavailability")
-        kwargs = {"speakerproposal": obj}
+        AvailabilityModel = apps.get_model("program", "SpeakerProposalAvailability")
+        kwargs = {"speaker_proposal": obj}
 
     # start with a clean slate
     AvailabilityModel.objects.filter(**kwargs).delete()
@@ -152,7 +152,7 @@ def save_speaker_availability(form, obj):
         if field[:13] != "availability_":
             continue
 
-        # this is a speakeravailability field, first split the
+        # this is a speaker_availability field, first split the
         # fieldname to get the tzrange for this daychunk
         elements = field.split("_")
         # format is "availability_2020_08_28_18_00_to_2020_08_28_21_00"
@@ -216,10 +216,10 @@ def save_speaker_availability(form, obj):
         )
 
 
-def add_matrix_availability(matrix, speakerproposal):
+def add_matrix_availability(matrix, speaker_proposal):
     """
     Loops over the matrix and adds an "intial" member to the daychunk dicts
-    with the availability info for the speakerproposal.
+    with the availability info for the speaker_proposal.
     This is used to populate initial form field values and to set <td> background
     colours in the html table.
     """
@@ -228,16 +228,16 @@ def add_matrix_availability(matrix, speakerproposal):
         # loop over daychunks and check if we need a checkbox
         for daychunk in matrix[date].keys():
             if not matrix[date][daychunk]:
-                # we have no eventsession here, carry on
+                # we have no event_session here, carry on
                 continue
-            if speakerproposal.availabilities.filter(when__contains=daychunk).exists():
-                availability = speakerproposal.availabilities.get(
+            if speaker_proposal.availabilities.filter(when__contains=daychunk).exists():
+                availability = speaker_proposal.availabilities.get(
                     when__contains=daychunk
                 )
                 matrix[date][daychunk]["initial"] = availability.available
 
 
-def get_slots(period, duration):
+def get_slots(period, duration, bounds="()"):
     """
     Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them
     """
@@ -248,7 +248,7 @@ def get_slots(period, duration):
 
     # create the first slot
     slot = DateTimeTZRange(
-        period.lower, period.lower + timedelta(minutes=duration), bounds="()"
+        period.lower, period.lower + timedelta(minutes=duration), bounds=bounds
     )
 
     # loop until we pass the end
@@ -256,7 +256,7 @@ def get_slots(period, duration):
         slots.append(slot)
         # the next slot starts when this one ends
         slot = DateTimeTZRange(
-            slot.upper, slot.upper + timedelta(minutes=duration), bounds="()"
+            slot.upper, slot.upper + timedelta(minutes=duration), bounds=bounds
         )
 
     # append the final slot to the list unless it continues past the end

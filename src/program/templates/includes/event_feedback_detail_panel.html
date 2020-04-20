@@ -1,0 +1,57 @@
+{% load bootstrap3 %}
+{% load commonmark %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="h3">Feedback for Event: {{ event.title }}</span>
+  </div>
+  <div class="panel-body">
+    <table class="table table-bordered">
+      {% if request.resolver_match.url_name == "approve_event_feedback" %}
+      <tr>
+        <th>Username (feedback submitter)</th>
+        <td>{{ event_feedback.user.username }}</td>
+      </tr>
+      {% endif %}
+      <tr>
+        <th>Were Your Expectations Fulfilled?</th>
+        <td>{{ event_feedback.expectations_fulfilled|yesno }}</td>
+      </tr>
+
+      <tr>
+        <th>Would You Attend the Same Speaker Again?</th>
+        <td>{{ event_feedback.attend_speaker_again|yesno }}</td>
+      </tr>
+
+      <tr>
+        <th>Rating (0-5)?</th>
+        <td>{{ event_feedback.rating }}/5</td>
+      </tr>
+
+      <tr>
+        <th>Created</th>
+        <td>{{ event_feedback.created }}</td>
+      </tr>
+
+      <tr>
+        <th>Updated</th>
+        <td>{{ event_feedback.updated|default:"N/A" }}</td>
+      </tr>
+
+      <tr>
+        <th>Approved</th>
+        <td>{{ event_feedback.approved|yesno }}</td>
+      </tr>
+
+      <tr>
+        <th>Comment</th>
+        <td>{{ event_feedback.comment|default:"N/A"|untrustedcommonmark }}</td>
+      </tr>
+    </table>
+    {% if form %}
+      {% bootstrap_form form %}
+    {% elif buttoninclude %}
+      {% include buttoninclude %}
+    {% endif %}
+  </div>
+</div>
+

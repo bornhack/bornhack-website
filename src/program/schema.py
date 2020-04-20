@@ -82,7 +82,7 @@ class UrlNode(DjangoObjectType):
     class Meta:
         model = Url
         interfaces = (relay.Node,)
-        only_fields = ("url", "urltype")
+        only_fields = ("url", "url_type")
 
 
 class UrlTypeNode(DjangoObjectType):

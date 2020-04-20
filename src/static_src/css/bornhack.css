@@ -334,3 +334,8 @@ body.bar-menu {
     font-size: 80%;
     font-weight: bold;
 }
+
+/* the .noscript class is in <body> html and removed on load for js enabled useragents */
+.no-js .hide-for-no-js-users {
+    display: none;
+}

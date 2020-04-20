@@ -2,7 +2,6 @@ import logging
 
 from django import template
 from django.template import Context, Template
-from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -24,7 +23,7 @@ def render_datetimetzrange(datetimetzrange):
 def availabilitytable(matrix, form=None):
     """
     Build the HTML table to show speaker availability, and hold the checkboxes
-    for the speakeravailability form.
+    for the speaker_availability form.
     """
     if not matrix:
         logger.error("we have no matrix to build a table from")
@@ -71,7 +70,7 @@ def availabilitytable(matrix, form=None):
                         popup = f'<div class="text-left"><p>{render_datetime(daychunk.lower.date)} from {render_datetime(daychunk.lower.time)} to {render_datetime(daychunk.upper.time)}.</p>'
 
                         popup += "<p>This time slot is used for:<br>"
-                        for et in matrix[date][daychunk]["eventtypes"]:
+                        for et in matrix[date][daychunk]["event_types"]:
                             popup += f'<i class="fas fa-{et["icon"]} fa-fw" style="color: {et["color"]};"></i> {et["name"]}s<br>'
                         popup += "</p>"
 
@@ -85,7 +84,7 @@ def availabilitytable(matrix, form=None):
                             tdicon = "question"
                             needsinfo = True
                             if form:
-                                popup += "<p>We have no existing records about this persons availability during this time slot. Please update your availability information!</p>"
+                                popup += "<p>We have no existing records about this persons availability during this time slot. Please update availability information!</p>"
                             else:
                                 popup += "<p>We have no existing records about this persons availability during this time slot.</p>"
 
@@ -126,48 +125,3 @@ def availabilitytable(matrix, form=None):
 
     output += "</div>"
     return mark_safe(output)
-
-
-@register.simple_tag(takes_context=True)
-def feedbackbutton(context):
-    """ A templatetag to show a suitable button for EventFeedback """
-
-    if context.request.user.is_anonymous:
-        return None
-
-    event = context["event"]
-    if event.proposal and event.proposal.user == context.request.user:
-        # current user is the event owner, show a link to EventFeedbackList
-        return mark_safe(
-            "<a class='btn btn-primary' href='%s'><i class='fas fa-comments'></i> Read Feedback (%s)</a>"
-            % (
-                reverse(
-                    "program:eventfeedback_list",
-                    kwargs={"camp_slug": event.camp.slug, "event_slug": event.slug},
-                ),
-                event.feedbacks.filter(approved=True).count(),
-            )
-        )
-    # FIXME: for some reason this triggers a lookup even though all feedbacks have been prefetched..
-    elif event.feedbacks.filter(user=context.request.user).exists():
-        # this user already submitted feedback for this event, show a link to DetailView
-        return mark_safe(
-            "<a class='btn btn-default' href='%s'><i class='fas fa-comment-dots'></i> Change Feedback</a>"
-            % (
-                reverse(
-                    "program:eventfeedback_detail",
-                    kwargs={"camp_slug": event.camp.slug, "event_slug": event.slug},
-                )
-            )
-        )
-    else:
-        # this user has not submitted feedback yet, show a link to CreateView
-        return mark_safe(
-            "<a class='btn btn-success' href='%s'><i class='fas fa-comment'></i> Add Feedback</a>"
-            % (
-                reverse(
-                    "program:eventfeedback_create",
-                    kwargs={"camp_slug": event.camp.slug, "event_slug": event.slug},
-                )
-            )
-        )

@@ -1,0 +1,10 @@
+Hello!
+
+Event "{{ proposal.title }}" for {{ proposal.camp }} was just updated!
+
+More info: https://bornhack.dk/admin/program/event_proposal/{{ proposal.uuid }}/change/
+
+
+Best regards,
+
+The BornHack Team

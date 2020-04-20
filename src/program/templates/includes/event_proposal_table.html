@@ -14,33 +14,33 @@
         </tr>
     </thead>
     <tbody>
-        {% for eventproposal in eventproposals %}
+        {% for event_proposal in event_proposals %}
         <tr>
-            <td><span class="h4">{{ eventproposal.title }}</span></td>
-            <td><i class="fas fa-{{ eventproposal.event_type.icon }} fa-lg" style="color: {{ eventproposal.event_type.color }};"></i><span class="h4"> {{ eventproposal.event_type }}</span></td>
-            <td><span class="h4">{% for url in eventproposal.urls.all %}<a href="{{ url.url }}" target="_blank">
-                <i class="{{ url.urltype.icon }}" data-toggle="tooltip" title="{{ url.urltype.name }}"></i></a> {% empty %}N/A{% endfor %}</span></td>
+            <td><span class="h4">{{ event_proposal.title }}</span></td>
+            <td><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }};"></i><span class="h4"> {{ event_proposal.event_type }}</span></td>
+            <td><span class="h4">{% for url in event_proposal.urls.all %}<a href="{{ url.url }}" target="_blank">
+                <i class="{{ url.url_type.icon }}" data-toggle="tooltip" title="{{ url.url_type.name }}"></i></a> {% empty %}N/A{% endfor %}</span></td>
             <td><span class="h4">
-                {% for person in eventproposal.speakers.all %}
+                {% for person in event_proposal.speakers.all %}
                     {% if request.resolver_match.app_name == "program" %}
-                        <a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a> 
+                        <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a> 
                     {% else %}
                         <i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i>
                     {% endif %}
                 {% endfor %}
             </span></td>
-            <td><span class="h4">{{ eventproposal.track.name }}</span></td>
-            <td><span class="badge">{{ eventproposal.proposal_status }}</span></td>
+            <td><span class="h4">{{ event_proposal.track.name }}</span></td>
+            <td><span class="badge">{{ event_proposal.proposal_status }}</span></td>
             <td>
-              {% if eventproposal.event %}
-              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=eventproposal.event.slug %}" class="btn btn-default btn-sm"><i class="fas fa-{{ eventproposal.event_type.icon }} fa-lg" style="color: {{ eventproposal.event_type.color }};"></i> Show Event</a>
+              {% if event_proposal.event %}
+              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event_proposal.event.slug %}" class="btn btn-default btn-sm"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }};"></i> Show Event</a>
               {% else %}
               <i class="fas fa-times"></i>
               {% endif %}
             </td>
             {% if request.resolver_match.app_name == "program" %}
                 <td class='text-right'>
-                    <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=eventproposal.uuid %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary btn-sm">
                         <i class="fas fa-eye"></i><span class="h5"> Details</span>
                     </a>
                 </td>

@@ -7,10 +7,10 @@
     <h3 class="panel-title">Validate Schedule</h3>
   </div>
   <div class="panel-body">
-      <p class="lead">Which schedule to validate??</p>
-      <p>Validating the <i>current</i> schedule means looking at the EventSessions, EventLocations, EventTypes, Events, Speakers and SpeakerAvailability, and comparing all that with the existing EventInstances (the currently published schedule). Some speakers changed availability or some EventSessions changed? Use this to check if the existing EventInstances still make up a valid schedule!</p>
-      <p>Validating the <i>similar</i> schedule means looking at the same things as above, then calculating a new schedule (as similar to the current one as possible), and checking if the new schedule is valid. Use this to find out if it is feasible to create a new similar schedule from the current data in the database.</p>
-      <p>Validating the <i>new</i> schedule means looking at the same things as above, then calculating a new schedule, without considering the existing EventInstances.</p>
+      <p class="lead">What do you want to validate?</p>
+      <p>Validating the <i>current</i> schedule means looking at the EventSessions, EventLocations, EventTypes, Events and their conflicts, Speakers, SpeakerAvailability, and Speaker&lt;&gt;EventConflicts, and comparing all that with the currently published schedule. Maybe some speakers changed availability or added some event conflicts? Use this tool to check if we still have a valid schedule!</p>
+      <p>Validating the <i>similar</i> schedule means looking at the same things as above, then calculating a new schedule (as similar to the current one as possible), and checking if the new schedule is (would be) valid. Use this to find out if it is feasible to create a new similar schedule from the current data in the database.</p>
+      <p>Validating the <i>new</i> schedule means looking at the same things as above, then calculating a new schedule, without considering the existing schedule. The new schedule will likely be very different from the existing one.</p>
     <form method="POST">
       {% csrf_token %}
       {% bootstrap_form form %}

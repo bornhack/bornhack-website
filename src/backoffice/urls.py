@@ -17,13 +17,16 @@ from .views import (
     CredebtorDetailView,
     EventDeleteView,
     EventDetailView,
-    EventInstanceCreateEventSelectView,
-    EventInstanceCreateView,
-    EventInstanceDeleteView,
-    EventInstanceDetailView,
-    EventInstanceListView,
     EventListView,
-    EventProposalManageView,
+    EventLocationCreateView,
+    EventLocationDeleteView,
+    EventLocationDetailView,
+    EventLocationListView,
+    EventLocationUpdateView,
+    EventProposalApproveRejectView,
+    EventProposalDetailView,
+    EventProposalListView,
+    EventScheduleView,
     EventSessionCreateLocationSelectView,
     EventSessionCreateTypeSelectView,
     EventSessionCreateView,
@@ -31,13 +34,18 @@ from .views import (
     EventSessionDetailView,
     EventSessionListView,
     EventSessionUpdateView,
+    EventSlotDetailView,
+    EventSlotListView,
+    EventSlotUnscheduleView,
+    EventTypeDetailView,
+    EventTypeListView,
     EventUpdateView,
     ExpenseDetailView,
     ExpenseListView,
     FacilityFeedbackView,
-    ManageProposalsView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
+    PendingProposalsView,
     ProductHandoutView,
     ReimbursementCreateUserSelectView,
     ReimbursementCreateView,
@@ -52,7 +60,9 @@ from .views import (
     SpeakerDeleteView,
     SpeakerDetailView,
     SpeakerListView,
-    SpeakerProposalManageView,
+    SpeakerProposalApproveRejectView,
+    SpeakerProposalDetailView,
+    SpeakerProposalListView,
     SpeakerUpdateView,
     TicketCheckinView,
     VillageOrdersView,
@@ -94,31 +104,81 @@ urlpatterns = [
     # village orders
     path("village_orders/", VillageOrdersView.as_view(), name="village_orders"),
     path("village_to_order/", VillageToOrderView.as_view(), name="village_to_order"),
-    # manage proposals
+    # manage SpeakerProposals and EventProposals
     path(
-        "manage_proposals/",
+        "proposals/",
         include(
             [
-                path("", ManageProposalsView.as_view(), name="manage_proposals"),
                 path(
-                    "speakers/<uuid:pk>/",
-                    SpeakerProposalManageView.as_view(),
-                    name="speakerproposal_manage",
+                    "pending/", PendingProposalsView.as_view(), name="pending_proposals"
                 ),
                 path(
-                    "events/<uuid:pk>/",
-                    EventProposalManageView.as_view(),
-                    name="eventproposal_manage",
+                    "speakers/",
+                    include(
+                        [
+                            path(
+                                "",
+                                SpeakerProposalListView.as_view(),
+                                name="speaker_proposal_list",
+                            ),
+                            path(
+                                "<uuid:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            SpeakerProposalDetailView.as_view(),
+                                            name="speaker_proposal_detail",
+                                        ),
+                                        path(
+                                            "approve_reject/",
+                                            SpeakerProposalApproveRejectView.as_view(),
+                                            name="speaker_proposal_approve_reject",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "events/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventProposalListView.as_view(),
+                                name="event_proposal_list",
+                            ),
+                            path(
+                                "<uuid:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            EventProposalDetailView.as_view(),
+                                            name="event_proposal_detail",
+                                        ),
+                                        path(
+                                            "approve_reject/",
+                                            EventProposalApproveRejectView.as_view(),
+                                            name="event_proposal_approve_reject",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
                 ),
             ]
         ),
     ),
-    # manage eventsession objects
+    # manage EventSession objects
     path(
-        "eventsessions/",
+        "event_sessions/",
         include(
             [
-                path("", EventSessionListView.as_view(), name="eventsession_list"),
+                path("", EventSessionListView.as_view(), name="event_session_list"),
                 path(
                     "create/",
                     include(
@@ -126,21 +186,21 @@ urlpatterns = [
                             path(
                                 "",
                                 EventSessionCreateTypeSelectView.as_view(),
-                                name="eventsession_typeselect",
+                                name="event_session_create_type_select",
                             ),
                             path(
-                                "<slug:eventtype_slug>/",
+                                "<slug:event_type_slug>/",
                                 include(
                                     [
                                         path(
                                             "",
                                             EventSessionCreateLocationSelectView.as_view(),
-                                            name="eventsession_locationselect",
+                                            name="event_session_create_location_select",
                                         ),
                                         path(
-                                            "<slug:eventlocation_slug>/",
+                                            "<slug:event_location_slug>/",
                                             EventSessionCreateView.as_view(),
-                                            name="eventsession_create",
+                                            name="event_session_create",
                                         ),
                                     ]
                                 ),
@@ -155,17 +215,17 @@ urlpatterns = [
                             path(
                                 "",
                                 EventSessionDetailView.as_view(),
-                                name="eventsession_detail",
+                                name="event_session_detail",
                             ),
                             path(
                                 "update/",
                                 EventSessionUpdateView.as_view(),
-                                name="eventsession_update",
+                                name="event_session_update",
                             ),
                             path(
                                 "delete/",
                                 EventSessionDeleteView.as_view(),
-                                name="eventsession_delete",
+                                name="event_session_delete",
                             ),
                         ]
                     ),
@@ -173,7 +233,33 @@ urlpatterns = [
             ]
         ),
     ),
-    # manage speaker objects
+    # manage EventSlot objects
+    path(
+        "event_slots/",
+        include(
+            [
+                path("", EventSlotListView.as_view(), name="event_slot_list"),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSlotDetailView.as_view(),
+                                name="event_slot_detail",
+                            ),
+                            path(
+                                "unschedule/",
+                                EventSlotUnscheduleView.as_view(),
+                                name="event_slot_unschedule",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage Speaker objects
     path(
         "speakers/",
         include(
@@ -202,7 +288,57 @@ urlpatterns = [
             ]
         ),
     ),
-    # manage event objects
+    # manage EventType objects
+    path(
+        "event_types/",
+        include(
+            [
+                path("", EventTypeListView.as_view(), name="event_type_list"),
+                path(
+                    "<slug:slug>/",
+                    EventTypeDetailView.as_view(),
+                    name="event_type_detail",
+                ),
+            ]
+        ),
+    ),
+    # manage EventLocation objects
+    path(
+        "event_locations/",
+        include(
+            [
+                path("", EventLocationListView.as_view(), name="event_location_list"),
+                path(
+                    "create/",
+                    EventLocationCreateView.as_view(),
+                    name="event_location_create",
+                ),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventLocationDetailView.as_view(),
+                                name="event_location_detail",
+                            ),
+                            path(
+                                "update/",
+                                EventLocationUpdateView.as_view(),
+                                name="event_location_update",
+                            ),
+                            path(
+                                "delete/",
+                                EventLocationDeleteView.as_view(),
+                                name="event_location_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage Event objects
     path(
         "events/",
         include(
@@ -219,6 +355,11 @@ urlpatterns = [
                                 name="event_update",
                             ),
                             path(
+                                "schedule/",
+                                EventScheduleView.as_view(),
+                                name="event_schedule",
+                            ),
+                            path(
                                 "delete/",
                                 EventDeleteView.as_view(),
                                 name="event_delete",
@@ -229,57 +370,7 @@ urlpatterns = [
             ]
         ),
     ),
-    # manage eventinstance objects
-    path(
-        "scheduling/",
-        include(
-            [
-                path("", EventInstanceListView.as_view(), name="eventinstance_list"),
-                path(
-                    "create/",
-                    include(
-                        [
-                            path(
-                                "",
-                                EventInstanceCreateEventSelectView.as_view(),
-                                name="eventinstancecreate_eventselect",
-                            ),
-                            path(
-                                "<int:event_id>/pick_slot/",
-                                EventInstanceCreateView.as_view(),
-                                name="eventinstance_create",
-                                kwargs={"manual": False},
-                            ),
-                            path(
-                                "<int:event_id>/manual/",
-                                EventInstanceCreateView.as_view(),
-                                name="eventinstance_create_manual",
-                                kwargs={"manual": True},
-                            ),
-                        ]
-                    ),
-                ),
-                path(
-                    "<int:pk>/",
-                    include(
-                        [
-                            path(
-                                "",
-                                EventInstanceDetailView.as_view(),
-                                name="eventinstance_detail",
-                            ),
-                            path(
-                                "delete/",
-                                EventInstanceDeleteView.as_view(),
-                                name="eventinstance_delete",
-                            ),
-                        ]
-                    ),
-                ),
-            ]
-        ),
-    ),
-    # manage autoschedule objects
+    # manage AutoScheduler
     path(
         "autoscheduler/",
         include(
@@ -316,9 +407,11 @@ urlpatterns = [
             ]
         ),
     ),
-    # approve eventfeedback objects
+    # approve EventFeedback objects
     path(
-        "approve_feedback", ApproveFeedbackView.as_view(), name="approve_eventfeedback",
+        "approve_feedback",
+        ApproveFeedbackView.as_view(),
+        name="approve_event_feedback",
     ),
     # economy
     path(

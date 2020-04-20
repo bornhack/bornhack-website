@@ -8,9 +8,9 @@ from .models import (
     EventLocation,
     EventProposal,
     EventSession,
+    EventSlot,
     EventTrack,
     EventType,
-    Favorite,
     Speaker,
     SpeakerAvailability,
     SpeakerProposal,
@@ -22,8 +22,8 @@ from .models import (
 
 @admin.register(SpeakerProposalAvailability)
 class SpeakerProposalAvailabilityAdmin(admin.ModelAdmin):
-    list_display = ["speakerproposal", "available", "when"]
-    list_filter = ["speakerproposal__camp", "available", "speakerproposal"]
+    list_display = ["speaker_proposal", "available", "when"]
+    list_filter = ["speaker_proposal__camp", "available", "speaker_proposal"]
 
 
 @admin.register(SpeakerAvailability)
@@ -35,15 +35,15 @@ class SpeakerAvailabilityAdmin(admin.ModelAdmin):
 
 @admin.register(SpeakerProposal)
 class SpeakerProposalAdmin(admin.ModelAdmin):
-    def mark_speakerproposal_as_approved(self, request, queryset):
+    def mark_speaker_proposal_as_approved(self, request, queryset):
         for sp in queryset:
             sp.mark_as_approved(request)
 
-    mark_speakerproposal_as_approved.description = (
+    mark_speaker_proposal_as_approved.description = (
         "Approve and create Speaker object(s)"
     )
 
-    actions = ["mark_speakerproposal_as_approved"]
+    actions = ["mark_speaker_proposal_as_approved"]
     list_filter = ("camp", "proposal_status", "user")
 
 
@@ -56,7 +56,7 @@ get_speakers_string.short_description = "Speakers"
 
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
-    def mark_eventproposal_as_approved(self, request, queryset):
+    def mark_event_proposal_as_approved(self, request, queryset):
         for ep in queryset:
             if not ep.speakers.all():
                 messages.error(
@@ -70,12 +70,12 @@ class EventProposalAdmin(admin.ModelAdmin):
                     messages.error(request, e)
                     return False
 
-    mark_eventproposal_as_approved.description = "Approve and create Event object(s)"
+    mark_event_proposal_as_approved.description = "Approve and create Event object(s)"
 
     def get_speakers(self):
         return
 
-    actions = ["mark_eventproposal_as_approved"]
+    actions = ["mark_event_proposal_as_approved"]
     list_filter = ("event_type", "proposal_status", "track", "user")
     list_display = ["title", get_speakers_string, "event_type", "proposal_status"]
 
@@ -99,6 +99,12 @@ class EventSessionAdmin(admin.ModelAdmin):
     search_fields = ["event__type", "event__location"]
 
 
+@admin.register(EventSlot)
+class EventSlotAdmin(admin.ModelAdmin):
+    list_display = ("id", "event_session", "when")
+    list_filter = ("event_session__camp", "event_session__event_type", "event_session")
+
+
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
     list_display = ("event", "when", "location", "autoscheduled")
@@ -115,11 +121,6 @@ class EventTypeAdmin(admin.ModelAdmin):
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
     readonly_fields = ["proposal", "camp"]
-
-
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    raw_id_fields = ("event_instance",)
 
 
 class SpeakerInline(admin.StackedInline):

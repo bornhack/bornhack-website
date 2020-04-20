@@ -3,57 +3,22 @@
 {% load static %}
 {% load bornhack %}
 
+{% block title %}
+Event List | Backoffice | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">BackOffice - Events</span>
-  </div>
+  <div class="panel-heading"><h3 class="panel-title">Event List - BackOffice</h3></div>
   <div class="panel-body">
-      <p><i>Event</i> are the result of an approved <i>EventProposal</i>. They contain data for the event like title, abstract, duration and more. Search for an event title, speaker names or event type to filter the list.</p>
+    <p><i>Events</i> are the result of approving an <i>EventProposal</i>. They contain data for the event like title, abstract, duration and more. Search for an event title, speaker names or event type to filter the list. <b>Any changes made here will be reflected immediately on the live site!</b></p>
   {% if not event_list %}
     <p class="lead">No Events found.</p>
   {% else %}
   <p>
     <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+    {% include "includes/event_list_table.html" %}
   </p>
-  <table class="table table-striped datatable">
-    <thead>
-    <tr>
-        <th>Title</th>
-        <th>Event Type</th>
-        <th>People</th>
-        <th class="text-center">Scheduled Instances</th>
-        <th>Actions</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for event in event_list %}
-    <tr>
-      <td><b>{{ event.title }}</b></td>
-      <td><i class="fas fa-{{ event.event_type.icon }} fa-2x" style="color: {{ event.event_type.color }};"></i> {{ event.event_type }}</td>
-      <td>
-        {% if event.speakers.exists %}
-          <ul class="list-group">
-          {% for speaker in event.speakers.all %}
-          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}<span class="badge">{{ speaker.events.count }}</span></a>
-          {% endfor %}
-          </ul>
-        {% else %}
-          N/A
-        {% endif %}
-      </td>
-      <td class="text-center"><span class="badge">{{ event.instances.count }}</span></td>
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-          <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
   {% endif %}
   <p>
     <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>

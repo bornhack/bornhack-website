@@ -6,6 +6,11 @@ $(document).ready(function(){
     // Thursday, Aug 27th, 2020, 12:00 (CEST)
     // doesn't work, dates still sort wrong :( halp!
     $.fn.dataTable.moment( "dddd, MMM Do, YYYY, HH:mm" );
+
     // enable datatables for all tables on the page,
     $('.datatable').DataTable();
+
+    // remove the .noscript class from <body>
+    // add the class .hide-for-nojs-users to any element as needed
+    $('body,html').removeClass("no-js");
 } );

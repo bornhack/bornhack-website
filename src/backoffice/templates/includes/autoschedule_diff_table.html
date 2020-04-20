@@ -19,8 +19,8 @@
             Event ID {{ eventdiff.event }} (deleted)
             {% endif %}
           </td>
-          <td>{{ eventdiff.old.eventlocation.name|default:"N/A" }}</td>
-          <td>{{ eventdiff.new.eventlocation.name|default:"N/A" }}</td>
+          <td>{{ eventdiff.old.event_location.name|default:"N/A" }}</td>
+          <td>{{ eventdiff.new.event_location.name|default:"N/A" }}</td>
           <td>{{ eventdiff.old.starttime|default:"N/A" }}</td>
           <td>{{ eventdiff.new.starttime|default:"N/A" }}</td>
         </tr>
@@ -40,7 +40,7 @@
       <tbody>
         {% for slotdiff in diff.slot_diffs %}
         <tr>
-          <td>{{ slotdiff.eventlocation.name }}</td>
+          <td>{{ slotdiff.event_location.name }}</td>
           <td>{{ slotdiff.starttime }}</td>
           <td>
             {% if slotdiff.old.event %}

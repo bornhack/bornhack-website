@@ -7,11 +7,11 @@ class AutoScheduleValidateForm(forms.Form):
         choices=(
             (
                 "current",
-                "Validate Current Schedule (Create and validate a schedule based on the currently published EventInstances)",
+                "Validate Current Schedule (Load the AutoScheduler with the currently scheduled Events and validate)",
             ),
             (
                 "similar",
-                "Validate Similar Schedule (Create and validate a new schedule based on a schedule based on the currently published EventInstances)",
+                "Validate Similar Schedule (Create and validate a new schedule based on the current schedule)",
             ),
             ("new", "Validate New Schedule (Create and validate a new schedule)"),
         ),
@@ -35,6 +35,12 @@ class AutoScheduleApplyForm(forms.Form):
     )
 
 
+class EventScheduleForm(forms.Form):
+    """ The EventSlots are added in the view """
+
+    pass
+
+
 class SpeakerForm(forms.ModelForm):
     class Meta:
         model = Speaker
@@ -47,7 +53,7 @@ class SpeakerForm(forms.ModelForm):
 
     def __init__(self, matrix={}, *args, **kwargs):
         """
-        initialise the form and adapt based on eventtype
+        initialise the form and adapt based on event_type
         """
         super().__init__(*args, **kwargs)
 

@@ -3,13 +3,13 @@
 {% load program %}
 
 {% block program_content %}
-<h3>Submit {{ camp.title }} {{ eventtype.name }} <i class="fas fa-{{ eventtype.icon }}" style="color: {{ eventtype.color }};"></i></h3>
+<h3>Submit {{ camp.title }} {{ event_type.name }} <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i></h3>
 
 <form method="POST">
     {% csrf_token %}
     {% for field in form %}
-    {% if field.id_for_label == "id_speakerproposal-submission_notes" %}
-      {% availabilitytable form=form.speakerproposal matrix=matrix %}
+    {% if field.id_for_label == "id_speaker_proposal-submission_notes" %}
+      {% availabilitytable form=form.speaker_proposal matrix=matrix %}
       {% bootstrap_field field %}
     {% else %}
     {% if field.name|slice:":12" != "availability" %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Approve or Reject {{ form.instance.event_type.name }} Proposal</h3>
+  </div>
+  <div class="panel-body">
+    <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% if approve %}
+        {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
+        {% endif %}
+        {% bootstrap_button "<i class='fas fa-times'></i> Reject" button_type="submit" button_class="btn-danger" name="reject" %}
+        <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+

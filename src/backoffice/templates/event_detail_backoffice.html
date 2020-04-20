@@ -1,29 +1,27 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 {% load bornhack %}
+{% load commonmark %}
 
 {% block content %}
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3 class="panel-title">Details for Event: {{ event.title }}</h3>
+    <h3 class="panel-title">Event: {{ event.title }}</h3>
   </div>
   <div class="panel-body">
+    {{ event.abstract|untrustedcommonmark }}
+
+    <hr>
+
+    <h4>Details for <i>{{ event.title }}</i></h4>
     <table class="table">
       <tr>
-        <th>Title</th>
-        <td>{{ event.title }}</td>
-      </tr>
-      <tr>
-        <th>Event Type</th>
-        <td>{{ event.event_type.icon_html }} {{ event.event_type }}</td>
+        <th>EventType</th>
+        <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event.event_type.slug %}">{{ event.event_type }}</a></td>
       </tr>
       <tr>
         <th>Event Track</th>
         <td>{{ event.track.name }}</td>
-      </tr>
-      <tr>
-        <th>Abstract</th>
-        <td>{{ event.abstract }}</td>
       </tr>
       <tr>
         <th>Video Recording</th>
@@ -33,62 +31,25 @@
         <th>Demand</th>
         <td>{% if event.demand %}{{ event.demand }} participants expected{% else %}0 (The autoscheduler will not consider capacity/demand when scheduling this event){% endif %}</td>
       </tr>
-      <tr>
-        <th>Speakers</th>
-        <td>
-          {% if event.speakers.exists %}
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Events</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for speaker in event.speakers.all %}
-              <tr>
-                  <td><a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a></td>
-                <td>{{ speaker.email }}</td>
-                <td>{{ speaker.events.count }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          N/A
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Scheduled EventInstances</th>
-        <td>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Location</th>
-                <th class="text-center">Overflow</th>
-                <th>Start</th>
-                <th>End</th>
-                <th>Duration</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for instance in event.instances.all %}
-              <tr>
-                <td>{{ instance.location.icon_html }} {{ instance.location.name }}</td>
-                <td class="text-center{% if instance.overflow %} danger{% endif %}"><span class="badge">{{ instance.overflow }}</span></td>
-                <td>{{ instance.when.lower }}</td>
-                <td>{{ instance.when.upper }}</td>
-                <td>{{ instance.duration }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          <a href="{% url 'backoffice:eventinstance_create' camp_slug=camp.slug event_id=event.id %}" class="btn btn-success btn-xs pull-right"><i class="fas fa-plus"></i> Add New EventInstance</a>
-        </td>
-      </tr>
     </table>
+
+    <hr>
+
+    <h4>Speakers for <i>{{ event.title }}</i></h4>
+    {% include "includes/speaker_list_table_backoffice.html" with speaker_list=event.speakers.all noactions=True nodatatable=True %}
+
+    <hr>
+
+    <h4>Schedule for <i>{{ event.title }}</i></h4>
+    {% if event.event_slots.exists %}
+    {% include "includes/event_slot_list_backoffice.html" with event_slot_list=event.event_slots.all notitle=True %}
+    {% else %}
+    N/A
+    {% endif %}
+    <a href="{% url 'backoffice:event_schedule' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary pull-right"><i class="fas fa-plus"></i> Schedule Event</a>
+
+    <hr>
+
     <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Event</a>
     <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Event</a>
     <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Event List</a>

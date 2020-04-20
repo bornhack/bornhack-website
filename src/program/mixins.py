@@ -78,11 +78,11 @@ class UrlViewMixin(object):
         """
         # get the proposal
         if "event_uuid" in self.kwargs:
-            self.eventproposal = get_object_or_404(
+            self.event_proposal = get_object_or_404(
                 models.EventProposal, uuid=self.kwargs["event_uuid"], user=request.user
             )
         elif "speaker_uuid" in self.kwargs:
-            self.speakerproposal = get_object_or_404(
+            self.speaker_proposal = get_object_or_404(
                 models.SpeakerProposal,
                 uuid=self.kwargs["speaker_uuid"],
                 user=request.user,
@@ -97,20 +97,20 @@ class UrlViewMixin(object):
         Include the proposal in the template context
         """
         context = super().get_context_data(**kwargs)
-        if hasattr(self, "eventproposal") and self.eventproposal:
-            context["eventproposal"] = self.eventproposal
+        if hasattr(self, "event_proposal") and self.event_proposal:
+            context["event_proposal"] = self.event_proposal
         else:
-            context["speakerproposal"] = self.speakerproposal
+            context["speaker_proposal"] = self.speaker_proposal
         return context
 
     def get_success_url(self):
         """
         Return to the detail view of the proposal
         """
-        if hasattr(self, "eventproposal"):
-            return self.eventproposal.get_absolute_url()
+        if hasattr(self, "event_proposal"):
+            return self.event_proposal.get_absolute_url()
         else:
-            return self.speakerproposal.get_absolute_url()
+            return self.speaker_proposal.get_absolute_url()
 
 
 class EventViewMixin(CampViewMixin):
@@ -137,12 +137,12 @@ class EventFeedbackViewMixin(EventViewMixin):
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
-        self.eventfeedback = get_object_or_404(
+        self.event_feedback = get_object_or_404(
             models.EventFeedback, event=self.event, user=self.request.user,
         )
 
     def get_object(self):
-        return self.eventfeedback
+        return self.event_feedback
 
 
 class AvailabilityMatrixViewMixin(CampViewMixin):
@@ -153,14 +153,14 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         super().setup(*args, **kwargs)
         if hasattr(self.get_object(), "events"):
             event_types = models.EventType.objects.filter(
-                event__in=self.get_object().events.all()
+                events__in=self.get_object().events.all()
             ).distinct()
         else:
             event_types = models.EventType.objects.filter(
-                event__in=self.get_object().eventproposals.all()
+                events__in=self.get_object().event_proposals.all()
             ).distinct()
         self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.eventsessions.filter(event_type__in=event_types)
+            sessions=self.camp.event_sessions.filter(event_type__in=event_types)
         )
         # add availability info to the matrix
         add_matrix_availability(self.matrix, self.get_object())
@@ -172,7 +172,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         return kwargs
 
     def get_initial(self, *args, **kwargs):
-        """ Populate the speakeravailability checkboxes, only used if the view has a form """
+        """ Populate the speaker_availability checkboxes, only used if the view has a form """
         initial = super().get_initial(*args, **kwargs)
 
         # add initial checkbox states
@@ -180,7 +180,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
             # loop over daychunks and check if we need a checkbox
             for daychunk in self.matrix[date].keys():
                 if not self.matrix[date][daychunk]:
-                    # we have no eventsession here, carry on
+                    # we have no event_session here, carry on
                     continue
                 if self.matrix[date][daychunk]["initial"] in [True, None]:
                     initial[self.matrix[date][daychunk]["fieldname"]] = True

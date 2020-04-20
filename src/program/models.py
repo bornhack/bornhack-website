@@ -3,6 +3,7 @@ import uuid
 from datetime import timedelta
 
 import icalendar
+from conference_scheduler import resources
 from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
@@ -11,18 +12,19 @@ from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import F
+from django.db.models import F, Q
 from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
-from program.utils import get_slots
+from psycopg2.extras import DateTimeTZRange
+from utils.database import CastToInteger
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 
 from .email import (
-    add_eventproposal_accepted_email,
-    add_eventproposal_rejected_email,
-    add_speakerproposal_accepted_email,
-    add_speakerproposal_rejected_email,
+    add_event_proposal_accepted_email,
+    add_event_proposal_rejected_email,
+    add_speaker_proposal_accepted_email,
+    add_speaker_proposal_rejected_email,
 )
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -66,11 +68,11 @@ class Url(CampRelatedModel):
 
     url = models.URLField(help_text="The actual URL")
 
-    urltype = models.ForeignKey(
+    url_type = models.ForeignKey(
         "program.UrlType", help_text="The type of this URL", on_delete=models.PROTECT
     )
 
-    speakerproposal = models.ForeignKey(
+    speaker_proposal = models.ForeignKey(
         "program.SpeakerProposal",
         null=True,
         blank=True,
@@ -79,7 +81,7 @@ class Url(CampRelatedModel):
         related_name="urls",
     )
 
-    eventproposal = models.ForeignKey(
+    event_proposal = models.ForeignKey(
         "program.EventProposal",
         null=True,
         blank=True,
@@ -112,9 +114,9 @@ class Url(CampRelatedModel):
     def clean(self):
         """ Make sure we have exactly one FK """
         fks = 0
-        if self.speakerproposal:
+        if self.speaker_proposal:
             fks += 1
-        if self.eventproposal:
+        if self.event_proposal:
             fks += 1
         if self.speaker:
             fks += 1
@@ -130,10 +132,10 @@ class Url(CampRelatedModel):
         """
         Return the object this Url belongs to
         """
-        if self.speakerproposal:
-            return self.speakerproposal
-        elif self.eventproposal:
-            return self.eventproposal
+        if self.speaker_proposal:
+            return self.speaker_proposal
+        elif self.event_proposal:
+            return self.event_proposal
         elif self.speaker:
             return self.speaker
         elif self.event:
@@ -146,8 +148,8 @@ class Url(CampRelatedModel):
         return self.owner.camp
 
     camp_filter = [
-        "speakerproposal__camp",
-        "eventproposal__track__camp",
+        "speaker_proposal__camp",
+        "event_proposal__track__camp",
         "speaker__camp",
         "event__track__camp",
     ]
@@ -158,7 +160,7 @@ class Url(CampRelatedModel):
 
 class Availability(CampRelatedModel, UUIDModel):
     """
-    This model contains all the availability info for speakerproposals and
+    This model contains all the availability info for speaker_proposals and
     speakers. It is inherited by SpeakerProposalAvailability and SpeakerAvailability
     models.
     """
@@ -181,20 +183,29 @@ class SpeakerProposalAvailability(Availability):
     """ Availability info for SpeakerProposal objects """
 
     class Meta:
-        """ Add ExclusionConstraint preventing overlaps """
+        """ Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability """
 
         constraints = [
             # we do not want overlapping ranges
             ExclusionConstraint(
-                name="prevent_speakerproposalavailability_overlaps",
+                name="prevent_speaker_proposal_availability_overlaps",
                 expressions=[
-                    (F("speakerproposal"), RangeOperators.EQUAL),
+                    (F("speaker_proposal"), RangeOperators.EQUAL),
                     ("when", RangeOperators.OVERLAPS),
+                ],
+            ),
+            # we do not want adjacent ranges with same availability
+            ExclusionConstraint(
+                name="prevent_speaker_proposal_availability_adjacent_mergeable",
+                expressions=[
+                    ("speaker_proposal", RangeOperators.EQUAL),
+                    (CastToInteger("available"), RangeOperators.EQUAL),
+                    ("when", RangeOperators.ADJACENT_TO),
                 ],
             ),
         ]
 
-    speakerproposal = models.ForeignKey(
+    speaker_proposal = models.ForeignKey(
         "program.SpeakerProposal",
         null=True,
         blank=True,
@@ -205,13 +216,13 @@ class SpeakerProposalAvailability(Availability):
 
     @property
     def camp(self):
-        return self.speakerproposal.camp
+        return self.speaker_proposal.camp
 
-    camp_filter = "speakerproposal__camp"
+    camp_filter = "speaker_proposal__camp"
 
     def clean(self):
         if SpeakerProposalAvailability.objects.filter(
-            speakerproposal=self.speakerproposal,
+            speaker_proposal=self.speaker_proposal,
             when__adjacent_to=self.when,
             available=self.available,
         ).exists():
@@ -220,22 +231,31 @@ class SpeakerProposalAvailability(Availability):
             )
 
     def __str__(self):
-        return f"SpeakerProposalAvailability: {self.speakerproposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
+        return f"SpeakerProposalAvailability: {self.speaker_proposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
 
 
 class SpeakerAvailability(Availability):
     """ Availability info for Speaker objects """
 
     class Meta:
-        """ Add ExclusionConstraint preventing overlaps """
+        """ Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability """
 
         constraints = [
             # we do not want overlapping ranges
             ExclusionConstraint(
-                name="prevent_speakeravailability_overlaps",
+                name="prevent_speaker_availability_overlaps",
                 expressions=[
                     (F("speaker"), RangeOperators.EQUAL),
                     ("when", RangeOperators.OVERLAPS),
+                ],
+            ),
+            # we do not want adjacent ranges with same availability
+            ExclusionConstraint(
+                name="prevent_speaker_availability_adjacent_mergeable",
+                expressions=[
+                    ("speaker", RangeOperators.EQUAL),
+                    (CastToInteger("available"), RangeOperators.EQUAL),
+                    ("when", RangeOperators.ADJACENT_TO),
                 ],
             ),
         ]
@@ -263,87 +283,6 @@ class SpeakerAvailability(Availability):
             raise ValidationError(
                 "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()"
             )
-
-
-###############################################################################
-
-
-class SpeakerProposalEventConflict(CampRelatedModel, UUIDModel):
-    """
-    This model contains speakerproposal<>event conflicts. Each instance represent
-    a speakerproposal who does not want any of their own events to be scheduled as
-    the same time as the conflict events. This will allow speakers to tell us which
-    events they wish to attend, so we don't schedule them at the same time as
-    something they want to attend.
-    """
-
-    speakerproposal = models.OneToOneField(
-        "program.SpeakerProposal",
-        related_name="eventconflicts",
-        on_delete=models.PROTECT,
-        help_text="The SpeakerProposal",
-    )
-
-    events = models.ManyToManyField(
-        "program.Event",
-        related_name="speakerproposalconflicts",
-        help_text="The conflict events",
-    )
-
-    def __str__(self):
-        return f"EventConflicts for speakerproposal {self.speakerproposal}"
-
-    @property
-    def camp(self):
-        return self.event.camp
-
-    camp_filter = "event__track__camp"
-
-    def clean(self, *args, **kwargs):
-        """ Make sure none of the speakers own events are selected here """
-        # loop over eventproposals to find approved events
-        for eventproposal in self.speakerproposal.eventproposals.all():
-            if hasattr(eventproposal, "event") and eventproposal.event in self.events:
-                # this is a published event, and we have a conflict with it
-                raise ValidationError(
-                    "A speakerproposal cannot attend their own events!"
-                )
-
-
-class SpeakerEventConflict(CampRelatedModel, UUIDModel):
-    """
-    This model contains speaker<>event conflicts for Speakers rather than SpeakerProposals.
-    """
-
-    speaker = models.OneToOneField(
-        "program.Speaker",
-        related_name="eventconflicts",
-        on_delete=models.PROTECT,
-        help_text="The Speaker",
-    )
-
-    events = models.ManyToManyField(
-        "program.Event",
-        related_name="speakerconflicts",
-        help_text="The conflict events",
-    )
-
-    def __str__(self):
-        return f"EventConflicts for speaker {self.speaker}"
-
-    @property
-    def camp(self):
-        return self.event.camp
-
-    camp_filter = "event__track__camp"
-
-    def clean(self, *args, **kwargs):
-        """ Make sure none of the speakers own events are selected here """
-        for event in self.speaker.events.all():
-            if event in self.events:
-                raise ValidationError(
-                    "A speaker cannot conflict with their own events!"
-                )
 
 
 ###############################################################################
@@ -411,7 +350,7 @@ class SpeakerProposal(UserSubmittedModel):
 
     camp = models.ForeignKey(
         "camps.Camp",
-        related_name="speakerproposals",
+        related_name="speaker_proposals",
         on_delete=models.PROTECT,
         editable=False,
     )
@@ -440,22 +379,28 @@ class SpeakerProposal(UserSubmittedModel):
         help_text="Check if BornHack needs to provide a free one-day ticket for this speaker",
     )
 
+    event_conflicts = models.ManyToManyField(
+        "program.Event",
+        related_name="speaker_proposal_conflicts",
+        help_text="Pick the Events this person wishes to attend, and we will attempt to avoid scheduling conflicts.",
+    )
+
     @property
     def headline(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse_lazy(
-            "program:speakerproposal_detail",
+            "program:speaker_proposal_detail",
             kwargs={"camp_slug": self.camp.slug, "pk": self.uuid},
         )
 
     def mark_as_approved(self, request=None):
         """ Marks a SpeakerProposal as approved, including creating/updating the related Speaker object """
-        speakerproposalmodel = apps.get_model("program", "speakerproposal")
+        speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
         # create a Speaker if we don't have one
         if not hasattr(self, "speaker"):
-            speakermodel = apps.get_model("program", "speaker")
+            speakermodel = apps.get_model("program", "Speaker")
             speaker = speakermodel()
             speaker.proposal = self
         else:
@@ -480,37 +425,50 @@ class SpeakerProposal(UserSubmittedModel):
             )
 
         # mark as approved and save
-        self.proposal_status = speakerproposalmodel.PROPOSAL_APPROVED
+        self.proposal_status = speaker_proposalmodel.PROPOSAL_APPROVED
         self.save()
 
         # copy all the URLs to the speaker object
         speaker.urls.clear()
         for url in self.urls.all():
-            Url.objects.create(url=url.url, urltype=url.urltype, speaker=speaker)
+            Url.objects.create(url=url.url, url_type=url.url_type, speaker=speaker)
+
+        # copy event conflicts to the speaker object
+        speaker.event_conflicts.clear()
+        speaker.event_conflicts.set(self.event_conflicts.all())
 
         # a message to the admin (if we have a request)
         if request:
             messages.success(
                 request, "Speaker object %s has been created/updated" % speaker
             )
-        add_speakerproposal_accepted_email(self)
+        add_speaker_proposal_accepted_email(self)
 
     def mark_as_rejected(self, request=None):
-        speakerproposalmodel = apps.get_model("program", "speakerproposal")
-        self.proposal_status = speakerproposalmodel.PROPOSAL_REJECTED
+        speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
+        self.proposal_status = speaker_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
             messages.success(
                 request, "SpeakerProposal %s has been rejected" % self.name
             )
-        add_speakerproposal_rejected_email(self)
+        add_speaker_proposal_rejected_email(self)
 
     @property
-    def eventtypes(self):
+    def event_types(self):
         """ Return a queryset of the EventType objects for the EventProposals """
         return EventType.objects.filter(
-            id__in=self.eventproposals.all().values_list("event_type", flat=True)
+            id__in=self.event_proposals.all().values_list("event_type", flat=True)
         )
+
+    @property
+    def title(self):
+        """ Convenience method to return the proper host_title """
+        if self.event_proposals.values_list("event_type").distinct().count() > 1:
+            # we have different eventtypes, use generic title
+            return "Person"
+        else:
+            return self.event_proposals.first().event_type.host_title
 
 
 class EventProposal(UserSubmittedModel):
@@ -518,7 +476,7 @@ class EventProposal(UserSubmittedModel):
 
     track = models.ForeignKey(
         "program.EventTrack",
-        related_name="eventproposals",
+        related_name="event_proposals",
         help_text="The track this event belongs to",
         on_delete=models.PROTECT,
     )
@@ -537,14 +495,14 @@ class EventProposal(UserSubmittedModel):
         "program.EventType",
         help_text="The type of event",
         on_delete=models.PROTECT,
-        related_name="eventproposals",
+        related_name="event_proposals",
     )
 
     speakers = models.ManyToManyField(
         "program.SpeakerProposal",
         blank=True,
         help_text="Pick the speaker(s) for this event. If you cannot see anything here you need to go back and create Speaker Proposal(s) first.",
-        related_name="eventproposals",
+        related_name="event_proposals",
     )
 
     allow_video_recording = models.BooleanField(
@@ -553,8 +511,6 @@ class EventProposal(UserSubmittedModel):
     )
 
     duration = models.IntegerField(
-        default=None,
-        null=True,
         blank=True,
         help_text="How much time (in minutes) should we set aside for this act? Please keep it between 60 and 180 minutes (1-3 hours).",
     )
@@ -578,13 +534,18 @@ class EventProposal(UserSubmittedModel):
     def headline(self):
         return self.title
 
+    def save(self, **kwargs):
+        if not self.duration:
+            self.duration = self.event_type.event_duration_minutes
+        super().save(**kwargs)
+
     def get_absolute_url(self):
         return reverse_lazy(
-            "program:eventproposal_detail",
+            "program:event_proposal_detail",
             kwargs={"camp_slug": self.camp.slug, "pk": self.uuid},
         )
 
-    def get_available_speakerproposals(self):
+    def get_available_speaker_proposals(self):
         """
         Return all SpeakerProposals submitted by the user who submitted this EventProposal,
         which are not already added to this EventProposal
@@ -594,8 +555,8 @@ class EventProposal(UserSubmittedModel):
         ).exclude(uuid__in=self.speakers.all().values_list("uuid"))
 
     def mark_as_approved(self, request=None):
-        eventmodel = apps.get_model("program", "event")
-        eventproposalmodel = apps.get_model("program", "eventproposal")
+        eventmodel = apps.get_model("program", "Event")
+        event_proposalmodel = apps.get_model("program", "EventProposal")
         # use existing event if we have one
         if not hasattr(self, "event"):
             event = eventmodel()
@@ -608,7 +569,7 @@ class EventProposal(UserSubmittedModel):
         event.proposal = self
         event.video_recording = self.allow_video_recording
         event.save()
-        # loop through the speakerproposals linked to this eventproposal and associate any related speaker objects with this event
+        # loop through the speaker_proposals linked to this event_proposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
             try:
                 event.speakers.add(sp.speaker)
@@ -618,27 +579,27 @@ class EventProposal(UserSubmittedModel):
                 event.delete()
                 raise ValidationError("Not all speakers are approved or created yet.")
 
-        self.proposal_status = eventproposalmodel.PROPOSAL_APPROVED
+        self.proposal_status = event_proposalmodel.PROPOSAL_APPROVED
         self.save()
 
         # clear any old urls from the event object and copy all the URLs from the proposal
         event.urls.clear()
         for url in self.urls.all():
-            Url.objects.create(url=url.url, urltype=url.urltype, event=event)
+            Url.objects.create(url=url.url, url_type=url.url_type, event=event)
 
         if request:
             messages.success(
                 request, "Event object %s has been created/updated" % event
             )
-        add_eventproposal_accepted_email(self)
+        add_event_proposal_accepted_email(self)
 
     def mark_as_rejected(self, request=None):
-        eventproposalmodel = apps.get_model("program", "eventproposal")
-        self.proposal_status = eventproposalmodel.PROPOSAL_REJECTED
+        event_proposalmodel = apps.get_model("program", "EventProposal")
+        self.proposal_status = event_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
             messages.success(request, "EventProposal %s has been rejected" % self.title)
-        add_eventproposal_rejected_email(self)
+        add_event_proposal_rejected_email(self)
 
 
 ###############################################################################
@@ -653,7 +614,7 @@ class EventTrack(CampRelatedModel):
 
     camp = models.ForeignKey(
         "camps.Camp",
-        related_name="eventtracks",
+        related_name="event_tracks",
         on_delete=models.PROTECT,
         help_text="The Camp this Track belongs to",
     )
@@ -688,7 +649,7 @@ class EventLocation(CampRelatedModel):
     )
 
     camp = models.ForeignKey(
-        "camps.Camp", related_name="eventlocations", on_delete=models.PROTECT
+        "camps.Camp", related_name="event_locations", on_delete=models.PROTECT
     )
 
     capacity = models.PositiveIntegerField(
@@ -698,7 +659,8 @@ class EventLocation(CampRelatedModel):
 
     conflicts = models.ManyToManyField(
         "self",
-        help_text="Select the locations which this location conflicts with. Nothing can be scheduled in a location if a conflicting location has an EventInstance at the same time. Example: If one room can be split into two, then the big room would conflict with each of the two small rooms (but the small rooms would not conflict with eachother).",
+        blank=True,
+        help_text="Select the locations which this location conflicts with. Nothing can be scheduled in a location if a conflicting location has a scheduled Event at the same time. Example: If one room can be split into two, then the big room would conflict with each of the two small rooms (but the small rooms would not conflict with eachother).",
     )
 
     def __str__(self):
@@ -707,23 +669,28 @@ class EventLocation(CampRelatedModel):
     class Meta:
         unique_together = (("camp", "slug"), ("camp", "name"))
 
+    def save(self, **kwargs):
+        """ Create a slug """
+        if not self.slug:
+            self.slug = slugify(self.name)
+        if not self.slug:
+            raise ValidationError("Unable to slugify")
+        super().save(**kwargs)
+
     def serialize(self):
         return {"name": self.name, "slug": self.slug, "icon": self.icon}
 
-    def is_available(self, when):
-        """ Determine if a location is available """
-        if not self.camp.event_instances.filter(
-            location=self, when__overlap=when,
-        ).exists():
-            # nothing scheduled at this time on this location
-            return True
-        else:
-            # something is scheduled, no dice
-            return False
-
     @property
     def icon_html(self):
-        return mark_safe(f'<i class="fas fa-{ self.icon }"></i>')
+        return mark_safe(f'<i class="fas fa-{ self.icon } fa-fw"></i>')
+
+    @property
+    def event_slots(self):
+        return self.camp.event_slots.filter(event_session__event_location=self)
+
+    def scheduled_event_slots(self):
+        """ Returns a QuerySet of all EventSlots scheduled in this EventLocation """
+        return self.event_slots.filter(event__isnull=False)
 
 
 class EventType(CreatedUpdatedModel):
@@ -774,13 +741,18 @@ class EventType(CreatedUpdatedModel):
     )
 
     event_duration_minutes = models.PositiveIntegerField(
-        default=None,
+        null=True,
         blank=True,
-        help_text="The duration of an event of this type, in minutes. Leave this empty if events of this type can have different durations. Required for autoscheduling.",
+        help_text="The default duration of an event of this type, in minutes. Optional. This default can be overridden in individual EventSessions as needed.",
     )
 
     support_autoscheduling = models.BooleanField(
         default=False, help_text="Check to enable this EventType in the autoscheduler",
+    )
+
+    support_speaker_event_conflicts = models.BooleanField(
+        default=True,
+        help_text="True if Events of this type should be selectable in the EventConflict m2m for SpeakerProposal and Speaker objects.",
     )
 
     def __str__(self):
@@ -800,29 +772,37 @@ class EventType(CreatedUpdatedModel):
                 "You must specify event_duration_minutes to support autoscheduling"
             )
 
+    @property
+    def duration(self):
+        """ Just return a timedelta of the lenght of this Session """
+        return timedelta(minutes=self.event_duration_minutes)
+
     def icon_html(self):
         return mark_safe(
-            f'<i class="fas fa-{ self.icon }" style="color: { self.color };"></i>'
+            f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>'
         )
 
 
 class EventSession(CampRelatedModel):
     """
-    Sessions define the "opening hours" where we can create EventInstance
-    objects for Events of a given EventType on a given EventLocation.
-    This information is then used to allow submitters to specify speaker availability
-    when submitting, and to assist (but not restrict!) event scheduling in backoffice.
+    An EventSession define the "opening hours" for an EventType in an EventLocation.
+
+    Creating an EventSession also creates the related EventSlots. Updating an EventSesion
+    adds or removes EventSlots as needed.
 
     Multiple EventSessions can happen at the same time at the same location, for
     example we have both Meetups and Music Acts in the Bar Area in the evenings.
+
+    EventSessions are used to allow submitters to specify speaker availability
+    when submitting, and to assist and validate event scheduling (auto and manual).
     """
 
     class Meta:
         ordering = ["when", "event_type", "event_location"]
-        # We do not want overlapping sessions for the same EventType/EventLocation combo.
         constraints = [
+            # We do not want overlapping sessions for the same EventType/EventLocation combo.
             ExclusionConstraint(
-                name="prevent_eventsession_eventtype_eventlocation_overlaps",
+                name="prevent_event_session_event_type_event_location_overlaps",
                 expressions=[
                     ("when", RangeOperators.OVERLAPS),
                     ("event_location", RangeOperators.EQUAL),
@@ -833,7 +813,7 @@ class EventSession(CampRelatedModel):
 
     camp = models.ForeignKey(
         "camps.Camp",
-        related_name="eventsessions",
+        related_name="event_sessions",
         on_delete=models.PROTECT,
         help_text="The Camp this EventSession belongs to",
     )
@@ -841,19 +821,24 @@ class EventSession(CampRelatedModel):
     event_type = models.ForeignKey(
         "program.EventType",
         on_delete=models.PROTECT,
-        related_name="eventsessions",
+        related_name="event_sessions",
         help_text="The type of event this session is for",
     )
 
     event_location = models.ForeignKey(
         "program.EventLocation",
         on_delete=models.PROTECT,
-        related_name="eventsessions",
+        related_name="event_sessions",
         help_text="The event location this session is for",
     )
 
     when = DateTimeRangeField(
         help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>"
+    )
+
+    event_duration_minutes = models.PositiveIntegerField(
+        blank=True,
+        help_text="The duration of events in this EventSession. Defaults to the value from the EventType of this EventSession.",
     )
 
     description = models.TextField(
@@ -863,29 +848,10 @@ class EventSession(CampRelatedModel):
     def __str__(self):
         return f"EventSession for {self.event_type} in {self.event_location.name}: {self.when}"
 
-    def clean_when(self):
-        """ Make sure we have lower and upper, and that upper is after lower, and make sure we have no overlaps between sessions """
-        if (
-            self.when.lower > self.when.upper
-            or not self.when.lower
-            or not self.when.upper
-        ):
-            raise ValidationError(
-                "Both start and end are required, and end must be after start"
-            )
-        if (
-            EventSession.objects.filter(
-                camp=self.camp,
-                event_type=self.event_type,
-                event_location=self.event_location,
-                when__overlap=self.when,
-            )
-            .exclude(pk=self.pk)
-            .exists()
-        ):
-            raise ValidationError(
-                "This EventSession overlaps with another at the same location for the same type of event!"
-            )
+    def save(self, **kwargs):
+        if not self.event_duration_minutes:
+            self.event_duration_minutes = self.event_type.event_duration_minutes
+        super().save(**kwargs)
 
     @property
     def duration(self):
@@ -893,71 +859,229 @@ class EventSession(CampRelatedModel):
         return self.when.upper - self.when.lower
 
     @property
-    def eventinstance_count(self):
-        """ Returns the number of EventInstances which fall within this Session """
-        return self.eventinstances.count()
+    def free_time(self):
+        """ Returns a timedelta of the free time in this Session. """
+        return self.duration - timedelta(
+            minutes=self.event_duration_minutes * self.get_unavailable_slots().count()
+        )
+
+    def get_available_slots(self, count_autoscheduled_as_free=False, bounds="()"):
+        """
+        Return a queryset of slots that have nothing scheduled, remember to consider
+        conflicting locations too.
+        """
+        # do we want to count slots with autoscheduled Events as free or not?
+        if count_autoscheduled_as_free:
+            # a slot is available if nothing is scheduled, or if the event is autoscheduled
+            availablefilter = Q(event__isnull=True) | Q(autoscheduled=True)
+            # a slot is busy if something is manually scheduled
+            busyfilter = Q(autoscheduled=False)
+        else:
+            # a slot is available if nothing is scheduled
+            availablefilter = Q(event__isnull=True)
+            # a slot is busy if something is scheduled
+            busyfilter = Q(event__isnull=False)
+
+        # get the times of all busy slots in conflicting locations which overlap with this session
+        conflict_slot_times = self.camp.event_slots.filter(
+            # get slots that have something scheduled in them
+            busyfilter,
+            # at the same time as this session
+            when__overlap=self.when,
+            # at a location which conflicts with this one
+            event_session__event_location__in=self.event_location.conflicts.all(),
+        ).values_list("when", flat=True)
+
+        # build the excludefilter so we exclude any slots that overlap with any
+        # of our conflict_slot_times
+        excludefilter = Q()
+        for slot in conflict_slot_times:
+            # slot is a DateTimeTZRange with bounds "[)"
+            excludefilter | Q(when__overlap=slot)
+
+        # do the thing
+        return self.event_slots.filter(availablefilter).exclude(excludefilter)
+
+    def get_unavailable_slots(self, count_autoscheduled_as_free=False, bounds="[)"):
+        """ Return a list of slots that are not available for some reason """
+        return self.event_slots.exclude(
+            id__in=self.get_available_slots(
+                count_autoscheduled_as_free=count_autoscheduled_as_free, bounds=bounds,
+            ).values_list("id", flat=True),
+        )
+
+    def get_slot_times(self, bounds="[)"):
+        """ Return a list of the DateTimeTZRanges we want EventSlots to exists for """
+        slots = []
+        period = self.when
+        duration = timedelta(minutes=self.event_duration_minutes)
+        if period.upper - period.lower < duration:
+            # this period is shorter than the duration, no slots
+            return slots
+
+        # create the first slot
+        slot = DateTimeTZRange(period.lower, period.lower + duration, bounds=bounds)
+
+        # loop until we pass the end
+        while slot.upper < period.upper:
+            slots.append(slot)
+            # the next slot starts when this one ends
+            slot = DateTimeTZRange(slot.upper, slot.upper + duration, bounds=bounds)
+
+        # append the final slot to the list unless it continues past the end
+        if not slot.upper > period.upper:
+            slots.append(slot)
+        return slots
+
+    def fixup_event_slots(self):
+        """ This method takes care of creating and deleting EventSlots when the EventSession is created, updated or deleted """
+        # get a set of DateTimeTZRange objects representing the EventSlots we need
+        needed_slot_times = set(self.get_slot_times(bounds="[)"))
+
+        # get a set of DateTimeTZRange objects representing the EventSlots we have in DB
+        db_slot_times = set(self.event_slots.all().values_list("when", flat=True))
+
+        # loop over and create missing slots
+        for slot in needed_slot_times.difference(db_slot_times):
+            self.event_slots.create(event_session=self, when=slot)
+
+        # loop over and delete unneeded slots
+        for slot in db_slot_times.difference(needed_slot_times):
+            self.event_slots.get(when=slot).delete()
+
+    def scheduled_event_slots(self):
+        return self.event_slots.filter(event__isnull=False)
+
+
+class EventSlot(CampRelatedModel):
+    """
+    An EventSlot defines a window where we can schedule an Event.
+
+    The EventType and EventLocation is defined by the EventSession this
+    EventSlot belongs to. EventSlots are created and deleted by a post_save
+    signal when the parent EventSession is created, updated or deleted.
+
+    If the EventSession has a duration of 6 hours and event_duration_minutes=60
+    then 6 instances of this model would exist for that EventSession.
+    """
+
+    class Meta:
+        ordering = ["when"]
+        constraints = [
+            # we do not want overlapping slots for the same EventSession
+            ExclusionConstraint(
+                name="prevent_slot_session_overlaps",
+                expressions=[
+                    ("when", RangeOperators.OVERLAPS),
+                    ("event_session", RangeOperators.EQUAL),
+                ],
+            ),
+        ]
+
+    event_session = models.ForeignKey(
+        "program.EventSession",
+        related_name="event_slots",
+        on_delete=models.PROTECT,
+        help_text="The EventSession this EventSlot belongs to",
+    )
+
+    when = DateTimeRangeField(help_text="Start and end time of this slot",)
+
+    event = models.ForeignKey(
+        "program.Event",
+        null=True,
+        blank=True,
+        related_name="event_slots",
+        on_delete=models.SET_NULL,
+        help_text="The Event scheduled in this EventSlot",
+    )
+
+    autoscheduled = models.NullBooleanField(
+        default=None,
+        help_text="True if the Event was scheduled by the AutoScheduler, False if it was scheduled manually, None if there is nothing scheduled in this EventSlot.",
+    )
 
     @property
-    def eventinstances(self):
-        """ Return a queryset of the EventInstances which fall in this session """
-        return EventInstance.objects.filter(
-            event__track__camp=self.camp,
-            location=self.event_location,
-            when__contained_by=self.when,
+    def camp(self):
+        return self.event_session.camp
+
+    camp_filter = "event_session__camp"
+
+    def __str__(self):
+        return f"{self.when} ({self.event_session.event_location.name}, {self.event_session.event_type})"
+
+    def clean(self):
+        """ Validate EventSlot length, time, and autoscheduled status"""
+        if self.when.upper - self.when.lower != timedelta(
+            minutes=self.event_session.event_duration_minutes
+        ):
+            raise ValidationError(
+                f"This EventSlot has the wrong length. It must be {self.event_session.event_duration_minutes} minutes long."
+            )
+
+        # remember to use "[)" bounds when comparing
+        if self.when not in self.event_session.get_slot_times(bounds="[)"):
+            raise ValidationError(
+                "This EventSlot is not inside this EventSession, or it might be misaligned"
+            )
+
+        # if we have an Event we want to know if it was autoscheduled or not
+        if self.event and self.autoscheduled is None:
+            raise ValidationError(
+                "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None"
+            )
+        self.clean_speakers()
+
+    def get_autoscheduler_slot(self):
+        """ Return a conference_scheduler.resources.Slot object matching this EventSlot """
+        return resources.Slot(
+            venue=self.event_session.event_location.id,
+            starts_at=self.when.lower,
+            duration=int((self.when.upper - self.when.lower).total_seconds() / 60),
+            session=self.event_session.id,
+            capacity=self.event_session.event_location.capacity,
         )
 
     @property
-    def free_time(self):
-        """ Returns a timedelta of the free time in this Session, meaning time not already taken up by an EventInstance """
-        used = timedelta()
-        for i in self.events:
-            # add the duration of this EventInstance
-            used += i.when.upper - i.when.lower
-        # the free time is the whole session minus the used time
-        return (self.when.upper - self.when.lower) - used
+    def event_type(self):
+        return self.event_session.event_type
 
-    def get_slots(self):
-        """ Return a list of DateTimeTZRange objects representing the Slots in this Session """
-        return get_slots(self.when, self.event_type.event_duration_minutes)
+    @property
+    def event_location(self):
+        return self.event_session.event_location
 
-    def get_available_slots(self, count_autoscheduled_as_free=False):
-        slots = []
-        for slot in self.get_slots():
-            # check if this slot at this location is taken by something else
-            # (something could be manually scheduled)
-            kwargs = dict(location=self.event_location, when__overlap=slot,)
-            if count_autoscheduled_as_free:
-                # only consider manually scheduled instances
-                kwargs["autoscheduled"] = False
+    def clean_speakers(self):
+        """ Check if all speakers are available """
+        if self.event:
+            for speaker in self.event.speakers.all():
+                if not speaker.is_available(
+                    when=self.when, ignore_event_slot_ids=[self.pk]
+                ):
+                    raise ValidationError(
+                        f"The speaker {speaker} is not available at this time"
+                    )
 
-            if self.camp.event_instances.filter(**kwargs).exists():
-                # something has been manually scheduled on this location in this slot
-                continue
+    def unschedule(self):
+        """ Clear the Event FK and autoscheduled status, removing the Event from the schedule """
+        self.event = None
+        self.autoscheduled = None
+        self.save()
 
-            # check if anything is scheduled in another location which conflicts with this one
-            kwargs = dict(
-                location__in=self.event_location.conflicts.all(), when__overlap=slot,
-            )
-            if count_autoscheduled_as_free:
-                # only consider manually scheduled instances
-                kwargs["autoscheduled"] = False
-            if self.camp.event_instances.filter(**kwargs).exists():
-                # something has been scheduled on a location which conflicts with
-                # this location during this slot, slot is unavailable
-                continue
+    @property
+    def overflow(self):
+        """ If we have more demand than capacity return the overflow """
+        if self.event and self.event.demand > self.event_location.capacity:
+            return (self.event_location.capacity - self.event.demand) * -1
+        else:
+            return 0
 
-            # all good
-            slots.append(slot)
+    @property
+    def duration(self):
+        return self.when.upper - self.when.lower
 
-        # return all available slots
-        return slots
-
-    def get_unavailable_slots(self, count_autoscheduled_as_free=False):
-        return [
-            x
-            for x in self.get_slots()
-            if x not in self.get_available_slots(count_autoscheduled_as_free)
-        ]
+    @property
+    def duration_minutes(self):
+        return int(self.duration.total_seconds() // 60)
 
 
 class Event(CampRelatedModel):
@@ -970,6 +1094,7 @@ class Event(CampRelatedModel):
     event_type = models.ForeignKey(
         "program.EventType",
         help_text="The type of this event",
+        related_name="events",
         on_delete=models.PROTECT,
     )
 
@@ -1005,9 +1130,8 @@ class Event(CampRelatedModel):
 
     duration_minutes = models.PositiveIntegerField(
         default=None,
-        null=True,
         blank=True,
-        help_text="The duration of this event. Leave blank to use the default from the eventtype.",
+        help_text="The duration of this event in minutes. Leave blank to use the default from the event_type.",
     )
 
     demand = models.PositiveIntegerField(
@@ -1020,13 +1144,17 @@ class Event(CampRelatedModel):
         unique_together = (("track", "slug"), ("track", "title"))
 
     def __str__(self):
-        return "%s (%s)" % (self.title, self.camp.title)
+        return self.title
 
     def save(self, **kwargs):
+        """ Create a slug and get duration """
         if not self.slug:
             self.slug = slugify(self.title)
         if not self.slug:
             raise ValidationError("Unable to slugify")
+        if not self.duration_minutes:
+            # we default to the duration of the event_type
+            self.duration_minutes = self.event_type.event_duration_minutes
         super().save(**kwargs)
 
     @property
@@ -1068,15 +1196,12 @@ class Event(CampRelatedModel):
 
         return data
 
-    def get_duration(self):
-        if self.duration_minutes:
-            return self.duration_minutes
-        else:
-            return self.event_type.event_duration_minutes
+    def duration(self):
+        return timedelta(minutes=self.duration_minutes)
 
 
 class EventInstance(CampRelatedModel):
-    """ An instance of an event """
+    """ The old way of scheduling events. Model to be deleted after prod data migration """
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -1089,12 +1214,16 @@ class EventInstance(CampRelatedModel):
         "program.event", related_name="instances", on_delete=models.PROTECT
     )
 
-    when = DateTimeRangeField()
+    when = DateTimeRangeField(null=True, blank=True)
 
     notifications_sent = models.BooleanField(default=False)
 
     location = models.ForeignKey(
-        "program.EventLocation", related_name="eventinstances", on_delete=models.PROTECT
+        "program.EventLocation",
+        related_name="eventinstances",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     autoscheduled = models.BooleanField(
@@ -1121,28 +1250,18 @@ class EventInstance(CampRelatedModel):
         """ Check if all speakers are available """
         for speaker in self.event.speakers.all():
             if not speaker.is_available(
-                when=self.when, ignore_eventinstances=[self.pk]
+                when=self.event_slot.when, ignore_eventinstances=[self.pk]
             ):
                 raise ValidationError(
                     f"The speaker {speaker} is not available at this time"
                 )
 
-    def clean_location(self):
-        """ check that the location is available """
-        if not self.location.is_available(self.when):
-            raise ValidationError(
-                f"The location {self.location.name} is not available at this time"
-            )
-
     def save(self, *args, clean_speakers=True, **kwargs):
-        """ Validate speakers and location (unless we are asked not to) """
+        """ Validate speakers (unless we are asked not to) """
         if "commit" not in kwargs or kwargs["commit"]:
             # we are saving for real
             if clean_speakers:
                 self.clean_speakers()
-            # we do not permit skipping clean_location() since we have a DB
-            # ExclusionConstraint preventing conflicting saves anyway
-            self.clean_location()
         super().save(*args, **kwargs)
 
     @property
@@ -1226,6 +1345,14 @@ class EventInstance(CampRelatedModel):
         else:
             return 0
 
+    @property
+    def event_type(self):
+        return self.event_slot.event_session.event_type
+
+    @property
+    def event_location(self):
+        return self.event_slot.event_session.event_location
+
 
 class Speaker(CampRelatedModel):
     """ A Person (co)anchoring one or more events on a camp. """
@@ -1271,6 +1398,12 @@ class Speaker(CampRelatedModel):
         help_text="Check if BornHack needs to provide a free one-day ticket for this speaker",
     )
 
+    event_conflicts = models.ManyToManyField(
+        "program.Event",
+        related_name="speaker_conflicts",
+        help_text="The Events this person wishes to attend. The AutoScheduler will avoid conflicts.",
+    )
+
     class Meta:
         ordering = ["name"]
         unique_together = (("camp", "name"), ("camp", "slug"))
@@ -1293,24 +1426,39 @@ class Speaker(CampRelatedModel):
         data = {"name": self.name, "slug": self.slug, "biography": self.biography}
         return data
 
-    def is_available(self, when, ignore_eventinstances=[]):
+    def is_available(self, when, ignore_event_slot_ids=[]):
         """ A speaker is available if the person has positive availability for the period and
         if the speaker is not in another event at the time """
         if not self.availabilities.filter(when__contains=when, available=True).exists():
+            # we have no positive availability for this speaker
             return False
-        if self.camp.event_instances.filter(
-            event__speakers=self, when__overlap=when
-        ).exists():
+
+        # get all slots for this speaker which overlap with the period
+        slots = self.camp.event_slots.filter(event__speakers=self, when__overlap=when)
+
+        # do we have any slots we want to ignore?
+        if ignore_event_slot_ids:
+            slots = slots.exclude(pk__in=ignore_event_slot_ids)
+
+        if slots.exists():
+            # speaker is in another event at this time
             return False
+
+        # speaker is available
         return True
 
+    def scheduled_event_slots(self):
+        """ Returns a QuerySet of all EventSlots scheduled for this speaker """
+        return self.camp.event_slots.filter(event__speakers=self)
+
     @property
-    def event_instances(self):
-        return self.camp.event_instances.filter(event__speakers=self)
-
-
-class EventTag(CreatedUpdatedModel):
-    tag = models.CharField(max_length=100, help_text="The tag",)
+    def title(self):
+        """ Convenience method to return the proper host_title """
+        if self.events.values_list("event_type").distinct().count() > 1:
+            # we have different eventtypes, use generic title
+            return "Person"
+        else:
+            return self.events.first().event_type.host_title
 
 
 class Favorite(models.Model):
@@ -1381,7 +1529,7 @@ class EventFeedback(CampRelatedModel, UUIDModel):
 
     def get_absolute_url(self):
         return reverse(
-            "program:eventfeedback_detail",
+            "program:event_feedback_detail",
             kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
         )
 

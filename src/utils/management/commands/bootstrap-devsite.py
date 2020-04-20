@@ -31,15 +31,16 @@ from profiles.models import Profile
 from program.autoscheduler import AutoScheduler
 from program.models import (
     Event,
-    EventInstance,
     EventLocation,
     EventProposal,
     EventSession,
+    EventSlot,
     EventTrack,
     EventType,
     SpeakerProposal,
+    Url,
+    UrlType,
 )
-from program.signal_handlers import eventinstance_post_save
 from program.utils import (
     get_speaker_availability_form_matrix,
     save_speaker_availability,
@@ -114,7 +115,7 @@ class SpeakerProposalFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name")
     email = factory.Faker("email")
-    biography = factory.Faker("text")
+    biography = output_fake_md_description()
     submission_notes = factory.Iterator(["", output_fake_description()])
     needs_oneday_ticket = factory.Iterator([True, False])
 
@@ -125,10 +126,26 @@ class EventProposalFactory(factory.django.DjangoModelFactory):
 
     user = factory.Iterator(User.objects.all())
     title = factory.Faker("sentence")
-    abstract = factory.Faker("text")
-    allow_video_recording = factory.Iterator([True, False])
-    submission_notes = factory.Iterator(["", factory.Faker("text")])
+    abstract = output_fake_md_description()
+    allow_video_recording = factory.Iterator([True, True, True, False])
+    submission_notes = factory.Iterator(["", output_fake_description()])
     use_provided_speaker_laptop = factory.Iterator([True, False])
+
+
+class EventProposalUrlFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Url
+
+    url = factory.Faker("url")
+    url_type = factory.Iterator(UrlType.objects.all())
+
+
+class SpeakerProposalUrlFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Url
+
+    url = factory.Faker("url")
+    url_type = factory.Iterator(UrlType.objects.all())
 
 
 class Command(BaseCommand):
@@ -355,6 +372,7 @@ class Command(BaseCommand):
             host_title="Host",
             event_duration_minutes="180",
             support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["talk"] = EventType.objects.create(
@@ -368,6 +386,7 @@ class Command(BaseCommand):
             host_title="Speaker",
             event_duration_minutes="60",
             support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["lightning"] = EventType.objects.create(
@@ -380,6 +399,7 @@ class Command(BaseCommand):
             icon="bolt",
             host_title="Speaker",
             event_duration_minutes="5",
+            support_speaker_event_conflicts=True,
         )
 
         types["music"] = EventType.objects.create(
@@ -393,6 +413,7 @@ class Command(BaseCommand):
             host_title="Artist",
             event_duration_minutes="60",
             support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["keynote"] = EventType.objects.create(
@@ -405,6 +426,7 @@ class Command(BaseCommand):
             host_title="Speaker",
             event_duration_minutes="90",
             support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["debate"] = EventType.objects.create(
@@ -418,6 +440,7 @@ class Command(BaseCommand):
             public=True,
             event_duration_minutes="120",
             support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["facility"] = EventType.objects.create(
@@ -430,22 +453,60 @@ class Command(BaseCommand):
             icon="home",
             host_title="Host",
             event_duration_minutes="720",
+            support_speaker_event_conflicts=False,
         )
 
         types["slack"] = EventType.objects.create(
-            name="Recreational Event",
-            slug="recreational-event",
+            name="Recreational",
+            slug="recreational",
             color="#0000ff",
             light_text=True,
             public=True,
             description="Events of a recreational nature",
             icon="dice",
             host_title="Host",
-            event_duration_minutes="180",
-            support_autoscheduling=True,
+            event_duration_minutes="60",
+            support_autoscheduling=False,
+            support_speaker_event_conflicts=True,
         )
 
         return types
+
+    def create_url_types(self):
+        self.output("Creating UrlType objects...")
+        t, created = UrlType.objects.get_or_create(
+            name="Other", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Homepage", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Slides", defaults={"icon": "fas fa-chalkboard-teacher"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Twitter", defaults={"icon": "fab fa-twitter"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Mastodon", defaults={"icon": "fab fa-mastodon"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Facebook", defaults={"icon": "fab fa-facebook"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Project", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Blog", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Github", defaults={"icon": "fab fa-github"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Keybase", defaults={"icon": "fab fa-keybase"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Recording", defaults={"icon": "fas fa-film"}
+        )
 
     def create_product_categories(self):
         categories = {}
@@ -644,7 +705,7 @@ class Command(BaseCommand):
     def create_camp_tracks(self, camp):
         tracks = {}
         year = camp.camp.lower.year
-        self.output("Creating eventtracks for {}...".format(year))
+        self.output("Creating event_tracks for {}...".format(year))
         tracks[1] = EventTrack.objects.create(
             camp=camp, name="BornHack", slug=camp.slug
         )
@@ -654,7 +715,7 @@ class Command(BaseCommand):
     def create_event_locations(self, camp):
         locations = {}
         year = camp.camp.lower.year
-        self.output("Creating eventlocations for {}...".format(year))
+        self.output("Creating event_locations for {}...".format(year))
         locations["speakers_tent"] = EventLocation.objects.create(
             name="Speakers Tent",
             slug="speakers-tent",
@@ -718,8 +779,8 @@ class Command(BaseCommand):
             published_at=tz.localize(datetime(year, 9, 4, 12, 0)),
         )
 
-    def create_camp_eventsessions(self, camp, event_types, event_locations):
-        self.output(f"Creating eventsesions for {camp}...")
+    def create_camp_event_sessions(self, camp, event_types, event_locations):
+        self.output(f"Creating EventSessions for {camp}...")
         days = camp.get_days(camppart="camp")[1:-1]
         for day in days:
             start = day.lower
@@ -730,6 +791,15 @@ class Command(BaseCommand):
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 11, 0)),
                     tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["slack"],
+                event_location=event_locations["speakers_tent"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 13, 0)),
                 ),
             )
             EventSession.objects.create(
@@ -747,8 +817,8 @@ class Command(BaseCommand):
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_1"],
                 when=(
-                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
-                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
                 ),
             )
             EventSession.objects.create(
@@ -756,8 +826,8 @@ class Command(BaseCommand):
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_2"],
                 when=(
-                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
-                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
                 ),
             )
             EventSession.objects.create(
@@ -765,8 +835,8 @@ class Command(BaseCommand):
                 event_type=event_types["workshop"],
                 event_location=event_locations["workshop_room_3"],
                 when=(
-                    tz.localize(datetime(start.year, start.month, start.day, 10, 0)),
-                    tz.localize(datetime(start.year, start.month, start.day, 20, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
                 ),
             )
         # create sessions for the keynotes
@@ -787,18 +857,18 @@ class Command(BaseCommand):
 
     def create_camp_proposals(self, camp, event_types):
         year = camp.camp.lower.year
-        self.output("Creating event- and speakerproposals for {}...".format(year))
+        self.output("Creating event- and speaker_proposals for {}...".format(year))
 
-        # add 40 talks
+        # add 50 talks
         talkproposals = EventProposalFactory.create_batch(
-            40,
-            track=factory.Iterator(camp.eventtracks.all()),
+            50,
+            track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["talk"],
         )
-        # and 10 workshops
+        # and 15 workshops
         workshopproposals = EventProposalFactory.create_batch(
-            10,
-            track=factory.Iterator(camp.eventtracks.all()),
+            15,
+            track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["workshop"],
         )
         # and 3 keynotes
@@ -806,7 +876,7 @@ class Command(BaseCommand):
         # and promoted to keynotes by the content team)
         keynoteproposals = EventProposalFactory.create_batch(
             3,
-            track=factory.Iterator(camp.eventtracks.all()),
+            track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["keynote"],
         )
         for ep in talkproposals + workshopproposals + keynoteproposals:
@@ -827,8 +897,27 @@ class Command(BaseCommand):
             title="Lunch break",
             abstract="Daily lunch break. Remember to drink water.",
             event_type=event_types["slack"],
-            track=random.choice(camp.eventtracks.all()),
+            track=random.choice(camp.event_tracks.all()),
         ).mark_as_approved()
+
+    def create_proposal_urls(self, camp):
+        """ Create URL objects for the proposals """
+        year = camp.camp.lower.year
+        self.output(
+            "Creating URLs for Speaker- and EventProposals for {}...".format(year)
+        )
+        SpeakerProposalUrlFactory.create_batch(
+            100,
+            speaker_proposal=factory.Iterator(
+                SpeakerProposal.objects.filter(camp=camp)
+            ),
+        )
+        EventProposalUrlFactory.create_batch(
+            100,
+            event_proposal=factory.Iterator(
+                EventProposal.objects.filter(track__camp=camp)
+            ),
+        )
 
     def generate_speaker_availability(self, camp):
         """ Create SpeakerAvailability objects for the SpeakerProposals """
@@ -836,11 +925,11 @@ class Command(BaseCommand):
         self.output(
             "Generating random SpeakerProposalAvailability for {}...".format(year)
         )
-        for sp in camp.speakerproposals.all():
-            # generate a matrix for this speakerproposals eventtypes
+        for sp in camp.speaker_proposals.all():
+            # generate a matrix for this speaker_proposals event_types
             matrix = get_speaker_availability_form_matrix(
-                sessions=sp.camp.eventsessions.filter(
-                    event_type__in=sp.eventtypes.all(),
+                sessions=sp.camp.event_sessions.filter(
+                    event_type__in=sp.event_types.all(),
                 )
             )
 
@@ -862,22 +951,26 @@ class Command(BaseCommand):
             # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
-    def approve_speakerproposals(self, camp):
+    def approve_speaker_proposals(self, camp):
         """ Approve all keynotes but reject 10% of other events """
-        for sp in camp.speakerproposals.filter(
-            eventproposals__event_type__name="Keynote"
+        for sp in camp.speaker_proposals.filter(
+            event_proposals__event_type__name="Keynote"
         ):
             sp.mark_as_approved()
 
-        for sp in camp.speakerproposals.filter(proposal_status="pending"):
+        for sp in camp.speaker_proposals.filter(proposal_status="pending"):
             # we do not approve all speakers
-            if random.randint(1, 100) < 90:
+            x = random.randint(1, 100)
+            if x < 90:
                 sp.mark_as_approved()
+            elif x < 95:
+                # leave this as pending
+                continue
             else:
                 sp.mark_as_rejected()
 
-    def approve_eventproposals(self, camp):
-        for ep in camp.eventproposals.filter(proposal_status="pending"):
+    def approve_event_proposals(self, camp):
+        for ep in camp.event_proposals.filter(proposal_status="pending"):
             # are all speakers for this event approved?
             for sp in ep.speakers.all():
                 if not hasattr(sp, "speaker"):
@@ -897,19 +990,24 @@ class Command(BaseCommand):
             event.save()
 
     def create_camp_scheduling(self, camp):
-        post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
         year = camp.camp.lower.year
-        self.output("Creating eventinstances for {}...".format(year))
+        self.output("Creating scheduling for {}...".format(year))
+
+        # create a lunchbreak daily in speakers tent
         lunch = Event.objects.get(track__camp=camp, title="Lunch break")
-        for day in camp.get_days("camp"):
+        for day in camp.get_days(camppart="camp")[1:-1]:
             date = day.lower.date()
-            # everything conveniently begins at noon
             start = tz.localize(datetime(date.year, date.month, date.day, 12, 0))
-            EventInstance.objects.create(
-                event=lunch,
-                location=camp.eventlocations.get(name="Speakers Tent"),
-                when=(start, start + timedelta(hours=1),),
+            lunchslot = EventSlot.objects.get(
+                event_session__event_location=camp.event_locations.get(
+                    name="Speakers Tent"
+                ),
+                event_session__event_type=EventType.objects.get(name="Recreational"),
+                when=(start, start + timedelta(hours=1)),
             )
+            lunchslot.event = lunch
+            lunchslot.autoscheduled = False
+            lunchslot.save()
 
         # exercise the autoscheduler a bit
         scheduler = AutoScheduler(camp=camp)
@@ -925,11 +1023,28 @@ class Command(BaseCommand):
             f"Done running autoscheduler for {year}... It took {scheduleduration}"
         )
 
-    def create_camp_rescheduling(self, camp):
-        post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
+    def create_camp_speaker_event_conflicts(self, camp):
         year = camp.camp.lower.year
-        # reapprove all speakerproposals so the new availability takes effect
-        for prop in camp.speakerproposals.filter(proposal_status="approved"):
+        self.output(
+            "Generating event_conflicts for SpeakerProposals for {}...".format(year)
+        )
+        # loop over all
+        for sp in camp.speaker_proposals.all():
+            # not all speakers add conflicts
+            if random.choice([True, True, False]):
+                # pick 0-10 events this speaker wants to attend
+                conflictcount = random.randint(0, 10)
+                sp.event_conflicts.set(
+                    Event.objects.filter(
+                        track__camp=camp,
+                        event_type__support_speaker_event_conflicts=True,
+                    ).order_by("?")[0:conflictcount]
+                )
+
+    def create_camp_rescheduling(self, camp):
+        year = camp.camp.lower.year
+        # reapprove all speaker_proposals so the new availability takes effect
+        for prop in camp.speaker_proposals.filter(proposal_status="approved"):
             prop.mark_as_approved()
         # exercise the autoscheduler a bit
         self.output("Rescheduling {}...".format(year))
@@ -1428,6 +1543,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start = timezone.now()
+        print("\n")
+        self.output("----------[ Running bootstrap-devsite ]----------")
         self.output("----------[ Global stuff ]----------")
 
         camps = self.create_camps()
@@ -1437,6 +1554,8 @@ class Command(BaseCommand):
         self.create_news()
 
         event_types = self.create_event_types()
+
+        self.create_url_types()
 
         product_categories = self.create_product_categories()
 
@@ -1470,24 +1589,29 @@ class Command(BaseCommand):
 
                 self.create_camp_proposals(camp, event_types)
 
-                self.create_camp_eventsessions(camp, event_types, locations)
+                self.create_proposal_urls(camp)
+
+                self.create_camp_event_sessions(camp, event_types, locations)
 
                 self.generate_speaker_availability(camp)
 
                 try:
-                    self.approve_speakerproposals(camp)
+                    self.approve_speaker_proposals(camp)
                 except ValidationError:
                     self.output(
                         "Name collision, bad luck. Run 'manage.py flush' and run the bootstrap script again!"
                     )
                     sys.exit(1)
 
-                self.approve_eventproposals(camp)
+                self.approve_event_proposals(camp)
 
                 self.create_camp_scheduling(camp)
 
                 # shuffle it up - delete and create new random availability
                 self.generate_speaker_availability(camp)
+
+                # and create some speaker<>event conflicts
+                self.create_camp_speaker_event_conflicts(camp)
 
                 # recalculate the autoschedule
                 self.create_camp_rescheduling(camp)
@@ -1531,6 +1655,8 @@ class Command(BaseCommand):
                 self.output("Not creating anything for this year yet")
 
             camp.read_only = read_only
+            camp.call_for_participation_open = not read_only
+            camp.call_for_sponsors_open = not read_only
             camp.save()
 
         self.output("----------[ Finishing up ]----------")

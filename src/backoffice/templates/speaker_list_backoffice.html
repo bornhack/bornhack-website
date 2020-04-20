@@ -1,51 +1,18 @@
 {% extends 'program_base.html' %}
 
-{% block content %}
+{% block title %}
+Speaker List | Backoffice | {{ block.super }}
+{% endblock %}
 
+{% block content %}
 {% if speaker_list %}
 <div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">Speaker List - Backoffice</span>
-  </div>
+  <div class="panel-heading"><h3 class="panel-title">Speaker List - Backoffice</h3></div>
   <div class="panel-body">
-    <p class="lead">
-      An alphabetical list of all speakers, workshop hosts and other event anchors at {{ camp.title }}. Any changes made here will be reflected immediately on the live site!
-    </p>
+    <p><i>Speakers</i> are the result of approving a <i>SpeakerProposal</i>. This is an alphabetical list of all speakers, workshop hosts, artists and other event anchors at {{ camp.title }}. <b>Any changes made here will be reflected immediately on the live site!</b></p>
     <p><a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
-    <table class="table table-striped datatable">
-      <thead>
-      <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th class="text-center">Events</th>
-          <th>Actions</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for speaker in speaker_list %}
-      <tr>
-        <td><a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a></td>
-        <td>{{ speaker.email }}</td>
-        <td>
-          <ul class="list-group">
-            {% for event in speaker.events.all %}
-            <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item">
-              <i class="fas fa-{{ event.event_type.icon }} fa-lg fa-fw" style="color: {{ event.event_type.color }};"></i> {{ event.title }}<span class="badge">{{ event.instances.count }}</span>
-            </a>
-              {% endfor %}
-          </ul>
-        </td>
-        <td>
-          <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-            <a href="{% url 'backoffice:speaker_update' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-            <a href="{% url 'backoffice:speaker_delete' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-          </div>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    {% include "includes/speaker_list_table_backoffice.html" %}
+    <p><a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
 </div>
 {% else %}
 <p class="lead">No speakers found for {{ camp.title }}</p>

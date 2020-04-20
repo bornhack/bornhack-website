@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
-from program.models import EventLocation, EventType
 from psycopg2.extras import DateTimeTZRange
 from utils.models import CreatedUpdatedModel, UUIDModel
 
@@ -156,38 +155,6 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return "%s - %s" % (self.title, self.tagline)
 
     @property
-    def event_types(self):
-        """ Return all event types with at least one event in this camp """
-        return EventType.objects.filter(
-            event__instances__isnull=False, event__track__camp=self
-        ).distinct()
-
-    @property
-    def event_locations(self):
-        """ Return all event locations """
-        return EventLocation.objects.all()
-
-    @property
-    def eventproposals(self):
-        EventProposal = apps.get_model("program", "eventproposal")
-        return EventProposal.objects.filter(track__camp=self)
-
-    @property
-    def events(self):
-        Event = apps.get_model("program", "event")
-        return Event.objects.filter(track__camp=self)
-
-    @property
-    def event_sessions(self):
-        EventSession = apps.get_model("program", "eventsession")
-        return EventSession.objects.filter(camp=self)
-
-    @property
-    def event_instances(self):
-        EventInstance = apps.get_model("program", "eventinstance")
-        return EventInstance.objects.filter(event__track__camp=self)
-
-    @property
     def logo_small(self):
         return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
 
@@ -285,3 +252,33 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         Returns a list of DateTimeTZRanges representing the days during the buildup.
         """
         return self.get_days("teardown")
+
+    # convenience properties to access Camp-related stuff easily from the Camp object
+
+    @property
+    def event_types(self):
+        """ Return all event types with at least one event in this camp """
+        EventType = apps.get_model("program", "EventType")
+        return EventType.objects.filter(
+            events__isnull=False, event__track__camp=self
+        ).distinct()
+
+    @property
+    def event_proposals(self):
+        EventProposal = apps.get_model("program", "EventProposal")
+        return EventProposal.objects.filter(track__camp=self)
+
+    @property
+    def events(self):
+        Event = apps.get_model("program", "Event")
+        return Event.objects.filter(track__camp=self)
+
+    @property
+    def event_sessions(self):
+        EventSession = apps.get_model("program", "EventSession")
+        return EventSession.objects.filter(camp=self)
+
+    @property
+    def event_slots(self):
+        EventSlot = apps.get_model("program", "EventSlot")
+        return EventSlot.objects.filter(event_session__in=self.event_sessions.all())

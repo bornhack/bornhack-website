@@ -21,7 +21,7 @@
           <i class="fas fa-random fa-fw"></i> Show Schedule Diff
         </h4>
         <p class="list-group-item-text">
-          Show the differences between the published schedule and the similar draft schedule. Use this to predict what changes will happen if the draft schedule was applied now. This view takes a while to load.
+        Show the differences between the published schedule and the similar draft schedule. Use this to predict what schedule changes would happen if the draft schedule was applied now. <i>This view takes a while to load.</i>
         </p>
       </a>
       <a href="{% url 'backoffice:autoschedule_apply' camp_slug=camp.slug %}" class="list-group-item">
@@ -29,7 +29,7 @@
           <i class="fas fa-check fa-fw"></i> Apply Schedule
         </h4>
         <p class="list-group-item-text">
-          Apply the draft schedule by deleting existing EventInstances and creating new EventInstances to match the Slot/Event combinations in the draft schedule. It is prudent to check the validity and diff for the draft schedule before applying.
+          Apply the draft schedule by unscheduling any currently autoscheduled Events and scheduling new Events in EventSlots to match the Slot/Event combinations in the draft schedule. It is prudent to check the validity and diff for the draft schedule before applying!
         </p>
       </a>
       <a href="{% url 'backoffice:autoschedule_debug_event_slot_unavailability' camp_slug=camp.slug %}" class="list-group-item">
@@ -37,7 +37,7 @@
           <i class="fas fa-chess-board fa-fw"></i> Debug Event/Slot Unavailability
         </h4>
         <p class="list-group-item-text">
-          This debug view shows a matrix/table with all AutoScheduler Events on the Y axis and all AutoScheduler Slots on the X axis, and red/green table cells to indicate whether an event can be scheduled in that Slot.
+          This debug view shows a matrix/table with all AutoScheduler Events on the Y axis and all AutoScheduler Slots on the X axis, and red/green table cells to indicate whether an event can be scheduled in that Slot. <i>This view takes a while to load.</i>
         </p>
       </a>
       <a href="{% url 'backoffice:autoschedule_debug_event_conflicts' camp_slug=camp.slug %}" class="list-group-item">
@@ -45,7 +45,7 @@
           <i class="fas fa-chess-board fa-fw"></i> Debug Event Conflicts
         </h4>
         <p class="list-group-item-text">
-          This view shows a matrix/table with all Events on both axis, and red/green table cells to indicate conflicts between Events. Event conflicts can happen either because a Speaker on an Event is also a Speaker on other Events, or because of a SpeakerEventConflict.
+          This view shows a matrix/table with all Events on both axis, and red/green table cells to indicate conflicts between Events. Event conflicts can happen either because a Speaker on an Event is also a Speaker on other Events, or because of a SpeakerEventConflict, or because the events share one or more tags. <i>This view takes a while to load.</i>
         </p>
       </a>
     </div>

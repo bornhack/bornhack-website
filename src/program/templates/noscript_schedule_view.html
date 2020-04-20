@@ -17,22 +17,22 @@
   <tbody>
 
 
-  {% for instance in eventinstances %}
+  {% for slot in event_slots %}
 
-    {% ifchanged instance.when.lower.date %}
+    {% ifchanged slot.when.lower.date %}
       <tr>
-        <td colspan=4><strong>{{ instance.when.lower.date|date:"l Y-m-d" }}</strong></td>
+        <td colspan=4><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
       </tr>
     {% endifchanged %}
 
     <tr>
-      <td>{{ instance.when.lower|date:"H:i" }}-{{ instance.when.upper|date:"H:i" }}</td>
+      <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
       <td>
-        <i class="fas fa-video{% if not instance.event.video_recording %}-slash{% endif %}"></i>
-        <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=instance.event.slug %}">{{ instance.event.title }}</a>
+        <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
+        <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
       </td>
-      <td>{{ instance.location.name }}</td>
-      <td>{{ instance.event.event_type }}</td>
+      <td>{{ slot.location.name }}</td>
+      <td>{{ slot.event.event_type }}</td>
     </tr>
   {% endfor %}
   </tbody>

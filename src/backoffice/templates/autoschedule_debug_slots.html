@@ -2,7 +2,8 @@
 {% load bornhack %}
 
 {% block body %}
-<p class="lead">The following availability matrix has been generated for the Event/Slot combinations in AutoSchedule {{ object.id }}:</p>
+<p class="lead">The following availability matrix has been generated for the Event/Slot combinations in the AutoScheduler</p>
+<p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 <table class="table table-condensed table-bordered">
   <thead>
     <th>fedt nok</th>
@@ -25,13 +26,5 @@
     {% endfor %}
   </tbody>
 </table>
-
-<table class="table">
-  {% for autoevent, event in scheduler.autoevents|zip:scheduler.events.all %}
-  <tr>
-    <th>{{ event.title }}</th>
-    <td>{% for u in autoevent.unavailability %}{{ u }}<br>{% endfor %}</td>
-  </tr>
-  {% endfor %}
-</table>
+<p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 {% endblock body %}

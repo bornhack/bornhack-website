@@ -13,41 +13,41 @@
         </tr>
     </thead>
     <tbody>
-        {% for speakerproposal in speakerproposals %}
+        {% for speaker_proposal in speaker_proposals %}
         <tr>
-            <td><span class="h4">{{ speakerproposal.name }}</span></td>
-            <td><span class="h4">{{ speakerproposal.email }}</span></td>
+            <td><span class="h4">{{ speaker_proposal.name }}</span></td>
+            <td><span class="h4">{{ speaker_proposal.email }}</span></td>
             <td class="text-center">
-                {% if speakerproposal.eventproposals.all %}
-                    {% for ep in speakerproposal.eventproposals.all %}
-                        <a href="{% url 'program:eventproposal_detail' camp_slug=camp.slug pk=ep.uuid %}"><i class="fas fa-{{ ep.event_type.icon }} fa-lg" style="color: {{ ep.event_type.color }};" data-toggle="tooltip" title="{{ ep.title }} ({{ ep.event_type.name }})"></i></a>
+                {% if speaker_proposal.event_proposals.all %}
+                    {% for ep in speaker_proposal.event_proposals.all %}
+                        <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=ep.uuid %}"><i class="fas fa-{{ ep.event_type.icon }} fa-lg" style="color: {{ ep.event_type.color }};" data-toggle="tooltip" title="{{ ep.title }} ({{ ep.event_type.name }})"></i></a>
                     {% endfor %}
                 {% else %}
                     N/A
                 {% endif %}
             </td>
             <td class="text-center">
-                {% for url in speakerproposal.urls.all %}
-                    <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}"><i class="{{ url.urltype.icon }}"></i></a>
+                {% for url in speaker_proposal.urls.all %}
+                    <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}"><i class="{{ url.url_type.icon }}"></i></a>
                 {% empty %}
                     N/A
                 {% endfor %}
             </td>
-            <td><span class="badge">{{ speakerproposal.proposal_status }}</span></td>
+            <td><span class="badge text-success">{{ speaker_proposal.proposal_status }}</span></td>
             <td>
-              {% if speakerproposal.speaker %}
-              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speakerproposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+              {% if speaker_proposal.speaker %}
+              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
               {% else %}
               <i class="fas fa-times"></i>
               {% endif %}
             </td>
             {% if request.resolver_match.app_name == "program" %}
                 <td class="text-right">
-                    <a href="{% url 'program:speakerproposal_detail' camp_slug=camp.slug pk=speakerproposal.uuid %}" class="btn btn-primary btn-sm">
+                    <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm">
                         <i class="fas fa-eye"></i><span class="h5"> Details</span>
                     </a>
-                    {% if camp.call_for_participation_open and not camp.read_only and eventproposal and eventproposal.speakers.count > 1 %}
-                      <a href="{% url 'program:eventproposal_removeperson' camp_slug=camp.slug event_uuid=eventproposal.uuid speaker_uuid=speakerproposal.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Remove {{ eventproposal.event_type.host_title }}</span></a>
+                    {% if camp.call_for_participation_open and not camp.read_only and event_proposal and event_proposal.speakers.count > 1 %}
+                      <a href="{% url 'program:event_proposal_remove_person' camp_slug=camp.slug event_uuid=event_proposal.uuid speaker_uuid=speaker_proposal.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Remove {{ event_proposal.event_type.host_title }}</span></a>
                     {% endif %}
                 </td>
             {% endif %}
