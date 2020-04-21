@@ -28,6 +28,7 @@ from .email import (
 )
 from .forms import EventProposalForm, SpeakerProposalForm
 from .mixins import (
+    AvailabilityMatrixViewMixin,
     EnsureCFPOpenMixin,
     EnsureUserOwnsProposalMixin,
     EnsureWritableCampMixin,
@@ -36,11 +37,7 @@ from .mixins import (
     UrlViewMixin,
 )
 from .multiform import MultiModelForm
-from .utils import (
-    add_matrix_availability,
-    get_speaker_availability_form_matrix,
-    save_speaker_availability,
-)
+from .utils import get_speaker_availability_form_matrix, save_speaker_availability
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -232,7 +229,7 @@ class SpeakerProposalCreateView(
 
 class SpeakerProposalUpdateView(
     LoginRequiredMixin,
-    CampViewMixin,
+    AvailabilityMatrixViewMixin,
     EnsureWritableCampMixin,
     UserIsObjectOwnerMixin,
     EnsureCFPOpenMixin,
@@ -244,21 +241,6 @@ class SpeakerProposalUpdateView(
     template_name = "speaker_proposal_form.html"
     form_class = SpeakerProposalForm
 
-    def setup(self, *args, **kwargs):
-        """ Get speaker_availability matrix """
-        super().setup(*args, **kwargs)
-        self.speaker_proposal = self.get_object()
-        # get event_types for all event_proposals for this speaker_proposal
-        self.event_types = models.EventType.objects.filter(
-            event_proposals__in=self.speaker_proposal.event_proposals.all()
-        ).distinct()
-        # get the form field matrix for speaker availability
-        self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.event_sessions.filter(
-                event_type__in=self.event_types,
-            ).prefetch_related("event_type")
-        )
-
     def get_object(self, queryset=None):
         """ Prefetch availabilities for this SpeakerProposal """
         qs = self.model.objects.filter(pk=self.kwargs.get(self.pk_url_kwarg))
@@ -266,11 +248,17 @@ class SpeakerProposalUpdateView(
         return qs.get()
 
     def get_form_kwargs(self):
-        """ Set camp and event_type for the form """
+        """ Set camp, matrix and event_type for the form """
         kwargs = super().get_form_kwargs()
-        if len(self.event_types) == 1:
+
+        # get all event types this SpeakerProposal is involved in
+        all_event_types = models.EventType.objects.filter(
+            event_proposals__in=self.get_object().event_proposals.all()
+        ).distinct()
+
+        if len(all_event_types) == 1:
             # use the event_type to customise the speaker form
-            event_type = self.event_types[0]
+            event_type = all_event_types[0]
         else:
             # more than one event_type for this speaker, show a non-generic form
             event_type = None
@@ -279,36 +267,7 @@ class SpeakerProposalUpdateView(
         kwargs.update(
             {"camp": self.camp, "event_type": event_type, "matrix": self.matrix}
         )
-
         return kwargs
-
-    def get_initial(self, *args, **kwargs):
-        """ Populate the speaker_availability checkboxes """
-        initial = super().get_initial(*args, **kwargs)
-
-        # add availability info to the matrix
-        add_matrix_availability(self.matrix, self.get_object())
-
-        # add initial checkbox states
-        for date in self.matrix.keys():
-            # loop over daychunks and check if we need a checkbox
-            for daychunk in self.matrix[date].keys():
-                if not self.matrix[date][daychunk]:
-                    # we have no event_session here, carry on
-                    continue
-                if self.matrix[date][daychunk]["initial"] in [True, None]:
-                    initial[self.matrix[date][daychunk]["fieldname"]] = True
-                else:
-                    initial[self.matrix[date][daychunk]["fieldname"]] = False
-
-        # we are ready to render the form
-        return initial
-
-    def get_context_data(self, **kwargs):
-        """ Add matrix to template context """
-        context = super().get_context_data(**kwargs)
-        context["matrix"] = self.matrix
-        return context
 
     def form_valid(self, form):
         """ Change status and save availability """
@@ -386,29 +345,14 @@ class SpeakerProposalDeleteView(
 
 
 class SpeakerProposalDetailView(
-    LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView
+    LoginRequiredMixin,
+    AvailabilityMatrixViewMixin,
+    EnsureUserOwnsProposalMixin,
+    DetailView,
 ):
     model = models.SpeakerProposal
     template_name = "speaker_proposal_detail.html"
     context_object_name = "speaker_proposal"
-
-    def setup(self, *args, **kwargs):
-        """ Get the speaker availability matrix"""
-        super().setup(*args, **kwargs)
-        # get the form field matrix for speaker availability
-        self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.event_sessions.filter(
-                event_type__in=models.EventType.objects.filter(
-                    event_proposals__in=self.get_object().event_proposals.all()
-                ).distinct()
-            ).prefetch_related("event_type")
-        )
-        add_matrix_availability(self.matrix, self.get_object())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["matrix"] = self.matrix
-        return context
 
 
 ###################################################################
@@ -902,7 +846,8 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
                     initial["speaker_proposal"][
                         self.matrix[date][daychunk]["fieldname"]
                     ] = True
-                    self.matrix[date][daychunk]["initial"] = True
+                    # but we set the initial in the dict to None to indicate we have no info
+                    self.matrix[date][daychunk]["initial"] = None
         return initial
 
 

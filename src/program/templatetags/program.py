@@ -84,7 +84,7 @@ def availabilitytable(matrix, form=None):
                             tdicon = "question"
                             needsinfo = True
                             if form:
-                                popup += "<p>We have no existing records about this persons availability during this time slot. Please update availability information!</p>"
+                                popup += "<p>We have no existing records about this persons availability during this time slot. Please submit availability information!</p>"
                             else:
                                 popup += "<p>We have no existing records about this persons availability during this time slot.</p>"
 

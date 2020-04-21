@@ -941,13 +941,13 @@ class EventSession(CampRelatedModel):
         # get a set of DateTimeTZRange objects representing the EventSlots we have in DB
         db_slot_times = set(self.event_slots.all().values_list("when", flat=True))
 
-        # loop over and create missing slots
-        for slot in needed_slot_times.difference(db_slot_times):
-            self.event_slots.create(event_session=self, when=slot)
-
         # loop over and delete unneeded slots
         for slot in db_slot_times.difference(needed_slot_times):
             self.event_slots.get(when=slot).delete()
+
+        # loop over and create missing slots
+        for slot in needed_slot_times.difference(db_slot_times):
+            self.event_slots.create(event_session=self, when=slot)
 
     def scheduled_event_slots(self):
         return self.event_slots.filter(event__isnull=False)

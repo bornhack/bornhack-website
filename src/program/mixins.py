@@ -4,7 +4,10 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
-from program.utils import add_matrix_availability, get_speaker_availability_form_matrix
+from program.utils import (
+    add_existing_availability_to_matrix,
+    get_speaker_availability_form_matrix,
+)
 
 from . import models
 
@@ -146,24 +149,32 @@ class EventFeedbackViewMixin(EventViewMixin):
 
 
 class AvailabilityMatrixViewMixin(CampViewMixin):
-    """ Mixin with shared code between all availability matrix views """
+    """
+    Mixin with shared code between all availability matrix views,
+    meaning all views that show an availability matrix (form or not)
+    for a SpeakerProposal or Speaker object. Used by SpeakerProposal
+    submitters and in backoffice.
+    """
 
     def setup(self, *args, **kwargs):
         """ Get the availability matrix"""
         super().setup(*args, **kwargs)
+        # do we have an Event or an EventProposal?
         if hasattr(self.get_object(), "events"):
+            # we have an Event
             event_types = models.EventType.objects.filter(
                 events__in=self.get_object().events.all()
             ).distinct()
         else:
+            # we have an EventProposal
             event_types = models.EventType.objects.filter(
-                events__in=self.get_object().event_proposals.all()
+                event_proposals__in=self.get_object().event_proposals.all()
             ).distinct()
+        # get the matrix and add any existing availability to it
         self.matrix = get_speaker_availability_form_matrix(
             sessions=self.camp.event_sessions.filter(event_type__in=event_types)
         )
-        # add availability info to the matrix
-        add_matrix_availability(self.matrix, self.get_object())
+        add_existing_availability_to_matrix(self.matrix, self.get_object())
 
     def get_form_kwargs(self):
         """ Add the matrix to form kwargs, only used if the view has a form """

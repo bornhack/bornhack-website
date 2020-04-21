@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.db.models import Count, Q, Sum
 from django.forms import modelformset_factory
@@ -34,11 +34,7 @@ from program.models import (
     Speaker,
     SpeakerProposal,
 )
-from program.utils import (
-    add_matrix_availability,
-    get_speaker_availability_form_matrix,
-    save_speaker_availability,
-)
+from program.utils import save_speaker_availability
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
@@ -290,29 +286,8 @@ class SpeakerProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListVie
         return qs
 
 
-class SpeakerProposalAvailabilityMatrixMixin:
-    """ Shared between SpeakerProposal views """
-
-    def get_context_data(self, **kwargs):
-        """ Get the speaker availability matrix"""
-        context = super().get_context_data(**kwargs)
-        self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.event_sessions.filter(
-                event_type__in=EventType.objects.filter(
-                    event_proposals__in=self.get_object().event_proposals.all()
-                ).distinct()
-            )
-        )
-        add_matrix_availability(self.matrix, self.get_object())
-        context["matrix"] = self.matrix
-        return context
-
-
 class SpeakerProposalDetailView(
-    CampViewMixin,
-    SpeakerProposalAvailabilityMatrixMixin,
-    ContentTeamPermissionMixin,
-    DetailView,
+    AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, DetailView,
 ):
     """ This view permits Content Team members to see SpeakerProposal details """
 
@@ -327,27 +302,13 @@ class SpeakerProposalDetailView(
 
 
 class SpeakerProposalApproveRejectView(
-    SpeakerProposalAvailabilityMatrixMixin, ProposalApproveBaseView
+    AvailabilityMatrixViewMixin, ProposalApproveBaseView
 ):
     """ This view allows ContentTeam members to approve/reject SpeakerProposals """
 
     model = SpeakerProposal
     template_name = "speaker_proposal_approve_reject.html"
     context_object_name = "speaker_proposal"
-
-    def get_context_data(self, **kwargs):
-        """ Get the speaker availability matrix"""
-        context = super().get_context_data(**kwargs)
-        self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.event_sessions.filter(
-                event_type__in=EventType.objects.filter(
-                    event_proposals__in=self.get_object().event_proposals.all()
-                ).distinct()
-            )
-        )
-        add_matrix_availability(self.matrix, self.get_object())
-        context["matrix"] = self.matrix
-        return context
 
 
 class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
@@ -845,7 +806,7 @@ class EventSessionCreateView(
     """
 
     model = EventSession
-    fields = ["description", "when"]
+    fields = ["description", "when", "event_duration_minutes"]
     template_name = "event_session_form.html"
 
     def setup(self, *args, **kwargs):
@@ -905,22 +866,14 @@ class EventSessionUpdateView(
     """
 
     model = EventSession
-    fields = ["when", "description"]
+    fields = ["when", "description", "event_duration_minutes"]
     template_name = "event_session_form.html"
 
     def form_valid(self, form):
         """
-        Check for overlaps and save
+        Just save, we have a post_save signal which takes care of fixing EventSlots
         """
-        session = form.save(commit=False)
-        # check for overlaps with other sessions
-        try:
-            session.clean_when()
-        except ValidationError as E:
-            form.add_error("when", E)
-            return self.form_invalid(form)
-        # ok, save and redirect
-        session.save()
+        session = form.save()
         messages.success(self.request, f"{session} has been updated successfully!")
         return redirect(
             reverse(

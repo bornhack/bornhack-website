@@ -134,7 +134,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
 
-        elif event_type.name == "Talk":
+        elif event_type.name == "Talk" or event_type.name == "Keynote":
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
             self.fields[

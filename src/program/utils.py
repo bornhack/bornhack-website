@@ -6,6 +6,7 @@ from datetime import timedelta
 import pytz
 from django.apps import apps
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from psycopg2.extras import DateTimeTZRange
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -216,12 +217,13 @@ def save_speaker_availability(form, obj):
         )
 
 
-def add_matrix_availability(matrix, speaker_proposal):
+def add_existing_availability_to_matrix(matrix, speaker_proposal):
     """
     Loops over the matrix and adds an "intial" member to the daychunk dicts
     with the availability info for the speaker_proposal.
     This is used to populate initial form field values and to set <td> background
     colours in the html table.
+    speaker_proposal can be either a SpeakerProposal object or a Speaker object.
     """
     # loop over dates in the matrix
     for date in matrix.keys():
@@ -230,11 +232,15 @@ def add_matrix_availability(matrix, speaker_proposal):
             if not matrix[date][daychunk]:
                 # we have no event_session here, carry on
                 continue
-            if speaker_proposal.availabilities.filter(when__contains=daychunk).exists():
+            # do we have any availability info for this speakerproposal?
+            try:
                 availability = speaker_proposal.availabilities.get(
                     when__contains=daychunk
                 )
                 matrix[date][daychunk]["initial"] = availability.available
+            except ObjectDoesNotExist:
+                print(f"we have no availability for chunk {daychunk}")
+                matrix[date][daychunk]["initial"] = None
 
 
 def get_slots(period, duration, bounds="()"):
