@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import F, Q
@@ -17,8 +17,14 @@ from django.urls import reverse, reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from psycopg2.extras import DateTimeTZRange
+from taggit.managers import TaggableManager
 from utils.database import CastToInteger
-from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+from utils.models import (
+    CampRelatedModel,
+    CreatedUpdatedModel,
+    UUIDModel,
+    UUIDTaggedItem,
+)
 
 from .email import (
     add_event_proposal_accepted_email,
@@ -525,6 +531,8 @@ class EventProposal(UserSubmittedModel):
         help_text="Will you be using the provided speaker laptop?", default=True
     )
 
+    tags = TaggableManager(through=UUIDTaggedItem)
+
     @property
     def camp(self):
         return self.track.camp
@@ -572,13 +580,9 @@ class EventProposal(UserSubmittedModel):
         event.save()
         # loop through the speaker_proposals linked to this event_proposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
-            try:
-                event.speakers.add(sp.speaker)
-            except ObjectDoesNotExist:
-                # clean up
-                event.urls.clear()
-                event.delete()
+            if sp.proposal_status != "approved":
                 raise ValidationError("Not all speakers are approved or created yet.")
+            event.speakers.add(sp.speaker)
 
         self.proposal_status = event_proposalmodel.PROPOSAL_APPROVED
         self.save()
@@ -587,6 +591,9 @@ class EventProposal(UserSubmittedModel):
         event.urls.clear()
         for url in self.urls.all():
             Url.objects.create(url=url.url, url_type=url.url_type, event=event)
+
+        # set event tags
+        event.tags.add(*self.tags.names())
 
         if request:
             messages.success(
@@ -1147,6 +1154,8 @@ class Event(CampRelatedModel):
         default=0,
         help_text="The estimated demand for this event. Used by the autoscheduler to pick the optimal location for events. Set to 0 to disable demand constraints for this event.",
     )
+
+    tags = TaggableManager()
 
     class Meta:
         ordering = ["title"]

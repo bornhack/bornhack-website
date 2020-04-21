@@ -6,13 +6,14 @@
 {% block program_content %}
 
 <div class="row">
-
+<p class="lead">Schedule for {{ camp.title }}. All times are {{ event_slots.0.when.lower|date:"T" }}!</p>
 <table class="table">
   <thead>
     <th>When?</th>
     <th>What?</th>
     <th>Where?</th>
     <th>Type</th>
+    <th>Tags</th>
   </thead>
   <tbody>
 
@@ -25,14 +26,22 @@
       </tr>
     {% endifchanged %}
 
+
     <tr>
-      <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
+        <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
       <td>
         <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
         <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
       </td>
-      <td>{{ slot.location.name }}</td>
-      <td>{{ slot.event.event_type }}</td>
+      <td>{{ slot.event_location.icon_html }} {{ slot.event_location.name }}</td>
+      <td>{{ slot.event_type.icon_html }} {{ slot.event.event_type }}</td>
+      <td>
+        {% for tag in slot.event.tags.all %}
+        <span class="badge">{{ tag }}</span>
+        {% empty %}
+        N/A
+        {% endfor %}
+      </td>
     </tr>
   {% endfor %}
   </tbody>

@@ -375,13 +375,14 @@ class EventProposalTypeSelectView(
 
     model = models.EventType
     template_name = "event_type_select.html"
+    context_object_name = "event_type_list"
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, *args, **kwargs):
         """ Get the speaker_proposal object """
+        super().setup(*args, **kwargs)
         self.speaker = get_object_or_404(
             models.SpeakerProposal, pk=kwargs["speaker_uuid"]
         )
-        return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self, **kwargs):
         """ We only allow submissions of events with EventTypes where public=True """
@@ -544,15 +545,15 @@ class EventProposalCreateView(
     template_name = "event_proposal_form.html"
     form_class = EventProposalForm
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, *args, **kwargs):
         """ Get the speaker_proposal object """
+        super().setup(*args, **kwargs)
         self.speaker_proposal = get_object_or_404(
             models.SpeakerProposal, pk=self.kwargs["speaker_uuid"]
         )
         self.event_type = get_object_or_404(
             models.EventType, slug=self.kwargs["event_type_slug"]
         )
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         """ Make speaker_proposal object available in template """
@@ -570,8 +571,23 @@ class EventProposalCreateView(
         return kwargs
 
     def form_valid(self, form):
-        # set camp and user for this event_proposal
-        event_proposal = form.save(user=self.request.user, event_type=self.event_type)
+        """ set camp and user for this event_proposal, save slideurl """
+        event_proposal = form.save(commit=False)
+        event_proposal.user = self.request.user
+        event_proposal.event_type = self.event_type
+
+        # save or update slides url
+        slideurl = self.cleaned_data.get("slides_url")
+        if slideurl:
+            slides_url, created = models.Url.objects.get_or_create(
+                event_proposal=event_proposal,
+                url_type=models.UrlType.objects.get(name="Slides"),
+                defaults={"url": slideurl},
+            )
+
+        # save for real
+        event_proposal.save()
+        form.save_m2m()
 
         # add the speaker_proposal to the event_proposal
         event_proposal.speakers.add(self.speaker_proposal)
@@ -617,8 +633,21 @@ class EventProposalUpdateView(
 
     def form_valid(self, form):
         # set status to pending and save event_proposal
-        form.instance.proposal_status = models.EventProposal.PROPOSAL_PENDING
-        event_proposal = form.save()
+        event_proposal = form.save(commit=False)
+        event_proposal.proposal_status = models.EventProposal.PROPOSAL_PENDING
+
+        # save or update slides url
+        slideurl = self.cleaned_data.get("slides_url")
+        if slideurl:
+            slides_url, created = models.Url.objects.get_or_create(
+                event_proposal=event_proposal,
+                url_type=models.UrlType.objects.get(name="Slides"),
+                defaults={"url": slideurl},
+            )
+
+        # save for real
+        event_proposal.save()
+        form.save_m2m()
 
         # send email to content team
         if not add_event_proposal_updated_email(event_proposal):
@@ -727,7 +756,9 @@ class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListVi
         return super().get(request, *args, **kwargs)
 
 
-class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
+class CombinedProposalSubmitView(
+    LoginRequiredMixin, CampViewMixin, EnsureCFPOpenMixin, CreateView
+):
     """
     This view is used by users to submit CFP proposals.
     It allows the user to submit an EventProposal and a SpeakerProposal together.
@@ -775,12 +806,20 @@ class CombinedProposalSubmitView(LoginRequiredMixin, CampViewMixin, CreateView):
         save_speaker_availability(form["speaker_proposal"], speaker_proposal)
 
         # then save the event_proposal
-        event_proposal = form["event_proposal"].save(
-            user=self.request.user, event_type=self.event_type
-        )
+        event_proposal = form["event_proposal"].save(commit=False)
         event_proposal.user = self.request.user
         event_proposal.event_type = self.event_type
         event_proposal.save()
+        form["event_proposal"].save_m2m()
+
+        # save or update slides url
+        slideurl = form.cleaned_data.get("slides_url")
+        if slideurl:
+            slides_url, created = models.Url.objects.get_or_create(
+                event_proposal=event_proposal,
+                url_type=models.UrlType.objects.get(name="Slides"),
+                defaults={"url": slideurl},
+            )
 
         # add the speaker_proposal to the event_proposal
         event_proposal.speakers.add(speaker_proposal)
@@ -892,6 +931,7 @@ class EventListView(CampViewMixin, ListView):
             "track",
             "speakers",
             "event_slots__event_session__event_location",
+            "tags",
         )
         return qs
 

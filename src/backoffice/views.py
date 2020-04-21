@@ -319,7 +319,13 @@ class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related(
-            "user", "urls", "event", "event_type", "speakers__event_proposals", "track"
+            "user",
+            "urls",
+            "event",
+            "event_type",
+            "speakers__event_proposals",
+            "track",
+            "tags",
         )
         return qs
 
@@ -596,6 +602,7 @@ class EventListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
             "speakers__events",
             "event_type",
             "event_slots__event_session__event_location",
+            "tags",
         )
         return qs
 
@@ -611,7 +618,14 @@ class EventUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
     """ This view is used by the Content Team to update Event objects """
 
     model = Event
-    fields = ["title", "abstract", "video_recording", "duration_minutes", "demand"]
+    fields = [
+        "title",
+        "abstract",
+        "video_recording",
+        "duration_minutes",
+        "demand",
+        "tags",
+    ]
     template_name = "event_update.html"
 
     def get_success_url(self):

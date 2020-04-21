@@ -41,6 +41,16 @@
           <td>{{ event_proposal.duration }} minutes</td>
         </tr>
         <tr>
+          <th>Tags</th>
+          <td>
+            {% for tag in event_proposal.tags.all %}
+            <span class="badge">{{ tag }}</span>
+            {% empty %}
+            N/A
+            {% endfor %}
+          </td>
+        </tr>
+        <tr>
           <th>Use provided laptop?</th>
           <td>{{ event_proposal.use_provided_speaker_laptop|truefalseicon }}</td>
         </tr>

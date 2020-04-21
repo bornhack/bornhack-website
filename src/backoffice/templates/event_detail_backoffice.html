@@ -24,6 +24,16 @@
         <td>{{ event.track.name }}</td>
       </tr>
       <tr>
+        <th>Tags</th>
+        <td>
+          {% for tag in event.tags.all %}
+          <span class="badge">{{ tag }}</span>
+          {% empty %}
+          N/A
+          {% endfor %}
+        </td>
+      </tr>
+      <tr>
         <th>Video Recording</th>
         <td>{{ event.video_recording|truefalseicon }}</td>
       </tr>

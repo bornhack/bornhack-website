@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     "reversion",
     "leaflet",
     "oauth2_provider",
+    "taggit",
 ]
 
 # MEDIA_URL = '/media/'

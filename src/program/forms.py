@@ -3,7 +3,7 @@ import logging
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-from .models import Event, EventProposal, EventTrack, SpeakerProposal, Url, UrlType
+from .models import Event, EventProposal, EventTrack, SpeakerProposal
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -257,6 +257,7 @@ class EventProposalForm(forms.ModelForm):
             "abstract",
             "allow_video_recording",
             "duration",
+            "tags",
             "slides_url",
             "submission_notes",
             "track",
@@ -276,31 +277,6 @@ class EventProposalForm(forms.ModelForm):
         # TODO: make sure the track is part of the current camp, needs camp as form kwarg to verify
         return track
 
-    def save(self, commit=True, user=None, event_type=None):
-        event_proposal = super().save(commit=False)
-        if user:
-            event_proposal.user = user
-        if event_type:
-            event_proposal.event_type = event_type
-        event_proposal.save()
-
-        if not event_type and hasattr(event_proposal, "event_type"):
-            event_type = event_proposal.event_type
-
-        if self.cleaned_data.get("slides_url") and event_type.name in [
-            "Talk",
-            "Lightning Talk",
-        ]:
-            url = self.cleaned_data.get("slides_url")
-            if not event_proposal.urls.filter(url=url).exists():
-                slides_url = Url()
-                slides_url.event_proposal = event_proposal
-                slides_url.url = url
-                slides_url.url_type = UrlType.objects.get(name="Slides")
-                slides_url.save()
-
-        return event_proposal
-
     def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         # initialise form
         super().__init__(*args, **kwargs)
@@ -309,7 +285,7 @@ class EventProposalForm(forms.ModelForm):
         LIGHTNING_TALK = "Lightning Talk"
         DEBATE = "Debate"
         MUSIC_ACT = "Music Act"
-        RECREATIONAL_EVENT = "Recreational Event"
+        RECREATIONAL_EVENT = "Recreational"
         WORKSHOP = "Workshop"
         SLACKING_OFF = "Slacking Off"
         MEETUP = "Meetup"
@@ -339,7 +315,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = "The description of this debate"
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Debate Act Notes"
+            self.fields["submission_notes"].label = "Debate Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this debate. Only visible to yourself and the BornHack organisers."

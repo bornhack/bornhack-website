@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
+from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -111,3 +112,11 @@ class OutgoingEmail(CreatedUpdatedModel):
                     "recipient": "either to_recipient, bcc_recipient or cc_recipient required."
                 }
             )
+
+
+class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
+    """ Allows us to tag models with a UUID pk, use with TaggableManager(through=UUIDTaggedItem) """
+
+    class Meta:
+        verbose_name = "Tag"
+        verbose_name_plural = "Tags"

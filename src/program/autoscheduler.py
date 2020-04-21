@@ -101,7 +101,7 @@ class AutoScheduler:
                 resources.Event(
                     name=event.id,
                     duration=event.duration_minutes,
-                    tags=[],
+                    tags=event.tags.names(),
                     demand=event.demand,
                 )
             )

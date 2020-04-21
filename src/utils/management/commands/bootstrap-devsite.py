@@ -879,7 +879,21 @@ class Command(BaseCommand):
             track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["keynote"],
         )
+
+        tags = [
+            "infosec",
+            "hardware",
+            "politics",
+            "django",
+            "development",
+            "games",
+            "privacy",
+            "vampires",
+            "linux",
+        ]
+
         for ep in talkproposals + workshopproposals + keynoteproposals:
+            # create a speakerproposal for this EventProposal
             sp = SpeakerProposalFactory(camp=camp, user=ep.user)
             ep.speakers.add(sp)
             # 20% chance we add an extra speaker
@@ -891,6 +905,11 @@ class Command(BaseCommand):
                 if other_speakers.exists():
                     # add an extra speaker
                     ep.speakers.add(random.choice(other_speakers))
+
+            # add tags for 2 out of 3 events
+            if random.choice([True, True, False]):
+                # add 1-3 tags for this EP
+                ep.tags.add(*random.sample(tags, k=random.randint(1, 3)))
 
         EventProposal.objects.create(
             user=random.choice(User.objects.all()),

@@ -6,6 +6,7 @@
       <tr>
         <th>Event Main Title</th>
         <th>Event Type</th>
+        <th class="text-center">Tags</th>
         <th>Speakers</th>
         <th><i class="fas fa-video"></i></th>
         <th>Scheduled</th>
@@ -22,6 +23,13 @@
         <td>
           <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>
           </a>
+        </td>
+        <td class="text-center">
+          {% for tag in event.tags.all %}
+          <span class="badge">{{ tag }}</span><br>
+          {% empty %}
+          N/A
+          {% endfor %}
         </td>
         <td>
           {% for speaker in event.speakers.all %}

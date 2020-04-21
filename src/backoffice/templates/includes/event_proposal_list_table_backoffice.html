@@ -4,6 +4,7 @@
           <th>Title</th>
           <th>Status</th>
           <th>Type</th>
+          <th>Tags</th>
           <th>Speaker Proposals</th>
           <th>Event?</th>
           <th>User</th>
@@ -16,6 +17,13 @@
           <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.pk %}">{{ proposal.title }}</a></td>
           <td><span class="badge">{{ proposal.proposal_status }}</span></td>
           <td><i class="fas fa-{{ proposal.event_type.icon }} fa-lg" style="color: {{ proposal.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=proposal.event_type.slug %}">{{ proposal.event_type }}</a></td>
+        <td>
+          {% for tag in proposal.tags.all %}
+          <span class="badge">{{ tag }}</span><br>
+          {% empty %}
+          N/A
+          {% endfor %}
+        </td>
         <td>
           {% if proposal.speakers.exists %}
           <ul class="list-group">

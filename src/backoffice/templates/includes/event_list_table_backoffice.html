@@ -3,6 +3,7 @@
     <tr>
         <th>Title</th>
         <th>Event Type</th>
+        <th>Tags</th>
         {% if not nopeople %}<th>People</th>{% endif %}
         {% if not noschedule %}<th>Scheduled</th>{% endif %}
         {% if not noactions %}<th>Actions</th>{% endif %}
@@ -13,6 +14,13 @@
     <tr>
         <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
       <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event.event_type.slug %}">{{ event.event_type }}</a></td>
+      <td>
+        {% for tag in event.tags.all %}
+        <span class="badge">{{ tag }}</span><br>
+        {% empty %}
+        N/A
+        {% endfor %}
+      </td>
       {% if not nopeople %}
       <td>
         {% for speaker in event.speakers.all %}
