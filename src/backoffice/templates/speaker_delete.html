@@ -7,7 +7,7 @@
     <h2 class="panel-title">Delete Speaker {{ object.name }}?</h2>
   </div>
   <div class="panel-body">
-    <p class="lead">Deleting a Speaker object will remove the person from all Events, scheduled or not. The change will immediately take effect on the live site. Related Events and EventInstances will not be affected. The speaker can later be recreated by re-approving the SpeakerProposal if needed.</p>
+    <p class="lead">Deleting a Speaker object will remove the person from all Events, scheduled or not. The change will immediately take effect on the live site. The speaker can later be recreated by re-approving the SpeakerProposal if needed.</p>
     <form method="POST">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Delete Speaker</button>

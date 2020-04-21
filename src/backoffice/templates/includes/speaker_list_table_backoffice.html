@@ -5,7 +5,7 @@
           <th>Email</th>
           <th>User</th>
           <th>Proposal</th>
-          <th>Conflicts</th>
+          <th class="text-center">Event Conflicts</th>
           <th class="text-center">Events</th>
           {% if not noactions %}<th>Actions</th>{% endif %}
        </tr>
@@ -17,7 +17,7 @@
         <td>{{ speaker.email }}</td>
         <td>{{ speaker.proposal.user }}</td>
         <td><a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.proposal.pk %}" class="btn btn-default"><i class="fas fa-search"></i> Show</a></td>
-        <td>{{ speaker.event_conflicts.count }}</td>
+        <td class="text-center"><span class="badge">{{ speaker.event_conflicts.count }}</span></td>
         <td>
           {% if speaker.events.all %}
           <ul class="list-group">

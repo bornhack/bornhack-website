@@ -301,9 +301,7 @@ class SpeakerProposalDetailView(
         return qs
 
 
-class SpeakerProposalApproveRejectView(
-    AvailabilityMatrixViewMixin, ProposalApproveBaseView
-):
+class SpeakerProposalApproveRejectView(ProposalApproveBaseView):
     """ This view allows ContentTeam members to approve/reject SpeakerProposals """
 
     model = SpeakerProposal
@@ -340,23 +338,6 @@ class EventProposalApproveRejectView(ProposalApproveBaseView):
     model = EventProposal
     template_name = "event_proposal_approve_reject.html"
     context_object_name = "event_proposal"
-
-    def get(self, *args, **kwargs):
-        """ Show a warning if some speakers are not approved """
-        if self.get_object().speakers.exclude(proposal_status="approved").exists():
-            messages.warning(
-                self.request,
-                "NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.",
-            )
-            self.approve = False
-        else:
-            self.approve = True
-        return super().get(*args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context["approve"] = self.approve
-        return context
 
 
 ################################
@@ -429,8 +410,6 @@ class SpeakerDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
         # delete related objects first
         speaker.availabilities.all().delete()
         speaker.urls.all().delete()
-        if hasattr(speaker, "event_conflicts"):
-            speaker.event_conflicts.delete()
         return super().delete(*args, **kwargs)
 
     def get_success_url(self):
@@ -650,6 +629,7 @@ class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
     template_name = "event_delete.html"
 
     def delete(self, *args, **kwargs):
+        self.get_object().urls.all().delete()
         return super().delete(*args, **kwargs)
 
     def get_success_url(self):

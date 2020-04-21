@@ -47,7 +47,7 @@
             <tbody>
               {% for slot in session.event_slots.all %}
               <tr>
-                <td>{{ slot.when.lower }}</td>
+                <td><a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.when.lower }}</a></td>
                 <td>{{ slot.when.upper }}</td>
                 <td>
                   {% if slot.event %}

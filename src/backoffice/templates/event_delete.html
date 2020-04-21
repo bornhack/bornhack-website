@@ -12,7 +12,7 @@
     <form method="POST">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Delete it</button>
-      <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug pk=object.id %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=object.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back</a>
     </form>
   </div>
 </div>

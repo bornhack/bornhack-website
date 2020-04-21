@@ -299,7 +299,10 @@ class SpeakerProposalUpdateView(
             f"Changes to your proposal is now pending approval by the content team.",
         )
         return redirect(
-            reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse(
+                "program:speaker_proposal_detail",
+                kwargs={"camp_slug": self.camp.slug, "pk": speaker_proposal.pk},
+            )
         )
 
 
@@ -625,10 +628,14 @@ class EventProposalUpdateView(
 
         # message for the user and redirect
         messages.info(
-            self.request, "Your proposal is now pending approval by the content team."
+            self.request,
+            "Changes to your event proposal is now pending approval by the content team.",
         )
         return redirect(
-            reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse(
+                "program:event_proposal_detail",
+                kwargs={"camp_slug": self.camp.slug, "pk": event_proposal.pk},
+            )
         )
 
 

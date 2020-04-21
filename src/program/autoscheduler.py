@@ -130,8 +130,8 @@ class AutoScheduler:
                     "id", flat=True
                 )
                 for conflictevent in autoevents:
-                    # only the event with the lowest index gets the unavailability
                     if conflictevent.name in conflict_ids:
+                        # only the event with the lowest index gets the unavailability,
                         if autoevents.index(conflictevent) > autoevents.index(
                             autoevent
                         ):

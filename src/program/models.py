@@ -382,6 +382,7 @@ class SpeakerProposal(UserSubmittedModel):
     event_conflicts = models.ManyToManyField(
         "program.Event",
         related_name="speaker_proposal_conflicts",
+        blank=True,
         help_text="Pick the Events this person wishes to attend, and we will attempt to avoid scheduling conflicts.",
     )
 
@@ -600,6 +601,14 @@ class EventProposal(UserSubmittedModel):
         if request:
             messages.success(request, "EventProposal %s has been rejected" % self.title)
         add_event_proposal_rejected_email(self)
+
+    @property
+    def can_be_approved(self):
+        """ We cannot approve an EventProposal until all SpeakerProposals are approved """
+        if self.speakers.exclude(proposal_status="approved").exists():
+            return False
+        else:
+            return True
 
 
 ###############################################################################
