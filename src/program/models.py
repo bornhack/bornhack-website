@@ -1118,16 +1118,33 @@ class EventSlot(CampRelatedModel):
     @property
     def uuid(self):
         """
-        Returns a consistent UUID for this EventSlot.
+        Returns a consistent UUID for this EventSlot with this Event (if any).
+
         We want the UUID to be the same even if this EventSlot is deleted and replaced by
         another at the same start time and location, so it cannot be a regular UUIDField.
         We want the UUID to depend on event, location and start time, meaning if any of
         these change we consider it a "schedule change" and create a new UUID.
+
         We create the UUID from 32 hex digits, which are the unix timestamp of the starttime,
         the event id, and the location id, and the rest is padded with the event uuid as needed.
+
+        Examples:
+
+            # timestamp=1472374800 location_id=1 event_id=27 event_uuid=748316fa-78a5-4172-850b-341fc41ba2ba
+            In [1]: EventSlot.objects.filter(event__isnull=False).first().uuid
+            Out[1]: UUID('14723748-0012-7748-316f-a78a54172850')
+
+            # timestamp=147237840 location_id=3 event_id=0 event_uuid=00000000-0000-0000-0000-000000000000
+            In [2]: EventSlot.objects.filter(event__isnull=True).first().uuid
+            Out[2]: UUID('14723784-0030-0000-0000-000000000000')
         """
         # get starttime as unix timestamp, 10 bytes (until Sat, Nov. 20th 2286 at 18:46:40 CET)
         start_timestamp = int(self.when.lower.timestamp())
+
+        # get location_id
+        location_id = self.event_location.id  # 1-3? bytes
+
+        # do we have an event?
         if self.event:
             event_id = self.event.id  # 1-4? bytes
             event_uuid = str(self.event.uuid).replace("-", "")
@@ -1135,8 +1152,10 @@ class EventSlot(CampRelatedModel):
             event_id = 0
             event_uuid = "0" * 32
 
-        location_id = self.event_location.id  # 1-3? bytes
-        uuidbase = f"{start_timestamp}{event_id}{location_id}"
+        # put the start of the UUID together
+        uuidbase = f"{start_timestamp}{location_id}{event_id}"
+
+        # pad using event_uuid up to 32 hex chars and return
         return uuid.UUID(f"{uuidbase}{event_uuid[0:32-len(uuidbase)]}")
 
 
