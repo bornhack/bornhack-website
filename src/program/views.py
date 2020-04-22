@@ -1008,62 +1008,83 @@ class FrabXmlView(CampViewMixin, View):
     """
 
     def get(self, *args, **kwargs):
-        qs = models.EventInstance.objects.filter(event__track__camp=self.camp).order_by(
-            "when", "location"
+        # get all EventSlots with something scheduled
+        qs = (
+            models.EventSlot.objects.filter(event__track__camp=self.camp)
+            .prefetch_related(
+                "event__urls", "event__speakers", "event_session__event_location",
+            )
+            .order_by("when", "event_session__event_location")
         )
         E = objectify.ElementMaker(annotate=False)
         days = ()
         i = 0
+        # loop over days
         for day in self.camp.get_days("camp")[:-1]:
             i += 1
+            # build a tuple of locations
             locations = ()
+            # loop over locations
             for location in models.EventLocation.objects.filter(
-                id__in=qs.values_list("location_id", flat=True)
+                id__in=qs.filter(event__isnull=False).values_list(
+                    "event_session__event_location_id", flat=True
+                )
             ):
+                # build a tuple of scheduled events at this location
                 instances = ()
-                for instance in qs.filter(when__contained_by=day, location=location):
+                for slot in qs.filter(
+                    when__contained_by=day, event_session__event_location=location
+                ):
+                    # build a tuple of speakers for this event
                     speakers = ()
-                    for speaker in instance.event.speakers.all():
+                    for speaker in slot.event.speakers.all():
                         speakers += (E.person(speaker.name, id=str(speaker.pk)),)
+
+                    # build a tuple of URLs for this Event
                     urls = ()
-                    for url in instance.event.urls.all():
+                    for url in slot.event.urls.all():
                         urls += (E.link(url.url_type.name, href=url.url),)
+
+                    # add this event to the instances tuple
                     instances += (
                         E.event(
-                            E.date(instance.when.lower.isoformat()),
-                            E.start(instance.when.lower.time()),
-                            E.duration(instance.when.upper - instance.when.lower),
+                            E.date(slot.when.lower.isoformat()),
+                            E.start(slot.when.lower.time()),
+                            E.duration(slot.event.duration),
                             E.room(location.name),
-                            E.slug(f"{instance.pk}-{instance.event.slug}"),
+                            E.slug(f"{slot.pk}-{slot.event.slug}"),
                             E.url(
                                 self.request.build_absolute_uri(
-                                    instance.event.get_absolute_url()
+                                    slot.event.get_absolute_url()
                                 )
                             ),
                             E.recording(
                                 E.license("CC BY-SA 4.0"),
                                 E.optout(
-                                    "false"
-                                    if instance.event.video_recording
-                                    else "true"
+                                    "false" if slot.event.video_recording else "true"
                                 ),
                             ),
-                            E.title(instance.event.title),
+                            E.title(slot.event.title),
+                            # our Events have no subtitle
                             E.subtitle(""),
-                            E.track(instance.event.track),
-                            E.type(instance.event.event_type),
+                            E.track(slot.event.track),
+                            E.type(slot.event.event_type),
+                            # our Events have no language attribute but are mostly english
                             E.language("en"),
-                            E.abstract(instance.event.abstract),
+                            E.abstract(slot.event.abstract),
+                            # our Events have no long description
                             E.description(""),
                             E.persons(*speakers),
                             E.links(*urls),
                             E.attachments,
-                            id=str(instance.id),
-                            guid=str(instance.uuid),
+                            id=str(slot.id),
+                            guid=str(slot.uuid),
                         ),
                     )
-                if instances:
-                    locations += (E.room(*instances, name=location.name),)
+                # add the events for this location on this day to the locations tuple
+                locations += (E.room(*instances, name=location.name),)
+
+            # add this day to the days tuple
             days += (
                 E.day(
                     *locations,
@@ -1074,8 +1095,9 @@ class FrabXmlView(CampViewMixin, View):
                 ),
             )
 
+        # put the XML together
         xml = E.schedule(
-            E.version("BornHack Frab XML Generator v1.0"),
+            E.version("BornHack Frab XML Generator v2.0"),
             E.conference(
                 E.title(self.camp.title),
                 E.acronym(str(self.camp.camp.lower.year)),
