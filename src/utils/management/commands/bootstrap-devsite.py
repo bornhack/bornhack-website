@@ -1562,9 +1562,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start = timezone.now()
-        print("\n")
-        self.output("----------[ Running bootstrap-devsite ]----------")
-        self.output("----------[ Global stuff ]----------")
+        self.output(
+            self.style.SUCCESS("----------[ Running bootstrap-devsite ]----------")
+        )
+        self.output(self.style.SUCCESS("----------[ Global stuff ]----------"))
 
         camps = self.create_camps()
         self.create_event_routing_types()

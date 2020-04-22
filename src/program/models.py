@@ -14,6 +14,7 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.db.models import F, Q
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 from psycopg2.extras import DateTimeTZRange
@@ -1099,9 +1100,55 @@ class EventSlot(CampRelatedModel):
     def duration_minutes(self):
         return int(self.duration.total_seconds() // 60)
 
+    def get_ics_event(self):
+        if not self.event:
+            return False
+        ievent = icalendar.Event()
+        ievent["summary"] = self.event.title
+        ievent["description"] = self.event.abstract
+        ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
+        ievent["dtend"] = icalendar.vDatetime(
+            self.when.lower + self.event.duration
+        ).to_ical()
+        ievent["dtstamp"] = icalendar.vDatetime(timezone.now()).to_ical()
+        ievent["uid"] = self.uuid
+        ievent["location"] = icalendar.vText(self.event_location.name)
+        return ievent
+
+    @property
+    def uuid(self):
+        """
+        Returns a consistent UUID for this EventSlot.
+        We want the UUID to be the same even if this EventSlot is deleted and replaced by
+        another at the same start time and location, so it cannot be a regular UUIDField.
+        We want the UUID to depend on event, location and start time, meaning if any of
+        these change we consider it a "schedule change" and create a new UUID.
+        We create the UUID from 32 hex digits, which are the unix timestamp of the starttime,
+        the event id, and the location id, and the rest is padded with the event uuid as needed.
+        """
+        # get starttime as unix timestamp, 10 bytes (until Sat, Nov. 20th 2286 at 18:46:40 CET)
+        start_timestamp = int(self.when.lower.timestamp())
+        if self.event:
+            event_id = self.event.id  # 1-4? bytes
+            event_uuid = str(self.event.uuid).replace("-", "")
+        else:
+            event_id = 0
+            event_uuid = "0" * 32
+
+        location_id = self.event_location.id  # 1-3? bytes
+        uuidbase = f"{start_timestamp}{event_id}{location_id}"
+        return uuid.UUID(f"{uuidbase}{event_uuid[0:32-len(uuidbase)]}")
+
 
 class Event(CampRelatedModel):
     """ Something that is on the program one or more times. """
+
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        unique=True,
+        editable=False,
+        help_text="This field is not the PK of the model. It is used to create EventSlot UUID for FRAB and iCal and other calendaring purposes.",
+    )
 
     title = models.CharField(max_length=255, help_text="The title of this event")
 
@@ -1214,6 +1261,7 @@ class Event(CampRelatedModel):
 
         return data
 
+    @property
     def duration(self):
         return timedelta(minutes=self.duration_minutes)
 

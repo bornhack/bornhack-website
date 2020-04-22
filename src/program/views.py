@@ -48,31 +48,27 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class ICSView(CampViewMixin, View):
     def get(self, request, *args, **kwargs):
-        eventinstances = models.EventInstance.objects.filter(
-            event__track__camp=self.camp
-        )
-
+        query_kwargs = {}
         # Type query
         type_query = request.GET.get("type", None)
         if type_query:
             type_slugs = type_query.split(",")
-            types = models.EventType.objects.filter(slug__in=type_slugs)
-            eventinstances = eventinstances.filter(event__event_type__in=types)
+            query_kwargs["event__event_type__in"] = models.EventType.objects.filter(
+                slug__in=type_slugs
+            )
 
         # Location query
         location_query = request.GET.get("location", None)
         if location_query:
             location_slugs = location_query.split(",")
-            locations = models.EventLocation.objects.filter(
+            query_kwargs["location__in"] = models.EventLocation.objects.filter(
                 slug__in=location_slugs, camp=self.camp
             )
-            eventinstances = eventinstances.filter(location__in=locations)
 
         # Video recording query
         video_query = request.GET.get("video", None)
         if video_query:
             video_states = video_query.split(",")
-            query_kwargs = {}
 
             if "has-recording" in video_states:
                 query_kwargs["event__video_url__isnull"] = False
@@ -86,11 +82,15 @@ class ICSView(CampViewMixin, View):
                 else:
                     query_kwargs["event__video_recording"] = False
 
-            eventinstances = eventinstances.filter(**query_kwargs)
+        event_slots = models.EventSlot.objects.filter(
+            event__track__camp=self.camp, **query_kwargs,
+        ).prefetch_related("event", "event_session__event_location")
 
         cal = icalendar.Calendar()
-        for event_instance in eventinstances:
-            cal.add_component(event_instance.get_ics_event())
+        cal.add("prodid", "-//BornHack Website iCal Generator//bornhack.dk//")
+        cal.add("version", "2.0")
+        for slot in event_slots:
+            cal.add_component(slot.get_ics_event())
 
         response = HttpResponse(cal.to_ical())
         response["Content-Type"] = "text/calendar"
