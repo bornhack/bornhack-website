@@ -6,7 +6,7 @@
 <p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 <table class="table table-condensed table-bordered">
   <thead>
-    <th>fedt nok</th>
+    <th><br></th>
     {% for autoevent,event in scheduler.autoevents|zip:scheduler.events.all %}
     <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
     {% endfor %}
