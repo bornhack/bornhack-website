@@ -36,9 +36,9 @@ class AutoScheduleApplyForm(forms.Form):
 
 
 class EventScheduleForm(forms.Form):
-    """ The EventSlots are added in the view """
+    """ The EventSlots are added in the view and help_text is not visible, just define the field """
 
-    pass
+    slot = forms.ChoiceField()
 
 
 class SpeakerForm(forms.ModelForm):
