@@ -1134,7 +1134,7 @@ class EventSlot(CampRelatedModel):
             In [1]: EventSlot.objects.filter(event__isnull=False).first().uuid
             Out[1]: UUID('14723748-0012-7748-316f-a78a54172850')
 
-            # timestamp=147237840 location_id=3 event_id=0 event_uuid=00000000-0000-0000-0000-000000000000
+            # timestamp=1472378400 location_id=3 event_id=0 event_uuid=00000000-0000-0000-0000-000000000000
             In [2]: EventSlot.objects.filter(event__isnull=True).first().uuid
             Out[2]: UUID('14723784-0030-0000-0000-000000000000')
         """
