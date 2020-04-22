@@ -8,7 +8,7 @@
   <div class="panel-body">
     <p>The AutoScheduler needs a list of <i>AutoScheduler Slots</i> and a list of <i>AutoScheduler Events</i> to do its thing.</p>
     <p>We create one <i>AutoScheduler Slot</i> for each <i>EventSlot</i> in all <i>EventSessions</i> for the AutoScheduler-enabled <i>EventTypes</i>.</p>
-    <p>We create one <i>AutoScheduler Event</i> Event for each <i>EventType</i> which support autoscheduling, exluding any Events which have been scheduled manually.</p>
+    <p>We create one <i>AutoScheduler Event</i> for each <i>EventType</i> which support autoscheduling, excluding any Events which have been scheduled manually.</p>
     <p>All scheduling constraints are attached to <i>AutoScheduler Events</i>, and they come from many sources:
       <ul>
         <li><b>Slot Conflicts</b>: If a Slot is unavailable because something else has been scheduled in it the Slot is removed and not considered by the AutoScheduler. The same applies if something has been scheduled in a slot in a conflicting EventLocation.</li>
