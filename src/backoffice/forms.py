@@ -53,23 +53,27 @@ class SpeakerForm(forms.ModelForm):
 
     def __init__(self, matrix={}, *args, **kwargs):
         """
-        initialise the form and adapt based on event_type
+        initialise the form and add availability fields to form
         """
         super().__init__(*args, **kwargs)
 
-        if matrix:
-            # add speaker availability fields
-            for date in matrix.keys():
-                # do we need a column for this day?
-                if matrix[date]:
-                    # loop over the daychunks for this day
-                    for daychunk in matrix[date]:
-                        if matrix[date][daychunk]:
-                            # add the field
-                            self.fields[
-                                matrix[date][daychunk]["fieldname"]
-                            ] = forms.BooleanField(required=False)
-                            # add it to Meta.fields too
-                            self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
-        else:
-            print("no matrix")
+        # do we have a matrix to work with?
+        if not matrix:
+            return
+        # add speaker availability fields
+        for date in matrix.keys():
+            # do we need a column for this day?
+            if not matrix[date]:
+                # nothing on this day, skip it
+                continue
+            # loop over the daychunks for this day
+            for daychunk in matrix[date]:
+                if not matrix[date][daychunk]:
+                    # no checkbox needed for this daychunk
+                    continue
+                # add the field
+                self.fields[matrix[date][daychunk]["fieldname"]] = forms.BooleanField(
+                    required=False
+                )
+                # add it to Meta.fields too
+                self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
