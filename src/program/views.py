@@ -964,30 +964,24 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 class ScheduleView(CampViewMixin, TemplateView):
     template_name = "schedule_overview.html"
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, *args, **kwargs):
         """
         If no events are scheduled redirect to the event page
         """
-        response = super().dispatch(request, *args, **kwargs)
+        super().setup(*args, **kwargs)
 
-        events_exist = models.EventInstance.objects.filter(
-            event__track__camp=self.camp
-        ).exists()
+        # we redirect to the list of events if we dont show the schedule
+        event_list_url = reverse(
+            "program:event_index", kwargs={"camp_slug": self.camp.slug}
+        )
 
-        redirect_to_event_list = False
+        # do we have a schedule to show?
+        if not self.camp.event_slots.filter(event__isnull=False).exists():
+            raise RedirectException(event_list_url)
 
-        if not events_exist:
-            redirect_to_event_list = True
-
-        if not self.camp.show_schedule and not request.user.is_superuser:
-            redirect_to_event_list = True
-
-        if redirect_to_event_list:
-            return redirect(
-                reverse("program:event_index", kwargs={"camp_slug": self.camp.slug})
-            )
-
-        return response
+        # if camp.show_schedule is False we only show it to superusers
+        if not self.camp.show_schedule and not self.request.user.is_superuser:
+            raise RedirectException(event_list_url)
 
     def get_context_data(self, *args, **kwargs):
         context = super(ScheduleView, self).get_context_data(**kwargs)
