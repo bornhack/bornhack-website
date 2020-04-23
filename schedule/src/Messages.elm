@@ -1,12 +1,9 @@
 module Messages exposing (Msg(..))
 
 -- Local modules
-
-import Models exposing (Day, EventInstance, FilterType)
-
-
 -- External modules
 
+import Models exposing (Day, EventInstance, FilterType)
 import Navigation exposing (Location)
 
 

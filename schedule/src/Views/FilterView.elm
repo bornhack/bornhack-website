@@ -1,23 +1,17 @@
-module Views.FilterView exposing (filterSidebar, applyFilters, parseFilterFromQuery, filterToQuery, maybeFilteredOverviewRoute)
+module Views.FilterView exposing (applyFilters, filterSidebar, filterToQuery, maybeFilteredOverviewRoute, parseFilterFromQuery)
 
 -- Local modules
-
-import Messages exposing (Msg(..))
-import Models exposing (Model, EventInstance, Filter, Day, FilterQuery, Route(OverviewRoute, OverviewFilteredRoute), FilterType(..), unpackFilterType, getSlugFromFilterType)
-import Routing exposing (routeToString)
-
-
 -- Core modules
-
-import Regex
-
-
 -- External modules
 
-import Html exposing (Html, text, div, ul, li, span, i, h4, small, a)
-import Html.Attributes exposing (class, classList, style, href)
-import Html.Events exposing (onClick)
 import Date.Extra exposing (Interval(..), equalBy)
+import Html exposing (Html, a, div, h4, i, li, small, span, text, ul)
+import Html.Attributes exposing (class, classList, href, style)
+import Html.Events exposing (onClick)
+import Messages exposing (Msg(..))
+import Models exposing (Day, EventInstance, Filter, FilterQuery, FilterType(..), Model, Route(..), getSlugFromFilterType, unpackFilterType)
+import Regex
+import Routing exposing (routeToString)
 
 
 applyFilters : Day -> Model -> List EventInstance
@@ -27,6 +21,7 @@ applyFilters day model =
             List.map getSlugFromFilterType
                 (if List.isEmpty filters then
                     default
+
                  else
                     filters
                 )
@@ -46,8 +41,8 @@ applyFilters day model =
         filteredEventInstances =
             List.filter
                 (\eventInstance ->
-                    (Date.Extra.equalBy Month eventInstance.from day.date)
-                        && (Date.Extra.equalBy Date.Extra.Day eventInstance.from day.date)
+                    Date.Extra.equalBy Month eventInstance.from day.date
+                        && Date.Extra.equalBy Date.Extra.Day eventInstance.from day.date
                         && List.member eventInstance.location locations
                         && List.member eventInstance.eventType types
                         && List.member eventInstance.eventTrack tracks
@@ -55,7 +50,7 @@ applyFilters day model =
                 )
                 model.eventInstances
     in
-        filteredEventInstances
+    filteredEventInstances
 
 
 filterSidebar : Model -> Html Msg
@@ -112,17 +107,17 @@ icsButton model =
         icsURL =
             model.flags.ics_button_href ++ filterString
     in
-        a
-            [ classList
-                [ ( "btn", True )
-                , ( "btn-default", True )
-                ]
-            , href <| icsURL
+    a
+        [ classList
+            [ ( "btn", True )
+            , ( "btn-default", True )
             ]
-            [ i [ classList [ ( "fa", True ), ( "fa-calendar", True ) ] ]
-                []
-            , text " ICS file with these filters"
-            ]
+        , href <| icsURL
+        ]
+        [ i [ classList [ ( "fa", True ), ( "fa-calendar", True ) ] ]
+            []
+        , text " ICS file with these filters"
+        ]
 
 
 videoRecordingFilters : List FilterType
@@ -182,17 +177,16 @@ filterChoiceView filter currentFilters eventInstances slugLike =
         buttonStyle =
             case filter of
                 TypeFilter _ _ color lightText ->
-                    [ style
-                        [ ( "backgroundColor", color )
-                        , ( "color"
-                          , if lightText then
-                                "#fff"
-                            else
-                                "#000"
-                          )
-                        , ( "border", "1px solid black" )
-                        , ( "margin-bottom", "2px" )
-                        ]
+                    [ style "backgroundColor" color
+                    , style "color"
+                        (if lightText then
+                            "#fff"
+
+                         else
+                            "#000"
+                        )
+                    , style "border" "1px solid black"
+                    , style "margin-bottom" "2px"
                     ]
 
                 _ ->
@@ -232,50 +226,50 @@ filterChoiceView filter currentFilters eventInstances slugLike =
                                 _ ->
                                     ""
                     in
-                        [ i
-                            [ classList
-                                [ ( "fa", True )
-                                , ( "fa-" ++ icon, True )
-                                , ( "pull-right", True )
-                                ]
+                    [ i
+                        [ classList
+                            [ ( "fa", True )
+                            , ( "fa-" ++ icon, True )
+                            , ( "pull-right", True )
                             ]
-                            []
                         ]
+                        []
+                    ]
 
                 _ ->
                     []
     in
-        li
-            []
-            [ div
-                ([ classList
-                    [ ( "btn", True )
-                    , ( "btn-default", True )
-                    , ( "filter-choice-active", active )
-                    ]
-                 , onClick (ToggleFilter filter)
-                 ]
-                    ++ buttonStyle
-                )
-                [ span []
-                    ([ span [ classList [ ( "pull-left", True ) ] ]
-                        [ i
-                            [ classList
-                                [ ( "fa", True )
-                                , ( "fa-minus", active )
-                                , ( "fa-plus", notActive )
-                                ]
-                            ]
-                            []
-                        , text (" " ++ name)
-                        , small [] [ text <| " (" ++ (toString eventInstanceCount) ++ ")" ]
-                        ]
-                     ]
-                        ++ locationIcon
-                        ++ videoIcon
-                    )
+    li
+        []
+        [ div
+            ([ classList
+                [ ( "btn", True )
+                , ( "btn-default", True )
+                , ( "filter-choice-active", active )
                 ]
+             , onClick (ToggleFilter filter)
+             ]
+                ++ buttonStyle
+            )
+            [ span []
+                ([ span [ classList [ ( "pull-left", True ) ] ]
+                    [ i
+                        [ classList
+                            [ ( "fa", True )
+                            , ( "fa-minus", active )
+                            , ( "fa-plus", notActive )
+                            ]
+                        ]
+                        []
+                    , text (" " ++ name)
+                    , small [] [ text <| " (" ++ String.fromInt eventInstanceCount ++ ")" ]
+                    ]
+                 ]
+                    ++ locationIcon
+                    ++ videoIcon
+                )
             ]
+        ]
 
 
 findFilter : List FilterType -> String -> Maybe FilterType
@@ -287,7 +281,7 @@ findFilter modelItems filterSlug =
                     ( _, slug ) =
                         unpackFilterType x
                 in
-                    slug == filterSlug
+                slug == filterSlug
             )
             modelItems
         )
@@ -307,7 +301,7 @@ getFilter filterType modelItems query =
         filterSlugs =
             String.split "," filterMatch
     in
-        List.filterMap (\x -> findFilter modelItems x) filterSlugs
+    List.filterMap (\x -> findFilter modelItems x) filterSlugs
 
 
 parseFilterFromQuery : FilterQuery -> Model -> Filter
@@ -325,11 +319,11 @@ parseFilterFromQuery query model =
         videoFilters =
             getFilter "video" videoRecordingFilters query
     in
-        { eventTypes = types
-        , eventLocations = locations
-        , eventTracks = tracks
-        , videoRecording = videoFilters
-        }
+    { eventTypes = types
+    , eventLocations = locations
+    , eventTracks = tracks
+    , videoRecording = videoFilters
+    }
 
 
 filterToString : Filter -> String
@@ -359,7 +353,7 @@ filterToString filter =
                 video ->
                     "video=" ++ video
     in
-        String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
+    String.join "&" (List.filter (\x -> x /= "") [ typePart, locationPart, videoPart ])
 
 
 filterToQuery : Filter -> FilterQuery
@@ -368,7 +362,7 @@ filterToQuery filter =
         result =
             filterToString filter
     in
-        routeToString <| OverviewFilteredRoute result
+    routeToString <| OverviewFilteredRoute result
 
 
 maybeFilteredOverviewRoute : Model -> Route

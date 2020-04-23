@@ -1,19 +1,16 @@
 module Main exposing (..)
 
 -- Local modules
-
-import Models exposing (..)
-import Routing exposing (parseLocation)
-import Update exposing (update)
-import Messages exposing (Msg(..))
-import WebSocketCalls exposing (sendInitMessage)
-import Views exposing (view)
-
-
 -- External modules
 
-import WebSocket exposing (listen)
+import Messages exposing (Msg(..))
+import Models exposing (..)
 import Navigation exposing (Location)
+import Routing exposing (parseLocation)
+import Update exposing (update)
+import Views exposing (view)
+import WebSocket exposing (listen)
+import WebSocketCalls exposing (sendInitMessage)
 
 
 main : Program Flags Model Msg
@@ -39,7 +36,9 @@ init flags location =
         model =
             Model [] [] [] [] [] [] [] flags emptyFilter location currentRoute False
     in
-        model ! [ sendInitMessage flags.camp_slug flags.websocket_server ]
+    ( model
+    , sendInitMessage flags.camp_slug flags.websocket_server
+    )
 
 
 

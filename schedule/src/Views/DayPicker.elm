@@ -1,23 +1,17 @@
 module Views.DayPicker exposing (..)
 
 -- Local modules
-
-import Models exposing (..)
-import Messages exposing (Msg(..))
-import Routing exposing (routeToString)
-import Views.FilterView exposing (maybeFilteredOverviewRoute)
-
-
 -- Core modules
-
-import Date exposing (Date)
-
-
 -- External modules
 
-import Html exposing (Html, text, a, div)
-import Html.Attributes exposing (class, classList, href, id)
+import Date exposing (Date)
 import Date.Extra
+import Html exposing (Html, a, div, text)
+import Html.Attributes exposing (class, classList, href, id)
+import Messages exposing (Msg(..))
+import Models exposing (..)
+import Routing exposing (routeToString)
+import Views.FilterView exposing (maybeFilteredOverviewRoute)
 
 
 dayPicker : Model -> Html Msg
@@ -39,28 +33,28 @@ dayPicker model =
                 Nothing ->
                     True
     in
-        div
-            [ classList
-                [ ( "row", True )
-                , ( "sticky", True )
+    div
+        [ classList
+            [ ( "row", True )
+            , ( "sticky", True )
+            ]
+        , id "daypicker"
+        ]
+        [ div [ id "schedule-days", class "btn-group" ]
+            ([ a
+                [ classList
+                    [ ( "btn", True )
+                    , ( "btn-default", not isAllDaysActive )
+                    , ( "btn-primary", isAllDaysActive )
+                    ]
+                , href <| routeToString <| maybeFilteredOverviewRoute model
                 ]
-            , id "daypicker"
-            ]
-            [ div [ id "schedule-days", class "btn-group" ]
-                ([ a
-                    [ classList
-                        [ ( "btn", True )
-                        , ( "btn-default", not isAllDaysActive )
-                        , ( "btn-primary", isAllDaysActive )
-                        ]
-                    , href <| routeToString <| maybeFilteredOverviewRoute model
-                    ]
-                    [ text "All Days"
-                    ]
-                 ]
-                    ++ (List.map (\day -> dayButton day activeDate) model.days)
-                )
-            ]
+                [ text "All Days"
+                ]
+             ]
+                ++ List.map (\day -> dayButton day activeDate) model.days
+            )
+        ]
 
 
 dayButton : Day -> Maybe Date -> Html Msg
@@ -74,13 +68,13 @@ dayButton day activeDate =
                 Nothing ->
                     False
     in
-        a
-            [ classList
-                [ ( "btn", True )
-                , ( "btn-default", not isActive )
-                , ( "btn-primary", isActive )
-                ]
-            , href <| routeToString <| DayRoute <| Date.Extra.toFormattedString "y-MM-dd" day.date
+    a
+        [ classList
+            [ ( "btn", True )
+            , ( "btn-default", not isActive )
+            , ( "btn-primary", isActive )
             ]
-            [ text day.day_name
-            ]
+        , href <| routeToString <| DayRoute <| Date.Extra.toFormattedString "y-MM-dd" day.date
+        ]
+        [ text day.day_name
+        ]

@@ -1,25 +1,19 @@
 module Views exposing (..)
 
 -- Local modules
+-- Core modules
+-- External modules
 
-import Models exposing (..)
+import Date exposing (Month(..))
+import Date.Extra
+import Html exposing (Attribute, Html, a, div, h4, hr, i, input, label, li, p, small, span, text, ul)
 import Messages exposing (Msg(..))
+import Models exposing (..)
 import Views.DayPicker exposing (dayPicker)
 import Views.DayView exposing (dayView)
 import Views.EventDetail exposing (eventDetailView)
-import Views.SpeakerDetail exposing (speakerDetailView)
 import Views.ScheduleOverview exposing (scheduleOverviewView)
-
-
--- Core modules
-
-import Date exposing (Month(..))
-
-
--- External modules
-
-import Html exposing (Html, Attribute, div, input, text, li, ul, a, h4, label, i, span, hr, small, p)
-import Date.Extra
+import Views.SpeakerDetail exposing (speakerDetailView)
 
 
 view : Model -> Html Msg
@@ -40,11 +34,11 @@ view model =
                         let
                             day =
                                 model.days
-                                    |> List.filter (\x -> (Date.Extra.toFormattedString "y-MM-dd" x.date) == dayIso)
+                                    |> List.filter (\x -> Date.Extra.toFormattedString "y-MM-dd" x.date == dayIso)
                                     |> List.head
                                     |> Maybe.withDefault (Day "" (Date.Extra.fromParts 1970 Jan 1 0 0 0 0) "")
                         in
-                            dayView day model
+                        dayView day model
 
                     EventRoute eventSlug ->
                         eventDetailView eventSlug model

@@ -1,14 +1,12 @@
 module Routing exposing (..)
 
 -- Local modules
-
-import Models exposing (Route(..))
-
-
 -- External modules
 
+import Models exposing (Route(..))
 import Navigation exposing (Location)
-import UrlParser exposing (Parser, (</>), oneOf, map, top, s, string, parseHash)
+import UrlParser exposing ((</>), Parser, map, oneOf, parseHash, s, string, top)
+
 
 
 {--
@@ -69,4 +67,4 @@ routeToString route =
                 NotFoundRoute ->
                     []
     in
-        "#/" ++ String.join "/" parts
+    "#/" ++ String.join "/" parts

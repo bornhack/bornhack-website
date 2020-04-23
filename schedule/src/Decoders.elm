@@ -1,21 +1,16 @@
 module Decoders exposing (..)
 
 -- Local modules
-
-import Models exposing (Day, Speaker, Event, EventInstance, Model, Flags, Filter, Route(..), FilterType(..))
-
-
 -- Core modules
-
-import Json.Decode exposing (int, string, float, list, bool, dict, Decoder, nullable)
-import Json.Decode.Pipeline exposing (decode, required, optional, hardcoded)
-import Date exposing (Date, Month(..))
-
-
 -- External modules
 
+import Date exposing (Date, Month(..))
 import Date.Extra
+import Json.Decode exposing (Decoder, bool, dict, float, int, list, nullable, string, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Models exposing (Day, Event, EventInstance, Filter, FilterType(..), Flags, Model, Route(..), Speaker)
 import Navigation exposing (Location)
+
 
 
 -- DECODERS
@@ -28,13 +23,13 @@ type alias WebSocketAction =
 
 webSocketActionDecoder : Decoder WebSocketAction
 webSocketActionDecoder =
-    decode WebSocketAction
+    succeed WebSocketAction
         |> required "action" string
 
 
 dayDecoder : Decoder Day
 dayDecoder =
-    decode Day
+    succeed Day
         |> required "day_name" string
         |> required "iso" dateDecoder
         |> required "repr" string
@@ -42,7 +37,7 @@ dayDecoder =
 
 speakerDecoder : Decoder Speaker
 speakerDecoder =
-    decode Speaker
+    succeed Speaker
         |> required "name" string
         |> required "slug" string
         |> required "biography" string
@@ -50,7 +45,7 @@ speakerDecoder =
 
 eventDecoder : Decoder Event
 eventDecoder =
-    decode Event
+    succeed Event
         |> required "title" string
         |> required "slug" string
         |> required "abstract" string
@@ -68,12 +63,12 @@ dateDecoder =
                 |> Date.Extra.fromIsoString
                 |> Maybe.withDefault (Date.Extra.fromParts 1970 Jan 1 0 0 0 0)
     in
-        Json.Decode.map unpacked string
+    Json.Decode.map unpacked string
 
 
 eventInstanceDecoder : Decoder EventInstance
 eventInstanceDecoder =
-    decode EventInstance
+    succeed EventInstance
         |> required "title" string
         |> required "slug" string
         |> required "id" int
@@ -95,7 +90,7 @@ eventInstanceDecoder =
 
 eventLocationDecoder : Decoder FilterType
 eventLocationDecoder =
-    decode LocationFilter
+    succeed LocationFilter
         |> required "name" string
         |> required "slug" string
         |> required "icon" string
@@ -103,7 +98,7 @@ eventLocationDecoder =
 
 eventTypeDecoder : Decoder FilterType
 eventTypeDecoder =
-    decode TypeFilter
+    succeed TypeFilter
         |> required "name" string
         |> required "slug" string
         |> required "color" string
@@ -112,14 +107,14 @@ eventTypeDecoder =
 
 eventTrackDecoder : Decoder FilterType
 eventTrackDecoder =
-    decode TrackFilter
+    succeed TrackFilter
         |> required "name" string
         |> required "slug" string
 
 
 initDataDecoder : Decoder (Flags -> Filter -> Location -> Route -> Bool -> Model)
 initDataDecoder =
-    decode Model
+    succeed Model
         |> required "days" (list dayDecoder)
         |> required "events" (list eventDecoder)
         |> required "event_instances" (list eventInstanceDecoder)

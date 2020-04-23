@@ -1,14 +1,11 @@
 module WebSocketCalls exposing (sendInitMessage)
 
 -- Internal modules
-
-import Messages exposing (Msg)
-
-
 -- External modules
 
-import WebSocket
 import Json.Encode
+import Messages exposing (Msg)
+import WebSocket
 
 
 sendInitMessage : String -> String -> Cmd Msg

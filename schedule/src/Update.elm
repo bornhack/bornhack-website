@@ -1,22 +1,16 @@
 module Update exposing (update)
 
 -- Local modules
-
-import Models exposing (Model, Route(..), Filter, FilterType(..))
-import Messages exposing (Msg(..))
-import Decoders exposing (webSocketActionDecoder, initDataDecoder, eventDecoder)
-import Routing exposing (parseLocation)
-import Views.FilterView exposing (parseFilterFromQuery, filterToQuery)
-
-
 -- Core modules
-
-import Json.Decode
-
-
 -- External modules
 
+import Decoders exposing (eventDecoder, initDataDecoder, webSocketActionDecoder)
+import Json.Decode
+import Messages exposing (Msg(..))
+import Models exposing (Filter, FilterType(..), Model, Route(..))
 import Navigation
+import Routing exposing (parseLocation)
+import Views.FilterView exposing (filterToQuery, parseFilterFromQuery)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -48,7 +42,9 @@ update msg model =
                 ( newModel_, _ ) =
                     update (OnLocationChange model.location) newModel
             in
-                newModel_ ! []
+            ( newModel_
+            , Cmd.none
+            )
 
         ToggleFilter filter ->
             let
@@ -62,52 +58,56 @@ update msg model =
                                 eventType =
                                     TypeFilter name slug color lightText
                             in
-                                { currentFilter
-                                    | eventTypes =
-                                        if List.member eventType model.filter.eventTypes then
-                                            List.filter (\x -> x /= eventType) model.filter.eventTypes
-                                        else
-                                            eventType :: model.filter.eventTypes
-                                }
+                            { currentFilter
+                                | eventTypes =
+                                    if List.member eventType model.filter.eventTypes then
+                                        List.filter (\x -> x /= eventType) model.filter.eventTypes
+
+                                    else
+                                        eventType :: model.filter.eventTypes
+                            }
 
                         LocationFilter name slug icon ->
                             let
                                 eventLocation =
                                     LocationFilter name slug icon
                             in
-                                { currentFilter
-                                    | eventLocations =
-                                        if List.member eventLocation model.filter.eventLocations then
-                                            List.filter (\x -> x /= eventLocation) model.filter.eventLocations
-                                        else
-                                            eventLocation :: model.filter.eventLocations
-                                }
+                            { currentFilter
+                                | eventLocations =
+                                    if List.member eventLocation model.filter.eventLocations then
+                                        List.filter (\x -> x /= eventLocation) model.filter.eventLocations
+
+                                    else
+                                        eventLocation :: model.filter.eventLocations
+                            }
 
                         VideoFilter name slug ->
                             let
                                 videoRecording =
                                     VideoFilter name slug
                             in
-                                { currentFilter
-                                    | videoRecording =
-                                        if List.member videoRecording model.filter.videoRecording then
-                                            List.filter (\x -> x /= videoRecording) model.filter.videoRecording
-                                        else
-                                            videoRecording :: model.filter.videoRecording
-                                }
+                            { currentFilter
+                                | videoRecording =
+                                    if List.member videoRecording model.filter.videoRecording then
+                                        List.filter (\x -> x /= videoRecording) model.filter.videoRecording
+
+                                    else
+                                        videoRecording :: model.filter.videoRecording
+                            }
 
                         TrackFilter name slug ->
                             let
                                 eventTrack =
                                     TrackFilter name slug
                             in
-                                { currentFilter
-                                    | eventTracks =
-                                        if List.member eventTrack model.filter.eventTracks then
-                                            List.filter (\x -> x /= eventTrack) model.filter.videoRecording
-                                        else
-                                            eventTrack :: model.filter.eventTracks
-                                }
+                            { currentFilter
+                                | eventTracks =
+                                    if List.member eventTrack model.filter.eventTracks then
+                                        List.filter (\x -> x /= eventTrack) model.filter.videoRecording
+
+                                    else
+                                        eventTrack :: model.filter.eventTracks
+                            }
 
                 query =
                     filterToQuery newFilter
@@ -115,7 +115,9 @@ update msg model =
                 cmd =
                     Navigation.newUrl query
             in
-                { model | filter = newFilter } ! [ cmd ]
+            ( { model | filter = newFilter }
+            , cmd
+            )
 
         OnLocationChange location ->
             let
@@ -130,7 +132,11 @@ update msg model =
                         _ ->
                             model.filter
             in
-                { model | filter = newFilter, route = newRoute, location = location } ! []
+            ( { model | filter = newFilter, route = newRoute, location = location }
+            , Cmd.none
+            )
 
         BackInHistory ->
-            model ! [ Navigation.back 1 ]
+            ( model
+            , Navigation.back 1
+            )

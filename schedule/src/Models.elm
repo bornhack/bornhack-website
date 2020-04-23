@@ -1,13 +1,10 @@
 module Models exposing (..)
 
 -- Core modules
-
-import Date exposing (Date, now)
-
-
 -- External modules
 
 import Navigation exposing (Location)
+import Time exposing (Posix)
 
 
 type alias EventSlug =
@@ -83,8 +80,8 @@ type alias EventInstance =
     , eventTrack : String
     , backgroundColor : String
     , forgroundColor : String
-    , from : Date
-    , to : Date
+    , from : Posix
+    , to : Posix
     , timeslots : Float
     , location : String
     , locationIcon : String
@@ -173,7 +170,7 @@ getSlugFromFilterType filter =
         ( _, slug ) =
             unpackFilterType filter
     in
-        slug
+    slug
 
 
 getNameFromFilterType filter =
@@ -181,4 +178,4 @@ getNameFromFilterType filter =
         ( name, slug ) =
             unpackFilterType filter
     in
-        name
+    name
