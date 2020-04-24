@@ -2,7 +2,9 @@ import logging
 import os
 from itertools import chain
 
+import requests
 from camps.mixins import CampViewMixin
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.db.models import Sum
 from django.forms import modelformset_factory
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -771,3 +774,41 @@ class ShopTicketOverview(LoginRequiredMixin, CampViewMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
+
+
+class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, FormView):
+    """
+    Show proxied stuff, only for simple HTML pages with no external content
+    Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of description: url pairs
+    """
+
+    permission_required = "camps.backoffice_permission"
+    template_name = "backoffice_proxy.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.form_class = forms.Form
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["url"] = forms.ChoiceField(
+            choices=[
+                (url, desc) for desc, url in settings.BACKOFFICE_PROXY_URLS.items()
+            ],
+            widget=forms.RadioSelect,
+            help_text="Pick the URL you wish to see",
+        )
+        return form
+
+    def form_valid(self, form):
+        """ Perform the request and return the response """
+        if form.cleaned_data["url"] not in settings.BACKOFFICE_PROXY_URLS.values():
+            # this is not one of the urls from settings
+            messages.error(self.request, "Unknown URL")
+            return redirect(
+                reverse("backoffice:proxy", kwargs={"camp_slug": self.camp.slug})
+            )
+        # perform the request
+        r = requests.get(form.cleaned_data["url"])
+        # return the response, keeping the status code but no headers
+        return HttpResponse(r.content, status=r.status_code)
