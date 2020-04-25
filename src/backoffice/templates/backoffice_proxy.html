@@ -5,14 +5,11 @@
 <div class="panel panel-default">
   <div class="panel-heading"><h3 class="panel-title">See proxied content</h3></div>
   <div class="panel-body">
-    <form method="POST">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary"><i class='fas fa-check'></i> Show me!</button>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
+    <ul class="list-group">
+    {% for slug, urltuple in urls.items %}
+    <a class="list-group-item" href="{% url 'backoffice:proxy' camp_slug=camp.slug proxy_slug=slug %}"><span class="h4">{{ urltuple.0 }}</span><span class="pull-right">{{ urltuple.1 }}</span></a>
+    {% endfor %}
+    </ul>
   </div>
 </div>
-
 {% endblock content %}
-
