@@ -4,6 +4,7 @@ from .views import (
     ApproveFeedbackView,
     ApproveNamesView,
     BackofficeIndexView,
+    BackofficeProxyView,
     BadgeHandoutView,
     ChainDetailView,
     ChainListView,
@@ -36,6 +37,9 @@ app_name = "backoffice"
 
 urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
+    # proxy view
+    path("proxy/", BackofficeProxyView.as_view(), name="proxy"),
+    # facility feedback
     path(
         "feedback/facilities/<slug:team_slug>/",
         include([path("", FacilityFeedbackView.as_view(), name="facilityfeedback")]),
