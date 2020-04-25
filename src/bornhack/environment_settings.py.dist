@@ -96,5 +96,5 @@ ECONOMYTEAM_NAME = "Economy"
 
 BORNHACK_2019_OLD_TOKEN_TOKEN = "{{ bornhack_2019_old_token_token }}"
 KORTFORSYNINGEN_TOKEN = "{{ kortforsyningen_token }}"
-BACKOFFICE_PROXY_URLS = "{{ backoffice_proxy_urls }}"
+BACKOFFICE_PROXY_URLS = {{ backoffice_proxy_urls }}
 
