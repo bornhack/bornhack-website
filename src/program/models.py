@@ -710,6 +710,24 @@ class EventLocation(CampRelatedModel):
         """ Returns a QuerySet of all EventSlots scheduled in this EventLocation """
         return self.event_slots.filter(event__isnull=False)
 
+    def is_available(self, when, ignore_event_slot_ids=[]):
+        """ A location is available if nothing is scheduled in it at that time """
+        if (
+            self.event_slots.filter(event__isnull=False, when__overlap=when)
+            .exclude(pk__in=ignore_event_slot_ids)
+            .exists()
+        ):
+            # something is scheduled, the location is not available
+            print(f"ignoring ids: {ignore_event_slot_ids}")
+            print(
+                self.event_slots.filter(event__isnull=False, when__overlap=when)
+                .exclude(pk__in=ignore_event_slot_ids)
+                .values_list("pk", flat=True)
+            )
+            return False
+        # nothing is scheduled
+        return False
+
 
 class EventType(CreatedUpdatedModel):
     """  Every event needs to have a type. """
@@ -1050,6 +1068,7 @@ class EventSlot(CampRelatedModel):
                 "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None"
             )
         self.clean_speakers()
+        self.clean_location()
 
     def get_autoscheduler_slot(self):
         """ Return a conference_scheduler.resources.Slot object matching this EventSlot """
@@ -1079,6 +1098,16 @@ class EventSlot(CampRelatedModel):
                     raise ValidationError(
                         f"The speaker {speaker} is not available at this time"
                     )
+
+    def clean_location(self):
+        """ Make sure the location is available """
+        if self.event:
+            if not self.event_location.is_available(
+                when=self.when, ignore_event_slot_ids=[self.pk]
+            ):
+                raise ValidationError(
+                    f"The location {self.event_location} is not available at this time"
+                )
 
     def unschedule(self):
         """ Clear the Event FK and autoscheduled status, removing the Event from the schedule """
