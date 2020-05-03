@@ -801,6 +801,7 @@ class CombinedProposalSubmitView(
         if not speaker_proposal.email:
             speaker_proposal.email = self.request.user.email
         speaker_proposal.save()
+        form["speaker_proposal"].save_m2m()
 
         # then save speaker availability objects
         save_speaker_availability(form["speaker_proposal"], speaker_proposal)
