@@ -20,7 +20,7 @@
         <td class="text-center"><span class="badge">{{ proposal.proposal_status }}</span></td>
         <td class="text-center">
           {% if proposal.speaker %}
-          <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
           {% else %}
           <i class="fas fa-times"></i>
           {% endif %}
