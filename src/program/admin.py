@@ -101,7 +101,7 @@ class EventSessionAdmin(admin.ModelAdmin):
 
 @admin.register(EventSlot)
 class EventSlotAdmin(admin.ModelAdmin):
-    list_display = ("id", "event_session", "when")
+    list_display = ("id", "event_session", "when", "event")
     list_filter = ("event_session__camp", "event_session__event_type", "event_session")
 
 

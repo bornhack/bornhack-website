@@ -717,16 +717,10 @@ class EventLocation(CampRelatedModel):
             .exclude(pk__in=ignore_event_slot_ids)
             .exists()
         ):
-            # something is scheduled, the location is not available
-            print(f"ignoring ids: {ignore_event_slot_ids}")
-            print(
-                self.event_slots.filter(event__isnull=False, when__overlap=when)
-                .exclude(pk__in=ignore_event_slot_ids)
-                .values_list("pk", flat=True)
-            )
+            # something is scheduled, the location is not available at this time
             return False
-        # nothing is scheduled
-        return False
+        # nothing is scheduled, location is available
+        return True
 
 
 class EventType(CreatedUpdatedModel):
@@ -934,7 +928,10 @@ class EventSession(CampRelatedModel):
         excludefilter = Q()
         for slot in conflict_slot_times:
             # slot is a DateTimeTZRange with bounds "[)"
-            excludefilter | Q(when__overlap=slot)
+            if excludefilter:
+                excludefilter | Q(when__overlap=slot)
+            else:
+                excludefilter = Q(when__overlap=slot)
 
         # do the thing
         return self.event_slots.filter(availablefilter).exclude(excludefilter)

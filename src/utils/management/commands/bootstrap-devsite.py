@@ -859,9 +859,9 @@ class Command(BaseCommand):
         year = camp.camp.lower.year
         self.output("Creating event- and speaker_proposals for {}...".format(year))
 
-        # add 50 talks
+        # add 45 talks
         talkproposals = EventProposalFactory.create_batch(
-            50,
+            45,
             track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["talk"],
         )
