@@ -392,6 +392,12 @@ class SpeakerUpdateView(
     template_name = "speaker_update.html"
     form_class = SpeakerForm
 
+    def get_form_kwargs(self):
+        """ Set camp for the form """
+        kwargs = super().get_form_kwargs()
+        kwargs.update({"camp": self.camp})
+        return kwargs
+
     def form_valid(self, form):
         """ Save object and availability """
         speaker = form.save()

@@ -1,5 +1,5 @@
 from django import forms
-from program.models import Speaker
+from program.models import Event, Speaker
 
 
 class AutoScheduleValidateForm(forms.Form):
@@ -49,9 +49,10 @@ class SpeakerForm(forms.ModelForm):
             "email",
             "biography",
             "needs_oneday_ticket",
+            "event_conflicts",
         ]
 
-    def __init__(self, matrix={}, *args, **kwargs):
+    def __init__(self, camp, matrix={}, *args, **kwargs):
         """
         initialise the form and add availability fields to form
         """
@@ -77,3 +78,8 @@ class SpeakerForm(forms.ModelForm):
                 )
                 # add it to Meta.fields too
                 self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
+
+        # only show events from this camp
+        self.fields["event_conflicts"].queryset = Event.objects.filter(
+            track__camp=camp, event_type__support_speaker_event_conflicts=True
+        )
