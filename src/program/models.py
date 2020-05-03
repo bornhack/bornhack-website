@@ -533,7 +533,7 @@ class EventProposal(UserSubmittedModel):
         help_text="Will you be using the provided speaker laptop?", default=True
     )
 
-    tags = TaggableManager(through=UUIDTaggedItem)
+    tags = TaggableManager(through=UUIDTaggedItem, blank=True,)
 
     @property
     def camp(self):
