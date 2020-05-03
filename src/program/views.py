@@ -576,18 +576,18 @@ class EventProposalCreateView(
         event_proposal.user = self.request.user
         event_proposal.event_type = self.event_type
 
+        # save for real
+        event_proposal.save()
+        form.save_m2m()
+
         # save or update slides url
-        slideurl = self.cleaned_data.get("slides_url")
+        slideurl = form.cleaned_data.get("slides_url")
         if slideurl:
             slides_url, created = models.Url.objects.get_or_create(
                 event_proposal=event_proposal,
                 url_type=models.UrlType.objects.get(name="Slides"),
                 defaults={"url": slideurl},
             )
-
-        # save for real
-        event_proposal.save()
-        form.save_m2m()
 
         # add the speaker_proposal to the event_proposal
         event_proposal.speakers.add(self.speaker_proposal)
@@ -597,6 +597,11 @@ class EventProposalCreateView(
             logger.error(
                 "Unable to send email to content team after new event_proposal"
             )
+
+        messages.success(
+            self.request,
+            "Your event proposal is now pending approval by the content team.",
+        )
 
         # all good
         return redirect(self.get_success_url())
