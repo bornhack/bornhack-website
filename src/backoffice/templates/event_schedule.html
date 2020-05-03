@@ -13,6 +13,7 @@
     <p>This event has a demand of {{ event.demand }} people.</p>
     <form method="POST">
         {% csrf_token %}
+        {% if event_slots %}
         <table class="table table-hover datatable">
           <thead>
             <tr>
@@ -36,6 +37,9 @@
           </tbody>
         </table>
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Schedule Event</button>
+        {% else %}
+        <p class="lead">No available slots found</p>
+        {% endif %}
         <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
     </form>
   </div>
