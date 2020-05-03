@@ -912,7 +912,8 @@ class EventSession(CampRelatedModel):
             # a slot is busy if something is scheduled
             busyfilter = Q(event__isnull=False)
 
-        # get the times of all busy slots in the same or conflicting locations which overlap with this session
+        # get the times of all busy slots in the same or conflicting
+        # locations which overlap with this session
         conflict_slot_times = self.camp.event_slots.filter(
             # get slots at the same or a conflicting location
             Q(event_session__event_location__in=self.event_location.conflicts.all())
@@ -928,10 +929,7 @@ class EventSession(CampRelatedModel):
         excludefilter = Q()
         for slot in conflict_slot_times:
             # slot is a DateTimeTZRange with bounds "[)"
-            if excludefilter:
-                excludefilter | Q(when__overlap=slot)
-            else:
-                excludefilter = Q(when__overlap=slot)
+            excludefilter |= Q(when__overlap=slot)
 
         # do the thing
         return self.event_slots.filter(availablefilter).exclude(excludefilter)
