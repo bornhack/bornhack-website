@@ -325,7 +325,8 @@ class UserSubmittedModel(CampRelatedModel):
     )
 
     reason = models.TextField(
-        blank=True, help_text="The reason this proposal was accepted or rejected.",
+        blank=True,
+        help_text="The reason this proposal was accepted or rejected. This text will be included in the email to the submitter. Leave blank to send a standard email.",
     )
 
     def __str__(self):
