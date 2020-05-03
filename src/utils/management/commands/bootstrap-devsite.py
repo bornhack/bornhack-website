@@ -411,7 +411,7 @@ class Command(BaseCommand):
             description="A musical performance",
             icon="music",
             host_title="Artist",
-            event_duration_minutes="60",
+            event_duration_minutes="180",
             support_autoscheduling=True,
             support_speaker_event_conflicts=True,
         )
@@ -809,7 +809,7 @@ class Command(BaseCommand):
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 22, 0)),
                     tz.localize(datetime(start.year, start.month, start.day, 22, 0))
-                    + timedelta(hours=2),
+                    + timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
