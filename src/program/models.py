@@ -900,14 +900,15 @@ class EventSession(CampRelatedModel):
             # a slot is busy if something is scheduled
             busyfilter = Q(event__isnull=False)
 
-        # get the times of all busy slots in conflicting locations which overlap with this session
+        # get the times of all busy slots in the same or conflicting locations which overlap with this session
         conflict_slot_times = self.camp.event_slots.filter(
-            # get slots that have something scheduled in them
+            # get slots at the same or a conflicting location
+            Q(event_session__event_location__in=self.event_location.conflicts.all())
+            | Q(event_session__event_location=self.event_location),
+            # which have something scheduled in them
             busyfilter,
             # at the same time as this session
             when__overlap=self.when,
-            # at a location which conflicts with this one
-            event_session__event_location__in=self.event_location.conflicts.all(),
         ).values_list("when", flat=True)
 
         # build the excludefilter so we exclude any slots that overlap with any
