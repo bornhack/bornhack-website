@@ -669,13 +669,21 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         form = super().get_form(*args, **kwargs)
         self.slots = []
         slotindex = 0
-        # loop over sessions, get free slots, add to list
+        # loop over sessions, get free slots
         for session in self.camp.event_sessions.filter(
             event_type=self.event.event_type
         ):
             for slot in session.get_available_slots():
-                self.slots.append({"index": slotindex, "slot": slot})
-                slotindex += 1
+                # loop over speakers to see if they are all available
+                for speaker in self.event.speakers.all():
+                    if not speaker.is_available(slot.when):
+                        # this speaker is not available, skip this slot
+                        break
+                else:
+                    # all speakers are available for this slot
+                    self.slots.append({"index": slotindex, "slot": slot})
+                    slotindex += 1
+        # add the slot choicefield
         form.fields["slot"] = forms.ChoiceField(
             widget=forms.RadioSelect,
             choices=[(s["index"], s["index"]) for s in self.slots],
