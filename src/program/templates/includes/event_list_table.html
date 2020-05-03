@@ -38,7 +38,7 @@
             N/A
           {% endfor %}
         </td>
-        <td>{{ event.video_recording|truefalseicon }}</td>
+        <td class="text-center"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
         <td>
           {% for slot in event.event_slots.all %}
           {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
