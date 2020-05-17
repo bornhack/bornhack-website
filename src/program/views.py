@@ -1394,6 +1394,7 @@ class FeedbackListView(LoginRequiredMixin, EventViewMixin, ListView):
 
     model = models.EventFeedback
     template_name = "event_feedback_list.html"
+    context_object_name = "event_feedback_list"
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
