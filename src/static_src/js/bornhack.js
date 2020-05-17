@@ -1,4 +1,8 @@
 $(document).ready(function(){
+    // remove the .noscript class from <body>
+    // this allows us to add the class .hide-for-nojs-users to any element as needed
+    $('body,html').removeClass("no-js");
+
     // enable all js tooltips on the page
     $('[data-toggle="tooltip"]').tooltip();
 
@@ -10,9 +14,6 @@ $(document).ready(function(){
     // enable datatables for all tables on the page,
     $('.datatable').DataTable();
 
-    // remove the .noscript class from <body>
-    // add the class .hide-for-nojs-users to any element as needed
-    $('body,html').removeClass("no-js");
 } );
 
 // function used in speakeravailability form tables to toggle background color
