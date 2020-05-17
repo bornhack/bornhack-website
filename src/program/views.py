@@ -1464,6 +1464,7 @@ class FeedbackDetailView(
 
     model = models.EventFeedback
     template_name = "event_feedback_detail.html"
+    context_object_name = "event_feedback"
 
 
 class FeedbackUpdateView(
