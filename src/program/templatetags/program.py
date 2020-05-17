@@ -102,7 +102,7 @@ def availabilitytable(matrix, form=None):
                         if form:
                             # add the label for this form field, include an
                             # onclick() js event to the label to toggle the td background class
-                            output += f"<label for='id_{matrix[date][daychunk]['fieldname']}' style='display: block; margin-bottom: 0px;' onclick='toggleclass(\"id_{matrix[date][daychunk]['fieldname']}\");'>&nbsp;"
+                            output += f"<label for='id_{matrix[date][daychunk]['fieldname']}' style='display: block; margin-bottom: 0px;' onclick='toggle_sa_form_class(\"id_{matrix[date][daychunk]['fieldname']}\");'>&nbsp;"
                             output += str(form[matrix[date][daychunk]["fieldname"]])
                         else:
                             output += f'<i class="fas fa-{tdicon}"></i>'

@@ -3,17 +3,6 @@
 {% load program %}
 
 {% block program_content %}
-<script>
-function toggleclass(checkboxid) {
-    checkbox = $("#" + checkboxid);
-    if (checkbox.prop("checked")) {
-        checkbox.parent().parent().removeClass("danger warning active").addClass("success");
-    } else {
-        checkbox.parent().parent().removeClass("success warning active").addClass("danger");
-    };
-};
-</script>
-
 <h3>
     {% if object %}
         Update {{ object.name }} Details
@@ -37,4 +26,3 @@ function toggleclass(checkboxid) {
   {% bootstrap_button "Submit for review" button_type="submit" button_class="btn-primary" %}
 </form>
 {% endblock program_content %}
-

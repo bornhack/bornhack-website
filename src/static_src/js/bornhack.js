@@ -14,3 +14,13 @@ $(document).ready(function(){
     // add the class .hide-for-nojs-users to any element as needed
     $('body,html').removeClass("no-js");
 } );
+
+// function used in speakeravailability form tables to toggle background color
+function toggle_sa_form_class(checkboxid) {
+    checkbox = $("#" + checkboxid);
+    if (checkbox.prop("checked")) {
+        checkbox.parent().parent().removeClass("danger warning active").addClass("success");
+    } else {
+        checkbox.parent().parent().removeClass("success warning active").addClass("danger");
+    };
+};
