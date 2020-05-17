@@ -7,6 +7,7 @@ import pytz
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -68,7 +69,7 @@ def get_speaker_availability_form_matrix(sessions):
         return matrix
 
     # loop over days in the camp
-    for day in sessions[0].camp.get_days(camppart="camp"):
+    for day in get_tzrange_days(tzranges=[s.when for s in sessions]):
         # loop over the daychunks in this day
         for daychunk in get_daychunks(day):
             event_types = set()
@@ -239,7 +240,6 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
                 )
                 matrix[date][daychunk]["initial"] = availability.available
             except ObjectDoesNotExist:
-                print(f"we have no availability for chunk {daychunk}")
                 matrix[date][daychunk]["initial"] = None
 
 
@@ -269,3 +269,30 @@ def get_slots(period, duration, bounds="()"):
     if not slot.upper > period.upper:
         slots.append(slot)
     return slots
+
+
+def get_tzrange_days(tzranges):
+    """Loop over tzranges and build a list of datetimetzranges representing all unique dates (in the local timezone)."""
+    days = set()
+    # loop over input ranges
+    for tzrange in tzranges:
+        # convert this range to local timezone
+        localrange = DateTimeTZRange(
+            timezone.localtime(tzrange.lower), timezone.localtime(tzrange.upper)
+        )
+        # find the first date in this range
+        day = DateTimeTZRange(
+            localrange.lower.replace(hour=0),
+            localrange.lower.replace(hour=0) + timedelta(days=1),
+        )
+        # add this day to the set
+        days.add(day)
+        # does this range spans multiple dates?
+        if localrange.lower.date() != localrange.upper.date():
+            # this range spans multiple dates, loop over them
+            while day.lower.date() <= localrange.upper.date():
+                day = DateTimeTZRange(day.upper, day.upper + timedelta(days=1))
+                days.add(day)
+    days = list(days)
+    days.sort()
+    return days
