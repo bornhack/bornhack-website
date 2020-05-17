@@ -20,7 +20,7 @@ future==0.18.2
 graphene-django==2.10.0
 html5lib==1.0.1
 icalendar==4.0.6
-ipython==7.13.0
+ipython==7.14.0
 irc3==1.1.5
 lxml==4.5.0
 olefile==0.46
