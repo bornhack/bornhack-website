@@ -17,9 +17,9 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         {% if form.instance.can_be_approved %}
-        {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
+        <button type="submit" class="btn btn-success" name="approve"><i class='fas fa-check'></i> Approve Proposal</button>
         {% endif %}
-        {% bootstrap_button "<i class='fas fa-times'></i> Reject" button_type="submit" button_class="btn-danger" name="reject" %}
+        <button type="reject" class="btn btn-danger" name="reject"><i class='fas fa-times'></i> Reject Proposal</button>
         <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
     </form>
   </div>

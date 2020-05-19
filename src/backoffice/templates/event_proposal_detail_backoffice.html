@@ -77,6 +77,11 @@
   <div class="panel-footer">Status: <span class="badge">{{ event_proposal.proposal_status }}</span> | ID: <span class="badge">{{ event_proposal.uuid }}</span></div>
 </div>
 
+{% if not event_proposal.can_be_approved %}
+  <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+  <br>
+{% endif %}
+
 <p>
 {% if event_proposal.proposal_status == "pending" %}
 {% if form.instance.can_be_approved %}
