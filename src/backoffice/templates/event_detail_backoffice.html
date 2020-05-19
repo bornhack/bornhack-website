@@ -41,6 +41,14 @@
         <th>Demand</th>
         <td>{% if event.demand %}{{ event.demand }} participants expected{% else %}0 (The autoscheduler will not consider capacity/demand when scheduling this event){% endif %}</td>
       </tr>
+      <tr>
+        <th>Proposal</th>
+        <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=event.proposal.pk %}" class="btn btn-default btn-xs"><i class="fas fa-search"></i> Show</a></td>
+      </tr>
+      <tr>
+        <th>Submitted by</th>
+        <td><i class="fas fa-user"></i> {{ event.proposal.user.username }}</td>
+      </tr>
     </table>
 
     <hr>
