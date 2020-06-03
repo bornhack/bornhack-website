@@ -26,7 +26,6 @@ from .views import (
     NoScriptScheduleView,
     ProgramControlCenter,
     ProposalListView,
-    ScheduleView,
     SpeakerDetailView,
     SpeakerListView,
     SpeakerProposalCreateView,
@@ -41,7 +40,7 @@ from .views import (
 app_name = "program"
 
 urlpatterns = [
-    path("", ScheduleView.as_view(), name="schedule_index"),
+    path("", NoScriptScheduleView.as_view(), name="schedule_index"),
     path("noscript/", NoScriptScheduleView.as_view(), name="noscript_schedule_index"),
     path("ics/", ICSView.as_view(), name="ics_view"),
     path("frab.xml", FrabXmlView.as_view(), name="frab_view"),

@@ -17,8 +17,7 @@
     {% if event.event_type.include_in_event_list %}
       <tr>
         <td>
-          <span class="hide-for-no-js-users"><a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/event/{{ event.slug }}">{{ event.title }}</a></span>
-          <noscript><a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a></noscript>
+          <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
         </td>
         <td>
           <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>

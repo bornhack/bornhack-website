@@ -28,7 +28,7 @@
           {% if proposal.speakers.exists %}
           <ul class="list-group">
           {% for speaker in proposal.speakers.all %}
-          <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-toggle="tooltip" title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}<span class="badge">{{ speaker.event_proposals.count }}</span></a>
+          <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-toggle="tooltip" title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}</a>
           {% endfor %}
           {% else %}
           N/A
@@ -46,9 +46,7 @@
           <div class="btn-group-vertical">
             <a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
             {% if proposal.proposal_status == "pending" %}
-            {% if proposal.can_be_approved %}
             <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve</a>
-            {% endif %}
             <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject</a>
             {% endif %}
           </div>

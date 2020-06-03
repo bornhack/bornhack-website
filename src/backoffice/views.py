@@ -237,13 +237,15 @@ class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     context_object_name = "speaker_proposal_list"
 
     def get_queryset(self, **kwargs):
-        return self.camp.speaker_proposals.filter(proposal_status="pending")
+        qs = super().get_queryset(**kwargs).filter(proposal_status="pending")
+        qs = qs.prefetch_related("user", "urls", "speaker")
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["event_proposal_list"] = self.camp.event_proposals.filter(
             proposal_status=EventProposal.PROPOSAL_PENDING
-        ).prefetch_related("event_type", "track", "speakers")
+        ).prefetch_related("event_type", "track", "speakers", "tags", "user", "event")
         return context
 
 
@@ -280,8 +282,8 @@ class SpeakerProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListVie
     template_name = "speaker_proposal_list.html"
     context_object_name = "speaker_proposal_list"
 
-    def get_queryset(self, *args, **kwargs):
-        qs = super().get_queryset(*args, **kwargs)
+    def get_queryset(self, **kwargs):
+        qs = super().get_queryset(**kwargs)
         qs = qs.prefetch_related("user", "urls", "speaker")
         return qs
 
@@ -533,6 +535,7 @@ class EventLocationCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateV
         location = form.save(commit=False)
         location.camp = self.camp
         location.save()
+        form.save_m2m()
         messages.success(
             self.request, f"EventLocation {location.name} has been created"
         )

@@ -4,7 +4,6 @@ from collections import OrderedDict
 import icalendar
 from camps.mixins import CampViewMixin
 from django import forms
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -955,21 +954,6 @@ class EventDetailView(CampViewMixin, DetailView):
 class NoScriptScheduleView(CampViewMixin, TemplateView):
     template_name = "noscript_schedule_view.html"
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["event_slots"] = (
-            models.EventSlot.objects.filter(event__track__camp=self.camp)
-            .prefetch_related(
-                "event_session__event_location", "event__event_type", "event__speakers"
-            )
-            .order_by("when")
-        )
-        return context
-
-
-class ScheduleView(CampViewMixin, TemplateView):
-    template_name = "schedule_overview.html"
-
     def setup(self, *args, **kwargs):
         """
         If no events are scheduled redirect to the event page
@@ -990,10 +974,18 @@ class ScheduleView(CampViewMixin, TemplateView):
             raise RedirectException(event_list_url)
 
     def get_context_data(self, *args, **kwargs):
-        context = super(ScheduleView, self).get_context_data(**kwargs)
-        context[
-            "schedule_midnight_offset_hours"
-        ] = settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS
+        context = super().get_context_data(**kwargs)
+        context["event_slots"] = (
+            models.EventSlot.objects.filter(event__track__camp=self.camp)
+            .prefetch_related(
+                "event_session__event_location",
+                "event_session__event_type",
+                "event__speakers",
+                "event__tags",
+                "event__event_type",
+            )
+            .order_by("when")
+        )
         return context
 
 
