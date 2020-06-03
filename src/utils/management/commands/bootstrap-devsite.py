@@ -15,7 +15,6 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.text import slugify
 from events.models import Routing, Type
 from facilities.models import (
     Facility,
@@ -51,6 +50,7 @@ from sponsors.models import Sponsor, SponsorTier
 from teams.models import Team, TeamMember, TeamShift, TeamTask
 from tickets.models import TicketType
 from tokens.models import Token, TokenFind
+from utils.slugs import unique_slugify
 from villages.models import Village
 
 fake = Faker()
@@ -539,7 +539,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(2017, 3, 1, 11, 0)),
                 tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "PROSA bus transport (open for everyone)"
@@ -552,7 +557,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(2017, 3, 1, 11, 0)),
                 tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "T-shirt (large)"
@@ -565,7 +575,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(2017, 3, 1, 11, 0)),
                 tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "Village tent 3x3 meters, no floor"
@@ -578,7 +593,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(2017, 3, 1, 12, 0)),
                 tz.localize(datetime(2017, 8, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "Village tent 3x3 meters, with floor"
@@ -591,7 +611,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(2017, 3, 1, 12, 0)),
                 tz.localize(datetime(2017, 8, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         return products
@@ -627,7 +652,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(year, 1, 1, 12, 0)),
                 tz.localize(datetime(year, 12, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["tickets"]
+                ).values_list("slug", flat=True),
+            ),
             ticket_type=ticket_types["adult_full_week"],
         )
 
@@ -641,7 +671,12 @@ class Command(BaseCommand):
                 tz.localize(datetime(year, 1, 1, 12, 0)),
                 tz.localize(datetime(year, 12, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["tickets"]
+                ).values_list("slug", flat=True),
+            ),
             ticket_type=ticket_types["adult_full_week"],
         )
 

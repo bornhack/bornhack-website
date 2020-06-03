@@ -1,8 +1,7 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.utils.text import slugify
 from utils.models import CampRelatedModel
+from utils.slugs import unique_slugify
 
 
 class Wish(CampRelatedModel):
@@ -50,10 +49,12 @@ class Wish(CampRelatedModel):
         return self.name
 
     def save(self, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        if not self.slug:
-            raise ValidationError("Unable to slugify")
+        self.slug = unique_slugify(
+            self.title,
+            slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
+                "slug", flat=True
+            ),
+        )
         super().save(**kwargs)
 
     def get_absolute_url(self):

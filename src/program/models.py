@@ -16,7 +16,6 @@ from django.db.models import F, Q
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.text import slugify
 from psycopg2.extras import DateTimeTZRange
 from taggit.managers import TaggableManager
 from utils.database import CastToInteger
@@ -26,6 +25,7 @@ from utils.models import (
     UUIDModel,
     UUIDTaggedItem,
 )
+from utils.slugs import unique_slugify
 
 from .email import (
     add_event_proposal_accepted_email,
@@ -690,9 +690,12 @@ class EventLocation(CampRelatedModel):
     def save(self, **kwargs):
         """ Create a slug """
         if not self.slug:
-            self.slug = slugify(self.name)
-        if not self.slug:
-            raise ValidationError("Unable to slugify")
+            self.slug = unique_slugify(
+                self.name,
+                self.__class__.objects.filter(camp=self.camp).values_list(
+                    "slug", flat=True
+                ),
+            )
         super().save(**kwargs)
 
     def serialize(self):
@@ -1259,9 +1262,12 @@ class Event(CampRelatedModel):
     def save(self, **kwargs):
         """ Create a slug and get duration """
         if not self.slug:
-            self.slug = slugify(self.title)
-        if not self.slug:
-            raise ValidationError("Unable to slugify")
+            self.slug = unique_slugify(
+                self.title,
+                slugs_in_use=self.__class__.objects.filter(
+                    track__camp=self.track.camp
+                ).values_list("slug", flat=True),
+            )
         if not self.duration_minutes:
             # we default to the duration of the event_type
             self.duration_minutes = self.event_type.event_duration_minutes
@@ -1524,7 +1530,12 @@ class Speaker(CampRelatedModel):
 
     def save(self, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
+                    "slug", flat=True
+                ),
+            )
         super().save(**kwargs)
 
     def get_absolute_url(self):

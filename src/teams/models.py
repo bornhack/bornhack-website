@@ -5,8 +5,8 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
-from django.utils.text import slugify
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+from utils.slugs import unique_slugify
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -149,9 +149,13 @@ class Team(CampRelatedModel):
 
     def save(self, **kwargs):
         # generate slug if needed
-        if not self.pk or not self.slug:
-            slug = slugify(self.name)
-            self.slug = slug
+        if not self.slug:
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
+                    "slug", flat=True
+                ),
+            )
 
         # set shortslug if needed
         if not self.shortslug:
@@ -366,7 +370,12 @@ class TeamTask(CampRelatedModel):
     def save(self, **kwargs):
         # generate slug if needed
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
+                    "slug", flat=True
+                ),
+            )
         super().save(**kwargs)
 
 

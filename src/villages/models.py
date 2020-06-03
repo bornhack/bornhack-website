@@ -1,8 +1,7 @@
 from django.db import models
 from django.urls import reverse_lazy
-from django.utils.text import slugify
-
 from utils.models import CampRelatedModel, UUIDModel
+from utils.slugs import unique_slugify
 
 
 class Village(UUIDModel, CampRelatedModel):
@@ -34,26 +33,14 @@ class Village(UUIDModel, CampRelatedModel):
         )
 
     def save(self, **kwargs):
-        if (
-            not self.pk
-            or not self.slug
-            or Village.objects.filter(slug=self.slug).count() > 1
-        ):
-            slug = slugify(self.name)
-            if not slug:
-                slug = "noname"
-            incrementer = 1
-
-            # We have to make sure that the slug won't clash with current slugs
-            while Village.objects.filter(slug=slug).exists():
-                if incrementer == 1:
-                    slug = "{}-1".format(slug)
-                else:
-                    slug = "{}-{}".format("-".join(slug.split("-")[:-1]), incrementer)
-                incrementer += 1
-            self.slug = slug
-
-        super(Village, self).save(**kwargs)
+        if not self.slug:
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
+                    "slug", flat=True
+                ),
+            )
+        super().save(**kwargs)
 
     def delete(self, using=None, keep_parents=False):
         self.deleted = True

@@ -4,12 +4,11 @@ import logging
 
 import qrcode
 from django.contrib.gis.db.models import PointField
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.shortcuts import reverse
-from django.utils.text import slugify
 from maps.utils import LeafletMarkerChoices
 from utils.models import CampRelatedModel, UUIDModel
+from utils.slugs import unique_slugify
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -42,6 +41,7 @@ class FacilityType(CampRelatedModel):
     """
 
     class Meta:
+        # we need a unique slug for each team due to the url structure in backoffice
         unique_together = [("slug", "responsible_team")]
 
     name = models.CharField(max_length=100, help_text="The name of this facility type")
@@ -89,9 +89,12 @@ class FacilityType(CampRelatedModel):
 
     def save(self, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
-        if not self.slug:
-            raise ValidationError("Unable to slugify")
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(
+                    responsible_team=self.responsible_team
+                ).values_list("slug", flat=True),
+            )
         super().save(**kwargs)
 
 
