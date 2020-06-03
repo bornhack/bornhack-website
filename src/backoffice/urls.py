@@ -11,6 +11,7 @@ from .views import (
     AutoScheduleManageView,
     AutoScheduleValidateView,
     BackofficeIndexView,
+    BackofficeProxyView,
     BadgeHandoutView,
     ChainDetailView,
     ChainListView,
@@ -73,6 +74,10 @@ app_name = "backoffice"
 
 urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
+    # proxy view
+    path("proxy/", BackofficeProxyView.as_view(), name="proxy"),
+    path("proxy/<slug:proxy_slug>/", BackofficeProxyView.as_view(), name="proxy"),
+    # facility feedback
     path(
         "feedback/facilities/<slug:team_slug>/",
         include([path("", FacilityFeedbackView.as_view(), name="facilityfeedback")]),

@@ -2,6 +2,7 @@ import logging
 import os
 from itertools import chain
 
+import requests
 from camps.mixins import CampViewMixin
 from django import forms
 from django.conf import settings
@@ -12,6 +13,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.files import File
 from django.db.models import Count, Q, Sum
 from django.forms import modelformset_factory
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -1625,3 +1627,35 @@ class ShopTicketOverview(LoginRequiredMixin, CampViewMixin, ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
+
+
+class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
+    """
+    Show proxied stuff, only for simple HTML pages with no external content
+    Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of slug: (description, url) pairs
+    """
+
+    permission_required = "camps.backoffice_permission"
+    template_name = "backoffice_proxy.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        """ Perform the request and return the response if we have a slug """
+        # list available stuff if we have no slug
+        if "proxy_slug" not in kwargs:
+            return super().dispatch(request, *args, **kwargs)
+
+        # is the slug valid?
+        if kwargs["proxy_slug"] not in settings.BACKOFFICE_PROXY_URLS.keys():
+            raise Http404
+
+        # perform the request
+        description, url = settings.BACKOFFICE_PROXY_URLS[kwargs["proxy_slug"]]
+        r = requests.get(url)
+
+        # return the response, keeping the status code but no headers
+        return HttpResponse(r.content, status=r.status_code)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["urls"] = settings.BACKOFFICE_PROXY_URLS
+        return context

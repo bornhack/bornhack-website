@@ -45,7 +45,7 @@ Team: {{ team.name }} | {{ block.super }}
         </li>
         {% endif %}
 
-        {% if request.user in team.responsible_members.all %}
+        {% if request.user in team.responsible_members %}
         <li {% if view.active_menu == "info_categories" %}class="active"{% endif %}>
             <a href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
                 Info categories
@@ -53,7 +53,7 @@ Team: {{ team.name }} | {{ block.super }}
         </li>
         {% endif %}
 
-        {% if request.user in team.members.all %}
+        {% if request.user in team.approved_members %}
         <li {% if view.active_menu == "guide" %}class="active"{% endif %}>
             <a href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
                 Team guide

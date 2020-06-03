@@ -7,6 +7,10 @@ class WishListView(ListView):
     model = Wish
     template_name = "wish_list.html"
 
+    def get_queryset(self, **kwargs):
+        # only show unfulfilled wishes
+        return super().get_queryset().filter(fulfilled=False)
+
 
 class WishDetailView(DetailView):
     model = Wish

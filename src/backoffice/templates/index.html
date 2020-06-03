@@ -142,6 +142,12 @@
         <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
       </a>
       {% endif %}
+
+      <h3>External Content</h3>
+      <a href="{% url 'backoffice:proxy' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Proxied Content</h4>
+        <p class="list-group-item-text">Use this view to see proxied content</p>
+      </a>
     </div>
   </div>
 </div>

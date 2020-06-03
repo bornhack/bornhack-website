@@ -1,8 +1,7 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
-from django.core.exceptions import ValidationError
-
 from utils.models import CampRelatedModel
 
 
@@ -11,13 +10,15 @@ class Wish(CampRelatedModel):
     This model contains the stuff BornHack needs. This can be anything from kitchen equipment
     to network cables, or anything really.
     """
-    name = models.CharField(
-        max_length=100,
-        help_text="Short description of the wish",
-    )
+
+    class Meta:
+        verbose_name_plural = "wishes"
+
+    name = models.CharField(max_length=100, help_text="Short description of the wish",)
 
     slug = models.SlugField(
         blank=True,
+        unique=True,
         help_text="The url slug for this wish. Leave blank to autogenerate one.",
     )
 
@@ -25,10 +26,7 @@ class Wish(CampRelatedModel):
         help_text="Description of the needed item. Markdown is supported!"
     )
 
-    count = models.IntegerField(
-        default=1,
-        help_text="How many do we need?",
-    )
+    count = models.IntegerField(default=1, help_text="How many do we need?",)
 
     fulfilled = models.BooleanField(
         default=False,
@@ -59,7 +57,7 @@ class Wish(CampRelatedModel):
         super().save(**kwargs)
 
     def get_absolute_url(self):
-        return reverse("wishlist:detail", kwargs={
-            "camp_slug": self.camp.slug,
-            "wish_slug": self.slug,
-        })
+        return reverse(
+            "wishlist:detail",
+            kwargs={"camp_slug": self.camp.slug, "wish_slug": self.slug,},
+        )
