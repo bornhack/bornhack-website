@@ -19,7 +19,6 @@ class Migration(migrations.Migration):
                 default=uuid.uuid4,
                 editable=False,
                 help_text="This field is not the PK of the model. It is used to create EventSlot UUID for FRAB and iCal and other calendaring purposes.",
-                unique=True,
             ),
         ),
     ]
