@@ -72,6 +72,7 @@ class Migration(migrations.Migration):
             name="duration",
             field=models.IntegerField(
                 blank=True,
+                null=True,
                 help_text="How much time (in minutes) should we set aside for this act? Please keep it between 60 and 180 minutes (1-3 hours).",
             ),
         ),
