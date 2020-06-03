@@ -2,6 +2,10 @@
 {% load bootstrap3 %}
 {% load program %}
 
+{% block title %}
+Submit {{ camp.title }} {{ eventtype.name }} | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 <h3>Submit {{ camp.title }} {{ event_type.name }} <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i></h3>
 

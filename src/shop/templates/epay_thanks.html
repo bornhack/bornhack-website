@@ -1,6 +1,10 @@
 {% extends 'shop_base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}
+Thank you for your payment! | {{ block.super }}
+{% endblock %}
+
 {% block shop_content %}
 <h2>Thank you for your payment!</h2>
 <p class="lead">

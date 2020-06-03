@@ -1,5 +1,9 @@
 {% extends 'program_base.html' %}
 
+{% block title %}
+Event List | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 {% if event_list %}
   <p class="lead">A list of all talks, workshops, keynotes and other events at {{ camp.title }}.</p>

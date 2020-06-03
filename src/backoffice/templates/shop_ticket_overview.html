@@ -2,6 +2,11 @@
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
+
+{% block title %}
+Shop Tickets | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <h2>Shop Tickets</h2>

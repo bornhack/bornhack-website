@@ -1,6 +1,10 @@
 {% extends 'schedule_base.html' %}
 {% load static %}
 
+{% block title %}
+Schedule | {{ block.super }}
+{% endblock %}
+
 {% block schedule_content %}
 <table class="table day-table">
     {% for timeslot in timeslots %}

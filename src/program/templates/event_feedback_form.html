@@ -2,6 +2,10 @@
 {% load commonmark %}
 {% load bootstrap3 %}
 
+{% block title %}
+{% if request.resolver_match.url_name == "eventfeedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }} | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 <h2>{% if request.resolver_match.url_name == "event_feedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }}</h2>
 <form method="POST">

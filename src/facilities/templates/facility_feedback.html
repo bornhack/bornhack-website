@@ -2,6 +2,10 @@
 {% load bootstrap3 %}
 {% load bornhack %}
 
+{% block title %}
+{{ facility.name }} Feedback | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <h2>{{ facility.name }} Feedback</h2>
 {% if unhandled_feedbacks %}

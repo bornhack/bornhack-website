@@ -1,5 +1,9 @@
 {% extends 'profile_base.html' %}
 
+{% block title %}
+Your information | {{ block.super }}
+{% endblock %}
+
 {% block profile_content %}
 {% if not profile.description %}
 <div class="alert alert-danger">

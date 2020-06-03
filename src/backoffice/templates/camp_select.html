@@ -2,6 +2,11 @@
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
+
+{% block title %}
+Camp Picker | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <div class="row">

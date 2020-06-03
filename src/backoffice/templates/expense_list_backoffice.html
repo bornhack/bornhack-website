@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}
+Manage Expenses for {{ camp.title }} | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <h2>Manage Expenses for {{ camp.title }}</h2>
 

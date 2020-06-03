@@ -1,6 +1,10 @@
 {% extends 'program_base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}
+Confirm Submission | {{ block.super }}
+{% endblock %}
+
 {% block program_content %}
 <h3>Confirm Submission</h3>
 <form method="POST">

@@ -2,6 +2,11 @@
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
+
+{% block title %}
+{{ camp.title }} Backoffice | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <div class="panel panel-default">
