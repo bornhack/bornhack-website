@@ -10,20 +10,20 @@ Proposals | {{ block.super }}
     {% include 'includes/event_proposal_type_select.html' %}
 {% else %}
 <div class="alert alert-danger">
-    <strong>Note!</strong> This Call for Participation is not open.
+    <strong>Note!</strong> This Call for Participation is not open. You can not submit or change proposals.
 </div>
 {% endif %}
 
 
-{% if speakerproposal_list or eventproposal_list %}
+{% if speaker_proposal_list or event_proposal_list %}
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title"><i class="fas fa-pencil"></i> Existing Proposals</h3>
   </div>
   <div class="panel-body">
     <h4>People</h4>
-    {% if speakerproposal_list %}
-    {% include 'includes/speaker_proposal_table.html' with speakerproposals=speakerproposal_list %}
+    {% if speaker_proposal_list %}
+    {% include 'includes/speaker_proposal_table.html' with speaker_proposals=speaker_proposal_list %}
     {% else %}
     <i>Nothing found.</i>
     {% endif %}
@@ -31,8 +31,8 @@ Proposals | {{ block.super }}
     <p><hr></p>
 
     <h4>Events</h4>
-    {% if eventproposal_list %}
-    {% include 'includes/event_proposal_table.html' with eventproposals=eventproposal_list %}
+    {% if event_proposal_list %}
+    {% include 'includes/event_proposal_table.html' with event_proposals=event_proposal_list %}
     {% else %}
     <i>Nothing found.</i>
     {% endif %}

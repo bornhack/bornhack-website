@@ -1,5 +1,6 @@
 .dev
 .idea/
+.hypothesis/
 __pycache__/
 db.sqlite3
 *.sw*
@@ -7,3 +8,4 @@ db.sqlite3
 venv/
 environment_settings.py
 elm-stuff/
+.coverage

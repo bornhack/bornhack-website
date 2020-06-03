@@ -1,11 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
-
 {% block content %}
 <h2>Manage Expenses for {{ camp.title }}</h2>
 

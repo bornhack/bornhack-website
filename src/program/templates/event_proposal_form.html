@@ -1,0 +1,17 @@
+{% extends 'program_base.html' %}
+{% load bootstrap3 %}
+
+{% block program_content %}
+{% if speaker %}
+<h3>Submit new {{ event_type.name }} by {{ speaker.name }}</h3>
+{% else %}
+<h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} {{ event_type.name }}</h3>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button "Submit for Review" button_type="submit" button_class="btn-primary" %}
+</form>
+{% endblock program_content %}
+

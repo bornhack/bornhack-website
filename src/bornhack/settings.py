@@ -1,5 +1,8 @@
 import os
 
+# monkeypatch postgres Range object to support lookups
+from utils import range_fields  # noqa: F401
+
 from .environment_settings import *  # noqa: F403
 
 
@@ -66,6 +69,7 @@ INSTALLED_APPS = [
     "reversion",
     "leaflet",
     "oauth2_provider",
+    "taggit",
 ]
 
 # MEDIA_URL = '/media/'
@@ -79,7 +83,7 @@ USE_TZ = True
 SHORT_DATE_FORMAT = "Ymd"
 DATE_FORMAT = "l, M jS, Y"
 DATETIME_FORMAT = "l, M jS, Y, H:i (e)"
-TIME_FORMAT = "H:i (e)"
+TIME_FORMAT = "H:i"
 
 TEMPLATES = [
     {
@@ -117,7 +121,7 @@ LOGIN_URL = "/login/"
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 BOOTSTRAP3 = {
-    "jquery_url": "/static/js/jquery.min.js",
+    "jquery_url": "/static/js/jquery-3.3.1.min.js",
     "javascript_url": "/static/js/bootstrap.min.js",
 }
 MIDDLEWARE = [

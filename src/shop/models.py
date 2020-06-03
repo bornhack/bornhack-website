@@ -11,11 +11,10 @@ from django.db.models.aggregates import Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.text import slugify
 from django.utils.translation import ugettext_lazy as _
 from unidecode import unidecode
-
 from utils.models import CreatedUpdatedModel, UUIDModel
+from utils.slugs import unique_slugify
 
 from .managers import OrderQuerySet, ProductQuerySet
 
@@ -385,8 +384,11 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
         return self.name
 
     def save(self, **kwargs):
-        self.slug = slugify(self.name)
-        super(ProductCategory, self).save(**kwargs)
+        self.slug = unique_slugify(
+            self.name,
+            slugs_in_use=self.__class__.objects.all().values_list("slug", flat=True),
+        )
+        super().save(**kwargs)
 
 
 class Product(CreatedUpdatedModel, UUIDModel):

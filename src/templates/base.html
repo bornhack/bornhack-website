@@ -21,7 +21,18 @@
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
 
+    <!-- https://datatables.net/ -->
+    <link href="{% static 'css/jquery.dataTables.1.10.20.min.css' %}" rel="stylesheet">
+
     {% bootstrap_javascript jquery=1 %}
+
+    <!-- https://datatables.net/ -->
+    <script src="{% static "js/jquery.dataTables.1.10.20.min.js" %}"></script>
+    <script src="{% static "js/moment.2.8.4.min.js" %}"></script>
+    <script src="{% static "js/jquery.dataTables.datatime-moment.js" %}"></script>
+
+    <!-- misc. bornhack javascript bits we want on all pages -->
+    <script src="{% static 'js/bornhack.js' %}"></script>
 
     <!-- favicon.ico stuff -->
 	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
@@ -38,7 +49,8 @@
     {% endblock %}
   </head>
 
-  <body>
+  <body class="no-js">
+  {% block body %}
 
     <div id="main" class="container container-fluid">
     <nav class="navbar navbar-fixed-top">
@@ -134,12 +146,6 @@
           {% endblock %}
       </div>
     </footer>
-    <!-- Enable all bootstrap tooltips and jquery datatables on the page, only works if the useragent has JS enabled -->
-    <script>
-        $(document).ready(function(){
-            $('[data-toggle="tooltip"]').tooltip();
-            $('.table').DataTable();
-        });
-    </script>
+  {% endblock body %}
   </body>
 </html>
