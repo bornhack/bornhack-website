@@ -10,17 +10,17 @@
     <p>To submit content for {{ camp.title }} please begin by selecting the type of event below:</p>
     {% endif %}
     <div class="list-group">
-    {% for eventtype in eventtype_list %}
+    {% for event_type in event_type_list %}
         {% if speaker %}
-            <a href="{%url 'program:eventproposal_create' camp_slug=camp.slug event_type_slug=eventtype.slug speaker_uuid=speaker.uuid %}" class="list-group-item">
+            <a href="{%url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker.uuid %}" class="list-group-item">
         {% else %}
-            <a href="{% url 'program:proposal_combined_person_select' camp_slug=camp.slug event_type_slug=eventtype.slug %}" class="list-group-item">
+            <a href="{% url 'program:proposal_combined_person_select' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="list-group-item">
         {% endif %}
             <h4 class="list-group-item-heading">
-                <i class="fas fa-{{ eventtype.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ eventtype.color }};"></i>
-                {{ eventtype.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right" style="color: {{ eventtype.color }};"></i></span>
+                <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
+                {{ event_type.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right" style="color: {{ event_type.color }};"></i></span>
             </h4>
-            {% if eventtype.description %}<p class="list-group-item-text">{{ eventtype.description }}</p>{% endif %}
+            {% if event_type.description %}<p class="list-group-item-text">{{ event_type.description }}</p>{% endif %}
         </a>
     {% endfor %}
     </div>

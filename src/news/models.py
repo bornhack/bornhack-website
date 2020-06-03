@@ -1,8 +1,8 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
-
 from utils.models import CreatedUpdatedModel
+from utils.slugs import unique_slugify
 
 
 class NewsItem(CreatedUpdatedModel):
@@ -29,20 +29,13 @@ class NewsItem(CreatedUpdatedModel):
                 published_at_string = self.published_at.strftime("%Y-%m-%d")
                 base_slug = slugify(self.title)
                 slug = "{}-{}".format(published_at_string, base_slug)
-                incrementer = 1
-
-                # We have to make sure that the slug won't clash with current slugs
-                while NewsItem.objects.filter(slug=slug).exists():
-                    if incrementer == 1:
-                        slug = "{}-1".format(slug)
-                    else:
-                        slug = "{}-{}".format(
-                            "-".join(slug.split("-")[:-1]), incrementer
-                        )
-                    incrementer += 1
-                self.slug = slug
-
-        super(NewsItem, self).save(**kwargs)
+                self.slug = unique_slugify(
+                    slug,
+                    slugs_in_use=self.__class__.objects.all().values_list(
+                        "slug", flat=True
+                    ),
+                )
+        super().save(**kwargs)
 
     def get_absolute_url(self):
         return reverse("news:detail", kwargs={"slug": self.slug})

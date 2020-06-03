@@ -3,9 +3,8 @@ import os
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.text import slugify
-
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+from utils.slugs import unique_slugify
 
 from .email import (
     send_accountingsystem_expense_email,
@@ -62,8 +61,13 @@ class Chain(CreatedUpdatedModel, UUIDModel):
 
     def save(self, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
-        super(Chain, self).save(**kwargs)
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.all().values_list(
+                    "slug", flat=True
+                ),
+            )
+        super().save(**kwargs)
 
     @property
     def expenses(self):
@@ -133,8 +137,13 @@ class Credebtor(CreatedUpdatedModel, UUIDModel):
         Generate slug as needed
         """
         if not self.slug:
-            self.slug = slugify(self.name)
-        super(Credebtor, self).save(**kwargs)
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(
+                    chain=self.chain
+                ).values_list("slug", flat=True),
+            )
+        super().save(**kwargs)
 
 
 class Revenue(CampRelatedModel, UUIDModel):

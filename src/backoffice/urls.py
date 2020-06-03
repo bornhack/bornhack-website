@@ -3,18 +3,50 @@ from django.urls import include, path
 from .views import (
     ApproveFeedbackView,
     ApproveNamesView,
+    AutoScheduleApplyView,
+    AutoScheduleCrashCourseView,
+    AutoScheduleDebugEventConflictsView,
+    AutoScheduleDebugEventSlotUnavailabilityView,
+    AutoScheduleDiffView,
+    AutoScheduleManageView,
+    AutoScheduleValidateView,
     BackofficeIndexView,
+    BackofficeProxyView,
     BadgeHandoutView,
     ChainDetailView,
     ChainListView,
     CredebtorDetailView,
-    EventProposalManageView,
+    EventDeleteView,
+    EventDetailView,
+    EventListView,
+    EventLocationCreateView,
+    EventLocationDeleteView,
+    EventLocationDetailView,
+    EventLocationListView,
+    EventLocationUpdateView,
+    EventProposalApproveRejectView,
+    EventProposalDetailView,
+    EventProposalListView,
+    EventScheduleView,
+    EventSessionCreateLocationSelectView,
+    EventSessionCreateTypeSelectView,
+    EventSessionCreateView,
+    EventSessionDeleteView,
+    EventSessionDetailView,
+    EventSessionListView,
+    EventSessionUpdateView,
+    EventSlotDetailView,
+    EventSlotListView,
+    EventSlotUnscheduleView,
+    EventTypeDetailView,
+    EventTypeListView,
+    EventUpdateView,
     ExpenseDetailView,
     ExpenseListView,
     FacilityFeedbackView,
-    ManageProposalsView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
+    PendingProposalsView,
     ProductHandoutView,
     ReimbursementCreateUserSelectView,
     ReimbursementCreateView,
@@ -26,7 +58,13 @@ from .views import (
     RevenueListView,
     ScanTicketsView,
     ShopTicketOverview,
-    SpeakerProposalManageView,
+    SpeakerDeleteView,
+    SpeakerDetailView,
+    SpeakerListView,
+    SpeakerProposalApproveRejectView,
+    SpeakerProposalDetailView,
+    SpeakerProposalListView,
+    SpeakerUpdateView,
     TicketCheckinView,
     VillageOrdersView,
     VillageToOrderView,
@@ -36,6 +74,10 @@ app_name = "backoffice"
 
 urlpatterns = [
     path("", BackofficeIndexView.as_view(), name="index"),
+    # proxy view
+    path("proxy/", BackofficeProxyView.as_view(), name="proxy"),
+    path("proxy/<slug:proxy_slug>/", BackofficeProxyView.as_view(), name="proxy"),
+    # facility feedback
     path(
         "feedback/facilities/<slug:team_slug>/",
         include([path("", FacilityFeedbackView.as_view(), name="facilityfeedback")]),
@@ -67,28 +109,314 @@ urlpatterns = [
     # village orders
     path("village_orders/", VillageOrdersView.as_view(), name="village_orders"),
     path("village_to_order/", VillageToOrderView.as_view(), name="village_to_order"),
-    # manage proposals
+    # manage SpeakerProposals and EventProposals
     path(
-        "manage_proposals/",
+        "proposals/",
         include(
             [
-                path("", ManageProposalsView.as_view(), name="manage_proposals"),
                 path(
-                    "speakers/<uuid:pk>/",
-                    SpeakerProposalManageView.as_view(),
-                    name="speakerproposal_manage",
+                    "pending/", PendingProposalsView.as_view(), name="pending_proposals"
                 ),
                 path(
-                    "events/<uuid:pk>/",
-                    EventProposalManageView.as_view(),
-                    name="eventproposal_manage",
+                    "speakers/",
+                    include(
+                        [
+                            path(
+                                "",
+                                SpeakerProposalListView.as_view(),
+                                name="speaker_proposal_list",
+                            ),
+                            path(
+                                "<uuid:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            SpeakerProposalDetailView.as_view(),
+                                            name="speaker_proposal_detail",
+                                        ),
+                                        path(
+                                            "approve_reject/",
+                                            SpeakerProposalApproveRejectView.as_view(),
+                                            name="speaker_proposal_approve_reject",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "events/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventProposalListView.as_view(),
+                                name="event_proposal_list",
+                            ),
+                            path(
+                                "<uuid:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            EventProposalDetailView.as_view(),
+                                            name="event_proposal_detail",
+                                        ),
+                                        path(
+                                            "approve_reject/",
+                                            EventProposalApproveRejectView.as_view(),
+                                            name="event_proposal_approve_reject",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
                 ),
             ]
         ),
     ),
-    # approve eventfeedback objects
+    # manage EventSession objects
     path(
-        "approve_feedback", ApproveFeedbackView.as_view(), name="approve_eventfeedback",
+        "event_sessions/",
+        include(
+            [
+                path("", EventSessionListView.as_view(), name="event_session_list"),
+                path(
+                    "create/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSessionCreateTypeSelectView.as_view(),
+                                name="event_session_create_type_select",
+                            ),
+                            path(
+                                "<slug:event_type_slug>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            EventSessionCreateLocationSelectView.as_view(),
+                                            name="event_session_create_location_select",
+                                        ),
+                                        path(
+                                            "<slug:event_location_slug>/",
+                                            EventSessionCreateView.as_view(),
+                                            name="event_session_create",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSessionDetailView.as_view(),
+                                name="event_session_detail",
+                            ),
+                            path(
+                                "update/",
+                                EventSessionUpdateView.as_view(),
+                                name="event_session_update",
+                            ),
+                            path(
+                                "delete/",
+                                EventSessionDeleteView.as_view(),
+                                name="event_session_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage EventSlot objects
+    path(
+        "event_slots/",
+        include(
+            [
+                path("", EventSlotListView.as_view(), name="event_slot_list"),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventSlotDetailView.as_view(),
+                                name="event_slot_detail",
+                            ),
+                            path(
+                                "unschedule/",
+                                EventSlotUnscheduleView.as_view(),
+                                name="event_slot_unschedule",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage Speaker objects
+    path(
+        "speakers/",
+        include(
+            [
+                path("", SpeakerListView.as_view(), name="speaker_list"),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path(
+                                "", SpeakerDetailView.as_view(), name="speaker_detail",
+                            ),
+                            path(
+                                "update/",
+                                SpeakerUpdateView.as_view(),
+                                name="speaker_update",
+                            ),
+                            path(
+                                "delete/",
+                                SpeakerDeleteView.as_view(),
+                                name="speaker_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage EventType objects
+    path(
+        "event_types/",
+        include(
+            [
+                path("", EventTypeListView.as_view(), name="event_type_list"),
+                path(
+                    "<slug:slug>/",
+                    EventTypeDetailView.as_view(),
+                    name="event_type_detail",
+                ),
+            ]
+        ),
+    ),
+    # manage EventLocation objects
+    path(
+        "event_locations/",
+        include(
+            [
+                path("", EventLocationListView.as_view(), name="event_location_list"),
+                path(
+                    "create/",
+                    EventLocationCreateView.as_view(),
+                    name="event_location_create",
+                ),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EventLocationDetailView.as_view(),
+                                name="event_location_detail",
+                            ),
+                            path(
+                                "update/",
+                                EventLocationUpdateView.as_view(),
+                                name="event_location_update",
+                            ),
+                            path(
+                                "delete/",
+                                EventLocationDeleteView.as_view(),
+                                name="event_location_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage Event objects
+    path(
+        "events/",
+        include(
+            [
+                path("", EventListView.as_view(), name="event_list"),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path("", EventDetailView.as_view(), name="event_detail",),
+                            path(
+                                "update/",
+                                EventUpdateView.as_view(),
+                                name="event_update",
+                            ),
+                            path(
+                                "schedule/",
+                                EventScheduleView.as_view(),
+                                name="event_schedule",
+                            ),
+                            path(
+                                "delete/",
+                                EventDeleteView.as_view(),
+                                name="event_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    # manage AutoScheduler
+    path(
+        "autoscheduler/",
+        include(
+            [
+                path("", AutoScheduleManageView.as_view(), name="autoschedule_manage",),
+                path(
+                    "crashcourse/",
+                    AutoScheduleCrashCourseView.as_view(),
+                    name="autoschedule_crash_course",
+                ),
+                path(
+                    "validate/",
+                    AutoScheduleValidateView.as_view(),
+                    name="autoschedule_validate",
+                ),
+                path(
+                    "diff/", AutoScheduleDiffView.as_view(), name="autoschedule_diff",
+                ),
+                path(
+                    "apply/",
+                    AutoScheduleApplyView.as_view(),
+                    name="autoschedule_apply",
+                ),
+                path(
+                    "debug-event-slot-unavailability/",
+                    AutoScheduleDebugEventSlotUnavailabilityView.as_view(),
+                    name="autoschedule_debug_event_slot_unavailability",
+                ),
+                path(
+                    "debug-event-conflicts/",
+                    AutoScheduleDebugEventConflictsView.as_view(),
+                    name="autoschedule_debug_event_conflicts",
+                ),
+            ]
+        ),
+    ),
+    # approve EventFeedback objects
+    path(
+        "approve_feedback",
+        ApproveFeedbackView.as_view(),
+        name="approve_event_feedback",
     ),
     # economy
     path(

@@ -17,9 +17,9 @@ If you already cloned the repository without --recursive, you can change into th
     git submodule update --init --recursive
 
 ### Virtualenv
-Create a Python 3 virtual environment and activate it:
+Create a Python 3.7 virtual environment and activate it:
 ```
-$ virtualenv venv -p python3
+$ virtualenv venv -p python3.7
 $ source venv/bin/activate
 ```
 
@@ -57,7 +57,7 @@ Install pip packages:
 
 ### Postgres
 
-You need to have a running Postgres instance (we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`.
+You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints).
 
 ### Configuration file
 

@@ -6,7 +6,7 @@ Program | {{ block.super }}
 
 {% block content %}
 
-{% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speakerproposal_create,speakerproposal_detail,speakerproposal_update,speakerproposal_submit,speakerproposal_picture,eventproposal_create,eventproposal_detail,eventproposal_update,eventproposal_submit" %}
+{% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speaker_proposal_create,speaker_proposal_detail,speaker_proposal_update,speaker_proposal_submit,speaker_proposal_picture,event_proposal_create,event_proposal_detail,event_proposal_update,event_proposal_submit" %}
 
 <div class="row">
   <div class="btn-group btn-group-justified hidden-xs">

@@ -45,7 +45,7 @@ class MapProxyView(View):
             "upgrade",
         ]
         # proxy all headers from our upstream request to the response to our client,
-        # if they headers are not in our list of troublemakers
+        # if the headers are not in our list of troublemakers
         for key, value in r.headers.items():
             if key.lower() not in excluded_headers:
                 response[key] = value

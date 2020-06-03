@@ -1,11 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
-
 {% block title %}
 Manage Revenues for {{ camp.title }} | {{ block.super }}
 {% endblock %}

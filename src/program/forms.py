@@ -3,14 +3,15 @@ import logging
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-from .models import EventProposal, EventTrack, SpeakerProposal, Url, UrlType
+from .models import Event, EventProposal, EventTrack, SpeakerProposal
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class SpeakerProposalForm(forms.ModelForm):
     """
-    The SpeakerProposalForm. Takes an EventType in __init__ and changes fields accordingly.
+    The SpeakerProposalForm. Takes a list of EventTypes in __init__,
+    and changes fields accordingly if the list has 1 element.
     """
 
     class Meta:
@@ -21,17 +22,41 @@ class SpeakerProposalForm(forms.ModelForm):
             "biography",
             "needs_oneday_ticket",
             "submission_notes",
+            "event_conflicts",
         ]
 
-    def __init__(self, camp, eventtype=None, *args, **kwargs):
-        # initialise the form
+    def __init__(self, camp, event_type=None, matrix={}, *args, **kwargs):
+        """
+        initialise the form and adapt based on event_type
+        """
         super().__init__(*args, **kwargs)
 
+        # only show events from this camp
+        self.fields["event_conflicts"].queryset = Event.objects.filter(
+            track__camp=camp, event_type__support_speaker_event_conflicts=True,
+        )
+
+        if matrix:
+            # add speaker availability fields
+            for date in matrix.keys():
+                # do we need a column for this day?
+                if matrix[date]:
+                    # loop over the daychunks for this day
+                    for daychunk in matrix[date]:
+                        if matrix[date][daychunk]:
+                            # add the field
+                            self.fields[
+                                matrix[date][daychunk]["fieldname"]
+                            ] = forms.BooleanField(required=False)
+                            # add it to Meta.fields too
+                            self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
+
         # adapt form based on EventType?
-        if not eventtype:
+        if not event_type:
+            # we have no event_type to customize the form, use the default form
             return
 
-        if eventtype.name == "Debate":
+        if event_type.name == "Debate":
             # fix label and help_text for the name field
             self.fields["name"].label = "Guest Name"
             self.fields[
@@ -54,10 +79,10 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this guest. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Lightning Talk":
+        elif event_type.name == "Lightning Talk":
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
             self.fields[
@@ -83,7 +108,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for lightning talks
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Music Act":
+        elif event_type.name == "Music Act":
             # fix label and help_text for the name field
             self.fields["name"].label = "Artist Name"
             self.fields[
@@ -109,33 +134,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Recreational Event":
-            # fix label and help_text for the name field
-            self.fields["name"].label = "Host Name"
-            self.fields[
-                "name"
-            ].help_text = "The name of the event host. Can be a real name or an alias."
-
-            # fix label and help_text for the email field
-            self.fields["email"].label = "Host Email"
-            self.fields[
-                "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty."
-
-            # fix label and help_text for the biograpy field
-            self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host."
-
-            # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Host Notes"
-            self.fields[
-                "submission_notes"
-            ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
-
-            # no oneday tickets for music acts
-            del self.fields["needs_oneday_ticket"]
-
-        elif eventtype.name == "Talk":
+        elif event_type.name == "Talk" or event_type.name == "Keynote":
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
             self.fields[
@@ -158,7 +157,7 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this speaker. Only visible to yourself and the BornHack organisers."
 
-        elif eventtype.name == "Workshop":
+        elif event_type.name == "Workshop":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields[
@@ -186,7 +185,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Slacking Off":
+        elif event_type.name == "Recreational":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields["name"].help_text = "Can be a real name or an alias."
@@ -207,10 +206,10 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for recreational events
             del self.fields["needs_oneday_ticket"]
 
-        elif eventtype.name == "Meetup":
+        elif event_type.name == "Meetup":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields[
@@ -233,12 +232,12 @@ class SpeakerProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
 
-            # no free tickets for workshops
+            # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
 
         else:
             raise ImproperlyConfigured(
-                "Unsupported event type, don't know which form class to use"
+                f"Unsupported event type '{event_type.name}', don't know which form class to use"
             )
 
 
@@ -258,6 +257,7 @@ class EventProposalForm(forms.ModelForm):
             "abstract",
             "allow_video_recording",
             "duration",
+            "tags",
             "slides_url",
             "submission_notes",
             "track",
@@ -265,52 +265,35 @@ class EventProposalForm(forms.ModelForm):
         ]
 
     def clean_duration(self):
-        duration = self.cleaned_data["duration"]
-        if not duration or duration < 60 or duration > 180:
+        """ Make sure duration has been specified, and make sure it is not too long """
+        if not self.cleaned_data["duration"]:
+            raise forms.ValidationError(f"Please specify a duration.")
+        if (
+            self.event_type.event_duration_minutes
+            and self.cleaned_data["duration"] > self.event_type.event_duration_minutes
+        ):
             raise forms.ValidationError(
-                "Please keep duration between 60 and 180 minutes."
+                f"Please keep duration under {self.event_type.event_duration_minutes} minutes."
             )
-        return duration
+        return self.cleaned_data["duration"]
 
     def clean_track(self):
         track = self.cleaned_data["track"]
         # TODO: make sure the track is part of the current camp, needs camp as form kwarg to verify
         return track
 
-    def save(self, commit=True, user=None, event_type=None):
-        eventproposal = super().save(commit=False)
-        if user:
-            eventproposal.user = user
-        if event_type:
-            eventproposal.event_type = event_type
-        eventproposal.save()
-
-        if not event_type and hasattr(eventproposal, "event_type"):
-            event_type = eventproposal.event_type
-
-        if self.cleaned_data.get("slides_url") and event_type.name in [
-            "Talk",
-            "Lightning Talk",
-        ]:
-            url = self.cleaned_data.get("slides_url")
-            if not eventproposal.urls.filter(url=url).exists():
-                slides_url = Url()
-                slides_url.eventproposal = eventproposal
-                slides_url.url = url
-                slides_url.urltype = UrlType.objects.get(name="Slides")
-                slides_url.save()
-
-        return eventproposal
-
-    def __init__(self, camp, eventtype=None, *args, **kwargs):
+    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         # initialise form
         super().__init__(*args, **kwargs)
+
+        # we need event_type for cleaning later
+        self.event_type = event_type
 
         TALK = "Talk"
         LIGHTNING_TALK = "Lightning Talk"
         DEBATE = "Debate"
         MUSIC_ACT = "Music Act"
-        RECREATIONAL_EVENT = "Recreational Event"
+        RECREATIONAL_EVENT = "Recreational"
         WORKSHOP = "Workshop"
         SLACKING_OFF = "Slacking Off"
         MEETUP = "Meetup"
@@ -322,15 +305,34 @@ class EventProposalForm(forms.ModelForm):
         # make sure video_recording checkbox defaults to checked
         self.fields["allow_video_recording"].initial = True
 
-        if eventtype.name not in [TALK, LIGHTNING_TALK]:
+        if event_type.name not in [TALK, LIGHTNING_TALK]:
             # Only talk or lightning talk should show the slides_url field
             del self.fields["slides_url"]
 
-        if not eventtype.name == LIGHTNING_TALK:
+        # better placeholder text for duration field
+        self.fields["duration"].label = f"{event_type.name} Duration"
+        if event_type.event_duration_minutes:
+            self.fields[
+                "duration"
+            ].help_text = f"Please enter the duration of this {event_type.name} (in minutes, max {event_type.event_duration_minutes})"
+            self.fields["duration"].widget.attrs[
+                "placeholder"
+            ] = f"{event_type.name} Duration (in minutes, max {event_type.event_duration_minutes})"
+        else:
+            self.fields[
+                "duration"
+            ].help_text = (
+                f"Please enter the duration of this {event_type.name} (in minutes)"
+            )
+            self.fields["duration"].widget.attrs[
+                "placeholder"
+            ] = f"{event_type.name} Duration (in minutes)"
+
+        if not event_type.name == LIGHTNING_TALK:
             # Only lightning talks submissions will have to choose whether to use provided speaker laptop
             del self.fields["use_provided_speaker_laptop"]
 
-        if eventtype.name == DEBATE:
+        if event_type.name == DEBATE:
             # fix label and help_text for the title field
             self.fields["title"].label = "Title of debate"
             self.fields["title"].help_text = "The title of this debate"
@@ -340,17 +342,12 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = "The description of this debate"
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Debate Act Notes"
+            self.fields["submission_notes"].label = "Debate Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this debate. Only visible to yourself and the BornHack organisers."
 
-            # better placeholder text for duration field
-            self.fields["duration"].widget.attrs[
-                "placeholder"
-            ] = "Debate Duration (minutes)"
-
-        elif eventtype.name == MUSIC_ACT:
+        elif event_type.name == MUSIC_ACT:
             # fix label and help_text for the title field
             self.fields["title"].label = "Title of music act"
             self.fields["title"].help_text = "The title of this music act/concert/set."
@@ -368,10 +365,7 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for music acts
             del self.fields["allow_video_recording"]
 
-            # better placeholder text for duration field
-            self.fields["duration"].widget.attrs["placeholder"] = "Duration (minutes)"
-
-        elif eventtype.name == RECREATIONAL_EVENT:
+        elif event_type.name == RECREATIONAL_EVENT:
             # fix label and help_text for the title field
             self.fields["title"].label = "Event Title"
             self.fields["title"].help_text = "The title of this recreational event"
@@ -391,11 +385,7 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for music acts
             del self.fields["allow_video_recording"]
 
-            # better placeholder text for duration field
-            self.fields["duration"].label = "Event Duration"
-            self.fields["duration"].widget.attrs["placeholder"] = "Duration (minutes)"
-
-        elif eventtype.name in [TALK, LIGHTNING_TALK]:
+        elif event_type.name in [TALK, LIGHTNING_TALK]:
             # fix label and help_text for the title field
             self.fields["title"].label = "Title of Talk"
             self.fields["title"].help_text = "The title of this talk/presentation."
@@ -412,7 +402,7 @@ class EventProposalForm(forms.ModelForm):
                 "submission_notes"
             ].help_text = "Private notes regarding this talk. Only visible to yourself and the BornHack organisers."
 
-            if self.fields.get("slides_url") and eventtype.name == LIGHTNING_TALK:
+            if self.fields.get("slides_url") and event_type.name == LIGHTNING_TALK:
                 self.fields[
                     "slides_url"
                 ].help_text += " You will only get assigned a slot if you have provided slides (a title slide is enough if you don't use slides for the talk). You can add an URL later if need be."
@@ -420,7 +410,7 @@ class EventProposalForm(forms.ModelForm):
             # no duration for talks
             del self.fields["duration"]
 
-        elif eventtype.name == WORKSHOP:
+        elif event_type.name == WORKSHOP:
             # fix label and help_text for the title field
             self.fields["title"].label = "Workshop Title"
             self.fields["title"].help_text = "The title of this workshop."
@@ -440,13 +430,7 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for workshops
             del self.fields["allow_video_recording"]
 
-            # duration field
-            self.fields["duration"].label = "Workshop Duration"
-            self.fields[
-                "duration"
-            ].help_text = "How much time (in minutes) should we set aside for this workshop? Please keep it between 60 and 180 minutes (1-3 hours)."
-
-        elif eventtype.name == SLACKING_OFF:
+        elif event_type.name == SLACKING_OFF:
             # fix label and help_text for the title field
             self.fields["title"].label = "Event Title"
             self.fields["title"].help_text = "The title of this recreational event."
@@ -466,13 +450,7 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for recreational events
             del self.fields["allow_video_recording"]
 
-            # duration field
-            self.fields["duration"].label = "Event Duration"
-            self.fields[
-                "duration"
-            ].help_text = "How much time (in minutes) should we set aside for this event? Please keep it between 60 and 180 minutes (1-3 hours)."
-
-        elif eventtype.name == MEETUP:
+        elif event_type.name == MEETUP:
             # fix label and help_text for the title field
             self.fields["title"].label = "Meetup Title"
             self.fields["title"].help_text = "The title of this meetup."
@@ -491,12 +469,6 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for meetups
             del self.fields["allow_video_recording"]
-
-            # duration field
-            self.fields["duration"].label = "Meetup Duration"
-            self.fields[
-                "duration"
-            ].help_text = "How much time (in minutes) should we set aside for this meetup? Please keep it between 60 and 180 minutes (1-3 hours)."
 
         else:
             raise ImproperlyConfigured(

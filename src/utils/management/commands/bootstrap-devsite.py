@@ -1,14 +1,20 @@
 # coding: utf-8
+import logging
+import random
+import sys
+from datetime import datetime, timedelta
+
 import factory
+import pytz
 from allauth.account.models import EmailAddress
 from camps.models import Camp
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.utils.text import slugify
 from events.models import Routing, Type
 from facilities.models import (
     Facility,
@@ -21,24 +27,35 @@ from feedback.models import Feedback
 from info.models import InfoCategory, InfoItem
 from news.models import NewsItem
 from profiles.models import Profile
+from program.autoscheduler import AutoScheduler
 from program.models import (
     Event,
-    EventInstance,
     EventLocation,
+    EventProposal,
+    EventSession,
+    EventSlot,
     EventTrack,
     EventType,
-    Speaker,
+    SpeakerProposal,
+    Url,
+    UrlType,
 )
-from program.signal_handlers import eventinstance_post_save
+from program.utils import (
+    get_speaker_availability_form_matrix,
+    save_speaker_availability,
+)
 from rideshare.models import Ride
 from shop.models import Order, Product, ProductCategory
 from sponsors.models import Sponsor, SponsorTier
 from teams.models import Team, TeamMember, TeamShift, TeamTask
 from tickets.models import TicketType
 from tokens.models import Token, TokenFind
+from utils.slugs import unique_slugify
 from villages.models import Village
 
 fake = Faker()
+tz = pytz.timezone("Europe/Copenhagen")
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 @factory.django.mute_signals(post_save)
@@ -69,32 +86,71 @@ class EmailAddressFactory(factory.django.DjangoModelFactory):
     verified = True
 
 
+def output_fake_md_description():
+    fake_text = "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
+    fake_text += "\n\n"
+    fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
+    fake_text += "\n\n"
+    fake_text += "## " + fake.sentence(nb_words=3) + "\n"
+    fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
+    fake_text += "\n\n"
+    fake_text += '![The image is not awailable](/static/img/na.jpg "not available")'
+    fake_text += "\n\n"
+    fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
+    fake_text += "\n\n"
+    fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
+    fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
+    return fake_text
+
+
+def output_fake_description():
+    fake_text = "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
+    fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
+    return fake_text
+
+
+class SpeakerProposalFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = SpeakerProposal
+
+    name = factory.Faker("name")
+    email = factory.Faker("email")
+    biography = output_fake_md_description()
+    submission_notes = factory.Iterator(["", output_fake_description()])
+    needs_oneday_ticket = factory.Iterator([True, False])
+
+
+class EventProposalFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EventProposal
+
+    user = factory.Iterator(User.objects.all())
+    title = factory.Faker("sentence")
+    abstract = output_fake_md_description()
+    allow_video_recording = factory.Iterator([True, True, True, False])
+    submission_notes = factory.Iterator(["", output_fake_description()])
+    use_provided_speaker_laptop = factory.Iterator([True, False])
+
+
+class EventProposalUrlFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Url
+
+    url = factory.Faker("url")
+    url_type = factory.Iterator(UrlType.objects.all())
+
+
+class SpeakerProposalUrlFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Url
+
+    url = factory.Faker("url")
+    url_type = factory.Iterator(UrlType.objects.all())
+
+
 class Command(BaseCommand):
     args = "none"
     help = "Create mock data for development instances"
-
-    def output_fake_md_description(self):
-        fake_text = "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
-        fake_text += "\n\n"
-        fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
-        fake_text += "\n\n"
-        fake_text += "## " + fake.sentence(nb_words=3) + "\n"
-        fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
-        fake_text += "\n\n"
-        fake_text += '![The image is not awailable](/static/img/na.jpg "not available")'
-        fake_text += "\n\n"
-        fake_text += "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
-        fake_text += "\n\n"
-        fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
-        fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
-
-        return fake_text
-
-    def output_fake_description(self):
-        fake_text = "\n".join(fake.paragraphs(nb=3, ext_word_list=None))
-        fake_text += "* [" + fake.sentence(nb_words=3) + "](" + fake.uri() + ")\n"
-
-        return fake_text
 
     def create_camps(self):
         self.output("Creating camps...")
@@ -102,8 +158,8 @@ class Command(BaseCommand):
             dict(year=2016, tagline="Initial Commit", colour="#004dff", read_only=True),
             dict(year=2017, tagline="Make Tradition", colour="#750787", read_only=True),
             dict(year=2018, tagline="scale it", colour="#008026", read_only=True),
-            dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=False),
-            dict(year=2020, tagline="Undecided", colour="#ff8c00", read_only=False),
+            dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=True),
+            dict(year=2020, tagline="Going Viral", colour="#ff8c00", read_only=False),
             dict(year=2021, tagline="Undecided", colour="#e40303", read_only=False),
         ]
 
@@ -120,16 +176,16 @@ class Command(BaseCommand):
                         slug="bornhack-{}".format(year),
                         shortslug="bornhack-{}".format(year),
                         buildup=(
-                            timezone.datetime(year, 8, 25, 12, 0, tzinfo=timezone.utc),
-                            timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
+                            tz.localize(datetime(year, 8, 25, 12, 0)),
+                            tz.localize(datetime(year, 8, 27, 12, 0)),
                         ),
                         camp=(
-                            timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
-                            timezone.datetime(year, 9, 4, 11, 0, tzinfo=timezone.utc),
+                            tz.localize(datetime(year, 8, 27, 12, 0)),
+                            tz.localize(datetime(year, 9, 3, 12, 0)),
                         ),
                         teardown=(
-                            timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
-                            timezone.datetime(year, 9, 6, 12, 0, tzinfo=timezone.utc),
+                            tz.localize(datetime(year, 9, 3, 12, 0)),
+                            tz.localize(datetime(year, 9, 5, 12, 0)),
                         ),
                         colour=camp["colour"],
                     ),
@@ -139,12 +195,16 @@ class Command(BaseCommand):
 
         return camp_instances
 
+    def create_event_routing_types(self):
+        t, created = Type.objects.get_or_create(name="public_credit_name_changed")
+        t, created = Type.objects.get_or_create(name="ticket_created")
+
     def create_users(self):
         self.output("Creating users...")
 
         users = {}
 
-        for i in range(1, 10):
+        for i in range(0, 16):
             username = "user{}".format(i)
             user = UserFactory.create(
                 username=username, email="{}@example.com".format(username)
@@ -310,6 +370,9 @@ class Command(BaseCommand):
             description="Workshops actively involve the participants in the learning experience",
             icon="toolbox",
             host_title="Host",
+            event_duration_minutes="180",
+            support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["talk"] = EventType.objects.create(
@@ -321,6 +384,9 @@ class Command(BaseCommand):
             description="A presentation on a stage",
             icon="chalkboard-teacher",
             host_title="Speaker",
+            event_duration_minutes="60",
+            support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["lightning"] = EventType.objects.create(
@@ -332,6 +398,8 @@ class Command(BaseCommand):
             description="A short 5-10 minute presentation",
             icon="bolt",
             host_title="Speaker",
+            event_duration_minutes="5",
+            support_speaker_event_conflicts=True,
         )
 
         types["music"] = EventType.objects.create(
@@ -343,6 +411,9 @@ class Command(BaseCommand):
             description="A musical performance",
             icon="music",
             host_title="Artist",
+            event_duration_minutes="180",
+            support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["keynote"] = EventType.objects.create(
@@ -353,6 +424,9 @@ class Command(BaseCommand):
             description="A keynote presentation",
             icon="star",
             host_title="Speaker",
+            event_duration_minutes="90",
+            support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["debate"] = EventType.objects.create(
@@ -364,6 +438,9 @@ class Command(BaseCommand):
             icon="users",
             host_title="Guest",
             public=True,
+            event_duration_minutes="120",
+            support_autoscheduling=True,
+            support_speaker_event_conflicts=True,
         )
 
         types["facility"] = EventType.objects.create(
@@ -375,20 +452,61 @@ class Command(BaseCommand):
             description="Events involving facilities like bathrooms, food area and so on",
             icon="home",
             host_title="Host",
+            event_duration_minutes="720",
+            support_speaker_event_conflicts=False,
         )
 
         types["slack"] = EventType.objects.create(
-            name="Recreational Event",
-            slug="recreational-event",
+            name="Recreational",
+            slug="recreational",
             color="#0000ff",
             light_text=True,
             public=True,
             description="Events of a recreational nature",
             icon="dice",
             host_title="Host",
+            event_duration_minutes="60",
+            support_autoscheduling=False,
+            support_speaker_event_conflicts=True,
         )
 
         return types
+
+    def create_url_types(self):
+        self.output("Creating UrlType objects...")
+        t, created = UrlType.objects.get_or_create(
+            name="Other", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Homepage", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Slides", defaults={"icon": "fas fa-chalkboard-teacher"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Twitter", defaults={"icon": "fab fa-twitter"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Mastodon", defaults={"icon": "fab fa-mastodon"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Facebook", defaults={"icon": "fab fa-facebook"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Project", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Blog", defaults={"icon": "fas fa-link"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Github", defaults={"icon": "fab fa-github"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Keybase", defaults={"icon": "fab fa-keybase"}
+        )
+        t, created = UrlType.objects.get_or_create(
+            name="Recording", defaults={"icon": "fas fa-film"}
+        )
 
     def create_product_categories(self):
         categories = {}
@@ -418,10 +536,15 @@ class Command(BaseCommand):
             price=125,
             description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
             available_in=(
-                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+                tz.localize(datetime(2017, 3, 1, 11, 0)),
+                tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "PROSA bus transport (open for everyone)"
@@ -431,10 +554,15 @@ class Command(BaseCommand):
             price=125,
             description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
             available_in=(
-                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+                tz.localize(datetime(2017, 3, 1, 11, 0)),
+                tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "T-shirt (large)"
@@ -444,10 +572,15 @@ class Command(BaseCommand):
             price=160,
             description="Get a nice t-shirt",
             available_in=(
-                timezone.datetime(2017, 3, 1, 11, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 10, 30, 11, 30, tzinfo=timezone.utc),
+                tz.localize(datetime(2017, 3, 1, 11, 0)),
+                tz.localize(datetime(2017, 10, 30, 11, 30)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "Village tent 3x3 meters, no floor"
@@ -457,10 +590,15 @@ class Command(BaseCommand):
             price=3325,
             category=categories["villages"],
             available_in=(
-                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(2017, 3, 1, 12, 0)),
+                tz.localize(datetime(2017, 8, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         name = "Village tent 3x3 meters, with floor"
@@ -470,10 +608,15 @@ class Command(BaseCommand):
             price=3675,
             category=categories["villages"],
             available_in=(
-                timezone.datetime(2017, 3, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(2017, 8, 20, 12, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(2017, 3, 1, 12, 0)),
+                tz.localize(datetime(2017, 8, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"]
+                ).values_list("slug", flat=True),
+            ),
         )
 
         return products
@@ -506,10 +649,15 @@ class Command(BaseCommand):
             price=1200,
             category=categories["tickets"],
             available_in=(
-                timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["tickets"]
+                ).values_list("slug", flat=True),
+            ),
             ticket_type=ticket_types["adult_full_week"],
         )
 
@@ -520,10 +668,15 @@ class Command(BaseCommand):
             price=1337,
             category=categories["tickets"],
             available_in=(
-                timezone.datetime(year, 1, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 12, 20, 12, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
             ),
-            slug="{}".format(slugify(name)),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["tickets"]
+                ).values_list("slug", flat=True),
+            ),
             ticket_type=ticket_types["adult_full_week"],
         )
 
@@ -587,29 +740,63 @@ class Command(BaseCommand):
     def create_camp_tracks(self, camp):
         tracks = {}
         year = camp.camp.lower.year
-        self.output("Creating eventtracks for {}...".format(year))
+        self.output("Creating event_tracks for {}...".format(year))
         tracks[1] = EventTrack.objects.create(
             camp=camp, name="BornHack", slug=camp.slug
         )
 
         return tracks
 
-    def create_camp_locations(self, camp):
+    def create_event_locations(self, camp):
         locations = {}
         year = camp.camp.lower.year
-        self.output("Creating eventlocations for {}...".format(year))
+        self.output("Creating event_locations for {}...".format(year))
         locations["speakers_tent"] = EventLocation.objects.create(
-            name="Speakers Tent", slug="speakers-tent", icon="comment", camp=camp
+            name="Speakers Tent",
+            slug="speakers-tent",
+            icon="comment",
+            camp=camp,
+            capacity=150,
         )
-        locations["workshop_room"] = EventLocation.objects.create(
-            name="Workshop rooms", slug="workshop-rooms", icon="briefcase", camp=camp
+        locations["workshop_room_1"] = EventLocation.objects.create(
+            name="Workshop room 1 (big)",
+            slug="workshop-room-1",
+            icon="briefcase",
+            camp=camp,
+            capacity=50,
+        )
+        locations["workshop_room_2"] = EventLocation.objects.create(
+            name="Workshop room 2 (small)",
+            slug="workshop-room-2",
+            icon="briefcase",
+            camp=camp,
+            capacity=25,
+        )
+        locations["workshop_room_3"] = EventLocation.objects.create(
+            name="Workshop room 3 (small)",
+            slug="workshop-room-3",
+            icon="briefcase",
+            camp=camp,
+            capacity=25,
         )
         locations["bar_area"] = EventLocation.objects.create(
-            name="Bar Area", slug="bar-area", icon="glass", camp=camp
+            name="Bar Area",
+            slug="bar-area",
+            icon="glass-cheers",
+            camp=camp,
+            capacity=50,
         )
         locations["food_area"] = EventLocation.objects.create(
-            name="Food Area", slug="food-area", icon="cutlery", camp=camp
+            name="Food Area", slug="food-area", icon="utensils", camp=camp, capacity=50,
         )
+        locations["infodesk"] = EventLocation.objects.create(
+            name="Infodesk", slug="infodesk", icon="info", camp=camp, capacity=20,
+        )
+
+        # add workshop room conflicts (the big root can not be used while either
+        # of the small rooms are in use, and vice versa)
+        locations["workshop_room_1"].conflicts.add(locations["workshop_room_2"])
+        locations["workshop_room_1"].conflicts.add(locations["workshop_room_3"])
 
         return locations
 
@@ -619,626 +806,312 @@ class Command(BaseCommand):
         NewsItem.objects.create(
             title="Welcome to {}".format(camp.title),
             content="news body here with <b>html</b> support",
-            published_at=timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
+            published_at=tz.localize(datetime(year, 8, 27, 12, 0)),
         )
         NewsItem.objects.create(
             title="{} is over".format(camp.title),
             content="news body here",
-            published_at=timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
+            published_at=tz.localize(datetime(year, 9, 4, 12, 0)),
         )
 
-    def create_camp_events(self, camp, tracks, event_types):
-        events = {}
+    def create_camp_event_sessions(self, camp, event_types, event_locations):
+        self.output(f"Creating EventSessions for {camp}...")
+        days = camp.get_days(camppart="camp")[1:-1]
+        for day in days:
+            start = day.lower
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["talk"],
+                event_location=event_locations["speakers_tent"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 11, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["slack"],
+                event_location=event_locations["speakers_tent"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 13, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["music"],
+                event_location=event_locations["bar_area"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 22, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 22, 0))
+                    + timedelta(hours=3),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_1"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_2"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
+                ),
+            )
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["workshop"],
+                event_location=event_locations["workshop_room_3"],
+                when=(
+                    tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
+                    tz.localize(datetime(start.year, start.month, start.day, 18, 0)),
+                ),
+            )
+        # create sessions for the keynotes
+        for day in [days[1], days[3], days[5]]:
+            EventSession.objects.create(
+                camp=camp,
+                event_type=event_types["keynote"],
+                event_location=event_locations["speakers_tent"],
+                when=(
+                    tz.localize(
+                        datetime(day.lower.year, day.lower.month, day.lower.day, 20, 0)
+                    ),
+                    tz.localize(
+                        datetime(day.lower.year, day.lower.month, day.lower.day, 21, 30)
+                    ),
+                ),
+            )
+
+    def create_camp_proposals(self, camp, event_types):
         year = camp.camp.lower.year
-        self.output("Creating events for {}...".format(year))
-        events[1] = Event.objects.create(
-            title="Developing the BornHack website",
-            abstract=self.output_fake_md_description(),
+        self.output("Creating event- and speaker_proposals for {}...".format(year))
+
+        # add 45 talks
+        talkproposals = EventProposalFactory.create_batch(
+            45,
+            track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["talk"],
-            track=tracks[1],
         )
-        events[2] = Event.objects.create(
-            title="State of the world",
-            abstract=self.output_fake_md_description(),
+        # and 15 workshops
+        workshopproposals = EventProposalFactory.create_batch(
+            15,
+            track=factory.Iterator(camp.event_tracks.all()),
+            event_type=event_types["workshop"],
+        )
+        # and 3 keynotes
+        # (in the real world these are submitted as talks
+        # and promoted to keynotes by the content team)
+        keynoteproposals = EventProposalFactory.create_batch(
+            3,
+            track=factory.Iterator(camp.event_tracks.all()),
             event_type=event_types["keynote"],
-            track=tracks[1],
         )
-        events[3] = Event.objects.create(
-            title="Welcome to bornhack!",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[4] = Event.objects.create(
-            title="bar is open",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["facility"],
-            track=tracks[1],
-        )
-        events[5] = Event.objects.create(
-            title="Network something",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[6] = Event.objects.create(
-            title="State of outer space",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[9] = Event.objects.create(
-            title="The Alternative Welcoming",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[10] = Event.objects.create(
-            title="Words and Power - are we making the most of online activism?",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["keynote"],
-            track=tracks[1],
-        )
-        events[11] = Event.objects.create(
-            title="r4d1o hacking 101",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["workshop"],
-            track=tracks[1],
-        )
-        events[12] = Event.objects.create(
-            title="Introduction to Sustainable Growth in a Digital World",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["workshop"],
-            track=tracks[1],
-        )
-        events[13] = Event.objects.create(
-            title="American Fuzzy Lop and Address Sanitizer",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[14] = Event.objects.create(
-            title="PGP Keysigning Party",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["workshop"],
-            track=tracks[1],
-        )
-        events[15] = Event.objects.create(
-            title="Bluetooth Low Energy",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[16] = Event.objects.create(
-            title="TLS attacks and the burden of faulty TLS implementations",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[17] = Event.objects.create(
-            title="State of the Network",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[18] = Event.objects.create(
-            title="Running Exit Nodes in the North",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[19] = Event.objects.create(
-            title="Hacker Jeopardy Qualifier",
-            abstract=self.output_fake_description(),
+
+        tags = [
+            "infosec",
+            "hardware",
+            "politics",
+            "django",
+            "development",
+            "games",
+            "privacy",
+            "vampires",
+            "linux",
+        ]
+
+        for ep in talkproposals + workshopproposals + keynoteproposals:
+            # create a speakerproposal for this EventProposal
+            sp = SpeakerProposalFactory(camp=camp, user=ep.user)
+            ep.speakers.add(sp)
+            # 20% chance we add an extra speaker
+            if random.randint(1, 10) > 8:
+                other_speakers = SpeakerProposal.objects.filter(camp=camp).exclude(
+                    uuid=sp.uuid
+                )
+                # ... if we have any...
+                if other_speakers.exists():
+                    # add an extra speaker
+                    ep.speakers.add(random.choice(other_speakers))
+
+            # add tags for 2 out of 3 events
+            if random.choice([True, True, False]):
+                # add 1-3 tags for this EP
+                ep.tags.add(*random.sample(tags, k=random.randint(1, 3)))
+
+        EventProposal.objects.create(
+            user=random.choice(User.objects.all()),
+            title="Lunch break",
+            abstract="Daily lunch break. Remember to drink water.",
             event_type=event_types["slack"],
-            track=tracks[1],
-        )
-        events[20] = Event.objects.create(
-            title="Hacker Jeopardy Finals",
-            abstract=self.output_fake_description(),
-            event_type=event_types["slack"],
-            track=tracks[1],
-        )
-        events[21] = Event.objects.create(
-            title="Incompleteness Phenomena in Mathematics: From Kurt Gödel to Harvey Friedman",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[22] = Event.objects.create(
-            title="Infocalypse Now - and how to Survive It?",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["keynote"],
-            track=tracks[1],
-        )
-        events[23] = Event.objects.create(
-            title="Liquid Democracy (Introduction and Debate)",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[24] = Event.objects.create(
-            title="Badge Workshop",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["workshop"],
-            track=tracks[1],
-        )
-        events[25] = Event.objects.create(
-            title="Checking a Distributed Hash Table for Correctness",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[26] = Event.objects.create(
-            title="GraphQL - A Data Language",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["talk"],
-            track=tracks[1],
-        )
-        events[27] = Event.objects.create(
-            title="Visualisation of Public Datasets",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["workshop"],
-            track=tracks[1],
-        )
-        events[28] = Event.objects.create(
-            title="Local delicacies",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["facility"],
-            track=tracks[1],
-        )
-        events[29] = Event.objects.create(
-            title="Local delicacies from the world",
-            abstract=self.output_fake_md_description(),
-            event_type=event_types["facility"],
-            track=tracks[1],
-        )
+            track=random.choice(camp.event_tracks.all()),
+        ).mark_as_approved()
 
-        return events
-
-    def create_camp_speakers(self, camp, events):
-        speakers = {}
+    def create_proposal_urls(self, camp):
+        """ Create URL objects for the proposals """
         year = camp.camp.lower.year
-        self.output("Creating speakers for {}...".format(year))
-        speakers[1] = Speaker.objects.create(
-            name="Henrik Kramse",
-            biography=self.output_fake_description(),
-            slug="henrik-kramshj",
-            camp=camp,
-            email="email@example.com",
+        self.output(
+            "Creating URLs for Speaker- and EventProposals for {}...".format(year)
         )
-        speakers[1].events.add(events[5])
-        speakers[2] = Speaker.objects.create(
-            name="Thomas Tykling",
-            biography=self.output_fake_description(),
-            slug="thomas-tykling",
-            camp=camp,
-            email="email@example.com",
+        SpeakerProposalUrlFactory.create_batch(
+            100,
+            speaker_proposal=factory.Iterator(
+                SpeakerProposal.objects.filter(camp=camp)
+            ),
         )
-        speakers[2].events.add(events[3], events[1])
-        speakers[3] = Speaker.objects.create(
-            name="Alex Ahf",
-            biography=self.output_fake_description(),
-            slug="alex-ahf",
-            camp=camp,
-            email="email@example.com",
+        EventProposalUrlFactory.create_batch(
+            100,
+            event_proposal=factory.Iterator(
+                EventProposal.objects.filter(track__camp=camp)
+            ),
         )
-        speakers[3].events.add(events[4], events[2])
-        speakers[4] = Speaker.objects.create(
-            name="Jesper Arp",
-            biography=self.output_fake_description(),
-            slug="jesper-arp",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[4].events.add(events[9], events[27])
-        speakers[5] = Speaker.objects.create(
-            name="Rolf Bjerre",
-            biography=self.output_fake_description(),
-            slug="rolf-bjerre",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[5].events.add(events[9], events[23])
-        speakers[6] = Speaker.objects.create(
-            name="Emma Holten",
-            biography=self.output_fake_description(),
-            slug="emma-holten",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[6].events.add(events[10])
-        speakers[7] = Speaker.objects.create(
-            name="Christoffer Jerkeby",
-            biography=self.output_fake_description(),
-            slug="christoffer-jerkeby",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[7].events.add(events[11])
-        speakers[8] = Speaker.objects.create(
-            name="Stephan Engberg",
-            biography=self.output_fake_description(),
-            slug="stephan-engberg",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[8].events.add(events[12])
-        speakers[9] = Speaker.objects.create(
-            name="Hanno Böck",
-            biography=self.output_fake_description(),
-            slug="hanno-bock",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[9].events.add(events[13], events[16])
-        speakers[10] = Speaker.objects.create(
-            name="Ximin Luo",
-            biography=self.output_fake_description(),
-            slug="ximin-luo",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[10].events.add(events[14])
-        speakers[11] = Speaker.objects.create(
-            name="Michael Knudsen",
-            biography=self.output_fake_description(),
-            slug="michael-knudsen",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[11].events.add(events[15])
-        speakers[12] = Speaker.objects.create(
-            name="BornHack Network Team",
-            biography=self.output_fake_description(),
-            slug="bornhack-network-team",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[12].events.add(events[17])
-        speakers[13] = Speaker.objects.create(
-            name="Juha Nurmi",
-            biography=self.output_fake_description(),
-            slug="juha-nurmi",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[13].events.add(events[18])
-        speakers[14] = Speaker.objects.create(
-            name="Lasse Andersen",
-            biography=self.output_fake_description(),
-            slug="lasse-andersen",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[14].events.add(events[21])
-        speakers[15] = Speaker.objects.create(
-            name="Anders Kjærulff",
-            biography=self.output_fake_description(),
-            slug="anders-kjrulff",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[15].events.add(events[22])
-        speakers[16] = Speaker.objects.create(
-            name="Thomas Flummer",
-            biography=self.output_fake_description(),
-            slug="thomas-flummer",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[16].events.add(events[24])
-        speakers[17] = Speaker.objects.create(
-            name="Jesper Louis Andersen",
-            biography=self.output_fake_description(),
-            slug="jesper-louis-andersen",
-            camp=camp,
-            email="email@example.com",
-        )
-        speakers[17].events.add(events[25], events[26])
 
-        return speakers
-
-    def create_camp_scheduling(self, camp, events, locations):
-        post_save.disconnect(receiver=eventinstance_post_save, sender=EventInstance)
+    def generate_speaker_availability(self, camp):
+        """ Create SpeakerAvailability objects for the SpeakerProposals """
         year = camp.camp.lower.year
-        self.output("Creating eventinstances for {}...".format(year))
-        EventInstance.objects.create(
-            event=events[3],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 27, 13, 0, tzinfo=timezone.utc),
-            ),
+        self.output(
+            "Generating random SpeakerProposalAvailability for {}...".format(year)
         )
-        EventInstance.objects.create(
-            event=events[1],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
-            ),
+        for sp in camp.speaker_proposals.all():
+            # generate a matrix for this speaker_proposals event_types
+            matrix = get_speaker_availability_form_matrix(
+                sessions=sp.camp.event_sessions.filter(
+                    event_type__in=sp.event_types.all(),
+                )
+            )
+
+            # build a "form" object so we can reuse save_speaker_availability()
+            class FakeForm:
+                cleaned_data = {}
+
+            form = FakeForm()
+            for date, daychunks in matrix.items():
+                # 90% chance we have info for any given day
+                if random.randint(1, 100) > 90:
+                    # no availability info for this entire day, sorry
+                    continue
+                for daychunk, data in daychunks.items():
+                    if not data:
+                        continue
+                    # 90% chance this speaker is available for any given chunk
+                    form.cleaned_data[data["fieldname"]] = random.randint(1, 100) < 90
+            # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
+            save_speaker_availability(form, sp)
+
+    def approve_speaker_proposals(self, camp):
+        """ Approve all keynotes but reject 10% of other events """
+        for sp in camp.speaker_proposals.filter(
+            event_proposals__event_type__name="Keynote"
+        ):
+            sp.mark_as_approved()
+
+        for sp in camp.speaker_proposals.filter(proposal_status="pending"):
+            # we do not approve all speakers
+            x = random.randint(1, 100)
+            if x < 90:
+                sp.mark_as_approved()
+            elif x < 95:
+                # leave this as pending
+                continue
+            else:
+                sp.mark_as_rejected()
+
+    def approve_event_proposals(self, camp):
+        for ep in camp.event_proposals.filter(proposal_status="pending"):
+            # are all speakers for this event approved?
+            for sp in ep.speakers.all():
+                if not hasattr(sp, "speaker"):
+                    break
+            else:
+                # all speakers are approved, approve the event? always approve keynotes!
+                if random.randint(1, 100) < 90 or ep.event_type.name == "Keynote":
+                    ep.mark_as_approved()
+                else:
+                    ep.mark_as_rejected()
+
+        # set demand for workshops to see the autoscheduler in action
+        for event in camp.events.filter(event_type__name="Workshop"):
+            # this should put about half the workshops in the big room
+            # (since the small rooms have max. 25 ppl capacity)
+            event.demand = random.randint(10, 40)
+            event.save()
+
+    def create_camp_scheduling(self, camp):
+        year = camp.camp.lower.year
+        self.output("Creating scheduling for {}...".format(year))
+
+        # create a lunchbreak daily in speakers tent
+        lunch = Event.objects.get(track__camp=camp, title="Lunch break")
+        for day in camp.get_days(camppart="camp")[1:-1]:
+            date = day.lower.date()
+            start = tz.localize(datetime(date.year, date.month, date.day, 12, 0))
+            lunchslot = EventSlot.objects.get(
+                event_session__event_location=camp.event_locations.get(
+                    name="Speakers Tent"
+                ),
+                event_session__event_type=EventType.objects.get(name="Recreational"),
+                when=(start, start + timedelta(hours=1)),
+            )
+            lunchslot.event = lunch
+            lunchslot.autoscheduled = False
+            lunchslot.save()
+
+        # exercise the autoscheduler a bit
+        scheduler = AutoScheduler(camp=camp)
+        schedulestart = timezone.now()
+        try:
+            autoschedule = scheduler.calculate_autoschedule()
+            if autoschedule:
+                scheduler.apply(autoschedule)
+        except ValueError as E:
+            self.output(f"Got exception while calculating autoschedule: {E}")
+        scheduleduration = timezone.now() - schedulestart
+        self.output(
+            f"Done running autoscheduler for {year}... It took {scheduleduration}"
         )
-        EventInstance.objects.create(
-            event=events[2],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
-            ),
+
+    def create_camp_speaker_event_conflicts(self, camp):
+        year = camp.camp.lower.year
+        self.output(
+            "Generating event_conflicts for SpeakerProposals for {}...".format(year)
         )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 31, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 8, 31, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 9, 1, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 2, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[4],
-            location=locations["bar_area"],
-            when=(
-                timezone.datetime(year, 9, 2, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 3, 5, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[5],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[6],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 29, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 13, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[9],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[10],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 13, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[12],
-            location=locations["workshop_room"],
-            when=(
-                timezone.datetime(year, 8, 30, 9, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 11, 30, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[11],
-            location=locations["workshop_room"],
-            when=(
-                timezone.datetime(year, 8, 31, 14, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 31, 16, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[18],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 2, 14, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 2, 15, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[18],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 2, 16, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 2, 17, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[15],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 16, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[14],
-            location=locations["workshop_room"],
-            when=(
-                timezone.datetime(year, 8, 31, 21, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[16],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 1, 14, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 15, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[13],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 31, 17, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 31, 18, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[19],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 30, 22, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 23, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[19],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 23, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[19],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 28, 22, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 23, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[19],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 31, 22, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 31, 23, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[19],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 1, 22, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 23, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[20],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 2, 20, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 2, 22, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[21],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 28, 12, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 13, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[22],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 28, 18, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 28, 19, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[23],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 29, 9, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 11, 30, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[24],
-            location=locations["workshop_room"],
-            when=(
-                timezone.datetime(year, 8, 29, 20, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 22, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[25],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 1, 17, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 18, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[26],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 8, 30, 11, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 30, 12, 0, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[26],
-            location=locations["speakers_tent"],
-            when=(
-                timezone.datetime(year, 9, 1, 11, 45, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 12, 30, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[28],
-            location=locations["food_area"],
-            when=(
-                timezone.datetime(year, 9, 1, 18, 30, tzinfo=timezone.utc),
-                timezone.datetime(year, 9, 1, 21, 30, tzinfo=timezone.utc),
-            ),
-        )
-        EventInstance.objects.create(
-            event=events[29],
-            location=locations["food_area"],
-            when=(
-                timezone.datetime(year, 8, 29, 18, 30, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 29, 23, 30, tzinfo=timezone.utc),
-            ),
-        )
+        # loop over all
+        for sp in camp.speaker_proposals.all():
+            # not all speakers add conflicts
+            if random.choice([True, True, False]):
+                # pick 0-10 events this speaker wants to attend
+                conflictcount = random.randint(0, 10)
+                sp.event_conflicts.set(
+                    Event.objects.filter(
+                        track__camp=camp,
+                        event_type__support_speaker_event_conflicts=True,
+                    ).order_by("?")[0:conflictcount]
+                )
+
+    def create_camp_rescheduling(self, camp):
+        year = camp.camp.lower.year
+        # reapprove all speaker_proposals so the new availability takes effect
+        for prop in camp.speaker_proposals.filter(proposal_status="approved"):
+            prop.mark_as_approved()
+        # exercise the autoscheduler a bit
+        self.output("Rescheduling {}...".format(year))
+        scheduler = AutoScheduler(camp=camp)
+        schedulestart = timezone.now()
+        try:
+            autoschedule, diff = scheduler.calculate_similar_autoschedule()
+            scheduler.apply(autoschedule)
+        except ValueError as E:
+            self.output(f"Got exception while calculating similar autoschedule: {E}")
+            autoschedule = None
+        scheduleduration = timezone.now() - schedulestart
+        self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
@@ -1432,8 +1305,8 @@ class Command(BaseCommand):
         shifts[0] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                timezone.datetime(year, 8, 27, 2, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 27, 8, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(year, 8, 27, 2, 0)),
+                tz.localize(datetime(year, 8, 27, 8, 0)),
             ),
             people_required=1,
         )
@@ -1441,16 +1314,16 @@ class Command(BaseCommand):
         shifts[1] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                timezone.datetime(year, 8, 27, 8, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 27, 14, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(year, 8, 27, 8, 0)),
+                tz.localize(datetime(year, 8, 27, 14, 0)),
             ),
             people_required=1,
         )
         shifts[2] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
-                timezone.datetime(year, 8, 27, 14, 0, tzinfo=timezone.utc),
-                timezone.datetime(year, 8, 27, 20, 0, tzinfo=timezone.utc),
+                tz.localize(datetime(year, 8, 27, 14, 0)),
+                tz.localize(datetime(year, 8, 27, 20, 0)),
             ),
             people_required=1,
         )
@@ -1494,7 +1367,7 @@ class Command(BaseCommand):
             category=categories["travel"],
             headline="Public Transportation",
             anchor="public-transportation",
-            body=self.output_fake_md_description(),
+            body=output_fake_md_description(),
         )
         InfoItem.objects.create(
             category=categories["travel"],
@@ -1506,7 +1379,7 @@ class Command(BaseCommand):
             category=categories["when"],
             headline="Driving and Parking",
             anchor="driving-and-parking",
-            body=self.output_fake_md_description(),
+            body=output_fake_md_description(),
         )
         InfoItem.objects.create(
             category=categories["sleep"],
@@ -1548,7 +1421,7 @@ class Command(BaseCommand):
             seats=2,
             from_location="Copenhagen",
             to_location="BornHack",
-            when=timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
+            when=tz.localize(datetime(year, 8, 27, 12, 0)),
             description="I have space for two people and a little bit of luggage",
         )
         Ride.objects.create(
@@ -1557,7 +1430,7 @@ class Command(BaseCommand):
             seats=2,
             from_location="BornHack",
             to_location="Copenhagen",
-            when=timezone.datetime(year, 9, 4, 12, 0, tzinfo=timezone.utc),
+            when=tz.localize(datetime(year, 9, 4, 12, 0)),
             description="I have space for two people and a little bit of luggage",
         )
         Ride.objects.create(
@@ -1566,7 +1439,7 @@ class Command(BaseCommand):
             seats=1,
             from_location="Aarhus",
             to_location="BornHack",
-            when=timezone.datetime(year, 8, 27, 12, 0, tzinfo=timezone.utc),
+            when=tz.localize(datetime(year, 8, 27, 12, 0)),
             description="I need a ride and have a large backpack",
         )
 
@@ -1577,6 +1450,7 @@ class Command(BaseCommand):
         camp.call_for_participation = "Please give a talk at Bornhack {}...".format(
             year
         )
+        camp.save()
 
     def create_camp_cfs(self, camp):
         year = camp.camp.lower.year
@@ -1585,6 +1459,7 @@ class Command(BaseCommand):
         camp.call_for_sponsors = "Please give us ALL the money so that we can make Bornhack {} the best ever!".format(
             year
         )
+        camp.save()
 
     def create_camp_sponsor_tiers(self, camp):
         tiers = {}
@@ -1721,14 +1596,21 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.output("----------[ Global stuff ]----------")
+        start = timezone.now()
+        self.output(
+            self.style.SUCCESS("----------[ Running bootstrap-devsite ]----------")
+        )
+        self.output(self.style.SUCCESS("----------[ Global stuff ]----------"))
 
         camps = self.create_camps()
+        self.create_event_routing_types()
         users = self.create_users()
 
         self.create_news()
 
         event_types = self.create_event_types()
+
+        self.create_url_types()
 
         product_categories = self.create_product_categories()
 
@@ -1752,17 +1634,42 @@ class Command(BaseCommand):
 
                 self.create_orders(users, global_products, camp_products)
 
-                tracks = self.create_camp_tracks(camp)
+                self.create_camp_tracks(camp)
 
-                locations = self.create_camp_locations(camp)
+                locations = self.create_event_locations(camp)
 
                 self.create_camp_news(camp)
 
-                events = self.create_camp_events(camp, tracks, event_types)
+                self.create_camp_cfp(camp)
 
-                self.create_camp_speakers(camp, events)
+                self.create_camp_proposals(camp, event_types)
 
-                self.create_camp_scheduling(camp, events, locations)
+                self.create_proposal_urls(camp)
+
+                self.create_camp_event_sessions(camp, event_types, locations)
+
+                self.generate_speaker_availability(camp)
+
+                try:
+                    self.approve_speaker_proposals(camp)
+                except ValidationError:
+                    self.output(
+                        "Name collision, bad luck. Run 'manage.py flush' and run the bootstrap script again!"
+                    )
+                    sys.exit(1)
+
+                self.approve_event_proposals(camp)
+
+                self.create_camp_scheduling(camp)
+
+                # shuffle it up - delete and create new random availability
+                self.generate_speaker_availability(camp)
+
+                # and create some speaker<>event conflicts
+                self.create_camp_speaker_event_conflicts(camp)
+
+                # recalculate the autoschedule
+                self.create_camp_rescheduling(camp)
 
                 self.create_camp_villages(camp, users)
 
@@ -1790,8 +1697,6 @@ class Command(BaseCommand):
 
                 self.create_camp_rides(camp, users)
 
-                self.create_camp_cfp(camp)
-
                 self.create_camp_cfs(camp)
 
                 sponsor_tiers = self.create_camp_sponsor_tiers(camp)
@@ -1805,6 +1710,8 @@ class Command(BaseCommand):
                 self.output("Not creating anything for this year yet")
 
             camp.read_only = read_only
+            camp.call_for_participation_open = not read_only
+            camp.call_for_sponsors_open = not read_only
             camp.save()
 
         self.output("----------[ Finishing up ]----------")
@@ -1819,3 +1726,5 @@ class Command(BaseCommand):
         )
 
         self.output("done!")
+        duration = timezone.now() - start
+        self.output(f"bootstrap-devsite took {duration}!")

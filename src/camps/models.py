@@ -1,11 +1,12 @@
 import logging
 from datetime import timedelta
 
+from django.apps import apps
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from program.models import EventLocation, EventType
+from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 from utils.models import CreatedUpdatedModel, UUIDModel
 
@@ -154,20 +155,6 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return "%s - %s" % (self.title, self.tagline)
 
     @property
-    def event_types(self):
-        """ Return all event types with at least one event in this camp """
-        return EventType.objects.filter(
-            event__instances__isnull=False, event__camp=self
-        ).distinct()
-
-    @property
-    def event_locations(self):
-        """ Return all event locations with at least one event in this camp"""
-        return EventLocation.objects.filter(
-            eventinstances__isnull=False, camp=self
-        ).distinct()
-
-    @property
     def logo_small(self):
         return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
 
@@ -201,31 +188,46 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             logger.error("this attribute is not a datetimetzrange field: %s" % field)
             return False
 
-        daycount = (field.upper - field.lower).days
+        # count how many unique dates we have in this range
+        daycount = 1
+        while True:
+            if field.lower.date() + timedelta(days=daycount) > field.upper.date():
+                break
+            daycount += 1
+
+        # loop through the required number of days, append to list as we go
         days = []
         for i in range(0, daycount):
             if i == 0:
-                # on the first day use actual start time instead of midnight
+                # on the first day use actual start time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        field.lower,
-                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
+                        timezone.localtime(field.lower),
+                        timezone.localtime(
+                            (field.lower + timedelta(days=i + 1))
+                        ).replace(hour=0),
                     )
                 )
             elif i == daycount - 1:
-                # on the last day use actual end time instead of midnight
+                # on the last day use actual end time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        (field.lower + timedelta(days=i)).replace(hour=0),
-                        field.lower + timedelta(days=i + 1),
+                        timezone.localtime((field.lower + timedelta(days=i))).replace(
+                            hour=0
+                        ),
+                        timezone.localtime(field.lower + timedelta(days=i)),
                     )
                 )
             else:
-                # neither first nor last day, goes from midnight to midnight
+                # neither first nor last day, goes from midnight to midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        (field.lower + timedelta(days=i)).replace(hour=0),
-                        (field.lower + timedelta(days=i + 1)).replace(hour=0),
+                        timezone.localtime((field.lower + timedelta(days=i))).replace(
+                            hour=0
+                        ),
+                        timezone.localtime(
+                            (field.lower + timedelta(days=i + 1))
+                        ).replace(hour=0),
                     )
                 )
         return days
@@ -250,3 +252,33 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         Returns a list of DateTimeTZRanges representing the days during the buildup.
         """
         return self.get_days("teardown")
+
+    # convenience properties to access Camp-related stuff easily from the Camp object
+
+    @property
+    def event_types(self):
+        """ Return all event types with at least one event in this camp """
+        EventType = apps.get_model("program", "EventType")
+        return EventType.objects.filter(
+            events__isnull=False, event__track__camp=self
+        ).distinct()
+
+    @property
+    def event_proposals(self):
+        EventProposal = apps.get_model("program", "EventProposal")
+        return EventProposal.objects.filter(track__camp=self)
+
+    @property
+    def events(self):
+        Event = apps.get_model("program", "Event")
+        return Event.objects.filter(track__camp=self)
+
+    @property
+    def event_sessions(self):
+        EventSession = apps.get_model("program", "EventSession")
+        return EventSession.objects.filter(camp=self)
+
+    @property
+    def event_slots(self):
+        EventSlot = apps.get_model("program", "EventSlot")
+        return EventSlot.objects.filter(event_session__in=self.event_sessions.all())

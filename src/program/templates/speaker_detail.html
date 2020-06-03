@@ -6,49 +6,47 @@
 {% endblock %}
 
 {% block program_content %}
+<div class="panel panel-default">
+  <div class="panel-heading"><span class="h3">{{ speaker.name }}</span></div>
+  <div class="panel-body">
+    {{ speaker.biography|untrustedcommonmark }}
 
-<h3>{{ speaker.name }}</h3>
+  <hr>
 
-<div class="row">
-  <div class="col-md-12">
-{{ speaker.biography|untrustedcommonmark }}
+  <h4>URLs for {{ speaker.name }}</h4>
+  {% if speaker.urls.exists %}
+    {% for url in speaker.urls.all %}
+        <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
+    {% endfor %}
+  {% else %}
+    <p><i>No URLs found.</i></p>
+  {% endif %}
+
+  <hr>
+
+  {% if speaker.events.exists %}
+  <h4>Events for {{ speaker.name }}</h4>
+  {% for event in speaker.events.all %}
+  <div class="panel panel-default">
+    <div class="panel-heading"><span class="h5">{{ event.event_type.icon_html }} {{ event.event_type.name }}: <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a></span></div>
+    <div class="panel-body">
+      {{ event.abstract|untrustedcommonmark|truncatechars:"500" }}
+      <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">Read more</a>
+      <hr>
+      <h4>Schedule:</h4>
+      <ul class="list-group">
+        {% for slot in event.event_slots.all %}
+          <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }}</li>
+        {% empty %}
+          Not scheduled yet
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% empty %}
+    No events registered for this speaker yet
+  {% endfor %}
+  {% endif %}
   </div>
 </div>
-
-<hr />
-
-<h4>URLs for {{ speaker.name }}</h4>
-{% if speaker.urls.exists %}
-    {% for url in speaker.urls.all %}
-        <p><i class="{{ url.urltype.icon }}"></i> <b>{{ url.urltype }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.urltype }}">{{ url.url }}</a></p>
-    {% endfor %}
-{% else %}
-    <p><i>No URLs found.</i></p>
-{% endif %}
-
-<hr />
-
-{% if speaker.events.exists %}
-    {% for event in speaker.events.all %}
-        <h3>
-            <small style="background-color: {{ event.event_type.color }}; border: 0; color: {% if event.event_type.light_text %}white{% else %}black{% endif %}; display: inline-block; padding: 5px;">
-                {{ event.event_type.name }}
-            </small>
-            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
-        </h3>
-        {{ event.abstract|untrustedcommonmark }}
-
-        <h4>Scheduled Instances of "{{ event.title }}"</h4>
-            <ul class="list-group">
-                {% for ei in event.instances.all %}
-                    <li class="list-group-item">{{ ei.when.lower|date:"l M. d H:i" }} - {{ ei.when.upper|date:"H:i" }}</li>
-                {% empty %}
-                    No instances scheduled yet
-                {% endfor %}
-            </ul>
-        <hr>
-    {% empty %}
-      No events registered for this speaker yet
-    {% endfor %}
-{% endif %}
 {% endblock program_content %}
