@@ -19,16 +19,13 @@
 
 
   {% for slot in event_slots %}
-
     {% ifchanged slot.when.lower.date %}
-      <tr>
-        <td colspan=5<strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
-      </tr>
-    {% endifchanged %}
-
-
     <tr>
-        <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
+      <td colspan=5><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
+    </tr>
+    {% endifchanged %}
+    <tr>
+      <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
       <td>
         <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
         <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
@@ -46,7 +43,6 @@
   {% endfor %}
   </tbody>
 </table>
-
 
 </div>
 {% endblock %}
