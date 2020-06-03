@@ -45,6 +45,7 @@ class Migration(migrations.Migration):
             name="duration_minutes",
             field=models.PositiveIntegerField(
                 blank=True,
+                null=True,
                 default=None,
                 help_text="The duration of this event in minutes. Leave blank to use the default from the event_type.",
             ),
