@@ -2,6 +2,10 @@
 {% load commonmark %}
 {% load bootstrap3 %}
 
+{% block title %}
+{{ object.author }}{% if object.has_car %} has {% else %} needs {% endif %}{{ object.seats }} seat(s) free, going from {{ object.from_location }} to {{ object.to_location }} on {{ object.when|date:"jS \o\f F \a\t H:i T" }} | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <a class="btn btn-primary" href="{% url 'rideshare:list' camp_slug=camp.slug %}">

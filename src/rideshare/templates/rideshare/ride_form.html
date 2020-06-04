@@ -2,6 +2,10 @@
 {% load commonmark %}
 {% load bootstrap3 %}
 
+{% block title %}
+{% if object.pk %}Update{% else %}Create{% endif %} ride | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 
 <form method="POST">

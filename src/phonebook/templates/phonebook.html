@@ -5,11 +5,6 @@
 Phonebook | {{ block.super }}
 {% endblock %}
 
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
-
 {% block content %}
 
 <h2>{{ camp.title }} Phonebook</h2>
@@ -26,7 +21,7 @@ This is a list of all the registered DECT numbers in our phonebook for {{ camp.t
 {% endif %}
 
 {% if dectregistration_list %}
-<table class="table table-hover table-striped">
+<table class="table table-hover table-striped datatable">
   <thead>
   <tr>
     <th>Number</th>

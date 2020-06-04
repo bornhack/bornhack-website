@@ -19,13 +19,13 @@ from .views import (
     FeedbackDeleteView,
     FeedbackDetailView,
     FeedbackListView,
+    FeedbackRedirectView,
     FeedbackUpdateView,
     FrabXmlView,
     ICSView,
     NoScriptScheduleView,
     ProgramControlCenter,
     ProposalListView,
-    ScheduleView,
     SpeakerDetailView,
     SpeakerListView,
     SpeakerProposalCreateView,
@@ -40,11 +40,12 @@ from .views import (
 app_name = "program"
 
 urlpatterns = [
-    path("", ScheduleView.as_view(), name="schedule_index"),
+    path("", NoScriptScheduleView.as_view(), name="schedule_index"),
     path("noscript/", NoScriptScheduleView.as_view(), name="noscript_schedule_index"),
     path("ics/", ICSView.as_view(), name="ics_view"),
     path("frab.xml", FrabXmlView.as_view(), name="frab_view"),
     path("control/", ProgramControlCenter.as_view(), name="program_control_center"),
+    # SpeakerProposals and EventProposals
     path(
         "proposals/",
         include(
@@ -79,42 +80,42 @@ urlpatterns = [
                             path(
                                 "<uuid:pk>/",
                                 SpeakerProposalDetailView.as_view(),
-                                name="speakerproposal_detail",
+                                name="speaker_proposal_detail",
                             ),
                             path(
                                 "<uuid:pk>/update/",
                                 SpeakerProposalUpdateView.as_view(),
-                                name="speakerproposal_update",
+                                name="speaker_proposal_update",
                             ),
                             path(
                                 "<uuid:pk>/delete/",
                                 SpeakerProposalDeleteView.as_view(),
-                                name="speakerproposal_delete",
+                                name="speaker_proposal_delete",
                             ),
                             path(
                                 "<uuid:speaker_uuid>/add_event/",
                                 EventProposalTypeSelectView.as_view(),
-                                name="eventproposal_typeselect",
+                                name="event_proposal_type_select",
                             ),
                             path(
                                 "<uuid:speaker_uuid>/add_event/<slug:event_type_slug>/",
                                 EventProposalCreateView.as_view(),
-                                name="eventproposal_create",
+                                name="event_proposal_create",
                             ),
                             path(
                                 "<uuid:speaker_uuid>/add_url/",
                                 UrlCreateView.as_view(),
-                                name="speakerproposalurl_create",
+                                name="speaker_proposal_url_create",
                             ),
                             path(
                                 "<uuid:speaker_uuid>/urls/<uuid:url_uuid>/update/",
                                 UrlUpdateView.as_view(),
-                                name="speakerproposalurl_update",
+                                name="speaker_proposal_url_update",
                             ),
                             path(
                                 "<uuid:speaker_uuid>/urls/<uuid:url_uuid>/delete/",
                                 UrlDeleteView.as_view(),
-                                name="speakerproposalurl_delete",
+                                name="speaker_proposal_url_delete",
                             ),
                         ]
                     ),
@@ -126,53 +127,53 @@ urlpatterns = [
                             path(
                                 "<uuid:pk>/",
                                 EventProposalDetailView.as_view(),
-                                name="eventproposal_detail",
+                                name="event_proposal_detail",
                             ),
                             path(
                                 "<uuid:pk>/update/",
                                 EventProposalUpdateView.as_view(),
-                                name="eventproposal_update",
+                                name="event_proposal_update",
                             ),
                             path(
                                 "<uuid:pk>/delete/",
                                 EventProposalDeleteView.as_view(),
-                                name="eventproposal_delete",
+                                name="event_proposal_delete",
                             ),
                             path(
                                 "<uuid:event_uuid>/add_person/",
                                 EventProposalSelectPersonView.as_view(),
-                                name="eventproposal_selectperson",
+                                name="event_proposal_select_person",
                             ),
                             path(
                                 "<uuid:event_uuid>/add_person/new/",
                                 SpeakerProposalCreateView.as_view(),
-                                name="speakerproposal_create",
+                                name="speaker_proposal_create",
                             ),
                             path(
                                 "<uuid:event_uuid>/add_person/<uuid:speaker_uuid>/",
                                 EventProposalAddPersonView.as_view(),
-                                name="eventproposal_addperson",
+                                name="event_proposal_add_person",
                             ),
                             path(
                                 "<uuid:event_uuid>/remove_person/<uuid:speaker_uuid>/",
                                 EventProposalRemovePersonView.as_view(),
-                                name="eventproposal_removeperson",
+                                name="event_proposal_remove_person",
                             ),
                             # event url views
                             path(
                                 "<uuid:event_uuid>/add_url/",
                                 UrlCreateView.as_view(),
-                                name="eventproposalurl_create",
+                                name="event_proposal_url_create",
                             ),
                             path(
                                 "<uuid:event_uuid>/urls/<uuid:url_uuid>/update/",
                                 UrlUpdateView.as_view(),
-                                name="eventproposalurl_update",
+                                name="event_proposal_url_update",
                             ),
                             path(
                                 "<uuid:event_uuid>/urls/<uuid:url_uuid>/delete/",
                                 UrlDeleteView.as_view(),
-                                name="eventproposalurl_delete",
+                                name="event_proposal_url_delete",
                             ),
                         ]
                     ),
@@ -180,6 +181,7 @@ urlpatterns = [
             ]
         ),
     ),
+    # Speaker views
     path(
         "speakers/",
         include(
@@ -216,28 +218,33 @@ urlpatterns = [
                         [
                             path(
                                 "",
+                                FeedbackRedirectView.as_view(),
+                                name="event_feedback_redirect",
+                            ),
+                            path(
+                                "list/",
                                 FeedbackListView.as_view(),
-                                name="eventfeedback_list",
+                                name="event_feedback_list",
                             ),
                             path(
                                 "show/",
                                 FeedbackDetailView.as_view(),
-                                name="eventfeedback_detail",
+                                name="event_feedback_detail",
                             ),
                             path(
                                 "create/",
                                 FeedbackCreateView.as_view(),
-                                name="eventfeedback_create",
+                                name="event_feedback_create",
                             ),
                             path(
                                 "update/",
                                 FeedbackUpdateView.as_view(),
-                                name="eventfeedback_update",
+                                name="event_feedback_update",
                             ),
                             path(
                                 "delete/",
                                 FeedbackDeleteView.as_view(),
-                                name="eventfeedback_delete",
+                                name="event_feedback_delete",
                             ),
                         ]
                     ),

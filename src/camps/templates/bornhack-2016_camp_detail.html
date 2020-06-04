@@ -2,6 +2,11 @@
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
+
+{% block title %}
+{{ camp.title }}
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <div class="col-md-12">

@@ -10,10 +10,12 @@ services:
   - postgresql
 
 addons:
-  postgresql: "9.6"
+  postgresql: "10"
   apt:
     packages:
-    - postgresql-9.6-postgis-2.5
+    - postgresql-10
+    - postgresql-client-10
+    - postgresql-10-postgis-2.5
 
 install:
   - pip install -r src/requirements/dev.txt

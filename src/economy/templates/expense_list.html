@@ -5,11 +5,6 @@
 Expenses | {{ block.super }}
 {% endblock %}
 
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
-
 <{% block content %}
 <h3>Your {{ camp.title }} Expenses</h3>
 

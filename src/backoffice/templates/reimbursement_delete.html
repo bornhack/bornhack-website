@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}
+Delete Reimbursement for User {{ reimbursement_user }} | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <h3>Delete Reimbursement for User {{ reimbursement_user }}</h3>
 

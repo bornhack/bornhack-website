@@ -17,9 +17,9 @@ DATABASES = {
         "ENGINE": 'django.contrib.gis.db.backends.postgis',
         "NAME": "bornhack",
         "USER": "bornhack",
-# Comment back in if you are connecting via TCP
-#        "PASSWORD": "bornhack",
-#        "HOST": "localhost",
+        #"PASSWORD": "bornhack",
+        #"HOST": "localhost",
+        #"PORT": 5433,
     }
 }
 DEBUG = True
@@ -37,6 +37,7 @@ MEDIA_ROOT = os.path.join(
 SCHEDULE_MIDNIGHT_OFFSET_HOURS = 9
 SCHEDULE_TIMESLOT_LENGTH_MINUTES = 30
 SCHEDULE_EVENT_NOTIFICATION_MINUTES = 10
+SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3
 
 PDF_LETTERHEAD_FILENAME = "bornhack-2017_test_letterhead.pdf"
 PDF_ARCHIVE_PATH = os.path.join(MEDIA_ROOT, "pdf_archive")

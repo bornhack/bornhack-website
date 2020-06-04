@@ -2,10 +2,11 @@
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
+
+{% block title %}
+Shop Tickets | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <div class="row">
   <h2>Shop Tickets</h2>
@@ -15,7 +16,7 @@
 <span class="clearfix"></span>
 <hr class="clearfix"/>
 
-    <table class="table table-hover">
+    <table class="table table-hover datatable">
       <thead>
       <tr>
           <th>Ticket Type</th>

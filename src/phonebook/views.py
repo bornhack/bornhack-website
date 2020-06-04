@@ -36,11 +36,24 @@ class DectExportView(
             "Content-Disposition"
         ] = f'attachment; filename="{self.camp.slug}-dect-export-{timezone.now()}.csv"'
         writer = csv.writer(response)
-        for dect in DectRegistration.objects.filter(
-            camp=self.camp, publish_in_phonebook=True
-        ):
+        writer.writerow(
+            [
+                "number",
+                "letters",
+                "description",
+                "activation_code",
+                "publish_in_phonebook",
+            ]
+        )
+        for dect in DectRegistration.objects.filter(camp=self.camp):
             writer.writerow(
-                [dect.number, dect.letters, dect.description, dect.activation_code]
+                [
+                    dect.number,
+                    dect.letters,
+                    dect.description,
+                    dect.activation_code,
+                    dect.publish_in_phonebook,
+                ]
             )
         return response
 

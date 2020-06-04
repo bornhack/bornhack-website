@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_head %}
-<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
-<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
-{% endblock extra_head %}
+{% block title %}
+Ridesharing | {{ block.super }}
+{% endblock %}
 
 {% block content %}
-
 <div class="page-header">
     <h1>Ridesharing</h1>
 </div>
@@ -24,7 +22,7 @@ On this page participants of {{ camp.title }} can communicate about ridesharing 
 
 <hr />
 
-<table class="table table-condensed table-striped">
+<table class="table table-condensed table-striped datatable">
     <thead>
         <th>
             Author

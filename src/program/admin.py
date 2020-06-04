@@ -7,27 +7,43 @@ from .models import (
     EventInstance,
     EventLocation,
     EventProposal,
+    EventSession,
+    EventSlot,
     EventTrack,
     EventType,
-    Favorite,
     Speaker,
+    SpeakerAvailability,
     SpeakerProposal,
+    SpeakerProposalAvailability,
     Url,
     UrlType,
 )
 
 
+@admin.register(SpeakerProposalAvailability)
+class SpeakerProposalAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ["speaker_proposal", "available", "when"]
+    list_filter = ["speaker_proposal__camp", "available", "speaker_proposal"]
+
+
+@admin.register(SpeakerAvailability)
+class SpeakerAvailabilityAdmin(admin.ModelAdmin):
+    list_display = ["speaker", "available", "when"]
+    list_filter = ["speaker__camp", "available", "speaker"]
+    readonly_fields = ["speaker"]
+
+
 @admin.register(SpeakerProposal)
 class SpeakerProposalAdmin(admin.ModelAdmin):
-    def mark_speakerproposal_as_approved(self, request, queryset):
+    def mark_speaker_proposal_as_approved(self, request, queryset):
         for sp in queryset:
             sp.mark_as_approved(request)
 
-    mark_speakerproposal_as_approved.description = (
+    mark_speaker_proposal_as_approved.description = (
         "Approve and create Speaker object(s)"
     )
 
-    actions = ["mark_speakerproposal_as_approved"]
+    actions = ["mark_speaker_proposal_as_approved"]
     list_filter = ("camp", "proposal_status", "user")
 
 
@@ -40,7 +56,7 @@ get_speakers_string.short_description = "Speakers"
 
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
-    def mark_eventproposal_as_approved(self, request, queryset):
+    def mark_event_proposal_as_approved(self, request, queryset):
         for ep in queryset:
             if not ep.speakers.all():
                 messages.error(
@@ -54,12 +70,12 @@ class EventProposalAdmin(admin.ModelAdmin):
                     messages.error(request, e)
                     return False
 
-    mark_eventproposal_as_approved.description = "Approve and create Event object(s)"
+    mark_event_proposal_as_approved.description = "Approve and create Event object(s)"
 
     def get_speakers(self):
         return
 
-    actions = ["mark_eventproposal_as_approved"]
+    actions = ["mark_event_proposal_as_approved"]
     list_filter = ("event_type", "proposal_status", "track", "user")
     list_display = ["title", get_speakers_string, "event_type", "proposal_status"]
 
@@ -67,7 +83,7 @@ class EventProposalAdmin(admin.ModelAdmin):
 @admin.register(EventLocation)
 class EventLocationAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
-    list_display = ("name", "camp")
+    list_display = ("name", "camp", "capacity")
 
 
 @admin.register(EventTrack)
@@ -76,10 +92,23 @@ class EventTrackAdmin(admin.ModelAdmin):
     list_display = ("name", "camp")
 
 
+@admin.register(EventSession)
+class EventSessionAdmin(admin.ModelAdmin):
+    list_display = ("camp", "event_type", "event_location", "when")
+    list_filter = ("camp", "event_type", "event_location")
+    search_fields = ["event__type", "event__location"]
+
+
+@admin.register(EventSlot)
+class EventSlotAdmin(admin.ModelAdmin):
+    list_display = ("id", "event_session", "when", "event")
+    list_filter = ("event_session__camp", "event_session__event_type", "event_session")
+
+
 @admin.register(EventInstance)
 class EventInstanceAdmin(admin.ModelAdmin):
-    list_display = ("event", "when", "location")
-    list_filter = ("event__track__camp", "event")
+    list_display = ("event", "when", "location", "autoscheduled")
+    list_filter = ("event__track__camp", "event", "autoscheduled")
     search_fields = ["event__title"]
 
 
@@ -91,12 +120,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
-    readonly_fields = ["proposal"]
-
-
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    raw_id_fields = ("event_instance",)
+    readonly_fields = ["proposal", "camp"]
 
 
 class SpeakerInline(admin.StackedInline):
@@ -105,8 +129,8 @@ class SpeakerInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
-    list_filter = ("track", "speakers")
-    list_display = ["title", "event_type"]
+    list_display = ["title", "event_type", "duration_minutes", "demand"]
+    list_filter = ("track", "event_type", "speakers")
 
     inlines = [SpeakerInline]
 

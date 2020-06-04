@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load bootstrap3 %}
 
+{% block title %}
+Create {{ camp.title }} Village | {{ block.super }}
+{% endblock %}
+
 {% block content %}
 <h3>Create {{ camp.title }} Village</h3>
 <form method="post">

@@ -2,6 +2,9 @@
 {% load commonmark %}
 {% load bootstrap3 %}
 
+{% block title %}
+{% if object.pk %}Update{% else %}Create{% endif %} Shift | {{ block.super }}
+{% endblock %}
 
 {% block team_content %}
 
