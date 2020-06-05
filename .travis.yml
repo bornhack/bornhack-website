@@ -10,11 +10,9 @@ services:
   - postgresql
 
 addons:
-  postgresql: "10"
+  postgresql: 10
   apt:
     packages:
-    - postgresql-10
-    - postgresql-client-10
     - postgresql-10-postgis-2.5
     
 before_script:
