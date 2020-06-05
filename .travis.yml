@@ -16,12 +16,13 @@ addons:
     - postgresql-10
     - postgresql-client-10
     - postgresql-10-postgis-2.5
+    
+before_script:
+  - psql -U postgres -c "CREATE EXTENSION postgis"
+  - psql -U postgres -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
 
 install:
   - pip install -r src/requirements/dev.txt
-
-before_script:
-  - psql -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
 
 script:
   - cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
