@@ -1608,8 +1608,6 @@ class Command(BaseCommand):
 
         self.create_news()
 
-        self.create_url_types()
-
         event_types = self.create_event_types()
 
         self.create_url_types()
