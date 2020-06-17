@@ -1,6 +1,7 @@
 {% extends 'program_base.html' %}
 {% load leaflet_tags %}
 {% load static %}
+{% load commonmark %}
 
 {% block extra_head %}
     {% leaflet_css %}
@@ -20,13 +21,61 @@
       <h3 class="panel-title">{{ facility.facility_type.name }}: {{ facility.name }}</h3>
   </div>
   <div class="panel-body">
-    <p class="lead">
-      <i class="{{ facility.facility_type.icon }} fa-2x fa-pull-left fa-fw"></i> {{ facility.name }} {{ facility.description }}</p>
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>Facility Name</th>
+          <td>{{ facility.name }}</td>
+        </tr>
+        <tr>
+          <th>Facility Type</th>
+          <td><i class="{{ facility.facility_type.icon }}"></i> {{ facility.facility_type.name }}</p>
+        </tr>
+        <tr>
+          <th>Description</th>
+          <td>{{ facility.description }}</td>
+        </tr>
+        <tr>
+          <th>Location</th>
+          <td>Lat {{ facility.location.y }} Long {{ facility.location.x }}</td>
+        </tr>
+        <tr>
+          <th>Opening Hours</th>
+          <td>
+          {% if facility.opening_hours.exists %}
+          <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th>Opens</th>
+                <th>Closes</th>
+                <th>Duration</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for opening in facility.opening_hours.all %}
+              <tr>
+                <td>{{ opening.when.lower }}</td>
+                <td>{{ opening.when.upper }}</td>
+                <td>{{ opening.duration }}</td>
+                <td>{{ opening.notes|trustedcommonmark|default:"N/A" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          This facility does not have opening hours, it is always open.
+          {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
     {% if request.user.is_authenticated %}
     <a href="{% url "facilities:facility_feedback" camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-comment-dots"></i> Submit Feedback</a>
     {% endif %}
-    <a href="{% url "facilities:facility_list" camp_slug=camp.slug facility_type_slug=facilitytype.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Back to {{ facilitytype.name }} list</a>
-    <p>
+    <a href="{% url "facilities:facility_list" camp_slug=camp.slug facility_type_slug=facilitytype.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to {{ facilitytype.name }} list</a>
+    </p>
     <div id="map" class="map"></div>
   </div>
 </div>
@@ -35,7 +84,7 @@
 function MapReadyCallback() {
     // add a marker for this facility
     {% url "facilities:facility_feedback" camp_slug=facility.camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid as feedback %}
-    var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}])
+    var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}})
     marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>{% endif %}").addTo(this);
     // max zoom since we have only one marker
     this.setView(marker.getLatLng(), 13);

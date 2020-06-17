@@ -16,27 +16,36 @@
   <div class="panel-body">
     <p class="lead">Welcome to the promised land! Please select your desired action below:</p>
     <div class="list-group">
+      <h3>Facilities</h3>
+      {% if perms.camps.orgateam_permission %}
+      <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">
+          Facility Types
+        </h4>
+        <p class="list-group-item-text">
+          See and manage facility types
+        </p>
+      </a>
+      <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">
+          Facilities
+        </h4>
+        <p class="list-group-item-text">
+          See and manage facilites
+        </p>
+      </a>
+      {% endif %}
       {% for team in facilityfeedback_teams %}
       {% if "camps."|add:team.permission_set in perms %}
-      {% if forloop.first %}
-      <h3>Facility Feedback</h3>
-      {% endif %}
       <a href="{% url 'backoffice:facilityfeedback' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">
-          {{ team.name }} Team
+          Feedback for {{ team.name }} Team
         </h4>
         <p class="list-group-item-text">
           See unhandled feedback for facilities managed by {{ team.name }} Team
         </p>
       </a>
       {% endif %}
-      {% empty %}
-      <div class="list-group-item">
-      <h4 class="list-group-item-heading">N/A</h4>
-      <p class="list-group-item-text">
-        No unhandled Facility Feedback found!
-      </p>
-      </div>
       {% endfor %}
 
       {% if perms.camps.infoteam_permission %}

@@ -4,6 +4,9 @@ import logging
 
 import qrcode
 from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
 from django.db import models
 from django.shortcuts import reverse
 from maps.utils import LeafletMarkerChoices
@@ -37,7 +40,7 @@ class FacilityType(CampRelatedModel):
     """
     Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
     facilities.Type has a m2m relationship with FeedbackChoice which determines which choices
-    are presented for giving feedback for this Facility
+    are presented for giving feedback for facilities of this type
     """
 
     class Meta:
@@ -113,7 +116,10 @@ class Facility(CampRelatedModel, UUIDModel):
 
     description = models.TextField(help_text="Description of this facility")
 
-    location = PointField(help_text="The location of this facility")
+    # default to near the workshop rooms / cabins
+    location = PointField(
+        default=Point(9.93891, 55.38562), help_text="The location of this facility."
+    )
 
     @property
     def team(self):
@@ -150,6 +156,9 @@ class Facility(CampRelatedModel, UUIDModel):
         qr.save(file_like, format="png")
         qrcode_base64 = base64.b64encode(file_like.getvalue()).decode("utf-8")
         return f"data:image/png;base64,{qrcode_base64}"
+
+    def unhandled_feedbacks(self):
+        return self.feedbacks.filter(handled=False)
 
 
 class FacilityFeedback(CampRelatedModel):
@@ -210,3 +219,51 @@ class FacilityFeedback(CampRelatedModel):
         return self.facility.camp
 
     camp_filter = "facility__facility_type__responsible_team__camp"
+
+
+class FacilityOpeningHours(CampRelatedModel):
+    """
+    This model contains opening hours for facilities which are not always open.
+    If a facility has zero entries in this model it means is always open.
+    If a facility has one or more periods of opening hours defined in this model
+    it is considered closed outside of the period(s) defined in this model.
+    """
+
+    class Meta:
+        ordering = ["when"]
+        constraints = [
+            # we do not want overlapping hours for the same Facility
+            ExclusionConstraint(
+                name="prevent_facility_opening_hours_overlaps",
+                expressions=[
+                    ("when", RangeOperators.OVERLAPS),
+                    ("facility", RangeOperators.EQUAL),
+                ],
+            ),
+        ]
+
+    facility = models.ForeignKey(
+        "facilities.Facility",
+        related_name="opening_hours",
+        on_delete=models.PROTECT,
+        help_text="The Facility to which these opening hours belong.",
+    )
+
+    when = DateTimeRangeField(
+        db_index=True, help_text="The period when this facility is open.",
+    )
+
+    notes = models.TextField(
+        blank=True,
+        help_text="Any notes for this period like 'no hot food after 20' or 'no alcohol sale after 02'. Optional.",
+    )
+
+    @property
+    def camp(self):
+        return self.facility.camp
+
+    camp_filter = "facility__facility_type__responsible_team__camp"
+
+    @property
+    def duration(self):
+        return self.when.upper - self.when.lower

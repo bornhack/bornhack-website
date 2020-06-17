@@ -189,3 +189,6 @@ LOGGING = {
 }
 
 GRAPHENE = {"SCHEMA": "bornhack.schema.schema"}
+LEAFLET_CONFIG = {
+    "PLUGINS": {"forms": {"auto-include": True}},
+}

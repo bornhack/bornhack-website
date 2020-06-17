@@ -96,6 +96,39 @@
     // Add scale line to map, disable imperial units
     L.control.scale({imperial: false}).addTo(map);
 
+
+    var Position = L.Control.extend({ 
+        _container: null,
+        options: {
+          position: 'bottomright'
+        },
+
+        onAdd: function (map) {
+          var latlng = L.DomUtil.create('div', 'mouseposition');
+          latlng.style = 'background: rgba(255, 255, 255, 0.7);';
+          this._latlng = latlng;
+          return latlng;
+        },
+
+        updateHTML: function(lat, lng) {
+          this._latlng.innerHTML = "&nbsp;Lat: " + lat + " Lng: " + lng + "<br>&nbsp;Right click to copy coordinates&nbsp;";
+        }
+    });
+    position = new Position();
+    map.addControl(position);
+    var lat;
+    var lng;
+    map.addEventListener('mousemove', (event) => {
+        lat = Math.round(event.latlng.lat * 100000) / 100000;
+        lng = Math.round(event.latlng.lng * 100000) / 100000;
+        this.position.updateHTML(lat, lng);
+    });
+
+    map.addEventListener("contextmenu", (event) => {
+        alert("Lat: " + lat + " Lng: " + lng + '\n\nGeoJSON:\n{ "type": "Point", "coordinates": [ ' + lng + ', ' + lat + ' ] }');
+        return false; // To disable default popup.
+    });
+
     // fire our callback when ready
     map.whenReady(MapReadyCallback);
 })();

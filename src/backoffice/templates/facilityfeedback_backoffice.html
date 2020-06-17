@@ -60,7 +60,7 @@ Facility Feedback for {{ team.name }} Team | {{ block.super }}
     </form>
     {% else %}
     <p class="lead">No unhandled feedback found for any Facilities managed by {{ team.name }} Team. Good job!</p>
-    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Backoffice</a>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
     {% endif %}
   </div>
 </div>

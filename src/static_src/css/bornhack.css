@@ -339,3 +339,8 @@ body.bar-menu {
 .no-js .hide-for-no-js-users {
     display: none;
 }
+
+/* hide map in forms until we can show a real leaflet map */
+div #id_location-map {
+    display: none;
+}

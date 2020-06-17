@@ -29,18 +29,19 @@ class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     template_name = "facility_detail.html"
     pk_url_kwarg = "facility_uuid"
 
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        return qs.prefetch_related("opening_hours")
+
 
 class FacilityFeedbackView(FacilityViewMixin, CreateView):
     model = FacilityFeedback
     template_name = "facility_feedback.html"
     fields = ["quick_feedback", "comment", "urgent"]
 
-    def get_initial(self, *args, **kwargs):
-        initial = super().get_initial(*args, **kwargs)
-        return initial
-
     def get_form(self, form_class=None):
         """
+        - Add quick feedback field to the form
         - Add anon option to the form
         """
         form = super().get_form(form_class)

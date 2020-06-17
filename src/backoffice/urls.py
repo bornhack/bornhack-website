@@ -43,7 +43,19 @@ from .views import (
     EventUpdateView,
     ExpenseDetailView,
     ExpenseListView,
+    FacilityCreateView,
+    FacilityDeleteView,
+    FacilityDetailView,
     FacilityFeedbackView,
+    FacilityListView,
+    FacilityOpeningHoursCreateView,
+    FacilityOpeningHoursDeleteView,
+    FacilityOpeningHoursUpdateView,
+    FacilityTypeCreateView,
+    FacilityTypeDeleteView,
+    FacilityTypeListView,
+    FacilityTypeUpdateView,
+    FacilityUpdateView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
     PendingProposalsView,
@@ -77,10 +89,98 @@ urlpatterns = [
     # proxy view
     path("proxy/", BackofficeProxyView.as_view(), name="proxy"),
     path("proxy/<slug:proxy_slug>/", BackofficeProxyView.as_view(), name="proxy"),
-    # facility feedback
+    # facilities
     path(
         "feedback/facilities/<slug:team_slug>/",
         include([path("", FacilityFeedbackView.as_view(), name="facilityfeedback")]),
+    ),
+    path(
+        "facility_types/",
+        include(
+            [
+                path("", FacilityTypeListView.as_view(), name="facility_type_list"),
+                path(
+                    "create/",
+                    FacilityTypeCreateView.as_view(),
+                    name="facility_type_create",
+                ),
+                path(
+                    "<slug:slug>/",
+                    include(
+                        [
+                            path(
+                                "update/",
+                                FacilityTypeUpdateView.as_view(),
+                                name="facility_type_update",
+                            ),
+                            path(
+                                "delete/",
+                                FacilityTypeDeleteView.as_view(),
+                                name="facility_type_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
+    ),
+    path(
+        "facilities/",
+        include(
+            [
+                path("", FacilityListView.as_view(), name="facility_list"),
+                path("create/", FacilityCreateView.as_view(), name="facility_create"),
+                path(
+                    "<uuid:facility_uuid>/",
+                    include(
+                        [
+                            path(
+                                "", FacilityDetailView.as_view(), name="facility_detail"
+                            ),
+                            path(
+                                "update/",
+                                FacilityUpdateView.as_view(),
+                                name="facility_update",
+                            ),
+                            path(
+                                "delete/",
+                                FacilityDeleteView.as_view(),
+                                name="facility_delete",
+                            ),
+                            path(
+                                "opening_hours/",
+                                include(
+                                    [
+                                        path(
+                                            "create/",
+                                            FacilityOpeningHoursCreateView.as_view(),
+                                            name="facility_opening_hours_create",
+                                        ),
+                                        path(
+                                            "<int:pk>/",
+                                            include(
+                                                [
+                                                    path(
+                                                        "update/",
+                                                        FacilityOpeningHoursUpdateView.as_view(),
+                                                        name="facility_opening_hours_update",
+                                                    ),
+                                                    path(
+                                                        "delete/",
+                                                        FacilityOpeningHoursDeleteView.as_view(),
+                                                        name="facility_opening_hours_delete",
+                                                    ),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
     ),
     # infodesk
     path(
