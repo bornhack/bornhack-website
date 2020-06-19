@@ -23,7 +23,7 @@ $ virtualenv venv -p python3.7
 $ source venv/bin/activate
 ```
 
-If you installed python3 using Homebrew on macOS, you will need to install virtualenv by runinng the following command first:
+If you installed python3 using Homebrew on macOS, you will need to install virtualenv by running the following command first:
 ```
 pip3 install virtualenv
 ```
@@ -32,7 +32,7 @@ pip3 install virtualenv
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev
-  - FreeBSD: databases/postgresql93-client
+  - FreeBSD: databases/postgresql11-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
