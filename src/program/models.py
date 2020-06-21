@@ -1462,14 +1462,6 @@ class EventInstance(CampRelatedModel):
         else:
             return 0
 
-    @property
-    def event_type(self):
-        return self.event_slot.event_session.event_type
-
-    @property
-    def event_location(self):
-        return self.event_slot.event_session.event_location
-
 
 class Speaker(CampRelatedModel):
     """ A Person (co)anchoring one or more events on a camp. """
