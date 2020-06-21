@@ -41,7 +41,7 @@ class Command(BaseCommand):
                             when__adjacent_to=instance.when,
                             available=True,
                         )
-                        if sa.when.lower == instance.upper:
+                        if sa.when.lower == instance.when.upper:
                             # this availability begins when the instance ends
                             sa.when = (instance.when.lower, sa.when.upper)
                         else:
