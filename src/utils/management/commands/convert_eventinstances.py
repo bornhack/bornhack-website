@@ -58,6 +58,20 @@ class Command(BaseCommand):
                         logger.info(
                             f"created speakeravailability {sa} for instance {instance}"
                         )
+                    except SpeakerAvailability.MultipleObjectsReturned:
+                        # who the hell does three events in a row?!
+                        sas = SpeakerAvailability.objects.filter(
+                            speaker=speaker,
+                            when__adjacent_to=instance.when,
+                            available=True,
+                        ).order_by("when")
+                        sa = SpeakerAvailability(
+                            speaker=speaker,
+                            when=(sas[0].when.lower, sas[1].when.upper),
+                            available=True,
+                        )
+                        sas.all().delete()
+                        sa.save()
 
                 duration = int(
                     (instance.when.upper - instance.when.lower).total_seconds() / 60
