@@ -49,14 +49,14 @@ class Command(BaseCommand):
                             sa.when = (sa.when.lower, instance.when.upper)
                         sa.save()
                         logger.info(
-                            f"extended speakeravailability {sa} to include instance {instance}"
+                            f"extended speakeravailability {sa} for speaker {speaker} to include instance {instance}"
                         )
                     except SpeakerAvailability.DoesNotExist:
                         sa = SpeakerAvailability.objects.create(
                             speaker=speaker, when=instance.when, available=True,
                         )
                         logger.info(
-                            f"created speakeravailability {sa} for instance {instance}"
+                            f"created speakeravailability {sa} for speaker {speaker} for instance {instance}"
                         )
                     except SpeakerAvailability.MultipleObjectsReturned:
                         # who the hell does three events in a row?!
@@ -93,6 +93,7 @@ class Command(BaseCommand):
                             when__adjacent_to=instance.when,
                             event_type_id=event_type_id,
                             event_duration_minutes=duration,
+                            event_location=instance.location,
                         )
                         logger.info(
                             f"found existing eventsession adjacent to instance {instance}"
