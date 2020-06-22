@@ -1,7 +1,6 @@
+from camps.models import Camp
 from django.contrib import admin
 from django.utils import timezone
-
-from camps.models import Camp
 
 
 def get_current_camp():

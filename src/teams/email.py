@@ -9,6 +9,7 @@ def add_added_membership_email(membership):
     formatdict = {"team": membership.team.name, "camp": membership.team.camp.title}
 
     return add_outgoing_email(
+        responsible_team=membership.team,
         text_template="emails/add_membership_email.txt",
         html_template="emails/add_membership_email.html",
         to_recipients=membership.user.email,
@@ -28,6 +29,7 @@ def add_removed_membership_email(membership):
         html_template = "emails/unapproved_membership_email.html"
 
     return add_outgoing_email(
+        responsible_team=membership.team,
         text_template=text_template,
         html_template=html_template,
         to_recipients=membership.user.email,
@@ -40,6 +42,7 @@ def add_new_membership_email(membership):
     formatdict = {"team": membership.team.name, "camp": membership.team.camp.title}
 
     return add_outgoing_email(
+        responsible_team=membership.team,
         text_template="emails/new_membership_email.txt",
         html_template="emails/new_membership_email.html",
         to_recipients=[

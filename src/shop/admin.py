@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from tickets.admin import ShopTicketInline
 
 from .models import (

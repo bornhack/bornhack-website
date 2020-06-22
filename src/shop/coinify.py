@@ -3,7 +3,6 @@ import logging
 
 import requests
 from django.conf import settings
-
 from vendor.coinify.coinify_api import CoinifyAPI
 
 from .models import CoinifyAPICallback, CoinifyAPIInvoice, CoinifyAPIRequest

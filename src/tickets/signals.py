@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.db.models import Count
-
 from events.handler import handle_team_event
 
 

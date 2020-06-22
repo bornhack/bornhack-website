@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-
 from shop.models import OrderProductRelation
 from utils.models import CampRelatedModel, UUIDModel
 from utils.pdf import generate_pdf_letter

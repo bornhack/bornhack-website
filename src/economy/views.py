@@ -1,6 +1,7 @@
 import os
 
 import magic
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,8 +16,6 @@ from django.views.generic import (
     TemplateView,
     UpdateView,
 )
-
-from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
@@ -238,7 +237,10 @@ class ExpenseCreateView(
 
         # send an email to the economy team
         add_outgoing_email(
-            "emails/expense_awaiting_approval_email.txt",
+            responsible_team=Team.objects.get(
+                camp=self.camp, name=settings.ECONOMY_TEAM_NAME
+            ),
+            text_template="emails/expense_awaiting_approval_email.txt",
             formatdict=dict(expense=expense),
             subject="New %s expense for %s Team is awaiting approval"
             % (expense.camp.title, expense.responsible_team.name),
@@ -405,7 +407,10 @@ class RevenueCreateView(
 
         # send an email to the economy team
         add_outgoing_email(
-            "emails/revenue_awaiting_approval_email.txt",
+            responsible_team=Team.objects.get(
+                camp=self.camp, name=settings.ECONOMY_TEAM_NAME
+            ),
+            text_template="emails/revenue_awaiting_approval_email.txt",
             formatdict=dict(revenue=revenue),
             subject="New %s revenue for %s Team is awaiting approval"
             % (revenue.camp.title, revenue.responsible_team.name),

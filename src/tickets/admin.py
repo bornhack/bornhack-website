@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from shop.models import OrderProductRelation
 
 from .models import DiscountTicket, ShopTicket, SponsorTicket, TicketType

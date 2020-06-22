@@ -5,7 +5,7 @@ from utils.email import add_outgoing_email
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def add_creditnote_email(creditnote):
+def add_creditnote_email(creditnote, camp):
     # put formatdict together
     formatdict = {"creditnote": creditnote}
 
@@ -42,12 +42,4 @@ def add_invoice_email(invoice):
         subject=subject,
         attachment=invoice.pdf.read(),
         attachment_filename=invoice.filename,
-    )
-
-
-def add_test_email(recipient):
-    return add_outgoing_email(
-        text_template="emails/testmail.txt",
-        to_recipients=recipient,
-        subject="testmail from bornhack website",
     )

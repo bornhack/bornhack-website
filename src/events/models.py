@@ -1,5 +1,4 @@
 from django.db import models
-
 from teams.models import Team
 from utils.models import CreatedUpdatedModel
 

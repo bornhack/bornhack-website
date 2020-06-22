@@ -1,13 +1,12 @@
+import asyncio
 import logging
 import re
 import time
-import asyncio
 
 import irc3
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
-
 from ircbot.models import OutgoingIrcMessage
 from teams.models import Team, TeamMember
 from teams.utils import get_team_from_irc_channel

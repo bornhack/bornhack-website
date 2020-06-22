@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
-
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket

@@ -3,7 +3,6 @@ import logging
 from django.conf import settings
 from django.core.files import File
 from django.db.models import Q
-
 from shop.email import add_creditnote_email, add_invoice_email
 from shop.models import CreditNote, CustomOrder, Invoice, Order
 from utils.pdf import generate_pdf_letter

@@ -1,3 +1,4 @@
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,8 +11,7 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
-
-from camps.mixins import CampViewMixin
+from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import UserIsObjectOwnerMixin
 
@@ -44,7 +44,9 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
         form = ContactRideForm(request.POST)
         if form.is_valid():
             ride = self.get_object()
+            info_team = Team.objects.get(camp=self.camp, name="Info")
             add_outgoing_email(
+                responsible_team=info_team,
                 text_template="rideshare/emails/contact_mail.txt",
                 to_recipients=[ride.user.emailaddress_set.get(primary=True).email],
                 formatdict=dict(

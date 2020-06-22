@@ -1,6 +1,5 @@
-from channels.generic.websocket import JsonWebsocketConsumer
-
 from camps.models import Camp
+from channels.generic.websocket import JsonWebsocketConsumer
 
 from .models import (
     Event,

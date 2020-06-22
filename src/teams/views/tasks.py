@@ -1,10 +1,9 @@
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseNotAllowed, HttpResponseRedirect
 from django.views.generic import CreateView, DetailView, UpdateView
-
-from camps.mixins import CampViewMixin
 
 from ..models import TaskComment, Team, TeamMember, TeamTask
 from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin

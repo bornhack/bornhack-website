@@ -2,11 +2,10 @@ import logging
 from datetime import timedelta
 from time import sleep
 
+from camps.utils import get_current_camp
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-
-from camps.utils import get_current_camp
 from ircbot.models import OutgoingIrcMessage
 from program.models import EventInstance
 

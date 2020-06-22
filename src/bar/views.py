@@ -1,6 +1,5 @@
-from django.views.generic import ListView
-
 from camps.mixins import CampViewMixin
+from django.views.generic import ListView
 
 from .models import ProductCategory
 

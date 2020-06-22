@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from shop.factories import OrderProductRelationFactory
 
 from .factories import TicketTypeFactory

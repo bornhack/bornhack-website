@@ -1,3 +1,4 @@
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -15,8 +16,6 @@ from django.views.generic import (
     View,
 )
 from psycopg2.extras import DateTimeTZRange
-
-from camps.mixins import CampViewMixin
 
 from ..models import Team, TeamMember, TeamShift
 
