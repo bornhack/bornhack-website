@@ -1202,7 +1202,7 @@ class Event(CampRelatedModel):
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
-        unique=True,
+        # unique=True,
         editable=False,
         help_text="This field is not the PK of the model. It is used to create EventSlot UUID for FRAB and iCal and other calendaring purposes.",
     )
