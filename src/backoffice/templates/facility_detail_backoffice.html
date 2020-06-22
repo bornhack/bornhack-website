@@ -124,7 +124,7 @@
 <script type="text/javascript">
 function MapReadyCallback() {
     // add a marker for this facility
-    var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}])
+    var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}})
     marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description}}</p>").addTo(this);
     // max zoom since we have only one marker
     this.setView(marker.getLatLng(), 13);
