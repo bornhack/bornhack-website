@@ -1179,6 +1179,13 @@ class Command(BaseCommand):
             camp=camp,
             permission_set="sanitationteam_permission",
         )
+        teams["content"] = Team.objects.create(
+            name="Content",
+            description="The Content Team handles stuff on the program",
+            camp=camp,
+            mailing_list="content@example.com",
+            permission_set="contentteam_permission",
+        )
 
         return teams
 
@@ -1640,6 +1647,14 @@ class Command(BaseCommand):
 
                 self.create_camp_news(camp)
 
+                teams = self.create_camp_teams(camp)
+
+                self.create_camp_team_tasks(camp, teams)
+
+                team_memberships = self.create_camp_team_memberships(camp, teams, users)
+
+                self.create_camp_team_shifts(camp, teams, team_memberships)
+
                 self.create_camp_cfp(camp)
 
                 self.create_camp_proposals(camp, event_types)
@@ -1672,14 +1687,6 @@ class Command(BaseCommand):
                 self.create_camp_rescheduling(camp)
 
                 self.create_camp_villages(camp, users)
-
-                teams = self.create_camp_teams(camp)
-
-                self.create_camp_team_tasks(camp, teams)
-
-                team_memberships = self.create_camp_team_memberships(camp, teams, users)
-
-                self.create_camp_team_shifts(camp, teams, team_memberships)
 
                 facility_types = self.create_facility_types(
                     camp, teams, quickfeedback_options
