@@ -82,21 +82,49 @@ class CampRelatedModel(CreatedUpdatedModel):
 
 
 class OutgoingEmail(CreatedUpdatedModel):
-    subject = models.CharField(max_length=500)
-    text_template = models.TextField()
-    html_template = models.TextField(blank=True)
-    sender = models.CharField(max_length=500)
+    """The OutgoingEmail model contains all system emails, both unsent and sent."""
+
+    subject = models.CharField(max_length=500, help_text="The subject of the e-mail")
+    text_template = models.TextField(help_text="The plaintext body of the email.")
+    html_template = models.TextField(
+        blank=True, help_text="The HTML body of the email (optional)."
+    )
+    sender = models.CharField(max_length=500, help_text="The email sender.")
     to_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True), null=True, blank=True
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True,
+        help_text="The To: recipients",
     )
     cc_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True), null=True, blank=True
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True,
+        help_text="The Cc: recipients",
     )
     bcc_recipients = ArrayField(
-        models.CharField(max_length=500, blank=True), null=True, blank=True
+        models.CharField(max_length=500, blank=True),
+        null=True,
+        blank=True,
+        help_text="The Bcc: recipients",
     )
-    attachment = models.FileField(blank=True)
-    processed = models.BooleanField(default=False)
+    attachment = models.FileField(
+        blank=True, help_text="The attachment for this email. Optional."
+    )
+    processed = models.BooleanField(
+        default=False,
+        help_text="Unchecked before the email is sent, checked after the email has been sent.",
+    )
+    hold = models.BooleanField(
+        default=False, help_text="Hold (do not send) this email. Uncheck to send."
+    )
+    responsible_team = models.ForeignKey(
+        "teams.Team",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        help_text="The Team responsible for this email.",
+    )
 
     def __str__(self):
         return "OutgoingEmail Object id: {} ".format(self.id)

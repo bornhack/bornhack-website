@@ -12,7 +12,7 @@ def do_work():
         The outgoing email worker sends emails added to the OutgoingEmail
         queue.
     """
-    not_processed_email = OutgoingEmail.objects.filter(processed=False)
+    not_processed_email = OutgoingEmail.objects.filter(processed=False, hold=False)
 
     if len(not_processed_email) > 0:
         logger.debug("about to process {} emails".format(len(not_processed_email)))
@@ -38,6 +38,6 @@ def do_work():
         if mail_send_success:
             email.processed = True
             email.save()
-            logger.debug("successfully sent {}".format(email))
+            logger.debug("Successfully sent {}".format(email))
         else:
-            logger.error("unable to sent {}".format(email))
+            logger.error("Unable to send {}".format(email))

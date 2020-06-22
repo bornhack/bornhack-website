@@ -74,6 +74,7 @@ def add_outgoing_email(
     sender="BornHack <info@bornhack.dk>",
     attachment=None,
     attachment_filename="",
+    hold=False,
 ):
     """ adds an email to the outgoing queue
         recipients is a list of to recipients
@@ -104,6 +105,7 @@ def add_outgoing_email(
         to_recipients=to_recipients,
         cc_recipients=cc_recipients,
         bcc_recipients=bcc_recipients,
+        hold=hold,
     )
 
     if attachment:
