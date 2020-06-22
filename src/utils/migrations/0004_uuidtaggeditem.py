@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "object_id",
-                    models.UUIDField(db_index=True, verbose_name="Object id"),
+                    models.UUIDField(db_index=True, verbose_name="object ID"),
                 ),
                 (
                     "content_type",
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="utils_uuidtaggeditem_tagged_items",
                         to="contenttypes.ContentType",
-                        verbose_name="Content type",
+                        verbose_name="content type",
                     ),
                 ),
                 (
