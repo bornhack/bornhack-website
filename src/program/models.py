@@ -521,7 +521,7 @@ class EventProposal(UserSubmittedModel):
 
     duration = models.IntegerField(
         blank=True,
-        help_text="How much time (in minutes) should we set aside for this act? Please keep it between 60 and 180 minutes (1-3 hours).",
+        help_text="How much time (in minutes) should we set aside for this event?",
     )
 
     submission_notes = models.TextField(
@@ -840,6 +840,15 @@ class EventSession(CampRelatedModel):
                     ("when", RangeOperators.OVERLAPS),
                     ("event_location", RangeOperators.EQUAL),
                     ("event_type", RangeOperators.EQUAL),
+                ],
+            ),
+            # we do not want adjacent sessions for the same type and location
+            ExclusionConstraint(
+                name="prevent_adjacent_eventsessions",
+                expressions=[
+                    ("event_location", RangeOperators.EQUAL),
+                    ("event_type", RangeOperators.EQUAL),
+                    ("when", RangeOperators.ADJACENT_TO),
                 ],
             ),
         ]
