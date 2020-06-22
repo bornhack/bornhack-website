@@ -833,21 +833,23 @@ class EventSession(CampRelatedModel):
     class Meta:
         ordering = ["when", "event_type", "event_location"]
         constraints = [
-            # We do not want overlapping sessions for the same EventType/EventLocation combo.
+            # We do not want overlapping sessions for the same EventType/EventLocation/duration combo.
             ExclusionConstraint(
                 name="prevent_event_session_event_type_event_location_overlaps",
                 expressions=[
                     ("when", RangeOperators.OVERLAPS),
                     ("event_location", RangeOperators.EQUAL),
                     ("event_type", RangeOperators.EQUAL),
+                    ("event_duration_minutes", RangeOperators.EQUAL),
                 ],
             ),
-            # we do not want adjacent sessions for the same type and location
+            # we do not want adjacent sessions for the same type and location and duration
             ExclusionConstraint(
                 name="prevent_adjacent_eventsessions",
                 expressions=[
                     ("event_location", RangeOperators.EQUAL),
                     ("event_type", RangeOperators.EQUAL),
+                    ("event_duration_minutes", RangeOperators.EQUAL),
                     ("when", RangeOperators.ADJACENT_TO),
                 ],
             ),
