@@ -134,7 +134,7 @@ class EventAdmin(admin.ModelAdmin):
 
     inlines = [SpeakerInline]
 
-    readonly_fields = ["proposal"]
+    readonly_fields = ["uuid", "proposal"]
 
 
 @admin.register(UrlType)
