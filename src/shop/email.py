@@ -5,7 +5,7 @@ from utils.email import add_outgoing_email
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def add_creditnote_email(creditnote, camp):
+def add_creditnote_email(creditnote):
     # put formatdict together
     formatdict = {"creditnote": creditnote}
 
