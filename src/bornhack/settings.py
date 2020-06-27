@@ -192,3 +192,6 @@ GRAPHENE = {"SCHEMA": "bornhack.schema.schema"}
 LEAFLET_CONFIG = {
     "PLUGINS": {"forms": {"auto-include": True}},
 }
+
+# used to find the economy team
+ECONOMY_TEAM_NAME = "Economy"
