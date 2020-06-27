@@ -17,6 +17,7 @@ addons:
     
 before_script:
   - psql -U postgres -c "CREATE EXTENSION postgis"
+  - psql -U postgres -c "CREATE EXTENSION btree_gist"
   - psql -U postgres -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
 
 install:
