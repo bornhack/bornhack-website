@@ -641,7 +641,7 @@ class EventProposalUpdateView(
         event_proposal.proposal_status = models.EventProposal.PROPOSAL_PENDING
 
         # save or update slides url
-        slideurl = self.cleaned_data.get("slides_url")
+        slideurl = form.cleaned_data.get("slides_url")
         if slideurl:
             slides_url, created = models.Url.objects.get_or_create(
                 event_proposal=event_proposal,
