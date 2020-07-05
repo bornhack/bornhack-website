@@ -134,7 +134,7 @@
     });
 
     map.addEventListener("contextmenu", (event) => {
-        alert("Lat: " + lat + " Lng: " + lng + '\n\nGeoJSON:\n{ "type": "Point", "coordinates": [ ' + lng + ', ' + lat + ' ] }');
+        alert("Lat: " + lat + " Lng: " + lng + ' - GeoJSON: { "type": "Point", "coordinates": [ ' + lng + ', ' + lat + ' ] }');
         return false; // To disable default popup.
     });
 
