@@ -29,13 +29,13 @@
         crs: crs,
         center: [55.3, 9.9], // Set center location
         zoom: 9, // Initial zoom level
-        minzoom: 0,
+        minzoom: 1,
         maxzoom: 13,
     })
 
     // Define ortophoto layer [WMTS:orto_foraar]
     var ortofotowmts = L.tileLayer('/maps/kfproxy/orto_foraar?request=GetTile&version=1.0.0&service=WMTS&Layer=orto_foraar&style=default&format=image/jpeg&TileMatrixSet=View1&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
-        minZoom: 0,
+        minZoom: 1,
         maxZoom: 13,
         attribution: myAttributionText,
         crossOrigin: true,
@@ -69,7 +69,7 @@
         format: 'image/png',
         attribution: myAttributionText,
         minZoom: 9
-    }).addTo(map); // addTo means that the layer is visible by default
+    });
 
     // Hillshade overlay [WMS:dhm]
     var hillshade = L.tileLayer.wms('/maps/kfproxy/dhm', {
@@ -79,15 +79,24 @@
         attribution: myAttributionText,
     });
 
+    // hylkedam overlay
+    var venuepolygons = [
+        [[54, 7], [54, 16], [58, 16], [58, 7]], // full map
+        [[55.39019, 9.93918],[55.39007, 9.93991], [55.39001, 9.94075], [55.39002, 9.94119], [55.38997, 9.94154], [55.38983, 9.94355], [55.38983, 9.94383], [55.38973, 9.94474], [55.38953, 9.94742], [55.38946, 9.94739], [55.38955, 9.94587], [55.38956, 9.94503], [55.38952, 9.94435], [55.38941, 9.94359], [55.38377, 9.94072], [55.38462, 9.93793], [55.3847, 9.93778], [55.38499, 9.93675]], // hylkedam hole
+    ];
+    var venue = L.polygon(venuepolygons, {color: 'red'}).addTo(map); // default enabled
+
     // Define layer groups for layer control
     var baseLayers = {
         "Ortophoto Map": ortofotowmts,
         "Regular Map": toposkaermkortwmts,
         "Hillshade Map": dhmwmts
     };
+
     var overlays = {
-        "Cadastral Map Overlay": matrikel,
-        "Hillshade Map Overlay": hillshade
+        "Venue Overlay": venue,
+        "Cadastral Overlay": matrikel,
+        "Hillshade Overlay": hillshade
     };
 
     // Add layer control to map
