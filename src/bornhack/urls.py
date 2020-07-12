@@ -6,10 +6,8 @@ from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import path
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from feedback.views import FeedbackCreate
-from graphene_django.views import GraphQLView
 from info.views import CampInfoView
 from people.views import PeopleView
 from sponsors.views import SponsorsView
@@ -50,7 +48,7 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     # We don't need CSRF checks for the API
-    path("api/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    # path("api/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path("camps/", CampListView.as_view(), name="camp_list"),
     path("token/", include("tokens.urls", namespace="tokens")),
     path("maps/", include("maps.urls", namespace="maps")),
