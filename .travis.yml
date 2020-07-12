@@ -15,6 +15,9 @@ addons:
     packages:
     - postgresql-10-postgis-2.5
 
+before_script:
+  - psql -U postgres -c "CREATE ROLE bornhack WITH SUPERUSER LOGIN PASSWORD 'bornhack';"
+
 install:
   - pip install -r src/requirements/dev.txt
 
