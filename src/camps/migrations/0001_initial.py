@@ -4,6 +4,7 @@
 import uuid
 
 from django.conf import settings
+from django.contrib.postgres.operations import BtreeGistExtension, CreateExtension
 from django.db import migrations, models
 
 
@@ -12,6 +13,8 @@ class Migration(migrations.Migration):
     dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
+        BtreeGistExtension(),
+        CreateExtension("postgis"),
         migrations.CreateModel(
             name="Camp",
             fields=[
