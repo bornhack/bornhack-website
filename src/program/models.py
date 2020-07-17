@@ -118,7 +118,7 @@ class Url(CampRelatedModel):
     def __str__(self):
         return self.url
 
-    def clean(self):
+    def clean_fk(self):
         """ Make sure we have exactly one FK """
         fks = 0
         if self.speaker_proposal:
@@ -133,6 +133,11 @@ class Url(CampRelatedModel):
             raise ValidationError(
                 f"Url objects must have exactly one FK, this has {fks}"
             )
+
+    def save(self, *args, **kwargs):
+        """Just clean_fk() and super save()."""
+        self.clean_fk()
+        super().save(*args, **kwargs)
 
     @property
     def owner(self):
