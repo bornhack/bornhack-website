@@ -6,6 +6,6 @@ coverage==5.2
 codecov==2.1.8
 black==19.10b0
 pre-commit==2.6.0
-isort==5.1.1
+isort==5.1.4
 hypothesis==5.20.3
 flake8==3.8.3
