@@ -50,7 +50,7 @@ class Wish(CampRelatedModel):
 
     def save(self, **kwargs):
         self.slug = unique_slugify(
-            self.title,
+            self.name,
             slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
                 "slug", flat=True
             ),
