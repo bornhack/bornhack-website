@@ -5,6 +5,7 @@
         <td style="width: 75%;">&nbsp;</td>
         <td>
             <h3>
+                Ticket Created:<br>
                 {{ ticket.created|date:"b jS, Y" }}<br>
             </h3>
         </td>
@@ -39,6 +40,16 @@
   <img src="{{ ticket.get_qr_code_url }}"></img>
   <p>{{ ticket.token }}</p>
 </center>
+
+<br>
+<h3>Venue</h3>
+<p>Hylkedam, Hylkedamvej 54, 5591 Gelsted, Funen, Denmark</p>
+
+<br>
+<h3>Dates</h3>
+<h5>Buildup (volunteers only): From {{ ticket.camp.buildup.lower }} to {{ ticket.camp.buildup.upper }}</h5>
+<h5>Main Event: From {{ ticket.camp.camp.lower }} to {{ ticket.camp.camp.upper }}</h5>
+<h5>Teardown (volunteers only): From {{ ticket.camp.teardown.lower }} to {{ ticket.camp.teardown.upper }}</h5>
 
 {% if ticket.ticket_type.includes_badge %}
 <div style="display:block; clear:both; page-break-after:always;"></div>
