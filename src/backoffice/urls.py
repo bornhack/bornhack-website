@@ -58,6 +58,7 @@ from .views import (
     FacilityUpdateView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
+    OutgoingEmailMassUpdateView,
     PendingProposalsView,
     ProductHandoutView,
     ReimbursementCreateUserSelectView,
@@ -624,5 +625,11 @@ urlpatterns = [
                 ),
             ]
         ),
+    ),
+    # release held emails
+    path(
+        "release_emails",
+        OutgoingEmailMassUpdateView.as_view(),
+        name="outgoing_email_release",
     ),
 ]

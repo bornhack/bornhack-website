@@ -46,6 +46,7 @@ from program.utils import save_speaker_availability
 from shop.models import Order, OrderProductRelation
 from teams.models import Team
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
+from utils.models import OutgoingEmail
 
 from .forms import (
     AutoScheduleApplyForm,
@@ -1904,3 +1905,54 @@ class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
         context = super().get_context_data(*args, **kwargs)
         context["urls"] = settings.BACKOFFICE_PROXY_URLS
         return context
+
+
+################################
+# UPDATE HELD OUTGOING EMAILS
+
+
+class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
+    """
+    This view shows a list with forms to edit OutgoingEmail objects with hold=True
+    """
+
+    template_name = "outgoing_email_mass_update.html"
+
+    def setup(self, *args, **kwargs):
+        """Get emails with no team and emails with a team for the current camp."""
+        super().setup(*args, **kwargs)
+        self.queryset = OutgoingEmail.objects.filter(
+            hold=True, responsible_team__isnull=True
+        ).prefetch_related("responsible_team") | OutgoingEmail.objects.filter(
+            hold=True, responsible_team__camp=self.camp
+        ).prefetch_related(
+            "responsible_team"
+        )
+        self.form_class = modelformset_factory(
+            OutgoingEmail,
+            fields=["subject", "text_template", "html_template", "hold"],
+            min_num=self.queryset.count(),
+            validate_min=True,
+            max_num=self.queryset.count(),
+            validate_max=True,
+            extra=0,
+        )
+
+    def get_context_data(self, *args, **kwargs):
+        """Include the formset in the context."""
+        context = super().get_context_data(*args, **kwargs)
+        context["formset"] = self.form_class(queryset=self.queryset)
+        return context
+
+    def form_valid(self, form):
+        """Show a message saying how many objects were updated."""
+        form.save()
+        if form.changed_objects:
+            messages.success(
+                self.request, f"Updated {len(form.changed_objects)} OutgoingEmails"
+            )
+        return redirect(self.get_success_url())
+
+    def get_success_url(self, *args, **kwargs):
+        """Return to the backoffice index."""
+        return reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})

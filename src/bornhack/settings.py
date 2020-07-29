@@ -195,3 +195,6 @@ LEAFLET_CONFIG = {
 
 # used to find the economy team
 ECONOMY_TEAM_NAME = "Economy"
+
+# we have some large formsets sometimes
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
