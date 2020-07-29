@@ -63,7 +63,7 @@ def add_speaker_proposal_updated_email(speaker_proposal):
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
         subject="Speaker proposal '%s' was just updated" % speaker_proposal.name,
-        hold=True,
+        hold=False,
     )
 
 
@@ -83,7 +83,7 @@ def add_event_proposal_updated_email(event_proposal):
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
         subject="Event proposal '%s' was just updated" % event_proposal.title,
-        hold=True,
+        hold=False,
     )
 
 
