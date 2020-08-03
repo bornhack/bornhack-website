@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, UpdateView
+from jsonview.views import JsonView
+from oauth2_provider.views.generic import ProtectedResourceView
 
 from . import models
 
@@ -34,3 +36,18 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
             form.instance.save()
         messages.success(self.request, "Your profile has been updated.")
         return super().form_valid(form, **kwargs)
+
+
+class ProfileApiView(JsonView, ProtectedResourceView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user"] = {"username": self.request.user.username}
+        context["profile"] = {
+            "public_credit_name": self.request.user.profile.get_public_credit_name,
+            "description": self.request.user.profile.description,
+        }
+        context["teams"] = [
+            {"team": team.name, "camp": team.camp.title}
+            for team in self.request.user.teams.all()
+        ]
+        return context
