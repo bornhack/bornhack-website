@@ -350,6 +350,7 @@ class OrderReviewAndPayView(
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
     EnsureOrderHasProductsMixin,
+    EnsureUnpaidOrderMixin,
     EnsureOrderIsNotCancelledMixin,
     DetailView,
 ):
