@@ -12,8 +12,11 @@ $(document).ready(function(){
     $.fn.dataTable.moment( "dddd, MMM Do, YYYY, HH:mm" );
 
     // enable datatables for all tables on the page,
-    $('.datatable').DataTable();
-
+    $('.datatable').DataTable( {
+        "stateSave": true,
+        "pageLength": 100,
+        "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+    } );
 } );
 
 // function used in speakeravailability form tables to toggle background color
