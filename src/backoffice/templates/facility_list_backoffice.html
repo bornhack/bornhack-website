@@ -43,7 +43,7 @@ Facilities | BackOffice | {{ block.super }}
         <td>{{ facility.name }}</td>
         <td><i class="fas fa-{{ facility.facility_type.icon }} fa-2x fa-fw"></i> {{ facility.facility_type.name }}</td>
         <td>{{ facility.team.name }} Team</td>
-        <td>{{ facility.description|default:"N/A" }}</td>
+        <td>{{ facility.description|linebreaksbr|default:"N/A" }}</td>
         <td>{{ facility.location }}</td>
         <td class="text-center"><span class="badge">{{ facility.feedbacks.count }}</span> / <span class="badge">{{ facility.unhandled_feedbacks.count }}</span></td>
         <td>
@@ -69,7 +69,7 @@ function MapReadyCallback() {
     var markers = new Array();
     {% for facility in facility_list %}
     {% url "backoffice:facility_detail" camp_slug=facility.camp.slug facility_uuid=facility.uuid as detail %}
-    marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}}).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(this);
+    marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}}).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(this);
     markers.push(marker.getLatLng());
 {% endfor %}
     var markerBounds = L.latLngBounds(markers);

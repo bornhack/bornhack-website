@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>Description</th>
-          <td>{{ facility.description }}</td>
+          <td>{{ facility.description|linebreaksbr }}</td>
         </tr>
         <tr>
           <th>Location</th>
@@ -85,7 +85,7 @@ function MapReadyCallback() {
     // add a marker for this facility
     {% url "facilities:facility_feedback" camp_slug=facility.camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid as feedback %}
     var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}})
-    marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>{% endif %}").addTo(this);
+    marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>{% endif %}").addTo(this);
     // max zoom since we have only one marker
     this.setView(marker.getLatLng(), 13);
 };
