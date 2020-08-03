@@ -478,8 +478,8 @@ class SpeakerProposal(UserSubmittedModel):
     @property
     def title(self):
         """ Convenience method to return the proper host_title """
-        if self.event_proposals.values_list("event_type").distinct().count() > 1:
-            # we have different eventtypes, use generic title
+        if self.event_proposals.values_list("event_type").distinct().count() != 1:
+            # we have no events, or events of different eventtypes, use generic title
             return "Person"
         else:
             return self.event_proposals.first().event_type.host_title
