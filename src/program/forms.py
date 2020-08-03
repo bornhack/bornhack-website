@@ -185,7 +185,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
 
-        elif event_type.name == "Recreational":
+        elif event_type.name == "Recreational Event":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
             self.fields["name"].help_text = "Can be a real name or an alias."
@@ -293,9 +293,8 @@ class EventProposalForm(forms.ModelForm):
         LIGHTNING_TALK = "Lightning Talk"
         DEBATE = "Debate"
         MUSIC_ACT = "Music Act"
-        RECREATIONAL_EVENT = "Recreational"
+        RECREATIONAL_EVENT = "Recreational Event"
         WORKSHOP = "Workshop"
-        SLACKING_OFF = "Slacking Off"
         MEETUP = "Meetup"
 
         # disable the empty_label for the track select box
@@ -430,7 +429,7 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for workshops
             del self.fields["allow_video_recording"]
 
-        elif event_type.name == SLACKING_OFF:
+        elif event_type.name == RECREATIONAL_EVENT:
             # fix label and help_text for the title field
             self.fields["title"].label = "Event Title"
             self.fields["title"].help_text = "The title of this recreational event."

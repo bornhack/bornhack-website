@@ -456,16 +456,16 @@ class Command(BaseCommand):
             support_speaker_event_conflicts=False,
         )
 
-        types["slack"] = EventType.objects.create(
-            name="Recreational",
-            slug="recreational",
+        types["recreational"] = EventType.objects.create(
+            name="Recreational Event",
+            slug="recreational-event",
             color="#0000ff",
             light_text=True,
             public=True,
             description="Events of a recreational nature",
             icon="dice",
             host_title="Host",
-            event_duration_minutes="60",
+            event_duration_minutes="600",
             support_autoscheduling=False,
             support_speaker_event_conflicts=True,
         )
@@ -830,7 +830,7 @@ class Command(BaseCommand):
             )
             EventSession.objects.create(
                 camp=camp,
-                event_type=event_types["slack"],
+                event_type=event_types["recreational"],
                 event_location=event_locations["speakers_tent"],
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
@@ -950,7 +950,7 @@ class Command(BaseCommand):
             user=random.choice(User.objects.all()),
             title="Lunch break",
             abstract="Daily lunch break. Remember to drink water.",
-            event_type=event_types["slack"],
+            event_type=event_types["recreational"],
             track=random.choice(camp.event_tracks.all()),
         ).mark_as_approved()
 
@@ -1056,7 +1056,9 @@ class Command(BaseCommand):
                 event_session__event_location=camp.event_locations.get(
                     name="Speakers Tent"
                 ),
-                event_session__event_type=EventType.objects.get(name="Recreational"),
+                event_session__event_type=EventType.objects.get(
+                    name="Recreational Event"
+                ),
                 when=(start, start + timedelta(hours=1)),
             )
             lunchslot.event = lunch
