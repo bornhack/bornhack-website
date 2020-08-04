@@ -832,6 +832,7 @@ class Command(BaseCommand):
                 camp=camp,
                 event_type=event_types["recreational"],
                 event_location=event_locations["speakers_tent"],
+                event_duration_minutes=60,
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 12, 0)),
                     tz.localize(datetime(start.year, start.month, start.day, 13, 0)),
