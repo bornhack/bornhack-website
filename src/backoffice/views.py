@@ -920,7 +920,9 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
-        self.event = get_object_or_404(Event, slug=kwargs["slug"])
+        self.event = get_object_or_404(
+            Event, track__camp=self.camp, slug=kwargs["slug"]
+        )
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
