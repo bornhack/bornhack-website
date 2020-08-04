@@ -1266,7 +1266,7 @@ class Event(CampRelatedModel):
         help_text="The estimated demand for this event. Used by the autoscheduler to pick the optimal location for events. Set to 0 to disable demand constraints for this event.",
     )
 
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         ordering = ["title"]
