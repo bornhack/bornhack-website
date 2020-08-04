@@ -4,6 +4,7 @@
         <th>Title</th>
         <th>Event Type</th>
         <th>Tags</th>
+        {% if not noduration %}<th>Duration</th>{% endif %}
         {% if not nopeople %}<th>People</th>{% endif %}
         {% if not noschedule %}<th>Scheduled</th>{% endif %}
         {% if not noactions %}<th>Actions</th>{% endif %}
@@ -21,6 +22,9 @@
         N/A
         {% endfor %}
       </td>
+      {% if not noduration %}
+      <td>{{ event.duration }}</td>
+      {% endif %}
       {% if not nopeople %}
       <td>
         {% for speaker in event.speakers.all %}
