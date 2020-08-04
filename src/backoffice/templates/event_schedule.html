@@ -10,7 +10,8 @@
   </div>
   <div class="panel-body">
     <p>The following EventSlots are available and suitable for scheduling <i>{{ event.title }}</i></p>
-    <p>This event has a demand of {{ event.demand }} people.</p>
+    <p>This event has a duration <b>{{ event.duration }}</b> hours.</p>
+    <p>This event has a demand of <b>{{ event.demand }} people</b>.</p>
     <form method="POST">
         {% csrf_token %}
         {% if event_slots %}
