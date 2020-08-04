@@ -930,7 +930,8 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         slotindex = 0
         # loop over sessions, get free slots
         for session in self.camp.event_sessions.filter(
-            event_type=self.event.event_type
+            event_type=self.event.event_type,
+            event_duration_minutes__gte=self.event.duration_minutes,
         ):
             for slot in session.get_available_slots():
                 # loop over speakers to see if they are all available
