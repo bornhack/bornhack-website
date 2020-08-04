@@ -20,6 +20,7 @@
               <th>Pick</th>
               <th>Start</th>
               <th>End</th>
+              <th>Duration</th>
               <th>Location</th>
               <th class="text-center">Capacity</th>
             </tr>
@@ -31,6 +32,7 @@
               <td>{{ slot.slot.when.lower }}</td>
               <td>{{ slot.slot.when.upper }}</td>
               <td><i class="fas fa-{{ slot.slot.event_session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.slot.event_location.slug %}">{{ slot.slot.event_session.event_location.name }}</a></td>
+              <td>{{ slot.slot.duration }}</td>
               <td class="text-center{% if event.demand > slot.slot.event_session.event_location.capacity %} danger{% endif %}"><span class="badge">{{ slot.slot.event_session.event_location.capacity }}</span></td>
             </tr>
         {% endfor %}
