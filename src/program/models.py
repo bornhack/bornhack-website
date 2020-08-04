@@ -1558,7 +1558,12 @@ class Speaker(CampRelatedModel):
 
     def is_available(self, when, ignore_event_slot_ids=[]):
         """ A speaker is available if the person has positive availability for the period and
-        if the speaker is not in another event at the time """
+        if the speaker is not in another event at the time, or if the person has not submitted
+        any availability at all """
+        if not self.availabilities.exists():
+            # we have no availability at all for this speaker, assume they are available
+            return True
+
         if not self.availabilities.filter(when__contains=when, available=True).exists():
             # we have no positive availability for this speaker
             return False
