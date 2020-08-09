@@ -96,7 +96,7 @@ class EventTrackAdmin(admin.ModelAdmin):
 class EventSessionAdmin(admin.ModelAdmin):
     list_display = ("camp", "event_type", "event_location", "when")
     list_filter = ("camp", "event_type", "event_location")
-    search_fields = ["event__type", "event__location"]
+    search_fields = ["id", "event_type__name", "event_location__name"]
 
 
 @admin.register(EventSlot)
