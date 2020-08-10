@@ -27,6 +27,8 @@ Merchandise Orders | {{ block.super }}
           <th>OPR Id</th>
           <th>Product</th>
           <th>Quantity</th>
+          <th>Paid</th>
+          <th>Ticket Generated</th>
        </tr>
       </thead>
       <tbody>
@@ -38,6 +40,8 @@ Merchandise Orders | {{ block.super }}
           <td>{{ productrel.id }}</td>
           <td>{{ productrel.product.name }}</td>
           <td>{{ productrel.quantity }}</td>
+          <td>{{ product.order.paid|yesno }}</td>
+          <td>{{ product.order.ticket_generated|yesno }}</td>
       </tr>
       {% endfor %}
       </tbody>
