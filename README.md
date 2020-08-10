@@ -84,7 +84,7 @@ Is this a new installation? Initialize the database:
 (venv) $ python src/manage.py migrate
 ```
 
-Is this for local development? Bootstrap the database with dummy data and users:
+Is this for local development? Bootstrap the database with dummy data and users (takes ~10 minutes):
 
 ```
 (venv) $ python src/manage.py bootstrap-devsite
