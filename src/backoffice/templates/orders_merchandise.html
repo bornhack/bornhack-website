@@ -40,8 +40,8 @@ Merchandise Orders | {{ block.super }}
           <td>{{ productrel.id }}</td>
           <td>{{ productrel.product.name }}</td>
           <td>{{ productrel.quantity }}</td>
-          <td>{{ product.order.paid|yesno }}</td>
-          <td>{{ product.order.ticket_generated|yesno }}</td>
+          <td>{{ productrel.order.paid|yesno }}</td>
+          <td>{{ productrel.order.ticket_generated|yesno }}</td>
       </tr>
       {% endfor %}
       </tbody>
