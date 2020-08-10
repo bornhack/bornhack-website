@@ -1379,8 +1379,6 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
         return (
             OrderProductRelation.objects.filter(
-                ticket_generated=False,
-                order__paid=True,
                 order__refunded=False,
                 order__cancelled=False,
                 product__category__name="Merchandise",
@@ -1397,8 +1395,6 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
         camp_prefix = "BornHack {}".format(timezone.now().year)
 
         order_relations = OrderProductRelation.objects.filter(
-            ticket_generated=False,
-            order__paid=True,
             order__refunded=False,
             order__cancelled=False,
             product__category__name="Merchandise",
