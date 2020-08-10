@@ -67,6 +67,8 @@ Install pip packages:
 
 You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints).
 
+If you dont want to bother with running a local database, [Heroku offers free Postgres](https://www.heroku.com/postgres).
+
 ### Configuration file
 
 Copy dev environment settings file and change settings as needed:
