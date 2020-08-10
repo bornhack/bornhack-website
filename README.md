@@ -38,6 +38,10 @@ Install system dependencies (method depends on OS):
   - Debian: libpq-dev
   - FreeBSD: databases/postgresql11-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
+- [GeoDjango](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/)
+  - Debian ?
+  - FreeBSD ?
+  - MacOS `brew install gdal postgis postgresql libgeoip`
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
