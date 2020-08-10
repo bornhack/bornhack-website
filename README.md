@@ -27,6 +27,10 @@ If you installed python3 using Homebrew on macOS, you will need to install virtu
 ```
 pip3 install virtualenv
 ```
+or using [pipx](https://pypi.org/project/pipx/)
+```
+pipx install virtualenv
+```
 
 ### System libraries
 Install system dependencies (method depends on OS):
