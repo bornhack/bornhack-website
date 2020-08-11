@@ -3,6 +3,7 @@ import os
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 from utils.slugs import unique_slugify
 
@@ -465,3 +466,224 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         for expense in self.expenses.filter(paid_by_bornhack=False):
             amount += expense.amount
         return amount
+
+
+class Pos(CampRelatedModel, UUIDModel):
+    """A Pos is a point-of-sale like the bar or infodesk."""
+
+    class Meta:
+        ordering = ["name"]
+
+    name = models.CharField(max_length=255, help_text="The point-of-sale name")
+
+    slug = models.SlugField(
+        max_length=255,
+        blank=True,
+        help_text="Url slug for this POS. Leave blank to generate based on POS name.",
+    )
+
+    team = models.ForeignKey(
+        "teams.Team", on_delete=models.PROTECT, help_text="The Team managning this POS",
+    )
+
+    def save(self, **kwargs):
+        """Generate slug if needed."""
+        if not self.slug:
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.filter(
+                    team__camp=self.team.camp
+                ).values_list("slug", flat=True),
+            )
+        super().save(**kwargs)
+
+    @property
+    def camp(self):
+        return self.team.camp
+
+    camp_filter = "team__camp"
+
+    def get_absolute_url(self):
+        return reverse(
+            "backoffice:pos_detail",
+            kwargs={"camp_slug": self.team.camp.slug, "pos_slug": self.slug},
+        )
+
+
+class PosReport(CampRelatedModel, UUIDModel):
+    """A PosReport contains the HAX/DKK counts and the csv report from the POS system."""
+
+    pos = models.ForeignKey(
+        "economy.Pos",
+        on_delete=models.PROTECT,
+        related_name="pos_reports",
+        help_text="The Pos this PosReport belongs to.",
+    )
+
+    bank_responsible = models.ForeignKey(
+        "auth.User",
+        on_delete=models.PROTECT,
+        related_name="pos_reports_banker",
+        help_text="The banker responsible for this PosReport",
+    )
+
+    pos_responsible = models.ForeignKey(
+        "auth.User",
+        on_delete=models.PROTECT,
+        related_name="pos_reports_poser",
+        help_text="The POS person responsible for this PosReport",
+    )
+
+    date = models.DateField(
+        help_text="The date this report covers (pick the starting date if opening hours cross midnight).",
+    )
+
+    pos_json = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="The JSON exported from the external POS system",
+    )
+
+    # bank count start of day
+
+    bank_count_dkk_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of DKK handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax5_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 5 HAX coins handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax10_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 10 HAX coins handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax20_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 20 HAX coins handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax50_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 50 HAX coins handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax100_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 100 HAX coins handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
+    )
+
+    # POS count start of day
+
+    pos_count_dkk_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of DKK handed out from the bank to the POS at the start of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax5_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 5 HAX coins received by the POS from the bank at the start of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax10_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 10 HAX coins received by the POS from the bank at the start of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax20_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 20 HAX coins received by the POS from the bank at the start of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax50_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 50 HAX coins received by the POS from the bank at the start of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax100_start = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 100 HAX coins received by the POS from the bank at the start of the business day (counted by the POS responsible)",
+    )
+
+    # bank count end of day
+
+    bank_count_dkk_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of DKK handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax5_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 5 HAX coins handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax10_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 10 HAX coins handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax20_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 20 HAX coins handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax50_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 50 HAX coins handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    bank_count_hax100_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 100 HAX coins handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
+    )
+
+    # pos count end of day
+
+    pos_count_dkk_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of DKK handed back from the POS to the bank at the end of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax5_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 5 HAX coins received by the bank from the POS at the end of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax10_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 10 HAX coins received by the bank from the POS at the end of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax20_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 20 HAX coins received by the bank from the POS at the end of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax50_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 50 HAX coins received by the bank from the POS at the end of the business day (counted by the POS responsible)",
+    )
+
+    pos_count_hax100_end = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of 100 HAX coins received by the bank from the POS at the end of the business day (counted by the POS responsible)",
+    )
+
+    @property
+    def camp(self):
+        return self.pos.team.camp
+
+    camp_filter = "pos__team__camp"
+
+    def get_absolute_url(self):
+        return reverse(
+            "backoffice:posreport_detail",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "pos_slug": self.pos.slug,
+                "posreport_uuid": self.uuid,
+            },
+        )

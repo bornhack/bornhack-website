@@ -60,6 +60,18 @@ from .views import (
     MerchandiseToOrderView,
     OutgoingEmailMassUpdateView,
     PendingProposalsView,
+    PosCreateView,
+    PosDeleteView,
+    PosDetailView,
+    PosListView,
+    PosReportBankCountEndView,
+    PosReportBankCountStartView,
+    PosReportCreateView,
+    PosReportDetailView,
+    PosReportPosCountEndView,
+    PosReportPosCountStartView,
+    PosReportUpdateView,
+    PosUpdateView,
     ProductHandoutView,
     ReimbursementCreateUserSelectView,
     ReimbursementCreateView,
@@ -631,5 +643,78 @@ urlpatterns = [
         "release_emails",
         OutgoingEmailMassUpdateView.as_view(),
         name="outgoing_email_release",
+    ),
+    # point-of-sale
+    path(
+        "pos/",
+        include(
+            [
+                path("", PosListView.as_view(), name="pos_list",),
+                path("create/", PosCreateView.as_view(), name="pos_create",),
+                path(
+                    "<slug:pos_slug>/",
+                    include(
+                        [
+                            path("", PosDetailView.as_view(), name="pos_detail",),
+                            path(
+                                "update/", PosUpdateView.as_view(), name="pos_update",
+                            ),
+                            path(
+                                "delete/", PosDeleteView.as_view(), name="pos_delete",
+                            ),
+                            path(
+                                "reports/",
+                                include(
+                                    [
+                                        path(
+                                            "create/",
+                                            PosReportCreateView.as_view(),
+                                            name="posreport_create",
+                                        ),
+                                        path(
+                                            "<uuid:posreport_uuid>/",
+                                            include(
+                                                [
+                                                    path(
+                                                        "",
+                                                        PosReportDetailView.as_view(),
+                                                        name="posreport_detail",
+                                                    ),
+                                                    path(
+                                                        "update/",
+                                                        PosReportUpdateView.as_view(),
+                                                        name="posreport_update",
+                                                    ),
+                                                    path(
+                                                        "bankcount/start/",
+                                                        PosReportBankCountStartView.as_view(),
+                                                        name="posreport_bank_count_start",
+                                                    ),
+                                                    path(
+                                                        "bankcount/end/",
+                                                        PosReportBankCountEndView.as_view(),
+                                                        name="posreport_bank_count_end",
+                                                    ),
+                                                    path(
+                                                        "poscount/start/",
+                                                        PosReportPosCountStartView.as_view(),
+                                                        name="posreport_pos_count_start",
+                                                    ),
+                                                    path(
+                                                        "poscount/end/",
+                                                        PosReportPosCountEndView.as_view(),
+                                                        name="posreport_pos_count_end",
+                                                    ),
+                                                ]
+                                            ),
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+            ],
+        ),
     ),
 ]

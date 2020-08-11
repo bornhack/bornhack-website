@@ -1,0 +1,34 @@
+<table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Pos</th>
+      <th>Bank Responsible</th>
+      <th>Pos Responsible</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for pr in posreport_list %}
+    <tr>
+      <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.date }}</a></td>
+      <td>{{ pr.pos.name }}</td>
+      <td>{{ pr.bank_responsible }}</td>
+      <td>{{ pr.pos_responsible }}</td>
+      <td>
+        <div class="btn-group-vertical">
+          <a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          {% if request.user == pr.pos.bank_responsible %}
+          <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
+          <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
+          {% endif %}
+          {% if request.user == pr.pos.pos_responsible %}
+          <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
+          <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
+          {% endif %}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

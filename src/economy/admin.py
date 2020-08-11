@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Chain, Credebtor, Expense, Reimbursement, Revenue
+from .models import Chain, Credebtor, Expense, Pos, PosReport, Reimbursement, Revenue
 
 ###############################
 # chains and credebtors
@@ -113,3 +113,18 @@ class ReimbursementAdmin(admin.ModelAdmin):
     list_filter = ["camp", "user", "reimbursement_user", "paid"]
     list_display = ["camp", "user", "reimbursement_user", "paid", "notes", "get_amount"]
     search_fields = ["user__username", "reimbursement_user__username", "notes"]
+
+
+################################
+# pos
+
+
+@admin.register(Pos)
+class PosAdmin(admin.ModelAdmin):
+    list_display = ["name", "team"]
+    list_filter = ["team"]
+
+
+@admin.register(PosReport)
+class PosReportAdmin(admin.ModelAdmin):
+    list_display = ["uuid", "pos"]

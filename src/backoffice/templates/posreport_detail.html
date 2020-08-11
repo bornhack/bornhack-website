@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}
+PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+      <h3 class="panel-title">PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      {% if "camps.orgateam_permission" in perms %}
+      <a href="{% url 'backoffice:posreport_update' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+      {% endif %}
+      {% if request.user == posreport.bank_responsible %}
+      <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
+      <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
+      {% endif %}
+      {% if request.user == posreport.pos_responsible %}
+      <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
+      <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
+      {% endif %}
+    </p>
+    <table class="table">
+      <tbody>
+        <tr>
+          <th>PosReport UUID</th>
+          <td>{{ posreport.uuid }}</td>
+        </tr>
+        <tr>
+          <th>PosReport Date</th>
+          <td>{{ posreport.date }}</td>
+        </tr>
+        <tr>
+          <th>Pos Name</th>
+          <td>{{ posreport.pos.name }}</td>
+        </tr>
+        <tr>
+          <th>Team</th>
+          <td>{{ posreport.pos.team }}</p>
+        </tr>
+        <tr>
+          <th>Bank Responsible</th>
+          <td>{{ posreport.bank_responsible }}</p>
+        </tr>
+        <tr>
+          <th>Pos Responsible</th>
+          <td>{{ posreport.pos_responsible }}</p>
+        </tr>
+        <tr>
+          <th>Counts</th>
+          <td>
+            <table class="table table-condensed">
+              <thead>
+              <tr>
+                <th>What</th>
+                <th>Bank Start</th>
+                <th>Bank End</th>
+                <th>Pos Start</th>
+                <th>Pos End</th>
+              </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DKK</td>
+                  <td>{{ posreport.bank_count_dkk_start }}</td>
+                  <td>{{ posreport.bank_count_dkk_end }}</td>
+                  <td>{{ posreport.pos_count_dkk_start }}</td>
+                  <td>{{ posreport.pos_count_dkk_end }}</td>
+                </tr>
+                <tr>
+                  <td>5 HAX</td>
+                  <td>{{ posreport.bank_count_hax5_start }}</td>
+                  <td>{{ posreport.bank_count_hax5_end }}</td>
+                  <td>{{ posreport.pos_count_hax5_start }}</td>
+                  <td>{{ posreport.pos_count_hax5_end }}</td>
+                </tr>
+                <tr>
+                  <td>10 HAX</td>
+                  <td>{{ posreport.bank_count_hax10_start }}</td>
+                  <td>{{ posreport.bank_count_hax10_end }}</td>
+                  <td>{{ posreport.pos_count_hax10_start }}</td>
+                  <td>{{ posreport.pos_count_hax10_end }}</td>
+                </tr>
+                  <td>20 HAX</td>
+                  <td>{{ posreport.bank_count_hax20_start }}</td>
+                  <td>{{ posreport.bank_count_hax20_end }}</td>
+                  <td>{{ posreport.pos_count_hax20_start }}</td>
+                  <td>{{ posreport.pos_count_hax20_end }}</td>
+                </tr>
+                <tr>
+                  <td>50 HAX</td>
+                  <td>{{ posreport.bank_count_hax50_start }}</td>
+                  <td>{{ posreport.bank_count_hax50_end }}</td>
+                  <td>{{ posreport.pos_count_hax50_start }}</td>
+                  <td>{{ posreport.pos_count_hax50_end }}</td>
+                </tr>
+                <tr>
+                  <td>100 HAX</td>
+                  <td>{{ posreport.bank_count_hax100_start }}</td>
+                  <td>{{ posreport.bank_count_hax100_end }}</td>
+                  <td>{{ posreport.pos_count_hax100_start }}</td>
+                  <td>{{ posreport.pos_count_hax100_end }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
