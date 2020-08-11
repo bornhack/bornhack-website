@@ -63,8 +63,8 @@ class CampRelatedModel(CreatedUpdatedModel):
     def save(self, **kwargs):
         if self.camp.read_only:
             if hasattr(self, "request"):
-                messages.error(self.request, "Camp is in read only mode.")
-            raise CampReadOnlyModeError("This camp is in read only mode.")
+                messages.error(self.request, f"Camp {self.camp} is in read only mode.")
+            raise CampReadOnlyModeError(f"The camp {self.camp} is in read only mode.")
 
         super().save(**kwargs)
 
