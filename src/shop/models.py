@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.postgres.fields import DateTimeRangeField, JSONField
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models.aggregates import Sum
@@ -74,9 +74,10 @@ class Order(CreatedUpdatedModel):
         default=False,
     )
 
-    # We are using a NullBooleanField here to ensure that we only have one open order per user at a time.
+    # We are using a nullable BooleanField here to ensure that we only have one open order per user at a time.
     # This "hack" is possible since postgres treats null values as different, and thus we have database level integrity.
-    open = models.NullBooleanField(
+    open = models.BooleanField(
+        null=True,
         verbose_name=_("Open?"),
         help_text=_('Whether this shop order is open or not. "None" means closed.'),
         default=True,
@@ -518,7 +519,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
         verbose_name_plural = "Epay Callbacks"
         ordering = ["-created"]
 
-    payload = JSONField()
+    payload = models.JSONField()
     md5valid = models.BooleanField(default=False)
 
     def __str__(self):
@@ -652,7 +653,7 @@ class Invoice(CreatedUpdatedModel):
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
     coinify_id = models.IntegerField(null=True)
-    invoicejson = JSONField()
+    invoicejson = models.JSONField()
     order = models.ForeignKey(
         "shop.Order", related_name="coinify_api_invoices", on_delete=models.PROTECT
     )
@@ -666,8 +667,8 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
 
 
 class CoinifyAPICallback(CreatedUpdatedModel):
-    headers = JSONField()
-    payload = JSONField(blank=True)
+    headers = models.JSONField()
+    payload = models.JSONField(blank=True)
     body = models.TextField(default="")
     order = models.ForeignKey(
         "shop.Order", related_name="coinify_api_callbacks", on_delete=models.PROTECT
@@ -683,8 +684,8 @@ class CoinifyAPIRequest(CreatedUpdatedModel):
         "shop.Order", related_name="coinify_api_requests", on_delete=models.PROTECT
     )
     method = models.CharField(max_length=100)
-    payload = JSONField()
-    response = JSONField()
+    payload = models.JSONField()
+    response = models.JSONField()
 
     def __str__(self):
         return "order %s api request %s" % (self.order.id, self.method)

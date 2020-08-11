@@ -215,7 +215,8 @@ class Revenue(CampRelatedModel, UUIDModel):
         help_text="The team to which this revenue belongs. When in doubt pick the Economy team.",
     )
 
-    approved = models.NullBooleanField(
+    approved = models.BooleanField(
+        null=True,
         default=None,
         help_text="True if this Revenue has been approved by the responsible team. False if it has been rejected. Blank if noone has decided yet.",
     )
@@ -337,7 +338,8 @@ class Expense(CampRelatedModel, UUIDModel):
         help_text="The team to which this Expense belongs. A team responsible will need to approve the expense. When in doubt pick the Economy team.",
     )
 
-    approved = models.NullBooleanField(
+    approved = models.BooleanField(
+        null=True,
         default=None,
         help_text="True if this expense has been approved by the responsible team. False if it has been rejected. Blank if noone has decided yet.",
     )
