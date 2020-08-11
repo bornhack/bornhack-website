@@ -1978,7 +1978,7 @@ class PosListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     template_name = "pos_list.html"
 
 
-class PosDetailView(PosViewMixin, RaisePermissionRequiredMixin, DetailView):
+class PosDetailView(PosViewMixin, DetailView):
     """Show details for a Pos."""
 
     model = Pos
@@ -2029,7 +2029,7 @@ class PosDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
         return reverse("backoffice:pos_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class PosReportCreateView(PosViewMixin, RaisePermissionRequiredMixin, CreateView):
+class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
     model = PosReport
@@ -2066,7 +2066,7 @@ class PosReportCreateView(PosViewMixin, RaisePermissionRequiredMixin, CreateView
         )
 
 
-class PosReportUpdateView(PosViewMixin, RaisePermissionRequiredMixin, UpdateView):
+class PosReportUpdateView(PosViewMixin, UpdateView):
     """Use this view to update PosReports."""
 
     model = PosReport
@@ -2085,7 +2085,7 @@ class PosReportUpdateView(PosViewMixin, RaisePermissionRequiredMixin, UpdateView
         return context
 
 
-class PosReportDetailView(PosViewMixin, RaisePermissionRequiredMixin, DetailView):
+class PosReportDetailView(PosViewMixin, DetailView):
     """Show details for a PosReport."""
 
     model = PosReport
@@ -2093,9 +2093,7 @@ class PosReportDetailView(PosViewMixin, RaisePermissionRequiredMixin, DetailView
     pk_url_kwarg = "posreport_uuid"
 
 
-class PosReportBankCountStartView(
-    PosViewMixin, RaisePermissionRequiredMixin, UpdateView
-):
+class PosReportBankCountStartView(PosViewMixin, UpdateView):
     """The bank responsible for a PosReport uses this view to add day-start HAX and DKK counts to a PosReport."""
 
     model = PosReport
@@ -2116,7 +2114,7 @@ class PosReportBankCountStartView(
             raise PermissionDenied("Only the bank responsible can do this")
 
 
-class PosReportBankCountEndView(PosViewMixin, RaisePermissionRequiredMixin, UpdateView):
+class PosReportBankCountEndView(PosViewMixin, UpdateView):
     """The bank responsible for a PosReport uses this view to add day-end HAX and DKK counts to a PosReport."""
 
     model = PosReport
@@ -2137,9 +2135,7 @@ class PosReportBankCountEndView(PosViewMixin, RaisePermissionRequiredMixin, Upda
             raise PermissionDenied("Only the bank responsible can do this")
 
 
-class PosReportPosCountStartView(
-    PosViewMixin, RaisePermissionRequiredMixin, UpdateView
-):
+class PosReportPosCountStartView(PosViewMixin, UpdateView):
     """The Pos responsible for a PosReport uses this view to add day-start HAX and DKK counts to a PosReport."""
 
     model = PosReport
@@ -2160,7 +2156,7 @@ class PosReportPosCountStartView(
             raise PermissionDenied("Only the Pos responsible can do this")
 
 
-class PosReportPosCountEndView(PosViewMixin, RaisePermissionRequiredMixin, UpdateView):
+class PosReportPosCountEndView(PosViewMixin, UpdateView):
     """The Pos responsible for a PosReport uses this view to add day-end HAX and DKK counts to a PosReport."""
 
     model = PosReport

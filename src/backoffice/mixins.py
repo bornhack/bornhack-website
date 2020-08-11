@@ -1,4 +1,5 @@
 from camps.mixins import CampViewMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from economy.models import Pos
@@ -43,7 +44,7 @@ class ContentTeamPermissionMixin(RaisePermissionRequiredMixin):
     )
 
 
-class PosViewMixin(CampViewMixin):
+class PosViewMixin(CampViewMixin, UserPassesTestMixin):
     """A mixin to set self.pos based on pos_slug in url kwargs."""
 
     def setup(self, *args, **kwargs):
@@ -52,14 +53,20 @@ class PosViewMixin(CampViewMixin):
             Pos, team__camp=self.camp, slug=self.kwargs["pos_slug"]
         )
 
-    def get_permission_required(self):
+    def test_func(self):
         """
         This view requires two permissions, camps.backoffice_permission and the permission_set for the team in question.
         """
         if not self.pos.team.permission_set:
             raise PermissionDenied("No permissions set defined for this team")
-        perms = ["camps.backoffice_permission"]
-        return perms
+        if not self.request.user.has_perm("camps.backoffice_permission"):
+            raise PermissionDenied("User has no backoffice permission")
+
+        if not self.request.user.has_perm(
+            "camps.orgateam_permission"
+        ) and not self.request.user.has_perm("camps." + self.pos.team.permission_set):
+            raise PermissionDenied("User has no permission for this Pos")
+        return True
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
