@@ -77,6 +77,7 @@ class Order(CreatedUpdatedModel):
     # We are using a nullable BooleanField here to ensure that we only have one open order per user at a time.
     # This "hack" is possible since postgres treats null values as different, and thus we have database level integrity.
     open = models.BooleanField(
+        blank=True,
         null=True,
         verbose_name=_("Open?"),
         help_text=_('Whether this shop order is open or not. "None" means closed.'),

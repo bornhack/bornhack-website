@@ -1048,6 +1048,7 @@ class EventSlot(CampRelatedModel):
     )
 
     autoscheduled = models.BooleanField(
+        blank=True,
         null=True,
         default=None,
         help_text="True if the Event was scheduled by the AutoScheduler, False if it was scheduled manually, None if there is nothing scheduled in this EventSlot.",
@@ -1654,6 +1655,7 @@ class EventFeedback(CampRelatedModel, UUIDModel):
     comment = models.TextField(blank=True, help_text="Any other comments or feedback?")
 
     approved = models.BooleanField(
+        blank=True,
         null=True,
         help_text="Approve feedback? It will not be visible to the Event owner before it is approved.",
     )
