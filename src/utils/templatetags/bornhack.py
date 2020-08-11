@@ -22,3 +22,8 @@ def truefalseicon(value):
         )
     else:
         return "what is this"
+
+
+@register.simple_tag(takes_context=True)
+def feedbackqr(context, facility):
+    return facility.get_feedback_qr(request=context["request"])
