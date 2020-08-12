@@ -2,7 +2,6 @@ from django.urls import include, path
 
 from .views import (
     BankTransferView,
-    CashView,
     CoinifyCallbackView,
     CoinifyRedirectView,
     CoinifyThanksView,
@@ -16,6 +15,7 @@ from .views import (
     OrderListView,
     OrderMarkAsPaidView,
     OrderReviewAndPayView,
+    PayInPersonView,
     ProductDetailView,
     ShopIndexView,
 )
@@ -73,7 +73,7 @@ urlpatterns = [
                     BankTransferView.as_view(),
                     name="bank_transfer",
                 ),
-                path("pay/cash/", CashView.as_view(), name="cash"),
+                path("pay/in_person/", PayInPersonView.as_view(), name="in_person"),
             ]
         ),
     ),

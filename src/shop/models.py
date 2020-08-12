@@ -87,15 +87,15 @@ class Order(CreatedUpdatedModel):
     CREDIT_CARD = "credit_card"
     BLOCKCHAIN = "blockchain"
     BANK_TRANSFER = "bank_transfer"
-    CASH = "cash"
+    IN_PERSON = "in_person"
 
-    PAYMENT_METHODS = [CREDIT_CARD, BLOCKCHAIN, BANK_TRANSFER, CASH]
+    PAYMENT_METHODS = [CREDIT_CARD, BLOCKCHAIN, BANK_TRANSFER, IN_PERSON]
 
     PAYMENT_METHOD_CHOICES = [
         (CREDIT_CARD, "Credit card"),
         (BLOCKCHAIN, "Blockchain"),
         (BANK_TRANSFER, "Bank transfer"),
-        (CASH, "Cash"),
+        (IN_PERSON, "In Person"),
     ]
 
     payment_method = models.CharField(

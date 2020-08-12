@@ -385,7 +385,9 @@ class OrderReviewAndPayView(
                 Order.BANK_TRANSFER: reverse_lazy(
                     "shop:bank_transfer", kwargs={"pk": order.id}
                 ),
-                Order.CASH: reverse_lazy("shop:cash", kwargs={"pk": order.id}),
+                Order.IN_PERSON: reverse_lazy(
+                    "shop:in_person", kwargs={"pk": order.id}
+                ),
             }
 
             return HttpResponseRedirect(reverses[payment_method])
@@ -570,10 +572,10 @@ class BankTransferView(
         return context
 
 
-# Cash payment view
+# In-person (izettle) payment view
 
 
-class CashView(
+class PayInPersonView(
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
     EnsureUnpaidOrderMixin,
@@ -581,7 +583,7 @@ class CashView(
     DetailView,
 ):
     model = Order
-    template_name = "cash.html"
+    template_name = "in_person.html"
 
 
 # Coinify views
