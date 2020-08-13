@@ -55,6 +55,10 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
           <td>{{ posreport.allok | truefalseicon }}</p>
         </tr>
         <tr>
+          <th>Comments</th>
+          <td>{{ posreport.comments }}</td>
+        </tr>
+        <tr>
           <th>Counts</th>
           <td>
             <table class="table table-condensed">
