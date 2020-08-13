@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bornhack %}
 
 {% block title %}
 PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ block.super }}
@@ -50,6 +51,10 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
           <td>{{ posreport.pos_responsible }}</p>
         </tr>
         <tr>
+          <th>All OK?</th>
+          <td>{{ posreport.allok | truefalseicon }}</p>
+        </tr>
+        <tr>
           <th>Counts</th>
           <td>
             <table class="table table-condensed">
@@ -58,8 +63,10 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
                 <th>What</th>
                 <th>Bank Start</th>
                 <th>Pos Start</th>
+                <th>Start OK?</th>
                 <th>Pos End</th>
                 <th>Bank End</th>
+                <th>End OK?</th>
               </tr>
               </thead>
               <tbody>
@@ -67,46 +74,62 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
                   <td>DKK</td>
                   <td>{{ posreport.bank_count_dkk_start }}</td>
                   <td>{{ posreport.pos_count_dkk_start }}</td>
+                  <td>{{ posreport.dkk_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_dkk_end }}</td>
                   <td>{{ posreport.bank_count_dkk_end }}</td>
+                  <td>{{ posreport.dkk_end_ok | truefalseicon }}</td>
                 </tr>
                 <tr>
                   <td>5 HAX</td>
                   <td>{{ posreport.bank_count_hax5_start }}</td>
                   <td>{{ posreport.pos_count_hax5_start }}</td>
+                  <td>{{ posreport.hax5_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_hax5_end }}</td>
                   <td>{{ posreport.bank_count_hax5_end }}</td>
+                  <td>{{ posreport.hax5_end_ok | truefalseicon }}</td>
                 </tr>
                 <tr>
                   <td>10 HAX</td>
                   <td>{{ posreport.bank_count_hax10_start }}</td>
                   <td>{{ posreport.pos_count_hax10_start }}</td>
+                  <td>{{ posreport.hax10_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_hax10_end }}</td>
                   <td>{{ posreport.bank_count_hax10_end }}</td>
+                  <td>{{ posreport.hax10_end_ok | truefalseicon }}</td>
                 </tr>
                   <td>20 HAX</td>
                   <td>{{ posreport.bank_count_hax20_start }}</td>
                   <td>{{ posreport.pos_count_hax20_start }}</td>
+                  <td>{{ posreport.hax20_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_hax20_end }}</td>
                   <td>{{ posreport.bank_count_hax20_end }}</td>
+                  <td>{{ posreport.hax20_end_ok | truefalseicon }}</td>
                 </tr>
                 <tr>
                   <td>50 HAX</td>
                   <td>{{ posreport.bank_count_hax50_start }}</td>
                   <td>{{ posreport.pos_count_hax50_start }}</td>
+                  <td>{{ posreport.hax50_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_hax50_end }}</td>
                   <td>{{ posreport.bank_count_hax50_end }}</td>
+                  <td>{{ posreport.hax50_end_ok | truefalseicon }}</td>
                 </tr>
                 <tr>
                   <td>100 HAX</td>
                   <td>{{ posreport.bank_count_hax100_start }}</td>
                   <td>{{ posreport.pos_count_hax100_start }}</td>
+                  <td>{{ posreport.hax100_start_ok | truefalseicon }}</td>
                   <td>{{ posreport.pos_count_hax100_end }}</td>
                   <td>{{ posreport.bank_count_hax100_end }}</td>
+                  <td>{{ posreport.hax100_end_ok | truefalseicon }}</td>
                 </tr>
               </tbody>
             </table>
           </td>
+        </tr>
+        <tr>
+          <th>POS JSON</th>
+          <td>{{ posreport.pos_json }}</p>
         </tr>
       </tbody>
     </table>

@@ -691,3 +691,70 @@ class PosReport(CampRelatedModel, UUIDModel):
                 "posreport_uuid": self.uuid,
             },
         )
+
+    @property
+    def dkk_start_ok(self):
+        return self.bank_count_dkk_start == self.pos_count_dkk_start
+
+    @property
+    def hax5_start_ok(self):
+        return self.bank_count_hax5_start == self.pos_count_hax5_start
+
+    @property
+    def hax10_start_ok(self):
+        return self.bank_count_hax10_start == self.pos_count_hax10_start
+
+    @property
+    def hax20_start_ok(self):
+        return self.bank_count_hax20_start == self.pos_count_hax20_start
+
+    @property
+    def hax50_start_ok(self):
+        return self.bank_count_hax50_start == self.pos_count_hax50_start
+
+    @property
+    def hax100_start_ok(self):
+        return self.bank_count_hax100_start == self.pos_count_hax100_start
+
+    @property
+    def dkk_end_ok(self):
+        return self.bank_count_dkk_end == self.pos_count_dkk_end
+
+    @property
+    def hax5_end_ok(self):
+        return self.bank_count_hax5_end == self.pos_count_hax5_end
+
+    @property
+    def hax10_end_ok(self):
+        return self.bank_count_hax10_end == self.pos_count_hax10_end
+
+    @property
+    def hax20_end_ok(self):
+        return self.bank_count_hax20_end == self.pos_count_hax20_end
+
+    @property
+    def hax50_end_ok(self):
+        return self.bank_count_hax50_end == self.pos_count_hax50_end
+
+    @property
+    def hax100_end_ok(self):
+        return self.bank_count_hax100_end == self.pos_count_hax100_end
+
+    @property
+    def allok(self):
+        return all(
+            [
+                self.dkk_start_ok,
+                self.hax5_start_ok,
+                self.hax10_start_ok,
+                self.hax20_start_ok,
+                self.hax50_start_ok,
+                self.hax100_start_ok,
+                self.dkk_end_ok,
+                self.hax5_end_ok,
+                self.hax10_end_ok,
+                self.hax20_end_ok,
+                self.hax50_end_ok,
+                self.hax100_end_ok,
+            ]
+        )
