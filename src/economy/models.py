@@ -517,6 +517,9 @@ class Pos(CampRelatedModel, UUIDModel):
 class PosReport(CampRelatedModel, UUIDModel):
     """A PosReport contains the HAX/DKK counts and the csv report from the POS system."""
 
+    class Meta:
+        ordering = ["date", "pos"]
+
     pos = models.ForeignKey(
         "economy.Pos",
         on_delete=models.PROTECT,
