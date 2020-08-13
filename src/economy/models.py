@@ -548,6 +548,10 @@ class PosReport(CampRelatedModel, UUIDModel):
         help_text="The JSON exported from the external POS system",
     )
 
+    comments = models.TextField(
+        blank=True, help_text="Any comments about this PosReport",
+    )
+
     # bank count start of day
 
     bank_count_dkk_start = models.PositiveIntegerField(

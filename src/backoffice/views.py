@@ -2033,7 +2033,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
     model = PosReport
-    fields = ["date", "bank_responsible", "pos_responsible"]
+    fields = ["date", "bank_responsible", "pos_responsible", "comments"]
     template_name = "posreport_form.html"
 
     def get_context_data(self, **kwargs):
@@ -2070,7 +2070,7 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
     """Use this view to update PosReports."""
 
     model = PosReport
-    fields = ["date", "bank_responsible", "pos_responsible"]
+    fields = ["date", "bank_responsible", "pos_responsible", "comments"]
     template_name = "posreport_form.html"
     pk_url_kwarg = "posreport_uuid"
 
