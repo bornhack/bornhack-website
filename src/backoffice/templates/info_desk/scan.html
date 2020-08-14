@@ -72,6 +72,11 @@ Scan | {{ block.super }}
                 <strong>Order:</strong>
             <td>
                 {{ ticket.order }}
+        <tr>
+            <td>
+                <strong>User Email:</strong>
+            <td>
+                {{ ticket.order.user.email }}
         {% endif %}
 
         {% if ticket.sponsor %}
