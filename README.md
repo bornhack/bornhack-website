@@ -27,10 +27,6 @@ If you installed python3 using Homebrew on macOS, you will need to install virtu
 ```
 pip3 install virtualenv
 ```
-or using [pipx](https://pypi.org/project/pipx/)
-```
-pipx install virtualenv
-```
 
 ### System libraries
 Install system dependencies (method depends on OS):
@@ -38,10 +34,6 @@ Install system dependencies (method depends on OS):
   - Debian: libpq-dev
   - FreeBSD: databases/postgresql11-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
-- [GeoDjango](https://docs.djangoproject.com/en/3.1/ref/contrib/gis/install/)
-  - Debian ?
-  - FreeBSD ?
-  - MacOS `brew install gdal postgis postgresql libgeoip`
 - libjpeg (for pdf generation)
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
@@ -67,8 +59,6 @@ Install pip packages:
 
 You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints).
 
-If you dont want to bother with running a local database, [Heroku offers free Postgres](https://www.heroku.com/postgres).
-
 ### Configuration file
 
 Copy dev environment settings file and change settings as needed:
@@ -86,7 +76,7 @@ Is this a new installation? Initialize the database:
 (venv) $ python src/manage.py migrate
 ```
 
-Is this for local development? Bootstrap the database with dummy data and users (should take ~10 minutes, but may take longer depending on your setup):
+Is this for local development? Bootstrap the database with dummy data and users:
 
 ```
 (venv) $ python src/manage.py bootstrap-devsite
