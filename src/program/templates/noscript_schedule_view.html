@@ -12,8 +12,7 @@ Schedule | {{ block.super }}
 window.addEventListener('DOMContentLoaded', () => {
   // If the user already scrolled down before DOMContentLoaded we dont mess with the scroll
   const scrollIntoView = (document.scrollingElement && document.scrollingElement.scrollTop === 0)
-  findCurrentTimeSlot(new Date('2020-08-28T12:10:00+02:00'), scrollIntoView)
-  console.log(41)
+  findCurrentTimeSlot(new Date(), scrollIntoView)
 })
 
 // update the time indicator every minute
