@@ -30,6 +30,7 @@ class Permission(models.Model):
             ("contentteam_permission", "Content Team permissions set"),
             ("economyteam_permission", "Economy Team permissions set"),
             ("foodareateam_permission", "Foodarea Team permissions set"),
+            ("gameteam_permission", "Game Team permissions set"),
             ("infoteam_permission", "Info Team permissions set"),
             ("lightteam_permission", "Light Team permissions set"),
             ("logisticsteam_permission", "Logistics Team permissions set"),
