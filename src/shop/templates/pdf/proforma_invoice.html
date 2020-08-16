@@ -82,6 +82,6 @@
 <ul>
     <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
     <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
-    <li><b>Cash:</b> https://{{ hostname }}{% url 'shop:cash' pk=order.pk %} (requires geographical proximity to an organiser)</li>
+    <li><b>In person:</b> https://{{ hostname }}{% url 'shop:in_person' pk=order.pk %} (requires geographical proximity to infodesk or an organiser)</li>
 </ul>
 
