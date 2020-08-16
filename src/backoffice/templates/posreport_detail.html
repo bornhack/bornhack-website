@@ -23,6 +23,7 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
       <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
       <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
       {% endif %}
+      <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to Pos</a>
     </p>
     <table class="table">
       <tbody>
