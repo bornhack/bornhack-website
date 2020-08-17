@@ -1,7 +1,8 @@
-from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic import DetailView, ListView
-from utils.models import CampReadOnlyModeError
 
 from .models import Token, TokenFind
 
@@ -15,15 +16,15 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         # register this tokenview if it isn't already
-        try:
-            token, created = TokenFind.objects.get_or_create(
-                token=self.get_object(), user=request.user
+        token, created = TokenFind.objects.get_or_create(
+            token=self.get_object(), user=request.user
+        )
+        if created:
+            messages.success(
+                self.request,
+                f"You found a secret token: {self.get_object().description} - Your visit has been registered! Keep hunting, there might be more tokens out there.",
             )
-            return super().get(request, *args, **kwargs)
-        except CampReadOnlyModeError:
-            self.older_code = True
-            self.older_token_token = settings.BORNHACK_2019_OLD_TOKEN_TOKEN
-            return super().get(request, *args, **kwargs)
+        return redirect(reverse("tokens:tokenfind_list"))
 
 
 class TokenFindListView(LoginRequiredMixin, ListView):
