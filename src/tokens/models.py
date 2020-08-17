@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from utils.models import CampRelatedModel
 
 
@@ -21,6 +22,12 @@ class Token(CampRelatedModel):
     class Meta:
         ordering = ["camp"]
 
+    def get_absolute_url(self):
+        return reverse(
+            "backoffice:token_detail",
+            kwargs={"camp_slug": self.camp.slug, "pk": self.pk},
+        )
+
 
 class TokenFind(CampRelatedModel):
     class Meta:
@@ -28,7 +35,9 @@ class TokenFind(CampRelatedModel):
 
     token = models.ForeignKey("tokens.Token", on_delete=models.PROTECT)
 
-    user = models.ForeignKey("auth.User", on_delete=models.PROTECT)
+    user = models.ForeignKey(
+        "auth.User", on_delete=models.PROTECT, related_name="token_finds"
+    )
 
     camp_filter = "token__camp"
 

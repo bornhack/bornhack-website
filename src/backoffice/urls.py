@@ -91,6 +91,12 @@ from .views import (
     SpeakerProposalListView,
     SpeakerUpdateView,
     TicketCheckinView,
+    TokenCreateView,
+    TokenDeleteView,
+    TokenDetailView,
+    TokenListView,
+    TokenStatsView,
+    TokenUpdateView,
     VillageOrdersView,
     VillageToOrderView,
 )
@@ -715,6 +721,35 @@ urlpatterns = [
                     ),
                 ),
             ],
+        ),
+    ),
+    # tokens
+    path(
+        "tokens/",
+        include(
+            [
+                path("", TokenListView.as_view(), name="token_list",),
+                path("create/", TokenCreateView.as_view(), name="token_create",),
+                path("stats/", TokenStatsView.as_view(), name="token_stats",),
+                path(
+                    "<int:pk>/",
+                    include(
+                        [
+                            path("", TokenDetailView.as_view(), name="token_detail",),
+                            path(
+                                "update/",
+                                TokenUpdateView.as_view(),
+                                name="token_update",
+                            ),
+                            path(
+                                "delete/",
+                                TokenDeleteView.as_view(),
+                                name="token_delete",
+                            ),
+                        ]
+                    ),
+                ),
+            ]
         ),
     ),
 ]
