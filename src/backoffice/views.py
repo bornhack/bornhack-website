@@ -2077,6 +2077,7 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
         "pos_responsible",
         "hax_sold_izettle",
         "hax_sold_website",
+        "dkk_sales_izettle",
         "comments",
     ]
     template_name = "posreport_form.html"
