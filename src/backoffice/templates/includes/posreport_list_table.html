@@ -3,7 +3,6 @@
   <thead>
     <tr>
       <th>Date</th>
-      <th>Pos</th>
       <th>Responsible</th>
       <th>DKK Cash iZettle</th>
       <th>DKK Balance</th>
@@ -19,25 +18,24 @@
     {% for pr in posreport_list %}
     <tr>
       <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.date }}</a></td>
-      <td>{{ pr.pos.name }}</td>
       <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
       <td>{{ pr.dkk_sales_izettle }} DKK</td>
       <td class="text-right">
-        {{ pr.bank_count_dkk_start }}<br>
-        + {{ pr.dkk_sales_izettle }}<br>
-        - {{ pr.bank_count_dkk_end }}<br>
-        <b>= {{ pr.dkk_balance }}</b>
+        {{ pr.bank_count_dkk_start }} DKK<br>
+        + {{ pr.dkk_sales_izettle }} DKK<br>
+        - {{ pr.bank_count_dkk_end }} DKK<br>
+        <b>= {{ pr.dkk_balance }} DKK</b>
       </td>
       <td>{{ pr.pos_json_sales.1 }} HAX ({{ pr.pos_json_sales.0 }} tx)</td>
       <td>{{ pr.hax_sold_izettle }} HAX</td>
       <td>{{ pr.hax_sold_website }} HAX</td>
       <td class="text-right">
-        {{ pr.bank_start_hax }}<br>
-        + {{ pr.pos_json_sales.1 }}<br>
-        - {{ pr.hax_sold_izettle }}<br>
-        - {{ pr.hax_sold_website }}<br>
-        - {{ pr.bank_end_hax }}<br>
-        <b>= {{ pr.hax_balance }}</b>
+        {{ pr.bank_start_hax }} HAX<br>
+        + {{ pr.pos_json_sales.1 }} HAX<br>
+        - {{ pr.hax_sold_izettle }} HAX<br>
+        - {{ pr.hax_sold_website }} HAX<br>
+        - {{ pr.bank_end_hax }} HAX<br>
+        <b>= {{ pr.hax_balance }} HAX</b>
       </td>
       <td class="text-center">{{ pr.allok | truefalseicon }}</td>
       <td>
