@@ -2071,7 +2071,13 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
     """Use this view to update PosReports."""
 
     model = PosReport
-    fields = ["date", "bank_responsible", "pos_responsible", "comments"]
+    fields = [
+        "date",
+        "bank_responsible",
+        "pos_responsible",
+        "hax_sold_izettle",
+        "comments",
+    ]
     template_name = "posreport_form.html"
     pk_url_kwarg = "posreport_uuid"
 

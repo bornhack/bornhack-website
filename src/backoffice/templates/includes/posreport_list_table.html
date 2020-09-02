@@ -4,8 +4,14 @@
     <tr>
       <th>Date</th>
       <th>Pos</th>
-      <th>Bank Responsible</th>
-      <th>Pos Responsible</th>
+      <th>Responsible</th>
+      <th>Bank Start</th>
+      <th>Pos Start</th>
+      <th>Bank End</th>
+      <th>Pos End</th>
+      <th>Hax Income</th>
+      <th>Hax Sold</th>
+      <th>Hax Balance</th>
       <th class="text-center">OK?</th>
       <th>Actions</th>
     </tr>
@@ -15,8 +21,14 @@
     <tr>
       <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.date }}</a></td>
       <td>{{ pr.pos.name }}</td>
-      <td>{{ pr.bank_responsible }}</td>
-      <td>{{ pr.pos_responsible }}</td>
+      <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
+      <td>{{ pr.bank_start_hax }} HAX / {{ pr.bank_count_dkk_start }} DKK</td>
+      <td>{{ pr.pos_start_hax }} HAX / {{ pr.pos_count_dkk_start }} DKK</td>
+      <td>{{ pr.bank_end_hax }} HAX / {{ pr.bank_count_dkk_end }} DKK</td>
+      <td>{{ pr.pos_end_hax }} HAX / {{ pr.pos_count_dkk_end }} DKK</td>
+      <td>{{ pr.pos_json_sales.1 }} HAX ({{ pr.pos_json_sales.0 }} tx)</td>
+      <td>{{ pr.hax_sold_izettle }} HAX</td>
+      <td>{{ pr.hax_balance }} HAX</td>
       <td class="text-center">{{ pr.allok | truefalseicon }}</td>
       <td>
         <div class="btn-group-vertical">

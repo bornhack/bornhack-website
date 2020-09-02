@@ -555,6 +555,10 @@ class PosReport(CampRelatedModel, UUIDModel):
         blank=True, help_text="Any comments about this PosReport",
     )
 
+    hax_sold_izettle = models.PositiveIntegerField(
+        default=0, help_text="The number of HAX sold through the iZettle from the POS",
+    )
+
     # bank count start of day
 
     bank_count_dkk_start = models.PositiveIntegerField(
@@ -724,6 +728,46 @@ class PosReport(CampRelatedModel, UUIDModel):
         return self.bank_count_hax100_start == self.pos_count_hax100_start
 
     @property
+    def bank_start_hax(self):
+        return (
+            (self.bank_count_hax5_start * 5)
+            + (self.bank_count_hax10_start * 10)
+            + (self.bank_count_hax20_start * 20)
+            + (self.bank_count_hax50_start * 50)
+            + (self.bank_count_hax100_start * 100)
+        )
+
+    @property
+    def pos_start_hax(self):
+        return (
+            (self.pos_count_hax5_start * 5)
+            + (self.pos_count_hax10_start * 10)
+            + (self.pos_count_hax20_start * 20)
+            + (self.pos_count_hax50_start * 50)
+            + (self.pos_count_hax100_start * 100)
+        )
+
+    @property
+    def bank_end_hax(self):
+        return (
+            (self.bank_count_hax5_end * 5)
+            + (self.bank_count_hax10_end * 10)
+            + (self.bank_count_hax20_end * 20)
+            + (self.bank_count_hax50_end * 50)
+            + (self.bank_count_hax100_end * 100)
+        )
+
+    @property
+    def pos_end_hax(self):
+        return (
+            (self.pos_count_hax5_end * 5)
+            + (self.pos_count_hax10_end * 10)
+            + (self.pos_count_hax20_end * 20)
+            + (self.pos_count_hax50_end * 50)
+            + (self.pos_count_hax100_end * 100)
+        )
+
+    @property
     def dkk_end_ok(self):
         return self.bank_count_dkk_end == self.pos_count_dkk_end
 
@@ -747,7 +791,6 @@ class PosReport(CampRelatedModel, UUIDModel):
     def hax100_end_ok(self):
         return self.bank_count_hax100_end == self.pos_count_hax100_end
 
-    @property
     def allok(self):
         return all(
             [
@@ -765,3 +808,28 @@ class PosReport(CampRelatedModel, UUIDModel):
                 self.hax100_end_ok,
             ]
         )
+
+    @property
+    def pos_json_sales(self):
+        """Calculate the total HAX sales and number of transactions."""
+        transactions = 0
+        total = 0
+        for tx in self.pos_json:
+            transactions += 1
+            total += tx["amount"]
+        return transactions, total
+
+    @property
+    def hax_balance(self):
+        """Return the hax balance all things considered."""
+        balance = 0
+        # start by adding what the POS got at the start of the day
+        balance += self.bank_start_hax
+        # then substract the HAX the POS sold via the izettle
+        balance -= self.hax_sold_izettle
+        # then add the HAX sales from the POS json
+        balance += self.pos_json_sales[1]
+        # finally substract the HAX received from the POS at the end of the day
+        balance -= self.bank_end_hax
+        # all good
+        return balance

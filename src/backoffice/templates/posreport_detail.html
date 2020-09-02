@@ -56,6 +56,14 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
           <td>{{ posreport.allok | truefalseicon }}</p>
         </tr>
         <tr>
+          <th>Hax Sold from iZettle</th>
+          <td>{{ posreport.hax_sold_izettle }} HAX</td>
+        </tr>
+        <tr>
+          <th>Hax Balance (we want 0 here)</th>
+          <td>{{ posreport.hax_balance }} HAX</td>
+        </tr>
+        <tr>
           <th>Comments</th>
           <td>{{ posreport.comments }}</td>
         </tr>
@@ -134,7 +142,7 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
         </tr>
         <tr>
           <th>POS JSON</th>
-          <td>{{ posreport.pos_json }}</p>
+          <td>{{ posreport.pos_json_sales.1 }} HAX in {{ posreport.pos_json_sales.0 }} transactions</p>
         </tr>
       </tbody>
     </table>
