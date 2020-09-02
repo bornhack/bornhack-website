@@ -559,6 +559,11 @@ class PosReport(CampRelatedModel, UUIDModel):
         default=0, help_text="The number of HAX sold through the iZettle from the POS",
     )
 
+    hax_sold_website = models.PositiveIntegerField(
+        default=0,
+        help_text="The number of HAX sold through webshop tickets being used in the POS",
+    )
+
     # bank count start of day
 
     bank_count_dkk_start = models.PositiveIntegerField(
