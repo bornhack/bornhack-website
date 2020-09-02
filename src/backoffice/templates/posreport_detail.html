@@ -65,7 +65,42 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
         </tr>
         <tr>
           <th>Hax Balance (we want 0 here)</th>
-          <td>{{ posreport.hax_balance }} HAX</td>
+          <td>
+            <table class="table table-condensed">
+              <tbody>
+                <tr>
+                  <td class="text-right">&nbsp;</td>
+                  <td class="text-right">{{ posreport.bank_start_hax }} HAX</td>
+                  <td>Bank start</td>
+                </tr>
+                <tr>
+                  <td class="text-right">+</td>
+                  <td class="text-right">{{ posreport.pos_json_sales.1 }} HAX</td>
+                  <td>POS Sales</td>
+                </tr>
+                <tr>
+                  <td class="text-right">-</td>
+                  <td class="text-right">{{ posreport.hax_sold_izettle }} HAX</td>
+                  <td>Sold from iZettle</td>
+                </tr>
+                <tr>
+                  <td class="text-right">-</td>
+                  <td class="text-right">{{ posreport.hax_sold_website }} HAX</td>
+                  <td>Sold from webshop tickets</td>
+                </tr>
+                <tr>
+                  <td class="text-right">-</td>
+                  <td class="text-right">{{ posreport.bank_end_hax }} HAX</td>
+                  <td>Returned to the bank at day end</td>
+                </tr>
+                <tr>
+                  <td class="text-right">=</td>
+                  <td class="text-right"><b>{{ posreport.hax_balance }} HAX</b></td>
+                  <td><b>Final balance.<br>Negative means the POS returned too many HAX, positive means the POS returned too few HAX.</b></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
         </tr>
         <tr>
           <th>Comments</th>

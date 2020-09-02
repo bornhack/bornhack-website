@@ -30,7 +30,14 @@
       <td>{{ pr.pos_json_sales.1 }} HAX ({{ pr.pos_json_sales.0 }} tx)</td>
       <td>{{ pr.hax_sold_izettle }} HAX</td>
       <td>{{ pr.hax_sold_website }} HAX</td>
-      <td>{{ pr.hax_balance }} HAX</td>
+      <td class="text-right">
+        {{ pr.bank_start_hax }}<br>
+        + {{ pr.pos_json_sales.1 }}<br>
+        - {{ pr.hax_sold_izettle }}<br>
+        - {{ pr.hax_sold_website }}<br>
+        - {{ pr.bank_end_hax }}<br>
+        <b>= {{ pr.hax_balance }}</b>
+      </td>
       <td class="text-center">{{ pr.allok | truefalseicon }}</td>
       <td>
         <div class="btn-group-vertical">
