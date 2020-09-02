@@ -56,6 +56,39 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
           <td>{{ posreport.allok | truefalseicon }}</p>
         </tr>
         <tr>
+          <th>DKK cash sales from iZettle</th>
+          <td>{{ posreport.dkk_sales_izettle }} DKK</td>
+        </tr>
+        <tr>
+          <th>DKK balance</th>
+          <td>
+            <table class="table table-condensed">
+              <tbody>
+                <tr>
+                  <td class="text-right">&nbsp;</td>
+                  <td class="text-right">{{ posreport.bank_count_dkk_start }} DKK</td>
+                  <td>Bank start count</td>
+                </tr>
+                <tr>
+                  <td class="text-right">-</td>
+                  <td class="text-right">{{ posreport.dkk_sales_izettle }} DKK</td>
+                  <td>DKK cash income through iZettle</td>
+                </tr>
+                <tr>
+                  <td class="text-right">-</td>
+                  <td class="text-right">{{ posreport.bank_count_dkk_end }} DKK</td>
+                  <td>Returned to the bank at day end</td>
+                </tr>
+                <tr>
+                  <td class="text-right">=</td>
+                  <td class="text-right"><b>{{ posreport.dkk_balance }} DKK</b></td>
+                  <td><b>Final balance.<br>Negative means the POS returned too many DKK, positive means the POS returned too few DKK.</b></td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        <tr>
           <th>Hax Sold from iZettle</th>
           <td>{{ posreport.hax_sold_izettle }} HAX</td>
         </tr>

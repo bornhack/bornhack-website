@@ -555,6 +555,10 @@ class PosReport(CampRelatedModel, UUIDModel):
         blank=True, help_text="Any comments about this PosReport",
     )
 
+    dkk_sales_izettle = models.PositiveIntegerField(
+        default=0, help_text="The total DKK amount in iZettle cash sales"
+    )
+
     hax_sold_izettle = models.PositiveIntegerField(
         default=0, help_text="The number of HAX sold through the iZettle from the POS",
     )
@@ -838,5 +842,18 @@ class PosReport(CampRelatedModel, UUIDModel):
         balance += self.pos_json_sales[1]
         # finally substract the HAX received from the POS at the end of the day
         balance -= self.bank_end_hax
+        # all good
+        return balance
+
+    @property
+    def dkk_balance(self):
+        """Return the DKK balance all things considered."""
+        balance = 0
+        # start with the bank count at the start of the day
+        balance += self.bank_count_dkk_start
+        # then add the iZettle sales for the day
+        balance += self.dkk_sales_izettle
+        # then substract what was returned to the bank at days end
+        balance -= self.bank_count_dkk_end
         # all good
         return balance
