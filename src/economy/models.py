@@ -832,6 +832,8 @@ class PosReport(CampRelatedModel, UUIDModel):
         balance += self.bank_start_hax
         # then substract the HAX the POS sold via the izettle
         balance -= self.hax_sold_izettle
+        # then substract the HAX sold through webshop tickets
+        balance -= self.hax_sold_website
         # then add the HAX sales from the POS json
         balance += self.pos_json_sales[1]
         # finally substract the HAX received from the POS at the end of the day
