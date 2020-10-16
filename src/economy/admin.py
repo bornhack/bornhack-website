@@ -16,8 +16,8 @@ class ChainAdmin(admin.ModelAdmin):
 @admin.register(Credebtor)
 class CredebtorAdmin(admin.ModelAdmin):
     list_filter = ["chain", "name"]
-    list_display = ["chain", "name", "notes"]
-    search_fields = ["chain", "name", "notes"]
+    list_display = ["name", "chain", "address", "notes"]
+    search_fields = ["chain", "name", "address", "notes"]
 
 
 ###############################

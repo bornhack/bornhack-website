@@ -7,7 +7,7 @@ Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) | 
 
 {% block content %}
 <h2>Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }})</h2>
-<a href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}">Back to Credebtor list</a>
+<a class="btn btn-default" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list</a>
 
 <h3>{{ credebtor.expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
 {% include 'includes/expense_list_panel.html' with expense_list=credebtor.expenses.all %}

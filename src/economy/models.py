@@ -20,12 +20,17 @@ from .email import (
 class ChainManager(models.Manager):
     """
     ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
+    Also adds 'expenses_count' and 'revenues_count' and prefetches all expenses
+    and revenues for the credebtors.
     """
 
     def get_queryset(self):
         qs = super().get_queryset()
+        qs = qs.prefetch_related("credebtors__expenses", "credebtors__revenues")
         qs = qs.annotate(expenses_total=models.Sum("credebtors__expenses__amount"))
+        qs = qs.annotate(expenses_count=models.Count("credebtors__expenses", distinct=True))
         qs = qs.annotate(revenues_total=models.Sum("credebtors__revenues__amount"))
+        qs = qs.annotate(revenues_count=models.Count("credebtors__revenues", distinct=True))
         return qs
 
 
@@ -81,11 +86,13 @@ class Chain(CreatedUpdatedModel, UUIDModel):
 
 class CredebtorManager(models.Manager):
     """
-    CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs
+    CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs,
+    and prefetches expenses and revenues for the credebtor(s).
     """
 
     def get_queryset(self):
         qs = super().get_queryset()
+        qs = qs.prefetch_related("expenses", "revenues")
         qs = qs.annotate(expenses_total=models.Sum("expenses__amount"))
         qs = qs.annotate(revenues_total=models.Sum("revenues__amount"))
         return qs

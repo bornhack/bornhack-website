@@ -12,6 +12,7 @@ from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
+from django.core.management import call_command
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
@@ -52,13 +53,65 @@ from tickets.models import TicketType
 from tokens.models import Token, TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
+from economy.models import Chain, Credebtor, Expense, Revenue
 
 fake = Faker()
 tz = pytz.timezone("Europe/Copenhagen")
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-@factory.django.mute_signals(post_save)
+class ChainFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Chain
+
+    name = factory.Faker("company")
+    slug = factory.LazyAttribute(lambda f: unique_slugify(f.name, Chain.objects.all().values_list("slug", flat=True)))
+
+
+class CredebtorFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Credebtor
+
+    chain = factory.SubFactory(ChainFactory)
+    name = factory.Faker("company")
+    slug = factory.LazyAttribute(lambda f: unique_slugify(f.name, Credebtor.objects.all().values_list("slug", flat=True)))
+    address = factory.Faker("address", locale="dk_DK")
+    notes = factory.Faker("text")
+
+
+class ExpenseFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Expense
+
+    camp = factory.Faker("random_element", elements=Camp.objects.all())
+    creditor = factory.Faker("random_element", elements=Credebtor.objects.all())
+    user = factory.Faker("random_element", elements=User.objects.all())
+    amount = factory.Faker("random_int", min=20, max=20000)
+    description = factory.Faker("text")
+    paid_by_bornhack = factory.Faker("random_element", elements=[True, True, False])
+    invoice = factory.django.ImageField(color=random.choice(['#ff0000', '#00ff00', '#0000ff']))
+    invoice_date = factory.Faker("date")
+    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
+    approved = factory.Faker("random_element", elements=[True, True, False])
+    notes = factory.Faker("text")
+
+
+class RevenueFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Revenue
+
+    camp = factory.Faker("random_element", elements=Camp.objects.all())
+    debtor = factory.Faker("random_element", elements=Credebtor.objects.all())
+    user = factory.Faker("random_element", elements=User.objects.all())
+    amount = factory.Faker("random_int", min=20, max=20000)
+    description = factory.Faker("text")
+    invoice = factory.django.ImageField(color=random.choice(['#ff0000', '#00ff00', '#0000ff']))
+    invoice_date = factory.Faker("date")
+    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
+    approved = factory.Faker("random_element", elements=[True, True, False])
+    notes = factory.Faker("text")
+
+
 class ProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = Profile
@@ -159,8 +212,9 @@ class Command(BaseCommand):
             dict(year=2017, tagline="Make Tradition", colour="#750787", read_only=True),
             dict(year=2018, tagline="scale it", colour="#008026", read_only=True),
             dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=True),
-            dict(year=2020, tagline="Going Viral", colour="#ff8c00", read_only=False),
+            dict(year=2020, tagline="Make Clean", colour="#ff8c00", read_only=False),
             dict(year=2021, tagline="Undecided", colour="#e40303", read_only=False),
+            dict(year=2022, tagline="Undecided", colour="#004dff", read_only=False),
         ]
 
         camp_instances = []
@@ -508,6 +562,21 @@ class Command(BaseCommand):
             name="Recording", defaults={"icon": "fas fa-film"}
         )
 
+    def create_credebtors(self):
+        self.output("Creating Chains and Credebtors...")
+        try:
+            CredebtorFactory.create_batch(50)
+        except ValidationError:
+            self.outout("Name conflict, retrying...")
+            CredebtorFactory.create_batch(50)
+        for _ in range(20):
+            # add 20 more credebtors to random existing chains
+            try:
+                CredebtorFactory.create(chain=Chain.objects.order_by("?").first())
+            except ValidationError:
+                self.outout("Name conflict, skipping...")
+                continue
+
     def create_product_categories(self):
         categories = {}
         self.output("Creating productcategories...")
@@ -686,7 +755,7 @@ class Command(BaseCommand):
         orders = {}
         self.output("Creating orders...")
         orders[0] = Order.objects.create(
-            user=users[1], payment_method="cash", open=None, paid=True
+            user=users[1], payment_method="in_person", open=None, paid=True
         )
         orders[0].orderproductrelation_set.create(
             product=camp_products["ticket1"], quantity=1
@@ -697,7 +766,7 @@ class Command(BaseCommand):
         orders[0].mark_as_paid(request=None)
 
         orders[1] = Order.objects.create(
-            user=users[2], payment_method="cash", open=None
+            user=users[2], payment_method="in_person", open=None
         )
         orders[1].orderproductrelation_set.create(
             product=camp_products["ticket1"], quantity=1
@@ -708,7 +777,7 @@ class Command(BaseCommand):
         orders[1].mark_as_paid(request=None)
 
         orders[2] = Order.objects.create(
-            user=users[3], payment_method="cash", open=None
+            user=users[3], payment_method="in_person", open=None
         )
         orders[2].orderproductrelation_set.create(
             product=camp_products["ticket2"], quantity=1
@@ -722,7 +791,7 @@ class Command(BaseCommand):
         orders[2].mark_as_paid(request=None)
 
         orders[3] = Order.objects.create(
-            user=users[4], payment_method="cash", open=None
+            user=users[4], payment_method="in_person", open=None
         )
         orders[3].orderproductrelation_set.create(
             product=global_products["product0"], quantity=1
@@ -1189,6 +1258,13 @@ class Command(BaseCommand):
             mailing_list="content@example.com",
             permission_set="contentteam_permission",
         )
+        teams["economy"] = Team.objects.create(
+            name="Economy",
+            description="The Economy Team handles the money and accounts.",
+            camp=camp,
+            mailing_list="economy@example.com",
+            permission_set="economyteam_permission",
+        )
 
         return teams
 
@@ -1600,6 +1676,14 @@ class Command(BaseCommand):
         for i in range(0, 6):
             TokenFind.objects.create(token=tokens[i], user=users[1])
 
+    def create_camp_expenses(self, camp):
+        self.output(f"Creating expenses for {camp}...")
+        ExpenseFactory.create_batch(200, camp=camp)
+
+    def create_camp_revenues(self, camp):
+        self.output(f"Creating revenues for {camp}...")
+        RevenueFactory.create_batch(20, camp=camp)
+
     def output(self, message):
         self.stdout.write(
             "%s: %s" % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
@@ -1610,6 +1694,13 @@ class Command(BaseCommand):
         self.output(
             self.style.SUCCESS("----------[ Running bootstrap-devsite ]----------")
         )
+        self.output(
+            self.style.SUCCESS(
+                "----------[ Deleting all data from database ]----------"
+            )
+        )
+        call_command("flush", "--noinput")
+
         self.output(self.style.SUCCESS("----------[ Global stuff ]----------"))
 
         camps = self.create_camps()
@@ -1628,6 +1719,8 @@ class Command(BaseCommand):
 
         quickfeedback_options = self.create_quickfeedback_options()
 
+        self.create_credebtors()
+
         for (camp, read_only) in camps:
             year = camp.camp.lower.year
 
@@ -1635,7 +1728,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS("----------[ Bornhack {} ]----------".format(year))
             )
 
-            if year < 2021:
+            if year < 2022:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
@@ -1716,6 +1809,10 @@ class Command(BaseCommand):
                 tokens = self.create_camp_tokens(camp)
 
                 self.create_camp_token_finds(camp, tokens, users)
+
+                self.create_camp_expenses(camp)
+
+                self.create_camp_revenues(camp)
             else:
                 self.output("Not creating anything for this year yet")
 

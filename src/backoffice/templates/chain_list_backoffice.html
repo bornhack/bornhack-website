@@ -8,7 +8,7 @@ Select Chain | {{ block.super }}
 
 {% block content %}
 <h2>Chains</h2>
-<p><a href="{% url "backoffice:index" camp_slug=camp.slug %}">Back to Backoffice Index</a></p>
+<p><a class="btn btn-default" href="{% url "backoffice:index" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Backoffice Index</a></p>
 
 {% if chain_list %}
 <table class="table table-hover datatable">
@@ -30,9 +30,9 @@ Select Chain | {{ block.super }}
       <td>{{ chain.name }}</td>
       <td>{{ chain.notes|default:"N/A" }}</td>
       <td class="text-center"><span class="badge">{{ chain.credebtors.count }}</span></td>
-      <td class="text-center"><span class="badge">{{ chain.expenses.count }}</span></td>
+      <td class="text-center"><span class="badge">{{ chain.expenses_count }}</span></td>
       <td class="text-center">{{ chain.expenses_total|default:"0" }} DKK</td>
-      <td class="text-center"><span class="badge">{{ chain.revenues.count }}</span></td>
+      <td class="text-center"><span class="badge">{{ chain.revenues_count }}</span></td>
       <td class="text-center">{{ chain.revenues_total|default:"0" }} DKK</td>
       <td>
         <a class="btn btn-primary" href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}"><i class="fas fa-search"></i> Details</a>
