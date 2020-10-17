@@ -6,14 +6,17 @@ Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) | 
 {% endblock %}
 
 {% block content %}
-<h2>Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }})</h2>
-<a class="btn btn-default" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list</a>
+<div class="panel panel-default">
+  <div class="panel-heading"><h3 class="panel-title">Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) - BackOffice</h3></div>
+  <div class="panel-body">
+    <a class="btn btn-default" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list for {{ credebtor.chain.name }}</a>
 
-<h3>{{ credebtor.expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
-{% include 'includes/expense_list_panel.html' with expense_list=credebtor.expenses.all %}
+    <h3>{{ expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
+    {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
 
-<h3>{{ credebtor.revenues.count }} Revenues for Credebtor {{ credebtor.name }}</h3>
-{% include 'includes/revenue_list_panel.html' with revenue_list=credebtor.revenues.all %}
-
+    <h3>{{ revenues.count }} Revenues for Credebtor {{ credebtor.name }}</h3>
+    {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
+  </div>
+</div>
 {% endblock content %}
 

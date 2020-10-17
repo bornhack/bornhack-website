@@ -11,11 +11,12 @@ from camps.models import Camp
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
-from django.core.management.base import BaseCommand
 from django.core.management import call_command
+from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from economy.models import Chain, Credebtor, Expense, Revenue
 from events.models import Routing, Type
 from facilities.models import (
     Facility,
@@ -53,7 +54,6 @@ from tickets.models import TicketType
 from tokens.models import Token, TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
-from economy.models import Chain, Credebtor, Expense, Revenue
 
 fake = Faker()
 tz = pytz.timezone("Europe/Copenhagen")
@@ -65,7 +65,11 @@ class ChainFactory(factory.django.DjangoModelFactory):
         model = Chain
 
     name = factory.Faker("company")
-    slug = factory.LazyAttribute(lambda f: unique_slugify(f.name, Chain.objects.all().values_list("slug", flat=True)))
+    slug = factory.LazyAttribute(
+        lambda f: unique_slugify(
+            f.name, Chain.objects.all().values_list("slug", flat=True)
+        )
+    )
 
 
 class CredebtorFactory(factory.django.DjangoModelFactory):
@@ -74,7 +78,11 @@ class CredebtorFactory(factory.django.DjangoModelFactory):
 
     chain = factory.SubFactory(ChainFactory)
     name = factory.Faker("company")
-    slug = factory.LazyAttribute(lambda f: unique_slugify(f.name, Credebtor.objects.all().values_list("slug", flat=True)))
+    slug = factory.LazyAttribute(
+        lambda f: unique_slugify(
+            f.name, Credebtor.objects.all().values_list("slug", flat=True)
+        )
+    )
     address = factory.Faker("address", locale="dk_DK")
     notes = factory.Faker("text")
 
@@ -89,7 +97,9 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
     amount = factory.Faker("random_int", min=20, max=20000)
     description = factory.Faker("text")
     paid_by_bornhack = factory.Faker("random_element", elements=[True, True, False])
-    invoice = factory.django.ImageField(color=random.choice(['#ff0000', '#00ff00', '#0000ff']))
+    invoice = factory.django.ImageField(
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"])
+    )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
     approved = factory.Faker("random_element", elements=[True, True, False])
@@ -105,7 +115,9 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     user = factory.Faker("random_element", elements=User.objects.all())
     amount = factory.Faker("random_int", min=20, max=20000)
     description = factory.Faker("text")
-    invoice = factory.django.ImageField(color=random.choice(['#ff0000', '#00ff00', '#0000ff']))
+    invoice = factory.django.ImageField(
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"])
+    )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
     approved = factory.Faker("random_element", elements=[True, True, False])
@@ -567,7 +579,7 @@ class Command(BaseCommand):
         try:
             CredebtorFactory.create_batch(50)
         except ValidationError:
-            self.outout("Name conflict, retrying...")
+            self.output("Name conflict, retrying...")
             CredebtorFactory.create_batch(50)
         for _ in range(20):
             # add 20 more credebtors to random existing chains
@@ -856,10 +868,18 @@ class Command(BaseCommand):
             capacity=50,
         )
         locations["food_area"] = EventLocation.objects.create(
-            name="Food Area", slug="food-area", icon="utensils", camp=camp, capacity=50,
+            name="Food Area",
+            slug="food-area",
+            icon="utensils",
+            camp=camp,
+            capacity=50,
         )
         locations["infodesk"] = EventLocation.objects.create(
-            name="Infodesk", slug="infodesk", icon="info", camp=camp, capacity=20,
+            name="Infodesk",
+            slug="infodesk",
+            icon="info",
+            camp=camp,
+            capacity=20,
         )
 
         # add workshop room conflicts (the big root can not be used while either

@@ -26,11 +26,26 @@ class ChainManager(models.Manager):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.prefetch_related("credebtors__expenses", "credebtors__revenues")
-        qs = qs.annotate(expenses_total=models.Sum("credebtors__expenses__amount"))
-        qs = qs.annotate(expenses_count=models.Count("credebtors__expenses", distinct=True))
-        qs = qs.annotate(revenues_total=models.Sum("credebtors__revenues__amount"))
-        qs = qs.annotate(revenues_count=models.Count("credebtors__revenues", distinct=True))
+        qs = qs.prefetch_related(
+            models.Prefetch("credebtors__expenses", to_attr="all_expenses"),
+            models.Prefetch("credebtors__revenues", to_attr="all_revenues"),
+        )
+        qs = qs.annotate(
+            all_expenses_amount=models.Sum(
+                "credebtors__expenses__amount", distinct=True
+            )
+        )
+        qs = qs.annotate(
+            all_expenses_count=models.Count("credebtors__expenses", distinct=True)
+        )
+        qs = qs.annotate(
+            all_revenues_amount=models.Sum(
+                "credebtors__revenues__amount", distinct=True
+            )
+        )
+        qs = qs.annotate(
+            all_revenues_count=models.Count("credebtors__revenues", distinct=True)
+        )
         return qs
 
 
@@ -92,9 +107,12 @@ class CredebtorManager(models.Manager):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        qs = qs.prefetch_related("expenses", "revenues")
-        qs = qs.annotate(expenses_total=models.Sum("expenses__amount"))
-        qs = qs.annotate(revenues_total=models.Sum("revenues__amount"))
+        qs = qs.prefetch_related(
+            models.Prefetch("expenses", to_attr="all_expenses"),
+            models.Prefetch("revenues", to_attr="all_revenues"),
+        )
+        qs = qs.annotate(all_expenses_amount=models.Sum("expenses__amount"))
+        qs = qs.annotate(all_revenues_amount=models.Sum("revenues__amount"))
         return qs
 
 
@@ -494,7 +512,9 @@ class Pos(CampRelatedModel, UUIDModel):
     )
 
     team = models.ForeignKey(
-        "teams.Team", on_delete=models.PROTECT, help_text="The Team managning this POS",
+        "teams.Team",
+        on_delete=models.PROTECT,
+        help_text="The Team managning this POS",
     )
 
     def save(self, **kwargs):
@@ -559,7 +579,8 @@ class PosReport(CampRelatedModel, UUIDModel):
     )
 
     comments = models.TextField(
-        blank=True, help_text="Any comments about this PosReport",
+        blank=True,
+        help_text="Any comments about this PosReport",
     )
 
     dkk_sales_izettle = models.PositiveIntegerField(
@@ -567,7 +588,8 @@ class PosReport(CampRelatedModel, UUIDModel):
     )
 
     hax_sold_izettle = models.PositiveIntegerField(
-        default=0, help_text="The number of HAX sold through the iZettle from the POS",
+        default=0,
+        help_text="The number of HAX sold through the iZettle from the POS",
     )
 
     hax_sold_website = models.PositiveIntegerField(

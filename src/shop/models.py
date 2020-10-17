@@ -432,6 +432,15 @@ class Product(CreatedUpdatedModel, UUIDModel):
         blank=True,
     )
 
+    cost = models.IntegerField(
+        default=0,
+        help_text="The cost for this product, including VAT. Used for profit calculations in the economy system.",
+    )
+
+    comment = models.TextField(
+        blank=True, help_text="Internal comments for this product."
+    )
+
     objects = ProductQuerySet.as_manager()
 
     def __str__(self):
@@ -442,7 +451,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
             raise ValidationError("Products with category Tickets need a ticket_type")
 
     def is_available(self):
-        """ Is the product available or not?
+        """Is the product available or not?
 
         Checks for the following:
 

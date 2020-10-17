@@ -298,7 +298,11 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        form.fields["location"].widget = LeafletWidget(attrs={"display_raw": "true",})
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+            }
+        )
         return form
 
     def get_context_data(self, **kwargs):
@@ -324,7 +328,11 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        form.fields["location"].widget = LeafletWidget(attrs={"display_raw": "true",})
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+            }
+        )
         return form
 
     def get_success_url(self):
@@ -445,7 +453,7 @@ class FacilityOpeningHoursCreateView(
         hours = form.save(commit=False)
         hours.facility = self.facility
         hours.save()
-        messages.success(self.request, f"New opening hours created successfully!")
+        messages.success(self.request, "New opening hours created successfully!")
         return redirect(
             reverse(
                 "backoffice:facility_detail",
@@ -547,7 +555,9 @@ class SpeakerProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListVie
 
 
 class SpeakerProposalDetailView(
-    AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, DetailView,
+    AvailabilityMatrixViewMixin,
+    ContentTeamPermissionMixin,
+    DetailView,
 ):
     """ This view permits Content Team members to see SpeakerProposal details """
 
@@ -915,15 +925,16 @@ class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(
-            self.request, f"Event '{self.get_object().title}' has been deleted!",
+            self.request,
+            f"Event '{self.get_object().title}' has been deleted!",
         )
         return reverse("backoffice:event_list", kwargs={"camp_slug": self.camp.slug})
 
 
 class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """ This view is used by the Content Team to manually schedule Events.
+    """This view is used by the Content Team to manually schedule Events.
     It shows a table with radioselect buttons for the available slots for the
-    EventType of the Event """
+    EventType of the Event"""
 
     form_class = EventScheduleForm
     template_name = "event_schedule.html"
@@ -1259,9 +1270,9 @@ class AutoScheduleCrashCourseView(
 
 
 class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """ This view is used to validate schedules. It uses the AutoScheduler and can
+    """This view is used to validate schedules. It uses the AutoScheduler and can
     either validate the currently applied schedule or a new similar schedule, or a
-    brand new schedule """
+    brand new schedule"""
 
     template_name = "autoschedule_validate.html"
     form_class = AutoScheduleValidateForm
@@ -1314,7 +1325,7 @@ class AutoScheduleDiffView(CampViewMixin, ContentTeamPermissionMixin, TemplateVi
 
 
 class AutoScheduleApplyView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """ This view is used by the Content Team to apply a new schedules by unscheduling
+    """This view is used by the Content Team to apply a new schedules by unscheduling
     all autoscheduled Events, and scheduling all Event/Slot combinations in the schedule.
 
     TODO: see comment in program.autoscheduler.AutoScheduler.apply() method.
@@ -1481,17 +1492,117 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Chain
     template_name = "chain_list_backoffice.html"
 
+    def get_queryset(self, *args, **kwargs):
+        """Annotate the total count and amount for expenses and revenues for all credebtors in each chain."""
+        qs = Chain.objects.annotate(
+            camp_expenses_amount=Sum(
+                "credebtors__expenses__amount",
+                filter=Q(credebtors__expenses__camp=self.camp),
+                distinct=True,
+            ),
+            camp_expenses_count=Count(
+                "credebtors__expenses",
+                filter=Q(credebtors__expenses__camp=self.camp),
+                distinct=True,
+            ),
+            camp_revenues_amount=Sum(
+                "credebtors__revenues__amount",
+                filter=Q(credebtors__revenues__camp=self.camp),
+                distinct=True,
+            ),
+            camp_revenues_count=Count(
+                "credebtors__revenues",
+                filter=Q(credebtors__revenues__camp=self.camp),
+                distinct=True,
+            ),
+        )
+        return qs
+
 
 class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
     model = Chain
     template_name = "chain_detail_backoffice.html"
     slug_url_kwarg = "chain_slug"
 
+    def get_queryset(self, *args, **kwargs):
+        """Annotate the Chain object with the camp filtered expense and revenue info."""
+        qs = super().get_queryset(*args, **kwargs)
+        qs = qs.annotate(
+            camp_expenses_amount=Sum(
+                "credebtors__expenses__amount",
+                filter=Q(credebtors__expenses__camp=self.camp),
+                distinct=True,
+            ),
+            camp_expenses_count=Count(
+                "credebtors__expenses",
+                filter=Q(credebtors__expenses__camp=self.camp),
+                distinct=True,
+            ),
+            camp_revenues_amount=Sum(
+                "credebtors__revenues__amount",
+                filter=Q(credebtors__revenues__camp=self.camp),
+                distinct=True,
+            ),
+            camp_revenues_count=Count(
+                "credebtors__revenues",
+                filter=Q(credebtors__revenues__camp=self.camp),
+                distinct=True,
+            ),
+        )
+        return qs
+
+    def get_context_data(self, *args, **kwargs):
+        """Add credebtors, expenses and revenues to the context in camp-filtered versions."""
+        context = super().get_context_data(*args, **kwargs)
+
+        # include credebtors as a seperate queryset with annotations for total number and
+        # amount of expenses and revenues
+        context["credebtors"] = Credebtor.objects.filter(
+            chain=self.get_object()
+        ).annotate(
+            camp_expenses_amount=Sum(
+                "expenses__amount", filter=Q(expenses__camp=self.camp), distinct=True
+            ),
+            camp_expenses_count=Count(
+                "expenses", filter=Q(expenses__camp=self.camp), distinct=True
+            ),
+            camp_revenues_amount=Sum(
+                "revenues__amount", filter=Q(revenues__camp=self.camp), distinct=True
+            ),
+            camp_revenues_count=Count(
+                "revenues", filter=Q(revenues__camp=self.camp), distinct=True
+            ),
+        )
+
+        # Include expenses and revenues for the Chain in context as seperate querysets,
+        # since accessing them through the relatedmanager returns for all camps
+        context["expenses"] = Expense.objects.filter(
+            camp=self.camp, creditor__chain=self.get_object()
+        ).prefetch_related("responsible_team", "user", "creditor")
+        context["revenues"] = Revenue.objects.filter(
+            camp=self.camp, debtor__chain=self.get_object()
+        ).prefetch_related("responsible_team", "user", "debtor")
+        return context
+
 
 class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
     model = Credebtor
     template_name = "credebtor_detail_backoffice.html"
     slug_url_kwarg = "credebtor_slug"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["expenses"] = (
+            self.get_object()
+            .expenses.filter(camp=self.camp)
+            .prefetch_related("responsible_team", "user", "creditor")
+        )
+        context["revenues"] = (
+            self.get_object()
+            .revenues.filter(camp=self.camp)
+            .prefetch_related("responsible_team", "user", "debtor")
+        )
+        return context
 
 
 ################################
@@ -1507,7 +1618,11 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         Exclude unapproved expenses, they are shown seperately
         """
         queryset = super().get_queryset(**kwargs)
-        return queryset.exclude(approved__isnull=True)
+        return queryset.exclude(approved__isnull=True).prefetch_related(
+            "creditor",
+            "user",
+            "responsible_team",
+        )
 
     def get_context_data(self, **kwargs):
         """
@@ -1516,6 +1631,10 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp, approved__isnull=True
+        ).prefetch_related(
+            "creditor",
+            "user",
+            "responsible_team",
         )
         return context
 
@@ -1747,7 +1866,11 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         Exclude unapproved revenues, they are shown seperately
         """
         queryset = super().get_queryset(**kwargs)
-        return queryset.exclude(approved__isnull=True)
+        return queryset.exclude(approved__isnull=True).prefetch_related(
+            "debtor",
+            "user",
+            "responsible_team",
+        )
 
     def get_context_data(self, **kwargs):
         """
@@ -2040,7 +2163,8 @@ class PosReportCreateView(PosViewMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"].fields["bank_responsible"].queryset = Team.objects.get(
-            camp=self.camp, name="Orga",
+            camp=self.camp,
+            name="Orga",
         ).approved_members.all()
         context["form"].fields[
             "pos_responsible"
@@ -2054,7 +2178,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
         pr = form.save(commit=False)
         pr.pos = self.pos
         pr.save()
-        messages.success(self.request, f"New PosReport created successfully!")
+        messages.success(self.request, "New PosReport created successfully!")
         return redirect(
             reverse(
                 "backoffice:posreport_detail",
@@ -2086,7 +2210,8 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["form"].fields["bank_responsible"].queryset = Team.objects.get(
-            camp=self.camp, name="Orga",
+            camp=self.camp,
+            name="Orga",
         ).approved_members.all()
         context["form"].fields[
             "pos_responsible"
