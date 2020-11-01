@@ -823,7 +823,7 @@ class Command(BaseCommand):
         year = camp.camp.lower.year
         self.output("Creating event_tracks for {}...".format(year))
         tracks[1] = EventTrack.objects.create(
-            camp=camp, name="BornHack", slug=camp.slug
+            camp=camp, name="BornHack {}".format(year), slug=camp.slug
         )
 
         return tracks
