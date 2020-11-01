@@ -1,6 +1,7 @@
 from django.urls import include, path
 
 from .views import (
+    AddRecordingView,
     ApproveFeedbackView,
     ApproveNamesView,
     AutoScheduleApplyView,
@@ -537,6 +538,8 @@ urlpatterns = [
         ApproveFeedbackView.as_view(),
         name="approve_event_feedback",
     ),
+    # add recording url objects
+    path("add_recording", AddRecordingView.as_view(), name="add_eventrecording",),
     # economy
     path(
         "economy/",
