@@ -79,7 +79,7 @@ Is this a new installation? Initialize the database:
 Is this for local development? Bootstrap the database with dummy data and users:
 
 ```
-(venv) $ python src/manage.py bootstrap-devsite
+(venv) $ python src/manage.py bootstrap_devsite
 ```
 
 
