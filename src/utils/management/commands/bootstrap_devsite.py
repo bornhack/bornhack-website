@@ -1712,7 +1712,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         start = timezone.now()
         self.output(
-            self.style.SUCCESS("----------[ Running bootstrap-devsite ]----------")
+            self.style.SUCCESS("----------[ Running bootstrap_devsite ]----------")
         )
         self.output(
             self.style.SUCCESS(
@@ -1854,4 +1854,4 @@ class Command(BaseCommand):
 
         self.output("done!")
         duration = timezone.now() - start
-        self.output(f"bootstrap-devsite took {duration}!")
+        self.output(f"bootstrap_devsite took {duration}!")
