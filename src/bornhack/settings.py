@@ -198,3 +198,6 @@ ECONOMY_TEAM_NAME = "Economy"
 
 # we have some large formsets sometimes
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
+
+# use captcha form
+ACCOUNT_SIGNUP_FORM_CLASS = "bornhack.forms.AllAuthSignupCaptchaForm"
