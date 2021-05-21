@@ -119,6 +119,7 @@ You can also specify details like:
 * Alexander Færøy https://github.com/ahf
 * Benjamin Bach https://github.com/benjaoming
 * coral https://github.com/coral
+* Flemming Jacobsen https://github.com/batmule
 * Henrik Kramshøj https://github.com/kramse
 * Janus Troelsen https://github.com/ysangkok
 * Jeppe Ernst https://github.com/Ern-st
