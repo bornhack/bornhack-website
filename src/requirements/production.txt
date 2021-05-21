@@ -22,7 +22,7 @@ django-wkhtmltopdf==3.3.0
 future==0.18.2
 graphene-django==2.15.0
 html5lib==1.1
-icalendar==4.0.6
+icalendar==4.0.7
 ipython==7.23.1
 irc3==1.1.7
 lxml==4.6.3
