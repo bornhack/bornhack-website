@@ -102,10 +102,9 @@ class ProductAdmin(admin.ModelAdmin):
     ]
 
     list_editable = ["ticket_type"]
-
     list_filter = ["category", "ticket_type"]
-
     search_fields = ["name"]
+    save_as = True
 
 
 class ProductInline(admin.TabularInline):
