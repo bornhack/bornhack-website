@@ -98,6 +98,7 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
                 )
             )
         )
+        context["held_email_count"] =  OutgoingEmail.objects.filter(hold=True, responsible_team__isnull=True).count() + OutgoingEmail.objects.filter(hold=True, responsible_team__camp=self.camp).count()
         return context
 
 
