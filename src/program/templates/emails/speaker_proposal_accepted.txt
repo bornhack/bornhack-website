@@ -1,5 +1,7 @@
 Hello,
 
+Thank you for your submission!
+
 We have reviewed your speaker proposal "{{ proposal.name }}" and have decided to accept it.
 
 {% if proposal.reason %}{{ proposal.reason }}{% endif %}

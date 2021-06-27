@@ -1,5 +1,7 @@
 Hello,
 
+Thank you for your submission.
+
 We have reviewed your event proposal "{{ proposal.title }}" and have decided to reject it.
 
 {% if proposal.reason %}{{ proposal.reason }}{% endif %}

@@ -1,6 +1,8 @@
 {% load commonmark %}
 Hello,<br>
 <br>
+Thank you for your submission.<br>
+<br>
 We have reviewed your event proposal "{{ proposal.title }}" and have decided to reject it.<br>
 <br>
 {% if proposal.reason %}{{ proposal.reason|untrustedcommonmark }}{% endif %}
