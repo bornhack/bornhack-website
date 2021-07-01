@@ -37,4 +37,4 @@ Unidecode==1.2.0
 wheel==0.36.2
 
 # pillow is only here to make old migrations run
-Pillow==8.2.0
+Pillow==8.3.0
