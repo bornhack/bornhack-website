@@ -12,10 +12,11 @@ repos:
     rev: "v5.8.0"
     hooks:
     - id: "isort"
-  - repo: https://github.com/myint/autoflake
-    rev: v1.4
+  - repo: "https://github.com/myint/autoflake"
+    rev: "v1.4"
     hooks:
-      - id: autoflake
+      - id: "autoflake"
         args:
-          - --in-place
-          - --remove-all-unused-imports
+          - "--in-place"
+          - "--remove-all-unused-imports"
+          - "--ignore-init-module-imports"
