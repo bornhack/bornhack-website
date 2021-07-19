@@ -9,7 +9,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def do_work():
     """
-        Run irc3 module code, wait for events on IRC and wait for messages in OutgoingIrcMessage
+    Run irc3 module code, wait for events on IRC and wait for messages in OutgoingIrcMessage
     """
     if hasattr(settings, "IRCBOT_CHANNELS"):
         logger.error(

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic.detail import SingleObjectMixin
+
 from teams.models import Team, TeamMember
 
 

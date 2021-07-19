@@ -1,5 +1,6 @@
-from camps.models import Camp
 from django.views.generic import ListView
+
+from camps.models import Camp
 
 
 class PeopleView(ListView):

@@ -1,6 +1,5 @@
 import logging
 
-
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -13,6 +12,7 @@ def teammember_saved(sender, instance, created, **kwargs):
         # call the mail sending function
         # late import to please django 3.2 or "django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet."
         from .email import add_new_membership_email
+
         if not add_new_membership_email(instance):
             logger.error("Error adding email to outgoing queue")
 

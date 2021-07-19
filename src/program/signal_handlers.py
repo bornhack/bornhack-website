@@ -7,7 +7,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def check_speaker_event_camp_consistency(sender, instance, **kwargs):
     if kwargs["action"] == "pre_add":
-        from program.models import Speaker, Event
+        from program.models import Event, Speaker
 
         if isinstance(instance, Event):
             # loop over speakers being added to this event
@@ -35,5 +35,5 @@ def check_speaker_event_camp_consistency(sender, instance, **kwargs):
 
 
 def event_session_post_save(sender, instance, created, **kwargs):
-    """ Make sure we have the number of EventSlots we need to have, adjust if not """
+    """Make sure we have the number of EventSlots we need to have, adjust if not"""
     instance.fixup_event_slots()

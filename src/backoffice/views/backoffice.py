@@ -1,21 +1,19 @@
 import logging
 
 import requests
-from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.http import Http404, HttpResponse
 from django.views.generic import TemplateView
-from facilities.models import (
-    FacilityFeedback,
-)
+
+from camps.mixins import CampViewMixin
+from facilities.models import FacilityFeedback
 from teams.models import Team
 from utils.models import OutgoingEmail
 
-from ..mixins import (
-    RaisePermissionRequiredMixin,
-)
+from ..mixins import RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
     """
@@ -37,7 +35,14 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
                 )
             )
         )
-        context["held_email_count"] =  OutgoingEmail.objects.filter(hold=True, responsible_team__isnull=True).count() + OutgoingEmail.objects.filter(hold=True, responsible_team__camp=self.camp).count()
+        context["held_email_count"] = (
+            OutgoingEmail.objects.filter(
+                hold=True, responsible_team__isnull=True
+            ).count()
+            + OutgoingEmail.objects.filter(
+                hold=True, responsible_team__camp=self.camp
+            ).count()
+        )
         return context
 
 
@@ -51,7 +56,7 @@ class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
     template_name = "backoffice_proxy.html"
 
     def dispatch(self, request, *args, **kwargs):
-        """ Perform the request and return the response if we have a slug """
+        """Perform the request and return the response if we have a slug"""
         # list available stuff if we have no slug
         if "proxy_slug" not in kwargs:
             return super().dispatch(request, *args, **kwargs)

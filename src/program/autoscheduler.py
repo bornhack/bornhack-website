@@ -25,7 +25,7 @@ class AutoScheduler:
     """
 
     def __init__(self, camp):
-        """ Get EventTypes, EventSessions and Events, build autoslot and autoevent objects """
+        """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects"""
         self.camp = camp
 
         # Get all EventTypes which support autoscheduling
@@ -62,17 +62,17 @@ class AutoScheduler:
         self.autoevents, self.autoeventindex = self.get_autoevents(self.events)
 
     def get_event_types(self):
-        """ Return all EventTypes which support autoscheduling """
+        """Return all EventTypes which support autoscheduling"""
         return EventType.objects.filter(support_autoscheduling=True)
 
     def get_event_sessions(self, event_types):
-        """ Return all EventSessions for these EventTypes """
+        """Return all EventSessions for these EventTypes"""
         return self.camp.event_sessions.filter(
             event_type__in=event_types,
         ).prefetch_related("event_type", "event_location")
 
     def get_events(self, event_types):
-        """ Return all Events that need scheduling """
+        """Return all Events that need scheduling"""
         # return all events for these event_types, but..
         return self.camp.events.filter(event_type__in=event_types).exclude(
             # exclude Events that have been sceduled already...
@@ -82,7 +82,7 @@ class AutoScheduler:
         )
 
     def get_autoslots(self, event_sessions):
-        """ Return a list of autoslots for all slots in all EventSessions """
+        """Return a list of autoslots for all slots in all EventSessions"""
         autoslots = []
         # loop over the sessions
         for session in event_sessions:
@@ -92,7 +92,7 @@ class AutoScheduler:
         return autoslots
 
     def get_autoevents(self, events):
-        """ Return a list of resources.Event objects, one for each Event """
+        """Return a list of resources.Event objects, one for each Event"""
         autoevents = []
         autoeventindex = {}
         eventindex = {}
@@ -197,10 +197,10 @@ class AutoScheduler:
         return autoevents, autoeventindex
 
     def build_current_autoschedule(self):
-        """ Build an autoschedule object based on the existing published schedule.
+        """Build an autoschedule object based on the existing published schedule.
         Returns an autoschedule, which is a list of conference_scheduler.resources.ScheduledItem
         objects, one for each scheduled Event. This function is useful for creating an "original
-        schedule" to base a new similar schedule off of. """
+        schedule" to base a new similar schedule off of."""
 
         # loop over scheduled events and create a ScheduledItem object for each
         autoschedule = []
@@ -244,8 +244,8 @@ class AutoScheduler:
         return autoschedule
 
     def calculate_autoschedule(self, original_schedule=None):
-        """ Calculate autoschedule based on self.autoevents and self.autoslots,
-            optionally using original_schedule to minimise changes """
+        """Calculate autoschedule based on self.autoevents and self.autoslots,
+        optionally using original_schedule to minimise changes"""
         kwargs = {}
         kwargs["events"] = self.autoevents
         kwargs["slots"] = self.autoslots
@@ -264,8 +264,8 @@ class AutoScheduler:
         return autoschedule
 
     def calculate_similar_autoschedule(self, original_schedule=None):
-        """ Convenience method for creating similar schedules. If original_schedule
-        is omitted the new schedule is based on the current schedule instead """
+        """Convenience method for creating similar schedules. If original_schedule
+        is omitted the new schedule is based on the current schedule instead"""
 
         if not original_schedule:
             # we do not have an original_schedule, use current EventInstances
@@ -277,7 +277,7 @@ class AutoScheduler:
         return autoschedule, diff
 
     def apply(self, autoschedule):
-        """ Apply an autoschedule by creating EventInstance objects to match it """
+        """Apply an autoschedule by creating EventInstance objects to match it"""
 
         # "The Clean Slate protocol sir?" - delete any existing autoscheduled Events
         # TODO: investigate how this affects the FRAB XML export (for which we added a UUID on
@@ -320,7 +320,10 @@ class AutoScheduler:
         This method returns a dict of Event differences and Slot differences between
         the two schedules.
         """
-        slot_diff = scheduler.slot_schedule_difference(original_schedule, new_schedule,)
+        slot_diff = scheduler.slot_schedule_difference(
+            original_schedule,
+            new_schedule,
+        )
 
         slot_output = []
         for item in slot_diff:
@@ -347,7 +350,8 @@ class AutoScheduler:
 
         # then get a list of differences per event
         event_diff = scheduler.event_schedule_difference(
-            original_schedule, new_schedule,
+            original_schedule,
+            new_schedule,
         )
         event_output = []
         # loop over the differences and build the dict
@@ -357,7 +361,11 @@ class AutoScheduler:
             except self.camp.events.DoesNotExist:
                 event = item.event.name
             event_output.append(
-                {"event": event, "old": {}, "new": {},}
+                {
+                    "event": event,
+                    "old": {},
+                    "new": {},
+                }
             )
             # do we have an old slot for this event?
             if item.old_slot:
@@ -376,7 +384,7 @@ class AutoScheduler:
         return {"event_diffs": event_output, "slot_diffs": slot_output}
 
     def is_valid(self, autoschedule, return_violations=False):
-        """ Check if a schedule is valid, optionally returning a list of violations if invalid """
+        """Check if a schedule is valid, optionally returning a list of violations if invalid"""
         valid = is_valid_schedule(
             autoschedule, slots=self.autoslots, events=self.autoevents
         )

@@ -1,4 +1,5 @@
 from django.test import TestCase
+
 from shop.factories import OrderProductRelationFactory
 
 from .factories import TicketTypeFactory
@@ -12,7 +13,9 @@ class TicketTests(TestCase):
 
         orp = OrderProductRelationFactory()
         shop_ticket = ShopTicket.objects.create(
-            ticket_type=ticket_type, product=orp.product, order=orp.order,
+            ticket_type=ticket_type,
+            product=orp.product,
+            order=orp.order,
         )
 
         self.assertNotEqual(shop_ticket.token, shop_ticket.badge_token)

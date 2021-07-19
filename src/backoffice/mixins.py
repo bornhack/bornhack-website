@@ -1,7 +1,8 @@
-from camps.mixins import CampViewMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
+
+from camps.mixins import CampViewMixin
 from economy.models import Pos
 from utils.mixins import RaisePermissionRequiredMixin
 

@@ -11,13 +11,19 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="discountticket", old_name="checked_in", new_name="used",
+            model_name="discountticket",
+            old_name="checked_in",
+            new_name="used",
         ),
         migrations.RenameField(
-            model_name="shopticket", old_name="checked_in", new_name="used",
+            model_name="shopticket",
+            old_name="checked_in",
+            new_name="used",
         ),
         migrations.RenameField(
-            model_name="sponsorticket", old_name="checked_in", new_name="used",
+            model_name="sponsorticket",
+            old_name="checked_in",
+            new_name="used",
         ),
         migrations.AlterField(
             model_name="discountticket",

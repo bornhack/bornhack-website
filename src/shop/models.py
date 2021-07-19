@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import ugettext_lazy as _
 from unidecode import unidecode
+
 from utils.models import CreatedUpdatedModel, UUIDModel
 from utils.slugs import unique_slugify
 
@@ -160,7 +161,7 @@ class Order(CreatedUpdatedModel):
             return False
 
     def get_coinify_callback_url(self, request):
-        """ Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request """
+        """Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request"""
         if (
             hasattr(settings, "COINIFY_CALLBACK_HOSTNAME")
             and settings.COINIFY_CALLBACK_HOSTNAME

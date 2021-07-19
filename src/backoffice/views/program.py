@@ -1,6 +1,5 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -10,6 +9,8 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+
+from camps.mixins import CampViewMixin
 from program.autoscheduler import AutoScheduler
 from program.mixins import AvailabilityMatrixViewMixin
 from program.models import (
@@ -30,9 +31,7 @@ from ..forms import (
     EventScheduleForm,
     SpeakerForm,
 )
-from ..mixins import (
-    ContentTeamPermissionMixin,
-)
+from ..mixins import ContentTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -42,7 +41,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This convenience view shows a list of pending proposals """
+    """This convenience view shows a list of pending proposals"""
 
     model = SpeakerProposal
     template_name = "pending_proposals.html"
@@ -88,7 +87,7 @@ class ProposalApproveBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
 
 
 class SpeakerProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view permits Content Team members to list SpeakerProposals """
+    """This view permits Content Team members to list SpeakerProposals"""
 
     model = SpeakerProposal
     template_name = "speaker_proposal_list.html"
@@ -105,7 +104,7 @@ class SpeakerProposalDetailView(
     ContentTeamPermissionMixin,
     DetailView,
 ):
-    """ This view permits Content Team members to see SpeakerProposal details """
+    """This view permits Content Team members to see SpeakerProposal details"""
 
     model = SpeakerProposal
     template_name = "speaker_proposal_detail_backoffice.html"
@@ -118,7 +117,7 @@ class SpeakerProposalDetailView(
 
 
 class SpeakerProposalApproveRejectView(ProposalApproveBaseView):
-    """ This view allows ContentTeam members to approve/reject SpeakerProposals """
+    """This view allows ContentTeam members to approve/reject SpeakerProposals"""
 
     model = SpeakerProposal
     template_name = "speaker_proposal_approve_reject.html"
@@ -126,7 +125,7 @@ class SpeakerProposalApproveRejectView(ProposalApproveBaseView):
 
 
 class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view permits Content Team members to list EventProposals """
+    """This view permits Content Team members to list EventProposals"""
 
     model = EventProposal
     template_name = "event_proposal_list.html"
@@ -147,7 +146,7 @@ class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
 
 
 class EventProposalDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """ This view permits Content Team members to see EventProposal details """
+    """This view permits Content Team members to see EventProposal details"""
 
     model = EventProposal
     template_name = "event_proposal_detail_backoffice.html"
@@ -155,7 +154,7 @@ class EventProposalDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailV
 
 
 class EventProposalApproveRejectView(ProposalApproveBaseView):
-    """ This view allows ContentTeam members to approve/reject EventProposals """
+    """This view allows ContentTeam members to approve/reject EventProposals"""
 
     model = EventProposal
     template_name = "event_proposal_approve_reject.html"
@@ -167,7 +166,7 @@ class EventProposalApproveRejectView(ProposalApproveBaseView):
 
 
 class SpeakerListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view is used by the Content Team to see Speaker objects. """
+    """This view is used by the Content Team to see Speaker objects."""
 
     model = Speaker
     template_name = "speaker_list_backoffice.html"
@@ -186,7 +185,7 @@ class SpeakerListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 class SpeakerDetailView(
     AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, DetailView
 ):
-    """ This view is used by the Content Team to see details for Speaker objects """
+    """This view is used by the Content Team to see details for Speaker objects"""
 
     model = Speaker
     template_name = "speaker_detail_backoffice.html"
@@ -202,20 +201,20 @@ class SpeakerDetailView(
 class SpeakerUpdateView(
     AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, UpdateView
 ):
-    """ This view is used by the Content Team to update Speaker objects """
+    """This view is used by the Content Team to update Speaker objects"""
 
     model = Speaker
     template_name = "speaker_update.html"
     form_class = SpeakerForm
 
     def get_form_kwargs(self):
-        """ Set camp for the form """
+        """Set camp for the form"""
         kwargs = super().get_form_kwargs()
         kwargs.update({"camp": self.camp})
         return kwargs
 
     def form_valid(self, form):
-        """ Save object and availability """
+        """Save object and availability"""
         speaker = form.save()
         save_speaker_availability(form, obj=speaker)
         messages.success(self.request, "Speaker has been updated")
@@ -228,7 +227,7 @@ class SpeakerUpdateView(
 
 
 class SpeakerDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
-    """ This view is used by the Content Team to delete Speaker objects """
+    """This view is used by the Content Team to delete Speaker objects"""
 
     model = Speaker
     template_name = "speaker_delete.html"
@@ -252,7 +251,7 @@ class SpeakerDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
 
 
 class EventTypeListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view is used by the Content Team to list EventTypes """
+    """This view is used by the Content Team to list EventTypes"""
 
     model = EventType
     template_name = "event_type_list.html"
@@ -282,7 +281,7 @@ class EventTypeListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class EventTypeDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """ This view is used by the Content Team to see details for EventTypes """
+    """This view is used by the Content Team to see details for EventTypes"""
 
     model = EventType
     template_name = "event_type_detail.html"
@@ -306,7 +305,7 @@ class EventTypeDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView)
 
 
 class EventLocationListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view is used by the Content Team to list EventLocation objects. """
+    """This view is used by the Content Team to list EventLocation objects."""
 
     model = EventLocation
     template_name = "event_location_list.html"
@@ -319,7 +318,7 @@ class EventLocationListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
 
 
 class EventLocationDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """ This view is used by the Content Team to see details for EventLocation objects """
+    """This view is used by the Content Team to see details for EventLocation objects"""
 
     model = EventLocation
     template_name = "event_location_detail.html"
@@ -334,7 +333,7 @@ class EventLocationDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailV
 
 
 class EventLocationCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateView):
-    """ This view is used by the Content Team to create EventLocation objects """
+    """This view is used by the Content Team to create EventLocation objects"""
 
     model = EventLocation
     fields = ["name", "icon", "capacity", "conflicts"]
@@ -362,7 +361,7 @@ class EventLocationCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateV
 
 
 class EventLocationUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
-    """ This view is used by the Content Team to update EventLocation objects """
+    """This view is used by the Content Team to update EventLocation objects"""
 
     model = EventLocation
     fields = ["name", "icon", "capacity", "conflicts"]
@@ -386,7 +385,7 @@ class EventLocationUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
 
 
 class EventLocationDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
-    """ This view is used by the Content Team to delete EventLocation objects """
+    """This view is used by the Content Team to delete EventLocation objects"""
 
     model = EventLocation
     template_name = "event_location_delete.html"
@@ -414,7 +413,7 @@ class EventLocationDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteV
 
 
 class EventListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view is used by the Content Team to see Event objects. """
+    """This view is used by the Content Team to see Event objects."""
 
     model = Event
     template_name = "event_list_backoffice.html"
@@ -431,14 +430,14 @@ class EventListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class EventDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """ This view is used by the Content Team to see details for Event objects """
+    """This view is used by the Content Team to see details for Event objects"""
 
     model = Event
     template_name = "event_detail_backoffice.html"
 
 
 class EventUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
-    """ This view is used by the Content Team to update Event objects """
+    """This view is used by the Content Team to update Event objects"""
 
     model = Event
     fields = [
@@ -460,7 +459,7 @@ class EventUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
 
 
 class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
-    """ This view is used by the Content Team to delete Event objects """
+    """This view is used by the Content Team to delete Event objects"""
 
     model = Event
     template_name = "event_delete.html"
@@ -721,7 +720,7 @@ class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteVi
     context_object_name = "session"
 
     def get(self, *args, **kwargs):
-        """ Show a warning if we have something scheduled in this EventSession """
+        """Show a warning if we have something scheduled in this EventSession"""
         if self.get_object().event_slots.filter(event__isnull=False).exists():
             messages.warning(
                 self.request,
@@ -749,7 +748,7 @@ class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteVi
 
 
 class EventSlotListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """ This view is used by the Content Team to see EventSlot objects. """
+    """This view is used by the Content Team to see EventSlot objects."""
 
     model = EventSlot
     template_name = "event_slot_list.html"
@@ -766,7 +765,7 @@ class EventSlotListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class EventSlotDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """ This view is used by the Content Team to see details for EventSlot objects """
+    """This view is used by the Content Team to see details for EventSlot objects"""
 
     model = EventSlot
     template_name = "event_slot_detail.html"
@@ -774,7 +773,7 @@ class EventSlotDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView)
 
 
 class EventSlotUnscheduleView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
-    """ This view is used by the Content Team to remove an Event from the schedule/EventSlot """
+    """This view is used by the Content Team to remove an Event from the schedule/EventSlot"""
 
     model = EventSlot
     template_name = "event_slot_unschedule.html"
@@ -802,7 +801,7 @@ class EventSlotUnscheduleView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
 
 
 class AutoScheduleManageView(CampViewMixin, ContentTeamPermissionMixin, TemplateView):
-    """ Just an index type view with links to the various actions """
+    """Just an index type view with links to the various actions"""
 
     template_name = "autoschedule_index.html"
 
@@ -810,7 +809,7 @@ class AutoScheduleManageView(CampViewMixin, ContentTeamPermissionMixin, Template
 class AutoScheduleCrashCourseView(
     CampViewMixin, ContentTeamPermissionMixin, TemplateView
 ):
-    """ A short crash course on the autoscheduler """
+    """A short crash course on the autoscheduler"""
 
     template_name = "autoschedule_crash_course.html"
 

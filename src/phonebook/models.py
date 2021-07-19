@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+
 from utils.models import CampRelatedModel
 
 from .dectutils import DectUtils
@@ -20,7 +21,9 @@ class DectRegistration(CampRelatedModel):
         unique_together = [("camp", "number")]
 
     camp = models.ForeignKey(
-        "camps.Camp", related_name="dect_registrations", on_delete=models.PROTECT,
+        "camps.Camp",
+        related_name="dect_registrations",
+        on_delete=models.PROTECT,
     )
 
     user = models.ForeignKey(
@@ -47,11 +50,14 @@ class DectRegistration(CampRelatedModel):
     )
 
     activation_code = models.CharField(
-        max_length=10, blank=True, help_text="The 10 digit numeric activation code",
+        max_length=10,
+        blank=True,
+        help_text="The 10 digit numeric activation code",
     )
 
     publish_in_phonebook = models.BooleanField(
-        default=True, help_text="Check to list this registration in the phonebook",
+        default=True,
+        help_text="Check to list this registration in the phonebook",
     )
 
     def save(self, *args, **kwargs):

@@ -11,7 +11,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="coinifyapicallback", name="headers", field=models.JSONField(),
+            model_name="coinifyapicallback",
+            name="headers",
+            field=models.JSONField(),
         ),
         migrations.AlterField(
             model_name="coinifyapicallback",
@@ -24,13 +26,19 @@ class Migration(migrations.Migration):
             field=models.JSONField(),
         ),
         migrations.AlterField(
-            model_name="coinifyapirequest", name="payload", field=models.JSONField(),
+            model_name="coinifyapirequest",
+            name="payload",
+            field=models.JSONField(),
         ),
         migrations.AlterField(
-            model_name="coinifyapirequest", name="response", field=models.JSONField(),
+            model_name="coinifyapirequest",
+            name="response",
+            field=models.JSONField(),
         ),
         migrations.AlterField(
-            model_name="epaycallback", name="payload", field=models.JSONField(),
+            model_name="epaycallback",
+            name="payload",
+            field=models.JSONField(),
         ),
         migrations.AlterField(
             model_name="order",

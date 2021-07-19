@@ -1,4 +1,5 @@
 from django import template
+
 from tokens.models import TokenFind
 
 register = template.Library()

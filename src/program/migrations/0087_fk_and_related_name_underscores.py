@@ -32,13 +32,19 @@ class Migration(migrations.Migration):
             new_name="speaker_proposal",
         ),
         migrations.RenameField(
-            model_name="url", old_name="eventproposal", new_name="event_proposal",
+            model_name="url",
+            old_name="eventproposal",
+            new_name="event_proposal",
         ),
         migrations.RenameField(
-            model_name="url", old_name="speakerproposal", new_name="speaker_proposal",
+            model_name="url",
+            old_name="speakerproposal",
+            new_name="speaker_proposal",
         ),
         migrations.RenameField(
-            model_name="url", old_name="urltype", new_name="url_type",
+            model_name="url",
+            old_name="urltype",
+            new_name="url_type",
         ),
         migrations.AlterField(
             model_name="event",

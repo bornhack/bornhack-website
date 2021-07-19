@@ -1,24 +1,16 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
-from program.models import (
-    Event,
-    EventFeedback,
-    Url,
-    UrlType,
-)
 
-from ..forms import (
-    AddRecordingForm,
-)
-from ..mixins import (
-    ContentTeamPermissionMixin,
-)
+from camps.mixins import CampViewMixin
+from program.models import Event, EventFeedback, Url, UrlType
+
+from ..forms import AddRecordingForm
+from ..mixins import ContentTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -84,9 +76,7 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         super().setup(*args, **kwargs)
         self.queryset = Event.objects.filter(
             track__camp=self.camp, video_recording=True
-        ).exclude(
-            urls__url_type__name="Recording"
-        )
+        ).exclude(urls__url_type__name="Recording")
 
         self.form_class = modelformset_factory(
             Event,
@@ -113,19 +103,17 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         form.save()
 
         for event_data in form.cleaned_data:
-            if event_data['recording_url']:
-                url = event_data['recording_url']
-                if not event_data['id'].urls.filter(url=url).exists():
+            if event_data["recording_url"]:
+                url = event_data["recording_url"]
+                if not event_data["id"].urls.filter(url=url).exists():
                     recording_url = Url()
-                    recording_url.event = event_data['id']
+                    recording_url.event = event_data["id"]
                     recording_url.url = url
                     recording_url.url_type = UrlType.objects.get(name="Recording")
                     recording_url.save()
 
         if form.changed_objects:
-            messages.success(
-                self.request, f"Updated {len(form.changed_objects)} Event"
-            )
+            messages.success(self.request, f"Updated {len(form.changed_objects)} Event")
         return redirect(self.get_success_url())
 
     def get_success_url(self, *args, **kwargs):

@@ -11,6 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="eventfeedback", old_name="feedback", new_name="comment",
+            model_name="eventfeedback",
+            old_name="feedback",
+            new_name="comment",
         ),
     ]

@@ -1,7 +1,8 @@
 # coding: utf-8
-from camps.models import Camp
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from camps.models import Camp
 from sponsors.models import Sponsor
 from tickets.models import SponsorTicket, TicketType
 

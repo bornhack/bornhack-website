@@ -77,8 +77,8 @@ def add_outgoing_email(
     responsible_team=None,
     hold=False,
 ):
-    """ adds an email to the outgoing queue
-        recipients is a list of to recipients
+    """adds an email to the outgoing queue
+    recipients is a list of to recipients
     """
     text_template = render_to_string(text_template, formatdict)
 

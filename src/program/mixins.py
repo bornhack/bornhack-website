@@ -1,9 +1,10 @@
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
+
+from camps.mixins import CampViewMixin
 from program.utils import (
     add_existing_availability_to_matrix,
     get_speaker_availability_form_matrix,
@@ -141,7 +142,9 @@ class EventFeedbackViewMixin(EventViewMixin):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.event_feedback = get_object_or_404(
-            models.EventFeedback, event=self.event, user=self.request.user,
+            models.EventFeedback,
+            event=self.event,
+            user=self.request.user,
         )
 
     def get_object(self):
@@ -157,7 +160,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
     """
 
     def setup(self, *args, **kwargs):
-        """ Get the availability matrix"""
+        """Get the availability matrix"""
         super().setup(*args, **kwargs)
         # do we have an Event or an EventProposal?
         if hasattr(self.get_object(), "events"):
@@ -177,13 +180,13 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         add_existing_availability_to_matrix(self.matrix, self.get_object())
 
     def get_form_kwargs(self):
-        """ Add the matrix to form kwargs, only used if the view has a form """
+        """Add the matrix to form kwargs, only used if the view has a form"""
         kwargs = super().get_form_kwargs()
         kwargs["matrix"] = self.matrix
         return kwargs
 
     def get_initial(self, *args, **kwargs):
-        """ Populate the speaker_availability checkboxes, only used if the view has a form """
+        """Populate the speaker_availability checkboxes, only used if the view has a form"""
         initial = super().get_initial(*args, **kwargs)
 
         # add initial checkbox states
@@ -202,7 +205,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         return initial
 
     def get_context_data(self, **kwargs):
-        """ Add the matrix to context """
+        """Add the matrix to context"""
         context = super().get_context_data(**kwargs)
         context["matrix"] = self.matrix
         return context

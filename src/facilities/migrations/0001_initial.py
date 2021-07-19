@@ -42,7 +42,9 @@ class Migration(migrations.Migration):
                     models.TextField(help_text="Description of this facility"),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="FacilityQuickFeedback",
@@ -124,7 +126,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("slug", "responsible_team")},},
+            options={
+                "unique_together": {("slug", "responsible_team")},
+            },
         ),
         migrations.CreateModel(
             name="FacilityFeedback",
@@ -202,7 +206,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.AddField(
             model_name="facility",

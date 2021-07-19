@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="eventfeedback", unique_together={("user", "event")},
+            name="eventfeedback",
+            unique_together={("user", "event")},
         ),
     ]

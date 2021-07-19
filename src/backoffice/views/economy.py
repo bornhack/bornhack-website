@@ -1,7 +1,6 @@
 import logging
 import os
 
-from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -12,18 +11,12 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from economy.models import (
-    Chain,
-    Credebtor,
-    Expense,
-    Reimbursement,
-    Revenue,
-)
+
+from camps.mixins import CampViewMixin
+from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from teams.models import Team
 
-from ..mixins import (
-    EconomyTeamPermissionMixin,
-)
+from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -245,7 +238,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
     fields = ["notes", "paid"]
 
     def dispatch(self, request, *args, **kwargs):
-        """ Get the user from kwargs """
+        """Get the user from kwargs"""
         self.reimbursement_user = get_object_or_404(User, pk=kwargs["user_id"])
 
         # get response now so we have self.camp available below
@@ -448,5 +441,3 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         return redirect(
             reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug})
         )
-
-

@@ -1,10 +1,11 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import DetailView, UpdateView
+
+from camps.mixins import CampViewMixin
 from profiles.models import Profile
 
 from ..email import add_added_membership_email, add_removed_membership_email

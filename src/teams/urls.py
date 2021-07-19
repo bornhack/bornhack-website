@@ -1,4 +1,5 @@
 from django.urls import include, path
+
 from teams.views.base import (
     FixIrcAclView,
     TeamGeneralView,

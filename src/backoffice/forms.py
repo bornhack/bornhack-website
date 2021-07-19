@@ -1,4 +1,5 @@
 from django import forms
+
 from program.models import Event, Speaker
 
 
@@ -46,7 +47,7 @@ class AutoScheduleApplyForm(forms.Form):
 
 
 class EventScheduleForm(forms.Form):
-    """ The EventSlots are added in the view and help_text is not visible, just define the field """
+    """The EventSlots are added in the view and help_text is not visible, just define the field"""
 
     slot = forms.ChoiceField()
 

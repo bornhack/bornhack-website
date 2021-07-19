@@ -1,6 +1,7 @@
-from camps.mixins import CampViewMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import DetailView
+
+from camps.mixins import CampViewMixin
 
 from ..models import Team, TeamMember
 

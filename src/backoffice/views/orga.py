@@ -1,6 +1,5 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
@@ -8,13 +7,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView, TemplateView
 from django.views.generic.edit import FormView
+
+from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from utils.models import OutgoingEmail
 
-from ..mixins import (
-    OrgaTeamPermissionMixin,
-)
+from ..mixins import OrgaTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -27,6 +26,7 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         return Profile.objects.filter(public_credit_name_approved=False).exclude(
             public_credit_name=""
         )
+
 
 ################################
 # MERCHANDISE VIEWS

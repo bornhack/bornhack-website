@@ -395,7 +395,9 @@ urlpatterns = [
                     include(
                         [
                             path(
-                                "", SpeakerDetailView.as_view(), name="speaker_detail",
+                                "",
+                                SpeakerDetailView.as_view(),
+                                name="speaker_detail",
                             ),
                             path(
                                 "update/",
@@ -473,7 +475,11 @@ urlpatterns = [
                     "<slug:slug>/",
                     include(
                         [
-                            path("", EventDetailView.as_view(), name="event_detail",),
+                            path(
+                                "",
+                                EventDetailView.as_view(),
+                                name="event_detail",
+                            ),
                             path(
                                 "update/",
                                 EventUpdateView.as_view(),
@@ -500,7 +506,11 @@ urlpatterns = [
         "autoscheduler/",
         include(
             [
-                path("", AutoScheduleManageView.as_view(), name="autoschedule_manage",),
+                path(
+                    "",
+                    AutoScheduleManageView.as_view(),
+                    name="autoschedule_manage",
+                ),
                 path(
                     "crashcourse/",
                     AutoScheduleCrashCourseView.as_view(),
@@ -512,7 +522,9 @@ urlpatterns = [
                     name="autoschedule_validate",
                 ),
                 path(
-                    "diff/", AutoScheduleDiffView.as_view(), name="autoschedule_diff",
+                    "diff/",
+                    AutoScheduleDiffView.as_view(),
+                    name="autoschedule_diff",
                 ),
                 path(
                     "apply/",
@@ -539,7 +551,11 @@ urlpatterns = [
         name="approve_event_feedback",
     ),
     # add recording url objects
-    path("add_recording", AddRecordingView.as_view(), name="add_eventrecording",),
+    path(
+        "add_recording",
+        AddRecordingView.as_view(),
+        name="add_eventrecording",
+    ),
     # economy
     path(
         "economy/",
@@ -658,18 +674,34 @@ urlpatterns = [
         "pos/",
         include(
             [
-                path("", PosListView.as_view(), name="pos_list",),
-                path("create/", PosCreateView.as_view(), name="pos_create",),
+                path(
+                    "",
+                    PosListView.as_view(),
+                    name="pos_list",
+                ),
+                path(
+                    "create/",
+                    PosCreateView.as_view(),
+                    name="pos_create",
+                ),
                 path(
                     "<slug:pos_slug>/",
                     include(
                         [
-                            path("", PosDetailView.as_view(), name="pos_detail",),
                             path(
-                                "update/", PosUpdateView.as_view(), name="pos_update",
+                                "",
+                                PosDetailView.as_view(),
+                                name="pos_detail",
                             ),
                             path(
-                                "delete/", PosDeleteView.as_view(), name="pos_delete",
+                                "update/",
+                                PosUpdateView.as_view(),
+                                name="pos_update",
+                            ),
+                            path(
+                                "delete/",
+                                PosDeleteView.as_view(),
+                                name="pos_delete",
                             ),
                             path(
                                 "reports/",
@@ -731,14 +763,30 @@ urlpatterns = [
         "tokens/",
         include(
             [
-                path("", TokenListView.as_view(), name="token_list",),
-                path("create/", TokenCreateView.as_view(), name="token_create",),
-                path("stats/", TokenStatsView.as_view(), name="token_stats",),
+                path(
+                    "",
+                    TokenListView.as_view(),
+                    name="token_list",
+                ),
+                path(
+                    "create/",
+                    TokenCreateView.as_view(),
+                    name="token_create",
+                ),
+                path(
+                    "stats/",
+                    TokenStatsView.as_view(),
+                    name="token_stats",
+                ),
                 path(
                     "<int:pk>/",
                     include(
                         [
-                            path("", TokenDetailView.as_view(), name="token_detail",),
+                            path(
+                                "",
+                                TokenDetailView.as_view(),
+                                name="token_detail",
+                            ),
                             path(
                                 "update/",
                                 TokenUpdateView.as_view(),

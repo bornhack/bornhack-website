@@ -1,16 +1,15 @@
 import logging
 from itertools import chain
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, TemplateView
+
+from camps.mixins import CampViewMixin
 from shop.models import Order, OrderProductRelation
 from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
 
-from ..mixins import (
-    InfoTeamPermissionMixin,
-)
+from ..mixins import InfoTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -140,7 +139,9 @@ class ScanTicketsView(
         messages.success(request, "Order #{} has been marked as paid!".format(order.id))
 
 
-class ShopTicketOverview(LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, ListView):
+class ShopTicketOverview(
+    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, ListView
+):
     model = ShopTicket
     template_name = "shop_ticket_overview.html"
     context_object_name = "shop_tickets"

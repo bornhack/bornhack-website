@@ -1,4 +1,3 @@
-from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -11,6 +10,8 @@ from django.views.generic import (
     ListView,
     UpdateView,
 )
+
+from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import UserIsObjectOwnerMixin

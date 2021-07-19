@@ -2,8 +2,9 @@
 
 import django.contrib.postgres.constraints
 import django.db.models.deletion
-import utils.database
 from django.db import migrations, models
+
+import utils.database
 
 
 class Migration(migrations.Migration):
@@ -13,13 +14,21 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="speakereventconflict", name="events",),
-        migrations.RemoveField(model_name="speakereventconflict", name="speaker",),
         migrations.RemoveField(
-            model_name="speakerproposaleventconflict", name="events",
+            model_name="speakereventconflict",
+            name="events",
         ),
         migrations.RemoveField(
-            model_name="speakerproposaleventconflict", name="speaker_proposal",
+            model_name="speakereventconflict",
+            name="speaker",
+        ),
+        migrations.RemoveField(
+            model_name="speakerproposaleventconflict",
+            name="events",
+        ),
+        migrations.RemoveField(
+            model_name="speakerproposaleventconflict",
+            name="speaker_proposal",
         ),
         migrations.AddField(
             model_name="eventtype",
@@ -110,6 +119,10 @@ class Migration(migrations.Migration):
                 name="prevent_speaker_proposal_availability_adjacent_mergeable",
             ),
         ),
-        migrations.DeleteModel(name="SpeakerEventConflict",),
-        migrations.DeleteModel(name="SpeakerProposalEventConflict",),
+        migrations.DeleteModel(
+            name="SpeakerEventConflict",
+        ),
+        migrations.DeleteModel(
+            name="SpeakerProposalEventConflict",
+        ),
     ]

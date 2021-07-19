@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="facilityopeninghours", options={"ordering": ["when"]},
+            name="facilityopeninghours",
+            options={"ordering": ["when"]},
         ),
         migrations.AlterField(
             model_name="facility",

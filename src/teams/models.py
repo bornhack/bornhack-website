@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
+
 from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
 from utils.slugs import unique_slugify
 
@@ -317,7 +318,7 @@ class TeamMember(CampRelatedModel):
 
     @property
     def camp(self):
-        """ All CampRelatedModels must have a camp FK or a camp property """
+        """All CampRelatedModels must have a camp FK or a camp property"""
         return self.team.camp
 
     camp_filter = "team__camp"
@@ -362,7 +363,7 @@ class TeamTask(CampRelatedModel):
 
     @property
     def camp(self):
-        """ All CampRelatedModels must have a camp FK or a camp property """
+        """All CampRelatedModels must have a camp FK or a camp property"""
         return self.team.camp
 
     camp_filter = "team__camp"
@@ -406,7 +407,7 @@ class TeamShift(CampRelatedModel):
 
     @property
     def camp(self):
-        """ All CampRelatedModels must have a camp FK or a camp property """
+        """All CampRelatedModels must have a camp FK or a camp property"""
         return self.team.camp
 
     camp_filter = "team__camp"

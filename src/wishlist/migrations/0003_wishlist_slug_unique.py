@@ -11,7 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="wish", options={"verbose_name_plural": "wishes"},
+            name="wish",
+            options={"verbose_name_plural": "wishes"},
         ),
         migrations.AlterField(
             model_name="wish",

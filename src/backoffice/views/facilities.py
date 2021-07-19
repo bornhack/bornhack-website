@@ -1,6 +1,5 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -9,19 +8,18 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from leaflet.forms.widgets import LeafletWidget
+
+from camps.mixins import CampViewMixin
 from facilities.models import (
     Facility,
     FacilityFeedback,
     FacilityOpeningHours,
     FacilityType,
 )
-from leaflet.forms.widgets import LeafletWidget
 from teams.models import Team
 
-from ..mixins import (
-    OrgaTeamPermissionMixin,
-    RaisePermissionRequiredMixin,
-)
+from ..mixins import OrgaTeamPermissionMixin, RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -320,5 +318,3 @@ class FacilityOpeningHoursDeleteView(
             "backoffice:facility_detail",
             kwargs={"camp_slug": self.camp.slug, "facility_uuid": self.facility.pk},
         )
-
-

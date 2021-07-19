@@ -3,6 +3,7 @@ import logging
 from django.conf import settings
 from django.core.files import File
 from django.db.models import Q
+
 from shop.email import add_creditnote_email, add_invoice_email
 from shop.models import CreditNote, CustomOrder, Invoice, Order
 from utils.pdf import generate_pdf_letter
@@ -13,10 +14,10 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def do_work():
     """
-        The invoice worker creates Invoice objects for shop orders and
-        for custom orders. It also generates PDF files for Invoice objects
-        that have no PDF. It also emails invoices for shop orders.
-        It also generates proforma invoices for all closed orders.
+    The invoice worker creates Invoice objects for shop orders and
+    for custom orders. It also generates PDF files for Invoice objects
+    that have no PDF. It also emails invoices for shop orders.
+    It also generates proforma invoices for all closed orders.
     """
 
     # check if we need to generate any proforma invoices for shop orders

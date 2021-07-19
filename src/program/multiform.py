@@ -50,7 +50,8 @@ class MultiForm(object):
         # Some things, such as the WizardView expect these to exist.
         self.data, self.files = data, files
         kwargs.update(
-            data=data, files=files,
+            data=data,
+            files=files,
         )
 
         self.initials = kwargs.pop("initial", None)
@@ -74,7 +75,8 @@ class MultiForm(object):
         else:
             prefix = "{0}__{1}".format(key, prefix)
         fkwargs.update(
-            initial=self.initials.get(key), prefix=prefix,
+            initial=self.initials.get(key),
+            prefix=prefix,
         )
         return args, fkwargs
 

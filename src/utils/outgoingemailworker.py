@@ -9,8 +9,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def do_work():
     """
-        The outgoing email worker sends emails added to the OutgoingEmail
-        queue.
+    The outgoing email worker sends emails added to the OutgoingEmail
+    queue.
     """
     not_processed_email = OutgoingEmail.objects.filter(processed=False, hold=False)
 

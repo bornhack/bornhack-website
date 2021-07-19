@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+
 from utils.models import CampRelatedModel
 from utils.slugs import unique_slugify
 
@@ -13,7 +14,10 @@ class Wish(CampRelatedModel):
     class Meta:
         verbose_name_plural = "wishes"
 
-    name = models.CharField(max_length=100, help_text="Short description of the wish",)
+    name = models.CharField(
+        max_length=100,
+        help_text="Short description of the wish",
+    )
 
     slug = models.SlugField(
         blank=True,
@@ -25,7 +29,10 @@ class Wish(CampRelatedModel):
         help_text="Description of the needed item. Markdown is supported!"
     )
 
-    count = models.IntegerField(default=1, help_text="How many do we need?",)
+    count = models.IntegerField(
+        default=1,
+        help_text="How many do we need?",
+    )
 
     fulfilled = models.BooleanField(
         default=False,
@@ -60,5 +67,8 @@ class Wish(CampRelatedModel):
     def get_absolute_url(self):
         return reverse(
             "wishlist:detail",
-            kwargs={"camp_slug": self.camp.slug, "wish_slug": self.slug,},
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "wish_slug": self.slug,
+            },
         )

@@ -9,6 +9,7 @@ from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
 from django.db import models
 from django.shortcuts import reverse
+
 from maps.utils import LeafletMarkerChoices
 from utils.models import CampRelatedModel, UUIDModel
 from utils.slugs import unique_slugify
@@ -111,7 +112,8 @@ class Facility(CampRelatedModel, UUIDModel):
     )
 
     name = models.CharField(
-        max_length=100, help_text="Name or description of this facility",
+        max_length=100,
+        help_text="Name or description of this facility",
     )
 
     description = models.TextField(help_text="Description of this facility")
@@ -250,7 +252,8 @@ class FacilityOpeningHours(CampRelatedModel):
     )
 
     when = DateTimeRangeField(
-        db_index=True, help_text="The period when this facility is open.",
+        db_index=True,
+        help_text="The period when this facility is open.",
     )
 
     notes = models.TextField(

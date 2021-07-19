@@ -2,6 +2,7 @@ import logging
 import os
 
 from django.conf import settings
+
 from teams.models import Team
 from utils.email import add_outgoing_email
 

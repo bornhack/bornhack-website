@@ -5,9 +5,10 @@ from __future__ import unicode_literals
 import uuid
 
 import django.db.models.deletion
-import program.models
 from django.conf import settings
 from django.db import migrations, models
+
+import program.models
 
 
 class Migration(migrations.Migration):

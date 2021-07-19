@@ -143,7 +143,7 @@ class OutgoingEmail(CreatedUpdatedModel):
 
 
 class UUIDTaggedItem(GenericUUIDTaggedItemBase, TaggedItemBase):
-    """ Allows us to tag models with a UUID pk, use with TaggableManager(through=UUIDTaggedItem) """
+    """Allows us to tag models with a UUID pk, use with TaggableManager(through=UUIDTaggedItem)"""
 
     class Meta:
         verbose_name = "Tag"

@@ -51,7 +51,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"ordering": ["when", "event_type", "event_location"],},
+            options={
+                "ordering": ["when", "event_type", "event_location"],
+            },
         ),
         migrations.CreateModel(
             name="EventSlot",
@@ -81,7 +83,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"ordering": ["when"],},
+            options={
+                "ordering": ["when"],
+            },
         ),
         migrations.CreateModel(
             name="SpeakerAvailability",
@@ -128,7 +132,9 @@ class Migration(migrations.Migration):
                 ("created", models.DateTimeField(auto_now_add=True)),
                 ("updated", models.DateTimeField(auto_now=True)),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.CreateModel(
             name="SpeakerProposalAvailability",
@@ -175,7 +181,9 @@ class Migration(migrations.Migration):
                 ("created", models.DateTimeField(auto_now_add=True)),
                 ("updated", models.DateTimeField(auto_now=True)),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
         migrations.AddField(
             model_name="event",

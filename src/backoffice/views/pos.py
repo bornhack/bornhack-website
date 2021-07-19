@@ -1,23 +1,17 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from economy.models import (
-    Pos,
-    PosReport,
-)
+
+from camps.mixins import CampViewMixin
+from economy.models import Pos, PosReport
 from teams.models import Team
 
-from ..mixins import (
-    OrgaTeamPermissionMixin,
-    PosViewMixin,
-    RaisePermissionRequiredMixin,
-)
+from ..mixins import OrgaTeamPermissionMixin, PosViewMixin, RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

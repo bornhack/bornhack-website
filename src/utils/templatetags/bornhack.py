@@ -11,7 +11,7 @@ def zip_lists(a, b):
 
 @register.filter()
 def truefalseicon(value):
-    """ A templatetag to show a green checkbox or red x depending on True/False value """
+    """A templatetag to show a green checkbox or red x depending on True/False value"""
     if value is True:
         return mark_safe("<span class='text-success glyphicon glyphicon-ok'></span>")
     elif value is False:

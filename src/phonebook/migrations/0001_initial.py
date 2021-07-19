@@ -82,6 +82,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("camp", "number")},},
+            options={
+                "unique_together": {("camp", "number")},
+            },
         ),
     ]

@@ -93,7 +93,11 @@ def get_speaker_availability_form_matrix(sessions):
                 # pass a list of dicts instead of the queryset to avoid one million lookups
                 for et in event_types:
                     matrix[day][daychunk]["event_types"].append(
-                        {"name": et.name, "icon": et.icon, "color": et.color,}
+                        {
+                            "name": et.name,
+                            "icon": et.icon,
+                            "color": et.color,
+                        }
                     )
                 matrix[day][daychunk]["initial"] = None
             else:
@@ -205,7 +209,9 @@ def save_speaker_availability(form, obj):
         else:
             # "available" changed or daychunk is not adjacent to formerchunk
             AvailabilityModel.objects.create(
-                when=formerchunk, available=formeravailable, **kwargs,
+                when=formerchunk,
+                available=formeravailable,
+                **kwargs,
             )
             # and remember the current chunk for next iteration
             formerchunk = daychunk

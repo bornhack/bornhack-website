@@ -33,7 +33,8 @@ class SpeakerProposalForm(forms.ModelForm):
 
         # only show events from this camp
         self.fields["event_conflicts"].queryset = Event.objects.filter(
-            track__camp=camp, event_type__support_speaker_event_conflicts=True,
+            track__camp=camp,
+            event_type__support_speaker_event_conflicts=True,
         )
 
         if matrix:
@@ -265,9 +266,9 @@ class EventProposalForm(forms.ModelForm):
         ]
 
     def clean_duration(self):
-        """ Make sure duration has been specified, and make sure it is not too long """
+        """Make sure duration has been specified, and make sure it is not too long"""
         if not self.cleaned_data["duration"]:
-            raise forms.ValidationError(f"Please specify a duration.")
+            raise forms.ValidationError("Please specify a duration.")
         if (
             self.event_type.event_duration_minutes
             and self.cleaned_data["duration"] > self.event_type.event_duration_minutes

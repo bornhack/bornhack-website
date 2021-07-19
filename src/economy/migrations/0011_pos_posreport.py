@@ -53,7 +53,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"ordering": ["name"],},
+            options={
+                "ordering": ["name"],
+            },
         ),
         migrations.CreateModel(
             name="PosReport",
@@ -279,6 +281,8 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
         ),
     ]

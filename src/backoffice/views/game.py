@@ -1,6 +1,5 @@
 import logging
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
@@ -8,11 +7,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
+from camps.mixins import CampViewMixin
 from tokens.models import Token, TokenFind
 
-from ..mixins import (
-    RaisePermissionRequiredMixin,
-)
+from ..mixins import RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="posreport", options={"ordering": ["date", "pos"]},
+            name="posreport",
+            options={"ordering": ["date", "pos"]},
         ),
     ]

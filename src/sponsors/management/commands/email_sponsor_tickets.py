@@ -1,9 +1,10 @@
 # coding: utf-8
 import logging
 
-from camps.models import Camp
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from camps.models import Camp
 from sponsors.email import add_sponsorticket_email
 from sponsors.models import Sponsor
 

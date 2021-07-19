@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse_lazy
+
 from utils.models import CampRelatedModel, UUIDModel
 from utils.slugs import unique_slugify
 

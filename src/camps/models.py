@@ -8,6 +8,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
+
 from utils.models import CreatedUpdatedModel, UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -135,7 +136,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 
     def clean(self):
-        """ Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown """
+        """Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown"""
         errors = []
         # check for overlaps buildup vs. camp
         if self.buildup.upper > self.camp.lower:
@@ -258,7 +259,7 @@ class Camp(CreatedUpdatedModel, UUIDModel):
 
     @property
     def event_types(self):
-        """ Return all event types with at least one event in this camp """
+        """Return all event types with at least one event in this camp"""
         EventType = apps.get_model("program", "EventType")
         return EventType.objects.filter(
             events__isnull=False, event__track__camp=self

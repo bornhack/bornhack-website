@@ -19,6 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView, FormView, ListView, View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
+
 from shop.models import (
     CreditNote,
     EpayCallback,

@@ -9,13 +9,13 @@ register = template.Library()
 
 
 def render_datetime(datetime):
-    """ Renders a datetime in the users timezone """
+    """Renders a datetime in the users timezone"""
     t = Template("{{ datetime }}")
     return t.render(Context({"datetime": datetime}))
 
 
 def render_datetimetzrange(datetimetzrange):
-    """ Renders a datetimetzrange as 14:00-16:00 in the users timezone """
+    """Renders a datetimetzrange as 14:00-16:00 in the users timezone"""
     return f"{render_datetime(datetimetzrange.lower.time())}-{render_datetime(datetimetzrange.upper.time())} ({datetimetzrange.lower.tzname()})"
 
 
@@ -32,7 +32,7 @@ def availabilitytable(matrix, form=None):
     # start bulding the output
     output = "<div class='form-group'>"
     output += "<table class='table table-hover table-condensed table-bordered table-responsive' style='margin-bottom: .25em;'><thead>"
-    output += f"<tr><th class='text-nowrap'>Speaker Availability</th>"
+    output += "<tr><th class='text-nowrap'>Speaker Availability</th>"
 
     # to build the <thead> for this table we need to loop over the days (dates)
     # in the matrix and create a column for each

@@ -7,6 +7,7 @@ import irc3
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
+
 from ircbot.models import OutgoingIrcMessage
 from teams.models import Team, TeamMember
 from teams.utils import get_team_from_irc_channel
@@ -128,8 +129,8 @@ class Plugin(object):
     @irc3.extend
     def get_outgoing_messages(self):
         """
-            This method gets unprocessed OutgoingIrcMessage objects and attempts to send them to
-            the target channel. Messages are skipped if the bot is not in the channel.
+        This method gets unprocessed OutgoingIrcMessage objects and attempts to send them to
+        the target channel. Messages are skipped if the bot is not in the channel.
         """
         for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by(
             "created"

@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 import factory
 import pytz
 from allauth.account.models import EmailAddress
-from camps.models import Camp
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
@@ -16,6 +15,9 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from faker import Faker
+
+from camps.models import Camp
 from economy.models import Chain, Credebtor, Expense, Revenue
 from events.models import Routing, Type
 from facilities.models import (
@@ -24,7 +26,6 @@ from facilities.models import (
     FacilityQuickFeedback,
     FacilityType,
 )
-from faker import Faker
 from feedback.models import Feedback
 from info.models import InfoCategory, InfoItem
 from news.models import NewsItem
@@ -1045,7 +1046,7 @@ class Command(BaseCommand):
         ).mark_as_approved()
 
     def create_proposal_urls(self, camp):
-        """ Create URL objects for the proposals """
+        """Create URL objects for the proposals"""
         year = camp.camp.lower.year
         self.output(
             "Creating URLs for Speaker- and EventProposals for {}...".format(year)
@@ -1064,7 +1065,7 @@ class Command(BaseCommand):
         )
 
     def generate_speaker_availability(self, camp):
-        """ Create SpeakerAvailability objects for the SpeakerProposals """
+        """Create SpeakerAvailability objects for the SpeakerProposals"""
         year = camp.camp.lower.year
         self.output(
             "Generating random SpeakerProposalAvailability for {}...".format(year)
@@ -1096,7 +1097,7 @@ class Command(BaseCommand):
             save_speaker_availability(form, sp)
 
     def approve_speaker_proposals(self, camp):
-        """ Approve all keynotes but reject 10% of other events """
+        """Approve all keynotes but reject 10% of other events"""
         for sp in camp.speaker_proposals.filter(
             event_proposals__event_type__name="Keynote"
         ):

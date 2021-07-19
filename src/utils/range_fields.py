@@ -225,7 +225,12 @@ Range.__contains__ = range_contains
 Range.deconstruct = deconstruct
 
 
-_BOUNDS_SWAP = {"[": ")", "]": "(", "(": "]", ")": "[",}.get
+_BOUNDS_SWAP = {
+    "[": ")",
+    "]": "(",
+    "(": "]",
+    ")": "[",
+}.get
 
 
 def safe_subtract(initial, subtract):
@@ -255,7 +260,10 @@ def safe_subtract(initial, subtract):
             _Range(
                 initial.lower,
                 subtract.lower,
-                "{}{}".format(initial._bounds[0], sub_bounds[0],),
+                "{}{}".format(
+                    initial._bounds[0],
+                    sub_bounds[0],
+                ),
             )
         ]
     elif initial.lower in subtract or (

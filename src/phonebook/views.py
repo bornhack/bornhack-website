@@ -3,7 +3,6 @@ import logging
 import secrets
 import string
 
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
@@ -13,6 +12,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from oauth2_provider.views.generic import ProtectedResourceView
+
+from camps.mixins import CampViewMixin
 from utils.mixins import RaisePermissionRequiredMixin, UserIsObjectOwnerMixin
 
 from .mixins import DectRegistrationViewMixin

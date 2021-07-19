@@ -1,8 +1,9 @@
 # coding: utf-8
 import logging
 
-from camps.models import Camp
 from django.core.management.base import BaseCommand
+
+from camps.models import Camp
 from program.models import EventInstance, EventSession, EventSlot, SpeakerAvailability
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -14,7 +15,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "campslug", type=str, help="The slug of the camp to process",
+            "campslug",
+            type=str,
+            help="The slug of the camp to process",
         )
 
     def handle(self, *args, **options):
@@ -53,7 +56,9 @@ class Command(BaseCommand):
                         )
                     except SpeakerAvailability.DoesNotExist:
                         sa = SpeakerAvailability.objects.create(
-                            speaker=speaker, when=instance.when, available=True,
+                            speaker=speaker,
+                            when=instance.when,
+                            available=True,
                         )
                         logger.info(
                             f"created speakeravailability {sa} for speaker {speaker} for instance {instance}"

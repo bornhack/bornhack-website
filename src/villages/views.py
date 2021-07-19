@@ -1,5 +1,3 @@
-from camps.mixins import CampViewMixin
-from camps.models import Camp
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -11,6 +9,9 @@ from django.views.generic import (
     UpdateView,
 )
 from django.views.generic.detail import SingleObjectMixin
+
+from camps.mixins import CampViewMixin
+from camps.models import Camp
 
 from .mixins import EnsureWritableCampMixin
 from .models import Village
