@@ -57,6 +57,7 @@ from .views import (
     FacilityTypeListView,
     FacilityTypeUpdateView,
     FacilityUpdateView,
+    IrcOverView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
     OutgoingEmailMassUpdateView,
@@ -802,5 +803,9 @@ urlpatterns = [
                 ),
             ]
         ),
+    ),
+    path(
+        "irc/",
+        include([path("overview/", IrcOverView.as_view(), name="irc_overview")]),
     ),
 ]

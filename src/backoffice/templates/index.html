@@ -147,6 +147,10 @@
         <p class="list-group-item-text">No emails are currently held for release. Check back later!</p>
         {% endif %}
       </a>
+      <a href="{% url 'backoffice:irc_overview' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">IRC Overview</h4>
+        <p class="list-group-item-text">Use this view to see all IRC channels for this years teams</p>
+      </a>
       {% endif %}
 
       {% if perms.camps.economyteam_permission %}

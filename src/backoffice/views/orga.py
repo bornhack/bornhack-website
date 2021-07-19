@@ -11,6 +11,7 @@ from django.views.generic.edit import FormView
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
+from teams.models import Team
 from utils.models import OutgoingEmail
 
 from ..mixins import OrgaTeamPermissionMixin
@@ -173,3 +174,20 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
     def get_success_url(self, *args, **kwargs):
         """Return to the backoffice index."""
         return reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})
+
+
+######################
+# IRCBOT RELATED VIEWS
+class IrcOverView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    model = Team
+    template_name = "irc_overview.html"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .exclude(
+                public_irc_channel_name__isnull=True,
+                private_irc_channel_name__isnull=True,
+            )
+        )
