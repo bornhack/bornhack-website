@@ -1,10 +1,10 @@
 import asyncio
 import logging
+import os
 import re
 import time
 
 import irc3
-from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
 
@@ -13,6 +13,9 @@ from teams.models import Team, TeamMember
 from teams.utils import get_team_from_irc_channel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
+# irc3 and django sitting in a tree
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @irc3.plugin
@@ -30,7 +33,7 @@ class Plugin(object):
     ###############################################################################################
     # builtin irc3 event methods
 
-    async def server_ready(self, **kwargs):
+    def server_ready(self, **kwargs):
         """triggered after the server sent the MOTD (require core plugin)"""
         logger.debug("inside server_ready(), kwargs: %s" % kwargs)
 
@@ -45,8 +48,8 @@ class Plugin(object):
             "Calling self.bot.do_stuff() in %s seconds.."
             % settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS
         )
-        await asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
-        await self.bot.do_stuff()
+        asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
+        self.bot.do_stuff()
 
     def connection_lost(self, **kwargs):
         """triggered when connection is lost"""
@@ -110,21 +113,23 @@ class Plugin(object):
     # custom irc3 methods below here
 
     @irc3.extend
-    async def do_stuff(self):
+    def do_stuff(self):
         """
         Main periodic method called every N seconds.
         """
         # logger.debug("inside do_stuff()")
 
         # call the methods we need to
-        # call them with sync_to_async to be able to access database
-        await sync_to_async(self.bot.check_irc_channels)()
-        await sync_to_async(self.bot.fix_missing_acls)()
-        await sync_to_async(self.bot.get_outgoing_messages)()
+        self.bot.check_irc_channels()
+        self.bot.fix_missing_acls()
+        self.bot.get_outgoing_messages()
 
         # schedule a call of this function again in N seconds
-        await asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
-        await self.bot.do_stuff()
+        asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
+        self.bot.do_stuff()
+        self.bot.loop.call_later(
+            settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.do_stuff
+        )
 
     @irc3.extend
     def get_outgoing_messages(self):
