@@ -126,7 +126,6 @@ class Plugin(object):
 
         # schedule a call of this function again in N seconds
         asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
-        self.bot.do_stuff()
         self.bot.loop.call_later(
             settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.do_stuff
         )
