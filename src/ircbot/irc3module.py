@@ -85,7 +85,7 @@ class Plugin(object):
                     "Just joined a channel I am supposed to be managing, asking ChanServ for info about %s"
                     % channel
                 )
-                self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "info %s" % channel)
+                self.get_channel_info(channel)
                 return
 
     @irc3.event(irc3.rfc.PRIVMSG)
@@ -111,8 +111,21 @@ class Plugin(object):
 
     @irc3.event(irc3.rfc.MODE)
     def on_mode(self, **kwargs):
-        """Triggered whenever a mode is changed on a channel."""
+        """Triggered whenever a mode is changed."""
         logger.debug("inside on_mode(), kwargs: %s" % kwargs)
+
+        # check if the bot just received @ in a channel which it is supposed to be managing
+        if (
+            kwargs["data"] == self.bot.nick
+            and "o" in kwargs["modes"]
+            and kwargs["target"] in self.get_managed_team_channels()
+            and self.bot.nick in self.bot.channels[kwargs["target"]].modes["@"]
+        ):
+            # the bot has @ in this channel now, ask chanserv for info about it
+            logger.debug(
+                f"The bot just got +o aka @ in {kwargs['target']}, asking ChanServ for info about this channel, so it can be registered if needed..."
+            )
+            self.get_channel_info(kwargs["target"])
 
     ###############################################################################################
     # custom irc3 methods below here
@@ -486,3 +499,8 @@ class Plugin(object):
             return
 
         logger.debug("Unhandled NickServ message: %s" % kwargs["data"])
+
+    @irc3.extend
+    def get_channel_info(self, channel):
+        """Ask ChanServ for info about a channel."""
+        self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, f"info {channel}")
