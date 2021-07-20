@@ -109,6 +109,11 @@ class Plugin(object):
     def on_kick(self, **kwargs):
         logger.debug("inside on_kick(), kwargs: %s" % kwargs)
 
+    @irc3.event(irc3.rfc.MODE)
+    def on_mode(self, **kwargs):
+        """Triggered whenever a mode is changed on a channel."""
+        logger.debug("inside on_mode(), kwargs: %s" % kwargs)
+
     ###############################################################################################
     # custom irc3 methods below here
 
