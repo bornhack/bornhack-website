@@ -29,7 +29,7 @@
       <td class="text-right">{{ p.price|floatformat:"2" }} DKK</td>
       <td class="text-right">{{ p.cost|floatformat:"2" }} DKK</td>
       <td class="text-right">{{ p.profit|floatformat:"2" }} DKK</td>
-      <td class="text-right">{{ p.margin }}%</td>
+      <td class="text-right">{{ p.margin|floatformat:"2" }}%</td>
     </tr>
     {% endfor %}
     </tbody>

@@ -522,7 +522,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     @property
     def margin(self):
         try:
-            return (self.price / self.profit) * 100
+            return (self.profit / self.price) * 100
         except ValueError:
             return 0
 
