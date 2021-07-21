@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.aggregates import Sum
+from django.db.models import F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -396,7 +396,13 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
 
 class ProductStatsManager(models.Manager):
     def with_ticket_stats(self):
-        return self.annotate(total_units_sold=Sum("orderproductrelation__quantity"))
+        return (
+            self.annotate(total_units_sold=Sum("orderproductrelation__quantity"))
+            .annotate(profit=F("price") - F("cost"))
+            .annotate(total_revenue=F("price") * F("total_units_sold"))
+            .annotate(total_cost=F("cost") * F("total_units_sold"))
+            .annotate(total_profit=F("profit") * F("total_units_sold"))
+        )
 
 
 class Product(CreatedUpdatedModel, UUIDModel):
@@ -511,20 +517,6 @@ class Product(CreatedUpdatedModel, UUIDModel):
             return stock_available
         # If there is no stock defined the product is generally available.
         return True
-
-    @property
-    def profit(self):
-        try:
-            return self.price - self.cost
-        except ValueError:
-            return 0
-
-    @property
-    def margin(self):
-        try:
-            return (self.profit / self.price) * 100
-        except ValueError:
-            return 0
 
 
 class OrderProductRelation(CreatedUpdatedModel):
