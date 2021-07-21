@@ -14,7 +14,8 @@
     <thead>
     <tr>
       <th>Product</th>
-      <th class="text-center">Number Sold</th>
+      <th class="text-center">Orders</th>
+      <th class="text-center">Units Sold</th>
       <th class="text-right">Revenue</th>
       <th class="text-right">Cost</th>
       <th class="text-right">Profit</th>
@@ -25,7 +26,8 @@
     {% for p in product_list %}
     <tr>
       <td>{{ p.name }}</td>
-      <td class="text-center">{{ p.ticket_count }}</td>
+      <td class="text-center">{{ p.order_set.count }}</td>
+      <td class="text-center">{{ p.total_units_sold }}</td>
       <td class="text-right">{{ p.price|floatformat:"2" }} DKK</td>
       <td class="text-right">{{ p.cost|floatformat:"2" }} DKK</td>
       <td class="text-right">{{ p.profit|floatformat:"2" }} DKK</td>

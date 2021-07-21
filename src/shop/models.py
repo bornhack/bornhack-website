@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.aggregates import Count, Sum
+from django.db.models.aggregates import Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -396,7 +396,7 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
 
 class ProductStatsManager(models.Manager):
     def with_ticket_stats(self):
-        return self.annotate(ticket_count=Count("shopticket")).exclude(ticket_count=0)
+        return self.annotate(total_units_sold=Sum("orderproductrelation__quantity"))
 
 
 class Product(CreatedUpdatedModel, UUIDModel):
