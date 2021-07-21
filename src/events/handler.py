@@ -36,7 +36,7 @@ def handle_team_event(
 
     # loop over routes (teams) for this eventtype
     for team in eventtype.teams:
-        logger.info("Handling eventtype %s for team %s" % (eventtype, team))
+        logger.debug("Handling eventtype %s for team %s" % (eventtype, team))
         team_irc_notification(
             team=team,
             eventtype=eventtype,
@@ -53,7 +53,7 @@ def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
     """
     Sends IRC notifications for events to team IRC channels
     """
-    logger.info("Inside team_irc_notification, message %s" % irc_message)
+    logger.debug("Inside team_irc_notification, message %s" % irc_message)
     if not irc_message:
         logger.error("No IRC message found")
         return
@@ -63,14 +63,16 @@ def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
         return
 
     if not team.private_irc_channel_name or not team.private_irc_channel_bot:
-        logger.error("team %s does not have a private IRC channel" % team)
+        logger.error(
+            f"team {team} does not have a private IRC channel, or does not have the bot in the channel"
+        )
         return
 
     # send an IRC message to the the channel for this team
     add_irc_message(
         target=team.private_irc_channel_name, message=irc_message, timeout=60
     )
-    logger.info("Added new IRC message for channel %s" % team.irc_channel_name)
+    logger.debug(f"Added new IRC message for channel {team.private_irc_channel_name}")
 
 
 def team_email_notification(

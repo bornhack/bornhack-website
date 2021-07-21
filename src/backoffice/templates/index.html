@@ -149,7 +149,11 @@
       </a>
       <a href="{% url 'backoffice:irc_overview' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">IRC Overview</h4>
-        <p class="list-group-item-text">Use this view to see all IRC channels for this years teams</p>
+        <p class="list-group-item-text">Use this view to see IRC channels for this years teams</p>
+      </a>
+      <a href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Webshop Ticket Stats</h4>
+        <p class="list-group-item-text">Use this view to see stats for tickets created from webshop sales. This includes tickets for people (adults and children, full week and oneday tickets), merchandise, village gear, parking and so on. This view does not include sponsor tickets.</p>
       </a>
       {% endif %}
 

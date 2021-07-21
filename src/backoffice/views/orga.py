@@ -12,6 +12,7 @@ from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from teams.models import Team
+from tickets.models import TicketType
 from utils.models import OutgoingEmail
 
 from ..mixins import OrgaTeamPermissionMixin
@@ -178,6 +179,8 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
 
 ######################
 # IRCBOT RELATED VIEWS
+
+
 class IrcOverView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = Team
     template_name = "irc_overview.html"
@@ -191,3 +194,13 @@ class IrcOverView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
                 private_irc_channel_name__isnull=True,
             )
         )
+
+
+##############
+# TICKET STATS
+class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    model = TicketType
+    template_name = "ticket_stats.html"
+
+    def get_queryset(self):
+        return TicketType.objects.with_price_stats().filter(camp=self.camp)

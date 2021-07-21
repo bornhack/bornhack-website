@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load bornhack %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="h3">BackOffice - Ticket Stats for {{ camp.title }}</span>
+  </div>
+  <div class="panel-body">
+  <p class="lead">This view shows a list of all {{ camp.title }} ticket types with at least one ticket sold, along with the number of tickets and average price per type.</p>
+  <table class="table table-hover datatable">
+    <thead>
+    <tr>
+        <th>Ticket Type</th>
+        <th class="text-center">Number Sold</th>
+        <th class="text-right">Total Income</th>
+        <th class="text-right">Average Price</th>
+     </tr>
+    </thead>
+    <tbody>
+    {% for tt in tickettype_list %}
+    <tr>
+      <td>{{ tt.name }}</td>
+      <td class="text-center">{{ tt.shopticket_count }}</td>
+      <td class="text-right">{{ tt.total_price|floatformat:"2" }} DKK</td>
+      <td class="text-right">{{ tt.average_price|floatformat:"2" }} DKK</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+  </p>
+  </div>
+</div>
+{% endblock content %}

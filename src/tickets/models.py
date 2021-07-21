@@ -16,8 +16,20 @@ from utils.pdf import generate_pdf_letter
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-# TicketType can be full week, one day. etc.
+class TicketTypeManager(models.Manager):
+    def with_price_stats(self):
+        return (
+            self.annotate(shopticket_count=models.Count("shopticket"))
+            .annotate(average_price=models.Avg("shopticket__product__price"))
+            .annotate(total_price=models.Sum("shopticket__product__price"))
+            .exclude(shopticket_count=0)
+            .order_by("total_price")
+        )
+
+
+# TicketType can be full week, one day, cabins, parking, merch, hax, massage, etc.
 class TicketType(CampRelatedModel, UUIDModel):
+    objects = TicketTypeManager()
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
     includes_badge = models.BooleanField(default=False)

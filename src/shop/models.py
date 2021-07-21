@@ -506,6 +506,13 @@ class Product(CreatedUpdatedModel, UUIDModel):
         # If there is no stock defined the product is generally available.
         return True
 
+    @property
+    def profit(self):
+        try:
+            return self.price - self.cost
+        except ValueError:
+            return 0
+
 
 class OrderProductRelation(CreatedUpdatedModel):
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)

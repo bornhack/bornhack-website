@@ -85,6 +85,7 @@ from .views import (
     RevenueListView,
     ScanTicketsView,
     ShopTicketOverview,
+    ShopTicketStatsView,
     SpeakerDeleteView,
     SpeakerDetailView,
     SpeakerListView,
@@ -807,5 +808,9 @@ urlpatterns = [
     path(
         "irc/",
         include([path("overview/", IrcOverView.as_view(), name="irc_overview")]),
+    ),
+    path(
+        "shop_ticket_stats/",
+        include([path("", ShopTicketStatsView.as_view(), name="shop_ticket_stats")]),
     ),
 ]
