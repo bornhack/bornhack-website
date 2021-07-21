@@ -266,9 +266,9 @@ class Order(CreatedUpdatedModel):
                         if request:
                             messages.success(request, msg)
 
-                        # and mark the OPR as ticket_generated=True
-                        order_product.ticket_generated = True
-                        order_product.save()
+                # and mark the OPR as ticket_generated=True
+                order_product.ticket_generated = True
+                order_product.save()
 
         return tickets
 
