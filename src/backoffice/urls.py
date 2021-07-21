@@ -85,6 +85,7 @@ from .views import (
     RevenueListView,
     ScanTicketsView,
     ShopTicketOverview,
+    ShopTicketStatsDetailView,
     ShopTicketStatsView,
     SpeakerDeleteView,
     SpeakerDetailView,
@@ -811,6 +812,15 @@ urlpatterns = [
     ),
     path(
         "shop_ticket_stats/",
-        include([path("", ShopTicketStatsView.as_view(), name="shop_ticket_stats")]),
+        include(
+            [
+                path("", ShopTicketStatsView.as_view(), name="shop_ticket_stats"),
+                path(
+                    "<uuid:pk>/",
+                    ShopTicketStatsDetailView.as_view(),
+                    name="shop_ticket_stats_detail",
+                ),
+            ]
+        ),
     ),
 ]

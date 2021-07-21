@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models.aggregates import Sum
+from django.db.models.aggregates import Count, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -394,6 +394,11 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
         super().save(**kwargs)
 
 
+class ProductStatsManager(models.Manager):
+    def with_ticket_stats(self):
+        return self.annotate(ticket_count=Count("shopticket")).exclude(ticket_count=0)
+
+
 class Product(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = "Product"
@@ -443,6 +448,7 @@ class Product(CreatedUpdatedModel, UUIDModel):
     )
 
     objects = ProductQuerySet.as_manager()
+    statsobjects = ProductStatsManager()
 
     def __str__(self):
         return "{} ({} DKK)".format(self.name, self.price)
@@ -510,6 +516,13 @@ class Product(CreatedUpdatedModel, UUIDModel):
     def profit(self):
         try:
             return self.price - self.cost
+        except ValueError:
+            return 0
+
+    @property
+    def margin(self):
+        try:
+            return (self.price / self.profit) * 100
         except ValueError:
             return 0
 

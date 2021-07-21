@@ -17,15 +17,17 @@
         <th class="text-center">Number Sold</th>
         <th class="text-right">Total Income</th>
         <th class="text-right">Average Price</th>
+        <th class="text-center">Products</th>
      </tr>
     </thead>
     <tbody>
     {% for tt in tickettype_list %}
     <tr>
-      <td>{{ tt.name }}</td>
+      <td><a href="{% url 'backoffice:shop_ticket_stats_detail' camp_slug=camp.slug pk=tt.pk %}">{{ tt.name }}</a></td>
       <td class="text-center">{{ tt.shopticket_count }}</td>
       <td class="text-right">{{ tt.total_price|floatformat:"2" }} DKK</td>
       <td class="text-right">{{ tt.average_price|floatformat:"2" }} DKK</td>
+      <td class="text-center">{{ tt.product_set.count }}</td>
     </tr>
     {% endfor %}
     </tbody>

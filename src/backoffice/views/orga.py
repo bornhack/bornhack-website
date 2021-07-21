@@ -10,7 +10,7 @@ from django.views.generic.edit import FormView
 
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
-from shop.models import OrderProductRelation
+from shop.models import OrderProductRelation, Product
 from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
@@ -204,3 +204,13 @@ class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
     def get_queryset(self):
         return TicketType.objects.with_price_stats().filter(camp=self.camp)
+
+
+class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    model = Product
+    template_name = "ticket_stats_detail.html"
+
+    def get_queryset(self):
+        return Product.statsobjects.with_ticket_stats().filter(
+            ticket_type_id=self.kwargs["pk"]
+        )

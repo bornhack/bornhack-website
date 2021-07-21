@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load bornhack %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <span class="h3">BackOffice - {{ camp.title }} {{ product_list.0.ticket_type.name }} Ticket Product Stats</span>
+  </div>
+  <div class="panel-body">
+      <p class="lead">This view shows a table of each product associated with the ticket type <b>{{ product_list.0.ticket_type.name }}</b> along with the number sold, cost, price, profit and margin for each product.</p>
+  <table class="table table-hover datatable">
+    <thead>
+    <tr>
+      <th>Product</th>
+      <th class="text-center">Number Sold</th>
+      <th class="text-right">Revenue</th>
+      <th class="text-right">Cost</th>
+      <th class="text-right">Profit</th>
+      <th class="text-right">Margin</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for p in product_list %}
+    <tr>
+      <td>{{ p.name }}</td>
+      <td class="text-center">{{ p.ticket_count }}</td>
+      <td class="text-right">{{ p.price|floatformat:"2" }} DKK</td>
+      <td class="text-right">{{ p.cost|floatformat:"2" }} DKK</td>
+      <td class="text-right">{{ p.profit|floatformat:"2" }} DKK</td>
+      <td class="text-right">{{ p.margin }}%</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <a class="btn btn-default" href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Ticket Typess</a>
+  </p>
+  </div>
+</div>
+{% endblock content %}
