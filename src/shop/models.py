@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import F, Sum
+from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -403,6 +403,7 @@ class ProductStatsManager(models.Manager):
             .annotate(total_revenue=F("price") * F("total_units_sold"))
             .annotate(total_cost=F("cost") * F("total_units_sold"))
             .annotate(total_profit=F("profit") * F("total_units_sold"))
+            .annotate(order_count=Count("orderproductrelation__order"))
         )
 
 
