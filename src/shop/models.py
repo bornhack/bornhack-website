@@ -397,7 +397,8 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
 class ProductStatsManager(models.Manager):
     def with_ticket_stats(self):
         return (
-            self.annotate(total_units_sold=Sum("orderproductrelation__quantity"))
+            self.filter(orderproductrelation__order__paid=True)
+            .annotate(total_units_sold=Sum("orderproductrelation__quantity"))
             .annotate(profit=F("price") - F("cost"))
             .annotate(total_revenue=F("price") * F("total_units_sold"))
             .annotate(total_cost=F("cost") * F("total_units_sold"))
