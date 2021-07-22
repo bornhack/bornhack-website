@@ -18,12 +18,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeManager(models.Manager):
     def with_price_stats(self):
-        return (
-            self.annotate(shopticket_count=models.Count("shopticket"))
-            .annotate(average_price=models.Avg("shopticket__product__price"))
-            .annotate(total_price=models.Sum("shopticket__product__price"))
-            .exclude(shopticket_count=0)
-            .order_by("total_price")
+        return self.annotate(shopticket_count=models.Count("shopticket")).exclude(
+            shopticket_count=0
         )
 
 
