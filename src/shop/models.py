@@ -403,7 +403,7 @@ class ProductStatsManager(models.Manager):
             .annotate(total_revenue=F("price") * F("total_units_sold"))
             .annotate(total_cost=F("cost") * F("total_units_sold"))
             .annotate(total_profit=F("profit") * F("total_units_sold"))
-            .annotate(order_count=Count("orderproductrelation__order"))
+            .annotate(paid_order_count=Count("orderproductrelation__order"))
         )
 
 
