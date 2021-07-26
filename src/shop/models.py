@@ -400,7 +400,7 @@ class ProductStatsManager(models.Manager):
             self.filter(orderproductrelation__order__paid=True)
             .annotate(total_units_sold=Sum("orderproductrelation__quantity"))
             .annotate(profit=F("price") - F("cost"))
-            .annotate(total_revenue=F("price") * F("total_units_sold"))
+            .annotate(total_income=F("price") * F("total_units_sold"))
             .annotate(total_cost=F("cost") * F("total_units_sold"))
             .annotate(total_profit=F("profit") * F("total_units_sold"))
             .annotate(paid_order_count=Count("orderproductrelation__order"))

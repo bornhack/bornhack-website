@@ -214,3 +214,18 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
         return Product.statsobjects.with_ticket_stats().filter(
             ticket_type_id=self.kwargs["pk"]
         )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["total_orders"] = 0
+        context["total_units"] = 0
+        context["total_income"] = 0
+        context["total_cost"] = 0
+        context["total_profit"] = 0
+        for product in context["product_list"]:
+            context["total_orders"] += product.paid_order_count
+            context["total_units"] += product.total_units_sold
+            context["total_income"] += product.total_income
+            context["total_cost"] += product.total_cost
+            context["total_profit"] += product.total_profit
+        return context

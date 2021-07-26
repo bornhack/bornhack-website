@@ -9,17 +9,17 @@
     <span class="h3">BackOffice - {{ camp.title }} {{ product_list.0.ticket_type.name }} Ticket Product Stats</span>
   </div>
   <div class="panel-body">
-      <p class="lead">This view shows a table of each product associated with the ticket type <b>{{ product_list.0.ticket_type.name }}</b> along with the number sold, cost, price, profit and margin for each product.</p>
+      <p class="lead">This view shows a table of each product associated with the ticket type <b>{{ product_list.0.ticket_type.name }}</b> along with the number sold, cost, price, and profit for each product.</p>
   <table class="table table-hover datatable">
     <thead>
     <tr>
       <th>Product</th>
-      <th class="text-right">Revenue</th>
+      <th class="text-right">Income</th>
       <th class="text-right">Cost</th>
       <th class="text-right">Profit</th>
       <th class="text-center">Orders</th>
       <th class="text-center">Units Sold</th>
-      <th class="text-right">Total Revenue</th>
+      <th class="text-right">Total Income</th>
       <th class="text-right">Total Cost</th>
       <th class="text-right">Total Profit</th>
     </tr>
@@ -33,13 +33,25 @@
       <td class="text-right">{{ p.profit|floatformat:"2" }}&nbsp;DKK</td>
       <td class="text-center">{{ p.paid_order_count }}</td>
       <td class="text-center">{{ p.total_units_sold }}</td>
-      <td class="text-right">{{ p.total_revenue|floatformat:"2" }}&nbsp;DKK</td>
+      <td class="text-right">{{ p.total_income|floatformat:"2" }}&nbsp;DKK</td>
       <td class="text-right">{{ p.total_cost|floatformat:"2" }}&nbsp;DKK</td>
       <td class="text-right">{{ p.total_profit|floatformat:"2" }}&nbsp;DKK</td>
     </tr>
     {% endfor %}
     </tbody>
+    <tfoot>
+      <tr>
+        <td style="padding-left: 10px; padding-right: 10px" colspan=4><b>Totals (All amounts include 25% Danish VAT)</td>
+        <td style="padding-left: 10px; padding-right: 10px" class="text-center"><b>{{ total_orders }}</td>
+        <td style="padding-left: 10px; padding-right: 10px" class="text-center"><b>{{ total_units }}</td>
+        <td style="padding-left: 10px; padding-right: 10px" class="text-right"><b>{{ total_income|floatformat:"2" }}&nbsp;DKK</td>
+        <td style="padding-left: 10px; padding-right: 10px" class="text-right"><b>{{ total_cost|floatformat:"2" }}&nbsp;DKK</td>
+        <td style="padding-left: 10px; padding-right: 10px" class="text-right"><b>{{ total_profit|floatformat:"2" }}&nbsp;DKK</td>
+      </tr>
+    </tfoot>
   </table>
+  <br>
+  <p class="lead">Note: This view only shows tickets, which are generated based on paid orders. Unpaid orders are not included here.</p>
   <a class="btn btn-default" href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Ticket Types</a>
   </p>
   </div>
