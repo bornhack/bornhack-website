@@ -8,7 +8,7 @@ commonmark==0.9.1
 conference-scheduler==3.0.1
 django-allauth==0.45.0
 django-allauth-2fa==0.8
-django-bleach==0.7.0
+django-bleach==0.7.1
 django-bootstrap3==15.0.0
 django-cors-headers==3.7.0
 django-extensions==3.1.3
