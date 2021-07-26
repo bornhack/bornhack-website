@@ -51,6 +51,7 @@
     </tfoot>
   </table>
   <br>
+  <p class="lead">The average price of the <b>{{ total_units }}</b> tickets with the ticket type <b>{{ product_list.0.ticket_type.name }}</b> is <b>{{ average_price|floatformat:"2" }}</b>&nbsp;DKK.</p>
   <p class="lead">Note: This view only shows tickets, which are generated based on paid orders. Unpaid orders are not included here.</p>
   <a class="btn btn-default" href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Ticket Types</a>
   </p>

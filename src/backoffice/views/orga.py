@@ -228,4 +228,7 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
             context["total_income"] += product.total_income
             context["total_cost"] += product.total_cost
             context["total_profit"] += product.total_profit
+        context["average_price"] = round(
+            context["total_income"] / context["total_units"], 2
+        )
         return context

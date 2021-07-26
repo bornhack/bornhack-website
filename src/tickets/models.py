@@ -138,6 +138,8 @@ class DiscountTicket(BaseTicket):
 
 
 class ShopTicket(BaseTicket):
+    """Why doesn't this have an FK to OrderProductRelation instead of the fk to Order?"""
+
     order = models.ForeignKey(
         "shop.Order", related_name="shoptickets", on_delete=models.PROTECT
     )
