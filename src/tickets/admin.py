@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from shop.models import OrderProductRelation
-
 from .models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
 
 
@@ -57,18 +55,18 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "product_quantity",
     ]
 
-    list_filter = ["ticket_type__camp", "used", "ticket_type", "order", "product"]
+    list_filter = ["ticket_type__camp", "used", "ticket_type", "opr__order", "product"]
 
-    search_fields = ["uuid", "order__id", "order__user__email", "name", "email"]
+    search_fields = [
+        "uuid",
+        "opr__order__id",
+        "opr__order__user__email",
+        "name",
+        "email",
+    ]
 
     def product_quantity(self, ticket):
-        orp = OrderProductRelation.objects.get(
-            product=ticket.product, order=ticket.order
-        )
-
-        return (
-            str(orp.quantity) if ticket.ticket_type.single_ticket_per_product else "1"
-        )
+        return str(ticket.opr.quantity)
 
     product_quantity.short_description = "Quantity"
 

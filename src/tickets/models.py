@@ -9,7 +9,6 @@ from django.db import models
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
-from shop.models import OrderProductRelation
 from utils.models import CampRelatedModel, UUIDModel
 from utils.pdf import generate_pdf_letter
 
@@ -104,7 +103,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
         formatdict = {"ticket": self}
 
         if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
-            formatdict["quantity"] = self.orp.quantity
+            formatdict["quantity"] = self.opr.quantity
 
         return generate_pdf_letter(
             filename="{}_ticket_{}.pdf".format(self.shortname, self.pk),
@@ -138,11 +137,12 @@ class DiscountTicket(BaseTicket):
 
 
 class ShopTicket(BaseTicket):
-    """Why doesn't this have an FK to OrderProductRelation instead of the fk to Order?"""
-
-    order = models.ForeignKey(
-        "shop.Order", related_name="shoptickets", on_delete=models.PROTECT
+    opr = models.ForeignKey(
+        "shop.OrderProductRelation",
+        related_name="shoptickets",
+        on_delete=models.PROTECT,
     )
+
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
 
     name = models.CharField(
@@ -178,5 +178,5 @@ class ShopTicket(BaseTicket):
         return "shop"
 
     @property
-    def orp(self):
-        return OrderProductRelation.objects.get(product=self.product, order=self.order)
+    def order(self):
+        return self.opr.order

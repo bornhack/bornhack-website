@@ -222,7 +222,9 @@ class Order(CreatedUpdatedModel):
 
                 if order_product.product.ticket_type.single_ticket_per_product:
                     # This ticket type is one where we only create one ticket
-                    ticket, created = self.shoptickets.get_or_create(**query_kwargs)
+                    ticket, created = order_product.shoptickets.get_or_create(
+                        **query_kwargs
+                    )
 
                     if created:
                         msg = (
@@ -244,7 +246,7 @@ class Order(CreatedUpdatedModel):
                         messages.success(request, msg)
                 else:
                     # We should create a number of tickets equal to OrderProductRelation quantity
-                    already_created_tickets = self.shoptickets.filter(
+                    already_created_tickets = order_product.shoptickets.filter(
                         **query_kwargs
                     ).count()
                     tickets_to_create = max(
@@ -256,7 +258,7 @@ class Order(CreatedUpdatedModel):
                         for i in range(
                             0, (order_product.quantity - already_created_tickets)
                         ):
-                            ticket = self.shoptickets.create(**query_kwargs)
+                            ticket = order_product.shoptickets.create(**query_kwargs)
                             tickets.append(ticket)
 
                         msg = "Created %s tickets of type: %s" % (

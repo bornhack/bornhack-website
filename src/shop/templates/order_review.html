@@ -43,16 +43,16 @@ Details for Order #{{ order.id }} | {{ block.super }}
                         Total
 
                 <tbody>
-                {% for orp in order.orderproductrelation_set.all %}
+                {% for opr in order.orderproductrelation_set.all %}
                     <tr>
                     <td>
-                        {{ orp.product.name }}
+                        {{ opr.product.name }}
                     <td>
-                        {{ orp.quantity }}
+                        {{ opr.quantity }}
                     <td>
-                        {{ orp.product.price|currency }}
+                        {{ opr.product.price|currency }}
                     <td>
-                        {{ orp.total|currency }}
+                        {{ opr.total|currency }}
 
                 {% endfor %}
 

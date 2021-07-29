@@ -1,7 +1,5 @@
 from django.contrib import admin
 
-from tickets.admin import ShopTicketInline
-
 from .models import (
     CoinifyAPICallback,
     CoinifyAPIInvoice,
@@ -138,7 +136,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     exclude = ["products"]
 
-    inlines = [ProductInline, ShopTicketInline]
+    inlines = [ProductInline]
 
     actions = [
         "mark_order_as_paid",

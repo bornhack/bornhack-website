@@ -95,6 +95,9 @@ Enjoy!
 
 ## Notes
 
+### Running tests
+If your database user in your dev setup is not a postgres superuser you will encounter permission errors when the migrations try to create extensions "btree_gist" and "postgis". You can solve this by connecting to the "template1" database as the postgres superuser and creating the extensions there, which means they will be automatically loaded for all newly created databases.
+
 ### Add a camp
 
 Add a new camp by running:

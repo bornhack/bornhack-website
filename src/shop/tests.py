@@ -383,7 +383,7 @@ class TestTicketCreation(TestCase):
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
         self.assertEquals(
-            ShopTicket.objects.filter(product=product, order=order).count(), 5
+            ShopTicket.objects.filter(product=product, opr__order=order).count(), 5
         )
 
     def test_single_ticket_created(self):
@@ -394,5 +394,5 @@ class TestTicketCreation(TestCase):
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
         self.assertEquals(
-            ShopTicket.objects.filter(product=product, order=order).count(), 1
+            ShopTicket.objects.filter(product=product, opr__order=order).count(), 1
         )

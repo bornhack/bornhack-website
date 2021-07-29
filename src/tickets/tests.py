@@ -10,12 +10,11 @@ class TicketTests(TestCase):
     def test_correct_token_and_badge_token_are_different(self):
 
         ticket_type = TicketTypeFactory()
-
-        orp = OrderProductRelationFactory()
+        opr = OrderProductRelationFactory()
         shop_ticket = ShopTicket.objects.create(
             ticket_type=ticket_type,
-            product=orp.product,
-            order=orp.order,
+            product=opr.product,
+            opr=opr,
         )
 
         self.assertNotEqual(shop_ticket.token, shop_ticket.badge_token)
