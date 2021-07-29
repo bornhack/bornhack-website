@@ -56,7 +56,7 @@ class TicketTypeQuerySet(models.QuerySet):
         return self.annotate(
             shopticket_count=_make_subquery(Count("shopticket")),
             total_units_sold=_make_subquery(quantity),
-            total_income=_make_subquery(cost),
+            total_income=_make_subquery(income),
             total_cost=_make_subquery(cost),
             total_profit=_make_subquery(income - cost),
             avg_ticket_price=avg_ticket_price,
