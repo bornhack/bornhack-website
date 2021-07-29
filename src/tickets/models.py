@@ -3,11 +3,20 @@ import hashlib
 import io
 import logging
 from decimal import Decimal
+from typing import Union
 
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, ExpressionWrapper, F, OuterRef, Subquery, Sum
+from django.db.models import (
+    Count,
+    Expression,
+    ExpressionWrapper,
+    F,
+    OuterRef,
+    Subquery,
+    Sum,
+)
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -19,40 +28,16 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        shopticket_count = Subquery(
-            TicketType.objects.annotate(shopticket_count=Count("shopticket"))
-            .filter(pk=OuterRef("pk"))
-            .values("shopticket_count")
-        )
+        def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
+            return Subquery(
+                TicketType.objects.annotate(annotation_value=annotation)
+                .filter(pk=OuterRef("pk"))
+                .values("annotation_value")[:1]
+            )
 
         quantity = F("product__orderproductrelation__quantity")
-
-        total_units_sold = Subquery(
-            TicketType.objects.annotate(total_units_sold=quantity)
-            .filter(pk=OuterRef("pk"))
-            .values("total_units_sold")[:1]
-        )
-
         cost = quantity * F("product__cost")
-        total_cost = Subquery(
-            TicketType.objects.annotate(total_cost=Sum(cost))
-            .filter(pk=OuterRef("pk"))
-            .values("total_cost")[:1]
-        )
-
         income = quantity * F("product__price")
-        total_income = Subquery(
-            TicketType.objects.annotate(total_income=Sum(income))
-            .filter(pk=OuterRef("pk"))
-            .values("total_income")[:1]
-        )
-
-        profit = income - cost
-        total_profit = Subquery(
-            TicketType.objects.annotate(total_profit=Sum(profit))
-            .filter(pk=OuterRef("pk"))
-            .values("total_profit")[:1]
-        )
 
         avg_ticket_price = Subquery(
             TicketType.objects.annotate(units=Sum(quantity))
@@ -69,11 +54,11 @@ class TicketTypeQuerySet(models.QuerySet):
         )
 
         return self.annotate(
-            shopticket_count=shopticket_count,
-            total_units_sold=total_units_sold,
-            total_income=total_income,
-            total_cost=total_cost,
-            total_profit=total_profit,
+            shopticket_count=_make_subquery(Count("shopticket")),
+            total_units_sold=_make_subquery(quantity),
+            total_income=_make_subquery(cost),
+            total_cost=_make_subquery(cost),
+            total_profit=_make_subquery(income - cost),
             avg_ticket_price=avg_ticket_price,
         ).distinct()
 
