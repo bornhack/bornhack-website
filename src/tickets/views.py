@@ -19,14 +19,14 @@ class ShopTicketListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         tickets = super(ShopTicketListView, self).get_queryset()
         user = self.request.user
-        return tickets.filter(order__user=user).order_by("ticket_type__camp")
+        return tickets.filter(opr__order__user=user).order_by("ticket_type__camp")
 
 
 class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
     model = ShopTicket
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user == self.get_object().order.user:
+        if not request.user == self.get_object().opr.order.user:
             raise Http404("Ticket not found")
 
         return super().dispatch(request, *args, **kwargs)
@@ -54,6 +54,6 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         ticket = self.get_object()
-        if ticket.order.user != request.user:
+        if ticket.opr.order.user != request.user:
             raise Http404("Ticket not found")
         return super().dispatch(request, *args, **kwargs)
