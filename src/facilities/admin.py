@@ -18,12 +18,14 @@ class FacilityQuickFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(FacilityType)
 class FacilityTypeAdmin(admin.ModelAdmin):
+    save_as = True
     list_display = ["name", "description", "icon", "marker", "responsible_team", "camp"]
     list_filter = ["responsible_team__camp", "icon", "marker", "responsible_team"]
 
 
 @admin.register(Facility)
 class FacilityAdmin(LeafletGeoAdmin):
+    save_as = True
     list_display = [
         "name",
         "description",
@@ -73,5 +75,6 @@ class FacilityFeedbackAdmin(admin.ModelAdmin):
 
 @admin.register(FacilityOpeningHours)
 class FacilityOpeningHoursAdmin(admin.ModelAdmin):
+    save_as = True
     list_display = ["facility", "when", "notes"]
     list_filter = ["facility"]
