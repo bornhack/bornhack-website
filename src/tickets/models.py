@@ -6,7 +6,7 @@ import logging
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, OuterRef, Subquery, Sum
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -16,29 +16,55 @@ from utils.pdf import generate_pdf_letter
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class TicketTypeManager(models.Manager):
+class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        total_units_sold = Sum("shopticket__opr__quantity", distinct=True)
-        cost = F("shopticket__opr__quantity") * F("shopticket__opr__product__cost")
-        income = F("shopticket__opr__quantity") * F("shopticket__opr__product__price")
-        profit = income - cost
-        total_cost = Sum(cost, distinct=True)
-        total_profit = Sum(profit, distinct=True)
-        total_income = Sum(income, distinct=True)
-
-        return (
-            self.filter(shopticket__isnull=False)
-            .annotate(shopticket_count=Count("shopticket"))
-            .annotate(total_units_sold=total_units_sold)
-            .annotate(total_income=total_income)
-            .annotate(total_cost=total_cost)
-            .annotate(total_profit=total_profit)
+        shopticket_count = Subquery(
+            TicketType.objects.annotate(shopticket_count=Count("shopticket"))
+            .filter(pk=OuterRef("pk"))
+            .values("shopticket_count")
         )
+
+        quantity = F("product__orderproductrelation__quantity")
+
+        total_units_sold = Subquery(
+            TicketType.objects.annotate(total_units_sold=quantity)
+            .filter(pk=OuterRef("pk"))
+            .values("total_units_sold")[:1]
+        )
+
+        cost = quantity * F("product__cost")
+        total_cost = Subquery(
+            TicketType.objects.annotate(total_cost=Sum(cost))
+            .filter(pk=OuterRef("pk"))
+            .values("total_cost")[:1]
+        )
+
+        income = quantity * F("product__price")
+        total_income = Subquery(
+            TicketType.objects.annotate(total_income=Sum(income))
+            .filter(pk=OuterRef("pk"))
+            .values("total_income")[:1]
+        )
+
+        profit = income - cost
+        total_profit = Subquery(
+            TicketType.objects.annotate(total_profit=Sum(profit))
+            .filter(pk=OuterRef("pk"))
+            .values("total_profit")[:1]
+        )
+
+        return self.annotate(
+            shopticket_count=shopticket_count,
+            total_units_sold=total_units_sold,
+            total_income=total_income,
+            total_cost=total_cost,
+            total_profit=total_profit,
+        ).distinct()
 
 
 # TicketType can be full week, one day, cabins, parking, merch, hax, massage, etc.
 class TicketType(CampRelatedModel, UUIDModel):
-    objects = TicketTypeManager()
+    objects = TicketTypeQuerySet.as_manager()
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
     includes_badge = models.BooleanField(default=False)
