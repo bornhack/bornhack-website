@@ -6,6 +6,7 @@ import logging
 import qrcode
 from django.conf import settings
 from django.db import models
+from django.db.models import Sum, Count, F
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -17,8 +18,20 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeManager(models.Manager):
     def with_price_stats(self):
-        return self.annotate(shopticket_count=models.Count("shopticket")).exclude(
-            shopticket_count=0
+        total_units_sold = Sum("shopticket__opr__quantity", distinct=True)
+        cost = F("shopticket__opr__quantity") * F("shopticket__opr__product__cost")
+        income = F("shopticket__opr__quantity") * F("shopticket__opr__product__price")
+        profit = income - cost
+        total_cost = Sum(cost, distinct=True)
+        total_profit = Sum(profit, distinct=True)
+        total_income = Sum(income, distinct=True)
+
+        return (
+            self.filter(shopticket__isnull=False)
+            .annotate(total_units_sold=total_units_sold)
+            .annotate(total_income=total_income)
+            .annotate(total_cost=total_cost)
+            .annotate(total_profit=total_profit)
         )
 
 
