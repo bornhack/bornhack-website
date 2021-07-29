@@ -16,6 +16,10 @@
         <th>Ticket Type</th>
         <th class="text-center">Tickets Generated</th>
         <th class="text-center">Products</th>
+        <th class="text-center">Units Sold</th>
+        <th class="text-right">Total Income</th>
+        <th class="text-right">Total Cost</th>
+        <th class="text-right">Total Profit</th>
      </tr>
     </thead>
     <tbody>
@@ -24,6 +28,10 @@
       <td><a href="{% url 'backoffice:shop_ticket_stats_detail' camp_slug=camp.slug pk=tt.pk %}">{{ tt.name }}</a></td>
       <td class="text-center">{{ tt.shopticket_count }}</td>
       <td class="text-center">{{ tt.product_set.count }}</td>
+      <td class="text-center">{{ tt.total_units_sold }}</td>
+        <td class="text-right">{{ tt.total_income|floatformat:"2" }}&nbsp;DKK</td>
+        <td class="text-right">{{ tt.total_cost|floatformat:"2" }}&nbsp;DKK</td>
+        <td class="text-right">{{ tt.total_profit|floatformat:"2" }}&nbsp;DKK</td>
     </tr>
     {% endfor %}
     </tbody>
