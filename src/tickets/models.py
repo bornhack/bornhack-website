@@ -2,11 +2,12 @@ import base64
 import hashlib
 import io
 import logging
+from decimal import Decimal
 
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, F, OuterRef, Subquery, Sum
+from django.db.models import Count, ExpressionWrapper, F, OuterRef, Subquery, Sum
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -56,7 +57,12 @@ class TicketTypeQuerySet(models.QuerySet):
         avg_ticket_price = Subquery(
             TicketType.objects.annotate(units=Sum(quantity))
             .annotate(income=Sum(income))
-            .annotate(avg_ticket_price=F("income") / F("units"))
+            .annotate(
+                avg_ticket_price=ExpressionWrapper(
+                    F("income") * Decimal("1.0") / F("units"),
+                    output_field=models.DecimalField(),
+                )
+            )
             .filter(pk=OuterRef("pk"))
             .values("avg_ticket_price")[:1],
             output_field=models.DecimalField(),
