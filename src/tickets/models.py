@@ -53,12 +53,22 @@ class TicketTypeQuerySet(models.QuerySet):
             .values("total_profit")[:1]
         )
 
+        avg_ticket_price = Subquery(
+            TicketType.objects.annotate(units=Sum(quantity))
+            .annotate(income=Sum(income))
+            .annotate(avg_ticket_price=F("income") / F("units"))
+            .filter(pk=OuterRef("pk"))
+            .values("avg_ticket_price")[:1],
+            output_field=models.DecimalField(),
+        )
+
         return self.annotate(
             shopticket_count=shopticket_count,
             total_units_sold=total_units_sold,
             total_income=total_income,
             total_cost=total_cost,
             total_profit=total_profit,
+            avg_ticket_price=avg_ticket_price,
         ).distinct()
 
 

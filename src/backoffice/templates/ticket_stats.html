@@ -20,6 +20,7 @@
         <th class="text-right">Total Income</th>
         <th class="text-right">Total Cost</th>
         <th class="text-right">Total Profit</th>
+        <th class="text-right">Avg. Ticket Price</th>
      </tr>
     </thead>
     <tbody>
@@ -32,6 +33,7 @@
         <td class="text-right">{{ tt.total_income|floatformat:"2" }}&nbsp;DKK</td>
         <td class="text-right">{{ tt.total_cost|floatformat:"2" }}&nbsp;DKK</td>
         <td class="text-right">{{ tt.total_profit|floatformat:"2" }}&nbsp;DKK</td>
+        <td class="text-right">{{ tt.avg_ticket_price|floatformat:"2" }}&nbsp;DKK</td>
     </tr>
     {% endfor %}
     </tbody>
