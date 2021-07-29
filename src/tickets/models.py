@@ -6,7 +6,7 @@ import logging
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import Sum, Count, F
+from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -28,6 +28,7 @@ class TicketTypeManager(models.Manager):
 
         return (
             self.filter(shopticket__isnull=False)
+            .annotate(shopticket_count=Count("shopticket"))
             .annotate(total_units_sold=total_units_sold)
             .annotate(total_income=total_income)
             .annotate(total_cost=total_cost)
