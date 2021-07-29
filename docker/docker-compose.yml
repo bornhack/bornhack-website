@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+    app:
+        image: app
+        build:
+          context: ../
+          dockerfile: docker/Dockerfile
+        ports:
+          - "8000:8000"
+        tty: true
+        stdin_open: true
+        command: python src/manage.py runserver 0.0.0.0:8000
+        volumes:
+          - ..:/app
+        environment:
+          - DJANGO_DATABASE_NAME=postgres
+          - DJANGO_DATABASE_USER=postgres
+          - DJANGO_DATABASE_PASSWORD=postgres
+          - DJANGO_DATABASE_HOST=db
+          - DJANGO_DATABASE_PORT=5432
+        links:
+          - db
+    db:
+        build:
+          context: postgis_container
+        environment:
+            POSTGRES_USER: 'postgres'
+            POSTGRES_PASSWORD: 'postgres'
+        ports:
+          - 5432:5432
