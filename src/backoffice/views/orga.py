@@ -203,7 +203,10 @@ class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "ticket_stats.html"
 
     def get_queryset(self):
-        return TicketType.objects.with_price_stats().filter(camp=self.camp)
+        query = TicketType.objects.filter(
+            camp=self.camp, shopticket__isnull=False
+        ).with_price_stats()
+        return query
 
 
 class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView):

@@ -2,11 +2,21 @@ import base64
 import hashlib
 import io
 import logging
+from decimal import Decimal
+from typing import Union
 
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import Count, F, Sum
+from django.db.models import (
+    Count,
+    Expression,
+    ExpressionWrapper,
+    F,
+    OuterRef,
+    Subquery,
+    Sum,
+)
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
@@ -16,29 +26,46 @@ from utils.pdf import generate_pdf_letter
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class TicketTypeManager(models.Manager):
+class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        total_units_sold = Sum("shopticket__opr__quantity", distinct=True)
-        cost = F("shopticket__opr__quantity") * F("shopticket__opr__product__cost")
-        income = F("shopticket__opr__quantity") * F("shopticket__opr__product__price")
-        profit = income - cost
-        total_cost = Sum(cost, distinct=True)
-        total_profit = Sum(profit, distinct=True)
-        total_income = Sum(income, distinct=True)
+        def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
+            return Subquery(
+                TicketType.objects.annotate(annotation_value=annotation)
+                .filter(pk=OuterRef("pk"))
+                .values("annotation_value")[:1]
+            )
 
-        return (
-            self.filter(shopticket__isnull=False)
-            .annotate(shopticket_count=Count("shopticket"))
-            .annotate(total_units_sold=total_units_sold)
-            .annotate(total_income=total_income)
-            .annotate(total_cost=total_cost)
-            .annotate(total_profit=total_profit)
+        quantity = F("product__orderproductrelation__quantity")
+        cost = quantity * F("product__cost")
+        income = quantity * F("product__price")
+
+        avg_ticket_price = Subquery(
+            TicketType.objects.annotate(units=Sum(quantity))
+            .annotate(income=Sum(income))
+            .annotate(
+                avg_ticket_price=ExpressionWrapper(
+                    F("income") * Decimal("1.0") / F("units"),
+                    output_field=models.DecimalField(),
+                )
+            )
+            .filter(pk=OuterRef("pk"))
+            .values("avg_ticket_price")[:1],
+            output_field=models.DecimalField(),
         )
+
+        return self.annotate(
+            shopticket_count=_make_subquery(Count("shopticket")),
+            total_units_sold=_make_subquery(quantity),
+            total_income=_make_subquery(income),
+            total_cost=_make_subquery(cost),
+            total_profit=_make_subquery(income - cost),
+            avg_ticket_price=avg_ticket_price,
+        ).distinct()
 
 
 # TicketType can be full week, one day, cabins, parking, merch, hax, massage, etc.
 class TicketType(CampRelatedModel, UUIDModel):
-    objects = TicketTypeManager()
+    objects = TicketTypeQuerySet.as_manager()
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
     includes_badge = models.BooleanField(default=False)
