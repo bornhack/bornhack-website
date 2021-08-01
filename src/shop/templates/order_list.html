@@ -21,6 +21,7 @@ Orders | {{ block.super }}
               <th>Total amount</th>
               <th>Open?</th>
               <th>Paid?</th>
+              <th>Refunded?</th>
               <th>Delivered?</th>
               <th>Invoice</th>
               <th>Actions</th>
@@ -35,6 +36,7 @@ Orders | {{ block.super }}
                 <td>{{ order.total|currency }}</td>
                 <td class="text-center">{{ order.open|truefalseicon }}</td>
                 <td class="text-center">{{ order.paid|truefalseicon }}</td>
+                <td class="text-center">{{ order.refunded|truefalseicon }}</td>
                 <td class="text-center">{{ order.ticket_generated_status }}</td>
                 <td>
                 {% if order.paid %}

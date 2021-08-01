@@ -116,9 +116,13 @@ Details for Order #{{ order.id }} | {{ block.super }}
         {% endif %}
     </div>
     {% if order.paid %}
-    <div class="panel-footer">
-        <h4>Your order is paid in full.</h4>
-    </div>
+      <div class="panel-footer">
+      {% if order.refunded %}
+      <h4>This order has been refunded and tickets related to it are deleted and no longer valid.</h4>
+      {% else %}
+      <h4>This order is paid in full.</h4>
+      {% endif %}
+      </div>
     {% endif %}
 </div>
 

@@ -14,6 +14,7 @@ from django.utils.dateparse import parse_datetime
 from django.utils.translation import ugettext_lazy as _
 from unidecode import unidecode
 
+from tickets.models import ShopTicket
 from utils.models import CreatedUpdatedModel, UUIDModel
 from utils.slugs import unique_slugify
 
@@ -290,16 +291,17 @@ class Order(CreatedUpdatedModel):
         else:
             self.refunded = True
             # delete any tickets related to this order
-            if self.shoptickets.all():
+            tickets = ShopTicket.objects.filter(opr__order=self)
+            if tickets.exists():
                 msg = "Order %s marked as refunded, deleting %s tickets..." % (
                     self.pk,
-                    self.shoptickets.count(),
+                    tickets.count(),
                 )
                 if request:
                     messages.success(request, msg)
                 else:
                     print(msg)
-                self.shoptickets.all().delete()
+                tickets.delete()
             else:
                 msg = "Order %s marked as refunded, no tickets to delete" % self.pk
                 if request:
@@ -399,7 +401,10 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
 class ProductStatsManager(models.Manager):
     def with_ticket_stats(self):
         return (
-            self.filter(orderproductrelation__order__paid=True)
+            self.filter(
+                orderproductrelation__order__paid=True,
+                orderproductrelation__order__refunded=False,
+            )
             .annotate(total_units_sold=Sum("orderproductrelation__quantity"))
             .annotate(profit=F("price") - F("cost"))
             .annotate(total_income=F("price") * F("total_units_sold"))
