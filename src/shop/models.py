@@ -619,13 +619,13 @@ class CreditNote(CreatedUpdatedModel):
 
     def __str__(self):
         if self.user:
-            return "creditnoote#%s - %s DKK (customer: user %s)" % (
+            return "creditnote#%s - %s DKK (customer: user %s)" % (
                 self.id,
                 self.amount,
                 self.user.email,
             )
         else:
-            return "creditnoote#%s - %s DKK (customer: %s)" % (
+            return "creditnote#%s - %s DKK (customer: %s)" % (
                 self.id,
                 self.amount,
                 self.customer,
