@@ -27,7 +27,7 @@ ipython==7.26.0
 irc3==1.1.7
 lxml==4.6.3
 olefile==0.46
-pipdeptree==2.0.0
+pipdeptree==2.1.0
 psycopg2-binary==2.9.1
 pyOpenSSL==20.0.1
 PyPDF2==1.26.0
