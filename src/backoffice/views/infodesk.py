@@ -3,6 +3,7 @@ from itertools import chain
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils import timezone
 from django.views.generic import ListView, TemplateView
 
 from camps.mixins import CampViewMixin
@@ -121,6 +122,7 @@ class ScanTicketsView(
         check_in_ticket_id = request.POST.get("check_in_ticket_id")
         ticket_to_check_in = _ticket_getter_by_pk(check_in_ticket_id)
         ticket_to_check_in.used = True
+        ticket_to_check_in.used_time = timezone.now()
         ticket_to_check_in.save()
         messages.info(request, "Ticket checked-in!")
         return ticket_to_check_in

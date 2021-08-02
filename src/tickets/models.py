@@ -98,6 +98,7 @@ def qr_code_base64(token):
 class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
     used = models.BooleanField(default=False)
+    used_time = models.DateTimeField(null=True)
     badge_handed_out = models.BooleanField(default=False)
     token = models.CharField(max_length=64, blank=True)
     badge_token = models.CharField(max_length=64, blank=True)
