@@ -16,10 +16,15 @@ from .models import (
 )
 
 admin.site.register(EpayCallback)
-admin.site.register(EpayPayment)
 admin.site.register(CoinifyAPIInvoice)
 admin.site.register(CoinifyAPICallback)
 admin.site.register(CoinifyAPIRequest)
+
+
+@admin.register(EpayPayment)
+class EpayPaymentAdmin(admin.ModelAdmin):
+    list_display = ["id", "order", "callback", "txnid"]
+    list_display = ["order"]
 
 
 @admin.register(Invoice)
