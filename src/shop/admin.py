@@ -23,8 +23,8 @@ admin.site.register(CoinifyAPIRequest)
 
 @admin.register(EpayPayment)
 class EpayPaymentAdmin(admin.ModelAdmin):
-    list_display = ["id", "order", "callback", "txnid"]
-    list_display = ["order"]
+    list_display = ["uuid", "order", "callback", "txnid"]
+    list_filter = ["order"]
 
 
 @admin.register(Invoice)

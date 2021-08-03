@@ -562,6 +562,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = "Epay Payment"
         verbose_name_plural = "Epay Payments"
+        ordering = ["created"]
 
     order = models.OneToOneField("shop.Order", on_delete=models.PROTECT)
     callback = models.ForeignKey("shop.EpayCallback", on_delete=models.PROTECT)
