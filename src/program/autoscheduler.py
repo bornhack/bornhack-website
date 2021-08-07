@@ -6,6 +6,8 @@ from conference_scheduler.lp_problem import objective_functions
 from conference_scheduler.validator import is_valid_schedule, schedule_violations
 from psycopg2.extras import DateTimeTZRange
 
+from program.email import add_event_scheduled_email
+
 from .models import EventType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -281,7 +283,7 @@ class AutoScheduler:
 
         # "The Clean Slate protocol sir?" - delete any existing autoscheduled Events
         # TODO: investigate how this affects the FRAB XML export (for which we added a UUID on
-        # EventInstance objects). Make sure "favourite" functionality or bookmarks or w/e in
+        # Slot objects). Make sure "favourite" functionality or bookmarks or w/e in
         # FRAB clients still work after a schedule "re"apply. We might need a smaller hammer here.
         deleted = self.camp.event_slots.filter(
             # get all autoscheduled EventSlots
@@ -309,6 +311,7 @@ class AutoScheduler:
             slot.event = event
             slot.autoscheduled = True
             slot.save()
+            add_event_scheduled_email(slot)
 
             scheduled += 1
 

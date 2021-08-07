@@ -168,25 +168,27 @@ def add_event_proposal_accepted_email(event_proposal):
     )
 
 
-def add_event_scheduled_email(eventinstance, action):
-    formatdict = {"eventinstance": eventinstance, "action": action}
-    recipients = [speaker.email for speaker in eventinstance.event.speakers.all()]
-    recipients.append(eventinstance.event.proposal.user.email)
+def add_event_scheduled_email(slot):
+    formatdict = {"slot": slot}
+    # add all speaker emails
+    recipients = [speaker.email for speaker in slot.event.speakers.all()]
+    # also add the submitting users email
+    recipients.append(slot.event.proposal.user.email)
 
     try:
-        content_team = Team.objects.get(camp=eventinstance.camp, name="Content")
+        content_team = Team.objects.get(camp=slot.camp, name="Content")
     except ObjectDoesNotExist as e:
         logger.info("There is no team with name Content: {}".format(e))
         return False
 
     # loop over unique recipients and send an email to each
     for rcpt in set(recipients):
-        return add_outgoing_email(
+        add_outgoing_email(
             responsible_team=content_team,
             text_template="emails/event_scheduled.txt",
             html_template="emails/event_scheduled.html",
             to_recipients=rcpt,
             formatdict=formatdict,
-            subject=f"Your {eventinstance.camp.title} event '{eventinstance.event.title}' has been {action}!",
+            subject=f"Your {slot.camp.title} event '{slot.event.title}' has been scheduled!",
             hold=True,
         )

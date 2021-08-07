@@ -226,7 +226,12 @@ class Command(BaseCommand):
             dict(year=2018, tagline="scale it", colour="#008026", read_only=True),
             dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=True),
             dict(year=2020, tagline="Make Clean", colour="#ff8c00", read_only=False),
-            dict(year=2021, tagline="Undecided", colour="#e40303", read_only=False),
+            dict(
+                year=2021,
+                tagline="Continuous Delivery",
+                colour="#e40303",
+                read_only=False,
+            ),
             dict(year=2022, tagline="Undecided", colour="#004dff", read_only=False),
         ]
 

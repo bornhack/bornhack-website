@@ -1,6 +1,6 @@
 Hello,
 
-The {{ eventinstance.camp.title }} event "{{ eventinstance.event.title }}" has been {% if rescheduled %}re{% endif %}scheduled to begin {{ eventinstance.when.lower }} and end at {{ eventinstance.when.upper }}.
+The {{ slot.camp.title }} event "{{ slot.event.title }}" has been scheduled to begin {{ slot.when.lower }} and end at {{ slot.when.upper }}.
 
 Let us know in case this time slot doesn't work for you.
 

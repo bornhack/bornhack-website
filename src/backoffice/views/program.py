@@ -12,6 +12,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 
 from camps.mixins import CampViewMixin
 from program.autoscheduler import AutoScheduler
+from program.email import add_event_scheduled_email
 from program.mixins import AvailabilityMatrixViewMixin
 from program.models import (
     Event,
@@ -537,6 +538,7 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             self.request,
             f"{self.event.title} has been scheduled to begin at {slot.when.lower} at location {slot.event_location.name} successfully!",
         )
+        add_event_scheduled_email(slot)
         return redirect(
             reverse(
                 "backoffice:event_detail",
