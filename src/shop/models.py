@@ -683,6 +683,13 @@ class Invoice(CreatedUpdatedModel):
     def regretdate(self):
         return self.created + timedelta(days=15)
 
+    @property
+    def get_order(self):
+        if self.order:
+            return self.order
+        else:
+            return self.customorder
+
 
 class CoinifyAPIInvoice(CreatedUpdatedModel):
     coinify_id = models.IntegerField(null=True)

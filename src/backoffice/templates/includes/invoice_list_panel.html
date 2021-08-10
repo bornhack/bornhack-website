@@ -1,14 +1,14 @@
 {% load bornhack %}
 {% if invoice_list %}
-<table class="table table-hover">
+<table class="table table-hover datatable">
   <thead>
   <tr>
     <th>Invoice #</th>
     <th>Username</th>
     <th>Email</th>
     <th>Invoice Date</th>
-    <th>Paid</th>
     <th>Order</th>
+    <th>Paid</th>
     <th>Actions</th>
   </tr>
   </thead>
@@ -16,11 +16,11 @@
     {% for invoice in invoice_list %}
     <tr>
       <td>{{ invoice.id }}</td>
-      <td>{{ invoice.user.username }}</td>
-      <td>{{ invoice.user.email }} DKK</td>
-      <td>{{ invoice.invoice_date }}</td>
-      <td>{{ invoice.paid|truefalseicon }}</td>
-      <td>{{ invoice.order }}</td>
+      <td>{{ invoice.get_order.user.username }}</td>
+      <td>{{ invoice.get_order.user.email }}</td>
+      <td>{{ invoice.created|date }}</td>
+      <td>{{ invoice.get_order }}</td>
+      <td>{{ invoice.get_order.paid|truefalseicon }}</td>
       <td>
           n/a
       </td>
