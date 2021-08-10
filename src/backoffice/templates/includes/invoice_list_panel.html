@@ -20,7 +20,7 @@
       <td>{{ invoice.created|date }}</td>
       <td>{{ invoice.get_order.amount }} DKK</td>
       <td>{{ invoice.get_order }}</td>
-      <td>{{ invoice.get_order.paid|truefalseicon }}</td>
+      <td>{{ invoice.get_order.paid|truefalseicon }} {% if invoice.get_order.paid %}paid{% else %}unpaid{% endif %}</td>
       <td>
           n/a
       </td>
