@@ -4,9 +4,9 @@
   <thead>
   <tr>
     <th>Invoice #</th>
-    <th>Username</th>
-    <th>Email</th>
+    <th>Customer</th>
     <th>Invoice Date</th>
+    <th>Amount</th>
     <th>Order</th>
     <th>Paid</th>
     <th>Actions</th>
@@ -16,9 +16,9 @@
     {% for invoice in invoice_list %}
     <tr>
       <td>{{ invoice.id }}</td>
-      <td>{{ invoice.get_order.user.username }}</td>
-      <td>{{ invoice.get_order.user.email }}</td>
+      <td>{% if invoice.order %}{{ invoice.order.user.username }} &lt;{{ invoice.order.user.email }}&gt;{% else %}invoice.customorder.customer{% endif %}</td>
       <td>{{ invoice.created|date }}</td>
+      <td>{{ invoice.get_order.amount }} DKK</td>
       <td>{{ invoice.get_order }}</td>
       <td>{{ invoice.get_order.paid|truefalseicon }}</td>
       <td>
