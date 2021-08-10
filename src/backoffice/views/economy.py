@@ -14,6 +14,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from camps.mixins import CampViewMixin
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
+from shop.models import Invoice
 from teams.models import Team
 
 from ..mixins import EconomyTeamPermissionMixin
@@ -441,3 +442,12 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         return redirect(
             reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug})
         )
+
+
+################################
+# ORDERS & INVOICES
+
+
+class InvoiceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = Invoice
+    template_name = "invoice_list.html"

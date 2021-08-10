@@ -57,6 +57,7 @@ from .views import (
     FacilityTypeListView,
     FacilityTypeUpdateView,
     FacilityUpdateView,
+    InvoiceListView,
     IrcOverView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
@@ -660,6 +661,15 @@ urlpatterns = [
                                 ReimbursementCreateView.as_view(),
                                 name="reimbursement_create",
                             ),
+                        ]
+                    ),
+                ),
+                # invoices
+                path(
+                    "invoices/",
+                    include(
+                        [
+                            path("", InvoiceListView.as_view(), name="invoice_list"),
                         ]
                     ),
                 ),

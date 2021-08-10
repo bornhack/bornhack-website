@@ -1,0 +1,34 @@
+{% load bornhack %}
+{% if invoice_list %}
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th>Invoice #</th>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Invoice Date</th>
+    <th>Paid</th>
+    <th>Order</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for invoice in invoice_list %}
+    <tr>
+      <td>{{ invoice.id }}</td>
+      <td>{{ invoice.user.username }}</td>
+      <td>{{ invoice.user.email }} DKK</td>
+      <td>{{ invoice.invoice_date }}</td>
+      <td>{{ invoice.paid|truefalseicon }}</td>
+      <td>{{ invoice.order }}</td>
+      <td>
+          n/a
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <h4>No invoices found.</h4>
+{% endif %}
+

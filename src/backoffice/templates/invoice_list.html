@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Invoices | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h2>Invoices</h2>
+
+<div class="lead">
+  This table shows all invoices in the system.
+</div>
+
+{% include 'includes/invoice_list_panel.html' %}
+
+{% endblock content %}
