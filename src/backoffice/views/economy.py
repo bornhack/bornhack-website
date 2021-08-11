@@ -1,3 +1,4 @@
+import csv
 import logging
 import os
 
@@ -6,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.db.models import Count, Q, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -451,3 +453,30 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
 class InvoiceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Invoice
     template_name = "invoice_list.html"
+
+
+class InvoiceListCSVView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    """
+    CSV export of invoices for bookkeeping stuff
+    """
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        writer = csv.writer(response)
+        writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
+        for invoice in Invoice.objects.all():
+            writer.writerow(
+                [
+                    invoice.id,
+                    invoice.created.date(),
+                    invoice.order.total
+                    if invoice.order
+                    else invoice.customorder.amount,
+                    invoice.get_order,
+                    invoice.get_order.paid,
+                ]
+            )
+        return response

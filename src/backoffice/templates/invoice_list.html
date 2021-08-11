@@ -12,6 +12,9 @@ Invoices | {{ block.super }}
   This table shows all invoices in the system.
 </div>
 
+
+<a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
+<a href="{% url 'backoffice:invoice_list_csv' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> CSV</a>
 {% include 'includes/invoice_list_panel.html' %}
 
 {% endblock content %}
