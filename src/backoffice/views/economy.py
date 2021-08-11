@@ -467,7 +467,7 @@ class InvoiceListCSVView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
         writer = csv.writer(response)
         writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
-        for invoice in Invoice.objects.all():
+        for invoice in Invoice.objects.all().order_by("-id"):
             writer.writerow(
                 [
                     invoice.id,
