@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 from .views import (
     DectExportView,
@@ -25,8 +25,8 @@ urlpatterns = [
                     DectRegistrationCreateView.as_view(),
                     name="dectregistration_create",
                 ),
-                path(
-                    "<int:dect_number>/",
+                re_path(
+                    r"^(?P<dect_number>\d{4})/",
                     include(
                         [
                             path(
