@@ -26,7 +26,7 @@ urlpatterns = [
                     name="dectregistration_create",
                 ),
                 re_path(
-                    r"^(?P<dect_number>\d{4})/",
+                    r"^(?P<dect_number>\d{4,9})/",
                     include(
                         [
                             path(
