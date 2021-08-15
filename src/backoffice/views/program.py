@@ -890,6 +890,7 @@ class AutoScheduleApplyView(CampViewMixin, ContentTeamPermissionMixin, FormView)
             autoschedule, diff = scheduler.calculate_similar_autoschedule()
         elif form.cleaned_data["schedule"] == "new":
             autoschedule = scheduler.calculate_autoschedule()
+            diff = None
 
         # check validity
         valid, violations = scheduler.is_valid(autoschedule, return_violations=True)
@@ -898,8 +899,13 @@ class AutoScheduleApplyView(CampViewMixin, ContentTeamPermissionMixin, FormView)
             deleted, created = scheduler.apply(autoschedule)
             messages.success(
                 self.request,
-                f"Schedule has been applied! {deleted} Events removed from schedule, {created} new Events scheduled. Differences to the previous schedule: {len(diff['event_diffs'])} Event diffs and {len(diff['slot_diffs'])} Slot diffs.",
+                f"Schedule has been applied! {deleted} Events removed from schedule, {created} new Events scheduled.",
             )
+            if diff:
+                messages.success(
+                    self.request,
+                    "Differences to the previous schedule: {len(diff['event_diffs'])} Event diffs and {len(diff['slot_diffs'])} Slot diffs.",
+                )
         else:
             messages.error(self.request, "Schedule is NOT valid, cannot apply!")
         return redirect(
