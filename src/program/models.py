@@ -1540,6 +1540,7 @@ class Speaker(CampRelatedModel):
     event_conflicts = models.ManyToManyField(
         "program.Event",
         related_name="speaker_conflicts",
+        blank=True,
         help_text="The Events this person wishes to attend. The AutoScheduler will avoid conflicts.",
     )
 
