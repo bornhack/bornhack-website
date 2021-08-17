@@ -22,7 +22,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ticket_type = TicketType.objects.get(pk=options["ticket_type_pk"])
         camp = Camp.objects.get(slug=options["camp_slug"])
-        sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=False)
+        sponsors = Sponsor.objects.filter(
+            tier__camp=camp, ticket_ready=True, tickets_generated=False
+        )
 
         for sponsor in sponsors:
             if sponsor.tier.tickets:
