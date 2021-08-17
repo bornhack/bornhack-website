@@ -7,12 +7,10 @@ from django.views.generic import DetailView, ListView
 from .models import Token, TokenFind
 
 
-class TokenDetailView(LoginRequiredMixin, DetailView):
-    template_name = "token_detail.html"
+class TokenFindView(LoginRequiredMixin, DetailView):
     model = Token
     slug_field = "token"
     slug_url_kwarg = "token"
-    older_code = False
 
     def get(self, request, *args, **kwargs):
         # register this tokenview if it isn't already
@@ -22,14 +20,14 @@ class TokenDetailView(LoginRequiredMixin, DetailView):
         if created:
             messages.success(
                 self.request,
-                f"You found a secret token: {self.get_object().description} - Your visit has been registered! Keep hunting, there might be more tokens out there.",
+                f"Congratulations! You found a secret token: {self.get_object().description} - Your visit has been registered! Keep hunting, there might be more tokens out there.",
             )
         return redirect(reverse("tokens:tokenfind_list"))
 
 
 class TokenFindListView(LoginRequiredMixin, ListView):
     model = Token
-    template_name = "tokens/tokenfind_list.html"
+    template_name = "tokenfind_list.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
