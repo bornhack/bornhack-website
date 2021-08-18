@@ -25,7 +25,9 @@ def add_sponsorticket_email(ticket):
     with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:
         # add email to outgoing email queue
         return add_outgoing_email(
-            responsible_team=Team.objects.get(camp=ticket.sponsor.camp, name="Sponsor"),
+            responsible_team=Team.objects.get(
+                camp=ticket.sponsor.camp, name="Sponsors"
+            ),
             text_template="emails/sponsorticket_email.txt",
             html_template="emails/sponsorticket_email.html",
             to_recipients=ticket.sponsor.ticket_email,
