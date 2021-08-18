@@ -204,3 +204,8 @@ ACCOUNT_SIGNUP_FORM_CLASS = "bornhack.forms.AllAuthSignupCaptchaForm"
 
 # django 3.2 https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+WKHTMLTOPDF_CMD_OPTIONS = {
+    "quiet": True,
+    "enable-local-file-access": True,
+}
