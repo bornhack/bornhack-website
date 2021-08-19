@@ -1,8 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView
+
+from utils.models import CampReadOnlyModeError
 
 from .models import Token, TokenFind
 
@@ -13,10 +16,14 @@ class TokenFindView(LoginRequiredMixin, DetailView):
     slug_url_kwarg = "token"
 
     def get(self, request, *args, **kwargs):
-        # register this tokenview if it isn't already
-        token, created = TokenFind.objects.get_or_create(
-            token=self.get_object(), user=request.user
-        )
+        # register this token find if it isn't already
+        try:
+            token, created = TokenFind.objects.get_or_create(
+                token=self.get_object(), user=request.user
+            )
+        except CampReadOnlyModeError:
+            raise Http404
+
         if created:
             messages.success(
                 self.request,
