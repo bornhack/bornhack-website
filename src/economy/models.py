@@ -853,9 +853,10 @@ class PosReport(CampRelatedModel, UUIDModel):
         """Calculate the total HAX sales and number of transactions."""
         transactions = 0
         total = 0
-        for tx in self.pos_json:
-            transactions += 1
-            total += tx["amount"]
+        if self.pos_json:
+            for tx in self.pos_json:
+                transactions += 1
+                total += tx["amount"]
         return transactions, total
 
     @property
