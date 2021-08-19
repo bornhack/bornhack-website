@@ -26,7 +26,7 @@
         <h5>Mailing List</h5>
         {% if team.mailing_list and request.user in team.approved_members.all %}
           <p>The {{ team.name }} Team mailinglist is <b>{{ team.mailing_list }}</b>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You should sign up for the list if you haven't already.</p>
-        {% elif team.mailing_list and team.mailinglist_nonmember_posts %}
+        {% elif team.mailing_list and team.mailing_list_nonmember_posts %}
           <p>The {{ team.name }} Team mailinglist is <b>{{ team.mailing_list }}</b>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You do not need to be a member of the list to post to it.</p>
         {% else %}
           <p>The {{ team.name }} Team does not have a public mailing list, but it can be contacted through our main email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a>.
