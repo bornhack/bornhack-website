@@ -222,3 +222,6 @@ class ShopTicket(BaseTicket):
     @property
     def order(self):
         return self.opr.order
+
+
+TicketTypeUnion = Union[ShopTicket, SponsorTicket, DiscountTicket]

@@ -1,14 +1,22 @@
 import logging
 from itertools import chain
+from typing import Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from django.utils import timezone
 from django.views.generic import ListView, TemplateView
 
 from camps.mixins import CampViewMixin
 from shop.models import Order, OrderProductRelation
-from tickets.models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
+from tickets.models import (
+    DiscountTicket,
+    ShopTicket,
+    SponsorTicket,
+    TicketType,
+    TicketTypeUnion,
+)
 
 from ..mixins import InfoTeamPermissionMixin
 
@@ -49,15 +57,12 @@ class TicketCheckinView(CampViewMixin, InfoTeamPermissionMixin, ListView):
         return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
-def _ticket_getter_by_token(token):
+def _ticket_getter_by_token(token) -> Optional[TicketTypeUnion]:
     for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
         try:
-            return ticket_class.objects.get(token=token), False
+            return ticket_class.objects.get(Q(token=token) | Q(badge_token=token))
         except ticket_class.DoesNotExist:
-            try:
-                return ticket_class.objects.get(badge_token=token), True
-            except ticket_class.DoesNotExist:
-                pass
+            continue
 
 
 def _ticket_getter_by_pk(pk):
@@ -88,11 +93,11 @@ class ScanTicketsView(
             # Slice to get rid of the first character which is a '#'
             ticket_token = self.request.POST.get("ticket_token")[1:]
 
-            ticket, is_badge = _ticket_getter_by_token(ticket_token)
+            ticket: Optional[TicketTypeUnion] = _ticket_getter_by_token(ticket_token)
 
             if ticket:
                 context["ticket"] = ticket
-                context["is_badge"] = is_badge
+                context["is_badge"] = ticket_token == ticket.badge_token
             else:
                 messages.warning(self.request, "Ticket not found!")
 
