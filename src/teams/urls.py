@@ -179,6 +179,11 @@ urlpatterns = [
                                             MemberDropsShift.as_view(),
                                             name="shift_member_drop",
                                         ),
+                                        path(
+                                            "sell",
+                                            MemberSellsShift.as_view(),
+                                            name="shift_member_sell",
+                                        ),
                                     ]
                                 ),
                             ),

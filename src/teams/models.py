@@ -401,7 +401,7 @@ class TeamShift(CampRelatedModel):
 
     shift_range = DateTimeRangeField()
 
-    team_members = models.ManyToManyField(TeamMember, blank=True)
+    team_members = models.ManyToManyField(TeamMember, blank=True, through=TeamShiftAssignment)
 
     people_required = models.IntegerField(default=1)
 
@@ -420,3 +420,21 @@ class TeamShift(CampRelatedModel):
     @property
     def users(self):
         return [member.user for member in self.team_members.all()]
+
+class TeamShiftAssignment(CampRelatedModel):
+    team_shift = models.ForeignKey(
+        "teams.TeamShift",
+        on_delete=models.CASCADE,
+        help_text="The shift",
+    )
+
+    team_member = models.ForeignKey(
+        "teams.TeamMember",
+        on_delete=models.CASCADE,
+        help_text="The team member on shift",
+    )
+
+    for_sale = models.BooleanField(
+        default=False,
+        help_text="Is the shift assignment for sale?",
+    )
