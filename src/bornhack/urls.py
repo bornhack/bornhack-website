@@ -13,7 +13,6 @@ from info.views import CampInfoView
 from people.views import PeopleView
 from sponsors.views import SponsorsView
 from villages.views import (
-    VillageCreateView,
     VillageDeleteView,
     VillageDetailView,
     VillageListView,
@@ -118,11 +117,6 @@ urlpatterns = [
                     include(
                         [
                             path("", VillageListView.as_view(), name="village_list"),
-                            path(
-                                "create/",
-                                VillageCreateView.as_view(),
-                                name="village_create",
-                            ),
                             path(
                                 "<slug:slug>/delete/",
                                 VillageDeleteView.as_view(),
