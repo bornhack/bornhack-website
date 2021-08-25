@@ -16,10 +16,6 @@ Villages | {{ block.super }}
   tent, chairs and tables in the shop!
 </p>
 
-{% if user.is_authenticated and not camp.read_only %}
-<a href="{% url 'village_create' camp_slug=camp.slug %}" class="btn btn-primary">Create a new {{ camp.title }} village</a>
-{% endif %}
-
 <hr />
 {% if villages %}
 <table class="table table-hover table-condensed table-striped">
