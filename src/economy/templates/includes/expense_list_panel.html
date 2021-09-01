@@ -2,6 +2,7 @@
 <table class="table table-hover datatable">
   <thead>
   <tr>
+    <th>ID</th>
     <th>Invoice Date</th>
     <th>Created By</th>
     {% if not reimbursement %}
@@ -21,6 +22,7 @@
   <tbody>
     {% for expense in expense_list %}
     <tr>
+      <td>{{ expense.pk }}</td>
       <td>{{ expense.invoice_date }}</td>
       <td>{{ expense.user }}</td>
       {% if not reimbursement %}

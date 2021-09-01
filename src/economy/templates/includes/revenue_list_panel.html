@@ -2,10 +2,11 @@
 <table class="table table-hover">
   <thead>
   <tr>
+    <th>ID</th>
+    <th>Invoice Date</th>
     <th>Created By</th>
     <th>Debtor</th>
     <th>Amount</th>
-    <th>Invoice Date</th>
     <th>Description</th>
     <th>Responsible Team</th>
     <th>Approved</th>
@@ -15,10 +16,11 @@
   <tbody>
     {% for revenue in revenue_list %}
     <tr>
+      <td>{{ revenue.pk }}</td>
+      <td>{{ revenue.invoice_date }}</td>
       <td>{{ revenue.user }}</td>
       <td>{{ revenue.debtor }}</td>
       <td>{{ revenue.amount }} DKK</td>
-      <td>{{ revenue.invoice_date }}</td>
       <td>{{ revenue.description }}</td>
       <td>{{ revenue.responsible_team.name }} Team</td>
       <td>{{ revenue.approval_status }}</td>
