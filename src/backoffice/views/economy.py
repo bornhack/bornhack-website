@@ -346,8 +346,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
     template_name = "reimbursement_delete.html"
     fields = ["notes", "paid"]
 
-    def dispatch(self, request, *args, **kwargs):
-        response = super().dispatch(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
         if self.get_object().paid:
             messages.error(
                 request,
@@ -359,7 +358,17 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
                     kwargs={"camp_slug": self.camp.slug},
                 )
             )
-        return response
+        # continue with the request
+        return super().get(request, *args, **kwargs)
+
+    def get_success_url(self):
+        messages.success(
+            self.request, f"Reimbursement {self.kwargs['pk']} deleted successfully!"
+        )
+        return reverse(
+            "backoffice:reimbursement_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
 
 
 ################################

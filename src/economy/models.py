@@ -376,7 +376,7 @@ class Expense(CampRelatedModel, UUIDModel):
 
     reimbursement = models.ForeignKey(
         "economy.Reimbursement",
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         related_name="expenses",
         null=True,
         blank=True,
