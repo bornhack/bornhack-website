@@ -1,7 +1,9 @@
 import os
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.db import models
 from django.urls import reverse
 
@@ -472,30 +474,70 @@ class Reimbursement(CampRelatedModel, UUIDModel):
 
     notes = models.TextField(
         blank=True,
-        help_text="Economy Team notes for this reimbursement. Only visible to the Economy team and the related user.",
+        help_text="Economy Team notes for this reimbursement. Only visible to the Economy team and the reimbursed user.",
     )
 
     paid = models.BooleanField(
         default=False,
-        help_text="Check when this reimbursement has been paid to the user",
+        help_text="Check when this reimbursement has been paid to the user. Do not check until the bank transfer has been fully approved.",
     )
 
     @property
     def covered_expenses(self):
         """
-        Returns a queryset of all expenses covered by this reimbursement. Does not include the expense that paid for the reimbursement.
+        Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement.
         """
         return self.expenses.filter(paid_by_bornhack=False)
 
     @property
     def amount(self):
-        """
-        The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses
-        """
-        amount = 0
-        for expense in self.expenses.filter(paid_by_bornhack=False):
-            amount += expense.amount
-        return amount
+        """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses."""
+        return self.expenses.filter(paid_by_bornhack=False).aggregate(
+            models.Sum("amount")
+        )["amount__sum"]
+
+    @property
+    def payback_expense(self):
+        """Return the expense created to pay back this reimbursement."""
+        if self.expenses.filter(paid_by_bornhack=True).exists():
+            return self.expenses.get(paid_by_bornhack=True)
+
+    def create_payback_expense(self):
+        """Create the expense to pay back this reimbursement."""
+        if self.payback_expense:
+            # we already have an expense created, just return that one
+            return self.payback_expense
+
+        # we need an economy team to do this
+        if not self.camp.economy_team:
+            return False
+
+        # create the expense
+        expense = Expense()
+        expense.camp = self.camp
+        expense.user = self.user
+        expense.amount = self.amount
+        expense.description = "Payment of reimbursement %s to %s" % (
+            self.pk,
+            self.reimbursement_user,
+        )
+        expense.paid_by_bornhack = True
+        expense.responsible_team = self.camp.economy_team
+        expense.approved = True
+        expense.reimbursement = self
+        expense.invoice_date = self.created
+        expense.creditor = Credebtor.objects.get(name="Reimbursement")
+        expense.invoice.save(
+            "na.jpg",
+            File(
+                open(
+                    os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/na.jpg"),
+                    "rb",
+                )
+            ),
+        )
+        expense.save()
+        return expense
 
 
 class Pos(CampRelatedModel, UUIDModel):

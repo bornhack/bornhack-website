@@ -8,6 +8,8 @@ Expense Details | {{ block.super }}
 <div class="row">
 {% include 'includes/expense_detail_panel.html' %}
 </div>
+{% if not expense.approved %}
 <a class="btn btn-primary" href="{% url 'economy:expense_update' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update Expense</a>
+{% endif %}
 <a class="btn btn-primary" href="{% url 'economy:expense_list' camp_slug=camp.slug %}"><i class="fas fa-list"></i> Back to Expense List</a>
 {% endblock %}

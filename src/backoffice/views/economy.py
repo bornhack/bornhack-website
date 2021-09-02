@@ -1,11 +1,8 @@
 import csv
 import logging
-import os
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.core.files import File
 from django.db.models import Count, Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -17,7 +14,6 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from camps.mixins import CampViewMixin
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from shop.models import Invoice
-from teams.models import Team
 
 from ..mixins import EconomyTeamPermissionMixin
 
@@ -295,12 +291,8 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
                 )
             )
 
-        # get the Economy team for this camp
-        try:
-            economyteam = Team.objects.get(
-                camp=self.camp, name=settings.ECONOMYTEAM_NAME
-            )
-        except Team.DoesNotExist:
+        # do we have an Economy team for this camp?
+        if not self.camp.economy_team:
             messages.error(self.request, "No economy team found")
             return redirect(
                 reverse(
@@ -321,35 +313,12 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
             expense.reimbursement = reimbursement
             expense.save()
 
-        # create expense for this reimbursement
-        expense = Expense()
-        expense.camp = self.camp
-        expense.user = self.request.user
-        expense.amount = reimbursement.amount
-        expense.description = "Payment of reimbursement %s to %s" % (
-            reimbursement.pk,
-            reimbursement.reimbursement_user,
-        )
-        expense.paid_by_bornhack = True
-        expense.responsible_team = economyteam
-        expense.approved = True
-        expense.reimbursement = reimbursement
-        expense.invoice_date = timezone.now()
-        expense.creditor = Credebtor.objects.get(name="Reimbursement")
-        expense.invoice.save(
-            "na.jpg",
-            File(
-                open(
-                    os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/na.jpg"),
-                    "rb",
-                )
-            ),
-        )
-        expense.save()
+        # create payback expense for this reimbursement
+        reimbursement.create_payback_expense()
 
         messages.success(
             self.request,
-            "Reimbursement %s has been created with invoice_date %s"
+            f"Reimbursement {reimbursement} has been created with payback expense {reimbursement.payback_expense}"
             % (reimbursement.pk, timezone.now()),
         )
         return redirect(

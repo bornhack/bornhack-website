@@ -22,6 +22,12 @@
               <th>Paid</th>
               <td>{{ reimbursement.paid }}</td>
             </tr>
+            {% if request.resolver_match.app_name == "backoffice" %}
+            <tr>
+              <th>Payback Expense</th>
+              <td><a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=reimbursement.payback_expense.pk %}">{{ reimbursement.payback_expense.pk }}</a></td>
+            </tr>
+            {% endif %}
             <tr>
               <th>Created</th>
               <td>{{ reimbursement.created }} by {{ reimbursement.user }}</td>

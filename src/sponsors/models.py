@@ -29,7 +29,7 @@ class Sponsor(CampRelatedModel):
 
     ticket_ready = models.BooleanField(
         default=False,
-        help_text="Check when we are ready to send tickets to this sponsor.",
+        help_text="Check when we are ready to generate and send tickets to this sponsor.",
     )
 
     tickets_sent = models.BooleanField(

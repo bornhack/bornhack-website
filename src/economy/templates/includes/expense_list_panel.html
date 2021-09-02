@@ -22,7 +22,11 @@
   <tbody>
     {% for expense in expense_list %}
     <tr>
-      <td>{{ expense.pk }}</td>
+      {% if request.resolver_match.app_name == "backoffice" %}
+      <td><a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
+      {% else %}
+      <td><a href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
+      {% endif %}
       <td>{{ expense.invoice_date }}</td>
       <td>{{ expense.user }}</td>
       {% if not reimbursement %}
@@ -56,8 +60,10 @@
         {% endif %}
       {% else %}
         <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
+        {% if not expense.approved %}
         <a class="btn btn-primary" href="{% url 'economy:expense_update' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update</a>
         <a class="btn btn-danger" href="{% url 'economy:expense_delete' camp_slug=camp.slug pk=expense.uuid %}"><i class="fas fa-times"></i> Delete</a>
+        {% endif %}
       {% endif %}
       </td>
     </tr>

@@ -18,7 +18,7 @@ from django.utils.crypto import get_random_string
 from faker import Faker
 
 from camps.models import Camp
-from economy.models import Chain, Credebtor, Expense, Revenue
+from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from events.models import Routing, Type
 from facilities.models import (
     Facility,
@@ -225,7 +225,7 @@ class Command(BaseCommand):
             dict(year=2017, tagline="Make Tradition", colour="#750787", read_only=True),
             dict(year=2018, tagline="scale it", colour="#008026", read_only=True),
             dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=True),
-            dict(year=2020, tagline="Make Clean", colour="#ff8c00", read_only=False),
+            dict(year=2020, tagline="Make Clean", colour="#ff8c00", read_only=True),
             dict(
                 year=2021,
                 tagline="Continuous Delivery",
@@ -592,8 +592,15 @@ class Command(BaseCommand):
             try:
                 CredebtorFactory.create(chain=Chain.objects.order_by("?").first())
             except ValidationError:
-                self.outout("Name conflict, skipping...")
+                self.output("Name conflict, skipping...")
                 continue
+        # add a credebtor for reimbursements
+        reimbursement_chain = Chain.objects.create(
+            name="Reimbursement", notes="This chain is only used for reimbursements"
+        )
+        Credebtor.objects.create(
+            chain=reimbursement_chain, name="Reimbursement", address="Nowhere"
+        )
 
     def create_product_categories(self):
         categories = {}
@@ -1291,7 +1298,8 @@ class Command(BaseCommand):
             mailing_list="economy@example.com",
             permission_set="economyteam_permission",
         )
-
+        camp.economy_team = teams["economy"]
+        camp.save()
         return teams
 
     def create_camp_team_tasks(self, camp, teams):
@@ -1408,6 +1416,12 @@ class Command(BaseCommand):
             team=teams["shuttle"], user=users[9]
         )
 
+        # economy team also gets a member
+        TeamMember.objects.create(
+            team=teams["economy"],
+            user=random.choice(users),
+            approved=True,
+        )
         return memberships
 
     def create_camp_team_shifts(self, camp, teams, team_memberships):
@@ -1706,6 +1720,35 @@ class Command(BaseCommand):
         self.output(f"Creating expenses for {camp}...")
         ExpenseFactory.create_batch(200, camp=camp)
 
+    def create_camp_reimbursements(self, camp):
+        self.output(f"Creating reimbursements for {camp}...")
+        users = User.objects.filter(
+            id__in=Expense.objects.filter(
+                camp=camp,
+                reimbursement__isnull=True,
+                paid_by_bornhack=False,
+                approved=True,
+            )
+            .values_list("user", flat=True)
+            .distinct()
+        )
+        for user in users:
+            expenses = Expense.objects.filter(
+                user=user,
+                approved=True,
+                reimbursement__isnull=True,
+                paid_by_bornhack=False,
+            )
+            reimbursement = Reimbursement.objects.create(
+                camp=camp,
+                user=camp.economy_team.members.first(),
+                reimbursement_user=user,
+                notes=f"bootstrap created reimbursement for user {user.username}",
+                paid=random.choice([True, True, False]),
+            )
+            expenses.update(reimbursement=reimbursement)
+            reimbursement.create_payback_expense()
+
     def create_camp_revenues(self, camp):
         self.output(f"Creating revenues for {camp}...")
         RevenueFactory.create_batch(20, camp=camp)
@@ -1791,7 +1834,7 @@ class Command(BaseCommand):
                     self.approve_speaker_proposals(camp)
                 except ValidationError:
                     self.output(
-                        "Name collision, bad luck. Run 'manage.py flush' and run the bootstrap script again!"
+                        "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)"
                     )
                     sys.exit(1)
 
@@ -1837,6 +1880,8 @@ class Command(BaseCommand):
                 self.create_camp_token_finds(camp, tokens, users)
 
                 self.create_camp_expenses(camp)
+
+                self.create_camp_reimbursements(camp)
 
                 self.create_camp_revenues(camp)
             else:

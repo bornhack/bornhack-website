@@ -132,6 +132,15 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         help_text="Check if the schedule should be shown.", default=True
     )
 
+    economy_team = models.ForeignKey(
+        "teams.Team",
+        on_delete=models.PROTECT,
+        help_text="The economy team for this camp.",
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
     def get_absolute_url(self):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 

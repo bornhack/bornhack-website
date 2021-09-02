@@ -8,7 +8,15 @@ Reimbursements for {{ camp.title }} | {{ block.super }}
 {% block content %}
 <h2>Reimbursements for {{ camp.title }}</h2>
 
+<p>
+<a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+<a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+</p>
+
 {% include 'includes/reimbursement_list_panel.html' %}
 
+<p>
 <a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+<a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+</p>
 {% endblock content %}
