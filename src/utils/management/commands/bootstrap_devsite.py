@@ -18,6 +18,7 @@ from django.utils.crypto import get_random_string
 from faker import Faker
 
 from camps.models import Camp
+from economy.factories import BankAccountFactory, BankFactory, BankTransactionFactory
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from events.models import Routing, Type
 from facilities.models import (
@@ -327,6 +328,12 @@ class Command(BaseCommand):
             feedback="No power", icon="fas fa-bolt"
         )
         return options
+
+    def create_bank_stuff(self):
+        self.output("Creating Banks, BankAccounts, and BankTransactions...")
+        BankFactory.create_batch(2)
+        BankAccountFactory.create_batch(16)
+        BankTransactionFactory.create_batch(300)
 
     def create_facility_types(self, camp, teams, options):
         types = {}
@@ -1789,6 +1796,8 @@ class Command(BaseCommand):
         quickfeedback_options = self.create_quickfeedback_options()
 
         self.create_credebtors()
+
+        self.create_bank_stuff()
 
         for (camp, read_only) in camps:
             year = camp.camp.lower.year

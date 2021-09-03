@@ -1,20 +1,35 @@
 import csv
 import logging
+from io import StringIO
 
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count, Q, Sum
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    FormView,
+    ListView,
+    UpdateView,
+)
 
 from camps.mixins import CampViewMixin
-from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
-from shop.models import Invoice
+from economy.models import (
+    Bank,
+    BankAccount,
+    BankTransaction,
+    Chain,
+    Credebtor,
+    Expense,
+    Reimbursement,
+    Revenue,
+)
 
+from ..forms import BankCSVForm
 from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -425,36 +440,69 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
 
 
 ################################
-# ORDERS & INVOICES
+# BANK, ACCOUNTS, TRANSACTIONS
 
 
-class InvoiceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
-    model = Invoice
-    template_name = "invoice_list.html"
+class BankListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = Bank
+    template_name = "bank_list.html"
 
 
-class InvoiceListCSVView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
-    """
-    CSV export of invoices for bookkeeping stuff
-    """
+class BankDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = Bank
+    template_name = "bank_detail.html"
+    pk_url_kwarg = "bank_uuid"
 
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
-        writer = csv.writer(response)
-        writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
-        for invoice in Invoice.objects.all().order_by("-id"):
-            writer.writerow(
-                [
-                    invoice.id,
-                    invoice.created.date(),
-                    invoice.order.total
-                    if invoice.order
-                    else invoice.customorder.amount,
-                    invoice.get_order,
-                    invoice.get_order.paid,
-                ]
+
+class BankCSVUploadView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    form_class = BankCSVForm
+    template_name = "bank_csv_upload_form.html"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.bank = Bank.objects.get(pk=kwargs["bank_uuid"])
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        form_kwargs["bank"] = self.bank
+        return form_kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["bank"] = self.bank
+        return context
+
+    def form_valid(self, form):
+        for file_id, file_handle in form.files.items():
+            account = BankAccount.objects.get(pk=file_id)
+            csvdata = file_handle.read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=";", quotechar='"')
+            imported = account.import_csv(reader)
+            if imported:
+                messages.success(
+                    self.request,
+                    f"Successfully imported {imported} new transactions for bank account {account.name} ({account.pk})",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    f"No new transactions were created for bank account {account.name} ({account.pk}). Transaction text descriptions may have been updated.",
+                )
+        return redirect(
+            reverse(
+                "backoffice:bank_detail",
+                kwargs={"camp_slug": self.camp.slug, "bank_uuid": self.bank.pk},
             )
-        return response
+        )
+
+
+class BankAccountDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = BankAccount
+    template_name = "bankaccount_detail.html"
+    pk_url_kwarg = "bankaccount_uuid"
+
+
+class BankTransactionDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = BankTransaction
+    template_name = "banktransaction_detail.html"
+    pk_url_kwarg = "banktransaction_uuid"

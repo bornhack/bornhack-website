@@ -1,3 +1,4 @@
+import csv
 import logging
 from itertools import chain
 from typing import Optional
@@ -5,11 +6,12 @@ from typing import Optional
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.http import HttpResponse
 from django.utils import timezone
 from django.views.generic import ListView, TemplateView
 
 from camps.mixins import CampViewMixin
-from shop.models import Order, OrderProductRelation
+from shop.models import CreditNote, Invoice, Order, OrderProductRelation
 from tickets.models import (
     DiscountTicket,
     ShopTicket,
@@ -156,3 +158,49 @@ class ShopTicketOverview(
     def get_context_data(self, *, object_list=None, **kwargs):
         kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
+
+
+################################
+# ORDERS & INVOICES
+
+
+class InvoiceListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    model = Invoice
+    template_name = "invoice_list.html"
+
+
+class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    """
+    CSV export of invoices for bookkeeping stuff
+    """
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type="text/csv")
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        writer = csv.writer(response)
+        writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
+        for invoice in Invoice.objects.all().order_by("-id"):
+            writer.writerow(
+                [
+                    invoice.id,
+                    invoice.created.date(),
+                    invoice.order.total
+                    if invoice.order
+                    else invoice.customorder.amount,
+                    invoice.get_order,
+                    invoice.get_order.paid,
+                ]
+            )
+        return response
+
+
+class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    model = Order
+    template_name = "order_list.html"
+
+
+class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    model = CreditNote
+    template_name = "creditnote_list.html"

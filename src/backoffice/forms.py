@@ -94,3 +94,13 @@ class SpeakerForm(forms.ModelForm):
         self.fields["event_conflicts"].queryset = Event.objects.filter(
             track__camp=camp, event_type__support_speaker_event_conflicts=True
         )
+
+
+class BankCSVForm(forms.Form):
+    def __init__(self, bank, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for account in bank.accounts.all():
+            self.fields[str(account.pk)] = forms.FileField(
+                help_text=f"CSV file for account '{account.name}'. Leave empty if you don't need to import anything for this account.",
+                required=False,
+            )

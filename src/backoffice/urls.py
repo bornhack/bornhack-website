@@ -14,9 +14,15 @@ from .views import (
     BackofficeIndexView,
     BackofficeProxyView,
     BadgeHandoutView,
+    BankAccountDetailView,
+    BankCSVUploadView,
+    BankDetailView,
+    BankListView,
+    BankTransactionDetailView,
     ChainDetailView,
     ChainListView,
     CredebtorDetailView,
+    CreditNoteListView,
     EventDeleteView,
     EventDetailView,
     EventListView,
@@ -62,6 +68,7 @@ from .views import (
     IrcOverView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
+    OrderListView,
     OutgoingEmailMassUpdateView,
     PendingProposalsView,
     PosCreateView,
@@ -210,7 +217,35 @@ urlpatterns = [
     # infodesk
     path(
         "infodesk/",
-        include([path("", ScanTicketsView.as_view(), name="scan_tickets")]),
+        include(
+            [
+                path("scan_tickets/", ScanTicketsView.as_view(), name="scan_tickets"),
+                path("orders/", OrderListView.as_view(), name="order_list"),
+                path(
+                    "invoices/",
+                    include(
+                        [
+                            path("", InvoiceListView.as_view(), name="invoice_list"),
+                            path(
+                                "csv/",
+                                InvoiceListCSVView.as_view(),
+                                name="invoice_list_csv",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "creditnotes/",
+                    include(
+                        [
+                            path(
+                                "", CreditNoteListView.as_view(), name="creditnote_list"
+                            ),
+                        ]
+                    ),
+                ),
+            ]
+        ),
     ),
     path("shop_tickets/", ShopTicketOverview.as_view(), name="shop_ticket_overview"),
     path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),
@@ -665,16 +700,51 @@ urlpatterns = [
                         ]
                     ),
                 ),
-                # invoices
                 path(
-                    "invoices/",
+                    "banks/",
                     include(
                         [
-                            path("", InvoiceListView.as_view(), name="invoice_list"),
+                            path("", BankListView.as_view(), name="bank_list"),
                             path(
-                                "csv/",
-                                InvoiceListCSVView.as_view(),
-                                name="invoice_list_csv",
+                                "<uuid:bank_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            BankDetailView.as_view(),
+                                            name="bank_detail",
+                                        ),
+                                        path(
+                                            "upload-csv/",
+                                            BankCSVUploadView.as_view(),
+                                            name="bank_csvupload",
+                                        ),
+                                    ]
+                                ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "bankaccounts/",
+                    include(
+                        [
+                            path(
+                                "<uuid:bankaccount_uuid>/",
+                                BankAccountDetailView.as_view(),
+                                name="bankaccount_detail",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "banktransactions/",
+                    include(
+                        [
+                            path(
+                                "<uuid:banktransaction_uuid>/",
+                                BankTransactionDetailView.as_view(),
+                                name="banktransaction_detail",
                             ),
                         ]
                     ),

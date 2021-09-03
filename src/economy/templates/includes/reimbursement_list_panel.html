@@ -3,7 +3,9 @@
     <table class="table table-hover datatable">
       <thead>
       <tr>
-          {% if request.resolver_match.app_name != "backoffice" %}
+          {% if request.resolver_match.app_name == "backoffice" %}
+          <th>ID</th>
+          {% else %}
           <th>Camp</th>
           {% endif %}
           <th>Created By</th>
@@ -17,7 +19,9 @@
       <tbody>
       {% for reim in reimbursement_list %}
       <tr>
-        {% if request.resolver_match.app_name != "backoffice" %}
+        {% if request.resolver_match.app_name == "backoffice" %}
+        <td>{{ reim.pk }}</td>
+        {% else %}
         <td>{{ reim.camp }}</td>
         {% endif %}
         <td>{{ reim.user }}</td>

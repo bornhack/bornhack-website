@@ -1,13 +1,22 @@
 import os
+from datetime import datetime
+from decimal import Decimal
 
+import pytz
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.files import File
+from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 
-from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+from utils.models import (
+    CampRelatedModel,
+    CreatedUpdatedModel,
+    CreatedUpdatedUUIDModel,
+    UUIDModel,
+)
 from utils.slugs import unique_slugify
 
 from .email import (
@@ -930,3 +939,126 @@ class PosReport(CampRelatedModel, UUIDModel):
         balance -= self.bank_count_dkk_end
         # all good
         return balance
+
+
+class Bank(CreatedUpdatedUUIDModel):
+    """A bank where we have an account."""
+
+    name = models.CharField(max_length=100, help_text="The name of the bank")
+
+    def __str__(self):
+        return self.name
+
+
+class BankAccount(CreatedUpdatedUUIDModel):
+    """An account in our bank."""
+
+    bank = models.ForeignKey(
+        "economy.Bank",
+        on_delete=models.PROTECT,
+        related_name="accounts",
+        help_text="The bank this bank account belongs to.",
+    )
+
+    name = models.CharField(max_length=100, help_text="The name of the bank account")
+
+    reg_no = models.CharField(
+        max_length=4,
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{4}$",
+                message="Reg number must be 4 digits.",
+                code="invalid_reg_no",
+            ),
+        ],
+    )
+
+    account_no = models.CharField(
+        max_length=12,
+        validators=[
+            RegexValidator(
+                regex="^[0-9]{6,12}$",
+                message="Account number must be 6-12 digits.",
+                code="invalid_account_no",
+            ),
+        ],
+    )
+
+    start_date = models.DateField(
+        null=True, blank=True, help_text="The date we began using this bank account."
+    )
+
+    end_date = models.DateField(
+        null=True, blank=True, help_text="The date we stopped using this bank account."
+    )
+
+    def import_csv(self, csvreader):
+        """Import a CSV file with transactions for this bank account.
+
+        assumes a CSV structure like this:
+
+        "24-08-2021";"24-08-2021";"938d27e9-e559-4146-9d2e-be2dea";"-279,80";"230.119,11"
+        "24-08-2021";"24-08-2021";"f1a7b16b-27d3-432f-bca7-2e2229";"-59,85";"230.398,91"
+        "24-08-2021";"24-08-2021";"63e93a24-073b-4ebb-8b0d-5a3072";"-1.221,05";"230.458,76"
+
+        The second date column is unused. Dates are in Europe/Copenhagen tz.
+        """
+        cph = pytz.timezone("Europe/Copenhagen")
+        create_count = 0
+        for row in csvreader:
+            # use update_or_create() so we can import a new CSV with the same transactions
+            # but with updated descriptions, in case we fix a description in the bank
+            tx, created = self.transactions.update_or_create(
+                date=cph.localize(datetime.strptime(row[0], "%d-%m-%Y")),
+                amount=Decimal(row[3].replace(".", "").replace(",", ".")),
+                balance=Decimal(row[4].replace(".", "").replace(",", ".")),
+                defaults={
+                    "text": row[2],
+                },
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+
+class BankTransaction(CreatedUpdatedUUIDModel):
+    """A BankTransaction represents one movement into or out of the bank account."""
+
+    class Meta:
+        # get the latest created on the latest date
+        get_latest_by = ["date", "created"]
+        ordering = ["-date", "-created"]
+
+    bank_account = models.ForeignKey(
+        "economy.BankAccount",
+        on_delete=models.PROTECT,
+        related_name="transactions",
+        help_text="The bank account this transaction belongs to.",
+    )
+
+    date = models.DateField(help_text="The date of this transaction.")
+
+    text = models.CharField(max_length=255, help_text="The text for this transaction.")
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="The amount of this transaction. Negative numbers means money left the bank account, positive numbers mean money was put into the bank account.",
+    )
+
+    balance = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="The balance of the account after this transaction.",
+    )
+
+    def clean(self):
+        """Make sure transactions don't fall outside the bank accounts start and end dates."""
+        if self.bank_account.start_date and self.date < self.bank_account.start_date:
+            raise ValidationError(
+                f"Transaction on {self.date} is before the bank accounts start_date. Transaction text is '{self.text}' and amount is {self.amount}"
+            )
+        if self.bank_account.end_date and self.date > self.bank_account.end_date:
+            raise ValidationError(
+                f"Transaction on {self.date} is after the bank accounts end_date. Transaction text is '{self.text}' and amount is {self.amount}"
+            )

@@ -50,13 +50,31 @@
 
       {% if perms.camps.infoteam_permission %}
       <h3>Info Team</h3>
+      <a href="{% url 'backoffice:invoice_list' camp_slug=camp.slug %}"
+         class="list-group-item">
+        <h4 class="list-group-item-heading">
+          Invoices
+        </h4>
+        <p class="list-group-item-text">
+          Use this view see a list of all Invoices in the system
+        </p>
+      </a>
+      <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}"
+         class="list-group-item">
+        <h4 class="list-group-item-heading">
+          Orders
+        </h4>
+        <p class="list-group-item-text">
+          Use this view see and manage webshop orders
+        </p>
+      </a>
       <a href="{% url 'backoffice:scan_tickets' camp_slug=camp.slug %}"
          class="list-group-item">
         <h4 class="list-group-item-heading">
           Scan tickets
         </h4>
         <p class="list-group-item-text">
-          Use this to get scan tickets
+          Use this view to scan tickets QR codes to check in visitors, hand out merch and HAX, etc.
         </p>
       </a>
       {% endif %}
@@ -179,9 +197,9 @@
         <h4 class="list-group-item-heading">Revenues</h4>
         <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
       </a>
-      <a href="{% url 'backoffice:invoice_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Invoices</h4>
-        <p class="list-group-item-text">Use this view to see a list of invoices in the system.</p>
+      <a href="{% url 'backoffice:bank_list' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Banks</h4>
+        <p class="list-group-item-text">Use this view to see our banks, bank accounts and bank transactions.</p>
       </a>
       {% endif %}
 
