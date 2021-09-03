@@ -992,6 +992,9 @@ class BankAccount(CreatedUpdatedUUIDModel):
         null=True, blank=True, help_text="The date we stopped using this bank account."
     )
 
+    def __str__(self):
+        return f"Account {self.name} (reg. {self.reg_no} account {self.account_no}) in bank {self.bank.name}"
+
     def import_csv(self, csvreader):
         """Import a CSV file with transactions for this bank account.
 
@@ -1051,6 +1054,9 @@ class BankTransaction(CreatedUpdatedUUIDModel):
         decimal_places=2,
         help_text="The balance of the account after this transaction.",
     )
+
+    def __str__(self):
+        return f"Transaction {self.pk} for {self.amount} DKK with the text {self.text} on {self.date} on account {self.bank_account}"
 
     def clean(self):
         """Make sure transactions don't fall outside the bank accounts start and end dates."""

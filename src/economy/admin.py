@@ -1,6 +1,17 @@
 from django.contrib import admin
 
-from .models import Chain, Credebtor, Expense, Pos, PosReport, Reimbursement, Revenue
+from .models import (
+    Bank,
+    BankAccount,
+    BankTransaction,
+    Chain,
+    Credebtor,
+    Expense,
+    Pos,
+    PosReport,
+    Reimbursement,
+    Revenue,
+)
 
 ###############################
 # chains and credebtors
@@ -128,3 +139,32 @@ class PosAdmin(admin.ModelAdmin):
 @admin.register(PosReport)
 class PosReportAdmin(admin.ModelAdmin):
     list_display = ["uuid", "pos"]
+
+
+################################
+# bank
+
+
+@admin.register(Bank)
+class BankAdmin(admin.ModelAdmin):
+    list_display = ["pk", "name"]
+
+
+@admin.register(BankTransaction)
+class BankTransactionAdmin(admin.ModelAdmin):
+    list_display = ["pk", "bank_account", "date", "text", "amount", "balance"]
+    list_filter = ["bank_account"]
+
+
+@admin.register(BankAccount)
+class BankAccountAdmin(admin.ModelAdmin):
+    list_display = [
+        "pk",
+        "bank",
+        "name",
+        "reg_no",
+        "account_no",
+        "start_date",
+        "end_date",
+    ]
+    list_filter = ["bank"]
