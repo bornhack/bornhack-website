@@ -5,6 +5,7 @@
       <th>Date</th>
       <th>Text</th>
       <th>Amount</th>
+      <th>Balance</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -15,6 +16,7 @@
       <td>{{ tx.date }}</td>
       <td>{{ tx.text }}</td>
       <td>{{ tx.amount }}&nbsp;DKK</td>
+      <td>{{ tx.balance }}&nbsp;DKK</td>
       <td>
         <div class="btn-group-vertical">
           <a href="{% url 'backoffice:banktransaction_detail' camp_slug=camp.slug banktransaction_uuid=tx.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
