@@ -18,7 +18,7 @@
       <td>{{ account.reg_no }}</td>
       <td>{{ account.account_no }}</td>
       <td class="text-center"><span class="badge">{{ account.transactions.count }}</span></td>
-      <td>{{ account.transactions.latest.balance }}&nbsp;DKK</td>
+      <td data-order="{{ account.transactions.latest.sortable_balance }}">{{ account.transactions.latest.balance }}&nbsp;DKK</td>
       <td>
         <div class="btn-group-vertical">
           <a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=account.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>

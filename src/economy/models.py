@@ -1073,3 +1073,11 @@ class BankTransaction(CreatedUpdatedUUIDModel):
             raise ValidationError(
                 f"Transaction on {self.date} is after the bank accounts end_date. Transaction text is '{self.text}' and amount is {self.amount}"
             )
+
+    @property
+    def sortable_amount(self):
+        return str(self.amount * 100)
+
+    @property
+    def sortable_balance(self):
+        return str(self.balance * 100)

@@ -13,10 +13,10 @@
     {% for tx in banktransaction_list %}
     <tr>
       <td><a href="{% url 'backoffice:banktransaction_detail' camp_slug=camp.slug banktransaction_uuid=tx.pk %}">{{ tx.pk }}</a></td>
-      <td>{{ tx.date }}</td>
+      <td data-order="{{ tx.date|date:"Ymd" }}">{{ tx.date }}</td>
       <td>{{ tx.text }}</td>
-      <td>{{ tx.amount }}&nbsp;DKK</td>
-      <td>{{ tx.balance }}&nbsp;DKK</td>
+      <td data-order="{{ tx.sortable_amount }}">{{ tx.amount }}&nbsp;DKK</td>
+      <td data-order="{{ tx.sortable_balance }}"mm>{{ tx.balance }}&nbsp;DKK</td>
       <td>
         <div class="btn-group-vertical">
           <a href="{% url 'backoffice:banktransaction_detail' camp_slug=camp.slug banktransaction_uuid=tx.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
