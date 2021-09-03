@@ -1008,7 +1008,12 @@ class BankAccount(CreatedUpdatedUUIDModel):
         """
         cph = pytz.timezone("Europe/Copenhagen")
         create_count = 0
-        for row in csvreader:
+        # Bank csv has the most recent lines first in the file, and the oldest last.
+        # Read lines in reverse so we add the earliest transaction first,
+        # this is important because bank csv transactions are only date stamped,
+        # not time stamped. So we use the creation time of the db record in addition
+        # to the transaction date for sorting.
+        for row in reversed(list(csvreader)):
             # use update_or_create() so we can import a new CSV with the same transactions
             # but with updated descriptions, in case we fix a description in the bank
             tx, created = self.transactions.update_or_create(
