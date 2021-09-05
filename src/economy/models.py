@@ -1157,6 +1157,31 @@ class CoinifyPayout(CreatedUpdatedUUIDModel):
         help_text="The BTC txid (used if this was a BTC payout).",
     )
 
+    def to_dkk(self, amount, currency):
+        """Quick currency conversion to DKK to help sorting."""
+        if currency == "DKK":
+            return amount
+        elif currency == "EUR":
+            return amount * Decimal(7.5)
+        else:
+            # we should handle BTC payouts here if we ever start using them /tyk
+            return amount
+
+    @property
+    def amount_dkk(self):
+        """Convert to DKK to make it possible to sort tables with both EUR and DKK amounts."""
+        return self.to_dkk(self.amount, self.currency)
+
+    @property
+    def fee_dkk(self):
+        """Convert to DKK to make it possible to sort tables with both EUR and DKK amounts."""
+        return self.to_dkk(self.fee, self.currency)
+
+    @property
+    def transferred_dkk(self):
+        """Convert to DKK to make it possible to sort tables with both EUR and DKK amounts."""
+        return self.to_dkk(self.transferred, self.currency)
+
 
 class CoinifyBalance(CreatedUpdatedUUIDModel):
     class Meta:
