@@ -17,10 +17,10 @@
     {% for revenue in revenue_list %}
     <tr>
       <td>{{ revenue.pk }}</td>
-      <td>{{ revenue.invoice_date }}</td>
+      <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
       <td>{{ revenue.user }}</td>
       <td>{{ revenue.debtor }}</td>
-      <td>{{ revenue.amount }} DKK</td>
+      <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
       <td>{{ revenue.description }}</td>
       <td>{{ revenue.responsible_team.name }} Team</td>
       <td>{{ revenue.approval_status }}</td>

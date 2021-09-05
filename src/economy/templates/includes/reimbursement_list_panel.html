@@ -27,7 +27,7 @@
         <td>{{ reim.user }}</td>
         <td>{{ reim.reimbursement_user }}</td>
         <td>{{ reim.notes|default:"N/A" }}</td>
-        <td>{{ reim.amount }} DKK</td>
+        <td data-order="{{ reim.amount }}">{{ reim.amount }} DKK</td>
         <td>{{ reim.paid|truefalseicon }}</td>
         <td>
           {% if request.resolver_match.app_name == "backoffice" %}

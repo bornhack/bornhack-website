@@ -1,3 +1,4 @@
+{% load bornhack %}
 {% if expense_list %}
 <table class="table table-hover datatable">
   <thead>
@@ -27,13 +28,13 @@
       {% else %}
       <td><a href="{% url 'economy:expense_detail' camp_slug=camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
       {% endif %}
-      <td>{{ expense.invoice_date }}</td>
+      <td data-order="{{ expense.invoice_date|sortable }}">{{ expense.invoice_date }}</td>
       <td>{{ expense.user }}</td>
       {% if not reimbursement %}
       <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user }}{% endif %}</td>
       {% endif %}
       <td>{{ expense.creditor.name }}</td>
-      <td>{{ expense.amount }} DKK</td>
+      <td data-order="{{ expense.amount }}">{{ expense.amount }} DKK</td>
       <td>{{ expense.description }}</td>
       <td>{{ expense.responsible_team.name }} Team</td>
 
