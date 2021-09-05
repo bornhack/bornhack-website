@@ -2,11 +2,12 @@
 {% load static %}
 
 {% block title %}
-Reimbursements for {{ camp.title }} | {{ block.super }}
+Reimbursements for {{ camp.title }} | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>Reimbursements for {{ camp.title }}</h2>
+<h2>BackOffice: Reimbursements for {{ camp.title }}</h2>
+<p class="lead">This view shows all existing reimbursements for {{ camp.title }}. Creating a new reimbursement for a user can only be done after the users expenses have been approved. Only unpaid reimbursements can be deleted.</p>
 
 <p>
 <a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
