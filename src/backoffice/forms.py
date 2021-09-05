@@ -104,3 +104,18 @@ class BankCSVForm(forms.Form):
                 help_text=f"CSV file for account '{account.name}'. Leave empty if you don't need to import anything for this account.",
                 required=False,
             )
+
+
+class CoinifyCSVForm(forms.Form):
+    invoices = forms.FileField(
+        help_text="CSV file with Coinify invoices. Leave empty if no invoices need to be imported.",
+        required=False,
+    )
+    payouts = forms.FileField(
+        help_text="CSV file with Coinify payouts. Leave empty if no payouts need to be imported.",
+        required=False,
+    )
+    balances = forms.FileField(
+        help_text="CSV file with Coinify balances. Leave empty if no balances need to be imported.",
+        required=False,
+    )

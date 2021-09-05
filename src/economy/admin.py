@@ -5,6 +5,9 @@ from .models import (
     BankAccount,
     BankTransaction,
     Chain,
+    CoinifyBalance,
+    CoinifyInvoice,
+    CoinifyPayout,
     Credebtor,
     Expense,
     Pos,
@@ -168,3 +171,44 @@ class BankAccountAdmin(admin.ModelAdmin):
         "end_date",
     ]
     list_filter = ["bank"]
+
+
+################################
+# coinify
+
+
+@admin.register(CoinifyInvoice)
+class CoinifyInvoiceAdmin(admin.ModelAdmin):
+    list_display = [
+        "coinify_id",
+        "coinify_id_alpha",
+        "coinify_created",
+        "payment_amount",
+        "payment_currency",
+        "payment_btc_amount",
+        "description",
+        "custom",
+        "credited_amount",
+        "credited_currency",
+        "state",
+        "payment_type",
+        "original_payment_id",
+    ]
+
+
+@admin.register(CoinifyPayout)
+class CoinifyPayoutAdmin(admin.ModelAdmin):
+    list_display = [
+        "coinify_id",
+        "coinify_created",
+        "amount",
+        "fee",
+        "transferred",
+        "currency",
+        "btc_txid",
+    ]
+
+
+@admin.register(CoinifyBalance)
+class CoinifyBalanceAdmin(admin.ModelAdmin):
+    list_display = ["date", "btc", "dkk", "eur"]

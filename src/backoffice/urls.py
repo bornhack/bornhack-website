@@ -21,6 +21,11 @@ from .views import (
     BankTransactionDetailView,
     ChainDetailView,
     ChainListView,
+    CoinifyBalanceListView,
+    CoinifyCSVImportView,
+    CoinifyDashboardView,
+    CoinifyInvoiceListView,
+    CoinifyPayoutListView,
     CredebtorDetailView,
     CreditNoteListView,
     EventDeleteView,
@@ -745,6 +750,38 @@ urlpatterns = [
                                 "<uuid:banktransaction_uuid>/",
                                 BankTransactionDetailView.as_view(),
                                 name="banktransaction_detail",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "coinify/",
+                    include(
+                        [
+                            path(
+                                "",
+                                CoinifyDashboardView.as_view(),
+                                name="coinify_dashboard",
+                            ),
+                            path(
+                                "invoices/",
+                                CoinifyInvoiceListView.as_view(),
+                                name="coinifyinvoice_list",
+                            ),
+                            path(
+                                "payouts/",
+                                CoinifyPayoutListView.as_view(),
+                                name="coinifypayout_list",
+                            ),
+                            path(
+                                "balances/",
+                                CoinifyBalanceListView.as_view(),
+                                name="coinifybalance_list",
+                            ),
+                            path(
+                                "csv_import/",
+                                CoinifyCSVImportView.as_view(),
+                                name="coinify_csv_import",
                             ),
                         ]
                     ),

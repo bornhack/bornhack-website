@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .models import Bank, BankAccount
+from .utils import CoinifyCSVImporter
 
 
 class BankAccountCsvImportTest(TestCase):
@@ -44,3 +45,58 @@ class BankAccountCsvImportTest(TestCase):
             with open("testdata/bank.csv", encoding="utf-8-sig") as f:
                 reader = csv.reader(f, delimiter=";", quotechar='"')
                 created = account.import_csv(reader)
+
+
+class CoinifyCSVImportTest(TestCase):
+    def test_coinify_invoice_csv_import(self):
+        # make sure we create 4 invoices
+        with open(
+            "testdata/coinify-invoices-20200101-20200630.csv", encoding="utf-8-sig"
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
+            self.assertEqual(created, 4)
+
+        # make sure we create 0 invoices if the same csv is imported again
+        with open(
+            "testdata/coinify-invoices-20200101-20200630.csv", encoding="utf-8-sig"
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
+            self.assertEqual(created, 0)
+
+    def test_coinify_payout_csv_import(self):
+        # make sure we create 2 payouts
+        with open(
+            "testdata/coinify-payouts-20210701-20210904.csv", encoding="utf-8-sig"
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
+            self.assertEqual(created, 2)
+
+        # make sure we create 0 payouts if the same csv is imported again
+        with open(
+            "testdata/coinify-payouts-20210701-20210904.csv", encoding="utf-8-sig"
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
+            self.assertEqual(created, 0)
+
+    def test_coinify_balance_csv_import(self):
+        # make sure we create 66 balances
+        with open(
+            "testdata/coinify-account-balances-20210701-20210904.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_balance_csv(reader)
+            self.assertEqual(created, 66)
+
+        # make sure we create 0 balances if the same csv is imported again
+        with open(
+            "testdata/coinify-account-balances-20210701-20210904.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_balance_csv(reader)
+            self.assertEqual(created, 0)

@@ -941,6 +941,10 @@ class PosReport(CampRelatedModel, UUIDModel):
         return balance
 
 
+##################################
+# bank stuff
+
+
 class Bank(CreatedUpdatedUUIDModel):
     """A bank where we have an account."""
 
@@ -1033,7 +1037,8 @@ class BankTransaction(CreatedUpdatedUUIDModel):
     """A BankTransaction represents one movement into or out of the bank account."""
 
     class Meta:
-        # get the latest created on the latest date
+        # include both date and created in the ordering,
+        # (the bank CSV only includes date and not timestamp)
         get_latest_by = ["date", "created"]
         ordering = ["-date", "-created"]
 
@@ -1081,3 +1086,92 @@ class BankTransaction(CreatedUpdatedUUIDModel):
     @property
     def sortable_balance(self):
         return str(self.balance * 100)
+
+
+##################################
+# Coinify stuff
+
+
+class CoinifyInvoice(CreatedUpdatedUUIDModel):
+    """Coinify creates one invoice every time a payment is completed."""
+
+    coinify_id = models.IntegerField(help_text="Coinifys internal ID for this invoice")
+    coinify_id_alpha = models.CharField(
+        max_length=20, help_text="Coinifys other internal ID for this invoice"
+    )
+    coinify_created = models.DateTimeField(help_text="Created datetime in Coinifys end")
+    payment_amount = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The payment amount"
+    )
+    payment_currency = models.CharField(max_length=3, help_text="The payment currency.")
+    payment_btc_amount = models.DecimalField(
+        max_digits=18, decimal_places=8, help_text="The payment amount in BTC."
+    )
+    description = models.TextField(
+        help_text="The text description of this Coinify invoice"
+    )
+    custom = models.JSONField(
+        null=True, blank=True, help_text="Custom JSON data for this invoice"
+    )
+    credited_amount = models.DecimalField(
+        max_digits=18,
+        decimal_places=8,
+        help_text="The amount credited on our Coinify account.",
+    )
+    credited_currency = models.CharField(
+        max_length=3, help_text="The currency of the credited amount."
+    )
+    state = models.CharField(
+        max_length=100, help_text="The state of this Coinify invoice"
+    )
+    payment_type = models.CharField(
+        max_length=100,
+        help_text="The type of payment for this Coinify infoice. Extra means too much was paid on the original payment ID and a new invoice was created instead.",
+    )
+    original_payment_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The original payment id (used when the invoice payment type is 'extra')",
+    )
+
+
+class CoinifyPayout(CreatedUpdatedUUIDModel):
+    coinify_id = models.IntegerField(help_text="Coinifys internal ID for this payout")
+    coinify_created = models.DateTimeField(
+        help_text="Created datetime in Coinifys end for this payout"
+    )
+    amount = models.DecimalField(
+        max_digits=18, decimal_places=8, help_text="The payout amount before fees"
+    )
+    fee = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The payout fee"
+    )
+    transferred = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The transferred amount after fees"
+    )
+    currency = models.CharField(max_length=3, help_text="The payout currency.")
+    btc_txid = models.CharField(
+        max_length=64,
+        null=True,
+        blank=True,
+        help_text="The BTC txid (used if this was a BTC payout).",
+    )
+
+
+class CoinifyBalance(CreatedUpdatedUUIDModel):
+    class Meta:
+        get_latest_by = ["date"]
+        ordering = ["-date"]
+
+    date = models.DateField(
+        unique=True, help_text="The balance was recorded at UTC midnight at this date."
+    )
+    btc = models.DecimalField(
+        max_digits=18, decimal_places=8, help_text="The BTC balance"
+    )
+    dkk = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The DKK balance"
+    )
+    eur = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The EUR balance"
+    )

@@ -14,6 +14,7 @@ from django.views.generic import (
     DetailView,
     FormView,
     ListView,
+    TemplateView,
     UpdateView,
 )
 
@@ -23,13 +24,17 @@ from economy.models import (
     BankAccount,
     BankTransaction,
     Chain,
+    CoinifyBalance,
+    CoinifyInvoice,
+    CoinifyPayout,
     Credebtor,
     Expense,
     Reimbursement,
     Revenue,
 )
+from economy.utils import CoinifyCSVImporter
 
-from ..forms import BankCSVForm
+from ..forms import BankCSVForm, CoinifyCSVForm
 from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -506,3 +511,102 @@ class BankTransactionDetailView(CampViewMixin, EconomyTeamPermissionMixin, Detai
     model = BankTransaction
     template_name = "banktransaction_detail.html"
     pk_url_kwarg = "banktransaction_uuid"
+
+
+################################
+# COINIFY
+
+
+class CoinifyDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateView):
+    template_name = "coinify_dashboard.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        try:
+            latest = CoinifyBalance.objects.latest()
+            context["balance"] = {
+                "when": latest.date,
+                "btc": latest.btc,
+                "eur": latest.eur,
+                "dkk": latest.dkk,
+            }
+        except CoinifyBalance.DoesNotExist:
+            context["balance"] = None
+
+        context["invoices"] = CoinifyInvoice.objects.count()
+        context["payouts"] = CoinifyPayout.objects.count()
+        context["balances"] = CoinifyBalance.objects.count()
+        return context
+
+
+class CoinifyInvoiceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifyInvoice
+    template_name = "coinifyinvoice_list.html"
+
+
+class CoinifyPayoutListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifyPayout
+    template_name = "coinifypayout_list.html"
+
+
+class CoinifyBalanceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifyBalance
+    template_name = "coinifybalance_list.html"
+
+
+class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    form_class = CoinifyCSVForm
+    template_name = "coinify_csv_upload_form.html"
+
+    def form_valid(self, form):
+        if "invoices" in form.files:
+            csvdata = form.files["invoices"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Invoices CSV processed OK. Successfully imported {created} new Coinify invoices.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Invoices CSV processed OK. No new Coinify invoices were created.",
+                )
+
+        if "payouts" in form.files:
+            csvdata = form.files["payouts"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Payouts CSV processed OK. Successfully imported {created} new Coinify payouts.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Payouts CSV processed OK. No new Coinify payouts were created.",
+                )
+
+        if "balances" in form.files:
+            csvdata = form.files["balances"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_balance_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Balances CSV processed OK. Successfully imported {created} new Coinify balances.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Balances CSV processed OK. No new Coinify balances were created.",
+                )
+
+        return redirect(
+            reverse(
+                "backoffice:coinify_dashboard",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )

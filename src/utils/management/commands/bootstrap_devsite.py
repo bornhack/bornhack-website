@@ -18,7 +18,14 @@ from django.utils.crypto import get_random_string
 from faker import Faker
 
 from camps.models import Camp
-from economy.factories import BankAccountFactory, BankFactory, BankTransactionFactory
+from economy.factories import (
+    BankAccountFactory,
+    BankFactory,
+    BankTransactionFactory,
+    CoinifyBalanceFactory,
+    CoinifyInvoiceFactory,
+    CoinifyPayoutFactory,
+)
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from events.models import Routing, Type
 from facilities.models import (
@@ -58,6 +65,7 @@ from utils.slugs import unique_slugify
 from villages.models import Village
 
 fake = Faker()
+# Faker.seed(0)
 tz = pytz.timezone("Europe/Copenhagen")
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -334,6 +342,12 @@ class Command(BaseCommand):
         BankFactory.create_batch(2)
         BankAccountFactory.create_batch(16)
         BankTransactionFactory.create_batch(300)
+
+    def create_coinify_stuff(self):
+        self.output("Creating Coinify invoices, payouts and balances...")
+        CoinifyInvoiceFactory.create_batch(50)
+        CoinifyPayoutFactory.create_batch(10)
+        CoinifyBalanceFactory.create_batch(10)
 
     def create_facility_types(self, camp, teams, options):
         types = {}
@@ -1798,6 +1812,8 @@ class Command(BaseCommand):
         self.create_credebtors()
 
         self.create_bank_stuff()
+
+        self.create_coinify_stuff()
 
         for (camp, read_only) in camps:
             year = camp.camp.lower.year
