@@ -1,0 +1,4 @@
+"Merchantnumber";"Transactionid";"Ordreid";"Valutakode";"Valuta";"Godkendt dato";"Godkendt beløb";"Hævet dato";"Hævet beløb";"Krediteret dato";"Krediteret beløb";"Type (0 = produktion / 1 = test)";"Svindelkontrol (1 = ja)";"KorttypeID";"Korttype";"Bogført (1 = ja)";"Kortholder";"Beskrivelse";"Transaktionsgebyr";"Group";"Betalingskort"
+"1024488";"284515089";"2450";"208";"DKK";"2021-01-03 17:46:00";"1200.00";"2021-01-03 17:46:00";"1200.00";"";"0.00";"0";"0";"5";"Mastercard (udenlandsk)";"1";"";"Order #2450";"0.00";"";"123456XXXXXX1234"
+"1024488";"285364930";"3122";"208";"DKK";"2021-01-11 11:58:00";"1200.00";"2021-01-11 11:58:00";"1200.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #3122";"0.00";"";"123456XXXXXX4321"
+"1024488";"285659431";"1234";"208";"DKK";"2021-01-14 10:27:00";"900.00";"2021-01-14 10:27:00";"900.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #1234";"0.00";"";"987654XXXXXX9876"

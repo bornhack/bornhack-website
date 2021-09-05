@@ -28,6 +28,8 @@ from .views import (
     CoinifyPayoutListView,
     CredebtorDetailView,
     CreditNoteListView,
+    EpayCSVImportView,
+    EpayTransactionListView,
     EventDeleteView,
     EventDetailView,
     EventListView,
@@ -782,6 +784,23 @@ urlpatterns = [
                                 "csv_import/",
                                 CoinifyCSVImportView.as_view(),
                                 name="coinify_csv_import",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "epay/",
+                    include(
+                        [
+                            path(
+                                "",
+                                EpayTransactionListView.as_view(),
+                                name="epaytransaction_list",
+                            ),
+                            path(
+                                "csv_import/",
+                                EpayCSVImportView.as_view(),
+                                name="epay_csv_import",
                             ),
                         ]
                     ),

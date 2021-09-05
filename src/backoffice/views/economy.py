@@ -28,13 +28,14 @@ from economy.models import (
     CoinifyInvoice,
     CoinifyPayout,
     Credebtor,
+    EpayTransaction,
     Expense,
     Reimbursement,
     Revenue,
 )
-from economy.utils import CoinifyCSVImporter
+from economy.utils import CoinifyCSVImporter, import_epay_csv
 
-from ..forms import BankCSVForm, CoinifyCSVForm
+from ..forms import BankCSVForm, CoinifyCSVForm, EpayCSVForm
 from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -607,6 +608,43 @@ class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
         return redirect(
             reverse(
                 "backoffice:coinify_dashboard",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )
+
+
+################################
+# EPAY / BAMBORA
+
+
+class EpayTransactionListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = EpayTransaction
+    template_name = "epaytransaction_list.html"
+
+
+class EpayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    form_class = EpayCSVForm
+    template_name = "epay_csv_upload_form.html"
+
+    def form_valid(self, form):
+        if "transactions" in form.files:
+            csvdata = form.files["transactions"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=";", quotechar='"')
+            created = import_epay_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"ePay Transactions CSV processed OK. Successfully imported {created} new ePay Transactions.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "ePay Transactions CSV processed OK. No new ePay Transactions were created.",
+                )
+
+        return redirect(
+            reverse(
+                "backoffice:epaytransaction_list",
                 kwargs={"camp_slug": self.camp.slug},
             )
         )

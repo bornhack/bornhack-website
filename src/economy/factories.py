@@ -8,6 +8,7 @@ from .models import (
     CoinifyBalance,
     CoinifyInvoice,
     CoinifyPayout,
+    EpayTransaction,
 )
 
 
@@ -95,3 +96,37 @@ class CoinifyBalanceFactory(factory.django.DjangoModelFactory):
     btc = factory.Faker("pydecimal", right_digits=8, min_value=1, max_value=4)
     dkk = factory.Faker("pydecimal", right_digits=2, min_value=100, max_value=10000)
     eur = factory.Faker("pydecimal", right_digits=2, min_value=100, max_value=10000)
+
+
+class EpayTransactionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = EpayTransaction
+
+    merchant_id = "1024488"
+    transaction_id = factory.Faker("random_int", min=100000, max=200000)
+    order_id = factory.Faker("random_int", min=1000, max=2000)
+    currency = "DKK"
+    auth_date = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    auth_amount = factory.Faker(
+        "pydecimal", right_digits=2, min_value=500, max_value=3000
+    )
+    captured_date = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    captured_amount = factory.Faker(
+        "pydecimal", right_digits=2, min_value=500, max_value=3000
+    )
+    card_type = factory.Faker(
+        "random_element",
+        elements=[
+            "Mastercard (udenlandsk)",
+            "Visa/Electron (udenlandsk)",
+            "Mastercard",
+        ],
+    )
+    description = factory.Faker("sentence")
+    transaction_fee = factory.Faker(
+        "pydecimal", right_digits=2, min_value=2, max_value=5
+    )

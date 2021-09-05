@@ -1212,3 +1212,45 @@ class CoinifyBalance(CreatedUpdatedUUIDModel):
     eur = models.DecimalField(
         max_digits=12, decimal_places=2, help_text="The EUR balance"
     )
+
+
+##################################
+# ePay / Bambora stuff
+
+
+class EpayTransaction(CreatedUpdatedUUIDModel):
+    """ePay creates a transaction every time a card payment is completed through them."""
+
+    class Meta:
+        get_latest_by = ["auth_date"]
+        ordering = ["-auth_date"]
+
+    merchant_id = models.IntegerField(
+        help_text="ePay merchant number for this transaction."
+    )
+    transaction_id = models.IntegerField(help_text="ePays internal transaction ID.")
+    order_id = models.IntegerField(
+        help_text="The BornHack order ID for this ePay transaction."
+    )
+    currency = models.CharField(max_length=3, help_text="The currency of this payment.")
+    auth_date = models.DateTimeField(
+        help_text="The date this payment was authorised by the user."
+    )
+    auth_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount that was authorised by the user.",
+    )
+    captured_date = models.DateTimeField(
+        help_text="The date this payment was captured."
+    )
+    captured_amount = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The amount that was captured."
+    )
+    card_type = models.TextField(help_text="The card type used for this payment.")
+    description = models.TextField(help_text="The description of this payment.")
+    transaction_fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The transaction fee for this payment.",
+    )

@@ -25,6 +25,7 @@ from economy.factories import (
     CoinifyBalanceFactory,
     CoinifyInvoiceFactory,
     CoinifyPayoutFactory,
+    EpayTransactionFactory,
 )
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from events.models import Routing, Type
@@ -348,6 +349,10 @@ class Command(BaseCommand):
         CoinifyInvoiceFactory.create_batch(50)
         CoinifyPayoutFactory.create_batch(10)
         CoinifyBalanceFactory.create_batch(10)
+
+    def create_epay_transactions(self):
+        self.output("Creating ePay Transactions...")
+        EpayTransactionFactory.create_batch(50)
 
     def create_facility_types(self, camp, teams, options):
         types = {}
@@ -1440,7 +1445,8 @@ class Command(BaseCommand):
         # economy team also gets a member
         TeamMember.objects.create(
             team=teams["economy"],
-            user=random.choice(users),
+            user=users[0],
+            responsible=True,
             approved=True,
         )
         return memberships
@@ -1814,6 +1820,8 @@ class Command(BaseCommand):
         self.create_bank_stuff()
 
         self.create_coinify_stuff()
+
+        self.create_epay_transactions()
 
         for (camp, read_only) in camps:
             year = camp.camp.lower.year

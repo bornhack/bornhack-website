@@ -119,3 +119,9 @@ class CoinifyCSVForm(forms.Form):
         help_text="CSV file with Coinify balances. Leave empty if no balances need to be imported.",
         required=False,
     )
+
+
+class EpayCSVForm(forms.Form):
+    transactions = forms.FileField(
+        help_text="CSV file with ePay / Bambora transactions.",
+    )

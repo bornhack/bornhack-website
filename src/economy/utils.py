@@ -1,9 +1,56 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pytz
 from django.utils import timezone
 
-from economy.models import CoinifyBalance, CoinifyInvoice, CoinifyPayout
+from economy.models import (
+    CoinifyBalance,
+    CoinifyInvoice,
+    CoinifyPayout,
+    EpayTransaction,
+)
+
+
+def import_epay_csv(csvreader):
+    """Import an ePay CSV file. Assumes a CSV structure like this:
+
+    "Merchantnumber";"Transactionid";"Ordreid";"Valutakode";"Valuta";"Godkendt dato";"Godkendt beløb";"Hævet dato";"Hævet beløb";"Krediteret dato";"Krediteret beløb";"Type (0 = produktion / 1 = test)";"Svindelkontrol (1 = ja)";"KorttypeID";"Korttype";"Bogført (1 = ja)";"Kortholder";"Beskrivelse";"Transaktionsgebyr";"Group";"Betalingskort"
+    "1024488";"284515089";"2450";"208";"DKK";"2021-01-03 17:46:00";"1200.00";"2021-01-03 17:46:00";"1200.00";"";"0.00";"0";"0";"5";"Mastercard (udenlandsk)";"1";"";"Order #2450";"0.00";"";"123456XXXXXX1234"
+    "1024488";"285364930";"3122";"208";"DKK";"2021-01-11 11:58:00";"1200.00";"2021-01-11 11:58:00";"1200.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #3122";"0.00";"";"123456XXXXXX4321"
+    "1024488";"285659431";"1234";"208";"DKK";"2021-01-14 10:27:00";"900.00";"2021-01-14 10:27:00";"900.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #1234";"0.00";"";"987654XXXXXX9876"
+
+    Not all columns are imported. ePay CSV dialect includes a header line, is semicolon seperated, and uses "" for quoting.
+
+    This function expects an initiated csvreader object, or alternatively some other iterable with the data in the right index locations.
+    """
+    cph = pytz.timezone("Europe/Copenhagen")
+    create_count = 0
+    # skip header row
+    next(csvreader)
+    for row in csvreader:
+        et, created = EpayTransaction.objects.get_or_create(
+            merchant_id=row[0],
+            transaction_id=row[1],
+            order_id=row[2],
+            currency=row[4],
+            auth_date=timezone.make_aware(
+                datetime.strptime(row[5], "%Y-%m-%d %H:%M:%S"),
+                timezone=cph,
+            ),
+            auth_amount=Decimal(row[6]),
+            captured_date=timezone.make_aware(
+                datetime.strptime(row[7], "%Y-%m-%d %H:%M:%S"),
+                timezone=cph,
+            ),
+            captured_amount=Decimal(row[8]),
+            card_type=row[14],
+            description=row[17],
+            transaction_fee=row[18],
+        )
+        if created:
+            create_count += 1
+    return create_count
 
 
 class CoinifyCSVImporter:

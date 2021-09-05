@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .models import Bank, BankAccount
-from .utils import CoinifyCSVImporter
+from .utils import CoinifyCSVImporter, import_epay_csv
 
 
 class BankAccountCsvImportTest(TestCase):
@@ -99,4 +99,19 @@ class CoinifyCSVImportTest(TestCase):
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_balance_csv(reader)
+            self.assertEqual(created, 0)
+
+
+class EpayCSVImportTest(TestCase):
+    def test_epay_csv_import(self):
+        # make sure we create 4 epay transactions
+        with open("testdata/epay_test.csv", encoding="utf-8-sig") as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = import_epay_csv(reader)
+            self.assertEqual(created, 3)
+
+        # make sure we create 0 if the same csv is imported again
+        with open("testdata/epay_test.csv", encoding="utf-8-sig") as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = import_epay_csv(reader)
             self.assertEqual(created, 0)

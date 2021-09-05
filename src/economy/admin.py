@@ -9,6 +9,7 @@ from .models import (
     CoinifyInvoice,
     CoinifyPayout,
     Credebtor,
+    EpayTransaction,
     Expense,
     Pos,
     PosReport,
@@ -212,3 +213,25 @@ class CoinifyPayoutAdmin(admin.ModelAdmin):
 @admin.register(CoinifyBalance)
 class CoinifyBalanceAdmin(admin.ModelAdmin):
     list_display = ["date", "btc", "dkk", "eur"]
+
+
+################################
+# epay
+
+
+@admin.register(EpayTransaction)
+class EpayTransactionAdmin(admin.ModelAdmin):
+    list_display = [
+        "transaction_id",
+        "order_id",
+        "currency",
+        "auth_date",
+        "auth_amount",
+        "captured_date",
+        "captured_amount",
+        "card_type",
+        "description",
+        "transaction_fee",
+    ]
+    list_filter = ["card_type"]
+    search_fields = ["description"]
