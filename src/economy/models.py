@@ -1095,6 +1095,10 @@ class BankTransaction(CreatedUpdatedUUIDModel):
 class CoinifyInvoice(CreatedUpdatedUUIDModel):
     """Coinify creates one invoice every time a payment is completed."""
 
+    class Meta:
+        get_latest_by = ["coinify_created"]
+        ordering = ["-coinify_created"]
+
     coinify_id = models.IntegerField(help_text="Coinifys internal ID for this invoice")
     coinify_id_alpha = models.CharField(
         max_length=20, help_text="Coinifys other internal ID for this invoice"
@@ -1136,6 +1140,12 @@ class CoinifyInvoice(CreatedUpdatedUUIDModel):
 
 
 class CoinifyPayout(CreatedUpdatedUUIDModel):
+    """Coinify makes a payout every time our balance exceeds some preset amount in their end."""
+
+    class Meta:
+        get_latest_by = ["coinify_created"]
+        ordering = ["-coinify_created"]
+
     coinify_id = models.IntegerField(help_text="Coinifys internal ID for this payout")
     coinify_created = models.DateTimeField(
         help_text="Created datetime in Coinifys end for this payout"
@@ -1184,6 +1194,8 @@ class CoinifyPayout(CreatedUpdatedUUIDModel):
 
 
 class CoinifyBalance(CreatedUpdatedUUIDModel):
+    """Coinify balance objects show our balance in Coinifys end at UTC midnight daily."""
+
     class Meta:
         get_latest_by = ["date"]
         ordering = ["-date"]
