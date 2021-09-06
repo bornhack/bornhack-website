@@ -24,7 +24,7 @@
       <td data-order="{{ et.captured_amount }}">{{ et.captured_amount }}&nbsp;{{ et.currency }}</td>
       <td>{{ et.card_type }}</td>
       <td>{{ et.description }}</td>
-      <td>{{ et.transaction_fee }}&nbsp;{{ et.currency }}</td>
+      <td data-order="{{ et.transaction_fee }}">{{ et.transaction_fee }}&nbsp;{{ et.currency }}</td>
     </tr>
     {% endfor %}
   </tbody>
