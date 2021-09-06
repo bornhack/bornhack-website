@@ -15,10 +15,10 @@ from economy.models import (
 def import_epay_csv(csvreader):
     """Import an ePay CSV file. Assumes a CSV structure like this:
 
-    "Merchantnumber";"Transactionid";"Ordreid";"Valutakode";"Valuta";"Godkendt dato";"Godkendt beløb";"Hævet dato";"Hævet beløb";"Krediteret dato";"Krediteret beløb";"Type (0 = produktion / 1 = test)";"Svindelkontrol (1 = ja)";"KorttypeID";"Korttype";"Bogført (1 = ja)";"Kortholder";"Beskrivelse";"Transaktionsgebyr";"Group";"Betalingskort"
-    "1024488";"284515089";"2450";"208";"DKK";"2021-01-03 17:46:00";"1200.00";"2021-01-03 17:46:00";"1200.00";"";"0.00";"0";"0";"5";"Mastercard (udenlandsk)";"1";"";"Order #2450";"0.00";"";"123456XXXXXX1234"
-    "1024488";"285364930";"3122";"208";"DKK";"2021-01-11 11:58:00";"1200.00";"2021-01-11 11:58:00";"1200.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #3122";"0.00";"";"123456XXXXXX4321"
-    "1024488";"285659431";"1234";"208";"DKK";"2021-01-14 10:27:00";"900.00";"2021-01-14 10:27:00";"900.00";"";"0.00";"0";"0";"3";"Visa/Electron (udenlandsk)";"1";"";"Order #1234";"0.00";"";"987654XXXXXX9876"
+    "transactionID";"status";"merchantnumber";"orderID";"authamount";"currency";"authdate";"cardtypeID";"CompanyTransactionGroupID";"testTransaction";"FraudControl";"description";"CardHolder";"cardname";"display_short_name";"transaction_group_name";"CurrencyCodeA";"MinorUnit";"CurrencyName";"capturedamount";"creditedAmount";"capturedDate";"creditedDate";"isBooked";"fee";"tcardnumber";"authReferenceNumber"
+    "212670400";"2";"1024488";"123";"1200.00";"208";"14-05-2019 19:37";"2";"0";"0";"0";"Order #123";"";"Visa/Dankort";"Visa/Dankort";"";"DKK";"2";"Danish Krone";"1200.00";"0.00";"14-05-2019 19:37";"";"1";"0.00";"098765XXXXXX0987";"20000"
+    "213652781";"2";"1024488";"456";"1337.00";"208";"22-05-2019 17:58";"5";"0";"0";"0";"Order #456";"";"Mastercard (udenlandsk)";"MASTERCARD";"";"DKK";"2";"Danish Krone";"1337.00";"0.00";"22-05-2019 17:58";"";"1";"0.00";"543210XXXXXX4321";"20000"
+    "214301864";"2";"1024488";"789";"1200.00";"208";"27-05-2019 21:31";"3";"0";"0";"0";"Order #789";"";"Visa/Electron (udenlandsk)";"VISA/ELECTRON";"";"DKK";"2";"Danish Krone";"1200.00";"0.00";"27-05-2019 21:31";"";"1";"0.00";"123456XXXXXX1234";"20000"
 
     Not all columns are imported. ePay CSV dialect includes a header line, is semicolon seperated, and uses "" for quoting.
 
@@ -30,23 +30,23 @@ def import_epay_csv(csvreader):
     next(csvreader)
     for row in csvreader:
         et, created = EpayTransaction.objects.get_or_create(
-            merchant_id=row[0],
-            transaction_id=row[1],
-            order_id=row[2],
-            currency=row[4],
+            transaction_id=row[0],
+            merchant_id=row[2],
+            order_id=row[3],
+            auth_amount=Decimal(row[4]),
+            currency=row[16],
             auth_date=timezone.make_aware(
-                datetime.strptime(row[5], "%Y-%m-%d %H:%M:%S"),
+                datetime.strptime(row[6], "%d-%m-%Y %H:%M"),
                 timezone=cph,
             ),
-            auth_amount=Decimal(row[6]),
+            description=row[11],
+            card_type=row[13],
+            captured_amount=Decimal(row[19]),
             captured_date=timezone.make_aware(
-                datetime.strptime(row[7], "%Y-%m-%d %H:%M:%S"),
+                datetime.strptime(row[21], "%d-%m-%Y %H:%M"),
                 timezone=cph,
             ),
-            captured_amount=Decimal(row[8]),
-            card_type=row[14],
-            description=row[17],
-            transaction_fee=row[18],
+            transaction_fee=row[24],
         )
         if created:
             create_count += 1
