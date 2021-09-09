@@ -43,7 +43,7 @@ jobs:
           pip install -r src/requirements/dev.txt
       - name: Install system dependencies
         run: |
-          apt install -y libgdal-dev libpq-dev
+          sudo apt-get install -y libgdal-dev libpq-dev
       - name: Copy settings
         run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
       - name: Run tests
