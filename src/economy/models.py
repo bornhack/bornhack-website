@@ -1259,6 +1259,10 @@ class EpayTransaction(CreatedUpdatedUUIDModel):
 class ClearhausSettlement(CreatedUpdatedUUIDModel):
     """Clearhaus creates a settlement (meaning they transfer money to us) weekly (if our balance is > 0)."""
 
+    class Meta:
+        get_latest_by = ["period_start_date"]
+        ordering = ["-period_start_date"]
+
     merchant_id = models.IntegerField(help_text="The merchant ID in Clearhaus systems")
     merchant_name = models.CharField(
         max_length=255, help_text="The merchant name in Clearhaus systems"

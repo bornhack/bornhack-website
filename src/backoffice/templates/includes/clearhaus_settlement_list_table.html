@@ -17,7 +17,7 @@
     {% for cs in clearhaussettlement_list %}
     <tr>
       <td><a href="{% url 'backoffice:clearhaussettlement_detail' camp_slug=camp.slug settlement_uuid=cs.pk %}">{{ cs.pk }}</a></td>
-      <td>{{ cs.settled|truefalseicon }}</td>
+      <td data-order="{{ cs.settled }}">{{ cs.settled|truefalseicon }}</td>
       <td data-order="{{ cs.period_start_date|date:"Ymd" }}">{{ cs.period_start_date }}</td>
       <td data-order="{{ cs.period_end_date|date:"Ymd" }}">{{ cs.period_end_date }}</td>
       <td data-order="{{ cs.payout_amount }}">{{ cs.payout_amount }}&nbsp;{{ cs.currency }}</td>
