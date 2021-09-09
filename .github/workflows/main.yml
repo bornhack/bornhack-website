@@ -24,12 +24,6 @@ jobs:
         env:
           POSTGRES_USER: bornhack
           POSTGRES_PASSWORD: bornhack
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
