@@ -19,7 +19,7 @@ DATABASES = {
         "USER": os.getenv("POSTGRES_USER", "bornhack"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "bornhack"),
         "HOST": os.getenv("POSTGRES_HOST", "localhost"),
-        #"PORT": 5433,
+        "PORT": os.getenv("POSTGRES_PORT", "5432"),
     }
 }
 DEBUG = True
