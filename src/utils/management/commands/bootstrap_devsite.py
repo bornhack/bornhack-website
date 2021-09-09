@@ -22,6 +22,7 @@ from economy.factories import (
     BankAccountFactory,
     BankFactory,
     BankTransactionFactory,
+    ClearhausSettlementFactory,
     CoinifyBalanceFactory,
     CoinifyInvoiceFactory,
     CoinifyPayoutFactory,
@@ -337,6 +338,10 @@ class Command(BaseCommand):
             feedback="No power", icon="fas fa-bolt"
         )
         return options
+
+    def create_clearhaus_settlements(self):
+        self.output("Creating Clearhaus Settlements...")
+        ClearhausSettlementFactory.create_batch(50)
 
     def create_bank_stuff(self):
         self.output("Creating Banks, BankAccounts, and BankTransactions...")
@@ -1814,6 +1819,8 @@ class Command(BaseCommand):
         global_products = self.create_global_products(product_categories)
 
         quickfeedback_options = self.create_quickfeedback_options()
+
+        self.create_clearhaus_settlements()
 
         self.create_credebtors()
 

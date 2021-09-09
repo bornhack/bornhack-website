@@ -125,3 +125,9 @@ class EpayCSVForm(forms.Form):
     transactions = forms.FileField(
         help_text="CSV file with ePay / Bambora transactions.",
     )
+
+
+class ClearhausSettlementForm(forms.Form):
+    settlements = forms.FileField(
+        help_text="CSV file with Clearhaus Settlements. Importing the same settlements again will update values without creating duplicates.",
+    )

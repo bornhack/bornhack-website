@@ -24,6 +24,7 @@ from economy.models import (
     BankAccount,
     BankTransaction,
     Chain,
+    ClearhausSettlement,
     CoinifyBalance,
     CoinifyInvoice,
     CoinifyPayout,
@@ -33,9 +34,9 @@ from economy.models import (
     Reimbursement,
     Revenue,
 )
-from economy.utils import CoinifyCSVImporter, import_epay_csv
+from economy.utils import CoinifyCSVImporter, import_clearhaus_csv, import_epay_csv
 
-from ..forms import BankCSVForm, CoinifyCSVForm, EpayCSVForm
+from ..forms import BankCSVForm, ClearhausSettlementForm, CoinifyCSVForm, EpayCSVForm
 from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -614,7 +615,7 @@ class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
 
 
 ################################
-# EPAY / BAMBORA
+# EPAY / BAMBORA / CLEARHAUS
 
 
 class EpayTransactionListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
@@ -645,6 +646,50 @@ class EpayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
         return redirect(
             reverse(
                 "backoffice:epaytransaction_list",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )
+
+
+class ClearhausSettlementListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = ClearhausSettlement
+    template_name = "clearhaus_settlement_list.html"
+
+
+class ClearhausSettlementDetailView(
+    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+):
+    model = ClearhausSettlement
+    template_name = "clearhaus_settlement_detail.html"
+    pk_url_kwarg = "settlement_uuid"
+    context_object_name = "cs"
+
+
+class ClearhausSettlementImportView(
+    CampViewMixin, EconomyTeamPermissionMixin, FormView
+):
+    form_class = ClearhausSettlementForm
+    template_name = "clearhaus_csv_upload_form.html"
+
+    def form_valid(self, form):
+        if "settlements" in form.files:
+            csvdata = form.files["settlements"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = import_clearhaus_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Clearhaus Settlements CSV processed OK. Successfully imported {created} new Clearhaus Settlements.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Clearhaus Settlements CSV processed OK. No new Clearhaus Settlements created, but some might have been updated.",
+                )
+
+        return redirect(
+            reverse(
+                "backoffice:clearhaussettlement_list",
                 kwargs={"camp_slug": self.camp.slug},
             )
         )

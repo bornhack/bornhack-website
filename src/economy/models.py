@@ -1215,7 +1215,7 @@ class CoinifyBalance(CreatedUpdatedUUIDModel):
 
 
 ##################################
-# ePay / Bambora stuff
+# ePay / Bambora and Clearhaus stuff
 
 
 class EpayTransaction(CreatedUpdatedUUIDModel):
@@ -1253,4 +1253,152 @@ class EpayTransaction(CreatedUpdatedUUIDModel):
         max_digits=12,
         decimal_places=2,
         help_text="The transaction fee for this payment.",
+    )
+
+
+class ClearhausSettlement(CreatedUpdatedUUIDModel):
+    """Clearhaus creates a settlement (meaning they transfer money to us) weekly (if our balance is > 0)."""
+
+    merchant_id = models.IntegerField(help_text="The merchant ID in Clearhaus systems")
+    merchant_name = models.CharField(
+        max_length=255, help_text="The merchant name in Clearhaus systems"
+    )
+    clearhaus_uuid = models.UUIDField(
+        help_text="The Clearhaus UUID for this settlement."
+    )
+    settled = models.BooleanField(
+        help_text="True if the settlement has been paid out, False if not."
+    )
+    currency = models.CharField(
+        max_length=3, help_text="The currency of this settlement."
+    )
+    period_start_date = models.DateField(
+        help_text="The first date of the period this settlement covers."
+    )
+    period_end_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="The final date of the period this settlement covers. Can be empty if the period is still ongoing.",
+    )
+    payout_amount = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount that was paid out in this settlement. Can be empty if the settlement has not been paid out yet.",
+    )
+    payout_date = models.DateField(
+        null=True, blank=True, help_text="The date this settlement was paid out."
+    )
+    summary_sales = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The summary sales for this period"
+    )
+    summary_credits = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The summary credits for this period"
+    )
+    summary_refunds = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The summary refunds for this period"
+    )
+    summary_chargebacks = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary chargebacks for this period",
+    )
+    summary_fees = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The summary fees for this period"
+    )
+    summary_other_postings = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary other postings for this period",
+    )
+    summary_net = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary net (total) for this period",
+    )
+    reserve_amount = models.DecimalField(
+        null=True,
+        blank=True,
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount that has been reserved for later payout. Can be empty if nothing has been reserved for this period.",
+    )
+    reserve_date = models.DateField(
+        null=True,
+        blank=True,
+        help_text="The date the reserve for this period will be paid out.",
+    )
+    fees_sales = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The fees for sales for this period"
+    )
+    fees_refunds = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for refunds for this period",
+    )
+    fees_authorisations = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for authorisations for this period",
+    )
+    fees_credits = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for credits for this period",
+    )
+    fees_minimum_processing = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for minimum processing for this period",
+    )
+    fees_service = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for service for this period",
+    )
+    fees_wire_transfer = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for wire transfers for this period",
+    )
+    fees_chargebacks = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for chargebacks for this period",
+    )
+    fees_retrieval_requests = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for retrieval requests for this period",
+    )
+    payout_reference_number = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="The Clearhaus reference number for the payout of this settlement. Can be empty if the settlement has not been paid out yet.",
+    )
+    payout_descriptor = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        help_text="The Clearhaus descriptor for the payout of this settlement. Can be empty if the settlement has not been paid out yet.",
+    )
+    reserve_reference_number = models.BigIntegerField(
+        null=True,
+        blank=True,
+        help_text="The Clearhaus reference number for the payout of the reserve of this settlement. Can be empty if there is no reserve or it the reserve has not been paid out yet.",
+    )
+    reserve_descriptor = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        help_text="The Clearhaus descriptor for the payout of the reserve of this settlement. Can be empty if the settlement has no reserve, or the reserve has not been paid out yet.",
+    )
+    fees_interchange = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for interchange for this period",
+    )
+    fees_scheme = models.DecimalField(
+        max_digits=12, decimal_places=2, help_text="The fees for scheme for this period"
     )

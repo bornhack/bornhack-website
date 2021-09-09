@@ -5,6 +5,7 @@ from .models import (
     Bank,
     BankAccount,
     BankTransaction,
+    ClearhausSettlement,
     CoinifyBalance,
     CoinifyInvoice,
     CoinifyPayout,
@@ -129,4 +130,83 @@ class EpayTransactionFactory(factory.django.DjangoModelFactory):
     description = factory.Faker("sentence")
     transaction_fee = factory.Faker(
         "pydecimal", right_digits=2, min_value=2, max_value=5
+    )
+
+
+class ClearhausSettlementFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ClearhausSettlement
+
+    merchant_id = "2003656"
+    merchant_name = "BornHack IVS"
+    clearhaus_uuid = factory.Faker("uuid4")
+    settled = factory.Faker("random_element", elements=[True, True, True, False])
+    currency = "DKK"
+    period_start_date = factory.Faker("date_between", start_date="-6y")
+    period_end_date = factory.Faker("date_between", start_date="-6y")
+    payout_amount = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    payout_date = factory.Faker("date_between", start_date="-6y")
+    summary_sales = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_credits = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_refunds = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_chargebacks = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_fees = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_other_postings = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    summary_net = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    reserve_amount = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    reserve_date = factory.Faker("date_between", start_date="-6y")
+    fees_sales = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_refunds = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_authorisations = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_credits = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_minimum_processing = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_service = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_wire_transfer = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_chargebacks = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_retrieval_requests = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    payout_reference_number = factory.Faker("random_int", min=100000, max=200000)
+    payout_descriptor = factory.Faker("sentence")
+    reserve_reference_number = factory.Faker("random_int", min=100000, max=200000)
+    reserve_descriptor = factory.Faker("sentence")
+    fees_interchange = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
+    )
+    fees_scheme = factory.Faker(
+        "pydecimal", right_digits=2, min_value=100, max_value=20000
     )

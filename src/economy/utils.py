@@ -5,6 +5,7 @@ import pytz
 from django.utils import timezone
 
 from economy.models import (
+    ClearhausSettlement,
     CoinifyBalance,
     CoinifyInvoice,
     CoinifyPayout,
@@ -167,3 +168,62 @@ class CoinifyCSVImporter:
             if created:
                 create_count += 1
         return create_count
+
+
+def import_clearhaus_csv(csvreader):
+    """Import a Clearhaus settlements CSV file. Assumes a CSV structure like this:
+
+    "merchant_id","merchant_name","id","settled","currency","period_start_date","period_end_date","payout_amount","payout_date","summary_sales","summary_credits","summary_refunds","summary_chargebacks","summary_fees","summary_other_postings","summary_net","reserve_amount","reserve_date","fees_sales","fees_refunds","fees_authorisations","fees_credits","fees_minimum_processing","fees_service","fees_wire_transfer","fees_chargebacks","fees_retrieval_requests","payout_reference_number","payout_descriptor","reserve_reference_number","reserve_descriptor","fees_interchange","fees_scheme"
+    "1234567","BornHack IVS","abcdef09-1234-5678-90ab-987654332102","false","DKK","2021-08-31","","","","0.00","0.00","0.00","0.00","0.00","0.00","0.00","","","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","","","","","0.00","0.00"
+    "1234567","BornHack IVS","abcdef19-1234-5678-90ab-987654332105","true","DKK","2021-08-24","2021-08-30","985.50","2021-09-02","1000.00","0.00","0.00","0.00","-14.50","0.00","985.50","","","-14.50","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","1234567808","CH1234567 2021-09-02","","","0.00","0.00"
+    "1234567","BornHack IVS","abcdef29-1234-5678-90ab-987654332104","true","DKK","2021-08-17","2021-08-23","39018.54","2021-08-26","39807.51","0.00","0.00","0.00","-788.97","0.00","39018.54","","","-788.97","0.00","0.00","0.00","0.00","0.00","0.00","0.00","0.00","1234567899","CH1234567 2021-08-26","","","0.00","0.00"
+
+    All columns are imported. Clearhaus CSV dialect includes a header line, is comma seperated, and uses "" for quoting.
+
+    This function expects an initiated csvreader object, or alternatively some other iterable with the data in the right index locations.
+    """
+    create_count = 0
+    # skip header row
+    next(csvreader)
+    for row in csvreader:
+        # use create_or_update() so we can import CSV with the same settlements and update stuff like payout_date
+        cs, created = ClearhausSettlement.objects.update_or_create(
+            clearhaus_uuid=row[2],
+            defaults={
+                "merchant_id": row[0],
+                "merchant_name": row[1],
+                "settled": True if row[3] == "true" else "False",
+                "currency": row[4],
+                "period_start_date": row[5],
+                "period_end_date": row[6] if row[6] else None,
+                "payout_amount": Decimal(row[7]) if row[7] else None,
+                "payout_date": row[8] if row[8] else None,
+                "summary_sales": Decimal(row[9]),
+                "summary_credits": Decimal(row[10]),
+                "summary_refunds": Decimal(row[11]),
+                "summary_chargebacks": Decimal(row[12]),
+                "summary_fees": Decimal(row[13]),
+                "summary_other_postings": Decimal(row[14]),
+                "summary_net": Decimal(row[15]),
+                "reserve_amount": Decimal(row[16]) if row[16] else None,
+                "reserve_date": row[17] if row[17] else None,
+                "fees_sales": Decimal(row[18]),
+                "fees_refunds": Decimal(row[19]),
+                "fees_authorisations": Decimal(row[20]),
+                "fees_credits": Decimal(row[21]),
+                "fees_minimum_processing": Decimal(row[22]),
+                "fees_service": Decimal(row[23]),
+                "fees_wire_transfer": Decimal(row[24]),
+                "fees_chargebacks": Decimal(row[25]),
+                "fees_retrieval_requests": Decimal(row[26]),
+                "payout_reference_number": row[27] if row[27] else None,
+                "payout_descriptor": row[28] if row[28] else None,
+                "reserve_reference_number": row[29] if row[29] else None,
+                "reserve_descriptor": row[30] if row[30] else None,
+                "fees_interchange": Decimal(row[31]),
+                "fees_scheme": Decimal(row[32]),
+            },
+        )
+        if created:
+            create_count += 1
+    return create_count

@@ -21,6 +21,9 @@ from .views import (
     BankTransactionDetailView,
     ChainDetailView,
     ChainListView,
+    ClearhausSettlementDetailView,
+    ClearhausSettlementImportView,
+    ClearhausSettlementListView,
     CoinifyBalanceListView,
     CoinifyCSVImportView,
     CoinifyDashboardView,
@@ -801,6 +804,28 @@ urlpatterns = [
                                 "csv_import/",
                                 EpayCSVImportView.as_view(),
                                 name="epay_csv_import",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "clearhaus/",
+                    include(
+                        [
+                            path(
+                                "",
+                                ClearhausSettlementListView.as_view(),
+                                name="clearhaussettlement_list",
+                            ),
+                            path(
+                                "csv_import/",
+                                ClearhausSettlementImportView.as_view(),
+                                name="clearhaus_csv_import",
+                            ),
+                            path(
+                                "<uuid:settlement_uuid>/",
+                                ClearhausSettlementDetailView.as_view(),
+                                name="clearhaussettlement_detail",
                             ),
                         ]
                     ),
