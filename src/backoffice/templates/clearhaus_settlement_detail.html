@@ -18,8 +18,12 @@
     <table class="table">
       <tbody>
         <tr>
-          <th>BornHack ID</th>
+          <th>BornHack UUID</th>
           <td>{{ cs.pk }}</td>
+        </tr>
+        <tr>
+          <th>Clearhaus UUID</th>
+          <td>{{ cs.clearhaus_uuid }}</td>
         </tr>
         <tr>
           <th>Merchant ID</th>
@@ -87,7 +91,7 @@
         </tr>
         <tr>
           <th>Reserve Amount</th>
-          <td>{{ cs.reserve_amount }}</td>
+          <td>{{ cs.reserve_amount }}&nbsp;{{ cs.currency }}</td>
         </tr>
         <tr>
           <th>Reserve Date</th>
