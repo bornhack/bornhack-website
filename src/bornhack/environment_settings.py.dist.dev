@@ -15,10 +15,10 @@ ALLOWED_HOSTS = "*"
 DATABASES = {
     "default": {
         "ENGINE": 'django.contrib.gis.db.backends.postgis',
-        "NAME": "bornhack",
-        "USER": "bornhack",
-        #"PASSWORD": "bornhack",
-        #"HOST": "localhost",
+        "NAME": os.getenv("POSTGRES_DB", "bornhack"),
+        "USER": os.getenv("POSTGRES_USER", "bornhack"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "bornhack"),
+        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
         #"PORT": 5433,
     }
 }

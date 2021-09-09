@@ -48,6 +48,8 @@ jobs:
         run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
       - name: Run tests
         run: coverage run --source src/ src/manage.py test src/
+        env:
+          POSTGRES_HOST: postgres
       - name: Report to codecov
         run: codecov
         if: ${{ success() }}
