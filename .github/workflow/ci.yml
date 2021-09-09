@@ -1,0 +1,46 @@
+name: Run tests for the BornHack website project
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        #python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7]
+
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgis/postgis:10-2.5-alpine
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: bornhack
+          POSTGRES_PASSWORD: bornhack
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r src/requirements/dev.txt
+      - name: Copy settings
+        run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
+      - name: Run tests
+        run: coverage run --source src/ src/manage.py test src/
+      - name: Report to codecov
+        run: codecov
+        if: ${{ success() }}
