@@ -7,5 +7,5 @@ codecov==2.1.12
 black==21.8b0
 pre-commit==2.14.1
 isort==5.9.3
-hypothesis==6.17.4
+hypothesis==6.20.0
 flake8==3.9.2
