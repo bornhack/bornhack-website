@@ -11,7 +11,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    container: ubuntu:rolling
+#    container: ubuntu:rolling
 
     strategy:
       matrix:
@@ -38,12 +38,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Install system dependencies
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libgdal-dev libpq-dev libffi7 libmagic1 git
-      - name: Checkout submodule
-        run: cd $GITHUB_WORKSPACE; git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -56,8 +56,8 @@ jobs:
       - name: Run tests
         run: coverage run --source src/ src/manage.py test src/
         env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
       - name: Report to codecov
         run: codecov
         if: ${{ success() }}
