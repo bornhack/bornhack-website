@@ -44,11 +44,11 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install system dependencies
         run: |
-          sudo apt-get install -y libgdal-dev libpq-dev python3-pip
+          apt-get install -y libgdal-dev libpq-dev
       - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r src/requirements/dev.txt
+          python -m pip install -r src/requirements/dev.txt
       - name: Copy settings
         run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
       - name: Run tests
