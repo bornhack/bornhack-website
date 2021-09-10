@@ -37,11 +37,11 @@ jobs:
           --health-retries 5
 
     steps:
+      - uses: actions/checkout@v2
       - name: Install system dependencies
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libgdal-dev libpq-dev libffi7 libmagic1 git
-      - uses: actions/checkout@v2
       - name: Checkout submodule
         run: git submodule update --init --recursive
       - name: Set up Python ${{ matrix.python-version }}
