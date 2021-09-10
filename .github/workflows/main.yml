@@ -40,7 +40,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-      - uses: codecov/codecov-action@v2
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -59,3 +58,5 @@ jobs:
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@v2
