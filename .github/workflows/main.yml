@@ -42,8 +42,8 @@ jobs:
           submodules: recursive
       - name: Install system dependencies
         run: |
-          apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libgdal-dev libpq-dev libffi7 libmagic1 git
+          sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y --no-install-recommends libgdal-dev libpq-dev libffi7 libmagic1 git
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
