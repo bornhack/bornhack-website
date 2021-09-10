@@ -54,7 +54,7 @@ jobs:
       - name: Copy settings
         run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
       - name: Run tests
-        run: coverage run --source src/ src/manage.py test src/
+        run: cd src; coverage run manage.py test .
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
