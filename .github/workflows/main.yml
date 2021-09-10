@@ -45,7 +45,7 @@ jobs:
       - name: Install system dependencies
         run: |
           apt-get update
-          apt-get install -y libgdal-dev libpq-dev
+          apt-get install -y libgdal-dev libpq-dev libffi-dev
       - name: Install python dependencies
         run: |
           python -m pip install --upgrade pip
