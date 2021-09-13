@@ -9,11 +9,12 @@
   </div>
   <div class="panel-body">
     <p class="lead">Zettle Excel Upload</p>
+    <p>Zettle receipts can be <a href="https://my.zettle.com/transactions">exported here</a> and you can <a href="https://my.zettle.com/statement/v2">export balances here</a>.
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Upload</button>
-        <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:zettle_dashboard' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
     </form>
   </div>
 </div>
