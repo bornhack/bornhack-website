@@ -1406,3 +1406,87 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
     fees_scheme = models.DecimalField(
         max_digits=12, decimal_places=2, help_text="The fees for scheme for this period"
     )
+
+
+class ZettleBalance(CreatedUpdatedUUIDModel):
+    """Zettle (formerly iZettle) creates an account statement line every time there is a movement affecting our balance."""
+
+    class Meta:
+        get_latest_by = ["statement_time"]
+        ordering = ["-statement_time"]
+
+    statement_time = models.DateTimeField(
+        help_text="The date and time this movement was added to the account statement."
+    )
+    payment_time = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="The date and time this payment was made. Can be empty if this transaction is not a customer payment.",
+    )
+    payment_reference = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The reference for this payment. Can be empty if this transaction is not a customer payment.",
+    )
+    description = models.CharField(
+        max_length=100,
+        help_text="The description of this transaction.",
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount of this transaction",
+    )
+    balance = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="Our balance in Zettles systems after this transaction.",
+    )
+
+
+class ZettleReceipt(CreatedUpdatedUUIDModel):
+    """Zettle creates a receipt every time there is a customer payment or refund using Zettle. Not all receipts affect our Zettle balance (e.g. MobilePay payments are paid out by MobilePay directly)."""
+
+    class Meta:
+        get_latest_by = ["zettle_created"]
+        ordering = ["-zettle_created"]
+
+    zettle_created = models.DateTimeField(
+        help_text="The date and time this receipt was created in Zettles end"
+    )
+    receipt_number = models.IntegerField(help_text="The Zettle receipt number.")
+    vat = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The part of the total amount which is VAT",
+    )
+    total = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The total amount the customer paid",
+    )
+    fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payment fee BornHack has to pay to receive this payment",
+    )
+    net = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The part of the payment which goes to BornHack after fees have been substracted.",
+    )
+    payment_method = models.CharField(max_length=100, help_text="The payment method")
+    card_issuer = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        help_text="The card issuer. Can be empty if this was not a card payment.",
+    )
+    staff = models.CharField(
+        max_length=100, help_text="The Zettle account which was used to make this sale."
+    )
+    description = models.CharField(
+        max_length=255,
+        help_text="The description of this transaction.",
+    )
+    sold_via = models.CharField(max_length=100, help_text="Always POS?")

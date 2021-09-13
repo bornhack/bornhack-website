@@ -15,6 +15,8 @@ from .models import (
     PosReport,
     Reimbursement,
     Revenue,
+    ZettleBalance,
+    ZettleReceipt,
 )
 
 ###############################
@@ -235,3 +237,40 @@ class EpayTransactionAdmin(admin.ModelAdmin):
     ]
     list_filter = ["card_type"]
     search_fields = ["description"]
+
+
+################################
+# zettle
+
+
+@admin.register(ZettleBalance)
+class ZettleBalanceAdmin(admin.ModelAdmin):
+    list_display = [
+        "pk",
+        "statement_time",
+        "payment_time",
+        "payment_reference",
+        "description",
+        "amount",
+        "balance",
+    ]
+    search_fields = ["description"]
+
+
+@admin.register(ZettleReceipt)
+class ZettleReceiptAdmin(admin.ModelAdmin):
+    list_display = [
+        "pk",
+        "zettle_created",
+        "receipt_number",
+        "total",
+        "vat",
+        "fee",
+        "net",
+        "payment_method",
+        "card_issuer",
+        "staff",
+        "description",
+    ]
+    list_filter = ["payment_method", "card_issuer"]
+    search_fields = ["description", "receipt_number"]

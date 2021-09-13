@@ -202,7 +202,7 @@
         <p class="list-group-item-text">Use this view to see our banks, bank accounts and bank transactions.</p>
       </a>
       <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Coinify</h4>
+        <h4 class="list-group-item-heading">Coinify Dashboard</h4>
         <p class="list-group-item-text">Use this view to see Coinify invoices, payouts and balances imported from CSV (from the Coinify webinterface).</p>
       </a>
       <a href="{% url 'backoffice:epaytransaction_list' camp_slug=camp.slug %}" class="list-group-item">
@@ -212,6 +212,10 @@
       <a href="{% url 'backoffice:clearhaussettlement_list' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Clearhaus Settlements</h4>
         <p class="list-group-item-text">Use this view to see all Clearhaus Settlements. Clearhaus creates a settlement (bank payout) weekly (if needed). The data is imported from CSV (from the Clearhaus webinterface).</p>
+      </a>
+      <a href="{% url 'backoffice:zettle_dashboard' camp_slug=camp.slug %}" class="list-group-item">
+        <h4 class="list-group-item-heading">Zettle Dashboard</h4>
+        <p class="list-group-item-text">Use this view to see Zettle (iZettle) receipts and balances (account movements). All data is imported from Excel files from the Zettle webinterface.</p>
       </a>
       {% endif %}
 

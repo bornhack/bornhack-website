@@ -131,3 +131,14 @@ class ClearhausSettlementForm(forms.Form):
     settlements = forms.FileField(
         help_text="CSV file with Clearhaus Settlements. Importing the same settlements again will update values without creating duplicates.",
     )
+
+
+class ZettleUploadForm(forms.Form):
+    receipts = forms.FileField(
+        help_text="Excel file with Zettle receipts. Importing the same receipts multiple times will not create duplicates. Leave this empty if you don't need to upload any receipts.",
+        required=False,
+    )
+    balances = forms.FileField(
+        help_text="Excel file with Zettle account statements and balances. Importing the same balances multiple times will not create duplicates. Leave this empty if you don't need to upload any acount statement/balances.",
+        required=False,
+    )

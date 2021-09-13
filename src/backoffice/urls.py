@@ -122,6 +122,10 @@ from .views import (
     TokenUpdateView,
     VillageOrdersView,
     VillageToOrderView,
+    ZettleBalanceListView,
+    ZettleDashboardView,
+    ZettleDataImportView,
+    ZettleReceiptListView,
 )
 
 app_name = "backoffice"
@@ -826,6 +830,33 @@ urlpatterns = [
                                 "<uuid:settlement_uuid>/",
                                 ClearhausSettlementDetailView.as_view(),
                                 name="clearhaussettlement_detail",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "zettle/",
+                    include(
+                        [
+                            path(
+                                "",
+                                ZettleDashboardView.as_view(),
+                                name="zettle_dashboard",
+                            ),
+                            path(
+                                "receipts/",
+                                ZettleReceiptListView.as_view(),
+                                name="zettlereceipt_list",
+                            ),
+                            path(
+                                "balances/",
+                                ZettleBalanceListView.as_view(),
+                                name="zettlebalance_list",
+                            ),
+                            path(
+                                "import/",
+                                ZettleDataImportView.as_view(),
+                                name="zettle_import",
                             ),
                         ]
                     ),

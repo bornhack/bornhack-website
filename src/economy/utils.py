@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
+import pandas as pd
 import pytz
 from django.utils import timezone
 
@@ -10,7 +11,12 @@ from economy.models import (
     CoinifyInvoice,
     CoinifyPayout,
     EpayTransaction,
+    ZettleBalance,
+    ZettleReceipt,
 )
+
+# we need the Danish timezone here and there
+cph = pytz.timezone("Europe/Copenhagen")
 
 
 def import_epay_csv(csvreader):
@@ -25,7 +31,6 @@ def import_epay_csv(csvreader):
 
     This function expects an initiated csvreader object, or alternatively some other iterable with the data in the right index locations.
     """
-    cph = pytz.timezone("Europe/Copenhagen")
     create_count = 0
     # skip header row
     next(csvreader)
@@ -227,3 +232,119 @@ def import_clearhaus_csv(csvreader):
         if created:
             create_count += 1
     return create_count
+
+
+def optional_int(value):
+    if not pd.isnull(value):
+        return value
+
+
+def to_decimal(value):
+    try:
+        # converting from float introduces a shitton of decimals
+        return round(Decimal(value), 2)
+    except ValueError:
+        pass
+
+
+class ZettleExcelImporter:
+    @staticmethod
+    def load_zettle_receipts_excel(fh):
+        """Load an Excel file with Zettle receipts (from POS sales).
+
+        Zettle exports data in Excel files (not CSV), so this importer uses pandas for the file parsing.
+
+        The receipts sheet has 16 rows header and 3 rows footer to skip.
+        Also skip columns B (redundant) and J (part of cardnumber).
+        """
+        df = pd.read_excel(
+            fh,
+            skiprows=16,
+            skipfooter=3,
+            usecols="A,C:I,K:M",
+            dtype={
+                "Dato": datetime,  # A
+                "Betalingsmetode": str,  # H
+                "Kortudsteder": str,  # I
+                "Personale": str,  # K
+                "Beskrivelse": str,  # L
+                "Solgt via": str,  # M
+            },
+            converters={
+                "Kvitteringsnummer": optional_int,  # C
+                "Moms (25%)": to_decimal,  # D
+                "Total": to_decimal,  # E
+                "Afgift": to_decimal,  # F
+                "Netto": to_decimal,  # G
+            },
+        )
+        return df
+
+    @staticmethod
+    def import_zettle_receipts_df(df):
+        """Import a pandas dataframe with Zettle receipts (from POS sales)."""
+        create_count = 0
+        for index, row in df.iterrows():
+            zr, created = ZettleReceipt.objects.get_or_create(
+                zettle_created=pd.to_datetime(row["Dato"]).replace(tzinfo=cph),
+                receipt_number=row["Kvitteringsnummer"],
+                vat=to_decimal(row[2]),
+                total=row["Total"],
+                fee=row["Afgift"],
+                net=row["Netto"],
+                payment_method=row["Betalingsmetode"],
+                card_issuer=row["Kortudsteder"]
+                if not pd.isnull(row["Kortudsteder"])
+                else None,
+                staff=row["Personale"],
+                description=row["Beskrivelse"],
+                sold_via=row["Solgt via"],
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+    @staticmethod
+    def load_zettle_balances_excel(fh):
+        """Load an Excel file wi th Zettle balances and account movements.
+
+        Zettle exports data in Excel files (not CSV), so this importer uses pandas for the file parsing.
+
+        The receipts sheet has no header or footer rows, and no columns to skip.
+        """
+        df = pd.read_excel(
+            fh,
+            dtype={
+                "Opgørelsesdato": datetime,  # A
+                "Betalingsdato": datetime,  # B
+                "Type": str,  # D
+            },
+            converters={
+                "Reference": optional_int,  # C
+                "Beløb": to_decimal,  # E
+                "Saldo": to_decimal,  # F
+            },
+        )
+        return df
+
+    @staticmethod
+    def import_zettle_balances_df(df):
+        """Import a pandas dataframe with Zettle account statements and balances."""
+        create_count = 0
+        for index, row in df.iterrows():
+            # create balance
+            zb, created = ZettleBalance.objects.get_or_create(
+                statement_time=timezone.make_aware(row["Opgørelsesdato"], timezone=cph),
+                payment_time=timezone.make_aware(row["Betalingsdato"], timezone=cph)
+                if not pd.isnull(row["Betalingsdato"])
+                else None,
+                payment_reference=row["Reference"]
+                if not pd.isnull(row["Reference"])
+                else None,
+                description=row["Type"],
+                amount=row["Beløb"],
+                balance=row["Saldo"],
+            )
+            if created:
+                create_count += 1
+        return create_count

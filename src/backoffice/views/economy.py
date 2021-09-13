@@ -33,10 +33,23 @@ from economy.models import (
     Expense,
     Reimbursement,
     Revenue,
+    ZettleBalance,
+    ZettleReceipt,
 )
-from economy.utils import CoinifyCSVImporter, import_clearhaus_csv, import_epay_csv
+from economy.utils import (
+    CoinifyCSVImporter,
+    ZettleExcelImporter,
+    import_clearhaus_csv,
+    import_epay_csv,
+)
 
-from ..forms import BankCSVForm, ClearhausSettlementForm, CoinifyCSVForm, EpayCSVForm
+from ..forms import (
+    BankCSVForm,
+    ClearhausSettlementForm,
+    CoinifyCSVForm,
+    EpayCSVForm,
+    ZettleUploadForm,
+)
 from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -690,6 +703,77 @@ class ClearhausSettlementImportView(
         return redirect(
             reverse(
                 "backoffice:clearhaussettlement_list",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )
+
+
+################################
+# ZETTLE (iZettle)
+
+
+class ZettleDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateView):
+    template_name = "zettle_dashboard.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        try:
+            latest = ZettleBalance.objects.latest()
+            context["balance"] = latest
+        except ZettleBalance.DoesNotExist:
+            context["balance"] = None
+
+        context["receipts"] = ZettleReceipt.objects.count()
+        context["balances"] = ZettleBalance.objects.count()
+        return context
+
+
+class ZettleReceiptListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = ZettleReceipt
+    template_name = "zettlereceipt_list.html"
+
+
+class ZettleBalanceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = ZettleBalance
+    template_name = "zettlebalance_list.html"
+
+
+class ZettleDataImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    form_class = ZettleUploadForm
+    template_name = "zettle_upload_form.html"
+
+    def form_valid(self, form):
+        if "balances" in form.files:
+            df = ZettleExcelImporter.load_zettle_balances_excel(form.files["balances"])
+            created = ZettleExcelImporter.import_zettle_balances_df(df)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Zettle balances data processed OK. Successfully imported {created} new Zettle balances.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Zettle balances data processed OK. No new Zettle balances created.",
+                )
+
+        if "receipts" in form.files:
+            df = ZettleExcelImporter.load_zettle_receipts_excel(form.files["receipts"])
+            created = ZettleExcelImporter.import_zettle_receipts_df(df)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Zettle receipts data processed OK. Successfully imported {created} new Zettle receipts.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Zettle receipts data processed OK. No new Zettle receipts created.",
+                )
+
+        return redirect(
+            reverse(
+                "backoffice:zettle_dashboard",
                 kwargs={"camp_slug": self.camp.slug},
             )
         )

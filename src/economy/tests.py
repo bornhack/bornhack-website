@@ -5,7 +5,12 @@ from django.test import TestCase
 from django.utils import timezone
 
 from .models import Bank, BankAccount
-from .utils import CoinifyCSVImporter, import_clearhaus_csv, import_epay_csv
+from .utils import (
+    CoinifyCSVImporter,
+    ZettleExcelImporter,
+    import_clearhaus_csv,
+    import_epay_csv,
+)
 
 
 class BankAccountCsvImportTest(TestCase):
@@ -130,3 +135,25 @@ class ClearhausCSVImportTest(TestCase):
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = import_clearhaus_csv(reader)
             self.assertEqual(created, 0)
+
+
+class ZettleImportTest(TestCase):
+    def test_zettle_receipts_import(self):
+        with open("testdata/Zettle-Receipts-Report-20210101-20210910.xlsx", "rb") as f:
+            df = ZettleExcelImporter.load_zettle_receipts_excel(f)
+        created = ZettleExcelImporter.import_zettle_receipts_df(df)
+        self.assertEqual(created, 6)
+        # import the same df again to make sure we don't create duplicates
+        created = ZettleExcelImporter.import_zettle_receipts_df(df)
+        self.assertEqual(created, 0)
+
+    def test_zettle_balances_import(self):
+        with open(
+            "testdata/Zettle-Account-Statement-Report-20210101-20210910.xlsx", "rb"
+        ) as f:
+            df = ZettleExcelImporter.load_zettle_balances_excel(f)
+        created = ZettleExcelImporter.import_zettle_balances_df(df)
+        self.assertEqual(created, 11)
+        # import the same df again to make sure we don't create duplicates
+        created = ZettleExcelImporter.import_zettle_balances_df(df)
+        self.assertEqual(created, 0)

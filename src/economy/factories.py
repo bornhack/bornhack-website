@@ -10,6 +10,8 @@ from .models import (
     CoinifyInvoice,
     CoinifyPayout,
     EpayTransaction,
+    ZettleBalance,
+    ZettleReceipt,
 )
 
 
@@ -210,3 +212,55 @@ class ClearhausSettlementFactory(factory.django.DjangoModelFactory):
     fees_scheme = factory.Faker(
         "pydecimal", right_digits=2, min_value=100, max_value=20000
     )
+
+
+class ZettleBalanceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ZettleBalance
+
+    statement_time = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    payment_time = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    payment_reference = factory.Faker("random_int", min=4000, max=5000)
+    description = factory.Faker("sentence")
+    amount = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
+    balance = factory.Faker(
+        "pydecimal", right_digits=2, min_value=5000, max_value=30000
+    )
+
+
+class ZettleReceiptFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = ZettleReceipt
+
+    zettle_created = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    receipt_number = factory.Faker("random_int", min=4000, max=5000)
+    vat = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
+    total = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
+    fee = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
+    net = factory.Faker("pydecimal", right_digits=2, min_value=500, max_value=3000)
+    payment_method = factory.Faker(
+        "random_element",
+        elements=[
+            "Cash",
+            "Contactless",
+            "MobilePay",
+            "Chip",
+        ],
+    )
+    card_issuer = factory.Faker(
+        "random_element",
+        elements=[
+            "Mastercard",
+            "Visa/Electron",
+            "Mastercard",
+        ],
+    )
+    staff = factory.Faker("word")
+    description = factory.Faker("sentence")
+    sold_via = "POS"

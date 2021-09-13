@@ -27,6 +27,8 @@ from economy.factories import (
     CoinifyInvoiceFactory,
     CoinifyPayoutFactory,
     EpayTransactionFactory,
+    ZettleBalanceFactory,
+    ZettleReceiptFactory,
 )
 from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
 from events.models import Routing, Type
@@ -342,6 +344,11 @@ class Command(BaseCommand):
     def create_clearhaus_settlements(self):
         self.output("Creating Clearhaus Settlements...")
         ClearhausSettlementFactory.create_batch(50)
+
+    def create_zettle_stuff(self):
+        self.output("Creating Zettle receipts and balances...")
+        ZettleBalanceFactory.create_batch(100)
+        ZettleReceiptFactory.create_batch(100)
 
     def create_bank_stuff(self):
         self.output("Creating Banks, BankAccounts, and BankTransactions...")
