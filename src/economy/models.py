@@ -1490,3 +1490,57 @@ class ZettleReceipt(CreatedUpdatedUUIDModel):
         help_text="The description of this transaction.",
     )
     sold_via = models.CharField(max_length=100, help_text="Always POS?")
+
+
+##################################
+# MobilePay
+
+
+class MobilePayTransaction(CreatedUpdatedUUIDModel):
+    """MobilePay transactions cover payments/refunds, payouts, service fees and everything else."""
+
+    event = models.CharField(
+        max_length=100, help_text="The type of MobilePay transaction"
+    )
+    currency = models.CharField(
+        max_length=3, help_text="The currency of this transaction."
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount of this transaction",
+    )
+    mobilepay_created = models.DateTimeField(
+        help_text="The MobilePay date and time for this transaction.",
+    )
+    comment = models.CharField(
+        null=True,
+        blank=True,
+        max_length=255,
+        help_text="The description of this transaction. Rarely used when MobilePay is used through Zettle.",
+    )
+    transaction_id = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="The transaction id. Can be empty if the type of transaction is a transfer (bank payout).",
+    )
+    transfer_id = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="The ID of the transfer (payout) this transaction was included in. Can be empty if this transaction has not yet been included in a transfer.",
+    )
+    payment_point = models.CharField(
+        max_length=100,
+        help_text="The payment point. For now we only have one (which we rename from year to year)",
+    )
+    myshop_number = models.IntegerField(
+        help_text="The MobilePay MyShop number for this payment. For now we only have one."
+    )
+    bank_account = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="The bank account this transaction was transferred to. Can be empty if this is a payment (sale) which has not yet been included in a transfer.",
+    )

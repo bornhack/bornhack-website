@@ -7,6 +7,7 @@ from django.utils import timezone
 from .models import Bank, BankAccount
 from .utils import (
     CoinifyCSVImporter,
+    MobilePayCSVImporter,
     ZettleExcelImporter,
     import_clearhaus_csv,
     import_epay_csv,
@@ -157,3 +158,45 @@ class ZettleImportTest(TestCase):
         # import the same df again to make sure we don't create duplicates
         created = ZettleExcelImporter.import_zettle_balances_df(df)
         self.assertEqual(created, 0)
+
+
+class MobilePayImportTest(TestCase):
+    def test_mobilepay_import(self):
+        with open(
+            "testdata/MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_transfer_csv(reader)
+            self.assertEqual(created, 8)
+
+        # make sure we create 0 if the same csv is imported again
+        with open(
+            "testdata/MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_transfer_csv(reader)
+            self.assertEqual(created, 0)
+
+        # now test importing sales CSV, 3 out of 4 lines are already in from above import
+        with open(
+            "testdata/MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_sales_csv(reader)
+            # the CSV contains three sales and a refund but the sales are already in the db
+            self.assertEqual(
+                created,
+                1,
+                "more than 1 new mobilepay tx was created, something is fucky",
+            )
+        # make sure we create 0 if the same csv is imported again
+        with open(
+            "testdata/MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv",
+            encoding="utf-8-sig",
+        ) as f:
+            reader = csv.reader(f, delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_sales_csv(reader)
+            self.assertEqual(created, 0)

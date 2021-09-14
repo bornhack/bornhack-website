@@ -11,6 +11,7 @@ from economy.models import (
     CoinifyInvoice,
     CoinifyPayout,
     EpayTransaction,
+    MobilePayTransaction,
     ZettleBalance,
     ZettleReceipt,
 )
@@ -344,6 +345,82 @@ class ZettleExcelImporter:
                 description=row["Type"],
                 amount=row["Beløb"],
                 balance=row["Saldo"],
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+
+class MobilePayCSVImporter:
+    @staticmethod
+    def import_mobilepay_transfer_csv(csvreader):
+        """Import a CSV file with MobilePay transactions.
+
+        Assumes a CSV structure like in testdata/MobilePay_Transfer_overview_csv_MyShop_25-08-2021_14-09-2021.csv with these headers:
+
+        Event;Currency;Amount;Date and time;Customer name;MP-number;Comment;TransactionID;TransferID;Payment point;MyShop-Number;Bank account;Date;Time
+
+        The MobilePay CSV dialect includes a header line, is semicolon seperated, and uses "" for quoting. Numbers use comma for decimal seperator so we replace with .
+
+        This method expects an initiated csvreader object, or alternatively some other iterable with the data in the right index locations.
+
+        We skip the columns with Customer name, MP-number and the last two date/time columns (redundant)
+        """
+        create_count = 0
+        # skip header row
+        next(csvreader)
+        for row in csvreader:
+            mt, created = MobilePayTransaction.objects.get_or_create(
+                event=row[0],
+                currency=row[1],
+                amount=Decimal(row[2].replace(",", ".")),
+                mobilepay_created=row[3],
+                comment=row[6],
+                transaction_id=row[7] or None,
+                payment_point=row[9],
+                myshop_number=row[10],
+                defaults={
+                    "transfer_id": row[8] or None,
+                    "bank_account": row[11],
+                },
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+    @staticmethod
+    def import_mobilepay_sales_csv(csvreader):
+        """Import a CSV file with MobilePay sales and refunds. The sales CSV may contain transactions
+        which are not yet included in a transfer (bank payout) so they do not show up in the
+        transfers CSV yet.
+
+        Assumes a CSV structure like in testdata/MobilePay_Sales_overview_csv_MyShop_25-08-2021_14-09-2021.csv with these headers, it is identical to the transfers CSV except the "TransferID" and "Bank account" columns are missing:
+
+        Event;Currency;Amount;Date and time;Customer name;MP-number;Comment;TransactionID;Payment point;MyShop-Number;Date;Time
+
+        The MobilePay CSV dialect includes a header line, is semicolon seperated, and uses "" for quoting. Numbers use comma for decimal seperator so we replace with .
+
+        This method expects an initiated csvreader object, or alternatively some other iterable with the data in the right index locations.
+
+        We skip the columns with Customer name, MP-number and the last two date/time columns (redundant)
+        """
+        create_count = 0
+        # skip header row
+        next(csvreader)
+        for row in csvreader:
+            mt, created = MobilePayTransaction.objects.get_or_create(
+                event=row[0],
+                currency=row[1],
+                amount=Decimal(row[2].replace(",", ".")),
+                mobilepay_created=row[3],
+                comment=row[6],
+                transaction_id=row[7] or None,
+                payment_point=row[8],
+                myshop_number=row[9],
+                defaults={
+                    "transfer_id": None,
+                    "bank_account": None,
+                },
             )
             if created:
                 create_count += 1
