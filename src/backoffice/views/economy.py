@@ -818,12 +818,12 @@ class MobilePayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView
             if created:
                 messages.success(
                     self.request,
-                    f"MobilePay Transfers/transactions CSV processed OK. Successfully imported {created} new MobilePay Transactions.",
+                    f"MobilePay Sales CSV processed OK. Successfully imported {created} new MobilePay Transactions.",
                 )
             else:
                 messages.info(
                     self.request,
-                    "MobilePay Transfers/transactions CSV processed OK. No new MobilePay Transactions created.",
+                    "MobilePay Sales CSV processed OK. No new MobilePay Transactions created.",
                 )
 
         return redirect(
