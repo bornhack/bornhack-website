@@ -10,6 +10,7 @@ from .models import (
     CoinifyInvoice,
     CoinifyPayout,
     EpayTransaction,
+    MobilePayTransaction,
     ZettleBalance,
     ZettleReceipt,
 )
@@ -264,3 +265,29 @@ class ZettleReceiptFactory(factory.django.DjangoModelFactory):
     staff = factory.Faker("word")
     description = factory.Faker("sentence")
     sold_via = "POS"
+
+
+class MobilePayTransactionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = MobilePayTransaction
+
+    event = factory.Faker(
+        "random_element",
+        elements=[
+            "Refund",
+            "Transfer",
+            "Payment",
+            "Retainable",
+        ],
+    )
+    currency = "DKK"
+    amount = factory.Faker("pydecimal", right_digits=2, min_value=50, max_value=3000)
+    mobilepay_created = factory.Faker(
+        "date_time_between", start_date="-6y", tzinfo=timezone.utc
+    )
+    comment = factory.Faker("sentence")
+    transaction_id = factory.Faker("numerify", text="###E############")
+    transfer_id = factory.Faker("numerify", text="####################")
+    payment_point = "BornHack 2021"
+    myshop_number = "18291"
+    bank_account = factory.Faker("numerify", text="####00000######")

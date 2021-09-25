@@ -27,6 +27,7 @@ from economy.factories import (
     CoinifyInvoiceFactory,
     CoinifyPayoutFactory,
     EpayTransactionFactory,
+    MobilePayTransactionFactory,
     ZettleBalanceFactory,
     ZettleReceiptFactory,
 )
@@ -340,6 +341,10 @@ class Command(BaseCommand):
             feedback="No power", icon="fas fa-bolt"
         )
         return options
+
+    def create_mobilepay_transactions(self):
+        self.output("Creating MobilePay Transactions...")
+        MobilePayTransactionFactory.create_batch(50)
 
     def create_clearhaus_settlements(self):
         self.output("Creating Clearhaus Settlements...")
@@ -1826,6 +1831,8 @@ class Command(BaseCommand):
         global_products = self.create_global_products(product_categories)
 
         quickfeedback_options = self.create_quickfeedback_options()
+
+        self.create_mobilepay_transactions()
 
         self.create_clearhaus_settlements()
 

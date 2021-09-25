@@ -12,18 +12,21 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class HelpTextModel(models.Model):
+    """Base Model Class to dynamically add get_foo_help_text() methods for all model fields."""
+
     class Meta:
         abstract = True
 
     def __init__(self, *args, **kwargs):
+        """Loop over fields and add a new help_text getter method for each."""
         super().__init__(*args, **kwargs)
         for field in self._meta.fields:
             method_name = f"get_{field.name}_help_text"
-            print(f"setting method name {method_name} on {self}")
             partial_method = partial(self._get_help_text, field_name=field.name)
             setattr(self, method_name, partial_method)
 
     def _get_help_text(self, field_name):
+        """Loop over all fields and return the help_text for the requested field."""
         for field in self._meta.fields:
             if field.name == field_name:
                 return field.help_text
