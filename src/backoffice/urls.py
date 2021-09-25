@@ -78,6 +78,8 @@ from .views import (
     IrcOverView,
     MerchandiseOrdersView,
     MerchandiseToOrderView,
+    MobilePayCSVImportView,
+    MobilePayTransactionListView,
     OrderListView,
     OutgoingEmailMassUpdateView,
     PendingProposalsView,
@@ -857,6 +859,23 @@ urlpatterns = [
                                 "import/",
                                 ZettleDataImportView.as_view(),
                                 name="zettle_import",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "mobilepay/",
+                    include(
+                        [
+                            path(
+                                "",
+                                MobilePayTransactionListView.as_view(),
+                                name="mobilepaytransaction_list",
+                            ),
+                            path(
+                                "csv_import/",
+                                MobilePayCSVImportView.as_view(),
+                                name="mobilepay_csv_import",
                             ),
                         ]
                     ),

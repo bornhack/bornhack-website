@@ -142,3 +142,14 @@ class ZettleUploadForm(forms.Form):
         help_text="Excel file with Zettle account statements and balances. Importing the same balances multiple times will not create duplicates. Leave this empty if you don't need to upload any acount statement/balances.",
         required=False,
     )
+
+
+class MobilePayCSVForm(forms.Form):
+    transfers = forms.FileField(
+        help_text="CSV file with transfers and their related transactions. Importing the same transactions multiple times will not create duplicates. Leave this empty if you don't need to upload any transfers CSV.",
+        required=False,
+    )
+    sales = forms.FileField(
+        help_text="CSV file with MobilePay sales and refunds. Importing the same sales CSV multiple times will not create duplicates. Leave this empty if you don't need to upload any sales CSV.",
+        required=False,
+    )

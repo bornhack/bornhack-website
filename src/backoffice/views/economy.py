@@ -31,6 +31,7 @@ from economy.models import (
     Credebtor,
     EpayTransaction,
     Expense,
+    MobilePayTransaction,
     Reimbursement,
     Revenue,
     ZettleBalance,
@@ -38,6 +39,7 @@ from economy.models import (
 )
 from economy.utils import (
     CoinifyCSVImporter,
+    MobilePayCSVImporter,
     ZettleExcelImporter,
     import_clearhaus_csv,
     import_epay_csv,
@@ -48,6 +50,7 @@ from ..forms import (
     ClearhausSettlementForm,
     CoinifyCSVForm,
     EpayCSVForm,
+    MobilePayCSVForm,
     ZettleUploadForm,
 )
 from ..mixins import EconomyTeamPermissionMixin
@@ -774,6 +777,58 @@ class ZettleDataImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
         return redirect(
             reverse(
                 "backoffice:zettle_dashboard",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )
+
+
+################################
+# MOBILEPAY
+
+
+class MobilePayTransactionListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = MobilePayTransaction
+    template_name = "mobilepaytransaction_list.html"
+
+
+class MobilePayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    form_class = MobilePayCSVForm
+    template_name = "mobilepay_csv_upload_form.html"
+
+    def form_valid(self, form):
+        if "transfers" in form.files:
+            csvdata = form.files["transfers"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_transfer_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"MobilePay Transfers/transactions CSV processed OK. Successfully imported {created} new MobilePay Transactions.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "MobilePay Transfers/transactions CSV processed OK. No new MobilePay Transactions created.",
+                )
+
+        if "sales" in form.files:
+            csvdata = form.files["sales"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=";", quotechar='"')
+            created = MobilePayCSVImporter.import_mobilepay_sales_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"MobilePay Transfers/transactions CSV processed OK. Successfully imported {created} new MobilePay Transactions.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "MobilePay Transfers/transactions CSV processed OK. No new MobilePay Transactions created.",
+                )
+
+        return redirect(
+            reverse(
+                "backoffice:mobilepaytransaction_list",
                 kwargs={"camp_slug": self.camp.slug},
             )
         )
