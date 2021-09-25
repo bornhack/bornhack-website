@@ -1,12 +1,14 @@
 <table class="table table-striped datatable">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Date</th>
-      <th>Text</th>
-      <th>Amount</th>
-      <th>Balance</th>
-      <th>Actions</th>
+      {% with banktransaction_list.0 as t %}
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Internal BornHack UUID for this bank transaction">ID</th>
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_date_help_text }}">Date</th>
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_text_help_text }}">Text</th>
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_amount_help_text }}">Amount</th>
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_balance_help_text }}">Balance</th>
+      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Available actions for this bank">Actions</th>
+      {% endwith %}
     </tr>
   </thead>
   <tbody>

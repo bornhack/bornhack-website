@@ -975,6 +975,7 @@ class BankAccount(CreatedUpdatedUUIDModel):
                 code="invalid_reg_no",
             ),
         ],
+        help_text="The Danish reg. number of the bank account",
     )
 
     account_no = models.CharField(
@@ -986,6 +987,7 @@ class BankAccount(CreatedUpdatedUUIDModel):
                 code="invalid_account_no",
             ),
         ],
+        help_text="The Danish account number of the bank account",
     )
 
     start_date = models.DateField(
@@ -1135,7 +1137,7 @@ class CoinifyInvoice(CreatedUpdatedUUIDModel):
     original_payment_id = models.IntegerField(
         null=True,
         blank=True,
-        help_text="The original payment id (used when the invoice payment type is 'extra')",
+        help_text="The original payment id (used when the invoice payment type is extra)",
     )
 
 

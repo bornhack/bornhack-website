@@ -1,5 +1,6 @@
 import logging
 import uuid
+from functools import partial
 
 from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
@@ -10,7 +11,25 @@ from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class CleanedModel(models.Model):
+class HelpTextModel(models.Model):
+    class Meta:
+        abstract = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self._meta.fields:
+            method_name = f"get_{field.name}_help_text"
+            print(f"setting method name {method_name} on {self}")
+            partial_method = partial(self._get_help_text, field_name=field.name)
+            setattr(self, method_name, partial_method)
+
+    def _get_help_text(self, field_name):
+        for field in self._meta.fields:
+            if field.name == field_name:
+                return field.help_text
+
+
+class CleanedModel(HelpTextModel):
     class Meta:
         abstract = True
 

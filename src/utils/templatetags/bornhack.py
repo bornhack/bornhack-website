@@ -34,7 +34,6 @@ def feedbackqr(context, facility):
 @register.filter(name="sortable")
 def datatables_sortable(value):
     """A template filter to convert a value to something which sorts nicely in datatables js."""
-    print(f"input '{value}' is type {type(value)}")
     if isinstance(value, datetime.datetime):
         # return unix timestamp and microseconds
         return value.timestamp()
@@ -43,3 +42,19 @@ def datatables_sortable(value):
     else:
         # unsupported type
         return value
+
+
+@register.simple_tag(takes_context=True)
+def thh(context, fieldname, headerstring=None, tooltip=None, htmlclass=None):
+    """Return a <th> element with a popper.js tooltip with the help_text for the model field. Requires an object_list in the context."""
+    instance = context["object_list"][0]
+    if not headerstring:
+        headerstring = fieldname.replace("_", " ").title()
+    if not tooltip:
+        try:
+            tooltip = getattr(instance, f"get_{fieldname}_help_text")()
+        except AttributeError:
+            tooltip = "No get_help_text_method found on object :("
+    return mark_safe(
+        f"<th data-container='body' data-placement='bottom' data-toggle='tooltip' title='{tooltip}'>{headerstring}</th>"
+    )

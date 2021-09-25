@@ -2,16 +2,16 @@
 <table class="table table-striped table-hover datatable">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Created</th>
-      <th>Payment Amount</th>
-      <th>Payment BTC Amount</th>
-      <th>Description</th>
-      <th>Credited</th>
-      <th>State</th>
-      <th>Payment Type</th>
-      <th>Original Payment ID</th>
-      <th>Imported</th>
+      {% thh "coinify_id" "ID" %}
+      {% thh "coinify_created" "Created" %}
+      {% thh "payment_amount" %}
+      {% thh "payment_btc_amount" %}
+      {% thh "description" %}
+      {% thh "credited_amount" %}
+      {% thh "state" %}
+      {% thh "payment_type" %}
+      {% thh "original_payment_id" %}
+      {% thh "created" "Imported" "The date this Coinify invoice was imported" %}
     </tr>
   </thead>
   <tbody>
