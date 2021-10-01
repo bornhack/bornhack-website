@@ -1,6 +1,12 @@
 from django.urls import include, path
 
 from .views import (
+    AccountingExportCreateView,
+    AccountingExportDeleteView,
+    AccountingExportDetailView,
+    AccountingExportDownloadView,
+    AccountingExportListView,
+    AccountingExportUpdateView,
     AddRecordingView,
     ApproveFeedbackView,
     ApproveNamesView,
@@ -876,6 +882,50 @@ urlpatterns = [
                                 "csv_import/",
                                 MobilePayCSVImportView.as_view(),
                                 name="mobilepay_csv_import",
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "accounting_export/",
+                    include(
+                        [
+                            path(
+                                "",
+                                AccountingExportListView.as_view(),
+                                name="accountingexport_list",
+                            ),
+                            path(
+                                "create/",
+                                AccountingExportCreateView.as_view(),
+                                name="accountingexport_create",
+                            ),
+                            path(
+                                "<uuid:accountingexport_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            AccountingExportDetailView.as_view(),
+                                            name="accountingexport_detail",
+                                        ),
+                                        path(
+                                            "download/",
+                                            AccountingExportDownloadView.as_view(),
+                                            name="accountingexport_download",
+                                        ),
+                                        path(
+                                            "update/",
+                                            AccountingExportUpdateView.as_view(),
+                                            name="accountingexport_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            AccountingExportDeleteView.as_view(),
+                                            name="accountingexport_delete",
+                                        ),
+                                    ]
+                                ),
                             ),
                         ]
                     ),

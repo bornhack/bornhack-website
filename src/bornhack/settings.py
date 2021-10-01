@@ -1,16 +1,14 @@
-import os
+from pathlib import Path
 
 # monkeypatch postgres Range object to support lookups
 from utils import range_fields  # noqa: F401
 
 from .environment_settings import *  # noqa: F403
 
-
-def local_dir(entry):
-    return os.path.join(os.path.dirname(os.path.dirname(__file__)), entry)
-
-
-DJANGO_BASE_PATH = os.path.dirname(os.path.dirname(__file__))
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+# TODO: remove this and update references to DJANGO_BASE_PATH to use BASE_DIR
+DJANGO_BASE_PATH = BASE_DIR
 
 WSGI_APPLICATION = "bornhack.wsgi.application"
 ASGI_APPLICATION = "bornhack.routing.application"
@@ -74,8 +72,8 @@ INSTALLED_APPS = [
 
 # MEDIA_URL = '/media/'
 STATIC_URL = "/static/"
-STATIC_ROOT = local_dir("static")
-STATICFILES_DIRS = [local_dir("static_src")]
+STATIC_ROOT = str(BASE_DIR / "static")
+STATICFILES_DIRS = [BASE_DIR / "static_src"]
 LANGUAGE_CODE = "en-us"
 # USE_I18N = True
 # USE_L10N = True
@@ -88,7 +86,7 @@ TIME_FORMAT = "H:i"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [local_dir("templates")],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

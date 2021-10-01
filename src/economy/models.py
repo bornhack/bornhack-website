@@ -1,3 +1,4 @@
+import csv
 import os
 from datetime import datetime
 from decimal import Decimal
@@ -10,6 +11,7 @@ from django.core.files import File
 from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 from utils.models import (
     CampRelatedModel,
@@ -1034,6 +1036,18 @@ class BankAccount(CreatedUpdatedUUIDModel):
                 create_count += 1
         return create_count
 
+    def export_csv(self, period, workdir, filename=None):
+        """Write a CSV file to disk with all transactions for the requested period."""
+        if not filename:
+            filename = f"bornhack_bank_account_{slugify(self.bank.name)}_{slugify(self.name)}_{self.reg_no}_{self.account_no}_{period.lower}_{period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            transactions = self.transactions.filter(date__contained_by=period)
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(["bornhack_uuid", "date", "text", "amount", "balance"])
+            for tx in transactions:
+                writer.writerow([tx.pk, tx.date, tx.text, tx.amount, tx.balance])
+        return (self, filename, transactions.count())
+
 
 class BankTransaction(CreatedUpdatedUUIDModel):
     """A BankTransaction represents one movement into or out of the bank account."""
@@ -1080,14 +1094,6 @@ class BankTransaction(CreatedUpdatedUUIDModel):
             raise ValidationError(
                 f"Transaction on {self.date} is after the bank accounts end_date. Transaction text is '{self.text}' and amount is {self.amount}"
             )
-
-    @property
-    def sortable_amount(self):
-        return str(self.amount * 100)
-
-    @property
-    def sortable_balance(self):
-        return str(self.balance * 100)
 
 
 ##################################
@@ -1546,3 +1552,29 @@ class MobilePayTransaction(CreatedUpdatedUUIDModel):
         blank=True,
         help_text="The bank account this transaction was transferred to. Can be empty if this is a payment (sale) which has not yet been included in a transfer.",
     )
+
+
+##################################
+# AccountingExport
+
+
+class AccountingExport(CreatedUpdatedUUIDModel):
+    date_from = models.DateField(
+        help_text="The start date for this accounting export (YYYY-MM-DD)."
+    )
+    date_to = models.DateField(
+        help_text="The end date for this accounting export (YYYY-MM-DD)."
+    )
+    comment = models.CharField(
+        null=True,
+        blank=True,
+        max_length=255,
+        help_text="Any economy team comment for this export. Optional.",
+    )
+    archive = models.FileField(
+        upload_to="accountingexports/",
+        help_text="The zipfile containing the exported accounting info (html+CSV files)",
+    )
+
+    def __str__(self):
+        return f"AccountingExport from {self.date_from} to {self.date_to}"

@@ -1,20 +1,34 @@
+import csv
+import io
+import tempfile
 from datetime import datetime
 from decimal import Decimal
+from os.path import basename
+from pathlib import Path
+from zipfile import ZipFile
 
 import pandas as pd
 import pytz
+from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils import timezone
+from psycopg2.extras import DateRange
 
 from economy.models import (
+    BankAccount,
     ClearhausSettlement,
     CoinifyBalance,
     CoinifyInvoice,
     CoinifyPayout,
     EpayTransaction,
+    Expense,
     MobilePayTransaction,
+    Reimbursement,
+    Revenue,
     ZettleBalance,
     ZettleReceipt,
 )
+from shop.models import CreditNote, CustomOrder, Invoice, Order
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
@@ -425,3 +439,327 @@ class MobilePayCSVImporter:
             if created:
                 create_count += 1
         return create_count
+
+
+class AccountingExporter:
+    """A class containing... something."""
+
+    def __init__(self, startdate, enddate):
+        """Requires startdate and enddate."""
+        self.period = DateRange(startdate, enddate)
+
+    def doit(self):
+        """Do all the things."""
+        with tempfile.TemporaryDirectory(prefix="django-accounting-") as tmpdir:
+            workdir = Path(tmpdir)
+            self.bankaccounts = self.bank_csv_export(workdir)
+            self.paid_invoices = self.invoice_csv_export(workdir, paid=True)
+            self.unpaid_invoices = self.invoice_csv_export(workdir, paid=False)
+            self.paid_creditnotes = self.creditnote_csv_export(workdir, paid=True)
+            self.unpaid_creditnotes = self.creditnote_csv_export(workdir, paid=False)
+            self.orders = self.shoporder_csv_export(workdir)
+            self.customorders = self.customorder_csv_export(workdir)
+            self.expenses = self.expense_csv_export(workdir)
+            self.revenues = self.revenue_csv_export(workdir)
+            self.reimbursements = self.reimbursement_csv_export(workdir)
+            self.create_index_html(workdir)
+            self.create_archive(workdir)
+
+    def bank_csv_export(self, workdir):
+        """Export bank accounting data in CSV files."""
+        files = []
+        for ba in (
+            BankAccount.objects.all()
+            .exclude(start_date__gt=self.period.upper)
+            .exclude(end_date__lt=self.period.lower)
+        ):
+            files.append(ba.export_csv(self.period, workdir))
+        return files
+
+    def invoice_csv_export(self, workdir, paid=True, filename=None):
+        """Export invoices in our system."""
+        if not filename:
+            paid_str = "paid" if paid else "unpaid"
+            filename = f"bornhack_{paid_str}_invoices_{self.period.lower}_{self.period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                ["invoice_date", "invoice_number", "order", "amount", "vat"]
+            )
+            invoices = Invoice.objects.filter(
+                created__gt=self.period.lower, created__lt=self.period.upper
+            )
+            count = 0
+            for invoice in invoices:
+                if invoice.get_order.paid != paid:
+                    continue
+                if invoice.order:
+                    amount = invoice.order.total
+                    vat = True
+                else:
+                    amount = invoice.customorder.amount
+                    vat = invoice.customorder.danish_vat
+                writer.writerow(
+                    [invoice.created.date(), invoice.id, invoice.get_order, amount, vat]
+                )
+                count += 1
+        return (filename, count)
+
+    def creditnote_csv_export(self, workdir, paid=True, filename=None):
+        """Export creditnotes in our system."""
+        if not filename:
+            paid_str = "paid" if paid else "unpaid"
+            filename = f"bornhack_{paid_str}_creditnotes_{self.period.lower}_{self.period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "creditnote_date",
+                    "creditnote_number",
+                    "customer",
+                    "text",
+                    "amount",
+                    "vat",
+                ]
+            )
+            creditnotes = CreditNote.objects.filter(
+                paid=paid, created__gt=self.period.lower, created__lt=self.period.upper
+            )
+            for creditnote in creditnotes:
+                writer.writerow(
+                    [
+                        creditnote.created.date(),
+                        creditnote.id,
+                        creditnote.user if creditnote.user else creditnote.customer,
+                        creditnote.text,
+                        creditnote.amount,
+                        creditnote.danish_vat,
+                    ]
+                )
+        return (filename, creditnotes.count())
+
+    def shoporder_csv_export(self, workdir, filename=None):
+        """Export webshop orders in our system. Only paid orders are interesting for accounting."""
+        if not filename:
+            filename = f"bornhack_paid_webshop_orders_{self.period.lower}_{self.period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "id",
+                    "amount",
+                    "vat",
+                    "payment_method",
+                    "cancelled",
+                    "refunded",
+                    "notes",
+                    "invoice",
+                ]
+            )
+            orders = Order.objects.filter(
+                paid=True, created__gt=self.period.lower, created__lt=self.period.upper
+            )
+            for order in orders:
+                if order.invoice:
+                    invoiceid = order.invoice.id
+                else:
+                    invoiceid = "N/A"
+                writer.writerow(
+                    [
+                        order.id,
+                        order.total,
+                        True,
+                        order.payment_method,
+                        order.cancelled,
+                        order.refunded,
+                        order.notes,
+                        invoiceid,
+                    ]
+                )
+        return (filename, orders.count())
+
+    def customorder_csv_export(self, workdir, filename=None):
+        """Export customorders in our system."""
+        if not filename:
+            filename = (
+                f"bornhack_custom_orders_{self.period.lower}_{self.period.upper}.csv"
+            )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(["id", "amount", "vat", "paid", "customer"])
+            orders = CustomOrder.objects.filter(
+                created__gt=self.period.lower, created__lt=self.period.upper
+            )
+            for order in orders:
+                writer.writerow(
+                    [
+                        order.id,
+                        order.amount,
+                        order.danish_vat,
+                        order.paid,
+                        order.customer,
+                    ]
+                )
+        return (filename, orders.count())
+
+    def expense_csv_export(self, workdir, filename=None):
+        """Export expenses in our system."""
+        if not filename:
+            filename = f"bornhack_expenses_{self.period.lower}_{self.period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "uuid",
+                    "camp",
+                    "creating_user",
+                    "creditor",
+                    "amount",
+                    "description",
+                    "paid_by_bornhack",
+                    "invoice",
+                    "invoice_date",
+                    "reimbursement",
+                    "notes",
+                ]
+            )
+            expenses = Expense.objects.filter(
+                invoice_date__gt=self.period.lower, invoice_date__lt=self.period.upper
+            )
+            for expense in expenses:
+                writer.writerow(
+                    [
+                        expense.uuid,
+                        expense.camp.title,
+                        expense.user,
+                        expense.creditor,
+                        expense.amount,
+                        expense.description,
+                        expense.paid_by_bornhack,
+                        expense.invoice.path,
+                        expense.invoice_date,
+                        expense.reimbursement,
+                        expense.notes,
+                    ]
+                )
+        return (filename, expenses.count())
+
+    def revenue_csv_export(self, workdir, filename=None):
+        """Export revenues in our system."""
+        if not filename:
+            filename = f"bornhack_revenues_{self.period.lower}_{self.period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "uuid",
+                    "camp",
+                    "creating_user",
+                    "debtor",
+                    "amount",
+                    "description",
+                    "invoice",
+                    "invoice_date",
+                    "notes",
+                ]
+            )
+            revenues = Revenue.objects.filter(
+                invoice_date__gt=self.period.lower, invoice_date__lt=self.period.upper
+            )
+            for revenue in revenues:
+                writer.writerow(
+                    [
+                        revenue.uuid,
+                        revenue.camp.title,
+                        revenue.user,
+                        revenue.debtor,
+                        revenue.amount,
+                        revenue.description,
+                        revenue.invoice.path,
+                        revenue.invoice_date,
+                        revenue.notes,
+                    ]
+                )
+        return (filename, revenues.count())
+
+    def reimbursement_csv_export(self, workdir, filename=None):
+        """Export reimbursements in our system."""
+        if not filename:
+            filename = (
+                f"bornhack_reimbursements_{self.period.lower}_{self.period.upper}.csv"
+            )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "uuid",
+                    "created_by",
+                    "created_for",
+                    "notes",
+                    "paid",
+                    "covered_expenses",
+                    "payback_expense",
+                ]
+            )
+            count = 0
+            for reimbursement in Reimbursement.objects.filter(paid=True):
+                if not reimbursement.payback_expense:
+                    continue
+                if reimbursement.payback_expense.invoice_date < self.period.lower:
+                    continue
+                if reimbursement.payback_expense.invoice_date > self.period.upper:
+                    continue
+                writer.writerow(
+                    [
+                        reimbursement.uuid,
+                        reimbursement.user,
+                        reimbursement.reimbursement_user,
+                        reimbursement.notes,
+                        reimbursement.paid,
+                        reimbursement.expenses.exclude(
+                            paid_by_bornhack=True
+                        ).values_list("uuid", flat=True),
+                        reimbursement.payback_expense.uuid,
+                    ]
+                )
+                count += 1
+        return (filename, count)
+
+    def create_index_html(self, workdir):
+        """Create a HTML file with links for everything"""
+        context = {
+            "period": self.period,
+            "bankaccounts": self.bankaccounts,
+            "paid_invoices": self.paid_invoices,
+            "unpaid_invoices": self.unpaid_invoices,
+            "paid_creditnotes": self.paid_creditnotes,
+            "unpaid_creditnotes": self.unpaid_creditnotes,
+            "orders": self.orders,
+            "customorders": self.customorders,
+            "expenses": self.expenses,
+            "revenues": self.revenues,
+            "reimbursements": self.reimbursements,
+        }
+        rendered = render_to_string("accounting_export.html", context)
+        with open(workdir / "index.html", "w") as f:
+            f.write(rendered)
+
+    def create_archive(self, workdir):
+        """Create an in-memory zip-file with all the CSV data and the HTML file"""
+        self.archivedata = io.BytesIO()
+        subdir = f"bornhack_accounting_export_from_{self.period.lower}_to_{self.period.upper}"
+        with ZipFile(self.archivedata, "w") as zh:
+            # add everything in the workdir
+            for filename in workdir.glob("*"):
+                zh.write(filename, f"{subdir}/{basename(filename)}")
+            # add support files for styling
+            for filepath in [
+                "css/bootstrap.min.css",
+                "css/jquery.dataTables.1.10.20.min.css",
+                "js/jquery-3.3.1.min.js",
+                "js/jquery.dataTables.1.10.20.min.js",
+                "js/bootstrap.min.js",
+            ]:
+                # generate an absolute path
+                fullpath = Path(settings.BASE_DIR) / "static_src" / filepath
+                zh.write(fullpath, f"{subdir}/{basename(fullpath)}")

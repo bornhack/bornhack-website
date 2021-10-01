@@ -2,9 +2,11 @@ import csv
 import logging
 from io import StringIO
 
+import magic
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count, Q, Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -20,6 +22,7 @@ from django.views.generic import (
 
 from camps.mixins import CampViewMixin
 from economy.models import (
+    AccountingExport,
     Bank,
     BankAccount,
     BankTransaction,
@@ -38,6 +41,7 @@ from economy.models import (
     ZettleReceipt,
 )
 from economy.utils import (
+    AccountingExporter,
     CoinifyCSVImporter,
     MobilePayCSVImporter,
     ZettleExcelImporter,
@@ -832,3 +836,108 @@ class MobilePayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView
                 kwargs={"camp_slug": self.camp.slug},
             )
         )
+
+
+################################
+# ACCOUNTING EXPORT
+
+
+class AccountingExportCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateView):
+    template_name = "accountingexport_form.html"
+    model = AccountingExport
+    fields = ["date_from", "date_to", "comment"]
+
+    def form_valid(self, form):
+        """Gather data and create a zipfile with all of it."""
+        # get the model instance
+        export = form.save(commit=False)
+
+        # initiate and run the exporter
+        exporter = AccountingExporter(
+            startdate=export.date_from,
+            enddate=export.date_to,
+        )
+        exporter.doit()
+
+        # add the archive to the model and save
+        export.archive.save(
+            f"bornhack_accounting_export_from_{export.date_from}_to_{export.date_to}_{export.uuid}.zip",
+            exporter.archivedata,
+        )
+
+        # some feedback and redirect
+        messages.success(
+            self.request, f"Wrote archive file {export.archive.path} to disk, yay"
+        )
+        messages.success(
+            self.request,
+            f"Wrote {len(exporter.bankaccounts)} CSV files for bank accounts",
+        )
+        return redirect(
+            reverse(
+                "backoffice:accountingexport_list",
+                kwargs={"camp_slug": self.camp.slug},
+            )
+        )
+
+
+class AccountingExportListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = AccountingExport
+    template_name = "accountingexport_list.html"
+
+
+class AccountingExportDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
+    model = AccountingExport
+    template_name = "accountingexport_detail.html"
+    pk_url_kwarg = "accountingexport_uuid"
+
+
+class AccountingExportUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+    model = AccountingExport
+    template_name = "accountingexport_form.html"
+    pk_url_kwarg = "accountingexport_uuid"
+    fields = ["comment"]
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"Accounting Export {self.kwargs['accountingexport_uuid']} updated successfully!",
+        )
+        return reverse(
+            "backoffice:accountingexport_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
+
+
+class AccountingExportDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteView):
+    model = AccountingExport
+    template_name = "accountingexport_delete.html"
+    pk_url_kwarg = "accountingexport_uuid"
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"Accounting Export {self.kwargs['accountingexport_uuid']} deleted successfully!",
+        )
+        return reverse(
+            "backoffice:accountingexport_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
+
+
+class AccountingExportDownloadView(
+    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+):
+    model = AccountingExport
+    pk_url_kwarg = "accountingexport_uuid"
+
+    def get(self, request, *args, **kwargs):
+        ae = self.get_object()
+        archive = ae.archive.read()
+        mimetype = magic.from_buffer(archive, mime=True)
+        response = HttpResponse(content_type=mimetype)
+        response[
+            "Content-Disposition"
+        ] = f"attachment; filename=bornhack_accounting_export_from_{ae.date_from}_to_{ae.date_to}_{ae.uuid}.zip"
+        response.write(archive)
+        return response

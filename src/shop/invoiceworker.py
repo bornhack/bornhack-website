@@ -39,7 +39,7 @@ def do_work():
             },
         )
         # update order object with the file
-        order.pdf.save(order.filename, File(pdffile))
+        order.pdf.save(str(order.filename), File(pdffile))
         order.save()
         logger.info("Generated proforma invoice PDF for order %s" % order)
 
@@ -84,7 +84,7 @@ def do_work():
             continue
 
         # update invoice object with the file
-        invoice.pdf.save(invoice.filename, File(pdffile))
+        invoice.pdf.save(str(invoice.filename), File(pdffile))
         invoice.save()
 
     # check if we need to send out any invoices (only for shop orders, and only where pdf has been generated)
