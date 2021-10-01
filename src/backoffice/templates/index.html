@@ -221,7 +221,7 @@
         <h4 class="list-group-item-heading">MobilePay Transactions</h4>
         <p class="list-group-item-text">Use this view to see all MobilePay sales, refunds, payouts and other transactions. The data is imported via CSV from the MobilePay webinterface.</p>
       </a>
-      <a href="{% url 'backoffice:accounting_export_list' camp_slug=camp.slug %}" class="list-group-item">
+      <a href="{% url 'backoffice:accountingexport_list' camp_slug=camp.slug %}" class="list-group-item">
         <h4 class="list-group-item-heading">Accounting Exports</h4>
         <p class="list-group-item-text">Use this view to see and generate Accounting Exports for bookkeeping purposes. The exports include bank accounts, PSP data, expenses, revenues, and reimbursements, invoices and creditnotes.</p>
       </a>
