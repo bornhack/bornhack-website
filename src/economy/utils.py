@@ -464,6 +464,7 @@ class AccountingExporter:
             self.revenues = self.revenue_csv_export(workdir)
             self.reimbursements = self.reimbursement_csv_export(workdir)
             self.pos = self.pos_csv_export(workdir)
+            self.coinify = self.coinify_csv_export(workdir)
             self.create_index_html(workdir)
             self.create_archive(workdir)
 
@@ -733,6 +734,116 @@ class AccountingExporter:
         for pos in Pos.objects.filter(pos_reports__period__overlap=self.period):
             files.append(pos.export_csv(self.period, workdir))
         return files
+
+    def coinify_csv_export(self, workdir):
+        """Export coinify data in our system. Three different CSV files is created."""
+        # invoices
+        filename = (
+            f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
+        )
+        invoices = CoinifyInvoice.objects.filter(
+            coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "coinify_id",
+                    "coinify_id_alpha",
+                    "coinify_created",
+                    "payment_amount",
+                    "payment_currency",
+                    "payment_btc_amount",
+                    "description",
+                    "credited_amount",
+                    "credited_currency",
+                    "state",
+                    "payment_type",
+                    "original_payment_id",
+                ]
+            )
+            for ci in invoices:
+                writer.writerow(
+                    [
+                        ci.pk,
+                        ci.coinify_id,
+                        ci.coinify_id_alpha,
+                        ci.coinify_created,
+                        ci.payment_amount,
+                        ci.payment_currency,
+                        ci.payment_btc_amount,
+                        ci.description,
+                        ci.credited_amount,
+                        ci.credited_currency,
+                        ci.state,
+                        ci.payment_type,
+                        ci.original_payment_id,
+                    ]
+                )
+
+        # payouts
+        filename = (
+            f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
+        )
+        payouts = CoinifyPayout.objects.filter(
+            coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "coinify_id",
+                    "coinify_created",
+                    "amount",
+                    "fee",
+                    "transferred",
+                    "currency",
+                    "amount_dkk",
+                    "fee_dkk",
+                    "transferred_dkk",
+                ]
+            )
+            for cp in payouts:
+                writer.writerow(
+                    [
+                        cp.pk,
+                        cp.coinify_id,
+                        cp.coinify_created,
+                        cp.amount,
+                        cp.fee,
+                        cp.transferred,
+                        cp.currency,
+                        cp.amount_dkk,
+                        cp.fee_dkk,
+                        cp.transferred_dkk,
+                    ]
+                )
+
+        # balances
+        filename = (
+            f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
+        )
+        balances = CoinifyBalance.objects.filter(
+            date__gt=self.period.lower, date__lt=self.period.upper
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "date",
+                    "btc",
+                    "dkk",
+                    "eur",
+                ]
+            )
+            for balance in balances:
+                writer.writerow(
+                    [balance.pk, balance.date, balance.btc, balance.dkk, balance.eur]
+                )
+            return (balances.count(), payouts.count(), invoices.count())
 
     def create_index_html(self, workdir):
         """Create a HTML file with links for everything"""

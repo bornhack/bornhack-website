@@ -870,10 +870,6 @@ class AccountingExportCreateView(CampViewMixin, EconomyTeamPermissionMixin, Crea
         messages.success(
             self.request, f"Wrote archive file {export.archive.path} to disk, yay"
         )
-        messages.success(
-            self.request,
-            f"Wrote {len(exporter.bankaccounts)} CSV files for bank accounts",
-        )
         return redirect(
             reverse(
                 "backoffice:accountingexport_list",
