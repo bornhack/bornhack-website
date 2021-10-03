@@ -99,6 +99,23 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     ticket_type = models.ForeignKey("TicketType", on_delete=models.PROTECT)
     used = models.BooleanField(default=False)
     used_time = models.DateTimeField(null=True, blank=True)
+    used_pos = models.ForeignKey(
+        "economy.Pos",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name=None,
+        help_text="The Pos this ticket was scanned in",
+    )
+    used_pos_username = models.ForeignKey(
+        "auth.User",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name=None,
+        help_text="The PoS user who scanned this ticket",
+    )
+
     badge_handed_out = models.BooleanField(default=False)
     token = models.CharField(max_length=64, blank=True)
     badge_token = models.CharField(max_length=64, blank=True)

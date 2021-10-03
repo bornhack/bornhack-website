@@ -79,7 +79,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
     model = PosReport
-    fields = ["date", "bank_responsible", "pos_responsible", "comments"]
+    fields = ["period", "bank_responsible", "pos_responsible", "comments"]
     template_name = "posreport_form.html"
 
     def get_context_data(self, **kwargs):

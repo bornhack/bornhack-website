@@ -110,6 +110,7 @@ from .views import (
     ReimbursementUpdateView,
     RevenueDetailView,
     RevenueListView,
+    ScanTicketsPosSelectView,
     ScanTicketsView,
     ShopTicketOverview,
     ShopTicketStatsDetailView,
@@ -241,7 +242,23 @@ urlpatterns = [
         "infodesk/",
         include(
             [
-                path("scan_tickets/", ScanTicketsView.as_view(), name="scan_tickets"),
+                path(
+                    "scan_tickets/",
+                    include(
+                        [
+                            path(
+                                "",
+                                ScanTicketsPosSelectView.as_view(),
+                                name="scan_tickets_pos_select",
+                            ),
+                            path(
+                                "<slug:pos_slug>/",
+                                ScanTicketsView.as_view(),
+                                name="scan_tickets",
+                            ),
+                        ]
+                    ),
+                ),
                 path("orders/", OrderListView.as_view(), name="order_list"),
                 path(
                     "invoices/",
