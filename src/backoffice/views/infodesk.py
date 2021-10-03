@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.views.generic import ListView, TemplateView
 
 from camps.mixins import CampViewMixin
+from economy.models import Pos
 from shop.models import CreditNote, Invoice, Order, OrderProductRelation
 from tickets.models import (
     DiscountTicket,
@@ -75,6 +76,13 @@ def _ticket_getter_by_pk(pk):
             pass
 
 
+class ScanTicketsPosSelectView(
+    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, ListView
+):
+    model = Pos
+    template_name = "scan_ticket_pos_select.html"
+
+
 class ScanTicketsView(
     LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, TemplateView
 ):
@@ -84,8 +92,14 @@ class ScanTicketsView(
     order = None
     order_search = False
 
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.pos = Pos.objects.get(team__camp=self.camp, slug=kwargs["pos_slug"])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context["pos"] = self.pos
 
         if self.ticket:
             context["ticket"] = self.ticket
@@ -130,6 +144,8 @@ class ScanTicketsView(
         ticket_to_check_in = _ticket_getter_by_pk(check_in_ticket_id)
         ticket_to_check_in.used = True
         ticket_to_check_in.used_time = timezone.now()
+        ticket_to_check_in.used_pos = self.pos
+        ticket_to_check_in.used_pos_username = request.user
         ticket_to_check_in.save()
         messages.info(request, "Ticket checked-in!")
         return ticket_to_check_in
@@ -198,7 +214,7 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
 
 class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Order
-    template_name = "order_list.html"
+    template_name = "order_list_backoffice.html"
 
 
 class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
