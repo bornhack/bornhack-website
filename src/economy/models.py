@@ -959,10 +959,14 @@ class PosReport(CampRelatedModel, UUIDModel):
     def hax_sold_website(self):
         """Return the number of HAX handed out from checked in website shop tickets."""
         total = 0
-        # loop over shoptickets checked in during the period of the posreport
         for st in ShopTicket.objects.filter(
-            product=Product.objects.filter(name="100 HAX"),
+            # we only care about tickets for the current camp
+            ticket_type__camp=self.camp,
+            # and only the 100 HAX product
+            product__in=Product.objects.filter(name="100 HAX"),
+            # and only for the current PoS
             used_pos=self.pos,
+            # and only in the PoS period
             used_time__contained_by=self.period,
         ):
             total += st.opr.quantity * 100
