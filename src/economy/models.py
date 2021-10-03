@@ -1487,6 +1487,10 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
     )
 
 
+##################################
+# Zettle
+
+
 class ZettleBalance(CreatedUpdatedUUIDModel):
     """Zettle (formerly iZettle) creates an account statement line every time there is a movement affecting our balance."""
 

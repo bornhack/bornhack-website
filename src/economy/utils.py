@@ -453,7 +453,9 @@ class AccountingExporter:
         """Do all the things."""
         with tempfile.TemporaryDirectory(prefix="django-accounting-") as tmpdir:
             workdir = Path(tmpdir)
+            # bank
             self.bankaccounts = self.bank_csv_export(workdir)
+            # website stuff
             self.paid_invoices = self.invoice_csv_export(workdir, paid=True)
             self.unpaid_invoices = self.invoice_csv_export(workdir, paid=False)
             self.paid_creditnotes = self.creditnote_csv_export(workdir, paid=True)
@@ -464,7 +466,13 @@ class AccountingExporter:
             self.revenues = self.revenue_csv_export(workdir)
             self.reimbursements = self.reimbursement_csv_export(workdir)
             self.pos = self.pos_csv_export(workdir)
+            # PSPs
             self.coinify = self.coinify_csv_export(workdir)
+            self.epay = self.epay_csv_export(workdir)
+            self.clearhaus = self.clearhaus_csv_export(workdir)
+            self.zettle = self.zettle_csv_export(workdir)
+            self.mobilepay = self.mobilepay_csv_export(workdir)
+            # wrap up
             self.create_index_html(workdir)
             self.create_archive(workdir)
 
@@ -849,6 +857,262 @@ class AccountingExporter:
             (invoices_filename, invoices.count()),
         )
 
+    def epay_csv_export(self, workdir):
+        """Export ePay/bambora transactions in our system."""
+        filename = (
+            f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
+        )
+        transactions = EpayTransaction.objects.filter(
+            auth_date__gt=self.period.lower, auth_date__lt=self.period.upper
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "merchant_id",
+                    "transaction_id",
+                    "order_id",
+                    "currency",
+                    "auth_date",
+                    "auth_amount",
+                    "captured_date",
+                    "captured_amount",
+                    "card_type",
+                    "description",
+                    "transaction_fee",
+                ]
+            )
+            for et in transactions:
+                writer.writerow(
+                    [
+                        et.pk,
+                        et.merchant_id,
+                        et.transaction_id,
+                        et.order_id,
+                        et.currency,
+                        et.auth_date,
+                        et.auth_amount,
+                        et.captured_date,
+                        et.captured_amount,
+                        et.card_type,
+                        et.description,
+                        et.transaction_fee,
+                    ]
+                )
+        return (filename, transactions.count())
+
+    def clearhaus_csv_export(self, workdir):
+        """Export Clearhaus settlements in our system."""
+        filename = f"bornhack_clearhaus_settlements_{self.period.lower}_{self.period.upper}.csv"
+        settlements = ClearhausSettlement.objects.filter(
+            payout_date__gt=self.period.lower, payout_date__lt=self.period.upper
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "merchant_id",
+                    "merchant_name",
+                    "clearhaus_uuid",
+                    "settled",
+                    "currency",
+                    "period_start_date",
+                    "period_end_date",
+                    "payout_amount",
+                    "payout_date",
+                    "summary_sales",
+                    "summary_credits",
+                    "summary_refunds",
+                    "summary_chargebacks",
+                    "summary_fees",
+                    "summary_other_postings",
+                    "summary_net",
+                    "reserve_amount",
+                    "reserve_date",
+                    "fees_sales",
+                    "fees_refunds",
+                    "fees_authorisations",
+                    "fees_credits",
+                    "fees_minimum_processing",
+                    "fees_service",
+                    "fees_wire_transfer",
+                    "fees_chargebacks",
+                    "fees_retrieval_requests",
+                    "payout_reference_number",
+                    "payout_descriptor",
+                    "reserve_reference_number",
+                    "reserve_descriptor",
+                    "fees_interchange",
+                    "fees_scheme",
+                ]
+            )
+            for s in settlements:
+                writer.writerow(
+                    [
+                        s.pk,
+                        s.merchant_id,
+                        s.merchant_name,
+                        s.clearhaus_uuid,
+                        s.settled,
+                        s.currency,
+                        s.period_start_date,
+                        s.period_end_date,
+                        s.payout_amount,
+                        s.payout_date,
+                        s.summary_sales,
+                        s.summary_credits,
+                        s.summary_refunds,
+                        s.summary_chargebacks,
+                        s.summary_fees,
+                        s.summary_other_postings,
+                        s.summary_net,
+                        s.reserve_amount,
+                        s.reserve_date,
+                        s.fees_sales,
+                        s.fees_refunds,
+                        s.fees_authorisations,
+                        s.fees_credits,
+                        s.fees_minimum_processing,
+                        s.fees_service,
+                        s.fees_wire_transfer,
+                        s.fees_chargebacks,
+                        s.fees_retrieval_requests,
+                        s.payout_reference_number,
+                        s.payout_descriptor,
+                        s.reserve_reference_number,
+                        s.reserve_descriptor,
+                        s.fees_interchange,
+                        s.fees_scheme,
+                    ]
+                )
+        return (filename, settlements.count())
+
+    def zettle_csv_export(self, workdir):
+        """Export Zettle data in our system. Two different CSV files will be created."""
+        # balances
+        balances_filename = (
+            f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
+        )
+        balances = ZettleBalance.objects.filter(
+            statement_time__gt=self.period.lower, statement_time__lt=self.period.upper
+        )
+        with open(workdir / balances_filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "statement_time",
+                    "payment_time",
+                    "payment_reference",
+                    "description",
+                    "amount",
+                    "balance",
+                ]
+            )
+            for balance in balances:
+                writer.writerow(
+                    [
+                        balance.pk,
+                        balance.statement_time,
+                        balance.payment_reference,
+                        balance.description,
+                        balance.amount,
+                        balance.balance,
+                    ]
+                )
+
+        # receipts
+        receipts_filename = (
+            f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
+        )
+        receipts = ZettleReceipt.objects.filter(
+            zettle_created__gt=self.period.lower, zettle_created__lt=self.period.upper
+        )
+        with open(workdir / receipts_filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "zettle_created",
+                    "receipt_number",
+                    "vat",
+                    "total",
+                    "fee",
+                    "net",
+                    "payment_method",
+                    "card_issuer",
+                    "staff",
+                    "description",
+                    "sold_via",
+                ]
+            )
+            for re in receipts:
+                writer.writerow(
+                    [
+                        re.pk,
+                        re.zettle_created,
+                        re.receipt_number,
+                        re.vat,
+                        re.total,
+                        re.fee,
+                        re.net,
+                        re.payment_method,
+                        re.card_issuer,
+                        re.staff,
+                        re.description,
+                        re.sold_via,
+                    ]
+                )
+
+        return (
+            (balances_filename, balances.count()),
+            (receipts_filename, receipts.count()),
+        )
+
+    def mobilepay_csv_export(self, workdir):
+        """Export MobilePay transactions in our system."""
+        filename = f"bornhack_mobilepay_transactions_{self.period.lower}_{self.period.upper}.csv"
+        transactions = MobilePayTransaction.objects.filter(
+            mobilepay_created__gt=self.period.lower,
+            mobilepay_created__lt=self.period.upper,
+        )
+        with open(workdir / filename, "w", newline="") as f:
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "event",
+                    "currency",
+                    "amount",
+                    "mobilepay_created",
+                    "comment",
+                    "transaction_id",
+                    "transfer_id",
+                    "payment_point",
+                    "myshop_number",
+                    "bank_account",
+                ]
+            )
+            for mt in transactions:
+                writer.writerow(
+                    [
+                        mt.pk,
+                        mt.event,
+                        mt.currency,
+                        mt.amount,
+                        mt.mobilepay_created,
+                        mt.comment,
+                        mt.transaction_id,
+                        mt.transfer_id,
+                        mt.payment_point,
+                        mt.myshop_number,
+                        mt.bank_account,
+                    ]
+                )
+        return (filename, transactions.count())
+
     def create_index_html(self, workdir):
         """Create a HTML file with links for everything"""
         context = {
@@ -864,6 +1128,10 @@ class AccountingExporter:
             "revenues": self.revenues,
             "reimbursements": self.reimbursements,
             "coinify": self.coinify,
+            "epay": self.epay,
+            "clearhaus": self.clearhaus,
+            "zettle": self.zettle,
+            "mobilepay": self.mobilepay,
         }
         rendered = render_to_string("accounting_export.html", context)
         with open(workdir / "index.html", "w") as f:

@@ -126,7 +126,7 @@
       </table>
       <hr>
       <h3>Coinify: Invoices, Payouts and Balances</h3>
-      <p class="lead">This table shows coinify invoices, payouts and daily balances.</p>
+      <p class="lead">This table shows coinify invoices, payouts and daily balances. Coinify is our PSP for blockchain payments, and they payout in EUR, so multiple currencies are in play (DKK, EUR, BTC).</p>
       <table class="table table-striped datatable">
         <thead>
           <tr>
@@ -150,6 +150,73 @@
             <td>Coinify Invoices</td>
             <td>{{ coinify.2.1 }}</td>
             <td><a href="{{ coinify.2.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>ePay/Bambora transactions and Clearhaus settlements</h3>
+      <p class="lead">This table contains a CSV file with all transactions for our online creditcard PSP ePay/Bambora, and another CSV file with the payouts/settlements which are handled by Clearhaus.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ePay/Bambora Transactions</td>
+            <td>{{ epay.1 }}</td>
+            <td><a href="{{ epay.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Clearhaus Settlements</td>
+            <td>{{ clearhaus.1 }}</td>
+            <td><a href="{{ clearhaus.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>Zettle (iZettle) receipts and balances</h3>
+      <p class="lead">This table contains two CSV files with all the receipts and balances from Zettle. The receipts CSV has one row per sale, the balances CSV has one row every time something affects our Zettle balance.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Zettle Balances</td>
+            <td>{{ zettle.0.1 }}</td>
+            <td><a href="{{ zettle.0.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Zettle Receipts</td>
+            <td>{{ zettle.1.1 }}</td>
+            <td><a href="{{ zettle.1.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>MobilePay Transactions</h3>
+      <p class="lead">We use MobilePay through Zettle but they do payouts directly to our bank account. This CSV contains one row for every time something happens which affects our balance, like a sale, payout etc.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MobilePay Transactions</td>
+            <td>{{ mobilepay.1 }}</td>
+            <td><a href="{{ mobilepay.0 }}">CSV</a></td>
           </tr>
         </tbody>
       </table>
