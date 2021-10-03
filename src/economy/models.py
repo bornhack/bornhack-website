@@ -14,6 +14,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
+from shop.models import Product
+from tickets.models import ShopTicket
 from utils.models import (
     CampRelatedModel,
     CreatedUpdatedModel,
@@ -956,8 +958,15 @@ class PosReport(CampRelatedModel, UUIDModel):
     @property
     def hax_sold_website(self):
         """Return the number of HAX handed out from checked in website shop tickets."""
+        total = 0
         # loop over shoptickets checked in during the period of the posreport
-        return 0
+        for st in ShopTicket.objects.filter(
+            product=Product.objects.filter(name="100 HAX"),
+            used_pos=self.pos,
+            used_time__contained_by=self.period,
+        ):
+            total += st.opr.quantity * 100
+        return total
 
 
 ##################################
