@@ -738,13 +738,13 @@ class AccountingExporter:
     def coinify_csv_export(self, workdir):
         """Export coinify data in our system. Three different CSV files is created."""
         # invoices
-        filename = (
+        invoices_filename = (
             f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
         )
         invoices = CoinifyInvoice.objects.filter(
             coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
         )
-        with open(workdir / filename, "w", newline="") as f:
+        with open(workdir / invoices_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
                 [
@@ -783,13 +783,13 @@ class AccountingExporter:
                 )
 
         # payouts
-        filename = (
+        payouts_filename = (
             f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
         )
         payouts = CoinifyPayout.objects.filter(
             coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
         )
-        with open(workdir / filename, "w", newline="") as f:
+        with open(workdir / payouts_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
                 [
@@ -822,13 +822,13 @@ class AccountingExporter:
                 )
 
         # balances
-        filename = (
+        balances_filename = (
             f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
         )
         balances = CoinifyBalance.objects.filter(
             date__gt=self.period.lower, date__lt=self.period.upper
         )
-        with open(workdir / filename, "w", newline="") as f:
+        with open(workdir / balances_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
                 [
@@ -843,7 +843,11 @@ class AccountingExporter:
                 writer.writerow(
                     [balance.pk, balance.date, balance.btc, balance.dkk, balance.eur]
                 )
-            return (balances.count(), payouts.count(), invoices.count())
+        return (
+            (balances_filename, balances.count()),
+            (payouts_filename, payouts.count()),
+            (invoices_filename, invoices.count()),
+        )
 
     def create_index_html(self, workdir):
         """Create a HTML file with links for everything"""
@@ -859,6 +863,7 @@ class AccountingExporter:
             "expenses": self.expenses,
             "revenues": self.revenues,
             "reimbursements": self.reimbursements,
+            "coinify": self.coinify,
         }
         rendered = render_to_string("accounting_export.html", context)
         with open(workdir / "index.html", "w") as f:

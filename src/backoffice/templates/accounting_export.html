@@ -125,5 +125,34 @@
         </tbody>
       </table>
       <hr>
+      <h3>Coinify: Invoices, Payouts and Balances</h3>
+      <p class="lead">This table shows coinify invoices, payouts and daily balances.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Coinify Balances</td>
+            <td>{{ coinify.0.1 }}</td>
+            <td><a href="{{ invoices.0.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Coinify Payouts</td>
+            <td>{{ coinify.1.1 }}</td>
+            <td><a href="{{ coinify.1.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Coinify Invoices</td>
+            <td>{{ coinify.2.1 }}</td>
+            <td><a href="{{ coinify.2.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
   </body
 </html>
