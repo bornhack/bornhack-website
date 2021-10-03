@@ -21,6 +21,7 @@ Shop Tickets | {{ block.super }}
       <tr>
           <th>Ticket Type</th>
           <th>Product</th>
+          <th>Quantity</th>
           <th>Order comment</th>
           <th>User / Email</th>
           <th>Used?</th>
@@ -33,10 +34,11 @@ Shop Tickets | {{ block.super }}
       <tr>
         <td>{{ ticket.ticket_type.name }}</td>
         <td>{{ ticket.product.name }}</td>
+        <td class="text-center">{{ ticket.opr.quantity }}</td>
         <td>{{ ticket.order.customer_comment|default:"None" }}</td>
         <td>{{ ticket.order.user.profile.name }}
          / {{ ticket.order.user.email }}</td>
-        <td>{{ ticket.used }}</td>
+        <td>{{ ticket.used_time|default:"N/A" }}</td>
         <td>{{ ticket.order.payment_method }}</td>
         <td>{{ ticket.order.paid }}</td>
       </tr>
