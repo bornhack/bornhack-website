@@ -17,7 +17,7 @@
   <tbody>
     {% for pr in posreport_list %}
     <tr>
-      <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.period }}</a></td>
+        <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.period.lower }} - {{ pr.period.upper }}</a></td>
       <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
       <td>{{ pr.dkk_sales_izettle }} DKK</td>
       <td class="text-right">
