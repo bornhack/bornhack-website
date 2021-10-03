@@ -23,6 +23,7 @@ from economy.models import (
     EpayTransaction,
     Expense,
     MobilePayTransaction,
+    Pos,
     Reimbursement,
     Revenue,
     ZettleBalance,
@@ -442,7 +443,7 @@ class MobilePayCSVImporter:
 
 
 class AccountingExporter:
-    """A class containing... something."""
+    """A class with methods for exporting all the financial data for the bookkeeper."""
 
     def __init__(self, startdate, enddate):
         """Requires startdate and enddate."""
@@ -462,6 +463,7 @@ class AccountingExporter:
             self.expenses = self.expense_csv_export(workdir)
             self.revenues = self.revenue_csv_export(workdir)
             self.reimbursements = self.reimbursement_csv_export(workdir)
+            self.pos = self.pos_csv_export(workdir)
             self.create_index_html(workdir)
             self.create_archive(workdir)
 
@@ -725,6 +727,13 @@ class AccountingExporter:
                 count += 1
         return (filename, count)
 
+    def pos_csv_export(self, workdir):
+        """Export PoS data in CSV files."""
+        files = []
+        for pos in Pos.objects.filter(pos_reports__date__contained_by=self.period):
+            files.append(pos.export_csv(self.period, workdir))
+        return files
+
     def create_index_html(self, workdir):
         """Create a HTML file with links for everything"""
         context = {
@@ -747,7 +756,7 @@ class AccountingExporter:
     def create_archive(self, workdir):
         """Create an in-memory zip-file with all the CSV data and the HTML file"""
         self.archivedata = io.BytesIO()
-        subdir = f"bornhack_accounting_export_from_{self.period.lower}_to_{self.period.upper}"
+        subdir = "bornhack_accounting_export"
         with ZipFile(self.archivedata, "w") as zh:
             # add everything in the workdir
             for filename in workdir.glob("*"):

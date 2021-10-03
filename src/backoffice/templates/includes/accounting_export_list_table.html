@@ -23,7 +23,7 @@
       <td>
         <div class="btn-group-vertical">
           <a href="{% url 'backoffice:accountingexport_detail' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-primary">Details</a>
-          <a href="{% url 'backoffice:accountingexport_download' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-primary">Download</a>
+          <a href="{% url 'backoffice:accountingexport_download_archive' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-primary">Download Archive</a>
           <a href="{% url 'backoffice:accountingexport_update' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-secondary">Update</a>
           <a href="{% url 'backoffice:accountingexport_delete' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-danger">Delete</a>
         </div>

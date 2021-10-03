@@ -601,6 +601,49 @@ class Pos(CampRelatedModel, UUIDModel):
             kwargs={"camp_slug": self.team.camp.slug, "pos_slug": self.slug},
         )
 
+    def export_csv(self, period, workdir):
+        """Write PosReports to a CSV file for the bookkeeper"""
+        filename = f"bornhack_pos_{self.slug}_{period.lower}_{period.upper}.csv"
+        with open(workdir / filename, "w", newline="") as f:
+            posreports = self.pos_reports.filter(period__contained_by=period)
+            writer = csv.writer(f, dialect="excel")
+            writer.writerow(
+                [
+                    "bornhack_uuid",
+                    "start_time",
+                    "end_time",
+                    "dkk_sales_izettle",
+                    "hax_sold_izettle",
+                    "hax_sold_website",
+                    "dkk_start",
+                    "dkk_end",
+                    "dkk_balance",
+                    "hax_start",
+                    "hax_end",
+                    "hax_balance",
+                    "pos_transactions",
+                ]
+            )
+            for pr in posreports:
+                writer.writerow(
+                    [
+                        pr.pk,
+                        pr.period.lower,
+                        pr.period.upper,
+                        pr.dkk_sales_izettle,
+                        pr.hax_sold_izettle,
+                        pr.hax_sold_website,
+                        pr.bank_count_dkk_start,
+                        pr.bank_count_dkk_end,
+                        pr.dkk_balance,
+                        pr.bank_start_hax,
+                        pr.bank_end_hax,
+                        pr.hax_balance,
+                        pr.pos_json_sales[0],
+                    ]
+                )
+        return (self, filename, posreports.count())
+
 
 class PosReport(CampRelatedModel, UUIDModel):
     """A PosReport contains the HAX/DKK counts and the csv report from the POS system."""

@@ -38,7 +38,15 @@
         </tr>
         <tr>
           <th>Archive</th>
-          <td><a href="{% url 'backoffice:accountingexport_download' camp_slug=camp.slug accountingexport_uuid=accountingexport.uuid %}" class="btn btn-primary">Download</a></td>
+          <td><a href="{% url 'backoffice:accountingexport_download_archive' camp_slug=camp.slug accountingexport_uuid=accountingexport.uuid %}" class="btn btn-primary">Download</a></td>
+        </tr>
+        <tr>
+          <th>Files</th>
+          <td>
+            {% for file in files %}
+            <a href="{% url 'backoffice:accountingexport_download_file' camp_slug=camp.slug accountingexport_uuid=accountingexport.uuid filename=file %}">{{ file }}</a><br>
+            {% endfor %}
+          </td>
         </tr>
       </tbody>
     </table>

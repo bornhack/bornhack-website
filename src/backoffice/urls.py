@@ -4,7 +4,8 @@ from .views import (
     AccountingExportCreateView,
     AccountingExportDeleteView,
     AccountingExportDetailView,
-    AccountingExportDownloadView,
+    AccountingExportDownloadArchiveView,
+    AccountingExportDownloadFileView,
     AccountingExportListView,
     AccountingExportUpdateView,
     AddRecordingView,
@@ -928,8 +929,20 @@ urlpatterns = [
                                         ),
                                         path(
                                             "download/",
-                                            AccountingExportDownloadView.as_view(),
-                                            name="accountingexport_download",
+                                            include(
+                                                [
+                                                    path(
+                                                        "",
+                                                        AccountingExportDownloadArchiveView.as_view(),
+                                                        name="accountingexport_download_archive",
+                                                    ),
+                                                    path(
+                                                        "<str:filename>",
+                                                        AccountingExportDownloadFileView.as_view(),
+                                                        name="accountingexport_download_file",
+                                                    ),
+                                                ]
+                                            ),
                                         ),
                                         path(
                                             "update/",

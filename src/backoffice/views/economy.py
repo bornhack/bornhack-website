@@ -1,5 +1,6 @@
 import csv
 import logging
+import zipfile
 from io import StringIO
 
 import magic
@@ -891,6 +892,15 @@ class AccountingExportDetailView(CampViewMixin, EconomyTeamPermissionMixin, Deta
     template_name = "accountingexport_detail.html"
     pk_url_kwarg = "accountingexport_uuid"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        z = zipfile.ZipFile(self.get_object().archive.path)
+        # we need a list of just filenames without the folder name
+        sorted_names = z.namelist()
+        sorted_names.sort()
+        context["files"] = [f.split("/")[1] for f in sorted_names if "/" in f]
+        return context
+
 
 class AccountingExportUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = AccountingExport
@@ -925,7 +935,7 @@ class AccountingExportDeleteView(CampViewMixin, EconomyTeamPermissionMixin, Dele
         )
 
 
-class AccountingExportDownloadView(
+class AccountingExportDownloadArchiveView(
     CampViewMixin, EconomyTeamPermissionMixin, DetailView
 ):
     model = AccountingExport
@@ -940,4 +950,23 @@ class AccountingExportDownloadView(
             "Content-Disposition"
         ] = f"attachment; filename=bornhack_accounting_export_from_{ae.date_from}_to_{ae.date_to}_{ae.uuid}.zip"
         response.write(archive)
+        return response
+
+
+class AccountingExportDownloadFileView(
+    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+):
+    model = AccountingExport
+    pk_url_kwarg = "accountingexport_uuid"
+
+    def get(self, request, *args, **kwargs):
+        ae = self.get_object()
+        filename = kwargs["filename"]
+        with zipfile.ZipFile(ae.archive.path) as z:
+            with z.open("bornhack_accounting_export/" + filename) as f:
+                data = f.read()
+        mimetype = magic.from_buffer(data, mime=True)
+        response = HttpResponse(content_type=mimetype)
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        response.write(data)
         return response
