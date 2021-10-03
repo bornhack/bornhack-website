@@ -12,7 +12,7 @@ import pytz
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
-from psycopg2.extras import DateRange
+from psycopg2.extras import DateTimeTZRange
 
 from economy.models import (
     BankAccount,
@@ -447,7 +447,7 @@ class AccountingExporter:
 
     def __init__(self, startdate, enddate):
         """Requires startdate and enddate."""
-        self.period = DateRange(startdate, enddate)
+        self.period = DateTimeTZRange(startdate, enddate)
 
     def doit(self):
         """Do all the things."""
@@ -730,7 +730,7 @@ class AccountingExporter:
     def pos_csv_export(self, workdir):
         """Export PoS data in CSV files."""
         files = []
-        for pos in Pos.objects.filter(pos_reports__date__contained_by=self.period):
+        for pos in Pos.objects.filter(pos_reports__period__overlap=self.period):
             files.append(pos.export_csv(self.period, workdir))
         return files
 

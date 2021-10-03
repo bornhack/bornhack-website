@@ -649,7 +649,7 @@ class PosReport(CampRelatedModel, UUIDModel):
     """A PosReport contains the HAX/DKK counts and the csv report from the POS system."""
 
     class Meta:
-        ordering = ["date", "pos"]
+        ordering = ["period", "pos"]
 
     pos = models.ForeignKey(
         "economy.Pos",
@@ -676,10 +676,6 @@ class PosReport(CampRelatedModel, UUIDModel):
         null=True,
         blank=True,
         help_text="The time period this report covers",
-    )
-
-    date = models.DateField(
-        help_text="The date this report covers (pick the starting date if opening hours cross midnight).",
     )
 
     pos_json = models.JSONField(
@@ -1114,7 +1110,9 @@ class BankAccount(CreatedUpdatedUUIDModel):
         if not filename:
             filename = f"bornhack_bank_account_{slugify(self.bank.name)}_{slugify(self.name)}_{self.reg_no}_{self.account_no}_{period.lower}_{period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
-            transactions = self.transactions.filter(date__contained_by=period)
+            transactions = self.transactions.filter(
+                date__gt=period.lower, date__lt=period.upper
+            )
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["bornhack_uuid", "date", "text", "amount", "balance"])
             for tx in transactions:
