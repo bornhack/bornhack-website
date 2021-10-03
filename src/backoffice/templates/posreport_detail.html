@@ -32,8 +32,8 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
           <td>{{ posreport.uuid }}</td>
         </tr>
         <tr>
-          <th>PosReport Date</th>
-          <td>{{ posreport.date }}</td>
+          <th>PosReport Period</th>
+          <td>{{ posreport.period.lower }} - {{ posreport.period.upper }}</td>
         </tr>
         <tr>
           <th>Pos Name</th>

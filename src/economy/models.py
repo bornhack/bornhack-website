@@ -6,6 +6,7 @@ from decimal import Decimal
 import pytz
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.validators import RegexValidator
@@ -551,6 +552,10 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         return expense
 
 
+##################################
+# Point of Sale
+
+
 class Pos(CampRelatedModel, UUIDModel):
     """A Pos is a point-of-sale like the bar or infodesk."""
 
@@ -622,6 +627,12 @@ class PosReport(CampRelatedModel, UUIDModel):
         help_text="The POS person responsible for this PosReport",
     )
 
+    period = DateTimeRangeField(
+        null=True,
+        blank=True,
+        help_text="The time period this report covers",
+    )
+
     date = models.DateField(
         help_text="The date this report covers (pick the starting date if opening hours cross midnight).",
     )
@@ -646,9 +657,9 @@ class PosReport(CampRelatedModel, UUIDModel):
         help_text="The number of HAX sold through the iZettle from the POS",
     )
 
-    hax_sold_website = models.PositiveIntegerField(
+    hax_sold_website_old = models.PositiveIntegerField(
         default=0,
-        help_text="The number of HAX sold through webshop tickets being used in the POS",
+        help_text="The number of HAX sold through webshop tickets being used in the POS. Not used anymore.",
     )
 
     # bank count start of day
@@ -941,6 +952,12 @@ class PosReport(CampRelatedModel, UUIDModel):
         balance -= self.bank_count_dkk_end
         # all good
         return balance
+
+    @property
+    def hax_sold_website(self):
+        """Return the number of HAX handed out from checked in website shop tickets."""
+        # loop over shoptickets checked in during the period of the posreport
+        return 0
 
 
 ##################################
