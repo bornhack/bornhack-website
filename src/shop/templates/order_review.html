@@ -1,6 +1,6 @@
 {% extends 'profile_base.html' %}
 {% load bootstrap3 %}
-{% load shop_tags %}
+{% load bornhack %}
 
 {% block title %}
 Review Order #{{ order.id }} ({% if order.open == None %}closed{% else %}open{% endif %}, unpaid) | {{ block.super }}
