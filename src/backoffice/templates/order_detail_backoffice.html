@@ -45,7 +45,42 @@ Order #{{ order.pk }} | BackOffice | {{ block.super }}
       </tr>
       <tr>
         <th>Proforma Invoice</th>
-        <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download</a></td>
+        <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download Proforma Invoice</a></td>
+      </tr>
+      <tr>
+        <th>Invoice</th>
+        <td>{% if order.invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.pk %}" class="btn btn-primary">Download Invoice #{{ order.invoice.pk }}</a>{% else %}N/A{% endif %}</td>
+      </tr>
+      <tr>
+        <th>Products</th>
+        <td>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Total</th>
+                <th>Used</th>
+                <th>Refunded</th>
+                <th>Available</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for opr in order.oprs.all %}
+            <tr>
+              <td>{{ opr.product.name }}</td>
+              <td>{{ opr.quantity }}</td>
+              <td>{{ opr.product.price|currency }}</td>
+              <td>{{ opr.total|currency }}</td>
+              <td>{{ opr.used_shoptickets.count }}</td>
+              <td>{{ opr.refunded }}</td>
+              <td>{{ opr.unused_shoptickets.count }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </td>
       </tr>
     </table>
   </div>

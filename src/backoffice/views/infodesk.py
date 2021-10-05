@@ -221,6 +221,21 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
         return response
 
 
+class InvoiceDownloadView(LoginRequiredMixin, DetailView):
+    model = Invoice
+    pk_url_kwarg = "invoice_id"
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_object().pdf:
+            raise Http404
+        response = HttpResponse(content_type="application/pdf")
+        response[
+            "Content-Disposition"
+        ] = f"attachment; filename='{self.get_object().filename}'"
+        response.write(self.get_object().pdf.read())
+        return response
+
+
 class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Order
     template_name = "order_list_backoffice.html"
