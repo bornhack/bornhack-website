@@ -35,7 +35,7 @@
 
 <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-{% for order_product in invoice.order.orderproductrelation_set.all %}
+{% for order_product in invoice.order.oprs.all %}
   <tr>
       <td>
       {{ order_product.product.name }}

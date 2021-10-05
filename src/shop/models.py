@@ -6,10 +6,8 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
-from django.db import models
-from django.db.models import Count
-from django.db.models import F
-from django.db.models import Sum
+from django.db import models, transaction
+from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -220,71 +218,10 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         return str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
     def create_tickets(self, request=None):
+        """Calls create_tickets() on each OPR and returns a list of all created tickets."""
         tickets = []
-        for order_product in self.orderproductrelation_set.all():
-            # if this is a Ticket product?
-            if order_product.product.ticket_type:
-                query_kwargs = {
-                    "product": order_product.product,
-                    "ticket_type": order_product.product.ticket_type,
-                }
-
-                if order_product.product.ticket_type.single_ticket_per_product:
-                    # This ticket type is one where we only create one ticket
-                    ticket, created = order_product.shoptickets.get_or_create(
-                        **query_kwargs
-                    )
-
-                    if created:
-                        msg = (
-                            "Created ticket for product %s on order %s (quantity: %s)"
-                            % (
-                                order_product.product,
-                                order_product.order.pk,
-                                order_product.quantity,
-                            )
-                        )
-                        tickets.append(ticket)
-                    else:
-                        msg = (
-                            "Ticket already created for product {} on order {}".format(
-                                order_product.product,
-                                order_product.order.pk,
-                            )
-                        )
-
-                    if request:
-                        messages.success(request, msg)
-                else:
-                    # We should create a number of tickets equal to OrderProductRelation quantity
-                    already_created_tickets = order_product.shoptickets.filter(
-                        **query_kwargs
-                    ).count()
-                    tickets_to_create = max(
-                        0,
-                        order_product.quantity - already_created_tickets,
-                    )
-
-                    # create the number of tickets required
-                    if tickets_to_create > 0:
-                        for _i in range(
-                            0,
-                            (order_product.quantity - already_created_tickets),
-                        ):
-                            ticket = order_product.shoptickets.create(**query_kwargs)
-                            tickets.append(ticket)
-
-                        msg = "Created {} tickets of type: {}".format(
-                            order_product.quantity,
-                            order_product.product.ticket_type.name,
-                        )
-                        if request:
-                            messages.success(request, msg)
-
-                # and mark the OPR as ticket_generated=True
-                order_product.ticket_generated = True
-                order_product.save()
-
+        for opr in self.oprs.all():
+            tickets += opr.create_tickets(request)
         return tickets
 
     def mark_as_paid(self, request=None):
@@ -334,40 +271,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             self.open = None
             self.save()
 
-    def is_not_ticket_generated(self):
-        if self.orderproductrelation_set.filter(ticket_generated=True).count() == 0:
-            return True
-        else:
-            return False
-
-    def is_partially_ticket_generated(self):
-        if (
-            self.orderproductrelation_set.filter(ticket_generated=True).count() != 0
-            and self.orderproductrelation_set.filter(ticket_generated=False).count()
-            != 0
-        ):
-            # some products are handed out, others are not
-            return True
-        else:
-            return False
-
-    def is_fully_ticket_generated(self):
-        if self.orderproductrelation_set.filter(ticket_generated=False).count() == 0:
-            return True
-        else:
-            return False
-
-    @property
-    def ticket_generated_status(self):
-        if self.is_not_ticket_generated():
-            return "no"
-        elif self.is_partially_ticket_generated():
-            return "partially"
-        elif self.is_fully_ticket_generated():
-            return "fully"
-        else:
-            return False
-
     @property
     def coinifyapiinvoice(self):
         if not self.coinify_api_invoices.exists():
@@ -385,6 +288,30 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     @property
     def filename(self):
         return "bornhack_proforma_invoice_order_%s.pdf" % self.pk
+
+    def get_invoice_address(self):
+        if self.invoice_address:
+            return self.invoice_address
+        else:
+            return self.user.email
+
+    @property
+    def used_status(self):
+        used = len(self.get_used_shoptickets())
+        unused = len(self.get_unused_shoptickets())
+        return f"{used} / {used+unused}"
+
+    def get_used_shoptickets(self):
+        tickets = []
+        for opr in self.oprs.all():
+            tickets += opr.used_shoptickets
+        return tickets
+
+    def get_unused_shoptickets(self):
+        tickets = []
+        for opr in self.oprs.all():
+            tickets += opr.unused_shoptickets
+        return tickets
 
 
 class ProductCategory(
@@ -564,22 +491,96 @@ class OrderProductRelation(
     CreatedUpdatedModel,
 ):
     def __str__(self):
-        return f"#{self.order}: {self.quantity} {self.product}"
-
+        return f'#{self.order}: {self.quantity} {self.product}'
+    order = models.ForeignKey(
+        "shop.Order", related_name="oprs", on_delete=models.PROTECT
+    )
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
-    quantity = models.PositiveIntegerField()
-    ticket_generated = models.BooleanField(default=False)
+    quantity = models.PositiveIntegerField(
+        help_text="The number of times this product has been bought on this order"
+    )
+    refunded = models.PositiveIntegerField(
+        default=0, help_text="The number of items refunded from this OPR"
+    )
+    ticket_generated = models.BooleanField(
+        default=False,
+        help_text="True if the ticket(s) for this OPR have been generated, False if not.",
+    )
 
     @property
     def total(self):
+        """Returns the total price for this OPR considering quantity."""
         return Decimal(self.product.price * self.quantity)
 
-    def clean(self):
-        if self.ticket_generated and not self.order.paid:
-            raise ValidationError(
-                "Product can not be handed out when order is not paid.",
+    def create_tickets(self, request=None):
+        """This method generates the needed tickets for this OPR.
+
+        We run this in a transaction so everything is undone in case something fails,
+        this is better than using djangos autocommit mode, which is only active
+        during a request, while transaction.atomic() will also protect against problems
+        when calling create_tickets() in manage.py shell or from a worker.
+        """
+        with transaction.atomic():
+            # do we evem generate tickets for this type of product?
+            if not self.product.ticket_type:
+                return []
+
+            tickets = []
+            # put reusable kwargs together
+            query_kwargs = dict(
+                product=self.product,
+                ticket_type=self.product.ticket_type,
             )
+
+            if self.product.ticket_type.single_ticket_per_product:
+                # For this ticket type we create one ticket regardless of quantity,
+                # so 20 chairs don't result in 20 tickets
+                ticket, created = self.shoptickets.get_or_create(**query_kwargs)
+
+                if request:
+                    if created:
+                        msg = f"Created ticket for product {self.product} on order {self.order} (quantity: {self.quantity})"
+                        tickets.append(ticket)
+                    else:
+                        msg = f"Ticket already exists for product {self.product} on order {self.order} (quantity: {self.quantity})"
+                        messages.success(request, msg)
+            else:
+                # For this ticket type we create a ticket per item,
+                # find out if any have already been created
+                already_created_tickets = self.shoptickets.filter(
+                    **query_kwargs
+                ).count()
+
+                # find out how many we need to create
+                tickets_to_create = max(
+                    0, self.quantity - already_created_tickets - self.refunded
+                )
+
+                # create the number of tickets required
+                if not tickets_to_create:
+                    return []
+                tickets = []
+                for i in range(0, tickets_to_create):
+                    ticket = self.shoptickets.create(**query_kwargs)
+                    tickets.append(ticket)
+
+                if request:
+                    msg = f"Created {self.quantity} tickets of type: {self.product.ticket_type.name}"
+                    messages.success(request, msg)
+
+            # and mark the OPR as ticket_generated=True
+            self.ticket_generated = True
+            self.save()
+            return tickets
+
+    @property
+    def used_shoptickets(self):
+        return self.shoptickets.filter(used=True)
+
+    @property
+    def unused_shoptickets(self):
+        return self.shoptickets.filter(used=False)
 
 
 class EpayCallback(

@@ -271,7 +271,6 @@ class OrderDetailView(
     DetailView,
 ):
     model = Order
-    template_name = "order_detail.html"
     context_object_name = "order"
 
     def get_context_data(self, **kwargs):
@@ -282,25 +281,45 @@ class OrderDetailView(
 
         return super().get_context_data(**kwargs)
 
+    def get_template_names(self):
+        if self.get_object().open is None:
+            return "order_detail_closed.html"
+        elif self.get_object().open is True:
+            return "order_detail_open.html"
+        else:
+            return False
+
     def get(self, request, *args, **kwargs):
         order = self.get_object()
         if order.open is None and not order.paid:
+            # order is already closed, go straight to the payment page
             return HttpResponseRedirect(
                 reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
             )
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        """The main webshop order handling method.
+
+        Start out by handling two special cases, deleting OPR and
+        cancelling orders, before creating a formset with the POST data.
+
+        The formset validation checks stock amounts. If no stock issues are
+        found the formset (meaning OPRs) is saved.
+
+        Then the user is redirected either back to the order page or to the
+        payment page, depending on which submit button was pressed.
+        """
         self.object = self.get_object()
         order = self.object
 
         # First check if the user is removing a product from the order.
         product_remove = request.POST.get("remove_product")
         if product_remove:
-            order.orderproductrelation_set.filter(pk=product_remove).delete()
+            order.oprs.filter(pk=product_remove).delete()
             if not order.products.count() > 0:
                 order.mark_as_cancelled()
-                messages.info(request, "Order cancelled!")
+                messages.info(request, "There is no spoon. Order cancelled!")
                 return HttpResponseRedirect(reverse_lazy("shop:index"))
 
         # Then see if the user is cancelling the order.
@@ -319,17 +338,18 @@ class OrderDetailView(
                 queryset=OrderProductRelation.objects.filter(order=order),
             )
 
-            # If the formset is not valid it means that we cannot fulfill the order, so return and inform the user.
+            # If the formset is not valid it means that we cannot fulfill the order,
+            # so show a message and redirect the user back to the order detail page
             if not formset.is_valid():
                 messages.error(
                     request,
                     "Some of the products you are ordering are out of stock. Review the order and try again.",
                 )
-                return self.render_to_response(
-                    self.get_context_data(order_product_formset=formset),
+                return HttpResponseRedirect(
+                    reverse("shop:order_detail", kwargs={"pk": order.pk})
                 )
 
-            # No stock issues, proceed to check if the user is updating or proceeding to review and pay the order.
+            # No stock issues, proceed to save OPRs and Order
             if "update_order" or "review_and_pay" in request.POST:
                 # We have already made sure the formset is valid, so just save it to update quantities.
                 formset.save()
@@ -338,12 +358,16 @@ class OrderDetailView(
                 order.invoice_address = request.POST.get("invoice_address") or ""
                 order.save()
 
-                if "review_and_pay" in request.POST:
-                    return HttpResponseRedirect(
-                        reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
-                    )
+            if "review_and_pay" in request.POST:
+                # user is ready to pay, redirect
+                return HttpResponseRedirect(
+                    reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+                )
 
-        return super().get(request, *args, **kwargs)
+        # redirect remaining cases back to the order page
+        return HttpResponseRedirect(
+            reverse("shop:order_detail", kwargs={"pk": order.pk})
+        )
 
 
 class OrderReviewAndPayView(
