@@ -19,20 +19,18 @@ Details for Order #{{ order.id }} | {{ block.super }}
           {{ order_product_formset.management_form }}
         {% endif %}
         <table class="table table-bordered {% if not order.open == None %}table-hover{% endif %}">
-
           <thead>
             <tr>
               <th>
                 Name
-              <th>
+              <th class="text-right">
                 Quantity
-              <th>
+              <th class="text-right">
                 Price
-              <th>
+              <th class="text-right">
                 Total
-              {% if not order.open == None %}
-              <th></th>
-              {% endif %}
+              <th>
+                Remove
 
           <tbody>
         {% for form in order_product_formset %}
@@ -43,42 +41,35 @@ Details for Order #{{ order.id }} | {{ block.super }}
               {% if form.instance.product.stock_amount %}
                 <br /><small>{{ form.instance.product.left_in_stock }} left in stock</small>
               {% endif %}
-            <td>
-              {% if not order.open == None %}
-              {% bootstrap_field form.quantity show_label=False %}
-              {% else %}
-              {{ form.instance.quantity }}
-              {% endif %}
-            <td>
+            <td class="text-right">
+              {% bootstrap_field form.quantity show_help=False show_label=False size="small" %}
+            <td class="text-right">
               {{ form.instance.product.price|currency }}
-            <td>
+            <td class="text-right">
               {{ form.instance.total|currency }}
-            {% if not order.open == None %}
             <td>
                 {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
-            {% endif %}
-
         {% endfor %}
 
           <tr>
-            <td colspan="2">
+            <td colspan="2">All our products include 25% Danish VAT</td>
             <td>
               <strong>Included VAT (25%)</strong>
-            <td>
+            <td class="text-right">
               {{ order.vat|currency }}
 
           <tr>
             <td colspan="2">
             <td>
               <strong>Total</strong>
-            <td>
+            <td class="text-right">
               {{ order.total|currency }}<br />
 
         </table>
 
         {% if not order.open == None %}
           <h4>Comment:</h4>
-          <textarea class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments or shipping address here...">{{ order.customer_comment }}</textarea></p>
+          <textarea class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments here...">{{ order.customer_comment }}</textarea></p>
         {% elif order.open == None and order.customer_comment %}
           <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
         {% endif %}
@@ -118,7 +109,7 @@ Details for Order #{{ order.id }} | {{ block.super }}
     {% if order.paid %}
       <div class="panel-footer">
       {% if order.refunded %}
-      <h4>This order has been refunded and tickets related to it are deleted and no longer valid.</h4>
+      <h4>This order has been fully refunded, tickets related to it are no longer valid.</h4>
       {% else %}
       <h4>This order is paid in full.</h4>
       {% endif %}

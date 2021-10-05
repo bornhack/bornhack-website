@@ -16,13 +16,13 @@ Orders | {{ block.super }}
         <table class="table table-hover">
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Items</th>
-              <th>Total amount</th>
-              <th>Open?</th>
-              <th>Paid?</th>
-              <th>Refunded?</th>
-              <th>Delivered?</th>
+              <th class="text-right">Order ID</th>
+              <th class="text-right">Items</th>
+              <th class="text-right">Total amount</th>
+              <th class="text-center">Open?</th>
+              <th class="text-center">Paid?</th>
+              <th class="text-center">Refunded?</th>
+              <th class="text-center">Used?</th>
               <th>Invoice</th>
               <th>Actions</th>
             </tr>
@@ -31,13 +31,13 @@ Orders | {{ block.super }}
         {% for order in orders %}
             {% if order.products.exists %}
             <tr {% if not order.open and order.paid and order.is_fully_ticket_generated %}style="color: lightgrey"{% endif %}>
-                <td>{{ order.id }}</td>
-                <td>{{ order.get_number_of_items }}</td>
-                <td>{{ order.total|currency }}</td>
-                <td class="text-center">{{ order.open|truefalseicon }}</td>
+                <td class="text-right">{{ order.id }}</td>
+                <td class="text-right">{{ order.get_number_of_items }}</td>
+                <td class="text-right">{{ order.total|currency }}</td>
+                <td class="text-center">{% if order.open %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-danger"></i>{% endif %}</td>
                 <td class="text-center">{{ order.paid|truefalseicon }}</td>
                 <td class="text-center">{{ order.refunded|truefalseicon }}</td>
-                <td class="text-center">{{ order.ticket_generated_status }}</td>
+                <td class="text-center">{{ order.used_status }}</td>
                 <td>
                 {% if order.paid %}
                     {% if order.invoice.pdf %}

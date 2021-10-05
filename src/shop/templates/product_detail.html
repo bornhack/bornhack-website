@@ -48,7 +48,7 @@
 
     <h3>{% if already_in_order %}Update order{% else %}Add to order{% endif %}</h3>
 
-    {% if already_in_order %}<p>You already have this product in your order.</p>{% endif %}
+    {% if already_in_order %}<p>You already have this product in your order. You can update the quantity below.</p>{% endif %}
 
     {% if user.is_authenticated %}
 
@@ -56,7 +56,7 @@
 
     <form method="POST">
       {% csrf_token %}
-      {% bootstrap_form form %}
+      {% bootstrap_form form show_help=False %}
         <button type="submit" class="btn btn-primary">
           {% if already_in_order %}Update{% else %}Add{% endif %}
         </button>

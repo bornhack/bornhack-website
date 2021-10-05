@@ -907,14 +907,8 @@ class Command(BaseCommand):
             open=None,
             paid=True,
         )
-        orders[0].orderproductrelation_set.create(
-            product=camp_products["ticket1"],
-            quantity=1,
-        )
-        orders[0].orderproductrelation_set.create(
-            product=global_products["tent1"],
-            quantity=1,
-        )
+        orders[0].oprs.create(product=camp_products["ticket1"], quantity=1)
+        orders[0].oprs.create(product=global_products["tent1"], quantity=1)
         orders[0].mark_as_paid(request=None)
 
         orders[1] = Order.objects.create(
@@ -922,14 +916,8 @@ class Command(BaseCommand):
             payment_method="in_person",
             open=None,
         )
-        orders[1].orderproductrelation_set.create(
-            product=camp_products["ticket1"],
-            quantity=1,
-        )
-        orders[1].orderproductrelation_set.create(
-            product=global_products["tent2"],
-            quantity=1,
-        )
+        orders[1].oprs.create(product=camp_products["ticket1"], quantity=1)
+        orders[1].oprs.create(product=global_products["tent2"], quantity=1)
         orders[1].mark_as_paid(request=None)
 
         orders[2] = Order.objects.create(
@@ -937,18 +925,9 @@ class Command(BaseCommand):
             payment_method="in_person",
             open=None,
         )
-        orders[2].orderproductrelation_set.create(
-            product=camp_products["ticket2"],
-            quantity=1,
-        )
-        orders[2].orderproductrelation_set.create(
-            product=camp_products["ticket1"],
-            quantity=1,
-        )
-        orders[2].orderproductrelation_set.create(
-            product=global_products["tent2"],
-            quantity=1,
-        )
+        orders[2].oprs.create(product=camp_products["ticket2"], quantity=1)
+        orders[2].oprs.create(product=camp_products["ticket1"], quantity=1)
+        orders[2].oprs.create(product=global_products["tent2"], quantity=1)
         orders[2].mark_as_paid(request=None)
 
         orders[3] = Order.objects.create(
@@ -956,18 +935,9 @@ class Command(BaseCommand):
             payment_method="in_person",
             open=None,
         )
-        orders[3].orderproductrelation_set.create(
-            product=global_products["product0"],
-            quantity=1,
-        )
-        orders[3].orderproductrelation_set.create(
-            product=camp_products["ticket2"],
-            quantity=1,
-        )
-        orders[3].orderproductrelation_set.create(
-            product=global_products["tent1"],
-            quantity=1,
-        )
+        orders[3].oprs.create(product=global_products["product0"], quantity=1)
+        orders[3].oprs.create(product=camp_products["ticket2"], quantity=1)
+        orders[3].oprs.create(product=global_products["tent1"], quantity=1)
         orders[3].mark_as_paid(request=None)
 
         return orders

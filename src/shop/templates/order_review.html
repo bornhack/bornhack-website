@@ -3,7 +3,7 @@
 {% load shop_tags %}
 
 {% block title %}
-Details for Order #{{ order.id }} | {{ block.super }}
+Review Order #{{ order.id }} ({% if order.open == None %}closed{% else %}open{% endif %}, unpaid) | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
@@ -18,7 +18,11 @@ Details for Order #{{ order.id }} | {{ block.super }}
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h4>Details for Order #{{ order.id }}</h4>
+          {% if order.open == None %}
+          <h4>Select Payment Method for Order #{{ order.id }} (closed, unpaid)</h4>
+          {% else %}
+          <h4>Review Order #{{ order.id }} (open, unpaid)</h4>
+          {% endif %}
         </div>
         <div class="panel-body">
 
@@ -26,7 +30,7 @@ Details for Order #{{ order.id }} | {{ block.super }}
                 {% if order.open is not None %}
                     Please review your order to make sure the quantities are right.
                 {% else %}
-                    This order is closed, but not paid.
+                    This order is closed, but not paid. You can choose your payment method after the order details.
                 {% endif %}
             </p>
 
@@ -43,7 +47,7 @@ Details for Order #{{ order.id }} | {{ block.super }}
                         Total
 
                 <tbody>
-                {% for opr in order.orderproductrelation_set.all %}
+                {% for opr in order.oprs.all %}
                     <tr>
                     <td>
                         {{ opr.product.name }}

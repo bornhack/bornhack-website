@@ -15,15 +15,13 @@ def zip_lists(a, b):
 def truefalseicon(value):
     """A template filter to show a green checkbox or red x depending on True/False value"""
     if value is True:
-        return mark_safe("<span class='text-success glyphicon glyphicon-ok'></span>")
+        return mark_safe("<i class='fas fa-check text-success'></i>")
     elif value is False:
-        return mark_safe("<span class='text-danger glyphicon glyphicon-remove'></span>")
+        return mark_safe("<i class='fas fa-times text-danger'></i>")
     elif value is None:
-        return mark_safe(
-            "<span class='text-secondary glyphicon glyphicon-question'></span>",
-        )
+        return mark_safe("<i class='fas fa-question text-secondary'></i>")
     else:
-        return "what is this"
+        return "the truefalseicon template filter doesn't know what to do here"
 
 
 @register.simple_tag(takes_context=True)
