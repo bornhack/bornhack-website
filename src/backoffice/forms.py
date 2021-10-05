@@ -1,7 +1,10 @@
 from django import forms
+from django.forms import modelformset_factory
 
 from program.models import Event
 from program.models import Speaker
+
+from shop.models import OrderProductRelation
 
 
 class AddRecordingForm(forms.ModelForm):
@@ -159,3 +162,23 @@ class MobilePayCSVForm(forms.Form):
         help_text="CSV file with MobilePay sales and refunds. Importing the same sales CSV multiple times will not create duplicates. Leave this empty if you don't need to upload any sales CSV.",
         required=False,
     )
+
+
+class OrderProductRelationRefundForm(forms.ModelForm):
+    class Meta:
+        model = OrderProductRelation
+        fields = ["id", "refund_quantity"]
+        widgets = {
+            "id": forms.HiddenInput(),
+        }
+
+    refund_quantity = forms.IntegerField(initial=0, min_value=0)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance:
+            refund_possible = self.instance.quantity - self.instance.refunded
+            self.fields["refund_quantity"].max_value = refund_possible
+
+
+OrderProductRelationRefundFormSet = modelformset_factory(OrderProductRelation, form=OrderProductRelationRefundForm, extra=0)

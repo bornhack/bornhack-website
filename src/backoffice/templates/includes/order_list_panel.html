@@ -30,8 +30,9 @@
       <td>{% if order.invoice %}{{ order.invoice }}{% else %}{{ order.pdf }} (proforma){% endif %}</td>
       <td>
         <div class="btn-group btn-group-vertical">
-          <a href="{% url "backoffice:order_detail" camp_slug=camp.slug pk=order.pk %}" class="btn btn-primary">Details</a>
-          <a href="{% url "backoffice:order_update" camp_slug=camp.slug pk=order.pk %}" class="btn btn-primary">Update</a>
+          <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Details</a>
+          <a href="{% url "backoffice:order_update" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Update</a>
+          <a href="{% url "backoffice:order_refund" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Refund</a>
         </div>
       </td>
     </tr>
