@@ -11,9 +11,6 @@
     <th>Paid</th>
     <th>Cancelled</th>
     <th>Refunded</th>
-    <th>Customer Comment</th>
-    <th>Invoice Address</th>
-    <th>Notes</th>
     <th>Invoice</th>
     <th>Actions</th>
   </tr>
@@ -30,12 +27,12 @@
       <td>{{ order.paid|truefalseicon }} {% if order.paid %}paid{% else %}unpaid{% endif %}</td>
       <td>{{ order.cancelled|truefalseicon }}</td>
       <td>{{ order.refunded|truefalseicon }}</td>
-      <td>{{ order.customer_comment }}</td>
-      <td>{{ order.invoice_address }}</td>
-      <td>{{ order.notes }}</td>
       <td>{% if order.invoice %}{{ order.invoice }}{% else %}{{ order.pdf }} (proforma){% endif %}</td>
       <td>
-          n/a
+        <div class="btn-group btn-group-vertical">
+          <a href="{% url "backoffice:order_detail" camp_slug=camp.slug pk=order.pk %}" class="btn btn-primary">Details</a>
+          <a href="{% url "backoffice:order_update" camp_slug=camp.slug pk=order.pk %}" class="btn btn-primary">Update</a>
+        </div>
       </td>
     </tr>
     {% endfor %}

@@ -520,13 +520,16 @@ class OrderProductRelation(
         this is better than using djangos autocommit mode, which is only active
         during a request, while transaction.atomic() will also protect against problems
         when calling create_tickets() in manage.py shell or from a worker.
+
+        Calling this method multiple times will not result in duplicate tickets being created,
+        and the number of tickets created takes the number of refunded into consideration too.
         """
+        tickets = []
         with transaction.atomic():
             # do we evem generate tickets for this type of product?
             if not self.product.ticket_type:
-                return []
+                return tickets
 
-            tickets = []
             # put reusable kwargs together
             query_kwargs = dict(
                 product=self.product,
@@ -556,11 +559,10 @@ class OrderProductRelation(
                 tickets_to_create = max(
                     0, self.quantity - already_created_tickets - self.refunded
                 )
+                if not tickets_to_create:
+                    return tickets
 
                 # create the number of tickets required
-                if not tickets_to_create:
-                    return []
-                tickets = []
                 for i in range(0, tickets_to_create):
                     ticket = self.shoptickets.create(**query_kwargs)
                     tickets.append(ticket)

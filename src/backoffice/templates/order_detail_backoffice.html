@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load bornhack %}
+
+{% block title %}
+Order #{{ order.pk }} | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default">
+  <div class="panel-heading">Order #{{ order.pk }} | BackOffice</div>
+  <div class="panel-body">
+    <table class="table">
+      <tr>
+        <th>User</th>
+        <td>{{ order.user }}</td>
+      </tr>
+      <tr>
+        <th>Payment Method</th>
+        <td>{{ order.payment_method }}</td>
+      </tr>
+      <tr>
+        <th>Paid</th>
+        <td>{{ order.paid|truefalseicon }}</td>
+      </tr>
+      <tr>
+        <th>Cancelled</th>
+        <td>{{ order.cancelled|truefalseicon }}</td>
+      </tr>
+      <tr>
+        <th>Refunded</th>
+        <td>{{ order.refunded|truefalseicon }}</td>
+      </tr>
+      <tr>
+        <th>Customer Comment</th>
+        <td>{{ order.customer_comment|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <th>Invoice Address</th>
+        <td>{{ order.get_invoice_address }}</td>
+      </tr>
+      <tr>
+        <th>Internal Notes</th>
+        <td>{{ order.notes|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <th>Proforma Invoice</th>
+        <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download</a></td>
+      </tr>
+    </table>
+  </div>
+</div>
+<a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Order List</a>
+{% endblock content %}
