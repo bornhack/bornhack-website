@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load bornhack %}
+
+{% block title %}
+    Refund of order #{{ order.pk }} | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+<form method="POST" class="form-inline">
+    {% csrf_token %}
+    {{ formset.management_form }}
+<div class="panel panel-default">
+
+    <div class="panel-heading">Order #{{ order.pk }} | BackOffice</div>
+    <div class="panel-body">
+
+    <table class="table">
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Refunded</th>
+            <th>Possible refund</th>
+        </tr>
+        {% for form in formset %}
+            {{ form.id }}
+            <tr>
+                <td>
+                    {{ form.instance.product }}
+                </td>
+                <td>
+                    {{ form.instance.quantity }}
+                </td>
+                <td>
+                    {{ form.instance.refunded }}
+                </td>
+                <td>
+                    {% if form.refund_quantity.field.max_value == 0 %}
+                        Fully refunded
+                        <input type="hidden"
+                               min="{{ form.refund_quantity.field.min_value }}"
+                               max="{{ form.refund_quantity.field.max_value }}"
+                               name="{{ form.refund_quantity.html_name }}"
+                               value="0">
+                    {% else %}
+                    <input type="number"
+                           class="form-control"
+                           min="{{ form.refund_quantity.field.min_value }}"
+                           max="{{ form.refund_quantity.field.max_value }}"
+                           id="{{ form.refund_quantity.id_for_label }}"
+                           name="{{ form.refund_quantity.html_name }}"
+                           value="{{ form.refund_quantity.initial }}">
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    </div>
+    <div class="panel-footer">
+        <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
+        <button type="submit" class="btn btn-primary pull-right">Refund</button>
+        <span class="clearfix"></span>
+    </div>
+
+</div>
+</form>
+
+{% endblock %}
