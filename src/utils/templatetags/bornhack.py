@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -56,3 +57,11 @@ def thh(context, fieldname, headerstring=None, tooltip=None, htmlclass=None):
     return mark_safe(
         f"<th data-container='body' data-placement='bottom' data-toggle='tooltip' title='{tooltip}'>{headerstring}</th>",
     )
+
+
+@register.filter
+def currency(value):
+    try:
+        return "{0:.2f} DKK".format(Decimal(value))
+    except ValueError:
+        return False
