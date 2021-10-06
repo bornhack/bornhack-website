@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -407,3 +408,16 @@ class TestTicketCreation(TestCase):
             ShopTicket.objects.filter(product=product, opr__order=order).count(),
             1,
         )
+
+
+class TestOrderProductRelationModel(TestCase):
+    def test_refunded_cannot_be_larger_than_quantity(self):
+        """ OrderProductRelation with refunded > quantity should raise an IntegrityError. """
+        user = UserFactory()
+        ticket_type = TicketTypeFactory(single_ticket_per_product=False)
+        product = ProductFactory(ticket_type=ticket_type)
+        order = OrderFactory(user=user)
+        opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
+        with self.assertRaises(IntegrityError):
+            opr.refunded = 6
+            opr.save()
