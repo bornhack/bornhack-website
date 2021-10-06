@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, Sum, Q
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -497,6 +497,11 @@ class OrderProductRelation(
         help_text="True if the ticket(s) for this OPR have been generated, False if not.",
     )
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=Q(refunded__lte=F("quantity")), name="refund_less_or_equal_quantity")
+        ]
+
     @property
     def total(self):
         """Returns the total price for this OPR considering quantity."""
@@ -572,6 +577,14 @@ class OrderProductRelation(
     @property
     def unused_shoptickets(self):
         return self.shoptickets.filter(used=False)
+
+    @property
+    def used_tickets_count(self):
+        return self.used_shoptickets.count()
+
+    @property
+    def possible_refund(self):
+        return self.quantity - self.used_tickets_count - self.refunded
 
 
 class EpayCallback(

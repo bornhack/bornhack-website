@@ -177,8 +177,8 @@ class OrderProductRelationRefundForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.instance:
-            refund_possible = self.instance.quantity - self.instance.refunded
-            self.fields["refund_quantity"].max_value = refund_possible
+            self.fields["refund_quantity"].max_value = self.instance.possible_refund
+
 
 
 OrderProductRelationRefundFormSet = modelformset_factory(OrderProductRelation, form=OrderProductRelationRefundForm, extra=0)
