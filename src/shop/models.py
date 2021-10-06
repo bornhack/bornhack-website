@@ -572,11 +572,11 @@ class OrderProductRelation(
 
     @property
     def used_shoptickets(self):
-        return self.shoptickets.filter(used=True)
+        return self.shoptickets.filter(used_at__isnull=False)
 
     @property
     def unused_shoptickets(self):
-        return self.shoptickets.filter(used=False)
+        return self.shoptickets.filter(used_at__isnull=True)
 
     @property
     def used_tickets_count(self):

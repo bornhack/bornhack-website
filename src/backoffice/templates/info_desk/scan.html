@@ -45,7 +45,11 @@ Scan | {{ block.super }}
             <td>
                 <strong>Used?:</strong>
             <td>
-                {{ ticket.used }}
+                {% if ticket.used_at %}
+                    True
+                {% else %}
+                    False
+                {% endif %}
 
         {% if ticket.ticket_type.includes_badge %}
         <tr>
@@ -112,7 +116,7 @@ Scan | {{ block.super }}
             {% qr_code "clear" %}
         </div>
 
-        {% if not ticket.used %}
+        {% if not ticket.used_at %}
         <div class="col-md-4">
             {% qr_code "checkin" %}
         </div>

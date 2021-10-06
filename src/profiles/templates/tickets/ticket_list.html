@@ -47,7 +47,7 @@ Your Tickets | {{ block.super }}
               {% if ticket.ticket_type.single_ticket_per_product %}{{ ticket.opr.quantity }} &times; {% endif %}
               {{ ticket.product.price|currency }}
             <td>
-              {% if ticket.used %}
+              {% if ticket.used_at %}
               Yes
               {% else %}
               Not yet

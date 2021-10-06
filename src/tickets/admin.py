@@ -27,9 +27,9 @@ class TicketTypeAdmin(admin.ModelAdmin):
 
 @admin.register(SponsorTicket)
 class SponsorTicketAdmin(BaseTicketAdmin):
-    list_display = ["pk", "ticket_type", "sponsor", "used"]
+    list_display = ["pk", "ticket_type", "sponsor", "used_at"]
 
-    list_filter = ["ticket_type__camp", "used", "ticket_type", "sponsor"]
+    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "sponsor"]
 
     search_fields = ["pk", "sponsor__name"]
 
@@ -54,11 +54,11 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "ticket_type",
         "order",
         "product",
-        "used",
+        "used_at",
         "product_quantity",
     ]
 
-    list_filter = ["ticket_type__camp", "used", "ticket_type", "opr__order", "product"]
+    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "opr__order", "product"]
 
     search_fields = [
         "uuid",

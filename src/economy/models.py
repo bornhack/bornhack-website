@@ -582,7 +582,7 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
     team = models.ForeignKey(
         "teams.Team",
         on_delete=models.PROTECT,
-        help_text="The Team managning this POS",
+        help_text="The Team managing this POS",
     )
 
     def save(self, **kwargs):
@@ -1014,7 +1014,7 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
             # and only for the current PoS
             used_pos=self.pos,
             # and only in the PoS period
-            used_time__contained_by=self.period,
+            used_at__contained_by=self.period,
         ):
             total += st.opr.quantity * 100
         return total

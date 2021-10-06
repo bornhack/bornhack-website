@@ -1,17 +1,19 @@
 import factory
 from django.utils import timezone
 
-from .models import Bank
-from .models import BankAccount
-from .models import BankTransaction
-from .models import ClearhausSettlement
-from .models import CoinifyBalance
-from .models import CoinifyInvoice
-from .models import CoinifyPayout
-from .models import EpayTransaction
-from .models import MobilePayTransaction
-from .models import ZettleBalance
-from .models import ZettleReceipt
+from .models import (
+    Bank,
+    BankAccount,
+    BankTransaction,
+    ClearhausSettlement,
+    CoinifyBalance,
+    CoinifyInvoice,
+    CoinifyPayout,
+    EpayTransaction,
+    MobilePayTransaction,
+    ZettleBalance,
+    ZettleReceipt, Pos,
+)
 
 
 class BankFactory(factory.django.DjangoModelFactory):
@@ -396,3 +398,11 @@ class MobilePayTransactionFactory(factory.django.DjangoModelFactory):
     payment_point = "BornHack 2021"
     myshop_number = "18291"
     bank_account = factory.Faker("numerify", text="####00000######")
+
+
+class PosFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Pos
+
+    team = factory.SubFactory("teams.factories.TeamFactory")
+    name = factory.Faker("name")

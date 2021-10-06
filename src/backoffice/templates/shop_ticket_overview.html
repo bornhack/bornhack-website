@@ -39,7 +39,7 @@ Shop Tickets | {{ block.super }}
         <td>{{ ticket.order.customer_comment|default:"None" }}</td>
         <td>{{ ticket.order.user.profile.name }}
          / {{ ticket.order.user.email }}</td>
-        <td data-order="{{ ticket.used_time|sortable }}">{{ ticket.used_time|default:"N/A" }}</td>
+        <td data-order="{{ ticket.used_at|sortable }}">{{ ticket.used_at|default:"N/A" }}</td>
         <td>{{ ticket.order.payment_method }}</td>
         <td>{{ ticket.order.paid }}</td>
       </tr>
