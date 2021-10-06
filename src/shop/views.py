@@ -386,7 +386,7 @@ class OrderReviewAndPayView(
         order = self.object
 
         payment_method = request.POST.get("payment_method")
-        if payment_method in order.PAYMENT_METHODS:
+        if payment_method in order.PaymentMethods.values:
             if not request.POST.get("accept_terms"):
                 messages.error(
                     request,
@@ -400,21 +400,17 @@ class OrderReviewAndPayView(
             order.save()
 
             reverses = {
-                Order.CREDIT_CARD: reverse_lazy(
-                    "shop:epay_form",
-                    kwargs={"pk": order.id},
+                Order.PaymentMethods.CREDIT_CARD: reverse_lazy(
+                    "shop:epay_form", kwargs={"pk": order.id}
                 ),
-                Order.BLOCKCHAIN: reverse_lazy(
-                    "shop:coinify_pay",
-                    kwargs={"pk": order.id},
+                Order.PaymentMethods.BLOCKCHAIN: reverse_lazy(
+                    "shop:coinify_pay", kwargs={"pk": order.id}
                 ),
-                Order.BANK_TRANSFER: reverse_lazy(
-                    "shop:bank_transfer",
-                    kwargs={"pk": order.id},
+                Order.PaymentMethods.BANK_TRANSFER: reverse_lazy(
+                    "shop:bank_transfer", kwargs={"pk": order.id}
                 ),
-                Order.IN_PERSON: reverse_lazy(
-                    "shop:in_person",
-                    kwargs={"pk": order.id},
+                Order.PaymentMethods.IN_PERSON: reverse_lazy(
+                    "shop:in_person", kwargs={"pk": order.id}
                 ),
             }
 
