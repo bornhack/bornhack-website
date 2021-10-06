@@ -11,6 +11,7 @@ from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
 from utils.factories import UserFactory
+from economy.factories import PosFactory
 
 
 class ProductAvailabilityTest(TestCase):
@@ -421,3 +422,28 @@ class TestOrderProductRelationModel(TestCase):
         with self.assertRaises(IntegrityError):
             opr.refunded = 6
             opr.save()
+
+    def test_refunded_possible(self):
+        user = UserFactory()
+        ticket_type = TicketTypeFactory(single_ticket_per_product=False)
+        product = ProductFactory(ticket_type=ticket_type)
+        order = OrderFactory(user=user)
+        opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
+        opr.create_tickets()
+
+        # Quantity is 5, we should be able to refund 5
+        self.assertEquals(opr.possible_refund, 5)
+
+        # Mark a ticket as used
+        ticket1 = opr.shoptickets.first()
+        ticket1.mark_as_used(pos=PosFactory(), user=UserFactory())
+
+        # Quantity is 5, but 1 is used, so we should be able to refund 4
+        self.assertEquals(opr.possible_refund, 4)
+
+        # Refund 1 ticket
+        opr.refunded = 1
+        opr.save()
+
+        # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
+        self.assertEquals(opr.possible_refund, 3)

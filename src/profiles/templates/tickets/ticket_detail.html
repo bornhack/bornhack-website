@@ -14,7 +14,7 @@ Your Tickets | {{ block.super }}
   </div>
   <div class="panel-body">
 
-    <h2>{% if ticket.used %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
+    <h2>{% if ticket.used_at %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
     {% if ticket.product.ticket_type.camp.read_only %}
     <dl>
       <dt>Name</dt><dd>{{ form.name.value|default:"Anonymous" }}</dd>
