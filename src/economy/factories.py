@@ -141,7 +141,7 @@ class ClearhausSettlementFactory(factory.django.DjangoModelFactory):
         model = ClearhausSettlement
 
     merchant_id = "2003656"
-    merchant_name = "BornHack IVS"
+    merchant_name = "BornHack ApS"
     clearhaus_uuid = factory.Faker("uuid4")
     settled = factory.Faker("random_element", elements=[True, True, True, False])
     currency = "DKK"
