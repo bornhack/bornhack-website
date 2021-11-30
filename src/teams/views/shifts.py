@@ -274,6 +274,9 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
                 request, template.render(Context({"shifts": overlapping_shifts}))
             )
         else:
+            # Remove at most one shift assignment for sale
+            for shift_assignment in shift.team_members.filter(for_sale=True)[:1]:
+                shift_assignment.delete()
             shift.team_members.add(team_member)
 
         kwargs.pop("pk")
@@ -297,6 +300,23 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
 
         return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
 
+class MemberSellsShift(LoginRequiredMixin, CampViewMixin, View):
+
+    http_methods = ["get"]
+
+    def get(self, request, **kwargs):
+        shift = TeamShift.objects.get(id=kwargs["pk"])
+        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+
+        team_member = TeamMember.objects.get(team=team, user=request.user)
+
+        shift_assignment = shift.team_members.get(team_member = team_member.pk)
+        shift_assignment.for_sale = True
+        shift_assignment.save()
+
+        kwargs.pop("pk")
+
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
 
 class UserShifts(CampViewMixin, TemplateView):
     template_name = "team_user_shifts.html"
