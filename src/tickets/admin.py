@@ -18,8 +18,8 @@ class BaseTicketAdmin(admin.ModelAdmin):
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
     list_display = ["name", "camp"]
-
     list_filter = ["name", "camp"]
+    save_as = True
 
 
 @admin.register(SponsorTicket)

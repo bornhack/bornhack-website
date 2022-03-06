@@ -17,6 +17,8 @@ class TeamMemberInline(admin.TabularInline):
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
+    save_as = True
+
     def get_responsible(self, obj):
         return ", ".join(
             [resp.profile.public_credit_name for resp in obj.responsible_members.all()]
