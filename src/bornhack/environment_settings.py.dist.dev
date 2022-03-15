@@ -7,7 +7,7 @@ import os
 # characters!
 SECRET_KEY = "something-very-random"
 
-ALLOWED_HOSTS = "*"
+ALLOWED_HOSTS = ["*"]
 
 # MODIFY THIS!
 #
