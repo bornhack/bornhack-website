@@ -1,4 +1,3 @@
-# coding: utf-8
 import logging
 
 from django.core.management.base import BaseCommand
@@ -19,7 +18,7 @@ class Command(BaseCommand):
 
     def output(self, message):
         self.stdout.write(
-            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
     def handle(self, *args, **options):
@@ -36,8 +35,8 @@ class Command(BaseCommand):
             ):
                 self.output(
                     "# Generating outgoing emails to send tickets for {}:".format(
-                        sponsor
-                    )
+                        sponsor,
+                    ),
                 )
                 for ticket in sponsor.sponsorticket_set.all():
                     # send the email
@@ -45,7 +44,7 @@ class Command(BaseCommand):
                         logger.info("OK: email to %s added" % sponsor)
                     else:
                         logger.error(
-                            "Unable to send sponsor ticket email to %s" % sponsor
+                            "Unable to send sponsor ticket email to %s" % sponsor,
                         )
 
                 sponsor.tickets_sent = True

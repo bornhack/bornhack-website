@@ -7,4 +7,3 @@ The attached receipt for revenue {{ revenue.pk }} has the following description:
 Greetings
 
 The {{ revenue.camp.title }} Economy Team
-

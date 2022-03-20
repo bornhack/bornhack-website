@@ -14,22 +14,23 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
-from economy.models import (
-    BankAccount,
-    ClearhausSettlement,
-    CoinifyBalance,
-    CoinifyInvoice,
-    CoinifyPayout,
-    EpayTransaction,
-    Expense,
-    MobilePayTransaction,
-    Pos,
-    Reimbursement,
-    Revenue,
-    ZettleBalance,
-    ZettleReceipt,
-)
-from shop.models import CreditNote, CustomOrder, Invoice, Order
+from economy.models import BankAccount
+from economy.models import ClearhausSettlement
+from economy.models import CoinifyBalance
+from economy.models import CoinifyInvoice
+from economy.models import CoinifyPayout
+from economy.models import EpayTransaction
+from economy.models import Expense
+from economy.models import MobilePayTransaction
+from economy.models import Pos
+from economy.models import Reimbursement
+from economy.models import Revenue
+from economy.models import ZettleBalance
+from economy.models import ZettleReceipt
+from shop.models import CreditNote
+from shop.models import CustomOrder
+from shop.models import Invoice
+from shop.models import Order
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
@@ -300,7 +301,7 @@ class ZettleExcelImporter:
     def import_zettle_receipts_df(df):
         """Import a pandas dataframe with Zettle receipts (from POS sales)."""
         create_count = 0
-        for index, row in df.iterrows():
+        for _index, row in df.iterrows():
             zr, created = ZettleReceipt.objects.get_or_create(
                 zettle_created=pd.to_datetime(row["Dato"]).replace(tzinfo=cph),
                 receipt_number=row["Kvitteringsnummer"],
@@ -347,7 +348,7 @@ class ZettleExcelImporter:
     def import_zettle_balances_df(df):
         """Import a pandas dataframe with Zettle account statements and balances."""
         create_count = 0
-        for index, row in df.iterrows():
+        for _index, row in df.iterrows():
             # create balance
             zb, created = ZettleBalance.objects.get_or_create(
                 statement_time=timezone.make_aware(row["Opgørelsesdato"], timezone=cph),
@@ -495,10 +496,11 @@ class AccountingExporter:
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
-                ["invoice_date", "invoice_number", "order", "amount", "vat"]
+                ["invoice_date", "invoice_number", "order", "amount", "vat"],
             )
             invoices = Invoice.objects.filter(
-                created__gt=self.period.lower, created__lt=self.period.upper
+                created__gt=self.period.lower,
+                created__lt=self.period.upper,
             )
             count = 0
             for invoice in invoices:
@@ -511,7 +513,13 @@ class AccountingExporter:
                     amount = invoice.customorder.amount
                     vat = invoice.customorder.danish_vat
                 writer.writerow(
-                    [invoice.created.date(), invoice.id, invoice.get_order, amount, vat]
+                    [
+                        invoice.created.date(),
+                        invoice.id,
+                        invoice.get_order,
+                        amount,
+                        vat,
+                    ],
                 )
                 count += 1
         return (filename, count)
@@ -531,10 +539,12 @@ class AccountingExporter:
                     "text",
                     "amount",
                     "vat",
-                ]
+                ],
             )
             creditnotes = CreditNote.objects.filter(
-                paid=paid, created__gt=self.period.lower, created__lt=self.period.upper
+                paid=paid,
+                created__gt=self.period.lower,
+                created__lt=self.period.upper,
             )
             for creditnote in creditnotes:
                 writer.writerow(
@@ -545,7 +555,7 @@ class AccountingExporter:
                         creditnote.text,
                         creditnote.amount,
                         creditnote.danish_vat,
-                    ]
+                    ],
                 )
         return (filename, creditnotes.count())
 
@@ -565,10 +575,12 @@ class AccountingExporter:
                     "refunded",
                     "notes",
                     "invoice",
-                ]
+                ],
             )
             orders = Order.objects.filter(
-                paid=True, created__gt=self.period.lower, created__lt=self.period.upper
+                paid=True,
+                created__gt=self.period.lower,
+                created__lt=self.period.upper,
             )
             for order in orders:
                 if order.invoice:
@@ -585,7 +597,7 @@ class AccountingExporter:
                         order.refunded,
                         order.notes,
                         invoiceid,
-                    ]
+                    ],
                 )
         return (filename, orders.count())
 
@@ -599,7 +611,8 @@ class AccountingExporter:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["id", "amount", "vat", "paid", "customer"])
             orders = CustomOrder.objects.filter(
-                created__gt=self.period.lower, created__lt=self.period.upper
+                created__gt=self.period.lower,
+                created__lt=self.period.upper,
             )
             for order in orders:
                 writer.writerow(
@@ -609,7 +622,7 @@ class AccountingExporter:
                         order.danish_vat,
                         order.paid,
                         order.customer,
-                    ]
+                    ],
                 )
         return (filename, orders.count())
 
@@ -632,10 +645,11 @@ class AccountingExporter:
                     "invoice_date",
                     "reimbursement",
                     "notes",
-                ]
+                ],
             )
             expenses = Expense.objects.filter(
-                invoice_date__gt=self.period.lower, invoice_date__lt=self.period.upper
+                invoice_date__gt=self.period.lower,
+                invoice_date__lt=self.period.upper,
             )
             for expense in expenses:
                 writer.writerow(
@@ -651,7 +665,7 @@ class AccountingExporter:
                         expense.invoice_date,
                         expense.reimbursement,
                         expense.notes,
-                    ]
+                    ],
                 )
         return (filename, expenses.count())
 
@@ -672,10 +686,11 @@ class AccountingExporter:
                     "invoice",
                     "invoice_date",
                     "notes",
-                ]
+                ],
             )
             revenues = Revenue.objects.filter(
-                invoice_date__gt=self.period.lower, invoice_date__lt=self.period.upper
+                invoice_date__gt=self.period.lower,
+                invoice_date__lt=self.period.upper,
             )
             for revenue in revenues:
                 writer.writerow(
@@ -689,7 +704,7 @@ class AccountingExporter:
                         revenue.invoice.path,
                         revenue.invoice_date,
                         revenue.notes,
-                    ]
+                    ],
                 )
         return (filename, revenues.count())
 
@@ -710,7 +725,7 @@ class AccountingExporter:
                     "paid",
                     "covered_expenses",
                     "payback_expense",
-                ]
+                ],
             )
             count = 0
             for reimbursement in Reimbursement.objects.filter(paid=True):
@@ -728,10 +743,10 @@ class AccountingExporter:
                         reimbursement.notes,
                         reimbursement.paid,
                         reimbursement.expenses.exclude(
-                            paid_by_bornhack=True
+                            paid_by_bornhack=True,
                         ).values_list("uuid", flat=True),
                         reimbursement.payback_expense.uuid,
-                    ]
+                    ],
                 )
                 count += 1
         return (filename, count)
@@ -750,7 +765,8 @@ class AccountingExporter:
             f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
         )
         invoices = CoinifyInvoice.objects.filter(
-            coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
+            coinify_created__gt=self.period.lower,
+            coinify_created__lt=self.period.upper,
         )
         with open(workdir / invoices_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -769,7 +785,7 @@ class AccountingExporter:
                     "state",
                     "payment_type",
                     "original_payment_id",
-                ]
+                ],
             )
             for ci in invoices:
                 writer.writerow(
@@ -787,7 +803,7 @@ class AccountingExporter:
                         ci.state,
                         ci.payment_type,
                         ci.original_payment_id,
-                    ]
+                    ],
                 )
 
         # payouts
@@ -795,7 +811,8 @@ class AccountingExporter:
             f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
         )
         payouts = CoinifyPayout.objects.filter(
-            coinify_created__gt=self.period.lower, coinify_created__lt=self.period.upper
+            coinify_created__gt=self.period.lower,
+            coinify_created__lt=self.period.upper,
         )
         with open(workdir / payouts_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -811,7 +828,7 @@ class AccountingExporter:
                     "amount_dkk",
                     "fee_dkk",
                     "transferred_dkk",
-                ]
+                ],
             )
             for cp in payouts:
                 writer.writerow(
@@ -826,7 +843,7 @@ class AccountingExporter:
                         cp.amount_dkk,
                         cp.fee_dkk,
                         cp.transferred_dkk,
-                    ]
+                    ],
                 )
 
         # balances
@@ -834,7 +851,8 @@ class AccountingExporter:
             f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
         )
         balances = CoinifyBalance.objects.filter(
-            date__gt=self.period.lower, date__lt=self.period.upper
+            date__gt=self.period.lower,
+            date__lt=self.period.upper,
         )
         with open(workdir / balances_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -845,11 +863,11 @@ class AccountingExporter:
                     "btc",
                     "dkk",
                     "eur",
-                ]
+                ],
             )
             for balance in balances:
                 writer.writerow(
-                    [balance.pk, balance.date, balance.btc, balance.dkk, balance.eur]
+                    [balance.pk, balance.date, balance.btc, balance.dkk, balance.eur],
                 )
         return (
             (balances_filename, balances.count()),
@@ -863,7 +881,8 @@ class AccountingExporter:
             f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
         )
         transactions = EpayTransaction.objects.filter(
-            auth_date__gt=self.period.lower, auth_date__lt=self.period.upper
+            auth_date__gt=self.period.lower,
+            auth_date__lt=self.period.upper,
         )
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -881,7 +900,7 @@ class AccountingExporter:
                     "card_type",
                     "description",
                     "transaction_fee",
-                ]
+                ],
             )
             for et in transactions:
                 writer.writerow(
@@ -898,7 +917,7 @@ class AccountingExporter:
                         et.card_type,
                         et.description,
                         et.transaction_fee,
-                    ]
+                    ],
                 )
         return (filename, transactions.count())
 
@@ -906,7 +925,8 @@ class AccountingExporter:
         """Export Clearhaus settlements in our system."""
         filename = f"bornhack_clearhaus_settlements_{self.period.lower}_{self.period.upper}.csv"
         settlements = ClearhausSettlement.objects.filter(
-            payout_date__gt=self.period.lower, payout_date__lt=self.period.upper
+            payout_date__gt=self.period.lower,
+            payout_date__lt=self.period.upper,
         )
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -946,7 +966,7 @@ class AccountingExporter:
                     "reserve_descriptor",
                     "fees_interchange",
                     "fees_scheme",
-                ]
+                ],
             )
             for s in settlements:
                 writer.writerow(
@@ -985,7 +1005,7 @@ class AccountingExporter:
                         s.reserve_descriptor,
                         s.fees_interchange,
                         s.fees_scheme,
-                    ]
+                    ],
                 )
         return (filename, settlements.count())
 
@@ -996,7 +1016,8 @@ class AccountingExporter:
             f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
         )
         balances = ZettleBalance.objects.filter(
-            statement_time__gt=self.period.lower, statement_time__lt=self.period.upper
+            statement_time__gt=self.period.lower,
+            statement_time__lt=self.period.upper,
         )
         with open(workdir / balances_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -1009,7 +1030,7 @@ class AccountingExporter:
                     "description",
                     "amount",
                     "balance",
-                ]
+                ],
             )
             for balance in balances:
                 writer.writerow(
@@ -1020,7 +1041,7 @@ class AccountingExporter:
                         balance.description,
                         balance.amount,
                         balance.balance,
-                    ]
+                    ],
                 )
 
         # receipts
@@ -1028,7 +1049,8 @@ class AccountingExporter:
             f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
         )
         receipts = ZettleReceipt.objects.filter(
-            zettle_created__gt=self.period.lower, zettle_created__lt=self.period.upper
+            zettle_created__gt=self.period.lower,
+            zettle_created__lt=self.period.upper,
         )
         with open(workdir / receipts_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -1046,7 +1068,7 @@ class AccountingExporter:
                     "staff",
                     "description",
                     "sold_via",
-                ]
+                ],
             )
             for re in receipts:
                 writer.writerow(
@@ -1063,7 +1085,7 @@ class AccountingExporter:
                         re.staff,
                         re.description,
                         re.sold_via,
-                    ]
+                    ],
                 )
 
         return (
@@ -1093,7 +1115,7 @@ class AccountingExporter:
                     "payment_point",
                     "myshop_number",
                     "bank_account",
-                ]
+                ],
             )
             for mt in transactions:
                 writer.writerow(
@@ -1109,7 +1131,7 @@ class AccountingExporter:
                         mt.payment_point,
                         mt.myshop_number,
                         mt.bank_account,
-                    ]
+                    ],
                 )
         return (filename, transactions.count())
 

@@ -27,6 +27,6 @@ def validate_epay_callback(query):
         if key != "hash":
             hashstring += value
     hash = hashlib.md5(
-        (hashstring + settings.EPAY_MD5_SECRET).encode("utf-8")
+        (hashstring + settings.EPAY_MD5_SECRET).encode("utf-8"),
     ).hexdigest()
     return hash == query["hash"]

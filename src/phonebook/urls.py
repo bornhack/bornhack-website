@@ -1,13 +1,13 @@
-from django.urls import include, path, re_path
+from django.urls import include
+from django.urls import path
+from django.urls import re_path
 
-from .views import (
-    DectExportView,
-    DectRegistrationCreateView,
-    DectRegistrationDeleteView,
-    DectRegistrationListView,
-    DectRegistrationUpdateView,
-    PhonebookListView,
-)
+from .views import DectExportView
+from .views import DectRegistrationCreateView
+from .views import DectRegistrationDeleteView
+from .views import DectRegistrationListView
+from .views import DectRegistrationUpdateView
+from .views import PhonebookListView
 
 app_name = "phonebook"
 urlpatterns = [
@@ -18,7 +18,9 @@ urlpatterns = [
         include(
             [
                 path(
-                    "", DectRegistrationListView.as_view(), name="dectregistration_list"
+                    "",
+                    DectRegistrationListView.as_view(),
+                    name="dectregistration_list",
                 ),
                 path(
                     "create/",
@@ -39,10 +41,10 @@ urlpatterns = [
                                 DectRegistrationDeleteView.as_view(),
                                 name="dectregistration_delete",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
 ]

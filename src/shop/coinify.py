@@ -4,9 +4,10 @@ import logging
 import requests
 from django.conf import settings
 
+from .models import CoinifyAPICallback
+from .models import CoinifyAPIInvoice
+from .models import CoinifyAPIRequest
 from vendor.coinify.coinify_api import CoinifyAPI
-
-from .models import CoinifyAPICallback, CoinifyAPIInvoice, CoinifyAPIRequest
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -14,7 +15,9 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 def process_coinify_invoice_json(invoicejson, order, request):
     # create or update the invoice object in our database
     coinifyinvoice, created = CoinifyAPIInvoice.objects.update_or_create(
-        coinify_id=invoicejson["id"], order=order, defaults={"invoicejson": invoicejson}
+        coinify_id=invoicejson["id"],
+        order=order,
+        defaults={"invoicejson": invoicejson},
     )
 
     # if the order is paid in full call the mark as paid method now
@@ -39,7 +42,10 @@ def save_coinify_callback(request, order):
 
     # save this callback to db
     callbackobject = CoinifyAPICallback.objects.create(
-        headers=headerdict, body=request.body, payload=parsed, order=order
+        headers=headerdict,
+        body=request.body,
+        payload=parsed,
+        order=order,
     )
 
     return callbackobject
@@ -67,7 +73,10 @@ def coinify_api_request(api_method, order, **kwargs):
 
     # save this API request to the database
     req = CoinifyAPIRequest.objects.create(
-        order=order, method=api_method, payload=kwargs, response=response
+        order=order,
+        method=api_method,
+        payload=kwargs,
+        response=response,
     )
     logger.debug("saved coinify api request %s in db" % req.id)
 
@@ -80,13 +89,18 @@ def handle_coinify_api_response(apireq, order, request):
         if apireq.response["success"]:
             # save this new coinify invoice to the DB
             coinifyinvoice = process_coinify_invoice_json(
-                invoicejson=apireq.response["data"], order=order, request=request
+                invoicejson=apireq.response["data"],
+                order=order,
+                request=request,
             )
             return coinifyinvoice
         else:
             api_error = apireq.response["error"]
             logger.error(
-                "coinify API error: %s (%s)" % (api_error["message"], api_error["code"])
+                "coinify API error: {} ({})".format(
+                    api_error["message"],
+                    api_error["code"],
+                ),
             )
             return False
     else:

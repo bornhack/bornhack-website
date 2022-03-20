@@ -1,6 +1,8 @@
 from django.urls import path
 
-from .views import ProfileApiView, ProfileDetail, ProfileUpdate
+from .views import ProfileApiView
+from .views import ProfileDetail
+from .views import ProfileUpdate
 
 app_name = "profiles"
 urlpatterns = [

@@ -1,9 +1,10 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import DetailView
 
+from ..models import Team
+from ..models import TeamMember
 from camps.mixins import CampViewMixin
-
-from ..models import Team, TeamMember
 
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, DetailView):
@@ -17,7 +18,9 @@ class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, Deta
         # Make sure that the user is an approved member of the team
         try:
             TeamMember.objects.get(
-                user=self.request.user, team=self.get_object(), approved=True
+                user=self.request.user,
+                team=self.get_object(),
+                approved=True,
             )
         except TeamMember.DoesNotExist:
             return False

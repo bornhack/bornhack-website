@@ -1,25 +1,23 @@
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
 
-from camps.mixins import CampViewMixin
-from program.utils import (
-    add_existing_availability_to_matrix,
-    get_speaker_availability_form_matrix,
-)
-
 from . import models
+from camps.mixins import CampViewMixin
+from program.utils import add_existing_availability_to_matrix
+from program.utils import get_speaker_availability_form_matrix
 
 
-class EnsureCFPOpenMixin(object):
+class EnsureCFPOpenMixin:
     def dispatch(self, request, *args, **kwargs):
         # do not permit this action if call for participation is not open
         if not self.camp.call_for_participation_open:
             messages.error(request, "The Call for Participation is not open.")
             return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # alright, continue with the request
@@ -38,20 +36,20 @@ class EnsureUnapprovedProposalMixin(SingleObjectMixin):
                 "This proposal has already been approved. Please contact the organisers if you need to modify something.",
             )
             return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # alright, continue with the request
         return super().dispatch(request, *args, **kwargs)
 
 
-class EnsureWritableCampMixin(object):
+class EnsureWritableCampMixin:
     def dispatch(self, request, *args, **kwargs):
         # do not permit view if camp is in readonly mode
         if self.camp.read_only:
             messages.error(request, "No thanks")
             return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # alright, continue with the request
@@ -64,14 +62,14 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
         if self.get_object().user.username != request.user.username:
             messages.error(request, "No thanks")
             return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # alright, continue with the request
         return super().dispatch(request, *args, **kwargs)
 
 
-class UrlViewMixin(object):
+class UrlViewMixin:
     """
     Mixin with code shared between all the Url views
     """
@@ -83,7 +81,9 @@ class UrlViewMixin(object):
         # get the proposal
         if "event_uuid" in self.kwargs:
             self.event_proposal = get_object_or_404(
-                models.EventProposal, uuid=self.kwargs["event_uuid"], user=request.user
+                models.EventProposal,
+                uuid=self.kwargs["event_uuid"],
+                user=request.user,
             )
         elif "speaker_uuid" in self.kwargs:
             self.speaker_proposal = get_object_or_404(
@@ -125,7 +125,9 @@ class EventViewMixin(CampViewMixin):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.event = get_object_or_404(
-            models.Event, track__camp=self.camp, slug=self.kwargs["event_slug"]
+            models.Event,
+            track__camp=self.camp,
+            slug=self.kwargs["event_slug"],
         )
 
     def get_context_data(self, *args, **kwargs):
@@ -166,16 +168,16 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         if hasattr(self.get_object(), "events"):
             # we have an Event
             event_types = models.EventType.objects.filter(
-                events__in=self.get_object().events.all()
+                events__in=self.get_object().events.all(),
             ).distinct()
         else:
             # we have an EventProposal
             event_types = models.EventType.objects.filter(
-                event_proposals__in=self.get_object().event_proposals.all()
+                event_proposals__in=self.get_object().event_proposals.all(),
             ).distinct()
         # get the matrix and add any existing availability to it
         self.matrix = get_speaker_availability_form_matrix(
-            sessions=self.camp.event_sessions.filter(event_type__in=event_types)
+            sessions=self.camp.event_sessions.filter(event_type__in=event_types),
         )
         add_existing_availability_to_matrix(self.matrix, self.get_object())
 

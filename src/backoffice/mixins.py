@@ -51,7 +51,9 @@ class PosViewMixin(CampViewMixin, UserPassesTestMixin):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.pos = get_object_or_404(
-            Pos, team__camp=self.camp, slug=self.kwargs["pos_slug"]
+            Pos,
+            team__camp=self.camp,
+            slug=self.kwargs["pos_slug"],
         )
 
     def test_func(self):
@@ -64,7 +66,7 @@ class PosViewMixin(CampViewMixin, UserPassesTestMixin):
             raise PermissionDenied("User has no backoffice permission")
 
         if not self.request.user.has_perm(
-            "camps.orgateam_permission"
+            "camps.orgateam_permission",
         ) and not self.request.user.has_perm("camps." + self.pos.team.permission_set):
             raise PermissionDenied("User has no permission for this Pos")
         return True

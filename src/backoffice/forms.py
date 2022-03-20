@@ -1,11 +1,14 @@
 from django import forms
 
-from program.models import Event, Speaker
+from program.models import Event
+from program.models import Speaker
 
 
 class AddRecordingForm(forms.ModelForm):
     recording_url = forms.URLField(
-        label="Recording URL", help_text="Add a URL to the recording.", required=False
+        label="Recording URL",
+        help_text="Add a URL to the recording.",
+        required=False,
     )
 
     class Meta:
@@ -63,11 +66,13 @@ class SpeakerForm(forms.ModelForm):
             "event_conflicts",
         ]
 
-    def __init__(self, camp, matrix={}, *args, **kwargs):
+    def __init__(self, camp, matrix=None, *args, **kwargs):
         """
         initialise the form and add availability fields to form
         """
         super().__init__(*args, **kwargs)
+
+        matrix = matrix or {}
 
         # do we have a matrix to work with?
         if not matrix:
@@ -85,14 +90,15 @@ class SpeakerForm(forms.ModelForm):
                     continue
                 # add the field
                 self.fields[matrix[date][daychunk]["fieldname"]] = forms.BooleanField(
-                    required=False
+                    required=False,
                 )
                 # add it to Meta.fields too
                 self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
 
         # only show events from this camp
         self.fields["event_conflicts"].queryset = Event.objects.filter(
-            track__camp=camp, event_type__support_speaker_event_conflicts=True
+            track__camp=camp,
+            event_type__support_speaker_event_conflicts=True,
         )
 
 

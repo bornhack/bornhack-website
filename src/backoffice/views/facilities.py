@@ -4,22 +4,25 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.forms import modelformset_factory
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import FormView
+from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
+from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
-from facilities.models import (
-    Facility,
-    FacilityFeedback,
-    FacilityOpeningHours,
-    FacilityType,
-)
+from facilities.models import Facility
+from facilities.models import FacilityFeedback
+from facilities.models import FacilityOpeningHours
+from facilities.models import FacilityType
 from teams.models import Team
-
-from ..mixins import OrgaTeamPermissionMixin, RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -48,13 +51,14 @@ class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView)
         """
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp
+            camp=self.camp,
         )
         return context
 
     def get_success_url(self):
         return reverse(
-            "backoffice:facility_type_list", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:facility_type_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -76,13 +80,14 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView)
         """
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp
+            camp=self.camp,
         )
         return context
 
     def get_success_url(self):
         return reverse(
-            "backoffice:facility_type_list", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:facility_type_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -101,7 +106,8 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
     def get_success_url(self):
         messages.success(self.request, "The FacilityType has been deleted")
         return reverse(
-            "backoffice:facility_type_list", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:facility_type_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -130,7 +136,7 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-            }
+            },
         )
         return form
 
@@ -140,7 +146,7 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
         """
         context = super().get_context_data(**kwargs)
         context["form"].fields["facility_type"].queryset = FacilityType.objects.filter(
-            responsible_team__camp=self.camp
+            responsible_team__camp=self.camp,
         )
         return context
 
@@ -160,7 +166,7 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-            }
+            },
         )
         return form
 
@@ -205,10 +211,13 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.team = get_object_or_404(
-            Team, camp=self.camp, slug=self.kwargs["team_slug"]
+            Team,
+            camp=self.camp,
+            slug=self.kwargs["team_slug"],
         )
         self.queryset = FacilityFeedback.objects.filter(
-            facility__facility_type__responsible_team=self.team, handled=False
+            facility__facility_type__responsible_team=self.team,
+            handled=False,
         )
         self.form_class = modelformset_factory(
             FacilityFeedback,
@@ -269,7 +278,9 @@ class FacilityMixin(CampViewMixin):
 
 
 class FacilityOpeningHoursCreateView(
-    FacilityMixin, OrgaTeamPermissionMixin, CreateView
+    FacilityMixin,
+    OrgaTeamPermissionMixin,
+    CreateView,
 ):
     model = FacilityOpeningHours
     template_name = "facility_opening_hours_form.html"
@@ -287,12 +298,14 @@ class FacilityOpeningHoursCreateView(
             reverse(
                 "backoffice:facility_detail",
                 kwargs={"camp_slug": self.camp.slug, "facility_uuid": self.facility.pk},
-            )
+            ),
         )
 
 
 class FacilityOpeningHoursUpdateView(
-    FacilityMixin, OrgaTeamPermissionMixin, UpdateView
+    FacilityMixin,
+    OrgaTeamPermissionMixin,
+    UpdateView,
 ):
     model = FacilityOpeningHours
     template_name = "facility_opening_hours_form.html"
@@ -307,7 +320,9 @@ class FacilityOpeningHoursUpdateView(
 
 
 class FacilityOpeningHoursDeleteView(
-    FacilityMixin, OrgaTeamPermissionMixin, DeleteView
+    FacilityMixin,
+    OrgaTeamPermissionMixin,
+    DeleteView,
 ):
     model = FacilityOpeningHours
     template_name = "facility_opening_hours_delete.html"

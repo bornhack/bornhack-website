@@ -33,4 +33,3 @@ for {{ team.name }} Team
     <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
 </div>
 {% endblock %}
-

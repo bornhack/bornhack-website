@@ -4,14 +4,19 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import UpdateView
 
+from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import PosViewMixin
+from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
-from economy.models import Pos, PosReport
+from economy.models import Pos
+from economy.models import PosReport
 from teams.models import Team
-
-from ..mixins import OrgaTeamPermissionMixin, PosViewMixin, RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -70,7 +75,8 @@ class PosDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(
-            self.request, "The Pos and all related PosReports has been deleted"
+            self.request,
+            "The Pos and all related PosReports has been deleted",
         )
         return reverse("backoffice:pos_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -109,7 +115,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
                     "pos_slug": self.pos.slug,
                     "posreport_uuid": pr.uuid,
                 },
-            )
+            ),
         )
 
 

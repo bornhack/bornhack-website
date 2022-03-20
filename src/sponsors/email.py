@@ -15,18 +15,19 @@ def add_sponsorticket_email(ticket):
         "ticket": ticket,
     }
 
-    subject = "%s %s Sponsor Ticket %s" % (
+    subject = "{} {} Sponsor Ticket {}".format(
         ticket.sponsor.camp.title,
         ticket.sponsor.name,
         ticket.uuid,
     )
 
-    filename = "sponsor_ticket_{}.pdf".format(ticket.pk)
+    filename = f"sponsor_ticket_{ticket.pk}.pdf"
     with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:
         # add email to outgoing email queue
         return add_outgoing_email(
             responsible_team=Team.objects.get(
-                camp=ticket.sponsor.camp, name="Sponsors"
+                camp=ticket.sponsor.camp,
+                name="Sponsors",
             ),
             text_template="emails/sponsorticket_email.txt",
             html_template="emails/sponsorticket_email.html",

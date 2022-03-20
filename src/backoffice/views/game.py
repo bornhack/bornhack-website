@@ -2,16 +2,20 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db.models import Count, Q
+from django.db.models import Count
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-
-from camps.mixins import CampViewMixin
-from tokens.models import Token, TokenFind
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import UpdateView
 
 from ..mixins import RaisePermissionRequiredMixin
+from camps.mixins import CampViewMixin
+from tokens.models import Token
+from tokens.models import TokenFind
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -52,7 +56,7 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
             reverse(
                 "backoffice:token_detail",
                 kwargs={"camp_slug": self.camp.slug, "pk": token.id},
-            )
+            ),
         )
 
 
@@ -76,7 +80,8 @@ class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(
-            self.request, "The Token and all related TokenFinds has been deleted"
+            self.request,
+            "The Token and all related TokenFinds has been deleted",
         )
         return reverse("backoffice:token_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -98,8 +103,9 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
             User.objects.filter(id__in=tokenusers)
             .annotate(
                 token_find_count=Count(
-                    "token_finds", filter=Q(token_finds__token__camp=self.camp)
-                )
+                    "token_finds",
+                    filter=Q(token_finds__token__camp=self.camp),
+                ),
             )
             .exclude(token_find_count=0)
         )

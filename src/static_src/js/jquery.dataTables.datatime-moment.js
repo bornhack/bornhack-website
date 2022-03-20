@@ -64,7 +64,7 @@ $.fn.dataTable.moment = function ( format, locale, reverseEmpties ) {
 			// Strip out surrounding white space
 			d = $.trim( d );
 		}
-		
+
 		return !moment(d, format, locale, true).isValid() ?
 			(reverseEmpties ? -Infinity : Infinity) :
 			parseInt( moment( d, format, locale, true ).format( 'x' ), 10 );

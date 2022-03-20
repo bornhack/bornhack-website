@@ -8,19 +8,18 @@ from typing import Union
 import qrcode
 from django.conf import settings
 from django.db import models
-from django.db.models import (
-    Count,
-    Expression,
-    ExpressionWrapper,
-    F,
-    OuterRef,
-    Subquery,
-    Sum,
-)
+from django.db.models import Count
+from django.db.models import Expression
+from django.db.models import ExpressionWrapper
+from django.db.models import F
+from django.db.models import OuterRef
+from django.db.models import Subquery
+from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-from utils.models import CampRelatedModel, UUIDModel
+from utils.models import CampRelatedModel
+from utils.models import UUIDModel
 from utils.pdf import generate_pdf_letter
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -28,11 +27,11 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
+        def _make_subquery(annotation: Expression | F) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
                 .filter(pk=OuterRef("pk"))
-                .values("annotation_value")[:1]
+                .values("annotation_value")[:1],
             )
 
         quantity = F("product__orderproductrelation__quantity")
@@ -46,7 +45,7 @@ class TicketTypeQuerySet(models.QuerySet):
                 avg_ticket_price=ExpressionWrapper(
                     F("income") * Decimal("1.0") / F("units"),
                     output_field=models.DecimalField(),
-                )
+                ),
             )
             .filter(pk=OuterRef("pk"))
             .values("avg_ticket_price")[:1],
@@ -78,7 +77,7 @@ class TicketType(CampRelatedModel, UUIDModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.camp.title)
+        return f"{self.name} ({self.camp.title})"
 
 
 def create_ticket_token(string):
@@ -87,7 +86,9 @@ def create_ticket_token(string):
 
 def qr_code_base64(token):
     qr = qrcode.make(
-        token, version=1, error_correction=qrcode.constants.ERROR_CORRECT_H
+        token,
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
     ).resize((250, 250))
     file_like = io.BytesIO()
     qr.save(file_like, format="png")
@@ -137,25 +138,27 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     def _get_token(self):
         return create_ticket_token(
             "{_id}{secret_key}".format(
-                _id=self.uuid, secret_key=settings.SECRET_KEY
-            ).encode("utf-8")
+                _id=self.uuid,
+                secret_key=settings.SECRET_KEY,
+            ).encode("utf-8"),
         )
 
     def _get_badge_token(self):
         return create_ticket_token(
             "{_id}{secret_key}-badge".format(
-                _id=self.uuid, secret_key=settings.SECRET_KEY
-            ).encode("utf-8")
+                _id=self.uuid,
+                secret_key=settings.SECRET_KEY,
+            ).encode("utf-8"),
         )
 
     def get_qr_code_url(self):
         return "data:image/png;base64,{}".format(
-            qr_code_base64(self._get_token()).decode("utf-8")
+            qr_code_base64(self._get_token()).decode("utf-8"),
         )
 
     def get_qr_badge_code_url(self):
         return "data:image/png;base64,{}".format(
-            qr_code_base64(self._get_badge_token()).decode("utf-8")
+            qr_code_base64(self._get_badge_token()).decode("utf-8"),
         )
 
     def generate_pdf(self):
@@ -165,7 +168,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
             formatdict["quantity"] = self.opr.quantity
 
         return generate_pdf_letter(
-            filename="{}_ticket_{}.pdf".format(self.shortname, self.pk),
+            filename=f"{self.shortname}_ticket_{self.pk}.pdf",
             formatdict=formatdict,
             template="pdf/ticket.html",
         )
@@ -175,7 +178,7 @@ class SponsorTicket(BaseTicket):
     sponsor = models.ForeignKey("sponsors.Sponsor", on_delete=models.PROTECT)
 
     def __str__(self):
-        return "SponsorTicket: {}".format(self.pk)
+        return f"SponsorTicket: {self.pk}"
 
     @property
     def shortname(self):
@@ -184,11 +187,11 @@ class SponsorTicket(BaseTicket):
 
 class DiscountTicket(BaseTicket):
     price = models.IntegerField(
-        help_text=_("Price of the discounted ticket (in DKK, including VAT).")
+        help_text=_("Price of the discounted ticket (in DKK, including VAT)."),
     )
 
     def __str__(self):
-        return "DiscountTicket: {}".format(self.pk)
+        return f"DiscountTicket: {self.pk}"
 
     @property
     def shortname(self):
@@ -220,13 +223,16 @@ class ShopTicket(BaseTicket):
     def _get_token(self):
         return hashlib.sha256(
             "{_id}{user_id}{secret_key}".format(
-                _id=self.pk, user_id=self.order.user.pk, secret_key=settings.SECRET_KEY
-            ).encode("utf-8")
+                _id=self.pk,
+                user_id=self.order.user.pk,
+                secret_key=settings.SECRET_KEY,
+            ).encode("utf-8"),
         ).hexdigest()
 
     def __str__(self):
         return "Ticket {user} {product}".format(
-            user=self.order.user, product=self.product
+            user=self.order.user,
+            product=self.product,
         )
 
     def get_absolute_url(self):

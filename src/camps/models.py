@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
-from utils.models import CreatedUpdatedModel, UUIDModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -74,7 +75,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     slug = models.SlugField(
-        verbose_name="Url Slug", help_text="The url slug to use for this camp"
+        verbose_name="Url Slug",
+        help_text="The url slug to use for this camp",
     )
 
     shortslug = models.SlugField(
@@ -83,17 +85,20 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     buildup = DateTimeRangeField(
-        verbose_name="Buildup Period", help_text="The camp buildup period."
+        verbose_name="Buildup Period",
+        help_text="The camp buildup period.",
     )
 
     camp = DateTimeRangeField(verbose_name="Camp Period", help_text="The camp period.")
 
     teardown = DateTimeRangeField(
-        verbose_name="Teardown period", help_text="The camp teardown period."
+        verbose_name="Teardown period",
+        help_text="The camp teardown period.",
     )
 
     read_only = models.BooleanField(
-        help_text="Whether the camp is read only (i.e. in the past)", default=False
+        help_text="Whether the camp is read only (i.e. in the past)",
+        default=False,
     )
 
     colour = models.CharField(
@@ -119,7 +124,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     call_for_sponsors_open = models.BooleanField(
-        help_text="Check if the Call for Sponsors is open for this camp", default=False
+        help_text="Check if the Call for Sponsors is open for this camp",
+        default=False,
     )
 
     call_for_sponsors = models.TextField(
@@ -129,7 +135,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     show_schedule = models.BooleanField(
-        help_text="Check if the schedule should be shown.", default=True
+        help_text="Check if the schedule should be shown.",
+        default=True,
     )
 
     economy_team = models.ForeignKey(
@@ -163,23 +170,23 @@ class Camp(CreatedUpdatedModel, UUIDModel):
             raise ValidationError(errors)
 
     def __str__(self):
-        return "%s - %s" % (self.title, self.tagline)
+        return f"{self.title} - {self.tagline}"
 
     @property
     def logo_small(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
+        return "img/{slug}/logo/{slug}-logo-s.png".format(slug=self.slug)
 
     @property
     def logo_small_svg(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-small.svg" % {"slug": self.slug}
+        return "img/{slug}/logo/{slug}-logo-small.svg".format(slug=self.slug)
 
     @property
     def logo_large(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-l.png" % {"slug": self.slug}
+        return "img/{slug}/logo/{slug}-logo-l.png".format(slug=self.slug)
 
     @property
     def logo_large_svg(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-large.svg" % {"slug": self.slug}
+        return "img/{slug}/logo/{slug}-logo-large.svg".format(slug=self.slug)
 
     def get_days(self, camppart):
         """
@@ -215,31 +222,31 @@ class Camp(CreatedUpdatedModel, UUIDModel):
                     DateTimeTZRange(
                         timezone.localtime(field.lower),
                         timezone.localtime(
-                            (field.lower + timedelta(days=i + 1))
+                            field.lower + timedelta(days=i + 1),
                         ).replace(hour=0),
-                    )
+                    ),
                 )
             elif i == daycount - 1:
                 # on the last day use actual end time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        timezone.localtime((field.lower + timedelta(days=i))).replace(
-                            hour=0
+                        timezone.localtime(field.lower + timedelta(days=i)).replace(
+                            hour=0,
                         ),
                         timezone.localtime(field.lower + timedelta(days=i)),
-                    )
+                    ),
                 )
             else:
                 # neither first nor last day, goes from midnight to midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        timezone.localtime((field.lower + timedelta(days=i))).replace(
-                            hour=0
+                        timezone.localtime(field.lower + timedelta(days=i)).replace(
+                            hour=0,
                         ),
                         timezone.localtime(
-                            (field.lower + timedelta(days=i + 1))
+                            field.lower + timedelta(days=i + 1),
                         ).replace(hour=0),
-                    )
+                    ),
                 )
         return days
 
@@ -271,7 +278,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         """Return all event types with at least one event in this camp"""
         EventType = apps.get_model("program", "EventType")
         return EventType.objects.filter(
-            events__isnull=False, event__track__camp=self
+            events__isnull=False,
+            event__track__camp=self,
         ).distinct()
 
     @property

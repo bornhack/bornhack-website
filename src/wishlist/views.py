@@ -1,4 +1,5 @@
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 
 from .models import Wish
 

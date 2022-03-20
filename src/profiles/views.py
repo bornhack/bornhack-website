@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ProtectedResourceView
 

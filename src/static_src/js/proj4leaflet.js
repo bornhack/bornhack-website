@@ -21,7 +21,7 @@
 		// See discussion in https://github.com/kartena/Proj4Leaflet/pull/147
 		proj4 = proj4.default;
 	}
- 
+
 	L.Proj = {};
 
 	L.Proj._isProj4Obj = function(a) {

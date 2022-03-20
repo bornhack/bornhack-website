@@ -3,36 +3,38 @@ import logging
 from django import forms
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, Q
-from django.shortcuts import get_object_or_404, redirect
+from django.db.models import Count
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import TemplateView
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import FormView
+from django.views.generic.edit import UpdateView
 
+from ..forms import AutoScheduleApplyForm
+from ..forms import AutoScheduleValidateForm
+from ..forms import EventScheduleForm
+from ..forms import SpeakerForm
+from ..mixins import ContentTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from program.autoscheduler import AutoScheduler
 from program.email import add_event_scheduled_email
 from program.mixins import AvailabilityMatrixViewMixin
-from program.models import (
-    Event,
-    EventLocation,
-    EventProposal,
-    EventSession,
-    EventSlot,
-    EventType,
-    Speaker,
-    SpeakerProposal,
-)
+from program.models import Event
+from program.models import EventLocation
+from program.models import EventProposal
+from program.models import EventSession
+from program.models import EventSlot
+from program.models import EventType
+from program.models import Speaker
+from program.models import SpeakerProposal
 from program.utils import save_speaker_availability
-
-from ..forms import (
-    AutoScheduleApplyForm,
-    AutoScheduleValidateForm,
-    EventScheduleForm,
-    SpeakerForm,
-)
-from ..mixins import ContentTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -56,7 +58,7 @@ class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["event_proposal_list"] = self.camp.event_proposals.filter(
-            proposal_status=EventProposal.PROPOSAL_PENDING
+            proposal_status=EventProposal.PROPOSAL_PENDING,
         ).prefetch_related("event_type", "track", "speakers", "tags", "user", "event")
         return context
 
@@ -82,8 +84,9 @@ class ProposalApproveBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
             messages.error(self.request, "Unknown submit action")
         return redirect(
             reverse(
-                "backoffice:pending_proposals", kwargs={"camp_slug": self.camp.slug}
-            )
+                "backoffice:pending_proposals",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
@@ -184,7 +187,9 @@ class SpeakerListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class SpeakerDetailView(
-    AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, DetailView
+    AvailabilityMatrixViewMixin,
+    ContentTeamPermissionMixin,
+    DetailView,
 ):
     """This view is used by the Content Team to see details for Speaker objects"""
 
@@ -194,13 +199,17 @@ class SpeakerDetailView(
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related(
-            "event_conflicts", "events__event_slots", "events__event_type"
+            "event_conflicts",
+            "events__event_slots",
+            "events__event_type",
         )
         return qs
 
 
 class SpeakerUpdateView(
-    AvailabilityMatrixViewMixin, ContentTeamPermissionMixin, UpdateView
+    AvailabilityMatrixViewMixin,
+    ContentTeamPermissionMixin,
+    UpdateView,
 ):
     """This view is used by the Content Team to update Speaker objects"""
 
@@ -223,7 +232,7 @@ class SpeakerUpdateView(
             reverse(
                 "backoffice:speaker_detail",
                 kwargs={"camp_slug": self.camp.slug, "slug": self.get_object().slug},
-            )
+            ),
         )
 
 
@@ -242,7 +251,8 @@ class SpeakerDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
 
     def get_success_url(self):
         messages.success(
-            self.request, f"Speaker '{self.get_object().name}' has been deleted"
+            self.request,
+            f"Speaker '{self.get_object().name}' has been deleted",
         )
         return reverse("backoffice:speaker_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -263,7 +273,9 @@ class EventTypeListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
         qs = qs.annotate(
             # only count events for the current camp
             event_count=Count(
-                "events", distinct=True, filter=Q(events__track__camp=self.camp)
+                "events",
+                distinct=True,
+                filter=Q(events__track__camp=self.camp),
             ),
             # only count EventSessions for the current camp
             event_sessions_count=Count(
@@ -291,12 +303,14 @@ class EventTypeDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView)
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["event_sessions"] = self.camp.event_sessions.filter(
-            event_type=self.get_object()
+            event_type=self.get_object(),
         ).prefetch_related("event_location", "event_slots")
         context["events"] = self.camp.events.filter(
-            event_type=self.get_object()
+            event_type=self.get_object(),
         ).prefetch_related(
-            "speakers", "event_slots__event_session__event_location", "event_type"
+            "speakers",
+            "event_slots__event_session__event_location",
+            "event_type",
         )
         return context
 
@@ -328,7 +342,9 @@ class EventLocationDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailV
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related(
-            "conflicts", "event_sessions__event_slots", "event_sessions__event_type"
+            "conflicts",
+            "event_sessions__event_slots",
+            "event_sessions__event_type",
         )
         return qs
 
@@ -351,13 +367,14 @@ class EventLocationCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateV
         location.save()
         form.save_m2m()
         messages.success(
-            self.request, f"EventLocation {location.name} has been created"
+            self.request,
+            f"EventLocation {location.name} has been created",
         )
         return redirect(
             reverse(
                 "backoffice:event_location_detail",
                 kwargs={"camp_slug": self.camp.slug, "slug": location.slug},
-            )
+            ),
         )
 
 
@@ -371,13 +388,14 @@ class EventLocationUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         form.fields["conflicts"].queryset = self.camp.event_locations.exclude(
-            pk=self.get_object().pk
+            pk=self.get_object().pk,
         )
         return form
 
     def get_success_url(self):
         messages.success(
-            self.request, f"EventLocation {self.get_object().name} has been updated"
+            self.request,
+            f"EventLocation {self.get_object().name} has been updated",
         )
         return reverse(
             "backoffice:event_location_detail",
@@ -402,10 +420,12 @@ class EventLocationDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteV
 
     def get_success_url(self):
         messages.success(
-            self.request, f"EventLocation '{self.get_object().name}' has been deleted."
+            self.request,
+            f"EventLocation '{self.get_object().name}' has been deleted.",
         )
         return reverse(
-            "backoffice:event_location_list", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:event_location_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -488,7 +508,9 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.event = get_object_or_404(
-            Event, track__camp=self.camp, slug=kwargs["slug"]
+            Event,
+            track__camp=self.camp,
+            slug=kwargs["slug"],
         )
 
     def get_form(self, *args, **kwargs):
@@ -543,7 +565,7 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             reverse(
                 "backoffice:event_detail",
                 kwargs={"camp_slug": self.camp.slug, "slug": self.event.slug},
-            )
+            ),
         )
 
 
@@ -552,7 +574,9 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
 
 class EventSessionCreateTypeSelectView(
-    CampViewMixin, ContentTeamPermissionMixin, ListView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    ListView,
 ):
     """
     This view is shown first when creating a new EventSession
@@ -564,7 +588,9 @@ class EventSessionCreateTypeSelectView(
 
 
 class EventSessionCreateLocationSelectView(
-    CampViewMixin, ContentTeamPermissionMixin, ListView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    ListView,
 ):
     """
     This view is shown second when creating a new EventSession
@@ -607,7 +633,7 @@ class EventSessionFormViewMixin:
         }
         if hasattr(form.fields, "event_location"):
             form.fields["event_location"].queryset = EventLocation.objects.filter(
-                camp=self.camp
+                camp=self.camp,
             )
         return form
 
@@ -629,7 +655,10 @@ class EventSessionFormViewMixin:
 
 
 class EventSessionCreateView(
-    CampViewMixin, ContentTeamPermissionMixin, EventSessionFormViewMixin, CreateView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    EventSessionFormViewMixin,
+    CreateView,
 ):
     """
     This view is used by the Content Team to create EventSession objects
@@ -643,7 +672,9 @@ class EventSessionCreateView(
         super().setup(*args, **kwargs)
         self.event_type = get_object_or_404(EventType, slug=kwargs["event_type_slug"])
         self.event_location = get_object_or_404(
-            EventLocation, camp=self.camp, slug=kwargs["event_location_slug"]
+            EventLocation,
+            camp=self.camp,
+            slug=kwargs["event_location_slug"],
         )
 
     def form_valid(self, form):
@@ -658,8 +689,9 @@ class EventSessionCreateView(
         messages.success(self.request, f"{session} has been created successfully!")
         return redirect(
             reverse(
-                "backoffice:event_session_list", kwargs={"camp_slug": self.camp.slug}
-            )
+                "backoffice:event_session_list",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
@@ -689,7 +721,10 @@ class EventSessionDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailVi
 
 
 class EventSessionUpdateView(
-    CampViewMixin, ContentTeamPermissionMixin, EventSessionFormViewMixin, UpdateView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    EventSessionFormViewMixin,
+    UpdateView,
 ):
     """
     This view is used by the Content Team to update EventSession objects
@@ -707,8 +742,9 @@ class EventSessionUpdateView(
         messages.success(self.request, f"{session} has been updated successfully!")
         return redirect(
             reverse(
-                "backoffice:event_session_list", kwargs={"camp_slug": self.camp.slug}
-            )
+                "backoffice:event_session_list",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
@@ -741,7 +777,8 @@ class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteVi
             "EventSession and related EventSlots was deleted successfully!",
         )
         return reverse(
-            "backoffice:event_session_list", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:event_session_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -794,7 +831,7 @@ class EventSlotUnscheduleView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
             reverse(
                 "backoffice:event_detail",
                 kwargs={"camp_slug": self.camp.slug, "slug": event.slug},
-            )
+            ),
         )
 
 
@@ -809,7 +846,9 @@ class AutoScheduleManageView(CampViewMixin, ContentTeamPermissionMixin, Template
 
 
 class AutoScheduleCrashCourseView(
-    CampViewMixin, ContentTeamPermissionMixin, TemplateView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    TemplateView,
 ):
     """A short crash course on the autoscheduler"""
 
@@ -835,7 +874,7 @@ class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormVi
         elif form.cleaned_data["schedule"] == "similar":
             original_autoschedule = scheduler.build_current_autoschedule()
             autoschedule, diff = scheduler.calculate_similar_autoschedule(
-                original_autoschedule
+                original_autoschedule,
             )
             message = f"The new similar schedule is valid! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. Differences to the current schedule: {len(diff['event_diffs'])} Event diffs and {len(diff['slot_diffs'])} Slot diffs."
         elif form.cleaned_data["schedule"] == "new":
@@ -854,8 +893,9 @@ class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormVi
             messages.error(self.request, mark_safe(message))
         return redirect(
             reverse(
-                "backoffice:autoschedule_validate", kwargs={"camp_slug": self.camp.slug}
-            )
+                "backoffice:autoschedule_validate",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
@@ -910,13 +950,16 @@ class AutoScheduleApplyView(CampViewMixin, ContentTeamPermissionMixin, FormView)
             messages.error(self.request, "Schedule is NOT valid, cannot apply!")
         return redirect(
             reverse(
-                "backoffice:autoschedule_apply", kwargs={"camp_slug": self.camp.slug}
-            )
+                "backoffice:autoschedule_apply",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
 class AutoScheduleDebugEventSlotUnavailabilityView(
-    CampViewMixin, ContentTeamPermissionMixin, TemplateView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    TemplateView,
 ):
     template_name = "autoschedule_debug_slots.html"
 
@@ -929,7 +972,9 @@ class AutoScheduleDebugEventSlotUnavailabilityView(
 
 
 class AutoScheduleDebugEventConflictsView(
-    CampViewMixin, ContentTeamPermissionMixin, TemplateView
+    CampViewMixin,
+    ContentTeamPermissionMixin,
+    TemplateView,
 ):
     template_name = "autoschedule_debug_events.html"
 

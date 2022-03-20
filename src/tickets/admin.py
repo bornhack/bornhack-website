@@ -1,6 +1,9 @@
 from django.contrib import admin
 
-from .models import DiscountTicket, ShopTicket, SponsorTicket, TicketType
+from .models import DiscountTicket
+from .models import ShopTicket
+from .models import SponsorTicket
+from .models import TicketType
 
 
 class BaseTicketAdmin(admin.ModelAdmin):

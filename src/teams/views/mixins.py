@@ -2,10 +2,11 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic.detail import SingleObjectMixin
 
-from teams.models import Team, TeamMember
+from teams.models import Team
+from teams.models import TeamMember
 
 
-class EnsureTeamResponsibleMixin(object):
+class EnsureTeamResponsibleMixin:
     """
     Use to make sure request.user is responsible for the team specified by kwargs['team_slug']
     """
@@ -15,7 +16,9 @@ class EnsureTeamResponsibleMixin(object):
         if request.user not in self.team.responsible_members.all():
             messages.error(request, "No thanks")
             return redirect(
-                "teams:general", camp_slug=self.camp.slug, team_slug=self.team.slug
+                "teams:general",
+                camp_slug=self.camp.slug,
+                team_slug=self.team.slug,
             )
 
         return super().dispatch(request, *args, **kwargs)

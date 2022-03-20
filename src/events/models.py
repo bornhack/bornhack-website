@@ -59,4 +59,4 @@ class Routing(CreatedUpdatedModel):
     )
 
     def __str__(self):
-        return "%s -> %s" % (self.eventtype, self.team)
+        return f"{self.eventtype} -> {self.team}"

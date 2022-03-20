@@ -3,7 +3,8 @@ import copy
 import magic
 from django import forms
 
-from .models import Expense, Revenue
+from .models import Expense
+from .models import Revenue
 
 
 class CleanInvoiceForm(forms.ModelForm):

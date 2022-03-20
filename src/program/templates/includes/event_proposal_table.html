@@ -23,7 +23,7 @@
             <td><span class="h4">
                 {% for person in event_proposal.speakers.all %}
                     {% if request.resolver_match.app_name == "program" %}
-                        <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a> 
+                        <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=person.uuid %}"><i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i></a>
                     {% else %}
                         <i class="fas fa-user" data-toggle="tooltip" title="{{ person.name }}"></i>
                     {% endif %}

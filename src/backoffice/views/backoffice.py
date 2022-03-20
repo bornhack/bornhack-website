@@ -2,15 +2,15 @@ import logging
 
 import requests
 from django.conf import settings
-from django.http import Http404, HttpResponse
+from django.http import Http404
+from django.http import HttpResponse
 from django.views.generic import TemplateView
 
+from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from facilities.models import FacilityFeedback
 from teams.models import Team
 from utils.models import OutgoingEmail
-
-from ..mixins import RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -31,16 +31,19 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
                     facility__facility_type__responsible_team__camp=self.camp,
                     handled=False,
                 ).values_list(
-                    "facility__facility_type__responsible_team__id", flat=True
-                )
-            )
+                    "facility__facility_type__responsible_team__id",
+                    flat=True,
+                ),
+            ),
         )
         context["held_email_count"] = (
             OutgoingEmail.objects.filter(
-                hold=True, responsible_team__isnull=True
+                hold=True,
+                responsible_team__isnull=True,
             ).count()
             + OutgoingEmail.objects.filter(
-                hold=True, responsible_team__camp=self.camp
+                hold=True,
+                responsible_team__camp=self.camp,
             ).count()
         )
         return context

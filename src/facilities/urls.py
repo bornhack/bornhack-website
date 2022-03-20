@@ -1,11 +1,10 @@
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
 
-from .views import (
-    FacilityDetailView,
-    FacilityFeedbackView,
-    FacilityListView,
-    FacilityTypeListView,
-)
+from .views import FacilityDetailView
+from .views import FacilityFeedbackView
+from .views import FacilityListView
+from .views import FacilityTypeListView
 
 app_name = "facilities"
 urlpatterns = [
@@ -20,17 +19,19 @@ urlpatterns = [
                     include(
                         [
                             path(
-                                "", FacilityDetailView.as_view(), name="facility_detail"
+                                "",
+                                FacilityDetailView.as_view(),
+                                name="facility_detail",
                             ),
                             path(
                                 "feedback/",
                                 FacilityFeedbackView.as_view(),
                                 name="facility_feedback",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
 ]

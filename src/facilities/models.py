@@ -6,12 +6,14 @@ import qrcode
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import RangeOperators
 from django.db import models
 from django.shortcuts import reverse
 
 from maps.utils import LeafletMarkerChoices
-from utils.models import CampRelatedModel, UUIDModel
+from utils.models import CampRelatedModel
+from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -96,7 +98,7 @@ class FacilityType(CampRelatedModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(
-                    responsible_team=self.responsible_team
+                    responsible_team=self.responsible_team,
                 ).values_list("slug", flat=True),
             )
         super().save(**kwargs)
@@ -108,7 +110,9 @@ class Facility(CampRelatedModel, UUIDModel):
     """
 
     facility_type = models.ForeignKey(
-        "facilities.FacilityType", related_name="facilities", on_delete=models.PROTECT
+        "facilities.FacilityType",
+        related_name="facilities",
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(
@@ -120,7 +124,8 @@ class Facility(CampRelatedModel, UUIDModel):
 
     # default to near the workshop rooms / cabins
     location = PointField(
-        default=Point(9.93891, 55.38562), help_text="The location of this facility."
+        default=Point(9.93891, 55.38562),
+        help_text="The location of this facility.",
     )
 
     @property
@@ -145,7 +150,7 @@ class Facility(CampRelatedModel, UUIDModel):
                     "facility_type_slug": self.facility_type.slug,
                     "facility_uuid": self.uuid,
                 },
-            )
+            ),
         )
 
     def get_feedback_qr(self, request):
@@ -194,7 +199,8 @@ class FacilityFeedback(CampRelatedModel):
     )
 
     comment = models.TextField(
-        blank=True, help_text="Any comments or feedback about this facility? (optional)"
+        blank=True,
+        help_text="Any comments or feedback about this facility? (optional)",
     )
 
     urgent = models.BooleanField(

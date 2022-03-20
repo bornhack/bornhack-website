@@ -106,7 +106,7 @@
     L.control.scale({imperial: false}).addTo(map);
 
 
-    var Position = L.Control.extend({ 
+    var Position = L.Control.extend({
         _container: null,
         options: {
           position: 'bottomright'

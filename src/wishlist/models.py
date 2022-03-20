@@ -26,7 +26,7 @@ class Wish(CampRelatedModel):
     )
 
     description = models.TextField(
-        help_text="Description of the needed item. Markdown is supported!"
+        help_text="Description of the needed item. Markdown is supported!",
     )
 
     count = models.IntegerField(
@@ -59,7 +59,8 @@ class Wish(CampRelatedModel):
         self.slug = unique_slugify(
             self.name,
             slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
-                "slug", flat=True
+                "slug",
+                flat=True,
             ),
         )
         super().save(**kwargs)

@@ -1,12 +1,10 @@
-# coding: utf-8
 import logging
 
 from django.core.management.base import BaseCommand
 
+from .models import TicketType
 from camps.models import Camp
 from events.handler import handle_team_event
-
-from .models import TicketType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 

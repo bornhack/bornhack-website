@@ -1,23 +1,24 @@
-from allauth.account.views import LoginView, LogoutView
+from allauth.account.views import LoginView
+from allauth.account.views import LogoutView
 from django.conf import settings
-from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.urls import include
 from django.urls import path
 from django.views.generic import TemplateView
 
 from bar.views import MenuView
-from camps.views import CampDetailView, CampListView, CampRedirectView
+from camps.views import CampDetailView
+from camps.views import CampListView
+from camps.views import CampRedirectView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from people.views import PeopleView
 from sponsors.views import SponsorsView
-from villages.views import (
-    VillageDeleteView,
-    VillageDetailView,
-    VillageListView,
-    VillageUpdateView,
-)
+from villages.views import VillageDeleteView
+from villages.views import VillageDetailView
+from villages.views import VillageListView
+from villages.views import VillageUpdateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
@@ -31,7 +32,9 @@ urlpatterns = [
     path("shop/", include("shop.urls", namespace="shop")),
     path("news/", include("news.urls", namespace="news")),
     path(
-        "contact/", TemplateView.as_view(template_name="contact.html"), name="contact"
+        "contact/",
+        TemplateView.as_view(template_name="contact.html"),
+        name="contact",
     ),
     path("conduct/", TemplateView.as_view(template_name="coc.html"), name="conduct"),
     path("login/", LoginView.as_view(), name="account_login"),
@@ -133,7 +136,7 @@ urlpatterns = [
                                 VillageDetailView.as_view(),
                                 name="village_detail",
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path("teams/", include("teams.urls", namespace="teams")),
@@ -144,7 +147,7 @@ urlpatterns = [
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
                 path("facilities/", include("facilities.urls", namespace="facilities")),
                 path("phonebook/", include("phonebook.urls", namespace="phonebook")),
-            ]
+            ],
         ),
     ),
 ]

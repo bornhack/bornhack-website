@@ -1,14 +1,15 @@
 import logging
 from datetime import timedelta
 
-from conference_scheduler import resources, scheduler
+from conference_scheduler import resources
+from conference_scheduler import scheduler
 from conference_scheduler.lp_problem import objective_functions
-from conference_scheduler.validator import is_valid_schedule, schedule_violations
+from conference_scheduler.validator import is_valid_schedule
+from conference_scheduler.validator import schedule_violations
 from psycopg2.extras import DateTimeTZRange
 
-from program.email import add_event_scheduled_email
-
 from .models import EventType
+from program.email import add_event_scheduled_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -105,7 +106,7 @@ class AutoScheduler:
                     duration=event.duration_minutes,
                     tags=event.tags.names(),
                     demand=event.demand,
-                )
+                ),
             )
             # create a dict of events with the autoevent index as key and the Event as value
             autoeventindex[autoevents.index(autoevents[-1])] = event
@@ -129,13 +130,14 @@ class AutoScheduler:
                 # loop over other events featuring this speaker, register each conflict,
                 # this means we dont schedule two events for the same speaker at the same time
                 conflict_ids = speaker.events.exclude(id=event.id).values_list(
-                    "id", flat=True
+                    "id",
+                    flat=True,
                 )
                 for conflictevent in autoevents:
                     if conflictevent.name in conflict_ids:
                         # only the event with the lowest index gets the unavailability,
                         if autoevents.index(conflictevent) > autoevents.index(
-                            autoevent
+                            autoevent,
                         ):
                             autoevent.add_unavailability(conflictevent)
 
@@ -144,19 +146,19 @@ class AutoScheduler:
                 # speaker wishes to attend.
                 # Only process Events which the AutoScheduler is handling
                 for conflictevent in speaker.event_conflicts.filter(
-                    pk__in=events.values_list("pk", flat=True)
+                    pk__in=events.values_list("pk", flat=True),
                 ):
                     # only the event with the lowest index gets the unavailability
                     if eventindex[conflictevent] > autoevents.index(autoevent):
                         autoevent.add_unavailability(
-                            autoevents[eventindex[conflictevent]]
+                            autoevents[eventindex[conflictevent]],
                         )
 
                 # loop over event_conflicts for this speaker, register unavailability for each,
                 # only process Events which the AutoScheduler is not handling, and which have
                 # been scheduled in one or more EventSlots
                 for conflictevent in speaker.event_conflicts.filter(
-                    event_slots__isnull=False
+                    event_slots__isnull=False,
                 ).exclude(pk__in=events.values_list("pk", flat=True)):
                     # loop over the EventSlots this conflict is scheduled in
                     for conflictslot in conflictevent.event_slots.all():
@@ -174,10 +176,12 @@ class AutoScheduler:
                 # for this speaker as unavailable
                 available = []
                 for availability in speaker.availabilities.filter(
-                    available=True
+                    available=True,
                 ).values_list("when", flat=True):
                     availability = DateTimeTZRange(
-                        availability.lower, availability.upper, "()"
+                        availability.lower,
+                        availability.upper,
+                        "()",
                     )
                     for slot in self.autoslots:
                         slotrange = DateTimeTZRange(
@@ -207,7 +211,8 @@ class AutoScheduler:
         # loop over scheduled events and create a ScheduledItem object for each
         autoschedule = []
         for slot in self.camp.event_slots.filter(
-            autoscheduled=True, event__in=self.events
+            autoscheduled=True,
+            event__in=self.events,
         ):
             # loop over all autoevents to find the index of this event
             for autoevent in self.autoevents:
@@ -231,7 +236,7 @@ class AutoScheduler:
                         resources.ScheduledItem(
                             event=self.autoevents[eventindex],
                             slot=self.autoslots[self.autoslots.index(autoslot)],
-                        )
+                        ),
                     )
                     scheduled = True
                     break
@@ -287,7 +292,7 @@ class AutoScheduler:
         # FRAB clients still work after a schedule "re"apply. We might need a smaller hammer here.
         deleted = self.camp.event_slots.filter(
             # get all autoscheduled EventSlots
-            autoscheduled=True
+            autoscheduled=True,
         ).update(
             # clear the Event
             event=None,
@@ -336,7 +341,7 @@ class AutoScheduler:
                     "starttime": item.slot.starts_at,
                     "old": {},
                     "new": {},
-                }
+                },
             )
             if item.old_event:
                 try:
@@ -368,7 +373,7 @@ class AutoScheduler:
                     "event": event,
                     "old": {},
                     "new": {},
-                }
+                },
             )
             # do we have an old slot for this event?
             if item.old_slot:
@@ -389,13 +394,17 @@ class AutoScheduler:
     def is_valid(self, autoschedule, return_violations=False):
         """Check if a schedule is valid, optionally returning a list of violations if invalid"""
         valid = is_valid_schedule(
-            autoschedule, slots=self.autoslots, events=self.autoevents
+            autoschedule,
+            slots=self.autoslots,
+            events=self.autoevents,
         )
         if not return_violations:
             return valid
         return (
             valid,
             schedule_violations(
-                autoschedule, slots=self.autoslots, events=self.autoevents
+                autoschedule,
+                slots=self.autoslots,
+                events=self.autoevents,
             ),
         )

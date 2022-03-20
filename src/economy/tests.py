@@ -4,14 +4,13 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from .models import Bank, BankAccount
-from .utils import (
-    CoinifyCSVImporter,
-    MobilePayCSVImporter,
-    ZettleExcelImporter,
-    import_clearhaus_csv,
-    import_epay_csv,
-)
+from .models import Bank
+from .models import BankAccount
+from .utils import CoinifyCSVImporter
+from .utils import import_clearhaus_csv
+from .utils import import_epay_csv
+from .utils import MobilePayCSVImporter
+from .utils import ZettleExcelImporter
 
 
 class BankAccountCsvImportTest(TestCase):
@@ -57,7 +56,8 @@ class CoinifyCSVImportTest(TestCase):
     def test_coinify_invoice_csv_import(self):
         # make sure we create 4 invoices
         with open(
-            "testdata/coinify-invoices-20200101-20200630.csv", encoding="utf-8-sig"
+            "testdata/coinify-invoices-20200101-20200630.csv",
+            encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
@@ -65,7 +65,8 @@ class CoinifyCSVImportTest(TestCase):
 
         # make sure we create 0 invoices if the same csv is imported again
         with open(
-            "testdata/coinify-invoices-20200101-20200630.csv", encoding="utf-8-sig"
+            "testdata/coinify-invoices-20200101-20200630.csv",
+            encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
@@ -74,7 +75,8 @@ class CoinifyCSVImportTest(TestCase):
     def test_coinify_payout_csv_import(self):
         # make sure we create 2 payouts
         with open(
-            "testdata/coinify-payouts-20210701-20210904.csv", encoding="utf-8-sig"
+            "testdata/coinify-payouts-20210701-20210904.csv",
+            encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
@@ -82,7 +84,8 @@ class CoinifyCSVImportTest(TestCase):
 
         # make sure we create 0 payouts if the same csv is imported again
         with open(
-            "testdata/coinify-payouts-20210701-20210904.csv", encoding="utf-8-sig"
+            "testdata/coinify-payouts-20210701-20210904.csv",
+            encoding="utf-8-sig",
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
@@ -150,7 +153,8 @@ class ZettleImportTest(TestCase):
 
     def test_zettle_balances_import(self):
         with open(
-            "testdata/Zettle-Account-Statement-Report-20210101-20210910.xlsx", "rb"
+            "testdata/Zettle-Account-Statement-Report-20210101-20210910.xlsx",
+            "rb",
         ) as f:
             df = ZettleExcelImporter.load_zettle_balances_excel(f)
         created = ZettleExcelImporter.import_zettle_balances_df(df)

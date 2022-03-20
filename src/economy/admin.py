@@ -1,23 +1,21 @@
 from django.contrib import admin
 
-from .models import (
-    Bank,
-    BankAccount,
-    BankTransaction,
-    Chain,
-    CoinifyBalance,
-    CoinifyInvoice,
-    CoinifyPayout,
-    Credebtor,
-    EpayTransaction,
-    Expense,
-    Pos,
-    PosReport,
-    Reimbursement,
-    Revenue,
-    ZettleBalance,
-    ZettleReceipt,
-)
+from .models import Bank
+from .models import BankAccount
+from .models import BankTransaction
+from .models import Chain
+from .models import CoinifyBalance
+from .models import CoinifyInvoice
+from .models import CoinifyPayout
+from .models import Credebtor
+from .models import EpayTransaction
+from .models import Expense
+from .models import Pos
+from .models import PosReport
+from .models import Reimbursement
+from .models import Revenue
+from .models import ZettleBalance
+from .models import ZettleReceipt
 
 ###############################
 # chains and credebtors

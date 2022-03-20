@@ -55,10 +55,14 @@ class Command(BaseCommand):
         while True:
             try:
                 # run worker code
-                getattr(self.workermodule, "do_work")()
+                if not hasattr(self.workermodule, "do_work"):
+                    raise NotImplementedError(
+                        "Worker module should have a 'do_work' function.",
+                    )
+                self.workermodule.do_work()
             except Exception:
                 logger.exception(
-                    "Got exception inside do_work for %s" % self.workermodule
+                    "Got exception inside do_work for %s" % self.workermodule,
                 )
                 sys.exit(1)
 

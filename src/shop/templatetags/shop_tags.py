@@ -8,6 +8,6 @@ register = template.Library()
 @register.filter
 def currency(value):
     try:
-        return "{0:.2f} DKK".format(Decimal(value))
+        return f"{Decimal(value):.2f} DKK"
     except ValueError:
         return False

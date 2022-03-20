@@ -2,13 +2,16 @@ from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 
+from .mixins import FacilityTypeViewMixin
+from .mixins import FacilityViewMixin
+from .models import Facility
+from .models import FacilityFeedback
+from .models import FacilityType
 from camps.mixins import CampViewMixin
-
-from .mixins import FacilityTypeViewMixin, FacilityViewMixin
-from .models import Facility, FacilityFeedback, FacilityType
 
 
 class FacilityTypeListView(CampViewMixin, ListView):
@@ -65,7 +68,8 @@ class FacilityFeedbackView(FacilityViewMixin, CreateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["unhandled_feedbacks"] = FacilityFeedback.objects.filter(
-            facility=self.facility, handled=False
+            facility=self.facility,
+            handled=False,
         ).count()
         return context
 
@@ -84,5 +88,5 @@ class FacilityFeedbackView(FacilityViewMixin, CreateView):
                     "facility_type_slug": self.facility_type.slug,
                     "facility_uuid": self.facility.uuid,
                 },
-            )
+            ),
         )

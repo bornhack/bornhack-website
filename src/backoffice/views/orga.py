@@ -5,17 +5,18 @@ from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView
+from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
+from ..mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
-from shop.models import OrderProductRelation, Product
+from shop.models import OrderProductRelation
+from shop.models import Product
 from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
-
-from ..mixins import OrgaTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -26,7 +27,7 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
     def get_queryset(self, **kwargs):
         return Profile.objects.filter(public_credit_name_approved=False).exclude(
-            public_credit_name=""
+            public_credit_name="",
         )
 
 
@@ -38,7 +39,7 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_merchandise.html"
 
     def get_queryset(self, **kwargs):
-        camp_prefix = "BornHack {}".format(timezone.now().year)
+        camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
             OrderProductRelation.objects.filter(
@@ -55,7 +56,7 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
     template_name = "merchandise_to_order.html"
 
     def get_context_data(self, **kwargs):
-        camp_prefix = "BornHack {}".format(timezone.now().year)
+        camp_prefix = f"BornHack {timezone.now().year}"
 
         order_relations = OrderProductRelation.objects.filter(
             order__refunded=False,
@@ -84,7 +85,7 @@ class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_village.html"
 
     def get_queryset(self, **kwargs):
-        camp_prefix = "BornHack {}".format(timezone.now().year)
+        camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
             OrderProductRelation.objects.filter(
@@ -103,7 +104,7 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
     template_name = "village_to_order.html"
 
     def get_context_data(self, **kwargs):
-        camp_prefix = "BornHack {}".format(timezone.now().year)
+        camp_prefix = f"BornHack {timezone.now().year}"
 
         order_relations = OrderProductRelation.objects.filter(
             ticket_generated=False,
@@ -141,11 +142,13 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
         """Get emails with no team and emails with a team for the current camp."""
         super().setup(*args, **kwargs)
         self.queryset = OutgoingEmail.objects.filter(
-            hold=True, responsible_team__isnull=True
+            hold=True,
+            responsible_team__isnull=True,
         ).prefetch_related("responsible_team") | OutgoingEmail.objects.filter(
-            hold=True, responsible_team__camp=self.camp
+            hold=True,
+            responsible_team__camp=self.camp,
         ).prefetch_related(
-            "responsible_team"
+            "responsible_team",
         )
         self.form_class = modelformset_factory(
             OutgoingEmail,
@@ -168,7 +171,8 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
         form.save()
         if form.changed_objects:
             messages.success(
-                self.request, f"Updated {len(form.changed_objects)} OutgoingEmails"
+                self.request,
+                f"Updated {len(form.changed_objects)} OutgoingEmails",
             )
         return redirect(self.get_success_url())
 
@@ -204,7 +208,8 @@ class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
     def get_queryset(self):
         query = TicketType.objects.filter(
-            camp=self.camp, shopticket__isnull=False
+            camp=self.camp,
+            shopticket__isnull=False,
         ).with_price_stats()
         return query
 
@@ -215,7 +220,7 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
 
     def get_queryset(self):
         return Product.statsobjects.with_ticket_stats().filter(
-            ticket_type_id=self.kwargs["pk"]
+            ticket_type_id=self.kwargs["pk"],
         )
 
     def get_context_data(self, *args, **kwargs):
@@ -233,6 +238,7 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
             context["total_profit"] += product.total_profit
         if context["total_income"] and context["total_units"]:
             context["average_price"] = round(
-                context["total_income"] / context["total_units"], 2
+                context["total_income"] / context["total_units"],
+                2,
             )
         return context

@@ -1,8 +1,7 @@
 from django.views.generic import ListView
 
-from camps.mixins import CampViewMixin
-
 from .models import InfoCategory
+from camps.mixins import CampViewMixin
 
 
 class CampInfoView(CampViewMixin, ListView):
@@ -11,6 +10,6 @@ class CampInfoView(CampViewMixin, ListView):
     context_object_name = "categories"
 
     def get_queryset(self):
-        queryset = super(CampInfoView, self).get_queryset()
+        queryset = super().get_queryset()
         # do not show categories with 0 items
         return queryset.exclude(infoitems__isnull=True)

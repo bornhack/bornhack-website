@@ -1,7 +1,8 @@
 import logging
 import random
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
 
 import factory
 import pytz
@@ -17,54 +18,59 @@ from django.utils.crypto import get_random_string
 from faker import Faker
 
 from camps.models import Camp
-from economy.factories import (
-    BankAccountFactory,
-    BankFactory,
-    BankTransactionFactory,
-    ClearhausSettlementFactory,
-    CoinifyBalanceFactory,
-    CoinifyInvoiceFactory,
-    CoinifyPayoutFactory,
-    EpayTransactionFactory,
-    MobilePayTransactionFactory,
-    ZettleBalanceFactory,
-    ZettleReceiptFactory,
-)
-from economy.models import Chain, Credebtor, Expense, Reimbursement, Revenue
-from events.models import Routing, Type
-from facilities.models import (
-    Facility,
-    FacilityFeedback,
-    FacilityQuickFeedback,
-    FacilityType,
-)
+from economy.factories import BankAccountFactory
+from economy.factories import BankFactory
+from economy.factories import BankTransactionFactory
+from economy.factories import ClearhausSettlementFactory
+from economy.factories import CoinifyBalanceFactory
+from economy.factories import CoinifyInvoiceFactory
+from economy.factories import CoinifyPayoutFactory
+from economy.factories import EpayTransactionFactory
+from economy.factories import MobilePayTransactionFactory
+from economy.factories import ZettleBalanceFactory
+from economy.factories import ZettleReceiptFactory
+from economy.models import Chain
+from economy.models import Credebtor
+from economy.models import Expense
+from economy.models import Reimbursement
+from economy.models import Revenue
+from events.models import Routing
+from events.models import Type
+from facilities.models import Facility
+from facilities.models import FacilityFeedback
+from facilities.models import FacilityQuickFeedback
+from facilities.models import FacilityType
 from feedback.models import Feedback
-from info.models import InfoCategory, InfoItem
+from info.models import InfoCategory
+from info.models import InfoItem
 from news.models import NewsItem
 from profiles.models import Profile
 from program.autoscheduler import AutoScheduler
-from program.models import (
-    Event,
-    EventLocation,
-    EventProposal,
-    EventSession,
-    EventSlot,
-    EventTrack,
-    EventType,
-    SpeakerProposal,
-    Url,
-    UrlType,
-)
-from program.utils import (
-    get_speaker_availability_form_matrix,
-    save_speaker_availability,
-)
+from program.models import Event
+from program.models import EventLocation
+from program.models import EventProposal
+from program.models import EventSession
+from program.models import EventSlot
+from program.models import EventTrack
+from program.models import EventType
+from program.models import SpeakerProposal
+from program.models import Url
+from program.models import UrlType
+from program.utils import get_speaker_availability_form_matrix
+from program.utils import save_speaker_availability
 from rideshare.models import Ride
-from shop.models import Order, Product, ProductCategory
-from sponsors.models import Sponsor, SponsorTier
-from teams.models import Team, TeamMember, TeamShift, TeamTask
+from shop.models import Order
+from shop.models import Product
+from shop.models import ProductCategory
+from sponsors.models import Sponsor
+from sponsors.models import SponsorTier
+from teams.models import Team
+from teams.models import TeamMember
+from teams.models import TeamShift
+from teams.models import TeamTask
 from tickets.models import TicketType
-from tokens.models import Token, TokenFind
+from tokens.models import Token
+from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
 
@@ -81,8 +87,9 @@ class ChainFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("company")
     slug = factory.LazyAttribute(
         lambda f: unique_slugify(
-            f.name, Chain.objects.all().values_list("slug", flat=True)
-        )
+            f.name,
+            Chain.objects.all().values_list("slug", flat=True),
+        ),
     )
 
 
@@ -94,8 +101,9 @@ class CredebtorFactory(factory.django.DjangoModelFactory):
     name = factory.Faker("company")
     slug = factory.LazyAttribute(
         lambda f: unique_slugify(
-            f.name, Credebtor.objects.all().values_list("slug", flat=True)
-        )
+            f.name,
+            Credebtor.objects.all().values_list("slug", flat=True),
+        ),
     )
     address = factory.Faker("address", locale="dk_DK")
     notes = factory.Faker("text")
@@ -112,7 +120,7 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
     description = factory.Faker("text")
     paid_by_bornhack = factory.Faker("random_element", elements=[True, True, False])
     invoice = factory.django.ImageField(
-        color=random.choice(["#ff0000", "#00ff00", "#0000ff"])
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
@@ -130,7 +138,7 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     amount = factory.Faker("random_int", min=20, max=20000)
     description = factory.Faker("text")
     invoice = factory.django.ImageField(
-        color=random.choice(["#ff0000", "#00ff00", "#0000ff"])
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
@@ -234,18 +242,48 @@ class Command(BaseCommand):
     def create_camps(self):
         self.output("Creating camps...")
         camps = [
-            dict(year=2016, tagline="Initial Commit", colour="#004dff", read_only=True),
-            dict(year=2017, tagline="Make Tradition", colour="#750787", read_only=True),
-            dict(year=2018, tagline="scale it", colour="#008026", read_only=True),
-            dict(year=2019, tagline="a new /home", colour="#ffed00", read_only=True),
-            dict(year=2020, tagline="Make Clean", colour="#ff8c00", read_only=True),
-            dict(
-                year=2021,
-                tagline="Continuous Delivery",
-                colour="#e40303",
-                read_only=False,
-            ),
-            dict(year=2022, tagline="Undecided", colour="#004dff", read_only=False),
+            {
+                "year": 2016,
+                "tagline": "Initial Commit",
+                "colour": "#004dff",
+                "read_only": True,
+            },
+            {
+                "year": 2017,
+                "tagline": "Make Tradition",
+                "colour": "#750787",
+                "read_only": True,
+            },
+            {
+                "year": 2018,
+                "tagline": "scale it",
+                "colour": "#008026",
+                "read_only": True,
+            },
+            {
+                "year": 2019,
+                "tagline": "a new /home",
+                "colour": "#ffed00",
+                "read_only": True,
+            },
+            {
+                "year": 2020,
+                "tagline": "Make Clean",
+                "colour": "#ff8c00",
+                "read_only": True,
+            },
+            {
+                "year": 2021,
+                "tagline": "Continuous Delivery",
+                "colour": "#e40303",
+                "read_only": False,
+            },
+            {
+                "year": 2022,
+                "tagline": "Undecided",
+                "colour": "#004dff",
+                "read_only": False,
+            },
         ]
 
         camp_instances = []
@@ -256,10 +294,10 @@ class Command(BaseCommand):
             camp_instances.append(
                 (
                     Camp.objects.create(
-                        title="BornHack {}".format(year),
+                        title=f"BornHack {year}",
                         tagline=camp["tagline"],
-                        slug="bornhack-{}".format(year),
-                        shortslug="bornhack-{}".format(year),
+                        slug=f"bornhack-{year}",
+                        shortslug=f"bornhack-{year}",
                         buildup=(
                             tz.localize(datetime(year, 8, 25, 12, 0)),
                             tz.localize(datetime(year, 8, 27, 12, 0)),
@@ -275,7 +313,7 @@ class Command(BaseCommand):
                         colour=camp["colour"],
                     ),
                     read_only,
-                )
+                ),
             )
 
         return camp_instances
@@ -290,19 +328,23 @@ class Command(BaseCommand):
         users = {}
 
         for i in range(0, 16):
-            username = "user{}".format(i)
+            username = f"user{i}"
             user = UserFactory.create(
-                username=username, email="{}@example.com".format(username)
+                username=username,
+                email=f"{username}@example.com",
             )
             user.set_password(username)
             user.save()
             users[i] = user
             EmailAddressFactory.create(
-                user=user, email="{}@example.com".format(username)
+                user=user,
+                email=f"{username}@example.com",
             )
 
         admin = User.objects.create_superuser(
-            username="admin", email="admin@example.com", password="admin"
+            username="admin",
+            email="admin@example.com",
+            password="admin",
         )
         users["admin"] = admin
         admin.profile.name = "Administrator"
@@ -311,33 +353,41 @@ class Command(BaseCommand):
         admin.profile.public_credit_name_approved = True
         admin.profile.save()
         EmailAddress.objects.create(
-            user=admin, email="admin@example.com", verified=True, primary=True
+            user=admin,
+            email="admin@example.com",
+            verified=True,
+            primary=True,
         )
 
         return users
 
     def create_news(self):
         NewsItem.objects.create(
-            title="unpublished news item", content="unpublished news body here"
+            title="unpublished news item",
+            content="unpublished news body here",
         )
 
     def create_quickfeedback_options(self):
         options = {}
         self.output("Creating quickfeedback options")
         options["na"] = FacilityQuickFeedback.objects.create(
-            feedback="N/A", icon="fas fa-times"
+            feedback="N/A",
+            icon="fas fa-times",
         )
         options["attention"] = FacilityQuickFeedback.objects.create(
-            feedback="Needs attention"
+            feedback="Needs attention",
         )
         options["toiletpaper"] = FacilityQuickFeedback.objects.create(
-            feedback="Needs more toiletpaper", icon="fas fa-toilet-paper"
+            feedback="Needs more toiletpaper",
+            icon="fas fa-toilet-paper",
         )
         options["cleaning"] = FacilityQuickFeedback.objects.create(
-            feedback="Needs cleaning", icon="fas fa-broom"
+            feedback="Needs cleaning",
+            icon="fas fa-broom",
         )
         options["power"] = FacilityQuickFeedback.objects.create(
-            feedback="No power", icon="fas fa-bolt"
+            feedback="No power",
+            icon="fas fa-bolt",
         )
         return options
 
@@ -589,37 +639,48 @@ class Command(BaseCommand):
     def create_url_types(self):
         self.output("Creating UrlType objects...")
         t, created = UrlType.objects.get_or_create(
-            name="Other", defaults={"icon": "fas fa-link"}
+            name="Other",
+            defaults={"icon": "fas fa-link"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Homepage", defaults={"icon": "fas fa-link"}
+            name="Homepage",
+            defaults={"icon": "fas fa-link"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Slides", defaults={"icon": "fas fa-chalkboard-teacher"}
+            name="Slides",
+            defaults={"icon": "fas fa-chalkboard-teacher"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Twitter", defaults={"icon": "fab fa-twitter"}
+            name="Twitter",
+            defaults={"icon": "fab fa-twitter"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Mastodon", defaults={"icon": "fab fa-mastodon"}
+            name="Mastodon",
+            defaults={"icon": "fab fa-mastodon"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Facebook", defaults={"icon": "fab fa-facebook"}
+            name="Facebook",
+            defaults={"icon": "fab fa-facebook"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Project", defaults={"icon": "fas fa-link"}
+            name="Project",
+            defaults={"icon": "fas fa-link"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Blog", defaults={"icon": "fas fa-link"}
+            name="Blog",
+            defaults={"icon": "fas fa-link"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Github", defaults={"icon": "fab fa-github"}
+            name="Github",
+            defaults={"icon": "fab fa-github"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Keybase", defaults={"icon": "fab fa-keybase"}
+            name="Keybase",
+            defaults={"icon": "fab fa-keybase"},
         )
         t, created = UrlType.objects.get_or_create(
-            name="Recording", defaults={"icon": "fas fa-film"}
+            name="Recording",
+            defaults={"icon": "fas fa-film"},
         )
 
     def create_credebtors(self):
@@ -638,26 +699,33 @@ class Command(BaseCommand):
                 continue
         # add a credebtor for reimbursements
         reimbursement_chain = Chain.objects.create(
-            name="Reimbursement", notes="This chain is only used for reimbursements"
+            name="Reimbursement",
+            notes="This chain is only used for reimbursements",
         )
         Credebtor.objects.create(
-            chain=reimbursement_chain, name="Reimbursement", address="Nowhere"
+            chain=reimbursement_chain,
+            name="Reimbursement",
+            address="Nowhere",
         )
 
     def create_product_categories(self):
         categories = {}
         self.output("Creating productcategories...")
         categories["transportation"] = ProductCategory.objects.create(
-            name="Transportation", slug="transportation"
+            name="Transportation",
+            slug="transportation",
         )
         categories["merchandise"] = ProductCategory.objects.create(
-            name="Merchandise", slug="merchandise"
+            name="Merchandise",
+            slug="merchandise",
         )
         categories["tickets"] = ProductCategory.objects.create(
-            name="Tickets", slug="tickets"
+            name="Tickets",
+            slug="tickets",
         )
         categories["villages"] = ProductCategory.objects.create(
-            name="Villages", slug="villages"
+            name="Villages",
+            slug="villages",
         )
 
         return categories
@@ -678,7 +746,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"]
+                    category=categories["transportation"],
                 ).values_list("slug", flat=True),
             ),
         )
@@ -696,7 +764,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"]
+                    category=categories["transportation"],
                 ).values_list("slug", flat=True),
             ),
         )
@@ -714,7 +782,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"]
+                    category=categories["merchandise"],
                 ).values_list("slug", flat=True),
             ),
         )
@@ -732,7 +800,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["villages"]
+                    category=categories["villages"],
                 ).values_list("slug", flat=True),
             ),
         )
@@ -750,7 +818,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["villages"]
+                    category=categories["villages"],
                 ).values_list("slug", flat=True),
             ),
         )
@@ -759,18 +827,22 @@ class Command(BaseCommand):
 
     def create_camp_ticket_types(self, camp):
         types = {}
-        self.output("Creating tickettypes for {}...".format(camp.camp.lower.year))
+        self.output(f"Creating tickettypes for {camp.camp.lower.year}...")
         types["adult_full_week"] = TicketType.objects.create(
-            name="Adult Full Week", camp=camp
+            name="Adult Full Week",
+            camp=camp,
         )
         types["adult_one_day"] = TicketType.objects.create(
-            name="Adult One Day", camp=camp
+            name="Adult One Day",
+            camp=camp,
         )
         types["child_full_week"] = TicketType.objects.create(
-            name="Child Full Week", camp=camp
+            name="Child Full Week",
+            camp=camp,
         )
         types["child_one_day"] = TicketType.objects.create(
-            name="Child One Day", camp=camp
+            name="Child One Day",
+            camp=camp,
         )
 
         return types
@@ -778,7 +850,7 @@ class Command(BaseCommand):
     def create_camp_products(self, camp, categories, ticket_types):
         products = {}
         year = camp.camp.lower.year
-        name = "BornHack {} Standard ticket".format(year)
+        name = f"BornHack {year} Standard ticket"
         products["ticket1"] = Product.objects.create(
             name=name,
             description="A ticket",
@@ -791,13 +863,13 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"]
+                    category=categories["tickets"],
                 ).values_list("slug", flat=True),
             ),
             ticket_type=ticket_types["adult_full_week"],
         )
 
-        name = "BornHack {} Hacker ticket".format(year)
+        name = f"BornHack {year} Hacker ticket"
         products["ticket2"] = Product.objects.create(
             name=name,
             description="Another ticket",
@@ -810,7 +882,7 @@ class Command(BaseCommand):
             slug=unique_slugify(
                 name,
                 slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"]
+                    category=categories["tickets"],
                 ).values_list("slug", flat=True),
             ),
             ticket_type=ticket_types["adult_full_week"],
@@ -822,52 +894,71 @@ class Command(BaseCommand):
         orders = {}
         self.output("Creating orders...")
         orders[0] = Order.objects.create(
-            user=users[1], payment_method="in_person", open=None, paid=True
+            user=users[1],
+            payment_method="in_person",
+            open=None,
+            paid=True,
         )
         orders[0].orderproductrelation_set.create(
-            product=camp_products["ticket1"], quantity=1
+            product=camp_products["ticket1"],
+            quantity=1,
         )
         orders[0].orderproductrelation_set.create(
-            product=global_products["tent1"], quantity=1
+            product=global_products["tent1"],
+            quantity=1,
         )
         orders[0].mark_as_paid(request=None)
 
         orders[1] = Order.objects.create(
-            user=users[2], payment_method="in_person", open=None
+            user=users[2],
+            payment_method="in_person",
+            open=None,
         )
         orders[1].orderproductrelation_set.create(
-            product=camp_products["ticket1"], quantity=1
+            product=camp_products["ticket1"],
+            quantity=1,
         )
         orders[1].orderproductrelation_set.create(
-            product=global_products["tent2"], quantity=1
+            product=global_products["tent2"],
+            quantity=1,
         )
         orders[1].mark_as_paid(request=None)
 
         orders[2] = Order.objects.create(
-            user=users[3], payment_method="in_person", open=None
+            user=users[3],
+            payment_method="in_person",
+            open=None,
         )
         orders[2].orderproductrelation_set.create(
-            product=camp_products["ticket2"], quantity=1
+            product=camp_products["ticket2"],
+            quantity=1,
         )
         orders[2].orderproductrelation_set.create(
-            product=camp_products["ticket1"], quantity=1
+            product=camp_products["ticket1"],
+            quantity=1,
         )
         orders[2].orderproductrelation_set.create(
-            product=global_products["tent2"], quantity=1
+            product=global_products["tent2"],
+            quantity=1,
         )
         orders[2].mark_as_paid(request=None)
 
         orders[3] = Order.objects.create(
-            user=users[4], payment_method="in_person", open=None
+            user=users[4],
+            payment_method="in_person",
+            open=None,
         )
         orders[3].orderproductrelation_set.create(
-            product=global_products["product0"], quantity=1
+            product=global_products["product0"],
+            quantity=1,
         )
         orders[3].orderproductrelation_set.create(
-            product=camp_products["ticket2"], quantity=1
+            product=camp_products["ticket2"],
+            quantity=1,
         )
         orders[3].orderproductrelation_set.create(
-            product=global_products["tent1"], quantity=1
+            product=global_products["tent1"],
+            quantity=1,
         )
         orders[3].mark_as_paid(request=None)
 
@@ -876,9 +967,11 @@ class Command(BaseCommand):
     def create_camp_tracks(self, camp):
         tracks = {}
         year = camp.camp.lower.year
-        self.output("Creating event_tracks for {}...".format(year))
+        self.output(f"Creating event_tracks for {year}...")
         tracks[1] = EventTrack.objects.create(
-            camp=camp, name="BornHack {}".format(year), slug=camp.slug
+            camp=camp,
+            name=f"BornHack {year}",
+            slug=camp.slug,
         )
 
         return tracks
@@ -886,7 +979,7 @@ class Command(BaseCommand):
     def create_event_locations(self, camp):
         locations = {}
         year = camp.camp.lower.year
-        self.output("Creating event_locations for {}...".format(year))
+        self.output(f"Creating event_locations for {year}...")
         locations["speakers_tent"] = EventLocation.objects.create(
             name="Speakers Tent",
             slug="speakers-tent",
@@ -946,14 +1039,14 @@ class Command(BaseCommand):
 
     def create_camp_news(self, camp):
         year = camp.camp.lower.year
-        self.output("Creating news for {}...".format(year))
+        self.output(f"Creating news for {year}...")
         NewsItem.objects.create(
-            title="Welcome to {}".format(camp.title),
+            title=f"Welcome to {camp.title}",
             content="news body here with <b>html</b> support",
             published_at=tz.localize(datetime(year, 8, 27, 12, 0)),
         )
         NewsItem.objects.create(
-            title="{} is over".format(camp.title),
+            title=f"{camp.title} is over",
             content="news body here",
             published_at=tz.localize(datetime(year, 9, 4, 12, 0)),
         )
@@ -1027,17 +1120,23 @@ class Command(BaseCommand):
                 event_location=event_locations["speakers_tent"],
                 when=(
                     tz.localize(
-                        datetime(day.lower.year, day.lower.month, day.lower.day, 20, 0)
+                        datetime(day.lower.year, day.lower.month, day.lower.day, 20, 0),
                     ),
                     tz.localize(
-                        datetime(day.lower.year, day.lower.month, day.lower.day, 21, 30)
+                        datetime(
+                            day.lower.year,
+                            day.lower.month,
+                            day.lower.day,
+                            21,
+                            30,
+                        ),
                     ),
                 ),
             )
 
     def create_camp_proposals(self, camp, event_types):
         year = camp.camp.lower.year
-        self.output("Creating event- and speaker_proposals for {}...".format(year))
+        self.output(f"Creating event- and speaker_proposals for {year}...")
 
         # add 45 talks
         talkproposals = EventProposalFactory.create_batch(
@@ -1079,7 +1178,7 @@ class Command(BaseCommand):
             # 20% chance we add an extra speaker
             if random.randint(1, 10) > 8:
                 other_speakers = SpeakerProposal.objects.filter(camp=camp).exclude(
-                    uuid=sp.uuid
+                    uuid=sp.uuid,
                 )
                 # ... if we have any...
                 if other_speakers.exists():
@@ -1103,18 +1202,18 @@ class Command(BaseCommand):
         """Create URL objects for the proposals"""
         year = camp.camp.lower.year
         self.output(
-            "Creating URLs for Speaker- and EventProposals for {}...".format(year)
+            f"Creating URLs for Speaker- and EventProposals for {year}...",
         )
         SpeakerProposalUrlFactory.create_batch(
             100,
             speaker_proposal=factory.Iterator(
-                SpeakerProposal.objects.filter(camp=camp)
+                SpeakerProposal.objects.filter(camp=camp),
             ),
         )
         EventProposalUrlFactory.create_batch(
             100,
             event_proposal=factory.Iterator(
-                EventProposal.objects.filter(track__camp=camp)
+                EventProposal.objects.filter(track__camp=camp),
             ),
         )
 
@@ -1122,14 +1221,14 @@ class Command(BaseCommand):
         """Create SpeakerAvailability objects for the SpeakerProposals"""
         year = camp.camp.lower.year
         self.output(
-            "Generating random SpeakerProposalAvailability for {}...".format(year)
+            f"Generating random SpeakerProposalAvailability for {year}...",
         )
         for sp in camp.speaker_proposals.all():
             # generate a matrix for this speaker_proposals event_types
             matrix = get_speaker_availability_form_matrix(
                 sessions=sp.camp.event_sessions.filter(
                     event_type__in=sp.event_types.all(),
-                )
+                ),
             )
 
             # build a "form" object so we can reuse save_speaker_availability()
@@ -1137,12 +1236,12 @@ class Command(BaseCommand):
                 cleaned_data = {}
 
             form = FakeForm()
-            for date, daychunks in matrix.items():
+            for _date, daychunks in matrix.items():
                 # 90% chance we have info for any given day
                 if random.randint(1, 100) > 90:
                     # no availability info for this entire day, sorry
                     continue
-                for daychunk, data in daychunks.items():
+                for _daychunk, data in daychunks.items():
                     if not data:
                         continue
                     # 90% chance this speaker is available for any given chunk
@@ -1153,7 +1252,7 @@ class Command(BaseCommand):
     def approve_speaker_proposals(self, camp):
         """Approve all keynotes but reject 10% of other events"""
         for sp in camp.speaker_proposals.filter(
-            event_proposals__event_type__name="Keynote"
+            event_proposals__event_type__name="Keynote",
         ):
             sp.mark_as_approved()
 
@@ -1190,7 +1289,7 @@ class Command(BaseCommand):
 
     def create_camp_scheduling(self, camp):
         year = camp.camp.lower.year
-        self.output("Creating scheduling for {}...".format(year))
+        self.output(f"Creating scheduling for {year}...")
 
         # create a lunchbreak daily in speakers tent
         lunch = Event.objects.get(track__camp=camp, title="Lunch break")
@@ -1199,10 +1298,10 @@ class Command(BaseCommand):
             start = tz.localize(datetime(date.year, date.month, date.day, 12, 0))
             lunchslot = EventSlot.objects.get(
                 event_session__event_location=camp.event_locations.get(
-                    name="Speakers Tent"
+                    name="Speakers Tent",
                 ),
                 event_session__event_type=EventType.objects.get(
-                    name="Recreational Event"
+                    name="Recreational Event",
                 ),
                 when=(start, start + timedelta(hours=1)),
             )
@@ -1221,13 +1320,13 @@ class Command(BaseCommand):
             self.output(f"Got exception while calculating autoschedule: {E}")
         scheduleduration = timezone.now() - schedulestart
         self.output(
-            f"Done running autoscheduler for {year}... It took {scheduleduration}"
+            f"Done running autoscheduler for {year}... It took {scheduleduration}",
         )
 
     def create_camp_speaker_event_conflicts(self, camp):
         year = camp.camp.lower.year
         self.output(
-            "Generating event_conflicts for SpeakerProposals for {}...".format(year)
+            f"Generating event_conflicts for SpeakerProposals for {year}...",
         )
         # loop over all
         for sp in camp.speaker_proposals.all():
@@ -1239,7 +1338,7 @@ class Command(BaseCommand):
                     Event.objects.filter(
                         track__camp=camp,
                         event_type__support_speaker_event_conflicts=True,
-                    ).order_by("?")[0:conflictcount]
+                    ).order_by("?")[0:conflictcount],
                 )
 
     def create_camp_rescheduling(self, camp):
@@ -1248,7 +1347,7 @@ class Command(BaseCommand):
         for prop in camp.speaker_proposals.filter(proposal_status="approved"):
             prop.mark_as_approved()
         # exercise the autoscheduler a bit
-        self.output("Rescheduling {}...".format(year))
+        self.output(f"Rescheduling {year}...")
         scheduler = AutoScheduler(camp=camp)
         schedulestart = timezone.now()
         try:
@@ -1262,7 +1361,7 @@ class Command(BaseCommand):
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
-        self.output("Creating villages for {}...".format(year))
+        self.output(f"Creating villages for {year}...")
         Village.objects.create(
             contact=users[1],
             camp=camp,
@@ -1288,7 +1387,7 @@ class Command(BaseCommand):
     def create_camp_teams(self, camp):
         teams = {}
         year = camp.camp.lower.year
-        self.output("Creating teams for {}...".format(year))
+        self.output(f"Creating teams for {year}...")
         teams["orga"] = Team.objects.create(
             name="Orga",
             description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
@@ -1346,7 +1445,7 @@ class Command(BaseCommand):
 
     def create_camp_team_tasks(self, camp, teams):
         year = camp.camp.lower.year
-        self.output("Creating TeamTasks for {}...".format(year))
+        self.output(f"Creating TeamTasks for {year}...")
         TeamTask.objects.create(
             team=teams["noc"],
             name="Setup private networks",
@@ -1378,7 +1477,9 @@ class Command(BaseCommand):
             description="We need a solution for chairs",
         )
         TeamTask.objects.create(
-            team=teams["bar"], name="Taps", description="Taps must be ordered"
+            team=teams["bar"],
+            name="Taps",
+            description="Taps must be ordered",
         )
         TeamTask.objects.create(
             team=teams["bar"],
@@ -1394,68 +1495,108 @@ class Command(BaseCommand):
     def create_camp_team_memberships(self, camp, teams, users):
         memberships = {}
         year = camp.camp.lower.year
-        self.output("Creating team memberships for {}...".format(year))
+        self.output(f"Creating team memberships for {year}...")
         # noc team
         memberships["noc"] = {}
         memberships["noc"]["user4"] = TeamMember.objects.create(
-            team=teams["noc"], user=users[4], approved=True, responsible=True
+            team=teams["noc"],
+            user=users[4],
+            approved=True,
+            responsible=True,
         )
         memberships["noc"]["user1"] = TeamMember.objects.create(
-            team=teams["noc"], user=users[1], approved=True
+            team=teams["noc"],
+            user=users[1],
+            approved=True,
         )
         memberships["noc"]["user5"] = TeamMember.objects.create(
-            team=teams["noc"], user=users[5], approved=True
+            team=teams["noc"],
+            user=users[5],
+            approved=True,
         )
         memberships["noc"]["user2"] = TeamMember.objects.create(
-            team=teams["noc"], user=users[2]
+            team=teams["noc"],
+            user=users[2],
         )
 
         # bar team
         memberships["bar"] = {}
         memberships["bar"]["user1"] = TeamMember.objects.create(
-            team=teams["bar"], user=users[1], approved=True, responsible=True
+            team=teams["bar"],
+            user=users[1],
+            approved=True,
+            responsible=True,
         )
         memberships["bar"]["user3"] = TeamMember.objects.create(
-            team=teams["bar"], user=users[3], approved=True, responsible=True
+            team=teams["bar"],
+            user=users[3],
+            approved=True,
+            responsible=True,
         )
         memberships["bar"]["user2"] = TeamMember.objects.create(
-            team=teams["bar"], user=users[2], approved=True
+            team=teams["bar"],
+            user=users[2],
+            approved=True,
         )
         memberships["bar"]["user7"] = TeamMember.objects.create(
-            team=teams["bar"], user=users[7], approved=True
+            team=teams["bar"],
+            user=users[7],
+            approved=True,
         )
         memberships["bar"]["user8"] = TeamMember.objects.create(
-            team=teams["bar"], user=users[8]
+            team=teams["bar"],
+            user=users[8],
         )
 
         # orga team
         memberships["orga"] = {}
         memberships["orga"]["user1"] = TeamMember.objects.create(
-            team=teams["orga"], user=users[1], approved=True, responsible=True
+            team=teams["orga"],
+            user=users[1],
+            approved=True,
+            responsible=True,
         )
         memberships["orga"]["user3"] = TeamMember.objects.create(
-            team=teams["orga"], user=users[3], approved=True, responsible=True
+            team=teams["orga"],
+            user=users[3],
+            approved=True,
+            responsible=True,
         )
         memberships["orga"]["user8"] = TeamMember.objects.create(
-            team=teams["orga"], user=users[8], approved=True, responsible=True
+            team=teams["orga"],
+            user=users[8],
+            approved=True,
+            responsible=True,
         )
         memberships["orga"]["user9"] = TeamMember.objects.create(
-            team=teams["orga"], user=users[9], approved=True, responsible=True
+            team=teams["orga"],
+            user=users[9],
+            approved=True,
+            responsible=True,
         )
         memberships["orga"]["user4"] = TeamMember.objects.create(
-            team=teams["orga"], user=users[4], approved=True, responsible=True
+            team=teams["orga"],
+            user=users[4],
+            approved=True,
+            responsible=True,
         )
 
         # shuttle team
         memberships["shuttle"] = {}
         memberships["shuttle"]["user7"] = TeamMember.objects.create(
-            team=teams["shuttle"], user=users[7], approved=True, responsible=True
+            team=teams["shuttle"],
+            user=users[7],
+            approved=True,
+            responsible=True,
         )
         memberships["shuttle"]["user3"] = TeamMember.objects.create(
-            team=teams["shuttle"], user=users[3], approved=True
+            team=teams["shuttle"],
+            user=users[3],
+            approved=True,
         )
         memberships["shuttle"]["user9"] = TeamMember.objects.create(
-            team=teams["shuttle"], user=users[9]
+            team=teams["shuttle"],
+            user=users[9],
         )
 
         # economy team also gets a member
@@ -1470,7 +1611,7 @@ class Command(BaseCommand):
     def create_camp_team_shifts(self, camp, teams, team_memberships):
         shifts = {}
         year = camp.camp.lower.year
-        self.output("Creating team shifts for {}...".format(year))
+        self.output(f"Creating team shifts for {year}...")
         shifts[0] = TeamShift.objects.create(
             team=teams["shuttle"],
             shift_range=(
@@ -1500,28 +1641,34 @@ class Command(BaseCommand):
     def create_camp_info_categories(self, camp, teams):
         categories = {}
         year = camp.camp.lower.year
-        self.output("Creating infocategories for {}...".format(year))
+        self.output(f"Creating infocategories for {year}...")
         categories["when"] = InfoCategory.objects.create(
-            team=teams["orga"], headline="When is BornHack happening?", anchor="when"
+            team=teams["orga"],
+            headline="When is BornHack happening?",
+            anchor="when",
         )
         categories["travel"] = InfoCategory.objects.create(
-            team=teams["orga"], headline="Travel Information", anchor="travel"
+            team=teams["orga"],
+            headline="Travel Information",
+            anchor="travel",
         )
         categories["sleep"] = InfoCategory.objects.create(
-            team=teams["orga"], headline="Where do I sleep?", anchor="sleep"
+            team=teams["orga"],
+            headline="Where do I sleep?",
+            anchor="sleep",
         )
 
         return categories
 
     def create_camp_info_items(self, camp, categories):
         year = camp.camp.lower.year
-        self.output("Creating infoitems for {}...".format(year))
+        self.output(f"Creating infoitems for {year}...")
         InfoItem.objects.create(
             category=categories["when"],
             headline="Opening",
             anchor="opening",
             body="BornHack {} starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)".format(
-                year
+                year,
             ),
         )
         InfoItem.objects.create(
@@ -1529,7 +1676,7 @@ class Command(BaseCommand):
             headline="Closing",
             anchor="closing",
             body="BornHack {} ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).".format(
-                year
+                year,
             ),
         )
         InfoItem.objects.create(
@@ -1565,9 +1712,11 @@ class Command(BaseCommand):
 
     def create_camp_feedback(self, camp, users):
         year = camp.camp.lower.year
-        self.output("Creating feedback for {}...".format(year))
+        self.output(f"Creating feedback for {year}...")
         Feedback.objects.create(
-            camp=camp, user=users[1], feedback="Awesome event, will be back next year"
+            camp=camp,
+            user=users[1],
+            feedback="Awesome event, will be back next year",
         )
         Feedback.objects.create(
             camp=camp,
@@ -1575,15 +1724,19 @@ class Command(BaseCommand):
             feedback="Very nice, though a bit more hot water would be awesome",
         )
         Feedback.objects.create(
-            camp=camp, user=users[5], feedback="Is there a token here?"
+            camp=camp,
+            user=users[5],
+            feedback="Is there a token here?",
         )
         Feedback.objects.create(
-            camp=camp, user=users[9], feedback="That was fun. Thanks!"
+            camp=camp,
+            user=users[9],
+            feedback="That was fun. Thanks!",
         )
 
     def create_camp_rides(self, camp, users):
         year = camp.camp.lower.year
-        self.output("Creating rides for {}...".format(year))
+        self.output(f"Creating rides for {year}...")
         Ride.objects.create(
             camp=camp,
             user=users[1],
@@ -1614,26 +1767,26 @@ class Command(BaseCommand):
 
     def create_camp_cfp(self, camp):
         year = camp.camp.lower.year
-        self.output("Creating CFP for {}...".format(year))
+        self.output(f"Creating CFP for {year}...")
         camp.call_for_participation_open = True
         camp.call_for_participation = "Please give a talk at Bornhack {}...".format(
-            year
+            year,
         )
         camp.save()
 
     def create_camp_cfs(self, camp):
         year = camp.camp.lower.year
-        self.output("Creating CFS for {}...".format(year))
+        self.output(f"Creating CFS for {year}...")
         camp.call_for_sponsors_open = True
         camp.call_for_sponsors = "Please give us ALL the money so that we can make Bornhack {} the best ever!".format(
-            year
+            year,
         )
         camp.save()
 
     def create_camp_sponsor_tiers(self, camp):
         tiers = {}
         year = camp.camp.lower.year
-        self.output("Creating sponsor tiers for {}...".format(year))
+        self.output(f"Creating sponsor tiers for {year}...")
         tiers["platinum"] = SponsorTier.objects.create(
             name="Platinum sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe\n- sponsored social event",
@@ -1667,7 +1820,7 @@ class Command(BaseCommand):
 
     def create_camp_sponsors(self, camp, tiers):
         year = camp.camp.lower.year
-        self.output("Creating sponsors for {}...".format(year))
+        self.output(f"Creating sponsors for {year}...")
         Sponsor.objects.create(
             name="PROSA",
             tier=tiers["platinum"],
@@ -1707,7 +1860,7 @@ class Command(BaseCommand):
     def create_camp_tokens(self, camp):
         tokens = {}
         year = camp.camp.lower.year
-        self.output("Creating tokens for {}...".format(year))
+        self.output(f"Creating tokens for {year}...")
         tokens[0] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
@@ -1736,7 +1889,7 @@ class Command(BaseCommand):
             camp=camp,
             token=get_random_string(length=32),
             category="Physical",
-            description="Token on the back of the BornHack {} badge".format(year),
+            description=f"Token on the back of the BornHack {year} badge",
         )
         tokens[5] = Token.objects.create(
             camp=camp,
@@ -1749,7 +1902,7 @@ class Command(BaseCommand):
 
     def create_camp_token_finds(self, camp, tokens, users):
         year = camp.camp.lower.year
-        self.output("Creating token finds for {}...".format(year))
+        self.output(f"Creating token finds for {year}...")
         TokenFind.objects.create(token=tokens[3], user=users[4])
         TokenFind.objects.create(token=tokens[5], user=users[4])
         TokenFind.objects.create(token=tokens[2], user=users[7])
@@ -1773,7 +1926,7 @@ class Command(BaseCommand):
                 approved=True,
             )
             .values_list("user", flat=True)
-            .distinct()
+            .distinct(),
         )
         for user in users:
             expenses = Expense.objects.filter(
@@ -1798,18 +1951,18 @@ class Command(BaseCommand):
 
     def output(self, message):
         self.stdout.write(
-            "%s: %s" % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
     def handle(self, *args, **options):
         start = timezone.now()
         self.output(
-            self.style.SUCCESS("----------[ Running bootstrap_devsite ]----------")
+            self.style.SUCCESS("----------[ Running bootstrap_devsite ]----------"),
         )
         self.output(
             self.style.SUCCESS(
-                "----------[ Deleting all data from database ]----------"
-            )
+                "----------[ Deleting all data from database ]----------",
+            ),
         )
         call_command("flush", "--noinput")
 
@@ -1847,14 +2000,16 @@ class Command(BaseCommand):
             year = camp.camp.lower.year
 
             self.output(
-                self.style.SUCCESS("----------[ Bornhack {} ]----------".format(year))
+                self.style.SUCCESS(f"----------[ Bornhack {year} ]----------"),
             )
 
             if year < 2022:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
-                    camp, product_categories, ticket_types
+                    camp,
+                    product_categories,
+                    ticket_types,
                 )
 
                 self.create_orders(users, global_products, camp_products)
@@ -1887,7 +2042,7 @@ class Command(BaseCommand):
                     self.approve_speaker_proposals(camp)
                 except ValidationError:
                     self.output(
-                        "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)"
+                        "Name collision, bad luck. Run the bootstrap script again! PRs to make this less annoying welcome :)",
                     )
                     sys.exit(1)
 
@@ -1907,7 +2062,9 @@ class Command(BaseCommand):
                 self.create_camp_villages(camp, users)
 
                 facility_types = self.create_facility_types(
-                    camp, teams, quickfeedback_options
+                    camp,
+                    teams,
+                    quickfeedback_options,
                 )
 
                 facilities = self.create_facilities(facility_types)
@@ -1953,7 +2110,8 @@ class Command(BaseCommand):
             eventtype=Type.objects.get(name="public_credit_name_changed"),
         )
         Routing.objects.create(
-            team=teams["orga"], eventtype=Type.objects.get(name="ticket_created")
+            team=teams["orga"],
+            eventtype=Type.objects.get(name="ticket_created"),
         )
 
         self.output("done!")

@@ -1,26 +1,25 @@
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
 
-from .views import (
-    ChainCreateView,
-    ChainListView,
-    CredebtorCreateView,
-    CredebtorListView,
-    EconomyDashboardView,
-    ExpenseCreateView,
-    ExpenseDeleteView,
-    ExpenseDetailView,
-    ExpenseInvoiceView,
-    ExpenseListView,
-    ExpenseUpdateView,
-    ReimbursementDetailView,
-    ReimbursementListView,
-    RevenueCreateView,
-    RevenueDeleteView,
-    RevenueDetailView,
-    RevenueInvoiceView,
-    RevenueListView,
-    RevenueUpdateView,
-)
+from .views import ChainCreateView
+from .views import ChainListView
+from .views import CredebtorCreateView
+from .views import CredebtorListView
+from .views import EconomyDashboardView
+from .views import ExpenseCreateView
+from .views import ExpenseDeleteView
+from .views import ExpenseDetailView
+from .views import ExpenseInvoiceView
+from .views import ExpenseListView
+from .views import ExpenseUpdateView
+from .views import ReimbursementDetailView
+from .views import ReimbursementListView
+from .views import RevenueCreateView
+from .views import RevenueDeleteView
+from .views import RevenueDetailView
+from .views import RevenueInvoiceView
+from .views import RevenueListView
+from .views import RevenueUpdateView
 
 app_name = "economy"
 
@@ -38,7 +37,9 @@ urlpatterns = [
                     include(
                         [
                             path(
-                                "", CredebtorListView.as_view(), name="credebtor_list"
+                                "",
+                                CredebtorListView.as_view(),
+                                name="credebtor_list",
                             ),
                             path(
                                 "add/",
@@ -59,13 +60,13 @@ urlpatterns = [
                                             RevenueCreateView.as_view(),
                                             name="revenue_create",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
     # expenses
@@ -79,7 +80,9 @@ urlpatterns = [
                     include(
                         [
                             path(
-                                "", ExpenseDetailView.as_view(), name="expense_detail"
+                                "",
+                                ExpenseDetailView.as_view(),
+                                name="expense_detail",
                             ),
                             path(
                                 "update/",
@@ -96,10 +99,10 @@ urlpatterns = [
                                 ExpenseInvoiceView.as_view(),
                                 name="expense_invoice",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
     # reimbursements
@@ -113,7 +116,7 @@ urlpatterns = [
                     ReimbursementDetailView.as_view(),
                     name="reimbursement_detail",
                 ),
-            ]
+            ],
         ),
     ),
     # revenue
@@ -127,7 +130,9 @@ urlpatterns = [
                     include(
                         [
                             path(
-                                "", RevenueDetailView.as_view(), name="revenue_detail"
+                                "",
+                                RevenueDetailView.as_view(),
+                                name="revenue_detail",
                             ),
                             path(
                                 "update/",
@@ -144,10 +149,10 @@ urlpatterns = [
                                 RevenueInvoiceView.as_view(),
                                 name="revenue_invoice",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
 ]

@@ -1,9 +1,9 @@
 from pathlib import Path
 
-# monkeypatch postgres Range object to support lookups
+from .environment_settings import *  # noqa: F403
 from utils import range_fields  # noqa: F401
 
-from .environment_settings import *  # noqa: F403
+# monkeypatch postgres Range object to support lookups
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -96,9 +96,9 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.current_order",
                 "camps.context_processors.camp",
-            ]
+            ],
         },
-    }
+    },
 ]
 
 AUTHENTICATION_BACKENDS = (
@@ -176,12 +176,12 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "console",
-        }
+        },
     },
     "loggers": {
         # send the bornhack logger to console at DEBUG level,
         # do not propagate bornhack.* messages up to the root logger
-        "bornhack": {"handlers": ["console"], "level": "DEBUG", "propagate": False}
+        "bornhack": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
     },
 }
 

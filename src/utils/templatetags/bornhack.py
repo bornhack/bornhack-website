@@ -20,7 +20,7 @@ def truefalseicon(value):
         return mark_safe("<span class='text-danger glyphicon glyphicon-remove'></span>")
     elif value is None:
         return mark_safe(
-            "<span class='text-secondary glyphicon glyphicon-question'></span>"
+            "<span class='text-secondary glyphicon glyphicon-question'></span>",
         )
     else:
         return "what is this"
@@ -56,5 +56,5 @@ def thh(context, fieldname, headerstring=None, tooltip=None, htmlclass=None):
         except AttributeError:
             tooltip = "No get_help_text_method found on object :("
     return mark_safe(
-        f"<th data-container='body' data-placement='bottom' data-toggle='tooltip' title='{tooltip}'>{headerstring}</th>"
+        f"<th data-container='body' data-placement='bottom' data-toggle='tooltip' title='{tooltip}'>{headerstring}</th>",
     )

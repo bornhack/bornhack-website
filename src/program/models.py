@@ -8,32 +8,30 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import F, Q
-from django.urls import reverse, reverse_lazy
+from django.db.models import F
+from django.db.models import Q
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from psycopg2.extras import DateTimeTZRange
 from taggit.managers import TaggableManager
 
+from .email import add_event_proposal_accepted_email
+from .email import add_event_proposal_rejected_email
+from .email import add_speaker_proposal_accepted_email
+from .email import add_speaker_proposal_rejected_email
 from utils.database import CastToInteger
-from utils.models import (
-    CampRelatedModel,
-    CreatedUpdatedModel,
-    UUIDModel,
-    UUIDTaggedItem,
-)
+from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
+from utils.models import UUIDTaggedItem
 from utils.slugs import unique_slugify
-
-from .email import (
-    add_event_proposal_accepted_email,
-    add_event_proposal_rejected_email,
-    add_speaker_proposal_accepted_email,
-    add_speaker_proposal_rejected_email,
-)
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -44,7 +42,9 @@ class UrlType(CreatedUpdatedModel):
     """
 
     name = models.CharField(
-        max_length=25, help_text="The name of this type", unique=True
+        max_length=25,
+        help_text="The name of this type",
+        unique=True,
     )
 
     icon = models.CharField(
@@ -77,7 +77,9 @@ class Url(CampRelatedModel):
     url = models.URLField(help_text="The actual URL")
 
     url_type = models.ForeignKey(
-        "program.UrlType", help_text="The type of this URL", on_delete=models.PROTECT
+        "program.UrlType",
+        help_text="The type of this URL",
+        on_delete=models.PROTECT,
     )
 
     speaker_proposal = models.ForeignKey(
@@ -132,7 +134,7 @@ class Url(CampRelatedModel):
             fks += 1
         if fks != 1:
             raise ValidationError(
-                f"Url objects must have exactly one FK, this has {fks}"
+                f"Url objects must have exactly one FK, this has {fks}",
             )
 
     def save(self, *args, **kwargs):
@@ -240,7 +242,7 @@ class SpeakerProposalAvailability(Availability):
             available=self.available,
         ).exists():
             raise ValidationError(
-                f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}"
+                f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}",
             )
 
     def __str__(self):
@@ -296,7 +298,7 @@ class SpeakerAvailability(Availability):
             available=self.available,
         ).exists():
             raise ValidationError(
-                "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()"
+                "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()",
             )
 
 
@@ -329,7 +331,9 @@ class UserSubmittedModel(CampRelatedModel):
     ]
 
     proposal_status = models.CharField(
-        max_length=50, choices=PROPOSAL_STATUS_CHOICES, default=PROPOSAL_PENDING
+        max_length=50,
+        choices=PROPOSAL_STATUS_CHOICES,
+        default=PROPOSAL_PENDING,
     )
 
     reason = models.TextField(
@@ -338,7 +342,7 @@ class UserSubmittedModel(CampRelatedModel):
     )
 
     def __str__(self):
-        return "%s (submitted by: %s, status: %s)" % (
+        return "{} (submitted by: {}, status: {})".format(
             self.headline,
             self.user,
             self.proposal_status,
@@ -372,7 +376,8 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     name = models.CharField(
-        max_length=150, help_text="Name or alias of the speaker/artist/host"
+        max_length=150,
+        help_text="Name or alias of the speaker/artist/host",
     )
 
     email = models.EmailField(
@@ -382,7 +387,7 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     biography = models.TextField(
-        help_text="Biography of the speaker/artist/host. Markdown is supported."
+        help_text="Biography of the speaker/artist/host. Markdown is supported.",
     )
 
     submission_notes = models.TextField(
@@ -457,7 +462,8 @@ class SpeakerProposal(UserSubmittedModel):
         # a message to the admin (if we have a request)
         if request:
             messages.success(
-                request, "Speaker object %s has been created/updated" % speaker
+                request,
+                "Speaker object %s has been created/updated" % speaker,
             )
         add_speaker_proposal_accepted_email(self)
 
@@ -467,7 +473,8 @@ class SpeakerProposal(UserSubmittedModel):
         self.save()
         if request:
             messages.success(
-                request, "SpeakerProposal %s has been rejected" % self.name
+                request,
+                "SpeakerProposal %s has been rejected" % self.name,
             )
         add_speaker_proposal_rejected_email(self)
 
@@ -475,7 +482,7 @@ class SpeakerProposal(UserSubmittedModel):
     def event_types(self):
         """Return a queryset of the EventType objects for the EventProposals"""
         return EventType.objects.filter(
-            id__in=self.event_proposals.all().values_list("event_type", flat=True)
+            id__in=self.event_proposals.all().values_list("event_type", flat=True),
         )
 
     @property
@@ -538,7 +545,8 @@ class EventProposal(UserSubmittedModel):
     )
 
     use_provided_speaker_laptop = models.BooleanField(
-        help_text="Will you be using the provided speaker laptop?", default=True
+        help_text="Will you be using the provided speaker laptop?",
+        default=True,
     )
 
     tags = TaggableManager(
@@ -573,7 +581,8 @@ class EventProposal(UserSubmittedModel):
         which are not already added to this EventProposal
         """
         return SpeakerProposal.objects.filter(
-            camp=self.track.camp, user=self.user
+            camp=self.track.camp,
+            user=self.user,
         ).exclude(uuid__in=self.speakers.all().values_list("uuid"))
 
     def mark_as_approved(self, request=None):
@@ -610,7 +619,8 @@ class EventProposal(UserSubmittedModel):
 
         if request:
             messages.success(
-                request, "Event object %s has been created/updated" % event
+                request,
+                "Event object %s has been created/updated" % event,
             )
         add_event_proposal_accepted_email(self)
 
@@ -678,7 +688,9 @@ class EventLocation(CampRelatedModel):
     )
 
     camp = models.ForeignKey(
-        "camps.Camp", related_name="event_locations", on_delete=models.PROTECT
+        "camps.Camp",
+        related_name="event_locations",
+        on_delete=models.PROTECT,
     )
 
     capacity = models.PositiveIntegerField(
@@ -693,7 +705,7 @@ class EventLocation(CampRelatedModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.camp)
+        return f"{self.name} ({self.camp})"
 
     class Meta:
         unique_together = (("camp", "slug"), ("camp", "name"))
@@ -704,7 +716,8 @@ class EventLocation(CampRelatedModel):
             self.slug = unique_slugify(
                 self.name,
                 self.__class__.objects.filter(camp=self.camp).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -724,8 +737,9 @@ class EventLocation(CampRelatedModel):
         """Returns a QuerySet of all EventSlots scheduled in this EventLocation"""
         return self.event_slots.filter(event__isnull=False)
 
-    def is_available(self, when, ignore_event_slot_ids=[]):
+    def is_available(self, when, ignore_event_slot_ids=None):
         """A location is available if nothing is scheduled in it at that time"""
+        ignore_event_slot_ids = ignore_event_slot_ids or []
         if (
             self.event_slots.filter(event__isnull=False, when__overlap=when)
             .exclude(pk__in=ignore_event_slot_ids)
@@ -741,7 +755,9 @@ class EventType(CreatedUpdatedModel):
     """Every event needs to have a type."""
 
     name = models.CharField(
-        max_length=100, unique=True, help_text="The name of this event type"
+        max_length=100,
+        unique=True,
+        help_text="The name of this event type",
     )
 
     slug = models.SlugField()
@@ -753,11 +769,13 @@ class EventType(CreatedUpdatedModel):
     )
 
     color = models.CharField(
-        max_length=50, help_text="The background color of this event type"
+        max_length=50,
+        help_text="The background color of this event type",
     )
 
     light_text = models.BooleanField(
-        default=False, help_text="Check if this event type should use white text color"
+        default=False,
+        help_text="Check if this event type should use white text color",
     )
 
     icon = models.CharField(
@@ -767,15 +785,18 @@ class EventType(CreatedUpdatedModel):
     )
 
     notifications = models.BooleanField(
-        default=False, help_text="Check to send notifications for this event type"
+        default=False,
+        help_text="Check to send notifications for this event type",
     )
 
     public = models.BooleanField(
-        default=False, help_text="Check to permit users to submit events of this type"
+        default=False,
+        help_text="Check to permit users to submit events of this type",
     )
 
     include_in_event_list = models.BooleanField(
-        default=True, help_text="Include events of this type in the event list?"
+        default=True,
+        help_text="Include events of this type in the event list?",
     )
 
     host_title = models.CharField(
@@ -814,7 +835,7 @@ class EventType(CreatedUpdatedModel):
     def clean(self):
         if self.support_autoscheduling and not self.event_duration_minutes:
             raise ValidationError(
-                "You must specify event_duration_minutes to support autoscheduling"
+                "You must specify event_duration_minutes to support autoscheduling",
             )
 
     @property
@@ -824,7 +845,7 @@ class EventType(CreatedUpdatedModel):
 
     def icon_html(self):
         return mark_safe(
-            f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>'
+            f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>',
         )
 
 
@@ -889,7 +910,7 @@ class EventSession(CampRelatedModel):
     )
 
     when = DateTimeRangeField(
-        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>"
+        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>",
     )
 
     event_duration_minutes = models.PositiveIntegerField(
@@ -919,7 +940,7 @@ class EventSession(CampRelatedModel):
     def free_time(self):
         """Returns a timedelta of the free time in this Session."""
         return self.duration - timedelta(
-            minutes=self.event_duration_minutes * self.get_unavailable_slots().count()
+            minutes=self.event_duration_minutes * self.get_unavailable_slots().count(),
         )
 
     def get_available_slots(self, count_autoscheduled_as_free=False, bounds="()"):
@@ -1077,22 +1098,22 @@ class EventSlot(CampRelatedModel):
     def clean(self):
         """Validate EventSlot length, time, and autoscheduled status"""
         if self.when.upper - self.when.lower != timedelta(
-            minutes=self.event_session.event_duration_minutes
+            minutes=self.event_session.event_duration_minutes,
         ):
             raise ValidationError(
-                f"This EventSlot has the wrong length. It must be {self.event_session.event_duration_minutes} minutes long."
+                f"This EventSlot has the wrong length. It must be {self.event_session.event_duration_minutes} minutes long.",
             )
 
         # remember to use "[)" bounds when comparing
         if self.when not in self.event_session.get_slot_times(bounds="[)"):
             raise ValidationError(
-                "This EventSlot is not inside this EventSession, or it might be misaligned"
+                "This EventSlot is not inside this EventSession, or it might be misaligned",
             )
 
         # if we have an Event we want to know if it was autoscheduled or not
         if self.event and self.autoscheduled is None:
             raise ValidationError(
-                "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None"
+                "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None",
             )
         self.clean_speakers()
         self.clean_location()
@@ -1120,20 +1141,22 @@ class EventSlot(CampRelatedModel):
         if self.event:
             for speaker in self.event.speakers.all():
                 if not speaker.is_available(
-                    when=self.when, ignore_event_slot_ids=[self.pk]
+                    when=self.when,
+                    ignore_event_slot_ids=[self.pk],
                 ):
                     raise ValidationError(
-                        f"The speaker {speaker} is not available at this time"
+                        f"The speaker {speaker} is not available at this time",
                     )
 
     def clean_location(self):
         """Make sure the location is available"""
         if self.event:
             if not self.event_location.is_available(
-                when=self.when, ignore_event_slot_ids=[self.pk]
+                when=self.when,
+                ignore_event_slot_ids=[self.pk],
             ):
                 raise ValidationError(
-                    f"The location {self.event_location} is not available at this time"
+                    f"The location {self.event_location} is not available at this time",
                 )
 
     def unschedule(self):
@@ -1166,7 +1189,7 @@ class EventSlot(CampRelatedModel):
         ievent["description"] = self.event.abstract
         ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
         ievent["dtend"] = icalendar.vDatetime(
-            self.when.lower + self.event.duration
+            self.when.lower + self.event.duration,
         ).to_ical()
         ievent["dtstamp"] = icalendar.vDatetime(timezone.now()).to_ical()
         ievent["uid"] = self.uuid
@@ -1252,11 +1275,15 @@ class Event(CampRelatedModel):
     )
 
     video_url = models.URLField(
-        max_length=1000, null=True, blank=True, help_text="URL to the recording"
+        max_length=1000,
+        null=True,
+        blank=True,
+        help_text="URL to the recording",
     )
 
     video_recording = models.BooleanField(
-        default=True, help_text="Do we intend to record video of this event?"
+        default=True,
+        help_text="Do we intend to record video of this event?",
     )
 
     proposal = models.OneToOneField(
@@ -1294,7 +1321,7 @@ class Event(CampRelatedModel):
             self.slug = unique_slugify(
                 self.title,
                 slugs_in_use=self.__class__.objects.filter(
-                    track__camp=self.track.camp
+                    track__camp=self.track.camp,
                 ).values_list("slug", flat=True),
             )
         if not self.duration_minutes:
@@ -1357,7 +1384,9 @@ class EventInstance(CampRelatedModel):
     )
 
     event = models.ForeignKey(
-        "program.event", related_name="instances", on_delete=models.PROTECT
+        "program.event",
+        related_name="instances",
+        on_delete=models.PROTECT,
     )
 
     when = DateTimeRangeField(null=True, blank=True)
@@ -1391,16 +1420,17 @@ class EventInstance(CampRelatedModel):
         ]
 
     def __str__(self):
-        return "%s (%s)" % (self.event, self.when)
+        return f"{self.event} ({self.when})"
 
     def clean_speakers(self):
         """Check if all speakers are available"""
         for speaker in self.event.speakers.all():
             if not speaker.is_available(
-                when=self.event_slot.when, ignore_eventinstances=[self.pk]
+                when=self.event_slot.when,
+                ignore_eventinstances=[self.pk],
             ):
                 raise ValidationError(
-                    f"The speaker {speaker} is not available at this time"
+                    f"The speaker {speaker} is not available at this time",
                 )
 
     def save(self, *args, clean_speakers=True, **kwargs):
@@ -1549,14 +1579,15 @@ class Speaker(CampRelatedModel):
         unique_together = (("camp", "name"), ("camp", "slug"))
 
     def __str__(self):
-        return "%s (%s)" % (self.name, self.camp)
+        return f"{self.name} ({self.camp})"
 
     def save(self, **kwargs):
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -1571,10 +1602,11 @@ class Speaker(CampRelatedModel):
         data = {"name": self.name, "slug": self.slug, "biography": self.biography}
         return data
 
-    def is_available(self, when, ignore_event_slot_ids=[]):
+    def is_available(self, when, ignore_event_slot_ids=None):
         """A speaker is available if the person has positive availability for the period and
         if the speaker is not in another event at the time, or if the person has not submitted
         any availability at all"""
+        ignore_event_slot_ids = ignore_event_slot_ids or []
         if not self.availabilities.exists():
             # we have no availability at all for this speaker, assume they are available
             return True
@@ -1613,10 +1645,13 @@ class Speaker(CampRelatedModel):
 
 class Favorite(models.Model):
     user = models.ForeignKey(
-        "auth.User", related_name="favorites", on_delete=models.PROTECT
+        "auth.User",
+        related_name="favorites",
+        on_delete=models.PROTECT,
     )
     event_instance = models.ForeignKey(
-        "program.EventInstance", on_delete=models.PROTECT
+        "program.EventInstance",
+        on_delete=models.PROTECT,
     )
 
     class Meta:

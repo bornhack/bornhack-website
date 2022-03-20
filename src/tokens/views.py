@@ -3,11 +3,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 
+from .models import Token
+from .models import TokenFind
 from utils.models import CampReadOnlyModeError
-
-from .models import Token, TokenFind
 
 
 class TokenFindView(LoginRequiredMixin, DetailView):
@@ -19,7 +20,8 @@ class TokenFindView(LoginRequiredMixin, DetailView):
         # register this token find if it isn't already
         try:
             token, created = TokenFind.objects.get_or_create(
-                token=self.get_object(), user=request.user
+                token=self.get_object(),
+                user=request.user,
             )
         except CampReadOnlyModeError:
             raise Http404
@@ -40,7 +42,8 @@ class TokenFindListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         # find the tokens the user still needs to find
         tokenfinds = TokenFind.objects.filter(user=self.request.user).values_list(
-            "token__id", flat=True
+            "token__id",
+            flat=True,
         )
         context["unfound_list"] = Token.objects.all().exclude(id__in=tokenfinds)
         return context

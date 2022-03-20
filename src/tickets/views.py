@@ -2,8 +2,12 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
-from django.views.generic import DetailView, ListView, UpdateView, View
+from django.http import Http404
+from django.http import HttpResponse
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
+from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
 from .models import ShopTicket
@@ -17,7 +21,7 @@ class ShopTicketListView(LoginRequiredMixin, ListView):
     context_object_name = "tickets"
 
     def get_queryset(self):
-        tickets = super(ShopTicketListView, self).get_queryset()
+        tickets = super().get_queryset()
         user = self.request.user
         return tickets.filter(opr__order__user=user).order_by("ticket_type__camp")
 
@@ -36,7 +40,8 @@ class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
         response[
             "Content-Disposition"
         ] = 'attachment; filename="{type}_ticket_{pk}.pdf"'.format(
-            type=self.get_object().shortname, pk=self.get_object().pk
+            type=self.get_object().shortname,
+            pk=self.get_object().pk,
         )
         response.write(self.get_object().generate_pdf().getvalue())
         return response

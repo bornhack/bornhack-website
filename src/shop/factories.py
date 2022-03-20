@@ -24,8 +24,9 @@ class ProductFactory(DjangoModelFactory):
     price = factory.Faker("pyint")
     available_in = factory.LazyFunction(
         lambda: DateTimeTZRange(
-            lower=timezone.now(), upper=timezone.now() + timezone.timedelta(31)
-        )
+            lower=timezone.now(),
+            upper=timezone.now() + timezone.timedelta(31),
+        ),
     )
     ticket_type = factory.SubFactory("tickets.factories.TicketTypeFactory")
 

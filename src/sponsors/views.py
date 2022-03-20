@@ -1,8 +1,7 @@
 from django.views.generic import ListView
 
-from camps.mixins import CampViewMixin
-
 from .models import Sponsor
+from camps.mixins import CampViewMixin
 
 
 class SponsorsView(CampViewMixin, ListView):

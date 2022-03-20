@@ -9,4 +9,3 @@ A new expense {{ expense.pk }} for {{ expense.responsible_team.name }} Team was 
 Have a nice day!
 
 The {{ expense.camp.title }} Team
-

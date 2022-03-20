@@ -14,24 +14,19 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 
+from .email import send_accountingsystem_expense_email
+from .email import send_accountingsystem_revenue_email
+from .email import send_expense_approved_email
+from .email import send_expense_rejected_email
+from .email import send_revenue_approved_email
+from .email import send_revenue_rejected_email
 from shop.models import Product
 from tickets.models import ShopTicket
-from utils.models import (
-    CampRelatedModel,
-    CreatedUpdatedModel,
-    CreatedUpdatedUUIDModel,
-    UUIDModel,
-)
+from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
+from utils.models import CreatedUpdatedUUIDModel
+from utils.models import UUIDModel
 from utils.slugs import unique_slugify
-
-from .email import (
-    send_accountingsystem_expense_email,
-    send_accountingsystem_revenue_email,
-    send_expense_approved_email,
-    send_expense_rejected_email,
-    send_revenue_approved_email,
-    send_revenue_rejected_email,
-)
 
 
 class ChainManager(models.Manager):
@@ -49,19 +44,21 @@ class ChainManager(models.Manager):
         )
         qs = qs.annotate(
             all_expenses_amount=models.Sum(
-                "credebtors__expenses__amount", distinct=True
-            )
+                "credebtors__expenses__amount",
+                distinct=True,
+            ),
         )
         qs = qs.annotate(
-            all_expenses_count=models.Count("credebtors__expenses", distinct=True)
+            all_expenses_count=models.Count("credebtors__expenses", distinct=True),
         )
         qs = qs.annotate(
             all_revenues_amount=models.Sum(
-                "credebtors__revenues__amount", distinct=True
-            )
+                "credebtors__revenues__amount",
+                distinct=True,
+            ),
         )
         qs = qs.annotate(
-            all_revenues_count=models.Count("credebtors__revenues", distinct=True)
+            all_revenues_count=models.Count("credebtors__revenues", distinct=True),
         )
         return qs
 
@@ -102,7 +99,8 @@ class Chain(CreatedUpdatedModel, UUIDModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.all().values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -183,7 +181,7 @@ class Credebtor(CreatedUpdatedModel, UUIDModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(
-                    chain=self.chain
+                    chain=self.chain,
                 ).values_list("slug", flat=True),
             )
         super().save(**kwargs)
@@ -238,7 +236,7 @@ class Revenue(CampRelatedModel, UUIDModel):
     )
 
     invoice_date = models.DateField(
-        help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+        help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
     )
 
     invoice_fk = models.ForeignKey(
@@ -371,7 +369,7 @@ class Expense(CampRelatedModel, UUIDModel):
     )
 
     invoice_date = models.DateField(
-        help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+        help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
     )
 
     responsible_team = models.ForeignKey(
@@ -507,7 +505,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
     def amount(self):
         """The total amount for a reimbursement is calculated by adding up the amounts for all the related expenses."""
         return self.expenses.filter(paid_by_bornhack=False).aggregate(
-            models.Sum("amount")
+            models.Sum("amount"),
         )["amount__sum"]
 
     @property
@@ -531,7 +529,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
         expense.camp = self.camp
         expense.user = self.user
         expense.amount = self.amount
-        expense.description = "Payment of reimbursement %s to %s" % (
+        expense.description = "Payment of reimbursement {} to {}".format(
             self.pk,
             self.reimbursement_user,
         )
@@ -547,7 +545,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
                 open(
                     os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/na.jpg"),
                     "rb",
-                )
+                ),
             ),
         )
         expense.save()
@@ -584,7 +582,7 @@ class Pos(CampRelatedModel, UUIDModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(
-                    team__camp=self.team.camp
+                    team__camp=self.team.camp,
                 ).values_list("slug", flat=True),
             )
         super().save(**kwargs)
@@ -622,7 +620,7 @@ class Pos(CampRelatedModel, UUIDModel):
                     "hax_end",
                     "hax_balance",
                     "pos_transactions",
-                ]
+                ],
             )
             for pr in posreports:
                 writer.writerow(
@@ -640,7 +638,7 @@ class Pos(CampRelatedModel, UUIDModel):
                         pr.bank_end_hax,
                         pr.hax_balance,
                         pr.pos_json_sales[0],
-                    ]
+                    ],
                 )
         return (self, filename, posreports.count())
 
@@ -690,7 +688,8 @@ class PosReport(CampRelatedModel, UUIDModel):
     )
 
     dkk_sales_izettle = models.PositiveIntegerField(
-        default=0, help_text="The total DKK amount in iZettle cash sales"
+        default=0,
+        help_text="The total DKK amount in iZettle cash sales",
     )
 
     hax_sold_izettle = models.PositiveIntegerField(
@@ -950,7 +949,7 @@ class PosReport(CampRelatedModel, UUIDModel):
                 self.hax20_end_ok,
                 self.hax50_end_ok,
                 self.hax100_end_ok,
-            ]
+            ],
         )
 
     @property
@@ -1062,11 +1061,15 @@ class BankAccount(CreatedUpdatedUUIDModel):
     )
 
     start_date = models.DateField(
-        null=True, blank=True, help_text="The date we began using this bank account."
+        null=True,
+        blank=True,
+        help_text="The date we began using this bank account.",
     )
 
     end_date = models.DateField(
-        null=True, blank=True, help_text="The date we stopped using this bank account."
+        null=True,
+        blank=True,
+        help_text="The date we stopped using this bank account.",
     )
 
     def __str__(self):
@@ -1111,7 +1114,8 @@ class BankAccount(CreatedUpdatedUUIDModel):
             filename = f"bornhack_bank_account_{slugify(self.bank.name)}_{slugify(self.name)}_{self.reg_no}_{self.account_no}_{period.lower}_{period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
             transactions = self.transactions.filter(
-                date__gt=period.lower, date__lt=period.upper
+                date__gt=period.lower,
+                date__lt=period.upper,
             )
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["bornhack_uuid", "date", "text", "amount", "balance"])
@@ -1159,11 +1163,11 @@ class BankTransaction(CreatedUpdatedUUIDModel):
         """Make sure transactions don't fall outside the bank accounts start and end dates."""
         if self.bank_account.start_date and self.date < self.bank_account.start_date:
             raise ValidationError(
-                f"Transaction on {self.date} is before the bank accounts start_date. Transaction text is '{self.text}' and amount is {self.amount}"
+                f"Transaction on {self.date} is before the bank accounts start_date. Transaction text is '{self.text}' and amount is {self.amount}",
             )
         if self.bank_account.end_date and self.date > self.bank_account.end_date:
             raise ValidationError(
-                f"Transaction on {self.date} is after the bank accounts end_date. Transaction text is '{self.text}' and amount is {self.amount}"
+                f"Transaction on {self.date} is after the bank accounts end_date. Transaction text is '{self.text}' and amount is {self.amount}",
             )
 
 
@@ -1180,21 +1184,28 @@ class CoinifyInvoice(CreatedUpdatedUUIDModel):
 
     coinify_id = models.IntegerField(help_text="Coinifys internal ID for this invoice")
     coinify_id_alpha = models.CharField(
-        max_length=20, help_text="Coinifys other internal ID for this invoice"
+        max_length=20,
+        help_text="Coinifys other internal ID for this invoice",
     )
     coinify_created = models.DateTimeField(help_text="Created datetime in Coinifys end")
     payment_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The payment amount"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payment amount",
     )
     payment_currency = models.CharField(max_length=3, help_text="The payment currency.")
     payment_btc_amount = models.DecimalField(
-        max_digits=18, decimal_places=8, help_text="The payment amount in BTC."
+        max_digits=18,
+        decimal_places=8,
+        help_text="The payment amount in BTC.",
     )
     description = models.TextField(
-        help_text="The text description of this Coinify invoice"
+        help_text="The text description of this Coinify invoice",
     )
     custom = models.JSONField(
-        null=True, blank=True, help_text="Custom JSON data for this invoice"
+        null=True,
+        blank=True,
+        help_text="Custom JSON data for this invoice",
     )
     credited_amount = models.DecimalField(
         max_digits=18,
@@ -1202,10 +1213,12 @@ class CoinifyInvoice(CreatedUpdatedUUIDModel):
         help_text="The amount credited on our Coinify account.",
     )
     credited_currency = models.CharField(
-        max_length=3, help_text="The currency of the credited amount."
+        max_length=3,
+        help_text="The currency of the credited amount.",
     )
     state = models.CharField(
-        max_length=100, help_text="The state of this Coinify invoice"
+        max_length=100,
+        help_text="The state of this Coinify invoice",
     )
     payment_type = models.CharField(
         max_length=100,
@@ -1227,16 +1240,22 @@ class CoinifyPayout(CreatedUpdatedUUIDModel):
 
     coinify_id = models.IntegerField(help_text="Coinifys internal ID for this payout")
     coinify_created = models.DateTimeField(
-        help_text="Created datetime in Coinifys end for this payout"
+        help_text="Created datetime in Coinifys end for this payout",
     )
     amount = models.DecimalField(
-        max_digits=18, decimal_places=8, help_text="The payout amount before fees"
+        max_digits=18,
+        decimal_places=8,
+        help_text="The payout amount before fees",
     )
     fee = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The payout fee"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payout fee",
     )
     transferred = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The transferred amount after fees"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The transferred amount after fees",
     )
     currency = models.CharField(max_length=3, help_text="The payout currency.")
     btc_txid = models.CharField(
@@ -1280,16 +1299,23 @@ class CoinifyBalance(CreatedUpdatedUUIDModel):
         ordering = ["-date"]
 
     date = models.DateField(
-        unique=True, help_text="The balance was recorded at UTC midnight at this date."
+        unique=True,
+        help_text="The balance was recorded at UTC midnight at this date.",
     )
     btc = models.DecimalField(
-        max_digits=18, decimal_places=8, help_text="The BTC balance"
+        max_digits=18,
+        decimal_places=8,
+        help_text="The BTC balance",
     )
     dkk = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The DKK balance"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The DKK balance",
     )
     eur = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The EUR balance"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The EUR balance",
     )
 
 
@@ -1305,15 +1331,15 @@ class EpayTransaction(CreatedUpdatedUUIDModel):
         ordering = ["-auth_date"]
 
     merchant_id = models.IntegerField(
-        help_text="ePay merchant number for this transaction."
+        help_text="ePay merchant number for this transaction.",
     )
     transaction_id = models.IntegerField(help_text="ePays internal transaction ID.")
     order_id = models.IntegerField(
-        help_text="The BornHack order ID for this ePay transaction."
+        help_text="The BornHack order ID for this ePay transaction.",
     )
     currency = models.CharField(max_length=3, help_text="The currency of this payment.")
     auth_date = models.DateTimeField(
-        help_text="The date this payment was authorised by the user."
+        help_text="The date this payment was authorised by the user.",
     )
     auth_amount = models.DecimalField(
         max_digits=12,
@@ -1321,10 +1347,12 @@ class EpayTransaction(CreatedUpdatedUUIDModel):
         help_text="The amount that was authorised by the user.",
     )
     captured_date = models.DateTimeField(
-        help_text="The date this payment was captured."
+        help_text="The date this payment was captured.",
     )
     captured_amount = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The amount that was captured."
+        max_digits=12,
+        decimal_places=2,
+        help_text="The amount that was captured.",
     )
     card_type = models.TextField(help_text="The card type used for this payment.")
     description = models.TextField(help_text="The description of this payment.")
@@ -1344,19 +1372,21 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
 
     merchant_id = models.IntegerField(help_text="The merchant ID in Clearhaus systems")
     merchant_name = models.CharField(
-        max_length=255, help_text="The merchant name in Clearhaus systems"
+        max_length=255,
+        help_text="The merchant name in Clearhaus systems",
     )
     clearhaus_uuid = models.UUIDField(
-        help_text="The Clearhaus UUID for this settlement."
+        help_text="The Clearhaus UUID for this settlement.",
     )
     settled = models.BooleanField(
-        help_text="True if the settlement has been paid out, False if not."
+        help_text="True if the settlement has been paid out, False if not.",
     )
     currency = models.CharField(
-        max_length=3, help_text="The currency of this settlement."
+        max_length=3,
+        help_text="The currency of this settlement.",
     )
     period_start_date = models.DateField(
-        help_text="The first date of the period this settlement covers."
+        help_text="The first date of the period this settlement covers.",
     )
     period_end_date = models.DateField(
         null=True,
@@ -1371,16 +1401,24 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
         help_text="The amount that was paid out in this settlement. Can be empty if the settlement has not been paid out yet.",
     )
     payout_date = models.DateField(
-        null=True, blank=True, help_text="The date this settlement was paid out."
+        null=True,
+        blank=True,
+        help_text="The date this settlement was paid out.",
     )
     summary_sales = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The summary sales for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary sales for this period",
     )
     summary_credits = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The summary credits for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary credits for this period",
     )
     summary_refunds = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The summary refunds for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary refunds for this period",
     )
     summary_chargebacks = models.DecimalField(
         max_digits=12,
@@ -1388,7 +1426,9 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
         help_text="The summary chargebacks for this period",
     )
     summary_fees = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The summary fees for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The summary fees for this period",
     )
     summary_other_postings = models.DecimalField(
         max_digits=12,
@@ -1413,7 +1453,9 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
         help_text="The date the reserve for this period will be paid out.",
     )
     fees_sales = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The fees for sales for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for sales for this period",
     )
     fees_refunds = models.DecimalField(
         max_digits=12,
@@ -1483,7 +1525,9 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
         help_text="The fees for interchange for this period",
     )
     fees_scheme = models.DecimalField(
-        max_digits=12, decimal_places=2, help_text="The fees for scheme for this period"
+        max_digits=12,
+        decimal_places=2,
+        help_text="The fees for scheme for this period",
     )
 
 
@@ -1499,7 +1543,7 @@ class ZettleBalance(CreatedUpdatedUUIDModel):
         ordering = ["-statement_time"]
 
     statement_time = models.DateTimeField(
-        help_text="The date and time this movement was added to the account statement."
+        help_text="The date and time this movement was added to the account statement.",
     )
     payment_time = models.DateTimeField(
         null=True,
@@ -1535,7 +1579,7 @@ class ZettleReceipt(CreatedUpdatedUUIDModel):
         ordering = ["-zettle_created"]
 
     zettle_created = models.DateTimeField(
-        help_text="The date and time this receipt was created in Zettles end"
+        help_text="The date and time this receipt was created in Zettles end",
     )
     receipt_number = models.IntegerField(help_text="The Zettle receipt number.")
     vat = models.DecimalField(
@@ -1566,7 +1610,8 @@ class ZettleReceipt(CreatedUpdatedUUIDModel):
         help_text="The card issuer. Can be empty if this was not a card payment.",
     )
     staff = models.CharField(
-        max_length=100, help_text="The Zettle account which was used to make this sale."
+        max_length=100,
+        help_text="The Zettle account which was used to make this sale.",
     )
     description = models.CharField(
         max_length=255,
@@ -1583,10 +1628,12 @@ class MobilePayTransaction(CreatedUpdatedUUIDModel):
     """MobilePay transactions cover payments/refunds, payouts, service fees and everything else."""
 
     event = models.CharField(
-        max_length=100, help_text="The type of MobilePay transaction"
+        max_length=100,
+        help_text="The type of MobilePay transaction",
     )
     currency = models.CharField(
-        max_length=3, help_text="The currency of this transaction."
+        max_length=3,
+        help_text="The currency of this transaction.",
     )
     amount = models.DecimalField(
         max_digits=12,
@@ -1619,7 +1666,7 @@ class MobilePayTransaction(CreatedUpdatedUUIDModel):
         help_text="The payment point. For now we only have one (which we rename from year to year)",
     )
     myshop_number = models.IntegerField(
-        help_text="The MobilePay MyShop number for this payment. For now we only have one."
+        help_text="The MobilePay MyShop number for this payment. For now we only have one.",
     )
     bank_account = models.CharField(
         max_length=100,
@@ -1635,10 +1682,10 @@ class MobilePayTransaction(CreatedUpdatedUUIDModel):
 
 class AccountingExport(CreatedUpdatedUUIDModel):
     date_from = models.DateField(
-        help_text="The start date for this accounting export (YYYY-MM-DD)."
+        help_text="The start date for this accounting export (YYYY-MM-DD).",
     )
     date_to = models.DateField(
-        help_text="The end date for this accounting export (YYYY-MM-DD)."
+        help_text="The end date for this accounting export (YYYY-MM-DD).",
     )
     comment = models.CharField(
         null=True,

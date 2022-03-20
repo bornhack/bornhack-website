@@ -6,7 +6,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 
-from utils.models import CampRelatedModel, CreatedUpdatedModel, UUIDModel
+from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -38,7 +40,9 @@ TEAM_GUIDE_TEMPLATE = """
 
 class Team(CampRelatedModel):
     camp = models.ForeignKey(
-        "camps.Camp", related_name="teams", on_delete=models.PROTECT
+        "camps.Camp",
+        related_name="teams",
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(max_length=255, help_text="The team name")
@@ -50,7 +54,7 @@ class Team(CampRelatedModel):
     )
 
     shortslug = models.SlugField(
-        help_text="Abbreviated version of the slug. Used in places like IRC channel names where space is limited"
+        help_text="Abbreviated version of the slug. Used in places like IRC channel names where space is limited",
     )
 
     description = models.TextField()
@@ -63,18 +67,22 @@ class Team(CampRelatedModel):
     )
 
     needs_members = models.BooleanField(
-        default=True, help_text="Check to indicate that this team needs more members"
+        default=True,
+        help_text="Check to indicate that this team needs more members",
     )
 
     members = models.ManyToManyField(
-        "auth.User", related_name="teams", through="teams.TeamMember"
+        "auth.User",
+        related_name="teams",
+        through="teams.TeamMember",
     )
 
     # mailing list related fields
     mailing_list = models.EmailField(blank=True)
 
     mailing_list_archive_public = models.BooleanField(
-        default=False, help_text="Check if the mailing list archive is public"
+        default=False,
+        help_text="Check if the mailing list archive is public",
     )
 
     mailing_list_nonmember_posts = models.BooleanField(
@@ -140,7 +148,7 @@ class Team(CampRelatedModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.camp)
+        return f"{self.name} ({self.camp})"
 
     def get_absolute_url(self):
         return reverse_lazy(
@@ -154,7 +162,8 @@ class Team(CampRelatedModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
 
@@ -189,36 +198,36 @@ class Team(CampRelatedModel):
         if self.public_irc_channel_name:
             if (
                 Team.objects.filter(
-                    private_irc_channel_name__iexact=self.public_irc_channel_name
+                    private_irc_channel_name__iexact=self.public_irc_channel_name,
                 )
                 .exclude(pk=self.pk)
                 .exists()
                 or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.public_irc_channel_name
+                    public_irc_channel_name__iexact=self.public_irc_channel_name,
                 )
                 .exclude(pk=self.pk)
                 .exists()
             ):
                 raise ValidationError(
-                    "The public IRC channel name is already in use on another team!"
+                    "The public IRC channel name is already in use on another team!",
                 )
 
         # make sure private_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
         if self.private_irc_channel_name:
             if (
                 Team.objects.filter(
-                    private_irc_channel_name__iexact=self.private_irc_channel_name
+                    private_irc_channel_name__iexact=self.private_irc_channel_name,
                 )
                 .exclude(pk=self.pk)
                 .exists()
                 or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.private_irc_channel_name
+                    public_irc_channel_name__iexact=self.private_irc_channel_name,
                 )
                 .exclude(pk=self.pk)
                 .exists()
             ):
                 raise ValidationError(
-                    "The private IRC channel name is already in use on another team!"
+                    "The private IRC channel name is already in use on another team!",
                 )
 
     @property
@@ -251,7 +260,8 @@ class Team(CampRelatedModel):
         Used to handle permissions for team management
         """
         return self.members.filter(
-            teammember__approved=True, teammember__responsible=True
+            teammember__approved=True,
+            teammember__responsible=True,
         )
 
     @property
@@ -262,7 +272,8 @@ class Team(CampRelatedModel):
         Used on the people pages.
         """
         return self.members.filter(
-            teammember__approved=True, teammember__responsible=False
+            teammember__approved=True,
+            teammember__responsible=False,
         )
 
     @property
@@ -292,7 +303,8 @@ class TeamMember(CampRelatedModel):
     )
 
     approved = models.BooleanField(
-        default=False, help_text="True if this membership is approved. False if not."
+        default=False,
+        help_text="True if this membership is approved. False if not.",
     )
 
     responsible = models.BooleanField(
@@ -333,10 +345,12 @@ class TeamTask(CampRelatedModel):
     )
     name = models.CharField(max_length=100, help_text="Short name of this task")
     slug = models.SlugField(
-        max_length=255, blank=True, help_text="url slug, leave blank to autogenerate"
+        max_length=255,
+        blank=True,
+        help_text="url slug, leave blank to autogenerate",
     )
     description = models.TextField(
-        help_text="Description of the task. Markdown is supported."
+        help_text="Description of the task. Markdown is supported.",
     )
     when = DateTimeRangeField(
         blank=True,
@@ -344,7 +358,8 @@ class TeamTask(CampRelatedModel):
         help_text="When does this task need to be started and/or finished?",
     )
     completed = models.BooleanField(
-        help_text="Check to mark this task as completed.", default=False
+        help_text="Check to mark this task as completed.",
+        default=False,
     )
 
     class Meta:
@@ -374,7 +389,8 @@ class TeamTask(CampRelatedModel):
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -382,7 +398,9 @@ class TeamTask(CampRelatedModel):
 
 class TaskComment(UUIDModel, CreatedUpdatedModel):
     task = models.ForeignKey(
-        "teams.TeamTask", on_delete=models.PROTECT, related_name="comments"
+        "teams.TeamTask",
+        on_delete=models.PROTECT,
+        related_name="comments",
     )
     author = models.ForeignKey("teams.TeamMember", on_delete=models.PROTECT)
     comment = models.TextField()
@@ -414,7 +432,9 @@ class TeamShift(CampRelatedModel):
 
     def __str__(self):
         return "{} team shift from {} to {}".format(
-            self.team.name, self.shift_range.lower, self.shift_range.upper
+            self.team.name,
+            self.shift_range.lower,
+            self.shift_range.upper,
         )
 
     @property

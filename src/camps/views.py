@@ -4,7 +4,8 @@ from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views import View
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 
 from .models import Camp
 
@@ -19,7 +20,7 @@ class CampRedirectView(View):
             camp = Camp.objects.get(camp__contains=now)
             logger.debug(
                 "Redirecting to camp '%s' for page '%s' because it is now!"
-                % (camp.slug, kwargs["page"])
+                % (camp.slug, kwargs["page"]),
             )
             return redirect(kwargs["page"], camp_slug=camp.slug)
         except Camp.DoesNotExist:

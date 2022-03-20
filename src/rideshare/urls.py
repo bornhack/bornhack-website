@@ -1,6 +1,11 @@
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
 
-from .views import RideCreate, RideDelete, RideDetail, RideList, RideUpdate
+from .views import RideCreate
+from .views import RideDelete
+from .views import RideDetail
+from .views import RideList
+from .views import RideUpdate
 
 app_name = "rideshare"
 
@@ -14,7 +19,7 @@ urlpatterns = [
                 path("", RideDetail.as_view(), name="detail"),
                 path("update/", RideUpdate.as_view(), name="update"),
                 path("delete/", RideDelete.as_view(), name="delete"),
-            ]
+            ],
         ),
     ),
 ]

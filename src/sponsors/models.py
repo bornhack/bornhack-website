@@ -24,7 +24,9 @@ class Sponsor(CampRelatedModel):
     tickets_generated = models.BooleanField(default=False)
 
     ticket_email = models.EmailField(
-        null=True, blank=True, help_text="The email to send the tickets to"
+        null=True,
+        blank=True,
+        help_text="The email to send the tickets to",
     )
 
     ticket_ready = models.BooleanField(
@@ -38,7 +40,7 @@ class Sponsor(CampRelatedModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.tier.camp)
+        return f"{self.name} ({self.tier.camp})"
 
     @property
     def camp(self):
@@ -49,7 +51,8 @@ class Sponsor(CampRelatedModel):
 
 class SponsorTier(CampRelatedModel):
     name = models.CharField(
-        max_length=25, help_text="Name of the tier (gold, silver, etc.)"
+        max_length=25,
+        help_text="Name of the tier (gold, silver, etc.)",
     )
 
     description = models.TextField(help_text="A description of what the tier includes.")
@@ -75,4 +78,4 @@ class SponsorTier(CampRelatedModel):
     )
 
     def __str__(self):
-        return "{} ({})".format(self.name, self.camp)
+        return f"{self.name} ({self.camp})"

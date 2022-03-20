@@ -1,13 +1,14 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class StaffMemberRequiredMixin(object):
+class StaffMemberRequiredMixin:
     """
     A CBV mixin for when a view should only be permitted for staff users
     """
