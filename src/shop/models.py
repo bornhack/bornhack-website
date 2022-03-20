@@ -11,7 +11,7 @@ from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from tickets.models import ShopTicket

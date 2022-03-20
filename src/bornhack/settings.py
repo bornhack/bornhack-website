@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.gis",
-    "graphene_django",
     "channels",
     "corsheaders",
     "profiles",
