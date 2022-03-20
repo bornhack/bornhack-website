@@ -277,6 +277,7 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                 opr = form.save(commit=False)
                 opr.refunded += form.cleaned_data["refund_quantity"]
                 opr.save()
+                # TODO: Post process - delete tickets, create credit note etc.
 
         return HttpResponseRedirect(
             reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
