@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, F, Sum, Q
+from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -302,6 +302,108 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             tickets += opr.unused_shoptickets
         return tickets
 
+    def create_refund(self, notes):
+        return Refund.objects.create(order=self, notes=notes)
+
+
+# ########## REFUNDS #################################################
+
+
+class Refund(CreatedUpdatedModel):
+    """A refund is created whenever we have to refund a webshop Order (partially or fully).
+
+    The Refund model does not have a products m2m like the Order model, instead self.rprs
+    returns a QS of the RefundProductRelations for this Refund, which in turn each have an FK
+    to the OrderProductRelation they are refunding (partially or fully).
+
+    A Refund is always related to a webshop Order. TODO add a CustomRefund model for when we
+    need to create a CreditNote without a related webshop Order.
+    """
+
+    class Meta:
+        ordering = ["-created"]
+
+    order = models.ForeignKey(
+        "shop.Order",
+        on_delete=models.PROTECT,
+        related_name="refunds",
+        help_text="The Order this Refund is refunding (partially or fully)",
+    )
+
+    paid = models.BooleanField(
+        verbose_name=_("Paid?"),
+        help_text=_("Whether this shop refund has been paid."),
+        default=False,
+    )
+
+    customer_comment = models.TextField(
+        verbose_name=_("Customer comment"),
+        help_text=_(
+            "If you (the customer) have any comments about the refund please enter them here. This field is not currently being used."
+        ),
+        default="",
+        blank=True,
+    )
+
+    invoice_address = models.TextField(
+        help_text=_(
+            "The invoice address for this refund. Leave blank to use the invoice address from the Order object.",
+        ),
+        blank=True,
+    )
+
+    notes = models.TextField(
+        help_text="Any internal notes about this Refund can be entered here. They will not be printed on the creditnote or shown to the customer in any way.",
+        default="",
+        blank=True,
+    )
+
+    @property
+    def invoice_address(self):
+        return self.order.invoice_address
+
+    def save(self, **kwargs):
+        """Take the invoice_address for the CreditNote from the Order object if we don't have one."""
+        if not self.invoice_address:
+            self.invoice_address = self.order.invoice_address
+        return super().save(**kwargs)
+
+
+class RefundProductRelation(CreatedUpdatedModel):
+    """The RPR model has an FK to the Refund it belongs to, as well as an FK to the OPR
+    it is refunding (partially or fully).
+
+    TODO: Make sure quantity is possible with a constraint
+    """
+
+    refund = models.ForeignKey(
+        "shop.Refund", related_name="rprs", on_delete=models.PROTECT
+    )
+
+    opr = models.ForeignKey(
+        "shop.OrderProductRelation",
+        help_text="The OPR which this RPR is refunding",
+        on_delete=models.PROTECT,
+    )
+
+    quantity = models.PositiveIntegerField(
+        help_text="The number of times this product is being refunded in this Refund"
+    )
+
+    ticket_deleted = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="The time when ticket(s) related to this RefundProductRelation were deleted",
+    )
+
+    @property
+    def total(self):
+        """Returns the total price for this RPR considering quantity."""
+        return Decimal(self.opr.price * self.quantity)
+
+
+# ########## PRODUCTS ################################################
+
 
 class ProductCategory(
     ExportModelOperationsMixin("product_category"),
@@ -481,26 +583,31 @@ class OrderProductRelation(
 ):
     def __str__(self):
         return f'#{self.order}: {self.quantity} {self.product}'
+    ]
+
     order = models.ForeignKey(
         "shop.Order", related_name="oprs", on_delete=models.PROTECT
     )
-    order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
+
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
+
     quantity = models.PositiveIntegerField(
         help_text="The number of times this product has been bought on this order"
     )
-    refunded = models.PositiveIntegerField(
-        default=0, help_text="The number of items refunded from this OPR"
-    )
-    ticket_generated = models.BooleanField(
-        default=False,
-        help_text="True if the ticket(s) for this OPR have been generated, False if not.",
+
+    ticket_generated = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Generation time of the ticket(s) for this OPR. Blank if ticket(s) have not been generated yet.",
     )
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(check=Q(refunded__lte=F("quantity")), name="refund_less_or_equal_quantity")
-        ]
+    price = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text=_(
+            "The price (per product, at the time of purchase, in DKK, including VAT)."
+        ),
+    )
 
     @property
     def total(self):
@@ -566,7 +673,7 @@ class OrderProductRelation(
                     messages.success(request, msg)
 
             # and mark the OPR as ticket_generated=True
-            self.ticket_generated = True
+            self.ticket_generated = timezone.now()
             self.save()
             return tickets
 
@@ -585,6 +692,22 @@ class OrderProductRelation(
     @property
     def possible_refund(self):
         return self.quantity - self.used_tickets_count - self.refunded
+
+    def save(self, **kwargs):
+        """Make sure we save the current price in the OPR."""
+        if not self.price:
+            self.price = self.product.price
+        super().save(**kwargs)
+
+    def create_rpr(self, refund, quantity):
+        return RefundProductRelation.objects.create(
+            refund=refund,
+            opr=self,
+            quantity=quantity,
+        )
+
+
+# ########## EPAY ####################################################
 
 
 class EpayCallback(
@@ -622,6 +745,10 @@ class EpayPayment(
 class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel):
     class Meta:
         ordering = ["-created"]
+        # TODO add a check constraint to ensure that a if a CreditNote has
+        # a reference to both an Invoice and a Refund object that the
+        # Refund object is related to an Order which related to the same
+        # Invoice object
 
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
