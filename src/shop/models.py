@@ -382,6 +382,7 @@ class RefundProductRelation(CreatedUpdatedModel):
 
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
+        related_name="rprs",
         help_text="The OPR which this RPR is refunding",
         on_delete=models.PROTECT,
     )
@@ -658,7 +659,13 @@ class OrderProductRelation(
 
                 # find out how many we need to create
                 tickets_to_create = max(
-                    0, self.quantity - already_created_tickets - self.refunded
+                    0,
+                    self.quantity
+                    - already_created_tickets
+                    - (
+                        self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
+                        or 0
+                    ),
                 )
                 if not tickets_to_create:
                     return tickets

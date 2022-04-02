@@ -129,6 +129,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 help_text="The OPR which this RPR is refunding",
                 on_delete=django.db.models.deletion.PROTECT,
+                related_name="rprs",
                 to="shop.orderproductrelation",
             ),
         ),
