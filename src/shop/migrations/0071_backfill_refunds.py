@@ -6,13 +6,18 @@ from django.db import migrations
 def backfill_refunds(apps, schema_editor):
     """Loop over Orders with refunded=True and create Refund and RefundProductRelation objects."""
     Order = apps.get_model("shop", "Order")
+    Refund = apps.get_model("shop", "Refund")
+    RefundProductRelation = apps.get_model("shop", "RefundProductRelation")
 
     for order in Order.objects.filter(refunded=True, refunds__isnull=True):
-        refund = order.create_refund(
-            notes="Auto-generated Refund from shop/migrations/0071_backfill_refunds.py"
+        refund = Refund.objects.create(
+            order=order,
+            notes="Auto-generated Refund from shop/migrations/0071_backfill_refunds.py",
         )
         for opr in Order.oprs.all():
-            opr.create_rpr(refund=refund, quantity=opr.quantity)
+            RefundProductRelation.objects.create(
+                refund=refund, opr=opr, quantity=opr.quantity
+            )
 
 
 class Migration(migrations.Migration):
