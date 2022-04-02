@@ -14,7 +14,7 @@ def backfill_refunds(apps, schema_editor):
             order=order,
             notes="Auto-generated Refund from shop/migrations/0071_backfill_refunds.py",
         )
-        for opr in Order.oprs.all():
+        for opr in order.oprs.all():
             RefundProductRelation.objects.create(
                 refund=refund, opr=opr, quantity=opr.quantity
             )
