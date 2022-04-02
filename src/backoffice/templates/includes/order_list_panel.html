@@ -10,7 +10,7 @@
     <th>Payment Method</th>
     <th>Paid</th>
     <th>Cancelled</th>
-    <th>Refunded</th>
+    <th>Refunds</th>
     <th>Invoice</th>
     <th>Actions</th>
   </tr>
@@ -22,17 +22,17 @@
       <td>{{ order.user.username }} &lt;{{ order.user.email }}&gt;</td>
       <td data-order="{{ order.created|sortable }}">{{ order.created }}</td>
       <td data-order="{{ order.updated|sortable }}">{{ order.updated }}</td>
-      <td>{{ order.oprs.all }}</td>
+      <td><ul>{% for opr in order.oprs.all %}<li>{{ opr.product.name }} ({{ opr.quantity }}){% endfor %}</ul></td>
       <td>{{ order.payment_method }}</td>
       <td>{{ order.paid|truefalseicon }} {% if order.paid %}paid{% else %}unpaid{% endif %}</td>
       <td>{{ order.cancelled|truefalseicon }}</td>
-      <td>{{ order.refunded|truefalseicon }}</td>
+      <td><ul>{% for refund in order.refunds.all %}<li>{{ refund }}{% empty %}N/A{% endfor %}</ul></td>
       <td>{% if order.invoice %}{{ order.invoice }}{% else %}{{ order.pdf }} (proforma){% endif %}</td>
       <td>
         <div class="btn-group btn-group-vertical">
-          <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Details</a>
-          <a href="{% url "backoffice:order_update" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Update</a>
-          <a href="{% url "backoffice:order_refund" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Refund</a>
+          <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          <a href="{% url "backoffice:order_update" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+          <a href="{% url "backoffice:order_refund" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-undo"></i> Refund</a>
         </div>
       </td>
     </tr>
