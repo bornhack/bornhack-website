@@ -15,7 +15,7 @@ from django.views.generic import DetailView, ListView, TemplateView, UpdateView
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
-from shop.models import CreditNote, Invoice, Order, OrderProductRelation
+from shop.models import CreditNote, Invoice, Order, OrderProductRelation, Refund
 from tickets.models import (
     DiscountTicket,
     ShopTicket,
@@ -273,43 +273,40 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
-        # get, and lock, all the OPRS we are updating
-        oprs = (
+        # lock all the OPRS we are updating
+        (
             OrderProductRelation.objects.prefetch_related("shoptickets")
             .filter(order=self.get_object())
             .select_for_update()
         )
+
+        opr_dict = {}
         with transaction.atomic():
-            to_refund = 0
-            tickets_to_delete = []
 
-            for opr in oprs:
-                ticket_formset = ShopTicketRefundFormSet(
-                    request.POST, queryset=opr.unused_shoptickets
+            ticket_formset = ShopTicketRefundFormSet(
+                request.POST,
+            )
+            if not ticket_formset.is_valid():
+                messages.error(
+                    request,
+                    "Some error!",
                 )
+                return self.get(request, *args, **kwargs)
 
-                if not ticket_formset.is_valid():
-                    messages.error(
-                        request,
-                        "Some error!",
-                    )
-                    return self.get(request, *args, **kwargs)
+            for form in ticket_formset:
+                refund = form.cleaned_data["refund"]
+                ticket: ShopTicket = form.cleaned_data["uuid"]
+                opr = ticket.opr
+                if refund:
+                    if opr in opr_dict:
+                        opr_dict[opr] += 1
+                    else:
+                        opr_dict[opr] = 1
 
-                for form in ticket_formset:
-                    refund = form.cleaned_data["refund"]
-                    if refund:
-                        to_refund += 1
-                        tickets_to_delete.append(form.cleaned_data["uuid"])
+            refund = Refund.objects.create(order=self.get_object())
 
-                # Update refunded on OPR
-                # TODO: Replace with RefundProductRelation
-                opr.refunded += to_refund
-                opr.save()
-
-                # Delete tickets
-                ShopTicket.objects.filter(id__in=tickets_to_delete).delete()
-
-                # TODO: Post process - create credit note etc.
+            for opr, quantity in opr_dict.items():
+                opr.create_rpr(refund, quantity)
 
         return HttpResponseRedirect(
             reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
