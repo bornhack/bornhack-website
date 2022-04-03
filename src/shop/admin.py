@@ -1,17 +1,21 @@
 from django.contrib import admin
 
-from .models import CoinifyAPICallback
-from .models import CoinifyAPIInvoice
-from .models import CoinifyAPIRequest
-from .models import CreditNote
-from .models import CustomOrder
-from .models import EpayCallback
-from .models import EpayPayment
-from .models import Invoice
-from .models import Order
-from .models import OrderProductRelation
-from .models import Product
-from .models import ProductCategory
+from .models import (
+    CoinifyAPICallback,
+    CoinifyAPIInvoice,
+    CoinifyAPIRequest,
+    CreditNote,
+    CustomOrder,
+    EpayCallback,
+    EpayPayment,
+    Invoice,
+    Order,
+    OrderProductRelation,
+    Product,
+    ProductCategory,
+    Refund,
+    RefundProductRelation,
+)
 
 admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)
@@ -180,3 +184,12 @@ class OrderAdmin(admin.ModelAdmin):
 
 def get_user_email(obj):
     return obj.order.user.email
+
+
+class RefundInline(admin.TabularInline):
+    model = RefundProductRelation
+
+
+@admin.register(Refund)
+class RefundAdmin(admin.ModelAdmin):
+    inlines = [RefundInline]

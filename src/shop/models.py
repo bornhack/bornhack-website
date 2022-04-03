@@ -358,10 +358,6 @@ class Refund(CreatedUpdatedModel):
         blank=True,
     )
 
-    @property
-    def invoice_address(self):
-        return self.order.invoice_address
-
     def save(self, **kwargs):
         """Take the invoice_address for the CreditNote from the Order object if we don't have one."""
         if not self.invoice_address:
@@ -703,6 +699,10 @@ class OrderProductRelation(
     @property
     def used_tickets_count(self):
         return self.used_shoptickets.count()
+
+    @property
+    def refunded(self):
+        return self.rprs.aggregate(refunded=Sum("quantity"))["refunded"] or 0
 
     @property
     def possible_refund(self):
