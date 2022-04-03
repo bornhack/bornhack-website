@@ -1,10 +1,8 @@
 from django import forms
 from django.forms import modelformset_factory
 
-from program.models import Event
-from program.models import Speaker
-
-from shop.models import OrderProductRelation
+from program.models import Event, Speaker
+from tickets.models import ShopTicket
 
 
 class AddRecordingForm(forms.ModelForm):
@@ -164,21 +162,17 @@ class MobilePayCSVForm(forms.Form):
     )
 
 
-class OrderProductRelationRefundForm(forms.ModelForm):
+class ShopTicketRefundForm(forms.ModelForm):
     class Meta:
-        model = OrderProductRelation
-        fields = ["id", "refund_quantity"]
-        widgets = {
-            "id": forms.HiddenInput(),
-        }
+        fields = ["refund"]
 
-    refund_quantity = forms.IntegerField(initial=0, min_value=0)
+    refund = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance:
-            self.fields["refund_quantity"].max_value = self.instance.possible_refund
+        self.fields["refund"].label = self.instance.name or "Unnamed ticket"
 
 
-
-OrderProductRelationRefundFormSet = modelformset_factory(OrderProductRelation, form=OrderProductRelationRefundForm, extra=0)
+ShopTicketRefundFormSet = modelformset_factory(
+    ShopTicket, form=ShopTicketRefundForm, extra=0
+)

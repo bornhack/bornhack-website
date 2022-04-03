@@ -24,7 +24,7 @@ from tickets.models import (
     TicketTypeUnion,
 )
 
-from ..forms import OrderProductRelationRefundFormSet
+from ..forms import ShopTicketRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -266,36 +266,50 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     pk_url_kwarg = "order_id"
 
     def get_context_data(self, **kwargs):
-        kwargs["formset"] = OrderProductRelationRefundFormSet(
-            queryset=OrderProductRelation.objects.filter(order=self.get_object())
-        )
+        kwargs["oprs"] = {
+            opr: ShopTicketRefundFormSet(queryset=opr.unused_shoptickets)
+            for opr in self.get_object().oprs.all()
+        }
         return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
-        formset = OrderProductRelationRefundFormSet(
-            request.POST,
-            queryset=OrderProductRelation.objects.filter(order=self.get_object()),
-        )
-
-        if not formset.is_valid():
-            messages.error(
-                request,
-                "Some error!",
-            )
-            return self.render_to_response({"formset": formset})
-
-        # get a lock for all the OPRs we are updating
-        _ = (
-            OrderProductRelation.objects.select_related("shoptickets")
+        # get, and lock, all the OPRS we are updating
+        oprs = (
+            OrderProductRelation.objects.prefetch_related("shoptickets")
             .filter(order=self.get_object())
             .select_for_update()
         )
         with transaction.atomic():
-            for form in formset:
-                opr = form.save(commit=False)
-                opr.refunded += form.cleaned_data["refund_quantity"]
+            to_refund = 0
+            tickets_to_delete = []
+
+            for opr in oprs:
+                ticket_formset = ShopTicketRefundFormSet(
+                    request.POST, queryset=opr.unused_shoptickets
+                )
+
+                if not ticket_formset.is_valid():
+                    messages.error(
+                        request,
+                        "Some error!",
+                    )
+                    return self.get(request, *args, **kwargs)
+
+                for form in ticket_formset:
+                    refund = form.cleaned_data["refund"]
+                    if refund:
+                        to_refund += 1
+                        tickets_to_delete.append(form.cleaned_data["uuid"])
+
+                # Update refunded on OPR
+                # TODO: Replace with RefundProductRelation
+                opr.refunded += to_refund
                 opr.save()
-                # TODO: Post process - delete tickets, create credit note etc.
+
+                # Delete tickets
+                ShopTicket.objects.filter(id__in=tickets_to_delete).delete()
+
+                # TODO: Post process - create credit note etc.
 
         return HttpResponseRedirect(
             reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})

@@ -20,40 +20,46 @@
         <tr>
             <th>Product</th>
             <th>Quantity</th>
+            <th>Used</th>
             <th>Refunded</th>
+            <th>Refundable</th>
             <th>Possible refund</th>
         </tr>
-        {% for form in formset %}
-            {{ form.id }}
+        {% for opr, formset in oprs.items %}
+{#            {{ opr.id }}#}
             <tr>
                 <td>
-                    {{ form.instance.product }}
+                    {{ opr.product }}
                 </td>
+
                 <td>
-                    {{ form.instance.quantity }}
+                    {{ opr.quantity }}
                 </td>
+
                 <td>
-                    {{ form.instance.refunded }}
+                    {{ opr.used_tickets_count }}
                 </td>
+
                 <td>
-                    {% if form.refund_quantity.field.max_value == 0 %}
-                        Fully refunded
-                        <input type="hidden"
-                               min="{{ form.refund_quantity.field.min_value }}"
-                               max="{{ form.refund_quantity.field.max_value }}"
-                               name="{{ form.refund_quantity.html_name }}"
-                               value="0">
+                    {{ opr.refunded }}
+                </td>
+
+                <td>
+                    {{ opr.possible_refund }}
+                </td>
+
+                <td>
+                    {% if opr.possible_refund == 0 %}
+                        No refund possible
                     {% else %}
-                    <input type="number"
-                           class="form-control"
-                           min="{{ form.refund_quantity.field.min_value }}"
-                           max="{{ form.refund_quantity.field.max_value }}"
-                           id="{{ form.refund_quantity.id_for_label }}"
-                           name="{{ form.refund_quantity.html_name }}"
-                           value="{{ form.refund_quantity.initial }}">
+                        {{ formset.management_form }}
+                        {% for form in formset %}
+                            {{ form.as_p }}
+                        {% endfor %}
                     {% endif %}
                 </td>
             </tr>
+
         {% endfor %}
     </table>
     </div>
