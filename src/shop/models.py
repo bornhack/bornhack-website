@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, F, Sum
+from django.db.models import Count, F, Q, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -396,6 +396,14 @@ class RefundProductRelation(CreatedUpdatedModel):
         blank=True,
         help_text="The time when ticket(s) related to this RefundProductRelation were deleted",
     )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=Q(quantity__lte=F("opr__quantity") - Sum("opr__rprs__quantity")),
+                name="",
+            )
+        ]
 
     @property
     def total(self):
