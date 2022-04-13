@@ -8,4 +8,4 @@ black==21.9b0
 pre-commit==2.18.1
 isort==5.9.3
 hypothesis==6.39.4
-flake8==3.9.2
+flake8==4.0.1
