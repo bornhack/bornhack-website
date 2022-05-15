@@ -13,7 +13,7 @@ def do_work():
     """
     if hasattr(settings, "IRCBOT_CHANNELS"):
         logger.error(
-            "settings.IRCBOT_CHANNELS is deprecated. Please define settings.IRCBOT_PUBLIC_CHANNEL and use team channels for the rest."
+            "settings.IRCBOT_CHANNELS is deprecated. Please define settings.IRCBOT_PUBLIC_CHANNEL and use team channels for the rest.",
         )
         return False
 

@@ -3,7 +3,10 @@ import logging
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-from .models import Event, EventProposal, EventTrack, SpeakerProposal
+from .models import Event
+from .models import EventProposal
+from .models import EventTrack
+from .models import SpeakerProposal
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -25,11 +28,13 @@ class SpeakerProposalForm(forms.ModelForm):
             "event_conflicts",
         ]
 
-    def __init__(self, camp, event_type=None, matrix={}, *args, **kwargs):
+    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
         """
         initialise the form and adapt based on event_type
         """
         super().__init__(*args, **kwargs)
+
+        matrix = matrix or {}
 
         # only show events from this camp
         self.fields["event_conflicts"].queryset = Event.objects.filter(
@@ -238,7 +243,7 @@ class SpeakerProposalForm(forms.ModelForm):
 
         else:
             raise ImproperlyConfigured(
-                f"Unsupported event type '{event_type.name}', don't know which form class to use"
+                f"Unsupported event type '{event_type.name}', don't know which form class to use",
             )
 
 
@@ -248,7 +253,9 @@ class EventProposalForm(forms.ModelForm):
     """
 
     slides_url = forms.URLField(
-        label="Slides URL", help_text="Add a URL to your slides.", required=False
+        label="Slides URL",
+        help_text="Add a URL to your slides.",
+        required=False,
     )
 
     class Meta:
@@ -274,7 +281,7 @@ class EventProposalForm(forms.ModelForm):
             and self.cleaned_data["duration"] > self.event_type.event_duration_minutes
         ):
             raise forms.ValidationError(
-                f"Please keep duration under {self.event_type.event_duration_minutes} minutes."
+                f"Please keep duration under {self.event_type.event_duration_minutes} minutes.",
             )
         return self.cleaned_data["duration"]
 
@@ -472,5 +479,5 @@ class EventProposalForm(forms.ModelForm):
 
         else:
             raise ImproperlyConfigured(
-                "Unsupported event type, don't know which form class to use"
+                "Unsupported event type, don't know which form class to use",
             )

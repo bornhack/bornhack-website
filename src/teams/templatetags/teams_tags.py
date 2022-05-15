@@ -27,6 +27,6 @@ def membershipstatus(user, team, showicon=False):
         icon = "fa-times"
 
     if showicon:
-        return mark_safe("<i class='fa %s' title='%s'></i>" % (icon, text))
+        return mark_safe(f"<i class='fa {icon}' title='{text}'></i>")
     else:
         return text

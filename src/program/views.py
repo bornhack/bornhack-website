@@ -6,38 +6,46 @@ from django import forms
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse, HttpResponseServerError
-from django.shortcuts import get_object_or_404, redirect
-from django.template import Context, Engine
-from django.urls import reverse, reverse_lazy
+from django.http import Http404
+from django.http import HttpResponse
+from django.http import HttpResponseServerError
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.template import Context
+from django.template import Engine
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import DetailView, ListView, TemplateView, View
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from lxml import etree, objectify
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import TemplateView
+from django.views.generic import View
+from django.views.generic.edit import CreateView
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import UpdateView
+from lxml import etree
+from lxml import objectify
 
+from . import models
+from .email import add_event_proposal_updated_email
+from .email import add_new_event_proposal_email
+from .email import add_new_speaker_proposal_email
+from .email import add_speaker_proposal_updated_email
+from .forms import EventProposalForm
+from .forms import SpeakerProposalForm
+from .mixins import AvailabilityMatrixViewMixin
+from .mixins import EnsureCFPOpenMixin
+from .mixins import EnsureUserOwnsProposalMixin
+from .mixins import EnsureWritableCampMixin
+from .mixins import EventFeedbackViewMixin
+from .mixins import EventViewMixin
+from .mixins import UrlViewMixin
+from .multiform import MultiModelForm
+from .utils import get_speaker_availability_form_matrix
+from .utils import save_speaker_availability
 from camps.mixins import CampViewMixin
 from utils.middleware import RedirectException
 from utils.mixins import UserIsObjectOwnerMixin
-
-from . import models
-from .email import (
-    add_event_proposal_updated_email,
-    add_new_event_proposal_email,
-    add_new_speaker_proposal_email,
-    add_speaker_proposal_updated_email,
-)
-from .forms import EventProposalForm, SpeakerProposalForm
-from .mixins import (
-    AvailabilityMatrixViewMixin,
-    EnsureCFPOpenMixin,
-    EnsureUserOwnsProposalMixin,
-    EnsureWritableCampMixin,
-    EventFeedbackViewMixin,
-    EventViewMixin,
-    UrlViewMixin,
-)
-from .multiform import MultiModelForm
-from .utils import get_speaker_availability_form_matrix, save_speaker_availability
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -54,7 +62,7 @@ class ICSView(CampViewMixin, View):
         if type_query:
             type_slugs = type_query.split(",")
             query_kwargs["event__event_type__in"] = models.EventType.objects.filter(
-                slug__in=type_slugs
+                slug__in=type_slugs,
             )
 
         # Location query
@@ -62,7 +70,8 @@ class ICSView(CampViewMixin, View):
         if location_query:
             location_slugs = location_query.split(",")
             query_kwargs["location__in"] = models.EventLocation.objects.filter(
-                slug__in=location_slugs, camp=self.camp
+                slug__in=location_slugs,
+                camp=self.camp,
             )
 
         # Video recording query
@@ -96,7 +105,7 @@ class ICSView(CampViewMixin, View):
         response = HttpResponse(cal.to_ical())
         response["Content-Type"] = "text/calendar"
         response["Content-Disposition"] = "inline; filename={}.ics".format(
-            self.camp.slug
+            self.camp.slug,
         )
         return response
 
@@ -128,7 +137,8 @@ class ProposalListView(LoginRequiredMixin, CampViewMixin, ListView):
         """Add event_proposals to the context"""
         context = super().get_context_data(**kwargs)
         context["event_proposal_list"] = models.EventProposal.objects.filter(
-            track__camp=self.camp, user=self.request.user
+            track__camp=self.camp,
+            user=self.request.user,
         ).prefetch_related("event_type", "track", "urls__url_type", "event", "speakers")
         context["event_type_list"] = models.EventType.objects.filter(public=True)
         return context
@@ -156,12 +166,13 @@ class SpeakerProposalCreateView(
         super().setup(*args, **kwargs)
         """ Get the event_proposal and availability matrix """
         self.event_proposal = get_object_or_404(
-            models.EventProposal, pk=kwargs["event_uuid"]
+            models.EventProposal,
+            pk=kwargs["event_uuid"],
         )
         self.matrix = get_speaker_availability_form_matrix(
             sessions=self.camp.event_sessions.filter(
-                event_type=self.event_proposal.event_type
-            )
+                event_type=self.event_proposal.event_type,
+            ),
         )
 
     def get_success_url(self):
@@ -175,7 +186,7 @@ class SpeakerProposalCreateView(
                 "camp": self.camp,
                 "event_type": self.event_proposal.event_type,
                 "matrix": self.matrix,
-            }
+            },
         )
         return kwargs
 
@@ -220,11 +231,11 @@ class SpeakerProposalCreateView(
         # send mail to content team
         if not add_new_speaker_proposal_email(speaker_proposal):
             logger.error(
-                "Unable to send email to content team after new speaker_proposal"
+                "Unable to send email to content team after new speaker_proposal",
             )
 
         return redirect(
-            reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -254,7 +265,7 @@ class SpeakerProposalUpdateView(
 
         # get all event types this SpeakerProposal is involved in
         all_event_types = models.EventType.objects.filter(
-            event_proposals__in=self.get_object().event_proposals.all()
+            event_proposals__in=self.get_object().event_proposals.all(),
         ).distinct()
 
         if len(all_event_types) == 1:
@@ -266,7 +277,7 @@ class SpeakerProposalUpdateView(
 
         # add camp and event_type to form kwargs
         kwargs.update(
-            {"camp": self.camp, "event_type": event_type, "matrix": self.matrix}
+            {"camp": self.camp, "event_type": event_type, "matrix": self.matrix},
         )
         return kwargs
 
@@ -291,7 +302,7 @@ class SpeakerProposalUpdateView(
         # send mail to content team
         if not add_speaker_proposal_updated_email(speaker_proposal):
             logger.error(
-                "Unable to send email to content team after speaker_proposal update"
+                "Unable to send email to content team after speaker_proposal update",
             )
 
         # message user and redirect
@@ -303,7 +314,7 @@ class SpeakerProposalUpdateView(
             reverse(
                 "program:speaker_proposal_detail",
                 kwargs={"camp_slug": self.camp.slug, "pk": speaker_proposal.pk},
-            )
+            ),
         )
 
 
@@ -330,7 +341,7 @@ class SpeakerProposalDeleteView(
                 "Cannot delete a person while it is associated with one or more event_proposals. Delete those first.",
             )
             return redirect(
-                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # continue with the request
@@ -343,7 +354,8 @@ class SpeakerProposalDeleteView(
 
     def get_success_url(self):
         messages.success(
-            self.request, "Proposal '%s' has been deleted." % self.object.name
+            self.request,
+            "Proposal '%s' has been deleted." % self.object.name,
         )
         return reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -382,7 +394,8 @@ class EventProposalTypeSelectView(
         """Get the speaker_proposal object"""
         super().setup(*args, **kwargs)
         self.speaker = get_object_or_404(
-            models.SpeakerProposal, pk=kwargs["speaker_uuid"]
+            models.SpeakerProposal,
+            pk=kwargs["speaker_uuid"],
         )
 
     def get_queryset(self, **kwargs):
@@ -414,7 +427,9 @@ class EventProposalSelectPersonView(
     def dispatch(self, request, *args, **kwargs):
         """Get EventProposal from url kwargs"""
         self.event_proposal = get_object_or_404(
-            models.EventProposal, pk=kwargs["event_uuid"], user=request.user
+            models.EventProposal,
+            pk=kwargs["event_uuid"],
+            user=request.user,
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -449,7 +464,9 @@ class EventProposalAddPersonView(
     def dispatch(self, request, *args, **kwargs):
         """Get the speaker_proposal object"""
         self.speaker_proposal = get_object_or_404(
-            models.SpeakerProposal, pk=kwargs["speaker_uuid"], user=request.user
+            models.SpeakerProposal,
+            pk=kwargs["speaker_uuid"],
+            user=request.user,
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -493,7 +510,9 @@ class EventProposalRemovePersonView(
         """Get the speaker_proposal object and check a few things"""
         # get the speaker_proposal object from URL kwargs
         self.speaker_proposal = get_object_or_404(
-            models.SpeakerProposal, pk=kwargs["speaker_uuid"], user=request.user
+            models.SpeakerProposal,
+            pk=kwargs["speaker_uuid"],
+            user=request.user,
         )
         return super().dispatch(request, *args, **kwargs)
 
@@ -511,7 +530,8 @@ class EventProposalRemovePersonView(
 
         if self.get_object().speakers.count() == 1:
             messages.error(
-                self.request, "Cannot delete the last person associalted with event!"
+                self.request,
+                "Cannot delete the last person associalted with event!",
             )
             return redirect(self.get_success_url())
 
@@ -550,10 +570,12 @@ class EventProposalCreateView(
         """Get the speaker_proposal object"""
         super().setup(*args, **kwargs)
         self.speaker_proposal = get_object_or_404(
-            models.SpeakerProposal, pk=self.kwargs["speaker_uuid"]
+            models.SpeakerProposal,
+            pk=self.kwargs["speaker_uuid"],
         )
         self.event_type = get_object_or_404(
-            models.EventType, slug=self.kwargs["event_type_slug"]
+            models.EventType,
+            slug=self.kwargs["event_type_slug"],
         )
 
     def get_context_data(self, *args, **kwargs):
@@ -596,7 +618,7 @@ class EventProposalCreateView(
         # send mail to content team
         if not add_new_event_proposal_email(event_proposal):
             logger.error(
-                "Unable to send email to content team after new event_proposal"
+                "Unable to send email to content team after new event_proposal",
             )
 
         messages.success(
@@ -658,7 +680,7 @@ class EventProposalUpdateView(
         # send email to content team
         if not add_event_proposal_updated_email(event_proposal):
             logger.error(
-                "Unable to send email to content team after event_proposal update"
+                "Unable to send email to content team after event_proposal update",
             )
 
         # message for the user and redirect
@@ -670,7 +692,7 @@ class EventProposalUpdateView(
             reverse(
                 "program:event_proposal_detail",
                 kwargs={"camp_slug": self.camp.slug, "pk": event_proposal.pk},
-            )
+            ),
         )
 
 
@@ -687,13 +709,17 @@ class EventProposalDeleteView(
 
     def get_success_url(self):
         messages.success(
-            self.request, "Proposal '%s' has been deleted." % self.object.title
+            self.request,
+            "Proposal '%s' has been deleted." % self.object.title,
         )
         return reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
 
 
 class EventProposalDetailView(
-    LoginRequiredMixin, CampViewMixin, EnsureUserOwnsProposalMixin, DetailView
+    LoginRequiredMixin,
+    CampViewMixin,
+    EnsureUserOwnsProposalMixin,
+    DetailView,
 ):
     model = models.EventProposal
     template_name = "event_proposal_detail.html"
@@ -732,7 +758,8 @@ class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListVi
         """Check that we have a valid EventType"""
         super().setup(*args, **kwargs)
         self.event_type = get_object_or_404(
-            models.EventType, slug=self.kwargs["event_type_slug"]
+            models.EventType,
+            slug=self.kwargs["event_type_slug"],
         )
 
     def get_queryset(self, **kwargs):
@@ -757,13 +784,16 @@ class CombinedProposalPersonSelectView(LoginRequiredMixin, CampViewMixin, ListVi
                         "camp_slug": self.camp.slug,
                         "event_type_slug": self.event_type.slug,
                     },
-                )
+                ),
             )
         return super().get(request, *args, **kwargs)
 
 
 class CombinedProposalSubmitView(
-    LoginRequiredMixin, CampViewMixin, EnsureCFPOpenMixin, CreateView
+    LoginRequiredMixin,
+    CampViewMixin,
+    EnsureCFPOpenMixin,
+    CreateView,
 ):
     """
     This view is used by users to submit CFP proposals.
@@ -778,13 +808,14 @@ class CombinedProposalSubmitView(
         """
         super().setup(*args, **kwargs)
         self.event_type = get_object_or_404(
-            models.EventType, slug=self.kwargs["event_type_slug"]
+            models.EventType,
+            slug=self.kwargs["event_type_slug"],
         )
 
         self.matrix = get_speaker_availability_form_matrix(
             sessions=self.camp.event_sessions.filter(
-                event_type=self.event_type
-            ).prefetch_related("event_type")
+                event_type=self.event_type,
+            ).prefetch_related("event_type"),
         )
 
     def get_context_data(self, **kwargs):
@@ -834,12 +865,12 @@ class CombinedProposalSubmitView(
         # send mail(s) to content team
         if not add_new_event_proposal_email(event_proposal):
             logger.error(
-                "Unable to send email to content team after new event_proposal"
+                "Unable to send email to content team after new event_proposal",
             )
         if not hasattr(self, "speaker_proposal"):
             if not add_new_speaker_proposal_email(speaker_proposal):
                 logger.error(
-                    "Unable to send email to content team after new speaker_proposal"
+                    "Unable to send email to content team after new speaker_proposal",
                 )
 
         messages.success(
@@ -849,7 +880,7 @@ class CombinedProposalSubmitView(
 
         # all good
         return redirect(
-            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
     def get_form_class(self):
@@ -863,7 +894,7 @@ class CombinedProposalSubmitView(
                 (
                     ("speaker_proposal", SpeakerProposalForm),
                     ("event_proposal", EventProposalForm),
-                )
+                ),
             )
 
         # return the form class
@@ -875,7 +906,7 @@ class CombinedProposalSubmitView(
         """
         kwargs = super().get_form_kwargs()
         kwargs.update(
-            {"camp": self.camp, "event_type": self.event_type, "matrix": self.matrix}
+            {"camp": self.camp, "event_type": self.event_type, "matrix": self.matrix},
         )
         return kwargs
 
@@ -964,7 +995,8 @@ class NoScriptScheduleView(CampViewMixin, TemplateView):
 
         # we redirect to the list of events if we dont show the schedule
         event_list_url = reverse(
-            "program:event_index", kwargs={"camp_slug": self.camp.slug}
+            "program:event_index",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
         # do we have a schedule to show?
@@ -1023,13 +1055,15 @@ class FrabXmlView(CampViewMixin, View):
             # loop over locations
             for location in models.EventLocation.objects.filter(
                 id__in=qs.filter(event__isnull=False).values_list(
-                    "event_session__event_location_id", flat=True
-                )
+                    "event_session__event_location_id",
+                    flat=True,
+                ),
             ):
                 # build a tuple of scheduled events at this location
                 instances = ()
                 for slot in qs.filter(
-                    when__contained_by=day, event_session__event_location=location
+                    when__contained_by=day,
+                    event_session__event_location=location,
                 ):
                     # build a tuple of speakers for this event
                     speakers = ()
@@ -1051,13 +1085,13 @@ class FrabXmlView(CampViewMixin, View):
                             E.slug(f"{slot.pk}-{slot.event.slug}"),
                             E.url(
                                 self.request.build_absolute_uri(
-                                    slot.event.get_absolute_url()
-                                )
+                                    slot.event.get_absolute_url(),
+                                ),
                             ),
                             E.recording(
                                 E.license("CC BY-SA 4.0"),
                                 E.optout(
-                                    "false" if slot.event.video_recording else "true"
+                                    "false" if slot.event.video_recording else "true",
                                 ),
                             ),
                             E.title(slot.event.title),
@@ -1135,7 +1169,8 @@ class ProgramControlCenter(CampViewMixin, TemplateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         proposals = models.EventProposal.objects.filter(camp=self.camp).select_related(
-            "user", "event"
+            "user",
+            "event",
         )
         context["proposals"] = proposals
 
@@ -1207,7 +1242,7 @@ class UrlCreateView(
 
         # all good
         return redirect(
-            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -1265,7 +1300,7 @@ class UrlUpdateView(
 
         # all good
         return redirect(
-            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -1322,7 +1357,7 @@ class UrlDeleteView(
 
         # all good
         return redirect(
-            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug})
+            reverse_lazy("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -1340,7 +1375,8 @@ class FeedbackRedirectView(LoginRequiredMixin, EventViewMixin, DetailView):
         super().setup(*args, **kwargs)
         if not self.request.user.is_authenticated:
             messages.error(
-                self.request, "You must be logged in to provide Event Feedback"
+                self.request,
+                "You must be logged in to provide Event Feedback",
             )
             raise RedirectException(
                 reverse(
@@ -1349,7 +1385,7 @@ class FeedbackRedirectView(LoginRequiredMixin, EventViewMixin, DetailView):
                         "camp_slug": self.camp.slug,
                         "event_slug": self.event.slug,
                     },
-                )
+                ),
             )
 
         if self.event.proposal.user == self.request.user:
@@ -1361,7 +1397,7 @@ class FeedbackRedirectView(LoginRequiredMixin, EventViewMixin, DetailView):
                         "camp_slug": self.camp.slug,
                         "event_slug": self.event.slug,
                     },
-                )
+                ),
             )
 
         elif self.event.feedbacks.filter(user=self.request.user).exists():
@@ -1370,7 +1406,7 @@ class FeedbackRedirectView(LoginRequiredMixin, EventViewMixin, DetailView):
                 reverse(
                     "program:event_feedback_detail",
                     kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
-                )
+                ),
             )
 
         else:
@@ -1379,7 +1415,7 @@ class FeedbackRedirectView(LoginRequiredMixin, EventViewMixin, DetailView):
                 reverse(
                     "program:event_feedback_create",
                     kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
-                )
+                ),
             )
 
 
@@ -1400,7 +1436,7 @@ class FeedbackListView(LoginRequiredMixin, EventViewMixin, ListView):
                 reverse(
                     "program:event_detail",
                     kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
-                )
+                ),
             )
 
     def get_queryset(self, *args, **kwargs):
@@ -1419,13 +1455,14 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         if models.EventFeedback.objects.filter(
-            event=self.event, user=self.request.user
+            event=self.event,
+            user=self.request.user,
         ).exists():
             raise RedirectException(
                 reverse(
                     "program:event_feedback_detail",
                     kwargs={"camp_slug": self.camp.slug, "event_slug": self.event.slug},
-                )
+                ),
             )
 
     def get_form(self, *args, **kwargs):
@@ -1447,13 +1484,17 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
         feedback.event = self.event
         feedback.save()
         messages.success(
-            self.request, "Your feedback was submitted, it is now pending approval."
+            self.request,
+            "Your feedback was submitted, it is now pending approval.",
         )
         return redirect(feedback.get_absolute_url())
 
 
 class FeedbackDetailView(
-    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DetailView
+    LoginRequiredMixin,
+    EventFeedbackViewMixin,
+    UserIsObjectOwnerMixin,
+    DetailView,
 ):
     """
     Used by the EventFeedback owner to see their own feedback.
@@ -1465,7 +1506,10 @@ class FeedbackDetailView(
 
 
 class FeedbackUpdateView(
-    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, UpdateView
+    LoginRequiredMixin,
+    EventFeedbackViewMixin,
+    UserIsObjectOwnerMixin,
+    UpdateView,
 ):
     """
     Used by the EventFeedback owner to update their feedback.
@@ -1484,7 +1528,10 @@ class FeedbackUpdateView(
 
 
 class FeedbackDeleteView(
-    LoginRequiredMixin, EventFeedbackViewMixin, UserIsObjectOwnerMixin, DeleteView
+    LoginRequiredMixin,
+    EventFeedbackViewMixin,
+    UserIsObjectOwnerMixin,
+    DeleteView,
 ):
     """
     Used by the EventFeedback owner to delete their own feedback.

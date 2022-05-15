@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Token, TokenFind
+from .models import Token
+from .models import TokenFind
 
 
 @admin.register(Token)

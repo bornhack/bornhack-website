@@ -19,20 +19,21 @@ class CampFactory(DjangoModelFactory):
         lambda: DateTimeTZRange(
             lower=timezone.now() - timezone.timedelta(days=3),
             upper=timezone.now() - timezone.timedelta(hours=1),
-        )
+        ),
     )
 
     camp = factory.LazyFunction(
         lambda: DateTimeTZRange(
-            lower=timezone.now(), upper=timezone.now() + timezone.timedelta(days=8)
-        )
+            lower=timezone.now(),
+            upper=timezone.now() + timezone.timedelta(days=8),
+        ),
     )
 
     teardown = factory.LazyFunction(
         lambda: DateTimeTZRange(
             lower=timezone.now() + timezone.timedelta(days=8, hours=1),
             upper=timezone.now() + timezone.timedelta(days=11),
-        )
+        ),
     )
 
     colour = factory.Faker("hex_color")

@@ -14,7 +14,7 @@ def add_added_membership_email(membership):
         html_template="emails/add_membership_email.html",
         to_recipients=membership.user.email,
         formatdict=formatdict,
-        subject="Team update from {}".format(membership.team.camp.title),
+        subject=f"Team update from {membership.team.camp.title}",
     )
 
 
@@ -34,7 +34,7 @@ def add_removed_membership_email(membership):
         html_template=html_template,
         to_recipients=membership.user.email,
         formatdict=formatdict,
-        subject="Team update from {}".format(membership.team.camp.title),
+        subject=f"Team update from {membership.team.camp.title}",
     )
 
 
@@ -50,6 +50,7 @@ def add_new_membership_email(membership):
         ],
         formatdict=formatdict,
         subject="New membership request for {} at {}".format(
-            membership.team.name, membership.team.camp.title
+            membership.team.name,
+            membership.team.camp.title,
         ),
     )

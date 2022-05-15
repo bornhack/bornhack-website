@@ -104,10 +104,10 @@
                 {% if user.orders.exists %}
                 {% url 'shop:order_list' as orders_list_url %}
                 <li><a href="{{ orders_list_url }}">Orders</a></li>
-          
+
                 {% url 'tickets:shopticket_list' as ticket_list_url %}
                 <li><a href="{{ ticket_list_url }}">Tickets</a></li>
-          
+
                 {% if user.creditnotes.exists %}
                 {% url 'shop:creditnote_list' as creditnote_list_url %}
                 <li><a href="{{ creditnote_list_url }}">Credit Notes</a></li>

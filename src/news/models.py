@@ -29,11 +29,12 @@ class NewsItem(CreatedUpdatedModel):
             ):
                 published_at_string = self.published_at.strftime("%Y-%m-%d")
                 base_slug = slugify(self.title)
-                slug = "{}-{}".format(published_at_string, base_slug)
+                slug = f"{published_at_string}-{base_slug}"
                 self.slug = unique_slugify(
                     slug,
                     slugs_in_use=self.__class__.objects.all().values_list(
-                        "slug", flat=True
+                        "slug",
+                        flat=True,
                     ),
                 )
         super().save(**kwargs)

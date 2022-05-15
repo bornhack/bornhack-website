@@ -10,7 +10,7 @@ class Token(CampRelatedModel):
     token = models.CharField(max_length=32, help_text="The secret token")
 
     category = models.TextField(
-        help_text="The category/hint for this token (physical, website, whatever)"
+        help_text="The category/hint for this token (physical, website, whatever)",
     )
 
     description = models.TextField(help_text="The description of the token")
@@ -18,7 +18,7 @@ class Token(CampRelatedModel):
     camp_filter = "camp"
 
     def __str__(self):
-        return "%s (%s)" % (self.description, self.camp)
+        return f"{self.description} ({self.camp})"
 
     class Meta:
         ordering = ["camp"]
@@ -37,13 +37,15 @@ class TokenFind(CampRelatedModel):
     token = models.ForeignKey("tokens.Token", on_delete=models.PROTECT)
 
     user = models.ForeignKey(
-        "auth.User", on_delete=models.PROTECT, related_name="token_finds"
+        "auth.User",
+        on_delete=models.PROTECT,
+        related_name="token_finds",
     )
 
     camp_filter = "token__camp"
 
     def __str__(self):
-        return "%s found by %s" % (self.token, self.user)
+        return f"{self.token} found by {self.user}"
 
     @property
     def camp(self):

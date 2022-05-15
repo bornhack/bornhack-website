@@ -85,7 +85,7 @@ def get_speaker_availability_form_matrix(sessions):
             # skip this chunk if we found no sessions
             if event_types:
                 # build the dict for this daychunk
-                matrix[day][daychunk] = dict()
+                matrix[day][daychunk] = {}
                 matrix[day][daychunk][
                     "fieldname"
                 ] = f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
@@ -97,7 +97,7 @@ def get_speaker_availability_form_matrix(sessions):
                             "name": et.name,
                             "icon": et.icon,
                             "color": et.color,
-                        }
+                        },
                     )
                 matrix[day][daychunk]["initial"] = None
             else:
@@ -170,7 +170,7 @@ def save_speaker_availability(form, obj):
                     int(elements[3]),
                     int(elements[4]),
                     int(elements[5]),
-                )
+                ),
             ),
             tz.localize(
                 datetime.datetime(
@@ -179,7 +179,7 @@ def save_speaker_availability(form, obj):
                     int(elements[9]),
                     int(elements[10]),
                     int(elements[11]),
-                )
+                ),
             ),
         )
         available = form.cleaned_data[field]
@@ -242,7 +242,7 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
             # do we have any availability info for this speakerproposal?
             try:
                 availability = speaker_proposal.availabilities.get(
-                    when__contains=daychunk
+                    when__contains=daychunk,
                 )
                 matrix[date][daychunk]["initial"] = availability.available
             except ObjectDoesNotExist:
@@ -260,7 +260,9 @@ def get_slots(period, duration, bounds="()"):
 
     # create the first slot
     slot = DateTimeTZRange(
-        period.lower, period.lower + timedelta(minutes=duration), bounds=bounds
+        period.lower,
+        period.lower + timedelta(minutes=duration),
+        bounds=bounds,
     )
 
     # loop until we pass the end
@@ -268,7 +270,9 @@ def get_slots(period, duration, bounds="()"):
         slots.append(slot)
         # the next slot starts when this one ends
         slot = DateTimeTZRange(
-            slot.upper, slot.upper + timedelta(minutes=duration), bounds=bounds
+            slot.upper,
+            slot.upper + timedelta(minutes=duration),
+            bounds=bounds,
         )
 
     # append the final slot to the list unless it continues past the end
@@ -284,7 +288,8 @@ def get_tzrange_days(tzranges):
     for tzrange in tzranges:
         # convert this range to local timezone
         localrange = DateTimeTZRange(
-            timezone.localtime(tzrange.lower), timezone.localtime(tzrange.upper)
+            timezone.localtime(tzrange.lower),
+            timezone.localtime(tzrange.upper),
         )
         # find the first date in this range
         day = DateTimeTZRange(

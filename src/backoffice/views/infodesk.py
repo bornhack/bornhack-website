@@ -8,20 +8,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponse
 from django.utils import timezone
-from django.views.generic import ListView, TemplateView
-
-from camps.mixins import CampViewMixin
-from economy.models import Pos
-from shop.models import CreditNote, Invoice, Order, OrderProductRelation
-from tickets.models import (
-    DiscountTicket,
-    ShopTicket,
-    SponsorTicket,
-    TicketType,
-    TicketTypeUnion,
-)
+from django.views.generic import ListView
+from django.views.generic import TemplateView
 
 from ..mixins import InfoTeamPermissionMixin
+from camps.mixins import CampViewMixin
+from economy.models import Pos
+from shop.models import CreditNote
+from shop.models import Invoice
+from shop.models import Order
+from shop.models import OrderProductRelation
+from tickets.models import DiscountTicket
+from tickets.models import ShopTicket
+from tickets.models import SponsorTicket
+from tickets.models import TicketType
+from tickets.models import TicketTypeUnion
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -77,14 +78,20 @@ def _ticket_getter_by_pk(pk):
 
 
 class ScanTicketsPosSelectView(
-    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, ListView
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    CampViewMixin,
+    ListView,
 ):
     model = Pos
     template_name = "scan_ticket_pos_select.html"
 
 
 class ScanTicketsView(
-    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, TemplateView
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    CampViewMixin,
+    TemplateView,
 ):
     template_name = "info_desk/scan.html"
 
@@ -161,11 +168,14 @@ class ScanTicketsView(
     def mark_order_as_paid(self, request):
         order = Order.objects.get(id=request.POST.get("mark_as_paid"))
         order.mark_as_paid()
-        messages.success(request, "Order #{} has been marked as paid!".format(order.id))
+        messages.success(request, f"Order #{order.id} has been marked as paid!")
 
 
 class ShopTicketOverview(
-    LoginRequiredMixin, InfoTeamPermissionMixin, CampViewMixin, ListView
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    CampViewMixin,
+    ListView,
 ):
     model = ShopTicket
     template_name = "shop_ticket_overview.html"
@@ -207,7 +217,7 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
                     else invoice.customorder.amount,
                     invoice.get_order,
                     invoice.get_order.paid,
-                ]
+                ],
             )
         return response
 

@@ -11832,7 +11832,7 @@ function render(model)
 
 function diff(a, b)
 {
-	
+
 	if (a.model.markdown === b.model.markdown && a.model.options === b.model.options)
 	{
 		return null;
@@ -16899,4 +16899,3 @@ for (var publicModule in Elm)
 }
 
 }).call(this);
-

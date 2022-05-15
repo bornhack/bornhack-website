@@ -14,7 +14,7 @@ def add_new_speaker_proposal_email(speaker_proposal):
     try:
         content_team = Team.objects.get(camp=speaker_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -34,7 +34,7 @@ def add_new_event_proposal_email(event_proposal):
     try:
         content_team = Team.objects.get(camp=event_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -54,7 +54,7 @@ def add_speaker_proposal_updated_email(speaker_proposal):
     try:
         content_team = Team.objects.get(camp=speaker_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -74,7 +74,7 @@ def add_event_proposal_updated_email(event_proposal):
     try:
         content_team = Team.objects.get(camp=event_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -94,7 +94,7 @@ def add_speaker_proposal_rejected_email(speaker_proposal):
     try:
         content_team = Team.objects.get(camp=speaker_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -114,7 +114,7 @@ def add_speaker_proposal_accepted_email(speaker_proposal):
     try:
         content_team = Team.objects.get(camp=speaker_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -134,7 +134,7 @@ def add_event_proposal_rejected_email(event_proposal):
     try:
         content_team = Team.objects.get(camp=event_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -154,7 +154,7 @@ def add_event_proposal_accepted_email(event_proposal):
     try:
         content_team = Team.objects.get(camp=event_proposal.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     return add_outgoing_email(
@@ -178,7 +178,7 @@ def add_event_scheduled_email(slot):
     try:
         content_team = Team.objects.get(camp=slot.camp, name="Content")
     except ObjectDoesNotExist as e:
-        logger.info("There is no team with name Content: {}".format(e))
+        logger.info(f"There is no team with name Content: {e}")
         return False
 
     # loop over unique recipients and send an email to each

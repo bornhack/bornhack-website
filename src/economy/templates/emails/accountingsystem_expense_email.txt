@@ -7,4 +7,3 @@ The attached receipt for expense {{ expense.pk }} has the following description:
 Greetings
 
 The {{ expense.camp.title }} Economy Team
-

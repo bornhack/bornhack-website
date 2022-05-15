@@ -5,39 +5,38 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import (
-    Http404,
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseRedirect,
-)
+from django.http import Http404
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, FormView, ListView, View
+from django.views.generic import DetailView
+from django.views.generic import FormView
+from django.views.generic import ListView
+from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
-from shop.models import (
-    CreditNote,
-    EpayCallback,
-    EpayPayment,
-    Order,
-    OrderProductRelation,
-    Product,
-    ProductCategory,
-)
+from .coinify import create_coinify_invoice
+from .coinify import process_coinify_invoice_json
+from .coinify import save_coinify_callback
+from .epay import calculate_epay_hash
+from .epay import validate_epay_callback
+from .forms import OrderProductRelationForm
+from .forms import OrderProductRelationFormSet
+from shop.models import CreditNote
+from shop.models import EpayCallback
+from shop.models import EpayPayment
+from shop.models import Order
+from shop.models import OrderProductRelation
+from shop.models import Product
+from shop.models import ProductCategory
 from vendor.coinify.coinify_callback import CoinifyCallback
-
-from .coinify import (
-    create_coinify_invoice,
-    process_coinify_invoice_json,
-    save_coinify_callback,
-)
-from .epay import calculate_epay_hash, validate_epay_callback
-from .forms import OrderProductRelationForm, OrderProductRelationFormSet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -51,9 +50,7 @@ class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
             messages.error(request, "This creditnote has no PDF yet!")
             return HttpResponseRedirect(reverse_lazy("shop:creditnote_list"))
 
-        return super(EnsureCreditNoteHasPDFMixin, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
@@ -65,9 +62,7 @@ class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
             if self.get_object().user != request.user:
                 raise Http404("CreditNote not found")
 
-        return super(EnsureUserOwnsCreditNoteMixin, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
@@ -79,7 +74,7 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
             if self.get_object().user != request.user:
                 raise Http404("Order not found")
 
-        return super(EnsureUserOwnsOrderMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureUnpaidOrderMixin(SingleObjectMixin):
@@ -89,10 +84,10 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
         if self.get_object().paid:
             messages.error(request, "This order is already paid for!")
             return HttpResponseRedirect(
-                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
+                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
 
-        return super(EnsureUnpaidOrderMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsurePaidOrderMixin(SingleObjectMixin):
@@ -102,10 +97,10 @@ class EnsurePaidOrderMixin(SingleObjectMixin):
         if not self.get_object().paid:
             messages.error(request, "This order is not paid for!")
             return HttpResponseRedirect(
-                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
+                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
 
-        return super(EnsurePaidOrderMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureClosedOrderMixin(SingleObjectMixin):
@@ -115,10 +110,10 @@ class EnsureClosedOrderMixin(SingleObjectMixin):
         if self.get_object().open is not None:
             messages.error(request, "This order is still open!")
             return HttpResponseRedirect(
-                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
+                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
 
-        return super(EnsureClosedOrderMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureOrderHasProductsMixin(SingleObjectMixin):
@@ -129,9 +124,7 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
             messages.error(request, "This order has no products!")
             return HttpResponseRedirect(reverse_lazy("shop:index"))
 
-        return super(EnsureOrderHasProductsMixin, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
@@ -140,13 +133,12 @@ class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         if self.get_object().cancelled:
             messages.error(
-                request, "Order #{} is cancelled!".format(self.get_object().id)
+                request,
+                f"Order #{self.get_object().id} is cancelled!",
             )
             return HttpResponseRedirect(reverse_lazy("shop:index"))
 
-        return super(EnsureOrderIsNotCancelledMixin, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
 
 # Shop views
@@ -156,13 +148,16 @@ class ShopIndexView(ListView):
     context_object_name = "products"
 
     def get_queryset(self):
-        queryset = super(ShopIndexView, self).get_queryset()
+        queryset = super().get_queryset()
         return queryset.available().order_by(
-            "category__weight", "category__name", "price", "name"
+            "category__weight",
+            "category__name",
+            "price",
+            "name",
         )
 
     def get_context_data(self, **kwargs):
-        context = super(ShopIndexView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         if "category" in self.request.GET:
             category = self.request.GET.get("category")
@@ -179,7 +174,7 @@ class ShopIndexView(ListView):
             context["products"] = context["products"].filter(category__slug=category)
             context["current_category"] = categoryobj
         context["categories"] = ProductCategory.objects.annotate(
-            num_products=Count("products")
+            num_products=Count("products"),
         ).filter(
             num_products__gt=0,
             public=True,
@@ -229,14 +224,16 @@ class ProductDetailView(FormView, DetailView):
             except OrderProductRelation.DoesNotExist:
                 self.opr = OrderProductRelation(product=self.get_object(), quantity=1)
 
-        return super(ProductDetailView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         opr = form.save(commit=False)
 
         if not opr.pk:
             opr.order, _ = Order.objects.get_or_create(
-                user=self.request.user, open=True, cancelled=False
+                user=self.request.user,
+                open=True,
+                cancelled=False,
             )
 
         opr.save()
@@ -244,12 +241,13 @@ class ProductDetailView(FormView, DetailView):
         messages.info(
             self.request,
             "{}x {} has been added to your order.".format(
-                opr.quantity, opr.product.name
+                opr.quantity,
+                opr.product.name,
             ),
         )
 
         # done
-        return super(ProductDetailView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         return reverse("shop:index")
@@ -261,7 +259,7 @@ class OrderListView(LoginRequiredMixin, ListView):
     context_object_name = "orders"
 
     def get_queryset(self):
-        queryset = super(OrderListView, self).get_queryset()
+        queryset = super().get_queryset()
         return queryset.filter(user=self.request.user).not_cancelled()
 
 
@@ -279,7 +277,7 @@ class OrderDetailView(
     def get_context_data(self, **kwargs):
         if "order_product_formset" not in kwargs:
             kwargs["order_product_formset"] = OrderProductRelationFormSet(
-                queryset=OrderProductRelation.objects.filter(order=self.get_object())
+                queryset=OrderProductRelation.objects.filter(order=self.get_object()),
             )
 
         return super().get_context_data(**kwargs)
@@ -288,7 +286,7 @@ class OrderDetailView(
         order = self.get_object()
         if order.open is None and not order.paid:
             return HttpResponseRedirect(
-                reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+                reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
             )
         return super().get(request, *args, **kwargs)
 
@@ -317,7 +315,8 @@ class OrderDetailView(
         # which product is not in stock if that is the case.
         else:
             formset = OrderProductRelationFormSet(
-                request.POST, queryset=OrderProductRelation.objects.filter(order=order)
+                request.POST,
+                queryset=OrderProductRelation.objects.filter(order=order),
             )
 
             # If the formset is not valid it means that we cannot fulfill the order, so return and inform the user.
@@ -327,7 +326,7 @@ class OrderDetailView(
                     "Some of the products you are ordering are out of stock. Review the order and try again.",
                 )
                 return self.render_to_response(
-                    self.get_context_data(order_product_formset=formset)
+                    self.get_context_data(order_product_formset=formset),
                 )
 
             # No stock issues, proceed to check if the user is updating or proceeding to review and pay the order.
@@ -341,10 +340,10 @@ class OrderDetailView(
 
                 if "review_and_pay" in request.POST:
                     return HttpResponseRedirect(
-                        reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+                        reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
                     )
 
-        return super(OrderDetailView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
 
 class OrderReviewAndPayView(
@@ -378,16 +377,20 @@ class OrderReviewAndPayView(
 
             reverses = {
                 Order.CREDIT_CARD: reverse_lazy(
-                    "shop:epay_form", kwargs={"pk": order.id}
+                    "shop:epay_form",
+                    kwargs={"pk": order.id},
                 ),
                 Order.BLOCKCHAIN: reverse_lazy(
-                    "shop:coinify_pay", kwargs={"pk": order.id}
+                    "shop:coinify_pay",
+                    kwargs={"pk": order.id},
                 ),
                 Order.BANK_TRANSFER: reverse_lazy(
-                    "shop:bank_transfer", kwargs={"pk": order.id}
+                    "shop:bank_transfer",
+                    kwargs={"pk": order.id},
                 ),
                 Order.IN_PERSON: reverse_lazy(
-                    "shop:in_person", kwargs={"pk": order.id}
+                    "shop:in_person",
+                    kwargs={"pk": order.id},
                 ),
             }
 
@@ -395,7 +398,10 @@ class OrderReviewAndPayView(
 
 
 class DownloadInvoiceView(
-    LoginRequiredMixin, EnsureUserOwnsOrderMixin, SingleObjectMixin, View
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    SingleObjectMixin,
+    View,
 ):
     model = Order
 
@@ -413,7 +419,7 @@ class DownloadInvoiceView(
         if not pdfobj.pdf:
             messages.error(request, "No PDF has been generated yet!")
             return HttpResponseRedirect(
-                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk})
+                reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = 'attachment; filename="%s"' % pdfobj.filename
@@ -461,7 +467,7 @@ class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
             messages.success(request, "The order has been marked as paid.")
             order = self.get_object()
             order.mark_as_paid()
-            return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+            return HttpResponseRedirect(request.headers.get("Referer"))
 
 
 # Epay views
@@ -478,7 +484,7 @@ class EpayFormView(
 
     def get_context_data(self, **kwargs):
         order = self.get_object()
-        context = super(EpayFormView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["merchant_number"] = settings.EPAY_MERCHANT_NUMBER
         context["description"] = order.description
         context["amount"] = order.total * 100
@@ -498,7 +504,7 @@ class EpayCallbackView(SingleObjectMixin, View):
 
         if "orderid" in request.GET:
             query = OrderedDict(
-                [tuple(x.split("=")) for x in request.META["QUERY_STRING"].split("&")]
+                [tuple(x.split("=")) for x in request.META["QUERY_STRING"].split("&")],
             )
             order = get_object_or_404(Order, pk=query.get("orderid"))
             if order.pk != self.get_object().pk:
@@ -520,7 +526,9 @@ class EpayCallbackView(SingleObjectMixin, View):
             if int(query["amount"]) == order.total * 100:
                 # create an EpayPayment object linking the callback to the order
                 EpayPayment.objects.create(
-                    order=order, callback=callback, txnid=query.get("txnid")
+                    order=order,
+                    callback=callback,
+                    txnid=query.get("txnid"),
                 )
                 # and mark order as paid (this will create tickets)
                 order.mark_as_paid(request)
@@ -533,7 +541,10 @@ class EpayCallbackView(SingleObjectMixin, View):
 
 
 class EpayThanksView(
-    LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureClosedOrderMixin,
+    DetailView,
 ):
     model = Order
     template_name = "epay_thanks.html"
@@ -543,10 +554,10 @@ class EpayThanksView(
             # epay redirects the user back to our accepturl with a long
             # and ugly querystring, redirect user to the clean url
             return HttpResponseRedirect(
-                reverse("shop:epay_thanks", kwargs={"pk": self.get_object().pk})
+                reverse("shop:epay_thanks", kwargs={"pk": self.get_object().pk}),
             )
 
-        return super(EpayThanksView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 # Bank Transfer view
@@ -563,7 +574,7 @@ class BankTransferView(
     template_name = "bank_transfer.html"
 
     def get_context_data(self, **kwargs):
-        context = super(BankTransferView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context["iban"] = settings.BANKACCOUNT_IBAN
         context["swiftbic"] = settings.BANKACCOUNT_SWIFTBIC
         context["orderid"] = self.get_object().pk
@@ -614,11 +625,12 @@ class CoinifyRedirectView(
                 )
                 return HttpResponseRedirect(
                     reverse_lazy(
-                        "shop:order_detail", kwargs={"pk": self.get_object().pk}
-                    )
+                        "shop:order_detail",
+                        kwargs={"pk": self.get_object().pk},
+                    ),
                 )
 
-        return super(CoinifyRedirectView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
         return self.get_object().coinifyapiinvoice.invoicejson["payment_url"]
@@ -629,7 +641,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(CoinifyCallbackView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         # save callback and parse json payload
@@ -640,7 +652,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             # no, return an error
             logger.error(
                 "unable to parse JSON body in callback for order %s"
-                % callbackobject.order.id
+                % callbackobject.order.id,
             )
             return HttpResponseBadRequest("unable to parse json")
 
@@ -649,7 +661,8 @@ class CoinifyCallbackView(SingleObjectMixin, View):
 
         # attemt to validate the callbackc
         if sdk.validate_callback(
-            request.body, request.META["HTTP_X_COINIFY_CALLBACK_SIGNATURE"]
+            request.body,
+            request.headers["X-Coinify-Callback-Signature"],
         ):
             # mark callback as valid in db
             callbackobject.valid = True
@@ -670,13 +683,16 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             return HttpResponse("OK")
         else:
             logger.error(
-                "unsupported callback event %s" % callbackobject.payload["event"]
+                "unsupported callback event %s" % callbackobject.payload["event"],
             )
             return HttpResponseBadRequest("unsupported event")
 
 
 class CoinifyThanksView(
-    LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureClosedOrderMixin,
+    DetailView,
 ):
     model = Order
     template_name = "coinify_thanks.html"

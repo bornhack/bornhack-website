@@ -18,7 +18,9 @@ class Product(models.Model):
     name = models.CharField(max_length=255)
     price = models.IntegerField()
     category = models.ForeignKey(
-        ProductCategory, related_name="products", on_delete=models.PROTECT
+        ProductCategory,
+        related_name="products",
+        on_delete=models.PROTECT,
     )
     in_stock = models.BooleanField(default=True)
 

@@ -1,7 +1,8 @@
 import logging
 
 from django import template
-from django.template import Context, Template
+from django.template import Context
+from django.template import Template
 from django.utils.safestring import mark_safe
 
 logger = logging.getLogger("bornhack.%s" % __name__)

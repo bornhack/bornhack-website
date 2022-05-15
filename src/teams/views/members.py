@@ -3,14 +3,17 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
 
+from ..email import add_added_membership_email
+from ..email import add_removed_membership_email
+from ..models import Team
+from ..models import TeamMember
+from .mixins import EnsureTeamMemberResponsibleMixin
+from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
-
-from ..email import add_added_membership_email, add_removed_membership_email
-from ..models import Team, TeamMember
-from .mixins import EnsureTeamMemberResponsibleMixin, TeamViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -74,7 +77,8 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
     def form_valid(self, form):
         TeamMember.objects.filter(
-            team=self.get_object(), user=self.request.user
+            team=self.get_object(),
+            user=self.request.user,
         ).delete()
         messages.success(
             self.request,
@@ -106,11 +110,13 @@ class TeamMemberRemoveView(
             )
             logger.error(
                 "Unable to add removed email to outgoing queue for teammember: {}".format(
-                    form.instance
-                )
+                    form.instance,
+                ),
             )
         return redirect(
-            "teams:general", camp_slug=self.camp.slug, team_slug=form.instance.team.slug
+            "teams:general",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
         )
 
 
@@ -138,9 +144,11 @@ class TeamMemberApproveView(
             )
             logger.error(
                 "Unable to add approved email to outgoing queue for teammember: {}".format(
-                    form.instance
-                )
+                    form.instance,
+                ),
             )
         return redirect(
-            "teams:general", camp_slug=self.camp.slug, team_slug=form.instance.team.slug
+            "teams:general",
+            camp_slug=self.camp.slug,
+            team_slug=form.instance.team.slug,
         )

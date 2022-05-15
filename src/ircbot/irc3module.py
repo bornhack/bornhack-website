@@ -9,7 +9,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from ircbot.models import OutgoingIrcMessage
-from teams.models import Team, TeamMember
+from teams.models import Team
+from teams.models import TeamMember
 from teams.utils import get_team_from_irc_channel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -19,7 +20,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @irc3.plugin
-class Plugin(object):
+class Plugin:
     """BornHack IRC3 class"""
 
     requires = [
@@ -46,7 +47,7 @@ class Plugin(object):
 
         logger.info(
             "Calling self.bot.do_stuff() in %s seconds.."
-            % settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS
+            % settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS,
         )
         asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
         self.bot.do_stuff()
@@ -83,7 +84,7 @@ class Plugin(object):
             ):
                 logger.debug(
                     "Just joined a channel I am supposed to be managing, asking ChanServ for info about %s"
-                    % channel
+                    % channel,
                 )
                 self.get_channel_info(channel)
                 return
@@ -123,7 +124,7 @@ class Plugin(object):
         ):
             # the bot has @ in this channel now, ask chanserv for info about it
             logger.debug(
-                f"The bot just got +o aka @ in {kwargs['target']}, asking ChanServ for info about this channel, so it can be registered if needed..."
+                f"The bot just got +o aka @ in {kwargs['target']}, asking ChanServ for info about this channel, so it can be registered if needed...",
             )
             self.get_channel_info(kwargs["target"])
 
@@ -145,7 +146,8 @@ class Plugin(object):
         # schedule a call of this function again in N seconds
         asyncio.sleep(settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS)
         self.bot.loop.call_later(
-            settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS, self.bot.do_stuff
+            settings.IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS,
+            self.bot.do_stuff,
         )
 
     @irc3.extend
@@ -155,13 +157,13 @@ class Plugin(object):
         the target channel. Messages are skipped if the bot is not in the channel.
         """
         for msg in OutgoingIrcMessage.objects.filter(processed=False).order_by(
-            "created"
+            "created",
         ):
-            logger.info("processing irc message to %s: %s" % (msg.target, msg.message))
+            logger.info(f"processing irc message to {msg.target}: {msg.message}")
             # if this message expired mark it as expired and processed without doing anything
             if msg.timeout < timezone.now():
                 logger.info(
-                    "this message is expired, marking it as such instead of sending it to irc"
+                    "this message is expired, marking it as such instead of sending it to irc",
                 )
                 msg.expired = True
                 msg.processed = True
@@ -170,12 +172,12 @@ class Plugin(object):
 
             # is this message for a channel or a nick?
             if msg.target[0] == "#" and msg.target in self.bot.channels:
-                logger.info("sending privmsg to %s: %s" % (msg.target, msg.message))
+                logger.info(f"sending privmsg to {msg.target}: {msg.message}")
                 self.bot.privmsg(msg.target, msg.message)
                 msg.processed = True
                 msg.save()
             elif msg.target:
-                logger.info("sending privmsg to %s: %s" % (msg.target, msg.message))
+                logger.info(f"sending privmsg to {msg.target}: {msg.message}")
                 self.bot.privmsg(msg.target, msg.message)
                 msg.processed = True
                 msg.save()
@@ -198,7 +200,7 @@ class Plugin(object):
         for channel in desired_channel_list:
             if channel not in self.bot.channels:
                 logger.debug(
-                    "I should be in %s but I am not, attempting to join..." % channel
+                    "I should be in %s but I am not, attempting to join..." % channel,
                 )
                 self.bot.join(channel)
 
@@ -268,12 +270,15 @@ class Plugin(object):
         self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +inpst" % channel)
         self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE on" % channel)
         self.bot.privmsg(
-            settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED on" % channel
+            settings.IRCBOT_CHANSERV_MASK,
+            "SET %s RESTRICTED on" % channel,
         )
 
         # add the bot to the ACL
         self.bot.add_user_to_channel_acl(
-            username=settings.IRCBOT_NICK, channel=channel, invite=True
+            username=settings.IRCBOT_NICK,
+            channel=channel,
+            invite=True,
         )
 
         team = get_team_from_irc_channel(channel)
@@ -295,7 +300,8 @@ class Plugin(object):
         self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s mlock +nt-lk" % channel)
         self.bot.privmsg(settings.IRCBOT_CHANSERV_MASK, "SET %s SECURE off" % channel)
         self.bot.privmsg(
-            settings.IRCBOT_CHANSERV_MASK, "SET %s RESTRICTED off" % channel
+            settings.IRCBOT_CHANSERV_MASK,
+            "SET %s RESTRICTED off" % channel,
         )
 
         team = get_team_from_irc_channel(channel)
@@ -326,7 +332,7 @@ class Plugin(object):
         # set autoop for this username
         self.bot.privmsg(
             settings.IRCBOT_CHANSERV_MASK,
-            "flags %(channel)s %(user)s +oO" % {"channel": channel, "user": username},
+            f"flags {channel} {username} +oO",
         )
 
         if invite:
@@ -345,14 +351,14 @@ class Plugin(object):
         """
         # first find all TeamMember objects which needs a loving hand
         missing_acls = TeamMember.objects.filter(irc_acl_fix_needed=True).exclude(
-            user__profile__nickserv_username=""
+            user__profile__nickserv_username="",
         )
 
         # loop over them and fix what needs to be fixed
         if missing_acls:
             logger.debug(
                 "Found %s memberships which need IRC ACL fixing.."
-                % missing_acls.count()
+                % missing_acls.count(),
             )
             for membership in missing_acls:
                 # add to team public channel?
@@ -392,7 +398,7 @@ class Plugin(object):
         for team in Team.objects.filter(private_irc_channel_fix_needed=True):
             logger.debug(
                 "Team %s private IRC channel %s needs ACL fixing"
-                % (team, team.private_irc_channel_name)
+                % (team, team.private_irc_channel_name),
             )
             self.bot.setup_private_channel(team.private_irc_channel_name)
 
@@ -400,7 +406,7 @@ class Plugin(object):
         for team in Team.objects.filter(public_irc_channel_fix_needed=True):
             logger.debug(
                 "Team %s public IRC channel %s needs ACL fixing"
-                % (team, team.public_irc_channel_name)
+                % (team, team.public_irc_channel_name),
             )
             self.bot.setup_public_channel(team.public_irc_channel_name)
 
@@ -418,7 +424,7 @@ class Plugin(object):
         # handle "Channel \x02#example\x02 is not registered." message
         ###############################################
         match = re.compile("Channel (#[a-zA-Z0-9-]+) is not registered.").match(
-            kwargs["data"].replace("\x02", "")
+            kwargs["data"].replace("\x02", ""),
         )
         if match:
             # the irc channel is not registered
@@ -432,15 +438,16 @@ class Plugin(object):
                 if self.bot.nick in self.bot.channels[channel].modes["@"]:
                     logger.debug(
                         "ChanServ says channel %s is not registered, bot is supposed to be managing this channel, registering it with chanserv"
-                        % channel
+                        % channel,
                     )
                     self.bot.privmsg(
-                        settings.IRCBOT_CHANSERV_MASK, "register %s" % channel
+                        settings.IRCBOT_CHANSERV_MASK,
+                        "register %s" % channel,
                     )
                 else:
                     logger.debug(
                         "ChanServ says channel %s is not registered, bot is supposed to be managing this channel, but the bot cannot register without @ in the channel"
-                        % channel
+                        % channel,
                     )
                     self.bot.privmsg(
                         channel,
@@ -452,13 +459,13 @@ class Plugin(object):
         # handle "\x02#example\x02 is now registered to \x02tykbhdev\x02" message
         ###############################################
         match = re.compile(
-            "(#[a-zA-Z0-9-]+) is now registered to ([a-zA-Z0-9-]+)\\."
+            "(#[a-zA-Z0-9-]+) is now registered to ([a-zA-Z0-9-]+)\\.",
         ).match(kwargs["data"].replace("\x02", ""))
         if match:
             # the irc channel is now registered
             channel = match.group(1)
             logger.debug(
-                "Channel %s was registered with ChanServ, looking up Team..." % channel
+                "Channel %s was registered with ChanServ, looking up Team..." % channel,
             )
 
             team = get_team_from_irc_channel(channel)

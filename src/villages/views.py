@@ -1,20 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
-
-from camps.mixins import CampViewMixin
-from camps.models import Camp
 
 from .mixins import EnsureWritableCampMixin
 from .models import Village
+from camps.mixins import CampViewMixin
+from camps.models import Camp
 
 
 class VillageListView(CampViewMixin, ListView):
@@ -36,7 +34,10 @@ class VillageDetailView(CampViewMixin, DetailView):
 
 
 class VillageCreateView(
-    CampViewMixin, LoginRequiredMixin, EnsureWritableCampMixin, CreateView
+    CampViewMixin,
+    LoginRequiredMixin,
+    EnsureWritableCampMixin,
+    CreateView,
 ):
     model = Village
     template_name = "village_form.html"
@@ -64,9 +65,7 @@ class EnsureUserOwnsVillageMixin(SingleObjectMixin):
             if self.get_object().contact != request.user:
                 raise Http404("Village not found")
 
-        return super(EnsureUserOwnsVillageMixin, self).dispatch(
-            request, *args, **kwargs
-        )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class VillageUpdateView(

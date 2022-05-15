@@ -10,20 +10,25 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 from oauth2_provider.views.generic import ProtectedResourceView
-
-from camps.mixins import CampViewMixin
-from utils.mixins import RaisePermissionRequiredMixin, UserIsObjectOwnerMixin
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
+from camps.mixins import CampViewMixin
+from utils.mixins import RaisePermissionRequiredMixin
+from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class DectExportView(
-    CampViewMixin, RaisePermissionRequiredMixin, ProtectedResourceView
+    CampViewMixin,
+    RaisePermissionRequiredMixin,
+    ProtectedResourceView,
 ):
     """
     CSV export for the POC team / DECT system
@@ -44,7 +49,7 @@ class DectExportView(
                 "description",
                 "activation_code",
                 "publish_in_phonebook",
-            ]
+            ],
         )
         for dect in DectRegistration.objects.filter(camp=self.camp):
             writer.writerow(
@@ -54,7 +59,7 @@ class DectExportView(
                     dect.description,
                     dect.activation_code,
                     dect.publish_in_phonebook,
-                ]
+                ],
             )
         return response
 
@@ -113,7 +118,7 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
             form.add_error(
                 "number",
                 ValidationError(
-                    "Numbers with fewer than 4 digits are reserved for special use"
+                    "Numbers with fewer than 4 digits are reserved for special use",
                 ),
             )
             return super().form_invalid(form)
@@ -132,13 +137,17 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         )
         return redirect(
             reverse(
-                "phonebook:dectregistration_list", kwargs={"camp_slug": self.camp.slug}
-            )
+                "phonebook:dectregistration_list",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
 class DectRegistrationUpdateView(
-    LoginRequiredMixin, DectRegistrationViewMixin, UserIsObjectOwnerMixin, UpdateView
+    LoginRequiredMixin,
+    DectRegistrationViewMixin,
+    UserIsObjectOwnerMixin,
+    UpdateView,
 ):
     model = DectRegistration
     fields = ["letters", "description", "publish_in_phonebook"]
@@ -157,17 +166,22 @@ class DectRegistrationUpdateView(
         # save and return
         dect.save()
         messages.success(
-            self.request, "Your DECT registration has been updated successfully"
+            self.request,
+            "Your DECT registration has been updated successfully",
         )
         return redirect(
             reverse(
-                "phonebook:dectregistration_list", kwargs={"camp_slug": self.camp.slug}
-            )
+                "phonebook:dectregistration_list",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
         )
 
 
 class DectRegistrationDeleteView(
-    LoginRequiredMixin, DectRegistrationViewMixin, UserIsObjectOwnerMixin, DeleteView
+    LoginRequiredMixin,
+    DectRegistrationViewMixin,
+    UserIsObjectOwnerMixin,
+    DeleteView,
 ):
     model = DectRegistration
     template_name = "dectregistration_delete.html"
@@ -178,5 +192,6 @@ class DectRegistrationDeleteView(
             f"Your DECT registration for number {self.get_object().number} has been deleted successfully",
         )
         return reverse(
-            "phonebook:dectregistration_list", kwargs={"camp_slug": self.camp.slug}
+            "phonebook:dectregistration_list",
+            kwargs={"camp_slug": self.camp.slug},
         )

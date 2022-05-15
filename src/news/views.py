@@ -1,6 +1,7 @@
 from django.contrib.syndication.views import Feed
 from django.utils import timezone
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 
 from .models import NewsItem
 
@@ -12,7 +13,9 @@ def news_items_queryset(kwargs=None):
         archived = kwargs["archived"]
 
     return NewsItem.objects.filter(
-        published_at__isnull=False, published_at__lt=timezone.now(), archived=archived
+        published_at__isnull=False,
+        published_at__lt=timezone.now(),
+        archived=archived,
     )
 
 

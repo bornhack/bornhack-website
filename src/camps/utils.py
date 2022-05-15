@@ -25,7 +25,7 @@ class CampPropertyListFilter(admin.SimpleListFilter):
         qs = model_admin.get_queryset(request)
 
         # get a list of the unique camps in the current queryset
-        unique_camps = set([item.camp for item in qs])
+        unique_camps = {item.camp for item in qs}
 
         # loop over camps and yield each as a tuple
         for camp in unique_camps:

@@ -4,9 +4,8 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from utils.models import CampRelatedModel
-
 from .dectutils import DectUtils
+from utils.models import CampRelatedModel
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 dectutil = DectUtils()
@@ -80,7 +79,7 @@ class DectRegistration(CampRelatedModel):
             # we have no phonenumber, do we have some letters at least?
             if not self.letters:
                 raise ValidationError(
-                    "You must enter either a phonenumber or a letter representation of the phonenumber!"
+                    "You must enter either a phonenumber or a letter representation of the phonenumber!",
                 )
             # we have letters but not a number, let's deduce the numbers
             self.number = dectutil.letters_to_number(self.letters)
@@ -102,13 +101,14 @@ class DectRegistration(CampRelatedModel):
         # check for conflicts with a longer number
         if (
             DectRegistration.objects.filter(
-                camp=self.camp, number__startswith=self.number
+                camp=self.camp,
+                number__startswith=self.number,
             )
             .exclude(pk=self.pk)
             .exists()
         ):
             raise ValidationError(
-                f"The DECT number {self.number} is not available, it conflicts with a longer number."
+                f"The DECT number {self.number} is not available, it conflicts with a longer number.",
             )
 
         # check if a shorter number is blocking
@@ -120,7 +120,7 @@ class DectRegistration(CampRelatedModel):
                 .exists()
             ):
                 raise ValidationError(
-                    f"The DECT number {self.number} is not available, it conflicts with a shorter number."
+                    f"The DECT number {self.number} is not available, it conflicts with a shorter number.",
                 )
             i -= 1
 
@@ -134,14 +134,14 @@ class DectRegistration(CampRelatedModel):
         if self.letters:
             if len(self.letters) != len(self.number):
                 raise ValidationError(
-                    f"Wrong number of letters ({len(self.letters)}) - should be {len(self.number)}"
+                    f"Wrong number of letters ({len(self.letters)}) - should be {len(self.number)}",
                 )
 
             # loop over the digits in the phonenumber
             combinations = list(dectutil.get_dect_letter_combinations(self.number))
             if not combinations:
                 raise ValidationError(
-                    "Numbers with 0 and 1 in them can not be expressed as letters"
+                    "Numbers with 0 and 1 in them can not be expressed as letters",
                 )
 
             if self.letters.upper() not in list(combinations):
@@ -150,6 +150,6 @@ class DectRegistration(CampRelatedModel):
                 for digit in self.number:
                     if self.letters[i].upper() not in dectutil.DECT_MATRIX[digit]:
                         raise ValidationError(
-                            f"The digit '{digit}' does not match the letter '{self.letters[i]}'. Valid letters for the digit '{digit}' are: {dectutil.DECT_MATRIX[digit]}"
+                            f"The digit '{digit}' does not match the letter '{self.letters[i]}'. Valid letters for the digit '{digit}' are: {dectutil.DECT_MATRIX[digit]}",
                         )
                     i += 1

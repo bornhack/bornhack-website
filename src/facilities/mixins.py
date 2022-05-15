@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 
+from .models import Facility
+from .models import FacilityType
 from camps.mixins import CampViewMixin
-
-from .models import Facility, FacilityType
 
 
 class FacilityTypeViewMixin(CampViewMixin):

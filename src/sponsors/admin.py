@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Sponsor, SponsorTier
+from .models import Sponsor
+from .models import SponsorTier
 
 
 @admin.register(Sponsor)

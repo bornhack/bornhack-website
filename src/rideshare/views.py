@@ -3,26 +3,23 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    ListView,
-    UpdateView,
-)
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 
+from .models import Ride
 from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import UserIsObjectOwnerMixin
 
-from .models import Ride
-
 
 class ContactRideForm(forms.Form):
     message = forms.CharField(
         widget=forms.Textarea(
-            attrs={"placeholder": "Remember to include your contact information!"}
+            attrs={"placeholder": "Remember to include your contact information!"},
         ),
         label="Write a message to the author of this rideshare",
         help_text="ATTENTION!: Pressing send will send an email to the author with the above text. It is up to you to include your contact information in the message so the person receiving the email can contact you.",
@@ -50,15 +47,15 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
                 responsible_team=info_team,
                 text_template="rideshare/emails/contact_mail.txt",
                 to_recipients=[ride.user.emailaddress_set.get(primary=True).email],
-                formatdict=dict(
-                    rideshare_url="https://bornhack.dk{}".format(
+                formatdict={
+                    "rideshare_url": "https://bornhack.dk{}".format(
                         reverse(
                             "rideshare:detail",
                             kwargs={"camp_slug": self.camp.slug, "pk": ride.pk},
-                        )
+                        ),
                     ),
-                    message=form.cleaned_data["message"],
-                ),
+                    "message": form.cleaned_data["message"],
+                },
                 subject="BornHack rideshare message!",
             )
         messages.info(request, "Your message has been sent.")

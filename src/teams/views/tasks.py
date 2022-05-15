@@ -1,13 +1,19 @@
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseNotAllowed, HttpResponseRedirect
-from django.views.generic import CreateView, DetailView, UpdateView
+from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseRedirect
+from django.views.generic import CreateView
+from django.views.generic import DetailView
+from django.views.generic import UpdateView
 
+from ..models import TaskComment
+from ..models import Team
+from ..models import TeamMember
+from ..models import TeamTask
+from .mixins import EnsureTeamResponsibleMixin
+from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
-
-from ..models import TaskComment, Team, TeamMember, TeamTask
-from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
 
 
 class TeamTasksView(CampViewMixin, DetailView):
@@ -79,7 +85,8 @@ class TaskCreateView(
 
     def get_team(self):
         return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"], slug=self.kwargs["team_slug"]
+            camp__slug=self.kwargs["camp_slug"],
+            slug=self.kwargs["team_slug"],
         )
 
     def form_valid(self, form):

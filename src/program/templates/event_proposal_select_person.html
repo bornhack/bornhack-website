@@ -30,4 +30,3 @@ Add {{ event_proposal.event_type.host_title }} | {{ block.super }}
 <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_proposal.event_type.host_title }}</a>
 <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 {% endblock %}
-

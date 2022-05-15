@@ -1,4 +1,3 @@
-# coding: utf-8
 import os
 
 from django.conf import settings
@@ -14,7 +13,7 @@ class Command(BaseCommand):
 
     def output(self, message):
         self.stdout.write(
-            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
     def local_dir(self, entry):
@@ -33,32 +32,32 @@ class Command(BaseCommand):
         for _file in files:
             path = self.local_dir(_file.format(camp_slug=camp_slug))
             if os.path.isfile(_file):
-                self.output("File {} exists...".format(path))
+                self.output(f"File {path} exists...")
             else:
-                self.output("Creating {}".format(path))
+                self.output(f"Creating {path}")
                 with open(path, mode="w", encoding="utf-8") as f:
                     f.write(_file.format(camp_slug=camp_slug))
 
         for _dir in dirs:
             path = self.local_dir(_file.format(camp_slug=camp_slug))
             if os.path.exists(path):
-                self.output("Path {} exists...".format(path))
+                self.output(f"Path {path} exists...")
             else:
-                self.output("Creating {}".format(path))
+                self.output(f"Creating {path}")
                 os.mkdir(path, mode=0o644)
 
         self.output("All there is left is to create:")
         self.output(
             self.local_dir(
                 "static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png".format(
-                    camp_slug=camp_slug
-                )
-            )
+                    camp_slug=camp_slug,
+                ),
+            ),
         )
         self.output(
             self.local_dir(
                 "static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png".format(
-                    camp_slug=camp_slug
-                )
-            )
+                    camp_slug=camp_slug,
+                ),
+            ),
         )

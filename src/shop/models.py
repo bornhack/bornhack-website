@@ -7,18 +7,21 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Count, F, Sum
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from .managers import OrderQuerySet
+from .managers import ProductQuerySet
 from tickets.models import ShopTicket
-from utils.models import CreatedUpdatedModel, UUIDModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
 from utils.slugs import unique_slugify
-
-from .managers import OrderQuerySet, ProductQuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -29,13 +32,13 @@ class CustomOrder(CreatedUpdatedModel):
     customer = models.TextField(help_text=_("The customer info for this order"))
 
     amount = models.IntegerField(
-        help_text=_("Amount of this custom order (in DKK, including VAT).")
+        help_text=_("Amount of this custom order (in DKK, including VAT)."),
     )
 
     paid = models.BooleanField(
         verbose_name=_("Paid?"),
         help_text=_(
-            "Check when this custom order has been paid (or if it gets cancelled out by a Credit Note)"
+            "Check when this custom order has been paid (or if it gets cancelled out by a Credit Note)",
         ),
         default=False,
     )
@@ -59,7 +62,8 @@ class Order(CreatedUpdatedModel):
         ordering = ["-created"]
 
     products = models.ManyToManyField(
-        "shop.Product", through="shop.OrderProductRelation"
+        "shop.Product",
+        through="shop.OrderProductRelation",
     )
 
     user = models.ForeignKey(
@@ -101,7 +105,10 @@ class Order(CreatedUpdatedModel):
     ]
 
     payment_method = models.CharField(
-        max_length=50, choices=PAYMENT_METHOD_CHOICES, default="", blank=True
+        max_length=50,
+        choices=PAYMENT_METHOD_CHOICES,
+        default="",
+        blank=True,
     )
 
     cancelled = models.BooleanField(default=False)
@@ -121,7 +128,7 @@ class Order(CreatedUpdatedModel):
 
     invoice_address = models.TextField(
         help_text=_(
-            "The invoice address for this order. Leave blank to use the email associated with the logged in user."
+            "The invoice address for this order. Leave blank to use the email associated with the logged in user.",
         ),
         blank=True,
     )
@@ -155,8 +162,8 @@ class Order(CreatedUpdatedModel):
                         models.F("orderproductrelation__product__price")
                         * models.F("orderproductrelation__quantity"),
                         output_field=models.IntegerField(),
-                    )
-                )["sum"]
+                    ),
+                )["sum"],
             )
         else:
             return False
@@ -216,10 +223,10 @@ class Order(CreatedUpdatedModel):
         for order_product in self.orderproductrelation_set.all():
             # if this is a Ticket product?
             if order_product.product.ticket_type:
-                query_kwargs = dict(
-                    product=order_product.product,
-                    ticket_type=order_product.product.ticket_type,
-                )
+                query_kwargs = {
+                    "product": order_product.product,
+                    "ticket_type": order_product.product.ticket_type,
+                }
 
                 if order_product.product.ticket_type.single_ticket_per_product:
                     # This ticket type is one where we only create one ticket
@@ -238,9 +245,11 @@ class Order(CreatedUpdatedModel):
                         )
                         tickets.append(ticket)
                     else:
-                        msg = "Ticket already created for product %s on order %s" % (
-                            order_product.product,
-                            order_product.order.pk,
+                        msg = (
+                            "Ticket already created for product {} on order {}".format(
+                                order_product.product,
+                                order_product.order.pk,
+                            )
                         )
 
                     if request:
@@ -251,18 +260,20 @@ class Order(CreatedUpdatedModel):
                         **query_kwargs
                     ).count()
                     tickets_to_create = max(
-                        0, order_product.quantity - already_created_tickets
+                        0,
+                        order_product.quantity - already_created_tickets,
                     )
 
                     # create the number of tickets required
                     if tickets_to_create > 0:
-                        for i in range(
-                            0, (order_product.quantity - already_created_tickets)
+                        for _i in range(
+                            0,
+                            (order_product.quantity - already_created_tickets),
                         ):
                             ticket = order_product.shoptickets.create(**query_kwargs)
                             tickets.append(ticket)
 
-                        msg = "Created %s tickets of type: %s" % (
+                        msg = "Created {} tickets of type: {}".format(
                             order_product.quantity,
                             order_product.product.ticket_type.name,
                         )
@@ -293,7 +304,7 @@ class Order(CreatedUpdatedModel):
             # delete any tickets related to this order
             tickets = ShopTicket.objects.filter(opr__order=self)
             if tickets.exists():
-                msg = "Order %s marked as refunded, deleting %s tickets..." % (
+                msg = "Order {} marked as refunded, deleting {} tickets...".format(
                     self.pk,
                     tickets.count(),
                 )
@@ -384,7 +395,8 @@ class ProductCategory(CreatedUpdatedModel, UUIDModel):
     slug = models.SlugField()
     public = models.BooleanField(default=True)
     weight = models.IntegerField(
-        default=100, help_text="Sorting weight. Heavier items sink to the bottom."
+        default=100,
+        help_text="Sorting weight. Heavier items sink to the bottom.",
     )
 
     def __str__(self):
@@ -421,14 +433,16 @@ class Product(CreatedUpdatedModel, UUIDModel):
         ordering = ["available_in", "price", "name"]
 
     category = models.ForeignKey(
-        "shop.ProductCategory", related_name="products", on_delete=models.PROTECT
+        "shop.ProductCategory",
+        related_name="products",
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(max_length=150)
     slug = models.SlugField(unique=True, max_length=100)
 
     price = models.IntegerField(
-        help_text=_("Price of the product (in DKK, including VAT).")
+        help_text=_("Price of the product (in DKK, including VAT)."),
     )
 
     description = models.TextField()
@@ -436,12 +450,15 @@ class Product(CreatedUpdatedModel, UUIDModel):
     available_in = DateTimeRangeField(
         help_text=_(
             "Which period is this product available for purchase? | "
-            "(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required"
-        )
+            "(Format: YYYY-MM-DD HH:MM) | Only one of start/end is required",
+        ),
     )
 
     ticket_type = models.ForeignKey(
-        "tickets.TicketType", on_delete=models.PROTECT, null=True, blank=True
+        "tickets.TicketType",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
     )
 
     stock_amount = models.IntegerField(
@@ -459,14 +476,15 @@ class Product(CreatedUpdatedModel, UUIDModel):
     )
 
     comment = models.TextField(
-        blank=True, help_text="Internal comments for this product."
+        blank=True,
+        help_text="Internal comments for this product.",
     )
 
     objects = ProductQuerySet.as_manager()
     statsobjects = ProductStatsManager()
 
     def __str__(self):
-        return "{} ({} DKK)".format(self.name, self.price)
+        return f"{self.name} ({self.price} DKK)"
 
     def clean(self):
         if self.category.name == "Tickets" and not self.ticket_type:
@@ -511,7 +529,9 @@ class Product(CreatedUpdatedModel, UUIDModel):
             # or is marked to be paid with cash or bank transfer, meaning it is a
             # "reservation" of the product in question.
             sold = OrderProductRelation.objects.filter(
-                product=self, order__open=None, order__cancelled=False
+                product=self,
+                order__open=None,
+                order__cancelled=False,
             ).aggregate(Sum("quantity"))["quantity__sum"]
 
             total_left = self.stock_amount - (sold or 0)
@@ -541,7 +561,7 @@ class OrderProductRelation(CreatedUpdatedModel):
     def clean(self):
         if self.ticket_generated and not self.order.paid:
             raise ValidationError(
-                "Product can not be handed out when order is not paid."
+                "Product can not be handed out when order is not paid.",
             )
 
 
@@ -555,7 +575,7 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
     md5valid = models.BooleanField(default=False)
 
     def __str__(self):
-        return "callback at %s (md5 valid: %s)" % (self.created, self.md5valid)
+        return f"callback at {self.created} (md5 valid: {self.md5valid})"
 
 
 class EpayPayment(CreatedUpdatedModel, UUIDModel):
@@ -590,7 +610,9 @@ class CreditNote(CreatedUpdatedModel):
     )
 
     customer = models.TextField(
-        help_text="Customer info if no user is selected", blank=True, default=""
+        help_text="Customer info if no user is selected",
+        blank=True,
+        default="",
     )
 
     danish_vat = models.BooleanField(help_text="Danish VAT?", default=True)
@@ -598,7 +620,7 @@ class CreditNote(CreatedUpdatedModel):
     paid = models.BooleanField(
         verbose_name=_("Paid?"),
         help_text=_(
-            "Whether the amount in this creditnote has been paid back to the customer."
+            "Whether the amount in this creditnote has been paid back to the customer.",
         ),
         default=False,
     )
@@ -620,13 +642,13 @@ class CreditNote(CreatedUpdatedModel):
 
     def __str__(self):
         if self.user:
-            return "creditnote#%s - %s DKK (customer: user %s)" % (
+            return "creditnote#{} - {} DKK (customer: user {})".format(
                 self.id,
                 self.amount,
                 self.user.email,
             )
         else:
-            return "creditnote#%s - %s DKK (customer: %s)" % (
+            return "creditnote#{} - {} DKK (customer: {})".format(
                 self.id,
                 self.amount,
                 self.customer,
@@ -646,17 +668,23 @@ class CreditNote(CreatedUpdatedModel):
 
 class Invoice(CreatedUpdatedModel):
     order = models.OneToOneField(
-        "shop.Order", null=True, blank=True, on_delete=models.PROTECT
+        "shop.Order",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
     )
     customorder = models.OneToOneField(
-        "shop.CustomOrder", null=True, blank=True, on_delete=models.PROTECT
+        "shop.CustomOrder",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
     )
     pdf = models.FileField(null=True, blank=True, upload_to="invoices/")
     sent_to_customer = models.BooleanField(default=False)
 
     def __str__(self):
         if self.order:
-            return "invoice#%s - shop order %s - %s - total %s DKK (sent to %s: %s)" % (
+            return "invoice#{} - shop order {} - {} - total {} DKK (sent to {}: {})".format(
                 self.id,
                 self.order.id,
                 self.order.created,
@@ -695,7 +723,9 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
     coinify_id = models.IntegerField(null=True)
     invoicejson = models.JSONField()
     order = models.ForeignKey(
-        "shop.Order", related_name="coinify_api_invoices", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="coinify_api_invoices",
+        on_delete=models.PROTECT,
     )
 
     def __str__(self):
@@ -711,21 +741,25 @@ class CoinifyAPICallback(CreatedUpdatedModel):
     payload = models.JSONField(blank=True)
     body = models.TextField(default="")
     order = models.ForeignKey(
-        "shop.Order", related_name="coinify_api_callbacks", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="coinify_api_callbacks",
+        on_delete=models.PROTECT,
     )
     authenticated = models.BooleanField(default=False)
 
     def __str__(self):
-        return "order #%s callback at %s" % (self.order.id, self.created)
+        return f"order #{self.order.id} callback at {self.created}"
 
 
 class CoinifyAPIRequest(CreatedUpdatedModel):
     order = models.ForeignKey(
-        "shop.Order", related_name="coinify_api_requests", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="coinify_api_requests",
+        on_delete=models.PROTECT,
     )
     method = models.CharField(max_length=100)
     payload = models.JSONField()
     response = models.JSONField()
 
     def __str__(self):
-        return "order %s api request %s" % (self.order.id, self.method)
+        return f"order {self.order.id} api request {self.method}"

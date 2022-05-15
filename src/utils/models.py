@@ -6,7 +6,8 @@ from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
-from taggit.models import GenericUUIDTaggedItemBase, TaggedItemBase
+from taggit.models import GenericUUIDTaggedItemBase
+from taggit.models import TaggedItemBase
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -118,7 +119,8 @@ class OutgoingEmail(CreatedUpdatedModel):
     subject = models.CharField(max_length=500, help_text="The subject of the e-mail")
     text_template = models.TextField(help_text="The plaintext body of the email.")
     html_template = models.TextField(
-        blank=True, help_text="The HTML body of the email (optional)."
+        blank=True,
+        help_text="The HTML body of the email (optional).",
     )
     sender = models.CharField(max_length=500, help_text="The email sender.")
     to_recipients = ArrayField(
@@ -140,14 +142,16 @@ class OutgoingEmail(CreatedUpdatedModel):
         help_text="The Bcc: recipients",
     )
     attachment = models.FileField(
-        blank=True, help_text="The attachment for this email. Optional."
+        blank=True,
+        help_text="The attachment for this email. Optional.",
     )
     processed = models.BooleanField(
         default=False,
         help_text="Unchecked before the email is sent, checked after the email has been sent.",
     )
     hold = models.BooleanField(
-        default=False, help_text="Hold (do not send) this email. Uncheck to send."
+        default=False,
+        help_text="Hold (do not send) this email. Uncheck to send.",
     )
     responsible_team = models.ForeignKey(
         "teams.Team",
@@ -158,7 +162,7 @@ class OutgoingEmail(CreatedUpdatedModel):
     )
 
     def __str__(self):
-        return "OutgoingEmail Object id: {} ".format(self.id)
+        return f"OutgoingEmail Object id: {self.id} "
 
     def clean(self):
         if (
@@ -168,8 +172,8 @@ class OutgoingEmail(CreatedUpdatedModel):
         ):
             raise ValidationError(
                 {
-                    "recipient": "either to_recipient, bcc_recipient or cc_recipient required."
-                }
+                    "recipient": "either to_recipient, bcc_recipient or cc_recipient required.",
+                },
             )
 
 

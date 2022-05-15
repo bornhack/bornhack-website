@@ -18,8 +18,8 @@ def check_speaker_event_camp_consistency(sender, instance, **kwargs):
                     raise ValidationError(
                         {
                             "speakers": "The speaker (%s) belongs to a different camp (%s) than the event does (%s)"
-                            % (speaker, speaker.camp, instance.camp)
-                        }
+                            % (speaker, speaker.camp, instance.camp),
+                        },
                     )
         elif isinstance(instance, Speaker):
             # loop over events being added to this speaker
@@ -29,8 +29,8 @@ def check_speaker_event_camp_consistency(sender, instance, **kwargs):
                 if event.camp != instance.camp:
                     raise ValidationError(
                         {
-                            "events": f"The event ({event}) belongs to a different camp ({event.camp}) than the speaker does ({instance.camp})"
-                        }
+                            "events": f"The event ({event}) belongs to a different camp ({event.camp}) than the speaker does ({instance.camp})",
+                        },
                     )
 
 

@@ -6,59 +6,53 @@ from io import StringIO
 import magic
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db.models import Count, Q, Sum
+from django.db.models import Count
+from django.db.models import Q
+from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import (
-    CreateView,
-    DeleteView,
-    DetailView,
-    FormView,
-    ListView,
-    TemplateView,
-    UpdateView,
-)
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import DetailView
+from django.views.generic import FormView
+from django.views.generic import ListView
+from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 
-from camps.mixins import CampViewMixin
-from economy.models import (
-    AccountingExport,
-    Bank,
-    BankAccount,
-    BankTransaction,
-    Chain,
-    ClearhausSettlement,
-    CoinifyBalance,
-    CoinifyInvoice,
-    CoinifyPayout,
-    Credebtor,
-    EpayTransaction,
-    Expense,
-    MobilePayTransaction,
-    Reimbursement,
-    Revenue,
-    ZettleBalance,
-    ZettleReceipt,
-)
-from economy.utils import (
-    AccountingExporter,
-    CoinifyCSVImporter,
-    MobilePayCSVImporter,
-    ZettleExcelImporter,
-    import_clearhaus_csv,
-    import_epay_csv,
-)
-
-from ..forms import (
-    BankCSVForm,
-    ClearhausSettlementForm,
-    CoinifyCSVForm,
-    EpayCSVForm,
-    MobilePayCSVForm,
-    ZettleUploadForm,
-)
+from ..forms import BankCSVForm
+from ..forms import ClearhausSettlementForm
+from ..forms import CoinifyCSVForm
+from ..forms import EpayCSVForm
+from ..forms import MobilePayCSVForm
+from ..forms import ZettleUploadForm
 from ..mixins import EconomyTeamPermissionMixin
+from camps.mixins import CampViewMixin
+from economy.models import AccountingExport
+from economy.models import Bank
+from economy.models import BankAccount
+from economy.models import BankTransaction
+from economy.models import Chain
+from economy.models import ClearhausSettlement
+from economy.models import CoinifyBalance
+from economy.models import CoinifyInvoice
+from economy.models import CoinifyPayout
+from economy.models import Credebtor
+from economy.models import EpayTransaction
+from economy.models import Expense
+from economy.models import MobilePayTransaction
+from economy.models import Reimbursement
+from economy.models import Revenue
+from economy.models import ZettleBalance
+from economy.models import ZettleReceipt
+from economy.utils import AccountingExporter
+from economy.utils import CoinifyCSVImporter
+from economy.utils import import_clearhaus_csv
+from economy.utils import import_epay_csv
+from economy.utils import MobilePayCSVImporter
+from economy.utils import ZettleExcelImporter
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -137,29 +131,39 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
         # include credebtors as a seperate queryset with annotations for total number and
         # amount of expenses and revenues
         context["credebtors"] = Credebtor.objects.filter(
-            chain=self.get_object()
+            chain=self.get_object(),
         ).annotate(
             camp_expenses_amount=Sum(
-                "expenses__amount", filter=Q(expenses__camp=self.camp), distinct=True
+                "expenses__amount",
+                filter=Q(expenses__camp=self.camp),
+                distinct=True,
             ),
             camp_expenses_count=Count(
-                "expenses", filter=Q(expenses__camp=self.camp), distinct=True
+                "expenses",
+                filter=Q(expenses__camp=self.camp),
+                distinct=True,
             ),
             camp_revenues_amount=Sum(
-                "revenues__amount", filter=Q(revenues__camp=self.camp), distinct=True
+                "revenues__amount",
+                filter=Q(revenues__camp=self.camp),
+                distinct=True,
             ),
             camp_revenues_count=Count(
-                "revenues", filter=Q(revenues__camp=self.camp), distinct=True
+                "revenues",
+                filter=Q(revenues__camp=self.camp),
+                distinct=True,
             ),
         )
 
         # Include expenses and revenues for the Chain in context as seperate querysets,
         # since accessing them through the relatedmanager returns for all camps
         context["expenses"] = Expense.objects.filter(
-            camp=self.camp, creditor__chain=self.get_object()
+            camp=self.camp,
+            creditor__chain=self.get_object(),
         ).prefetch_related("responsible_team", "user", "creditor")
         context["revenues"] = Revenue.objects.filter(
-            camp=self.camp, debtor__chain=self.get_object()
+            camp=self.camp,
+            debtor__chain=self.get_object(),
         ).prefetch_related("responsible_team", "user", "debtor")
         return context
 
@@ -209,7 +213,8 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         """
         context = super().get_context_data(**kwargs)
         context["unapproved_expenses"] = Expense.objects.filter(
-            camp=self.camp, approved__isnull=True
+            camp=self.camp,
+            approved__isnull=True,
         ).prefetch_related(
             "creditor",
             "user",
@@ -237,7 +242,7 @@ class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         else:
             messages.error(self.request, "Unknown submit action")
         return redirect(
-            reverse("backoffice:expense_list", kwargs={"camp_slug": self.camp.slug})
+            reverse("backoffice:expense_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -256,7 +261,9 @@ class ReimbursementDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailV
 
 
 class ReimbursementCreateUserSelectView(
-    CampViewMixin, EconomyTeamPermissionMixin, ListView
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    ListView,
 ):
     template_name = "reimbursement_create_userselect.html"
 
@@ -269,7 +276,7 @@ class ReimbursementCreateUserSelectView(
                 approved=True,
             )
             .values_list("user", flat=True)
-            .distinct()
+            .distinct(),
         )
         return queryset
 
@@ -292,13 +299,16 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
     def get(self, request, *args, **kwargs):
         # does this user have any approved and un-reimbursed expenses?
         if not self.reimbursement_user.expenses.filter(
-            reimbursement__isnull=True, approved=True, paid_by_bornhack=False
+            reimbursement__isnull=True,
+            approved=True,
+            paid_by_bornhack=False,
         ):
             messages.error(
-                request, "This user has no approved and unreimbursed expenses!"
+                request,
+                "This user has no approved and unreimbursed expenses!",
             )
             return redirect(
-                reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})
+                reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug}),
             )
         return super().get(request, *args, **kwargs)
 
@@ -331,7 +341,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
                 reverse(
                     "backoffice:reimbursement_list",
                     kwargs={"camp_slug": self.camp.slug},
-                )
+                ),
             )
 
         # do we have an Economy team for this camp?
@@ -341,7 +351,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
                 reverse(
                     "backoffice:reimbursement_list",
                     kwargs={"camp_slug": self.camp.slug},
-                )
+                ),
             )
 
         # create reimbursement in database
@@ -368,7 +378,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
             reverse(
                 "backoffice:reimbursement_detail",
                 kwargs={"camp_slug": self.camp.slug, "pk": reimbursement.pk},
-            )
+            ),
         )
 
 
@@ -399,14 +409,15 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
                 reverse(
                     "backoffice:reimbursement_list",
                     kwargs={"camp_slug": self.camp.slug},
-                )
+                ),
             )
         # continue with the request
         return super().get(request, *args, **kwargs)
 
     def get_success_url(self):
         messages.success(
-            self.request, f"Reimbursement {self.kwargs['pk']} deleted successfully!"
+            self.request,
+            f"Reimbursement {self.kwargs['pk']} deleted successfully!",
         )
         return reverse(
             "backoffice:reimbursement_list",
@@ -439,7 +450,8 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         """
         context = super().get_context_data(**kwargs)
         context["unapproved_revenues"] = Revenue.objects.filter(
-            camp=self.camp, approved__isnull=True
+            camp=self.camp,
+            approved__isnull=True,
         )
         return context
 
@@ -463,7 +475,7 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
         else:
             messages.error(self.request, "Unknown submit action")
         return redirect(
-            reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug})
+            reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 
@@ -520,7 +532,7 @@ class BankCSVUploadView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
             reverse(
                 "backoffice:bank_detail",
                 kwargs={"camp_slug": self.camp.slug, "bank_uuid": self.bank.pk},
-            )
+            ),
         )
 
 
@@ -631,7 +643,7 @@ class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
             reverse(
                 "backoffice:coinify_dashboard",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -668,7 +680,7 @@ class EpayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
             reverse(
                 "backoffice:epaytransaction_list",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -678,7 +690,9 @@ class ClearhausSettlementListView(CampViewMixin, EconomyTeamPermissionMixin, Lis
 
 
 class ClearhausSettlementDetailView(
-    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    DetailView,
 ):
     model = ClearhausSettlement
     template_name = "clearhaus_settlement_detail.html"
@@ -687,7 +701,9 @@ class ClearhausSettlementDetailView(
 
 
 class ClearhausSettlementImportView(
-    CampViewMixin, EconomyTeamPermissionMixin, FormView
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    FormView,
 ):
     form_class = ClearhausSettlementForm
     template_name = "clearhaus_csv_upload_form.html"
@@ -712,7 +728,7 @@ class ClearhausSettlementImportView(
             reverse(
                 "backoffice:clearhaussettlement_list",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -783,7 +799,7 @@ class ZettleDataImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
             reverse(
                 "backoffice:zettle_dashboard",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -835,7 +851,7 @@ class MobilePayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView
             reverse(
                 "backoffice:mobilepaytransaction_list",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -868,13 +884,14 @@ class AccountingExportCreateView(CampViewMixin, EconomyTeamPermissionMixin, Crea
 
         # some feedback and redirect
         messages.success(
-            self.request, f"Wrote archive file {export.archive.path} to disk, yay"
+            self.request,
+            f"Wrote archive file {export.archive.path} to disk, yay",
         )
         return redirect(
             reverse(
                 "backoffice:accountingexport_list",
                 kwargs={"camp_slug": self.camp.slug},
-            )
+            ),
         )
 
 
@@ -932,7 +949,9 @@ class AccountingExportDeleteView(CampViewMixin, EconomyTeamPermissionMixin, Dele
 
 
 class AccountingExportDownloadArchiveView(
-    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    DetailView,
 ):
     model = AccountingExport
     pk_url_kwarg = "accountingexport_uuid"
@@ -950,7 +969,9 @@ class AccountingExportDownloadArchiveView(
 
 
 class AccountingExportDownloadFileView(
-    CampViewMixin, EconomyTeamPermissionMixin, DetailView
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    DetailView,
 ):
     model = AccountingExport
     pk_url_kwarg = "accountingexport_uuid"

@@ -1,5 +1,4 @@
 # Copied from https://github.com/fusionbox/django-betterforms/blob/master/betterforms/multiform.py
-
 #
 # From https://github.com/fusionbox/django-betterforms/blob/master/LICENSE
 #
@@ -25,18 +24,18 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 from collections import OrderedDict
 from functools import reduce
 from itertools import chain
 from operator import add
 
-from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS
+from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
 
 
-class MultiForm(object):
+class MultiForm:
     """
     A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit
@@ -73,7 +72,7 @@ class MultiForm(object):
         if prefix is None:
             prefix = key
         else:
-            prefix = "{0}__{1}".format(key, prefix)
+            prefix = f"{key}__{prefix}"
         fkwargs.update(
             initial=self.initials.get(key),
             prefix=prefix,
@@ -195,11 +194,13 @@ class MultiModelForm(MultiForm):
         self.instances = kwargs.pop("instance", None)
         if self.instances is None:
             self.instances = {}
-        super(MultiModelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(
-            key, args, kwargs
+        fargs, fkwargs = super().get_form_args_kwargs(
+            key,
+            args,
+            kwargs,
         )
         try:
             # If we only pass instance when there was one specified, we make it

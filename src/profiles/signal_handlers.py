@@ -47,7 +47,8 @@ def public_credit_name_changed(instance, original):
 
     # put the message together
     message = "User {username} changed public credit name. please review and act accordingly: https://bornhack.dk/admin/profiles/profile/{uuid}/change/".format(
-        username=instance.name, uuid=instance.uuid
+        username=instance.name,
+        uuid=instance.uuid,
     )
 
     # trigger the event
@@ -66,7 +67,7 @@ def nickserv_username_changed(instance, original):
     ):
         logger.debug(
             "profile.nickserv_username changed for user %s, setting membership.irc_acl_fix_needed=True"
-            % instance.user.username
+            % instance.user.username,
         )
 
         # find team memberships for this user

@@ -1,13 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 from reversion.views import RevisionMixin
 
-from camps.mixins import CampViewMixin
-from info.models import InfoCategory, InfoItem
-
 from ..models import Team
-from .mixins import EnsureTeamResponsibleMixin, TeamViewMixin
+from .mixins import EnsureTeamResponsibleMixin
+from .mixins import TeamViewMixin
+from camps.mixins import CampViewMixin
+from info.models import InfoCategory
+from info.models import InfoItem
 
 
 class InfoCategoriesListView(
@@ -24,7 +28,8 @@ class InfoCategoriesListView(
 
     def get_team(self):
         return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"], slug=self.kwargs["team_slug"]
+            camp__slug=self.kwargs["camp_slug"],
+            slug=self.kwargs["team_slug"],
         )
 
 
@@ -43,13 +48,15 @@ class InfoItemCreateView(
 
     def get_team(self):
         return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"], slug=self.kwargs["team_slug"]
+            camp__slug=self.kwargs["camp_slug"],
+            slug=self.kwargs["team_slug"],
         )
 
     def form_valid(self, form):
         info_item = form.save(commit=False)
         category = InfoCategory.objects.get(
-            team__camp=self.camp, anchor=self.kwargs.get("category_anchor")
+            team__camp=self.camp,
+            anchor=self.kwargs.get("category_anchor"),
         )
         info_item.category = category
         info_item.save()
@@ -84,7 +91,8 @@ class InfoItemUpdateView(
 
     def get_team(self):
         return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"], slug=self.kwargs["team_slug"]
+            camp__slug=self.kwargs["camp_slug"],
+            slug=self.kwargs["team_slug"],
         )
 
     def get_success_url(self):
@@ -110,7 +118,8 @@ class InfoItemDeleteView(
 
     def get_team(self):
         return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"], slug=self.kwargs["team_slug"]
+            camp__slug=self.kwargs["camp_slug"],
+            slug=self.kwargs["team_slug"],
         )
 
     def get_success_url(self):

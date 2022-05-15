@@ -1,19 +1,17 @@
 from django.contrib import admin
 
-from .models import (
-    CoinifyAPICallback,
-    CoinifyAPIInvoice,
-    CoinifyAPIRequest,
-    CreditNote,
-    CustomOrder,
-    EpayCallback,
-    EpayPayment,
-    Invoice,
-    Order,
-    OrderProductRelation,
-    Product,
-    ProductCategory,
-)
+from .models import CoinifyAPICallback
+from .models import CoinifyAPIInvoice
+from .models import CoinifyAPIRequest
+from .models import CreditNote
+from .models import CustomOrder
+from .models import EpayCallback
+from .models import EpayPayment
+from .models import Invoice
+from .models import Order
+from .models import OrderProductRelation
+from .models import Product
+from .models import ProductCategory
 
 admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)
@@ -89,7 +87,7 @@ available_to.short_description = "Available to"
 
 def stock_info(product):
     if product.stock_amount:
-        return "{} / {}".format(product.left_in_stock, product.stock_amount)
+        return f"{product.left_in_stock} / {product.stock_amount}"
     return "N/A"
 
 

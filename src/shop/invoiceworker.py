@@ -4,8 +4,12 @@ from django.conf import settings
 from django.core.files import File
 from django.db.models import Q
 
-from shop.email import add_creditnote_email, add_invoice_email
-from shop.models import CreditNote, CustomOrder, Invoice, Order
+from shop.email import add_creditnote_email
+from shop.email import add_invoice_email
+from shop.models import CreditNote
+from shop.models import CustomOrder
+from shop.models import Invoice
+from shop.models import Order
 from utils.pdf import generate_pdf_letter
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +26,8 @@ def do_work():
 
     # check if we need to generate any proforma invoices for shop orders
     for order in Order.objects.filter(
-        Q(pdf="") | Q(pdf__isnull=True), open__isnull=True
+        Q(pdf="") | Q(pdf__isnull=True),
+        open__isnull=True,
     ):
         # generate proforma invoice for this Order
         pdffile = generate_pdf_letter(
@@ -79,7 +84,7 @@ def do_work():
         except Exception as E:
             logger.exception(
                 "Unable to generate PDF file for invoice #%s. Error: %s"
-                % (invoice.pk, E)
+                % (invoice.pk, E),
             )
             continue
 
@@ -89,7 +94,8 @@ def do_work():
 
     # check if we need to send out any invoices (only for shop orders, and only where pdf has been generated)
     for invoice in Invoice.objects.filter(
-        order__isnull=False, sent_to_customer=False
+        order__isnull=False,
+        sent_to_customer=False,
     ).exclude(pdf=""):
         logger.info("found unmailed Invoice object: %s" % invoice)
         # add email to the outgoing email queue
@@ -98,14 +104,15 @@ def do_work():
             invoice.save()
             logger.info(
                 "OK: Invoice email to {} added to queue.".format(
-                    invoice.order.user.email
-                )
+                    invoice.order.user.email,
+                ),
             )
         else:
             logger.error(
                 "Unable to add email for invoice {} to {}".format(
-                    invoice.pk, invoice.order.user.email
-                )
+                    invoice.pk,
+                    invoice.order.user.email,
+                ),
             )
 
     # check if we need to generate any pdf creditnotes?
@@ -121,7 +128,7 @@ def do_work():
         except Exception as E:
             logger.exception(
                 "Unable to generate PDF file for creditnote #%s. Error: %s"
-                % (creditnote.pk, E)
+                % (creditnote.pk, E),
             )
             continue
 
@@ -143,5 +150,5 @@ def do_work():
         else:
             logger.error(
                 "Unable to add creditnote email for creditnote %s to %s"
-                % (creditnote.pk, creditnote.user.email)
+                % (creditnote.pk, creditnote.user.email),
             )

@@ -30,4 +30,3 @@ Use Existing {{ event_type.host_title }} or Add New? | {{ block.super }}
 <a href="{% url 'program:proposal_combined_submit' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_type.host_title }}</a>
 <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 {% endblock %}
-

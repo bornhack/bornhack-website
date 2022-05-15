@@ -3,12 +3,13 @@ from django.urls import reverse
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
+from .factories import OrderFactory
+from .factories import OrderProductRelationFactory
+from .factories import ProductFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
 from utils.factories import UserFactory
-
-from .factories import OrderFactory, OrderProductRelationFactory, ProductFactory
 
 
 class ProductAvailabilityTest(TestCase):
@@ -160,7 +161,10 @@ class TestProductDetailView(TestCase):
     def test_product_is_in_order(self):
         # Put the product in an order owned by the user
         OrderProductRelationFactory(
-            product=self.product, quantity=1, order__open=True, order__user=self.user
+            product=self.product,
+            quantity=1,
+            order__open=True,
+            order__user=self.user,
         )
 
         self.client.force_login(self.user)
@@ -174,7 +178,10 @@ class TestProductDetailView(TestCase):
 
         # Put the product in an order owned by the user
         opr = OrderProductRelationFactory(
-            product=self.product, quantity=1, order__open=True, order__user=self.user
+            product=self.product,
+            quantity=1,
+            order__open=True,
+            order__user=self.user,
         )
 
         self.client.force_login(self.user)
@@ -183,13 +190,13 @@ class TestProductDetailView(TestCase):
 
         self.assertRedirects(response, reverse("shop:index"))
         opr.refresh_from_db()
-        self.assertEquals(opr.quantity, 2)
+        self.assertEqual(opr.quantity, 2)
 
     def test_product_category_not_public(self):
         self.product.category.public = False
         self.product.category.save()
         response = self.client.get(self.path)
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
 
 class TestOrderDetailView(TestCase):
@@ -208,7 +215,7 @@ class TestOrderDetailView(TestCase):
     def test_redirects_when_no_products(self):
         self.client.force_login(self.user)
         response = self.client.get(self.path)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
     def test_redirects_when_cancelled(self):
@@ -221,7 +228,7 @@ class TestOrderDetailView(TestCase):
 
         response = self.client.get(self.path)
 
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
     def test_remove_product(self):
@@ -236,11 +243,11 @@ class TestOrderDetailView(TestCase):
         data["remove_product"] = opr.pk
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
         order.refresh_from_db()
 
-        self.assertEquals(order.products.count(), 1)
+        self.assertEqual(order.products.count(), 1)
 
     def test_remove_last_product_cancels_order(self):
         self.client.force_login(self.user)
@@ -253,7 +260,7 @@ class TestOrderDetailView(TestCase):
         data["remove_product"] = opr.pk
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
         order.refresh_from_db()
@@ -270,7 +277,7 @@ class TestOrderDetailView(TestCase):
         data["cancel_order"] = ""
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
         order.refresh_from_db()
@@ -291,8 +298,8 @@ class TestOrderDetailView(TestCase):
 
         response = self.client.post(self.path, data=data)
         opr.refresh_from_db()
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(opr.quantity, 11)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(opr.quantity, 11)
 
     def test_incrementing_product_quantity_beyond_stock_fails(self):
         self.client.force_login(self.user)
@@ -307,7 +314,7 @@ class TestOrderDetailView(TestCase):
         data["form-0-quantity"] = 11
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("quantity", response.context["order_product_formset"].errors[0])
 
     def test_review_and_pay_saves_and_redirects(self):
@@ -324,7 +331,8 @@ class TestOrderDetailView(TestCase):
 
         response = self.client.post(self.path, data=data)
         self.assertRedirects(
-            response, reverse("shop:order_review_and_pay", kwargs={"pk": self.order.pk})
+            response,
+            reverse("shop:order_review_and_pay", kwargs={"pk": self.order.pk}),
         )
 
         # Get the updated objects
@@ -351,7 +359,7 @@ class TestOrderReviewAndPay(TestCase):
         data = {"payment_method": "bank_transfer"}
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
     def test_accepted_terms_and_chosen_payment_method(self):
         self.client.force_login(self.user)
@@ -359,9 +367,10 @@ class TestOrderReviewAndPay(TestCase):
         data = {"payment_method": "bank_transfer", "accept_terms": True}
 
         response = self.client.post(self.path, data=data)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(
-            response, reverse("shop:bank_transfer", kwargs={"pk": self.order.id})
+            response,
+            reverse("shop:bank_transfer", kwargs={"pk": self.order.id}),
         )
 
 
@@ -371,7 +380,7 @@ class TestOrderListView(TestCase):
         self.client.force_login(user)
         path = reverse("shop:order_list")
         response = self.client.get(path)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
 
 
 class TestTicketCreation(TestCase):
@@ -382,8 +391,9 @@ class TestTicketCreation(TestCase):
         order = OrderFactory(user=user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
-        self.assertEquals(
-            ShopTicket.objects.filter(product=product, opr__order=order).count(), 5
+        self.assertEqual(
+            ShopTicket.objects.filter(product=product, opr__order=order).count(),
+            5,
         )
 
     def test_single_ticket_created(self):
@@ -393,6 +403,7 @@ class TestTicketCreation(TestCase):
         order = OrderFactory(user=user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
-        self.assertEquals(
-            ShopTicket.objects.filter(product=product, opr__order=order).count(), 1
+        self.assertEqual(
+            ShopTicket.objects.filter(product=product, opr__order=order).count(),
+            1,
         )

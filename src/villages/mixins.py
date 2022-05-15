@@ -10,7 +10,7 @@ class EnsureWritableCampMixin(SingleObjectMixin):
         if self.camp.read_only:
             messages.error(request, "No thanks")
             return redirect(
-                reverse("village_list", kwargs={"camp_slug": self.camp.slug})
+                reverse("village_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
         # alright, continue with the request

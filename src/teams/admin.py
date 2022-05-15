@@ -1,9 +1,12 @@
 from django.contrib import admin
 
+from .email import add_added_membership_email
+from .email import add_removed_membership_email
+from .models import Team
+from .models import TeamMember
+from .models import TeamShift
+from .models import TeamTask
 from camps.utils import CampPropertyListFilter
-
-from .email import add_added_membership_email, add_removed_membership_email
-from .models import Team, TeamMember, TeamShift, TeamTask
 
 
 @admin.register(TeamTask)
@@ -21,7 +24,7 @@ class TeamAdmin(admin.ModelAdmin):
 
     def get_responsible(self, obj):
         return ", ".join(
-            [resp.profile.public_credit_name for resp in obj.responsible_members.all()]
+            [resp.profile.public_credit_name for resp in obj.responsible_members.all()],
         )
 
     get_responsible.short_description = "Responsible"
@@ -69,7 +72,8 @@ class TeamMemberAdmin(admin.ModelAdmin):
         self.message_user(
             request,
             "Membership(s) approved: Added {} user(s) to {} team(s).".format(
-                updated, teams_count
+                updated,
+                teams_count,
             ),
         )
 
@@ -85,7 +89,8 @@ class TeamMemberAdmin(admin.ModelAdmin):
             updated += 1
 
         self.message_user(
-            request, "Removed {} user(s) from {} team(s).".format(updated, teams_count)
+            request,
+            f"Removed {updated} user(s) from {teams_count} team(s).",
         )
 
     remove_member.description = "Remove a user from the team."

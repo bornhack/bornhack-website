@@ -1,6 +1,8 @@
 from django.urls import path
 
-from .views import ShopTicketDetailView, ShopTicketDownloadView, ShopTicketListView
+from .views import ShopTicketDetailView
+from .views import ShopTicketDownloadView
+from .views import ShopTicketListView
 
 app_name = "tickets"
 

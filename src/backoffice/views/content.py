@@ -6,11 +6,13 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from camps.mixins import CampViewMixin
-from program.models import Event, EventFeedback, Url, UrlType
-
 from ..forms import AddRecordingForm
 from ..mixins import ContentTeamPermissionMixin
+from camps.mixins import CampViewMixin
+from program.models import Event
+from program.models import EventFeedback
+from program.models import Url
+from program.models import UrlType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -26,7 +28,8 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.queryset = EventFeedback.objects.filter(
-            event__track__camp=self.camp, approved__isnull=True
+            event__track__camp=self.camp,
+            approved__isnull=True,
         )
 
         self.form_class = modelformset_factory(
@@ -54,13 +57,15 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         form.save()
         if form.changed_objects:
             messages.success(
-                self.request, f"Updated {len(form.changed_objects)} EventFeedbacks"
+                self.request,
+                f"Updated {len(form.changed_objects)} EventFeedbacks",
             )
         return redirect(self.get_success_url())
 
     def get_success_url(self, *args, **kwargs):
         return reverse(
-            "backoffice:approve_event_feedback", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:approve_event_feedback",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -75,7 +80,8 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.queryset = Event.objects.filter(
-            track__camp=self.camp, video_recording=True
+            track__camp=self.camp,
+            video_recording=True,
         ).exclude(urls__url_type__name="Recording")
 
         self.form_class = modelformset_factory(
@@ -118,5 +124,6 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
     def get_success_url(self, *args, **kwargs):
         return reverse(
-            "backoffice:add_eventrecording", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:add_eventrecording",
+            kwargs={"camp_slug": self.camp.slug},
         )

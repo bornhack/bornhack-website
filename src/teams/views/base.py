@@ -5,13 +5,14 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView
+from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 
-from camps.mixins import CampViewMixin
-
-from ..models import Team, TeamMember
+from ..models import Team
+from ..models import TeamMember
 from .mixins import EnsureTeamResponsibleMixin
+from camps.mixins import CampViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -35,7 +36,7 @@ class TeamListView(CampViewMixin, ListView):
         context = super().get_context_data(object_list=object_list, **kwargs)
         if self.request.user.is_authenticated:
             context["user_teams"] = self.request.user.teammember_set.filter(
-                team__camp=self.camp
+                team__camp=self.camp,
             )
         return context
 

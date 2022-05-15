@@ -7,5 +7,5 @@ register = template.Library()
 @register.simple_tag
 def get_weekday(year, month, day):
     return parse_date(
-        "%(year)s-%(month)s-%(day)s" % {"year": year, "month": month, "day": day}
+        f"{year}-{month}-{day}",
     ).strftime("%A")

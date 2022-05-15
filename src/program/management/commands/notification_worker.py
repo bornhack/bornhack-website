@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
     def output(self, message):
         self.stdout.write(
-            "%s: %s" % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
     def handle(self, *args, **options):
@@ -34,7 +34,7 @@ class Command(BaseCommand):
                     notifications_sent=False,
                     when__startswith__lt=timezone.now()
                     + timedelta(
-                        minutes=settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES
+                        minutes=settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES,
                     ),  # start of event is less than X minutes away
                     when__startswith__gt=timezone.now(),  # but event has not started yet
                 ):
@@ -45,7 +45,7 @@ class Command(BaseCommand):
                         timeout=ei.when.lower,
                     )
                     logger.info(
-                        "added irc message id %s for eventinstance %s" % (oim.id, ei)
+                        f"added irc message id {oim.id} for eventinstance {ei}",
                     )
                     ei.notifications_sent = True
                     ei.save()

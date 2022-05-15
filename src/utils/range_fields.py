@@ -58,8 +58,9 @@ def __and__(self, other):
     if not isinstance(other, self.__class__):
         raise TypeError(
             "unsupported operand type(s) for &: '{}' and '{}'".format(
-                self.__class__.__name__, other.__class__.__name__
-            )
+                self.__class__.__name__,
+                other.__class__.__name__,
+            ),
         )
 
     self = normalise(self)
@@ -210,7 +211,7 @@ def range_contains(self, other):
 
 def deconstruct(self):
     return (
-        "{}.{}".format(self.__class__.__module__, self.__class__.__name__),
+        f"{self.__class__.__module__}.{self.__class__.__name__}",
         [self.lower, self.upper, self._bounds],
         {},
     )
@@ -264,7 +265,7 @@ def safe_subtract(initial, subtract):
                     initial._bounds[0],
                     sub_bounds[0],
                 ),
-            )
+            ),
         ]
     elif initial.lower in subtract or (
         not initial.lower_inc and initial.lower == subtract.lower
@@ -273,20 +274,20 @@ def safe_subtract(initial, subtract):
             _Range(
                 subtract.upper,
                 initial.upper,
-                "{}{}".format(sub_bounds[1], initial._bounds[1]),
-            )
+                f"{sub_bounds[1]}{initial._bounds[1]}",
+            ),
         ]
     else:
         return [
             _Range(
                 initial.lower,
                 subtract.lower,
-                "{}{}".format(initial._bounds[0], sub_bounds[0]),
+                f"{initial._bounds[0]}{sub_bounds[0]}",
             ),
             _Range(
                 subtract.upper,
                 initial.upper,
-                "{}{}".format(sub_bounds[1], initial._bounds[1]),
+                f"{sub_bounds[1]}{initial._bounds[1]}",
             ),
         ]
 
