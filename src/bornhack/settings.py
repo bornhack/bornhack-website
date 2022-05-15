@@ -206,3 +206,10 @@ WKHTMLTOPDF_CMD_OPTIONS = {
     "quiet": True,
     "enable-local-file-access": True,
 }
+
+OAUTH2_PROVIDER = {
+    "SCOPES": {
+        "profile:read": "Profile read scope",
+        "phonebook:read": "Phonebook read scope",
+    },
+}
