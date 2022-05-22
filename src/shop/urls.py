@@ -1,23 +1,25 @@
 from django.urls import include
 from django.urls import path
 
-from .views import BankTransferView
-from .views import CoinifyCallbackView
-from .views import CoinifyRedirectView
-from .views import CoinifyThanksView
-from .views import CreditNoteListView
-from .views import DownloadCreditNoteView
-from .views import DownloadInvoiceView
-from .views import EpayCallbackView
-from .views import EpayFormView
-from .views import EpayThanksView
-from .views import OrderDetailView
-from .views import OrderListView
-from .views import OrderMarkAsPaidView
-from .views import OrderReviewAndPayView
-from .views import PayInPersonView
-from .views import ProductDetailView
-from .views import ShopIndexView
+from .views import (
+    BankTransferView,
+    CoinifyCallbackView,
+    CoinifyRedirectView,
+    CoinifyThanksView,
+    CreditNoteListView,
+    DownloadCreditNoteView,
+    DownloadInvoiceView,
+    OrderDetailView,
+    OrderListView,
+    OrderMarkAsPaidView,
+    OrderReviewAndPayView,
+    PayInPersonView,
+    ProductDetailView,
+    QuickPayCallbackView,
+    QuickPayLinkView,
+    QuickPayThanksView,
+    ShopIndexView,
+)
 
 app_name = "shop"
 
@@ -45,16 +47,23 @@ urlpatterns = [
                     OrderMarkAsPaidView.as_view(),
                     name="mark_order_as_paid",
                 ),
-                path("pay/creditcard/", EpayFormView.as_view(), name="epay_form"),
                 path(
-                    "pay/creditcard/callback/",
-                    EpayCallbackView.as_view(),
-                    name="epay_callback",
-                ),
-                path(
-                    "pay/creditcard/thanks/",
-                    EpayThanksView.as_view(),
-                    name="epay_thanks",
+                    "pay/creditcard/",
+                    include(
+                        [
+                            path("", QuickPayLinkView.as_view(), name="quickpay_link"),
+                            path(
+                                "callback/",
+                                QuickPayCallbackView.as_view(),
+                                name="quickpay_callback",
+                            ),
+                            path(
+                                "thanks/",
+                                QuickPayThanksView.as_view(),
+                                name="quickpay_thanks",
+                            ),
+                        ],
+                    ),
                 ),
                 path(
                     "pay/blockchain/",
