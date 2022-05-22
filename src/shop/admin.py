@@ -13,6 +13,9 @@ from .models import (
     OrderProductRelation,
     Product,
     ProductCategory,
+    QuickPayAPICallback,
+    QuickPayAPIObject,
+    QuickPayAPIRequest,
     Refund,
     RefundProductRelation,
 )
@@ -193,3 +196,49 @@ class RefundInline(admin.TabularInline):
 @admin.register(Refund)
 class RefundAdmin(admin.ModelAdmin):
     inlines = [RefundInline]
+
+
+@admin.register(QuickPayAPIRequest)
+class QuickPayAPIRequestAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "order",
+        "method",
+        "endpoint",
+        "body",
+        "headers",
+        "query",
+        "response_status_code",
+        "created",
+        "updated",
+    ]
+
+    list_filter = ["order", "method", "endpoint"]
+    search_fields = ["headers", "body"]
+
+
+@admin.register(QuickPayAPIObject)
+class QuickPayAPIObjectAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "order",
+        "object_type",
+        "created",
+        "updated",
+    ]
+
+    list_filter = ["order", "object_type"]
+    search_fields = ["object_body"]
+
+
+@admin.register(QuickPayAPICallback)
+class QuickPayAPICallbackAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "qpobject",
+        "created",
+        "updated",
+    ]
+
+    list_filter = ["qpobject"]
+    search_fields = ["headers", "body"]

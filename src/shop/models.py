@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
-from django.db.models import Count, F, Q, Sum
+from django.db.models import Count, F, Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -197,6 +197,20 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             "https://"
             + request.get_host()
             + str(reverse_lazy("shop:epay_callback", kwargs={"pk": self.pk}))
+        )
+
+    def get_quickpay_accept_url(self, request):
+        return (
+            "https://"
+            + request.get_host()
+            + str(reverse_lazy("shop:quickpay_thanks", kwargs={"pk": self.pk}))
+        )
+
+    def get_quickpay_callback_url(self, request):
+        return (
+            "https://"
+            + request.get_host()
+            + str(reverse_lazy("shop:quickpay_callback", kwargs={"pk": self.pk}))
         )
 
     @property
@@ -392,14 +406,6 @@ class RefundProductRelation(CreatedUpdatedModel):
         blank=True,
         help_text="The time when ticket(s) related to this RefundProductRelation were deleted",
     )
-
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=Q(quantity__lte=F("opr__quantity") - Sum("opr__rprs__quantity")),
-                name="",
-            )
-        ]
 
     @property
     def total(self):
@@ -953,3 +959,62 @@ class CoinifyAPIRequest(
 
     def __str__(self):
         return f"order {self.order.id} api request {self.method}"
+
+
+# ########## QUICKPAY #################################################
+
+HttpMethods = models.TextChoices("Method", "GET POST PUT PATCH DELETE")
+
+
+class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
+    order = models.ForeignKey(
+        "shop.Order", related_name="quickpay_api_requests", on_delete=models.PROTECT
+    )
+    method = models.CharField(
+        max_length=10,
+        choices=HttpMethods.choices,
+        help_text="The HTTP method for this request",
+    )
+    endpoint = models.TextField(help_text="The API endpoint for this request")
+    body = models.TextField(default="", blank=True)
+    headers = models.JSONField(default=dict, null=True, blank=True)
+    query = models.JSONField(default=dict, null=True, blank=True)
+    response_status_code = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The HTTP status code of the API response. This field is empty until we get an API response.",
+    )
+    response_headers = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="The API response headers. This field remains empty until we get an API response.",
+    )
+    response_body = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="The API response body. This field remains empty until we get an API response.",
+    )
+
+    def __str__(self):
+        return (
+            f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
+        )
+
+
+class QuickPayAPIObject(CreatedUpdatedModel, UUIDModel):
+    order = models.ForeignKey(
+        "shop.Order", related_name="quickpay_api_objects", on_delete=models.PROTECT
+    )
+    object_type = models.TextField(help_text="The type of this QuickPayAPIObject")
+    object_body = models.JSONField(help_text="The body of the QuickPay API object")
+
+
+class QuickPayAPICallback(CreatedUpdatedModel, UUIDModel):
+    qpobject = models.ForeignKey(
+        "shop.QuickPayAPIObject",
+        related_name="callbacks",
+        on_delete=models.PROTECT,
+        help_text="The QuickPayAPIObject this callback relates to.",
+    )
+    headers = models.JSONField(help_text="The HTTP headers of the callback")
+    body = models.JSONField(help_text="The JSON body of the callback")

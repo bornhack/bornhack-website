@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+import json
 import logging
 from collections import OrderedDict
 
@@ -5,10 +8,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import Http404
-from django.http import HttpResponse
-from django.http import HttpResponseBadRequest
-from django.http import HttpResponseRedirect
+from django.http import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    HttpResponseServerError,
+)
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -22,21 +28,27 @@ from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
-from .coinify import create_coinify_invoice
-from .coinify import process_coinify_invoice_json
-from .coinify import save_coinify_callback
-from .epay import calculate_epay_hash
-from .epay import validate_epay_callback
-from .forms import OrderProductRelationForm
-from .forms import OrderProductRelationFormSet
-from shop.models import CreditNote
-from shop.models import EpayCallback
-from shop.models import EpayPayment
-from shop.models import Order
-from shop.models import OrderProductRelation
-from shop.models import Product
-from shop.models import ProductCategory
+from shop.models import (
+    CreditNote,
+    EpayCallback,
+    EpayPayment,
+    Order,
+    OrderProductRelation,
+    Product,
+    ProductCategory,
+    QuickPayAPICallback,
+    QuickPayAPIObject,
+)
 from vendor.coinify.coinify_callback import CoinifyCallback
+
+from .coinify import (
+    create_coinify_invoice,
+    process_coinify_invoice_json,
+    save_coinify_callback,
+)
+from .epay import calculate_epay_hash, validate_epay_callback
+from .forms import OrderProductRelationForm, OrderProductRelationFormSet
+from .quickpay import QuickPay
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -401,7 +413,7 @@ class OrderReviewAndPayView(
 
             reverses = {
                 Order.PaymentMethods.CREDIT_CARD: reverse_lazy(
-                    "shop:epay_form", kwargs={"pk": order.id}
+                    "shop:quickpay_link", kwargs={"pk": order.id}
                 ),
                 Order.PaymentMethods.BLOCKCHAIN: reverse_lazy(
                     "shop:coinify_pay", kwargs={"pk": order.id}
@@ -716,3 +728,82 @@ class CoinifyThanksView(
 ):
     model = Order
     template_name = "coinify_thanks.html"
+
+
+# QuickPay views
+
+
+# Epay views
+class QuickPayLinkView(
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureUnpaidOrderMixin,
+    EnsureClosedOrderMixin,
+    EnsureOrderHasProductsMixin,
+    DetailView,
+):
+    model = Order
+    template_name = "quickpay_link.html"
+
+    def dispatch(self, *args, **kwargs):
+        order = self.get_object()
+        qp = QuickPay()
+        payment = qp.create_payment(order)
+        if not payment:
+            return HttpResponseServerError("Something isn't working :(")
+        self.payment_link = qp.get_payment_link(payment)
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["payment_link"] = self.payment_link
+        return context
+
+
+class QuickPayThanksView(
+    LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView
+):
+    model = Order
+    template_name = "quickpay_thanks.html"
+
+
+class QuickPayCallbackView(View):
+    """QuickPay sends callbacks whenever an object is created, updated or deleted."""
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """Validate signature before saving callback."""
+        calculated_signature = hmac.new(
+            settings.QUICKPAY_PRIVATE_KEY.encode("utf-8"), request.body, hashlib.sha256
+        ).hexdigest()
+        header_signature = request.META["HTTP_QUICKPAY_CHECKSUM_SHA256"]
+        if header_signature != calculated_signature:
+            # signature is not valid
+            logger.error("invalid quickpay callback signature detected")
+            return HttpResponseBadRequest("something is fucky")
+
+        # find the related Order object (where possible)
+        body = json.loads(request.body.decode("utf-8"))
+        if request.META["HTTP_QUICKPAY_RESOURCE_TYPE"] == "payment":
+            order = Order.objects.get(id=int(body["order_id"]))
+        else:
+            order = None
+
+        # save the new QuickPayAPIObject and the callback
+        qpobj = QuickPayAPIObject.objects.create(
+            order=order,
+            object_type=request.META["HTTP_QUICKPAY_RESOURCE_TYPE"],
+            object_body=json.loads(request.body.decode("utf-8")),
+        )
+        qpcb = QuickPayAPICallback.objects.create(
+            qpobject=qpobj,
+            headers={k: v for k, v in request.META.items() if k.startswith("HTTP_")},
+            body=json.loads(request.body.decode("utf-8")),
+        )
+        print(qpcb)
+        # TODO check if payment has been accepted and change order status if so
+
+        return HttpResponse("OK")
