@@ -520,6 +520,12 @@ class Product(CreatedUpdatedModel, UUIDModel):
         return self.available_in.lower > now
 
     @property
+    def available_for_days(self):
+        if self.available_in.upper is not None:
+            now = timezone.now()
+            return (self.available_in.upper - now).days
+
+    @property
     def left_in_stock(self):
         if self.stock_amount:
             # All orders that are not open and not cancelled count towards what has
