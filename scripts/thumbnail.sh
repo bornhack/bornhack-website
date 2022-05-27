@@ -3,14 +3,10 @@
 # If the image is already a thumbnail, don't create a new one.
 
 set -e
-for full_size in "$@"; do
-  if \
-      test png = "$(echo "$full_size" | sed 's/^.*\.//' | tr '[A-Z]' '[a-z]')" &&
-      test -f "$(echo "$full_size" | sed 's/\.[pP][nN][gG]$//')"; then
-    continue
-  fi
-  thumbnail="$full_size.png"
-  if ! test -f "$thumbnail"; then
-    convert -geometry 200 "$full_size" "$thumbnail"
+for image in "$@"; do
+  thumbnail_to_fullsize="$(echo "$image" | sed -e 's/^thumbnail_//' -e 's/\.[pP][nN][gG]$//')"
+  fullsize_to_thumbnail="thumbnail_$image.png"
+  if ! test -f "$thumbnail_to_fullsize" && ! test -f "$fullsize_to_thumbnail"; then
+    convert -geometry 200 "$image" "$fullsize_to_thumbnail"
   fi
 done
