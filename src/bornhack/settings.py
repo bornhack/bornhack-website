@@ -71,7 +71,6 @@ INSTALLED_APPS = [
 
 # MEDIA_URL = '/media/'
 STATIC_URL = "/static/"
-STATIC_ROOT = str(BASE_DIR / "static")
 STATICFILES_DIRS = [BASE_DIR / "static_src"]
 LANGUAGE_CODE = "en-us"
 # USE_I18N = True
