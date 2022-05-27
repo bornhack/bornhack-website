@@ -286,15 +286,9 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
     template_name = "reimbursement_create.html"
     fields = ["notes", "paid"]
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         """Get the user from kwargs"""
         self.reimbursement_user = get_object_or_404(User, pk=kwargs["user_id"])
-
-        # get response now so we have self.camp available below
-        response = super().dispatch(request, *args, **kwargs)
-
-        # return the response
-        return response
 
     def get(self, request, *args, **kwargs):
         # does this user have any approved and un-reimbursed expenses?
