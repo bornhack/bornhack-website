@@ -40,6 +40,8 @@ Install system dependencies (method depends on OS):
   - macOS: brew install libjpeg
 - libmagic (might already be installed)
   - macOS: brew install libmagic
+- GDAL (might already be installed)
+  - macOS: brew install gdal
 - wkhtmltopdf (also for pdf generation):
   - Debian: wkhtmltopdf
   - FreeBSD: converters/wkhtmltopdf
@@ -57,7 +59,7 @@ Install pip packages:
 
 ### Postgres
 
-You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints).
+You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints). You might also need `create extension btree_gist`, again as a superuser.
 
 ### Configuration file
 
