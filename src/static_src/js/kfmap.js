@@ -49,7 +49,8 @@
     }).addTo(map);
 
     // skaermkort layer [WMTS:topo_skaermkort]
-    var toposkaermkortwmts = L.tileLayer.wms('/maps/kfproxy/topo_skaermkort', {
+    var toposkaermkortwmts = L.tileLayer.wms('/maps/kfproxy/Dkskaermkort/topo_skaermkort/1.0.0/wms', {
+        version: '1.3.0',
         layers: 'dtk_skaermkort',
         format: 'image/png',
         attribution: myAttributionText

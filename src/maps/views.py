@@ -1,4 +1,6 @@
+import re
 import requests
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -18,15 +20,33 @@ class MapProxyView(View):
         """
         # only permit certain paths
         path = self.request.path.replace("/maps/kfproxy", "", 1)
-        if path not in ["/orto_foraar", "/topo_skaermkort", "/mat", "/dhm"]:
-            raise PermissionDenied("No thanks")
+#        if path not in ["/orto_foraar", "/topo_skaermkort", "/mat", "/dhm"]:
+#            raise PermissionDenied("No thanks")
 
+        # https://services.datafordeler.dk/Dkskaermkort/topo_skaermkort_wmts/1.0.0/wmts?username=JSBESEXZIG&password=Bornhack2022*&service=WMTS&request=GetCapabilities
         # ok, get the full path including querystring, and add our token
-        fullpath = self.request.get_full_path().replace("/maps/kfproxy", "", 1)
-        fullpath += f"&token={settings.KORTFORSYNINGEN_TOKEN}"
+        endpoint = self.request.get_full_path().replace("/maps/kfproxy", "", 1)
+        #fullpath += f"&token={settings.DATAFORSYNINGEN_TOKEN}"
+
+        # Convert value for 'Transparent' parameter to uppercase
+#        endpoint += re.sub(
+#            r"(transparent=)(true|false)",
+#            lambda match: r'{}'.format(match.group(2).upper()),
+#            endpoint)
+        endpoint = re.sub(
+            r'(transparent=)(true|false)',
+            lambda match: r'{}'.format(match.group(0).upper()),
+            endpoint)
+
+        username = settings.DATAFORDELER_USER
+        password = settings.DATAFORDELER_PASSWORD
+        endpoint += f"&username={username}&password={password}"
+        print(endpoint)
 
         # make the request
-        r = requests.get("https://services.kortforsyningen.dk" + fullpath)
+        r = requests.get("https://services.datafordeler.dk" + endpoint)
+        print(r.status_code)
+        print(r.content)
 
         # make the response
         response = HttpResponse(r.content, status=r.status_code)
