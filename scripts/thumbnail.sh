@@ -4,12 +4,13 @@
 
 set -e
 for full_size in "$@"; do
-  if test png = "$(echo "$full_size" | sed 's/^.*\.//' | tr '[A-Z]' '[a-z]')"; then
-    if ! test -f "$(echo "$full_size" | sed 's/\.[pP][nN][gG]$//')"; then
-      thumbnail="$full_size.png"
-      if ! test -f "$thumbnail"; then
-        convert -geometry 200 "$full_size" "$thumbnail"
-      fi
-    fi
+  if \
+      test png = "$(echo "$full_size" | sed 's/^.*\.//' | tr '[A-Z]' '[a-z]')" &&
+      test -f "$(echo "$full_size" | sed 's/\.[pP][nN][gG]$//')"; then
+    continue
+  fi
+  thumbnail="$full_size.png"
+  if ! test -f "$thumbnail"; then
+    convert -geometry 200 "$full_size" "$thumbnail"
   fi
 done
