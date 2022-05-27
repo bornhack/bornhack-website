@@ -5,6 +5,14 @@
 
 Django project to power Bornhack. Features include news, villages, webshop, and more.
 
+## Contributing
+Request changes, report bugs, submit other issues
+at [the issue tracker](https://github.com/bornhack/bornhack-website/issues),
+by email to one of the developers, or the #bornhack-website IRC channel.
+
+Submit changes [here](https://github.com/bornhack/bornhack-website/pulls),
+by email to one of the developers, or the #bornhack-website IRC channel.
+
 ## Development setup
 
 ### Clone the repo
