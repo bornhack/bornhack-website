@@ -10,3 +10,4 @@ environment_settings.py
 elm-stuff/
 .coverage
 /media
+src/static
