@@ -28,5 +28,7 @@
                 {% if request.user.is_authenticated %}
                   <li class="{% menudropdownclass 'rideshare' %}"><a href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a></li>
                 {% endif %}
+
+                <li class="{% menudropdownclass 'token' %}"><a href="{% url 'tokens:tokenfind_list' %}">Token Game</a></li>
               </ul>
             </div>
