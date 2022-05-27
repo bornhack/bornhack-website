@@ -34,7 +34,7 @@
     })
 
     // Define ortophoto layer [WMTS:orto_foraar]
-    var ortofotowmts = L.tileLayer('/maps/kfproxy/orto_foraar?request=GetTile&version=1.0.0&service=WMTS&Layer=orto_foraar&style=default&format=image/jpeg&TileMatrixSet=View1&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
+    var ortofotowmts = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar/1.0.0/wms?request=GetTile&version=1.0.0&service=WMTS&Layer=orto_foraar&style=default&format=image/jpeg&TileMatrixSet=View1&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
         minZoom: 1,
         maxZoom: 13,
         attribution: myAttributionText,
@@ -57,25 +57,28 @@
     });
 
     // hillshade tile layer [WMTS:dhm]
-    var dhmwmts = L.tileLayer.wms('/maps/kfproxy/dhm', {
-        layers: 'dhm_terraen_skyggekort_overdrevet',
+    var dhmwmts = L.tileLayer.wms('/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms', {
+        version: '1.3.0',
+        layers: 'dhm_terraen_skyggekort',
         format: 'image/png',
         attribution: myAttributionText
     });
 
     // Matrikelskel overlay [WMS:mat]
-    var matrikel = L.tileLayer.wms('/maps/kfproxy/mat', {
+    var matrikel = L.tileLayer.wms('/maps/kfproxy/Matrikel/MatrikelGaeldendeOgForeloebigWMS/1.0.0/wms', {
+        version: '1.3.0',
         transparent: true,
-        layers: 'MatrikelSkel,Centroide',
+        layers: 'MatrikelSkel_Foreloebig,Centroide_Gaeldende',
         format: 'image/png',
         attribution: myAttributionText,
         minZoom: 9
     });
 
     // Hillshade overlay [WMS:dhm]
-    var hillshade = L.tileLayer.wms('/maps/kfproxy/dhm', {
+    var hillshade = L.tileLayer.wms('/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms', {
+        version: '1.3.0',
         transparent: true,
-        layers: 'dhm_terraen_skyggekort_transparent_overdrevet',
+        layers: 'dhm_terraen_skyggekort',
         format: 'image/png',
         attribution: myAttributionText,
     });
