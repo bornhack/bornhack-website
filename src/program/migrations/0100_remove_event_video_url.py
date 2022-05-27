@@ -3,15 +3,25 @@
 from django.db import migrations
 
 
-def move_video_urls(apps, schema_editor):
-    # We can't import the Person model directly as it may be a newer
-    # version than this migration expects. We use the historical version.
+def remove_video_urls(apps, schema_editor):
     Event = apps.get_model('program', 'Event')
     Url = apps.get_model('program', 'Url')
     UrlType = apps.get_model('program', 'UrlType')
     recording, _ = UrlType.objects.get_or_create(name='Recording')
     for event in Event.objects.exclude(video_url__isnull=True).all():
         Url.objects.get_or_create(url=event.video_url, url_type=recording, event=event)
+
+
+def revert_video_urls(apps, schema_editor):
+    Event = apps.get_model('program', 'Event')
+    Url = apps.get_model('program', 'Url')
+    UrlType = apps.get_model('program', 'UrlType')
+    recording, _ = UrlType.objects.get_or_create(name='Recording')
+    for url in Url.objects.filter(url_type=recording, event__isnull=False):
+        url.event.video_url = url.url
+        url.event.save()
+        url.delete()
+
 
 class Migration(migrations.Migration):
 
@@ -20,7 +30,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(move_video_urls),
+        migrations.RunPython(remove_video_urls, revert_video_urls),
         migrations.RemoveField(
             model_name='event',
             name='video_url',
