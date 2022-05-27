@@ -80,7 +80,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the guest."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Guest Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this guest. Only visible to yourself and the BornHack organisers."
@@ -106,7 +105,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the speaker."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Speaker Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this speaker. Only visible to yourself and the BornHack organisers."
@@ -132,7 +130,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The description of the artist."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Artist Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this artist. Only visible to yourself and the BornHack organisers."
@@ -158,7 +155,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the speaker."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Speaker Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this speaker. Only visible to yourself and the BornHack organisers."
@@ -183,7 +179,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the host."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Host Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
@@ -207,7 +202,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the host."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Host Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
@@ -233,7 +227,6 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = "The biography of the host."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Host Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this host. Only visible to yourself and the BornHack organisers."
@@ -318,6 +311,7 @@ class EventProposalForm(forms.ModelForm):
 
         # better placeholder text for duration field
         self.fields["duration"].label = f"{event_type.name} Duration"
+        self.fields["submission_notes"].label = "Notes to the Content Team"
         if event_type.event_duration_minutes:
             self.fields[
                 "duration"
@@ -349,7 +343,6 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = "The description of this debate"
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Debate Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this debate. Only visible to yourself and the BornHack organisers."
@@ -364,7 +357,6 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = "The description of this music act"
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Music Act Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this music act. Only visible to yourself and the BornHack organisers."
@@ -384,7 +376,6 @@ class EventProposalForm(forms.ModelForm):
             ].help_text = "The description/abstract of this recreational event."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Event Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this recreational event. Only visible to yourself and the BornHack organisers."
@@ -404,7 +395,6 @@ class EventProposalForm(forms.ModelForm):
             ].help_text = "The description/abstract of this talk/presentation. Explain what the audience will experience."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Talk Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this talk. Only visible to yourself and the BornHack organisers."
@@ -423,7 +413,6 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this workshop."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Workshop Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this workshop. Only visible to yourself and the BornHack organisers."
@@ -443,7 +432,6 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this recreational event."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Event Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this recreational event. Only visible to yourself and the BornHack organisers."
@@ -463,7 +451,6 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this meetup."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].label = "Meetup Notes"
             self.fields[
                 "submission_notes"
             ].help_text = "Private notes regarding this meetup. Only visible to yourself and the BornHack organisers."
