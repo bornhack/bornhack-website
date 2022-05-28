@@ -54,11 +54,15 @@ Your Tickets | {{ block.super }}
               {% endif %}
             <td>
               <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
-              {% if not ticket.name %}
-                <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Set name</a>
-              {% else %}
-                <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Edit name</a>
-              {% endif %}
+              <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary">
+                {% if ticket.product.ticket_type.camp.read_only %}
+                <i class="fas fa-file" aria-hidden="true"></i> View name
+                {% elif not ticket.name %}
+                <i class="fas fa-edit" aria-hidden="true"></i> Set name
+                {% else %}
+                <i class="fas fa-edit" aria-hidden="true"></i> Edit name
+                {% endif %}
+              </a>
           {% endfor %}
       </table>
     {% else %}
