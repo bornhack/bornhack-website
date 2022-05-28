@@ -1346,23 +1346,24 @@ class Command(BaseCommand):
                     ).order_by("?")[0:conflictcount],
                 )
 
-    def create_camp_rescheduling(self, camp):
+    def create_camp_rescheduling(self, camp, autoschedule):
         year = camp.camp.lower.year
         # reapprove all speaker_proposals so the new availability takes effect
         for prop in camp.speaker_proposals.filter(proposal_status="approved"):
             prop.mark_as_approved()
         # exercise the autoscheduler a bit
         self.output(f"Rescheduling {year}...")
-        scheduler = AutoScheduler(camp=camp)
-        schedulestart = timezone.now()
-        try:
-            autoschedule, diff = scheduler.calculate_similar_autoschedule()
-            scheduler.apply(autoschedule)
-        except ValueError as E:
-            self.output(f"Got exception while calculating similar autoschedule: {E}")
-            autoschedule = None
-        scheduleduration = timezone.now() - schedulestart
-        self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
+        if autoschedule:
+            scheduler = AutoScheduler(camp=camp)
+            schedulestart = timezone.now()
+            try:
+                autoschedule, diff = scheduler.calculate_similar_autoschedule()
+                scheduler.apply(autoschedule)
+            except ValueError as E:
+                self.output(f"Got exception while calculating similar autoschedule: {E}")
+                autoschedule = None
+            scheduleduration = timezone.now() - schedulestart
+            self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
@@ -2062,7 +2063,7 @@ class Command(BaseCommand):
                 self.create_camp_speaker_event_conflicts(camp)
 
                 # recalculate the autoschedule
-                self.create_camp_rescheduling(camp)
+                self.create_camp_rescheduling(camp, not options['skip_auto_scheduler'])
 
                 self.create_camp_villages(camp, users)
 
