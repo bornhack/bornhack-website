@@ -84,6 +84,18 @@ Is this for local development? Bootstrap the database with dummy data and users:
 (venv) $ python src/manage.py bootstrap_devsite
 ```
 
+If you run software other than GNU/Linux or on architecture other than amd64,
+you may get an error like this.
+
+```
+OSError: [Errno 8] Exec format error: '/srv/opt/bornhack/.local/lib/python3.9/site-packages/pulp/apis/../solverdir/cbc/linux/64/cbc'
+```
+
+In such case, skip the autoscheduler like so.
+
+```
+(venv) $ python src/manage.py bootstrap_devsite --skip-auto-scheduler
+```
 
 ### Done
 Is this for local development? Start the Django devserver:
