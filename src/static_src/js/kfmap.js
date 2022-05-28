@@ -27,13 +27,14 @@
     // Make the map object using the custom projection
     var map = new L.Map('map', {
         crs: crs,
-        center: [55.3, 9.9], // Set center location
-        zoom: 9, // Initial zoom level
+//        center: [55.3, 9.9], // Set center location
+        center: [55.38739, 9.94032], // Set center location
+        zoom: 11, // Initial zoom level
         minzoom: 1,
         maxzoom: 13,
     })
 
-    // Define ortophoto layer [WMTS:orto_foraar]
+    // Define ortophoto layer [WMTS:orto_foraar_wmts]
     var ortofotowmts = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS?REQUEST=GetTile&VERSION=1.0.0&service=WMTS&Layer=orto_foraar_wmts&style=default&format=image/jpeg&TileMatrixSet=KortforsyningTilingDK&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
         minZoom: 1,
         maxZoom: 13,
@@ -49,7 +50,7 @@
         }
     }).addTo(map);
 
-    // skaermkort layer [WMTS:topo_skaermkort]
+    // skaermkort layer [WMS:topo_skaermkort]
     var toposkaermkortwmts = L.tileLayer.wms('/maps/kfproxy/Dkskaermkort/topo_skaermkort/1.0.0/wms', {
         version: '1.3.0',
         layers: 'dtk_skaermkort',
@@ -57,7 +58,7 @@
         attribution: myAttributionText
     });
 
-    // hillshade tile layer [WMTS:dhm]
+    // hillshade tile layer [WMS:dhm]
     var dhmwmts = L.tileLayer.wms('/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms', {
         version: '1.3.0',
         layers: 'dhm_terraen_skyggekort',

@@ -63,6 +63,11 @@ BANKACCOUNT_REG='{{ regno }}'
 BANKACCOUNT_ACCOUNT='{{ accountno }}'
 TICKET_CATEGORY_NAME='Tickets'
 
+# Dataforsyningen kort (datafordeler.dk)
+# Notice! These credentials MUST be for a 'tjenestebruger' and not a 'webbruger'
+DATAFORDELER_USER='{{ datafordeler_user }}'
+DATAFORDELER_PASSWORD='{{ datafordeler_password }}'
+
 # schedule settings
 SCHEDULE_MIDNIGHT_OFFSET_HOURS=9
 SCHEDULE_TIMESLOT_LENGTH_MINUTES=30
@@ -96,5 +101,4 @@ ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
 ECONOMYTEAM_NAME = "Economy"
 
 BORNHACK_2019_OLD_TOKEN_TOKEN = "{{ bornhack_2019_old_token_token }}"
-KORTFORSYNINGEN_TOKEN = "{{ kortforsyningen_token }}"
 BACKOFFICE_PROXY_URLS = {{ backoffice_proxy_urls }}
