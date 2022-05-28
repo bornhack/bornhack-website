@@ -549,6 +549,8 @@ class Product(CreatedUpdatedModel, UUIDModel):
 
 
 class OrderProductRelation(CreatedUpdatedModel):
+    def __str__(self):
+        return f'#{self.order}: {self.quantity} {self.product}'
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
