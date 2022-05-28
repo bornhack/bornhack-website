@@ -7,7 +7,9 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import View
 
+
 logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 class MapProxyView(View):
     """
@@ -66,7 +68,7 @@ class MapProxyView(View):
         return response
 
     def is_endpoint_valid(self, path: str) -> None:
-        """Validate request path against whitelisted endpoints.
+        """Validate request path against whitelisted endpoints or raise PermDenied
         """
         endpoint = path.replace(self.PROXY_URL, "", 1)
         if endpoint not in self.VALID_ENDPOINTS:
@@ -85,7 +87,7 @@ class MapProxyView(View):
         return sanitized_path
 
     def append_credentials(self, path: str) -> str:
-        """Append & verify credentials is defined in settings or raise exception.
+        """Verify credentials are defined in settings & append or raise exception
         """
         username = settings.DATAFORDELER_USER
         password = settings.DATAFORDELER_PASSWORD
