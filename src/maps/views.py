@@ -40,6 +40,7 @@ class MapProxyView(View):
 
         # make the request
         r = requests.get("https://services.datafordeler.dk" + endpoint)
+        print(r.text)
 
         # make the response
         response = HttpResponse(r.content, status=r.status_code)

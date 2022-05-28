@@ -34,17 +34,18 @@
     })
 
     // Define ortophoto layer [WMTS:orto_foraar]
-    var ortofotowmts = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar/1.0.0/wms?request=GetTile&version=1.0.0&service=WMTS&Layer=orto_foraar&style=default&format=image/jpeg&TileMatrixSet=View1&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
+    var ortofotowmts = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS?REQUEST=GetTile&VERSION=1.0.0&service=WMTS&Layer=orto_foraar_wmts&style=default&format=image/jpeg&TileMatrixSet=KortforsyningTilingDK&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
         minZoom: 1,
         maxZoom: 13,
         attribution: myAttributionText,
         crossOrigin: true,
         zoom: function () {
             var zoomlevel = map._animateToZoom ? map._animateToZoom : map.getZoom();
-            if (zoomlevel < 10)
-                return 'L0' + zoomlevel;
-            else
-                return 'L' + zoomlevel;
+            return zoomlevel;
+//            if (zoomlevel < 10)
+//                return 'L0' + zoomlevel;
+//            else
+//                return 'L' + zoomlevel;
         }
     }).addTo(map);
 
