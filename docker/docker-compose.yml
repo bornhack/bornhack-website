@@ -13,18 +13,18 @@ services:
         volumes:
           - ..:/app
         environment:
-          - DJANGO_DATABASE_NAME=postgres
-          - DJANGO_DATABASE_USER=postgres
-          - DJANGO_DATABASE_PASSWORD=postgres
-          - DJANGO_DATABASE_HOST=db
-          - DJANGO_DATABASE_PORT=5432
-        links:
+          - POSTGRES_DB=postgres
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
+          - POSTGRES_HOST=db
+          - POSTGRES_PORT=5432
+        depends_on:
           - db
     db:
         build:
           context: postgis_container
         environment:
-            POSTGRES_USER: 'postgres'
-            POSTGRES_PASSWORD: 'postgres'
+          - POSTGRES_USER=postgres
+          - POSTGRES_PASSWORD=postgres
         ports:
           - 5432:5432

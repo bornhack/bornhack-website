@@ -7,7 +7,33 @@ Django project to power Bornhack. Features include news, villages, webshop, and 
 
 ## Development setup
 
-### Clone the repo
+### Using docker
+
+There is a Docker/docker-compose setup in the docker/ directory to ease development.
+
+The `Makefile` contains commands to help running commands in the docker container.
+
+#### Initialise the development setup:
+
+Copy dev settings (will overwrite existing), make sure submodules are updated, migrate and bootstrap devsite in one command:
+
+    make init
+
+#### Run django management commands in the container
+
+To run commands in the container use the following
+
+    make manage COMMAND=<command>
+
+Common commands exist as own Makefile entries:
+
+    make shell           # ./manage.py shell
+    make makemigrations  # ./manage.py makemigrations
+    make migrate         # ./manage.py migrate
+
+### Manual setup
+
+#### Clone the repo
 Clone with --recursive to include submodules:
 
     git clone --recursive https://github.com/bornhack/bornhack-website
@@ -16,7 +42,7 @@ If you already cloned the repository without --recursive, you can change into th
 
     git submodule update --init --recursive
 
-### Virtualenv
+#### Virtualenv
 Create a Python 3.7 virtual environment and activate it:
 ```
 $ virtualenv venv -p python3.7
@@ -28,7 +54,7 @@ If you installed python3 using Homebrew on macOS, you will need to install virtu
 pip3 install virtualenv
 ```
 
-### System libraries
+#### System libraries
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
   - Debian: libpq-dev
@@ -51,17 +77,17 @@ Install system dependencies (method depends on OS):
   - FreeBSD: x11-fonts/webfonts
   - macOS: ?
 
-### Python packages
+#### Python packages
 Install pip packages:
 ```
 (venv) $ pip install -r src/requirements/dev.txt
 ```
 
-### Postgres
+#### Postgres
 
 You need to have a running Postgres instance (sqlite or mysql or others can't be used, because we use Postgres-specific fields and PostGIS/GeoDjango). Install Postgres and PostGIS, and add a database `bornhack` (or whichever you like) with some way for the application to connect to it, for instance adding a user with a password. Connect to the database as a superuser and run `create extension postgis`. The postgres version in production is 12 and the postgis version in production is 2.5. The minimum postgres version is 10, because we use GIST indexes on uuid fields (for ExclusionConstraints). You might also need `create extension btree_gist`, again as a superuser.
 
-### Configuration file
+#### Configuration file
 
 Copy dev environment settings file and change settings as needed:
 
@@ -71,7 +97,7 @@ Copy dev environment settings file and change settings as needed:
 
 Edit the configuration file, setting up `DATABASES` matching your Postgres settings.
 
-### Database
+#### Database
 Is this a new installation? Initialize the database:
 
 ```
@@ -97,7 +123,7 @@ In such case, skip the autoscheduler like so.
 (venv) $ python src/manage.py bootstrap_devsite --skip-auto-scheduler
 ```
 
-### Done
+#### Done
 Is this for local development? Start the Django devserver:
 ```
 (venv) $ python src/manage.py runserver
