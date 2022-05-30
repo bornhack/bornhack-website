@@ -31,6 +31,10 @@ Common commands exist as own Makefile entries:
     make makemigrations  # ./manage.py makemigrations
     make migrate         # ./manage.py migrate
 
+Run the project using
+
+    make run
+
 ### Manual setup
 
 #### Clone the repo
