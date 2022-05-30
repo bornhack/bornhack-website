@@ -239,6 +239,10 @@ class Command(BaseCommand):
     args = "none"
     help = "Create mock data for development instances"
 
+    def add_arguments(self, parser):
+        parser.add_argument('-s', '--skip-auto-scheduler', action='store_true',
+            help='Don\'t run the auto-scheduler. This is useful on operating systems for which the solver binary is not packaged, such as OpenBSD.')
+
     def create_camps(self):
         self.output("Creating camps...")
         camps = [
@@ -1287,7 +1291,7 @@ class Command(BaseCommand):
             event.demand = random.randint(10, 40)
             event.save()
 
-    def create_camp_scheduling(self, camp):
+    def create_camp_scheduling(self, camp, autoschedule):
         year = camp.camp.lower.year
         self.output(f"Creating scheduling for {year}...")
 
@@ -1310,18 +1314,19 @@ class Command(BaseCommand):
             lunchslot.save()
 
         # exercise the autoscheduler a bit
-        scheduler = AutoScheduler(camp=camp)
-        schedulestart = timezone.now()
-        try:
-            autoschedule = scheduler.calculate_autoschedule()
-            if autoschedule:
-                scheduler.apply(autoschedule)
-        except ValueError as E:
-            self.output(f"Got exception while calculating autoschedule: {E}")
-        scheduleduration = timezone.now() - schedulestart
-        self.output(
-            f"Done running autoscheduler for {year}... It took {scheduleduration}",
-        )
+        if autoschedule:
+            scheduler = AutoScheduler(camp=camp)
+            schedulestart = timezone.now()
+            try:
+                autoschedule = scheduler.calculate_autoschedule()
+                if autoschedule:
+                    scheduler.apply(autoschedule)
+            except ValueError as E:
+                self.output(f"Got exception while calculating autoschedule: {E}")
+            scheduleduration = timezone.now() - schedulestart
+            self.output(
+                f"Done running autoscheduler for {year}... It took {scheduleduration}",
+            )
 
     def create_camp_speaker_event_conflicts(self, camp):
         year = camp.camp.lower.year
@@ -1341,23 +1346,24 @@ class Command(BaseCommand):
                     ).order_by("?")[0:conflictcount],
                 )
 
-    def create_camp_rescheduling(self, camp):
+    def create_camp_rescheduling(self, camp, autoschedule):
         year = camp.camp.lower.year
         # reapprove all speaker_proposals so the new availability takes effect
         for prop in camp.speaker_proposals.filter(proposal_status="approved"):
             prop.mark_as_approved()
         # exercise the autoscheduler a bit
         self.output(f"Rescheduling {year}...")
-        scheduler = AutoScheduler(camp=camp)
-        schedulestart = timezone.now()
-        try:
-            autoschedule, diff = scheduler.calculate_similar_autoschedule()
-            scheduler.apply(autoschedule)
-        except ValueError as E:
-            self.output(f"Got exception while calculating similar autoschedule: {E}")
-            autoschedule = None
-        scheduleduration = timezone.now() - schedulestart
-        self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
+        if autoschedule:
+            scheduler = AutoScheduler(camp=camp)
+            schedulestart = timezone.now()
+            try:
+                autoschedule, diff = scheduler.calculate_similar_autoschedule()
+                scheduler.apply(autoschedule)
+            except ValueError as E:
+                self.output(f"Got exception while calculating similar autoschedule: {E}")
+                autoschedule = None
+            scheduleduration = timezone.now() - schedulestart
+            self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
 
     def create_camp_villages(self, camp, users):
         year = camp.camp.lower.year
@@ -2048,7 +2054,7 @@ class Command(BaseCommand):
 
                 self.approve_event_proposals(camp)
 
-                self.create_camp_scheduling(camp)
+                self.create_camp_scheduling(camp, not options['skip_auto_scheduler'])
 
                 # shuffle it up - delete and create new random availability
                 self.generate_speaker_availability(camp)
@@ -2057,7 +2063,7 @@ class Command(BaseCommand):
                 self.create_camp_speaker_event_conflicts(camp)
 
                 # recalculate the autoschedule
-                self.create_camp_rescheduling(camp)
+                self.create_camp_rescheduling(camp, not options['skip_auto_scheduler'])
 
                 self.create_camp_villages(camp, users)
 
