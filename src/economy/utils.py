@@ -480,9 +480,10 @@ class AccountingExporter:
     def bank_csv_export(self, workdir):
         """Export bank accounting data in CSV files."""
         files = []
-        for ba in BankAccount.objects.filter(
-            start_date__gte=self.period.lower,
-            end_date__lte=self.period.upper,
+        for ba in (
+            BankAccount.objects.all()
+            .exclude(start_date__gte=self.period.upper)
+            .exclude(end_date__lte=self.period.lower)
         ):
             files.append(ba.export_csv(self.period, workdir))
         return files
