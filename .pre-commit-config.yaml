@@ -3,7 +3,7 @@ default_language_version:
 exclude: ^.*\b(migrations)\b.*$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.3.0
     hooks:
       - id: check-ast
       - id: check-merge-conflict
@@ -18,7 +18,7 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
   - repo: https://github.com/asottile/reorder_python_imports
-    rev: v3.0.1
+    rev: v3.1.0
     hooks:
       - id: reorder-python-imports
         args:
@@ -34,14 +34,14 @@ repos:
       - id: python-no-log-warn
       - id: rst-backticks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.31.1
+    rev: v2.34.0
     hooks:
       - id: pyupgrade
         args:
           - --py39-plus
         exclude: migrations/
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.4.0
+    rev: 1.7.0
     hooks:
       - id: django-upgrade
         args:
@@ -51,15 +51,15 @@ repos:
     hooks:
       -   id: yesqa
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.2.1
+    rev: v2.2.3
     hooks:
       -   id: add-trailing-comma
   - repo: https://github.com/hadialqattan/pycln
-    rev: v1.2.5
+    rev: v1.3.3
     hooks:
       -   id: pycln
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 22.3.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8

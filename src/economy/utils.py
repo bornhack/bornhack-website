@@ -480,10 +480,9 @@ class AccountingExporter:
     def bank_csv_export(self, workdir):
         """Export bank accounting data in CSV files."""
         files = []
-        for ba in (
-            BankAccount.objects.all()
-            .exclude(start_date__gt=self.period.upper)
-            .exclude(end_date__lt=self.period.lower)
+        for ba in BankAccount.objects.filter(
+            start_date__gte=self.period.lower,
+            end_date__lte=self.period.upper,
         ):
             files.append(ba.export_csv(self.period, workdir))
         return files
@@ -499,8 +498,8 @@ class AccountingExporter:
                 ["invoice_date", "invoice_number", "order", "amount", "vat"],
             )
             invoices = Invoice.objects.filter(
-                created__gt=self.period.lower,
-                created__lt=self.period.upper,
+                created__gte=self.period.lower,
+                created__lte=self.period.upper,
             )
             count = 0
             for invoice in invoices:
@@ -543,8 +542,8 @@ class AccountingExporter:
             )
             creditnotes = CreditNote.objects.filter(
                 paid=paid,
-                created__gt=self.period.lower,
-                created__lt=self.period.upper,
+                created__gte=self.period.lower,
+                created__lte=self.period.upper,
             )
             for creditnote in creditnotes:
                 writer.writerow(
@@ -579,8 +578,8 @@ class AccountingExporter:
             )
             orders = Order.objects.filter(
                 paid=True,
-                created__gt=self.period.lower,
-                created__lt=self.period.upper,
+                created__gte=self.period.lower,
+                created__lte=self.period.upper,
             )
             for order in orders:
                 if order.invoice:
@@ -611,8 +610,8 @@ class AccountingExporter:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["id", "amount", "vat", "paid", "customer"])
             orders = CustomOrder.objects.filter(
-                created__gt=self.period.lower,
-                created__lt=self.period.upper,
+                created__gte=self.period.lower,
+                created__lte=self.period.upper,
             )
             for order in orders:
                 writer.writerow(
@@ -648,8 +647,8 @@ class AccountingExporter:
                 ],
             )
             expenses = Expense.objects.filter(
-                invoice_date__gt=self.period.lower,
-                invoice_date__lt=self.period.upper,
+                invoice_date__gte=self.period.lower,
+                invoice_date__lte=self.period.upper,
             )
             for expense in expenses:
                 writer.writerow(
@@ -689,8 +688,8 @@ class AccountingExporter:
                 ],
             )
             revenues = Revenue.objects.filter(
-                invoice_date__gt=self.period.lower,
-                invoice_date__lt=self.period.upper,
+                invoice_date__gte=self.period.lower,
+                invoice_date__lte=self.period.upper,
             )
             for revenue in revenues:
                 writer.writerow(
@@ -765,8 +764,8 @@ class AccountingExporter:
             f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
         )
         invoices = CoinifyInvoice.objects.filter(
-            coinify_created__gt=self.period.lower,
-            coinify_created__lt=self.period.upper,
+            coinify_created__gte=self.period.lower,
+            coinify_created__lte=self.period.upper,
         )
         with open(workdir / invoices_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -811,8 +810,8 @@ class AccountingExporter:
             f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
         )
         payouts = CoinifyPayout.objects.filter(
-            coinify_created__gt=self.period.lower,
-            coinify_created__lt=self.period.upper,
+            coinify_created__gte=self.period.lower,
+            coinify_created__lte=self.period.upper,
         )
         with open(workdir / payouts_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -851,8 +850,8 @@ class AccountingExporter:
             f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
         )
         balances = CoinifyBalance.objects.filter(
-            date__gt=self.period.lower,
-            date__lt=self.period.upper,
+            date__gte=self.period.lower,
+            date__lte=self.period.upper,
         )
         with open(workdir / balances_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -881,8 +880,8 @@ class AccountingExporter:
             f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
         )
         transactions = EpayTransaction.objects.filter(
-            auth_date__gt=self.period.lower,
-            auth_date__lt=self.period.upper,
+            auth_date__gte=self.period.lower,
+            auth_date__lte=self.period.upper,
         )
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -925,8 +924,8 @@ class AccountingExporter:
         """Export Clearhaus settlements in our system."""
         filename = f"bornhack_clearhaus_settlements_{self.period.lower}_{self.period.upper}.csv"
         settlements = ClearhausSettlement.objects.filter(
-            payout_date__gt=self.period.lower,
-            payout_date__lt=self.period.upper,
+            payout_date__gte=self.period.lower,
+            payout_date__lte=self.period.upper,
         )
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -1016,8 +1015,8 @@ class AccountingExporter:
             f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
         )
         balances = ZettleBalance.objects.filter(
-            statement_time__gt=self.period.lower,
-            statement_time__lt=self.period.upper,
+            statement_time__gte=self.period.lower,
+            statement_time__lte=self.period.upper,
         )
         with open(workdir / balances_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -1049,8 +1048,8 @@ class AccountingExporter:
             f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
         )
         receipts = ZettleReceipt.objects.filter(
-            zettle_created__gt=self.period.lower,
-            zettle_created__lt=self.period.upper,
+            zettle_created__gte=self.period.lower,
+            zettle_created__lte=self.period.upper,
         )
         with open(workdir / receipts_filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
@@ -1097,8 +1096,8 @@ class AccountingExporter:
         """Export MobilePay transactions in our system."""
         filename = f"bornhack_mobilepay_transactions_{self.period.lower}_{self.period.upper}.csv"
         transactions = MobilePayTransaction.objects.filter(
-            mobilepay_created__gt=self.period.lower,
-            mobilepay_created__lt=self.period.upper,
+            mobilepay_created__gte=self.period.lower,
+            mobilepay_created__lte=self.period.upper,
         )
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
