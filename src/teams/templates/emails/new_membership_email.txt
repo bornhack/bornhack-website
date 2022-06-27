@@ -2,6 +2,7 @@ Hello!
 
 There's a new membership request for the {{ team }} team at {{ camp }}.
 
+Go to the memberlist for approval: {{ memberlist_link }}
 
 Best regards,
 
