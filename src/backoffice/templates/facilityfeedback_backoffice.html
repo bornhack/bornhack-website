@@ -19,7 +19,7 @@ Facility Feedback for {{ team.name }} Team | {{ block.super }}
       {% for form, feedback in formset|zip:feedback_list %}
       <div class="panel panel-default">
         <div class="panel-heading">
-          <h4 class="panel-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.username|default:"Anonymous User" }}</h4>
+          <h4 class="panel-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.email|default:"Anonymous User" }}</h4>
         </div>
         <div class="panel-body">
           <table class="table">
