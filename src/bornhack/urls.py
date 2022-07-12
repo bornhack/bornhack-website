@@ -19,6 +19,7 @@ from villages.views import VillageDeleteView
 from villages.views import VillageDetailView
 from villages.views import VillageListView
 from villages.views import VillageUpdateView
+from villages.views import VillageCreateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
@@ -120,6 +121,9 @@ urlpatterns = [
                     include(
                         [
                             path("", VillageListView.as_view(), name="village_list"),
+                            path("create/",
+                                VillageCreateView.as_view(),
+                                name="village_create"),
                             path(
                                 "<slug:slug>/delete/",
                                 VillageDeleteView.as_view(),

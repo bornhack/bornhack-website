@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http import HttpResponseRedirect
@@ -21,10 +22,22 @@ class VillageListView(CampViewMixin, ListView):
     context_object_name = "villages"
 
     def get_queryset(self):
-        return super().get_queryset().filter(deleted=False)
+        return super().get_queryset().filter(deleted=False, approved=True)
 
 
-class VillageDetailView(CampViewMixin, DetailView):
+class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
+    model = Village
+
+    def dispatch(self, request, *args, **kwargs):
+        # If the user is not contact for this village OR is not staff and village not approved
+        if not request.user.is_staff:
+            if self.get_object().contact != request.user and not self.get_object().approved:
+                raise Http404("Village not found")
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailView):
     model = Village
     template_name = "village_detail.html"
     context_object_name = "village"
@@ -50,6 +63,10 @@ class VillageCreateView(
         if not village.name:
             village.name = "noname"
         village.save()
+        messages.success(
+            self.request,
+            "Your request to create a village has been registered - it will be published after review for CoC compliance"
+        )
         return HttpResponseRedirect(village.get_absolute_url())
 
     def get_success_url(self):
@@ -81,8 +98,13 @@ class VillageUpdateView(
 
     def form_valid(self, form):
         village = form.save(commit=False)
+        village.approved = False
         if not village.name:
             village.name = "noname"
+        messages.success(
+            self.request,
+            "Your village will be republished after the changes have been reviewed for CoC compliance."
+        )
         return super().form_valid(form)
 
     def get_success_url(self):
