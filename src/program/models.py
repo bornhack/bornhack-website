@@ -1282,13 +1282,6 @@ class Event(CampRelatedModel):
         on_delete=models.PROTECT,
     )
 
-    video_url = models.URLField(
-        max_length=1000,
-        null=True,
-        blank=True,
-        help_text="URL to the recording",
-    )
-
     video_recording = models.BooleanField(
         default=True,
         help_text="Do we intend to record video of this event?",
@@ -1364,12 +1357,9 @@ class Event(CampRelatedModel):
             "event_type": self.event_type.name,
         }
 
-        if self.video_url:
-            video_state = "has-recording"
-            data["video_url"] = self.video_url
-        elif self.video_recording:
+        if self.video_recording:
             video_state = "to-be-recorded"
-        elif not self.video_recording:
+        else:
             video_state = "not-to-be-recorded"
 
         data["video_state"] = video_state
@@ -1502,12 +1492,9 @@ class EventInstance(CampRelatedModel):
             "timeslots": self.timeslots,
         }
 
-        if self.event.video_url:
-            video_state = "has-recording"
-            data["video_url"] = self.event.video_url
-        elif self.event.video_recording:
+        if self.event.video_recording:
             video_state = "to-be-recorded"
-        elif not self.event.video_recording:
+        else:
             video_state = "not-to-be-recorded"
 
         data["video_state"] = video_state
