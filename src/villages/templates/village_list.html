@@ -15,6 +15,11 @@ Villages | {{ block.super }}
   where you can hack and hang out during the day. It is also possible to rent a
   tent, chairs and tables in the shop!
 </p>
+<p>
+    <a href="{% url 'village_create' camp_slug=camp.slug %}">Create a village</a>
+    <br>
+    Note, that our <a href="{% url 'conduct'%}">Code of Conduct</a> applies to village names and descriptions.
+</p>
 
 <hr />
 {% if villages %}

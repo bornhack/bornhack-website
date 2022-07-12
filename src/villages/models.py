@@ -25,6 +25,7 @@ class Village(UUIDModel, CampRelatedModel):
     )
 
     deleted = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.name} ({self.camp.title})"
