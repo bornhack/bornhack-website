@@ -12,7 +12,7 @@ django-bleach==3.0.0
 django-bootstrap3==21.2
 django-cors-headers==3.12.0
 django-extensions==3.1.5
-django-filter==21.1
+django-filter==22.1
 django-leaflet==0.28.2
 django-jsonview==2.0.0
 django-oauth-toolkit==2.0.0
