@@ -117,6 +117,7 @@ class ProductInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     change_form_template = "admin/change_order_form.html"
     readonly_fields = ("paid", "created", "updated")
+    search_fields = ("products__name", "products__description", "products__category__name")
 
     def get_email(self, obj):
         return obj.user.email
