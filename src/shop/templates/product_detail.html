@@ -30,10 +30,16 @@
       <small>Availability</small><br />
       {% if product.left_in_stock > 0 %}
       <bold>{{ product.left_in_stock }}</bold> available<br />
+      {% if product.available_for_days < 20 %}
+      <small>This product is available for {{ product.available_for_days }} more days.</small>
+      {% else %}
+      <small>This product is available until {{ product.available_in.lower|date:"Y-m-d" }}</small>
+      {% endif %}
       {% else %}
       <bold>Sold out.</bold><br />
+    
+      </h3>
       {% endif %}
-    </h3>
 
     <hr />
     {% endif %}
