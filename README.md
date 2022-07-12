@@ -69,18 +69,23 @@ pip3 install virtualenv
 #### System libraries
 Install system dependencies (method depends on OS):
 - postgresql headers (for psycopg2):
+
+  - OpenBSD: pkg_add postgresql-client-11
   - Debian: libpq-dev
   - FreeBSD: databases/postgresql11-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
 - libjpeg (for pdf generation)
+  - OpenBSD: pkg_add turbo
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
   - macOS: brew install libjpeg
 - libmagic (might already be installed)
+  - OpenBSD: pkg_add libmagic
   - macOS: brew install libmagic
 - GDAL (might already be installed)
   - macOS: brew install gdal
 - wkhtmltopdf (also for pdf generation):
+  - OpenBSD: pkg_add wkhtmltopdf
   - Debian: wkhtmltopdf
   - FreeBSD: converters/wkhtmltopdf
   - macOS: install from https://wkhtmltopdf.org/
@@ -88,6 +93,8 @@ Install system dependencies (method depends on OS):
   - Debian: ?
   - FreeBSD: x11-fonts/webfonts
   - macOS: ?
+- Not handled by pip
+  - OpenBSD: py3-cryptography py3-zope.event
 
 #### Python packages
 Install pip packages:
