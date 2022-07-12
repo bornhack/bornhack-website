@@ -1,32 +1,46 @@
+import logging
+import re
 import requests
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import View
 
 
+logger = logging.getLogger("bornhack.%s" % __name__)
+
+
 class MapProxyView(View):
     """
-    Proxy for KortForsyningen map service. Created so we can show maps without
+    Proxy for Datafordeler map service. Created so we can show maps without
     leaking the IP of our visitors.
     """
+
+    PROXY_URL = "/maps/kfproxy"
+    VALID_ENDPOINTS = [
+        "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
+        "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
+        "/DHMNedboer/dhm/1.0.0/wms"
+    ]
 
     def get(self, *args, **kwargs):
         """
         Before we make the request we check that the path is in our whitelist.
         Before we return the response we copy headers except for a list we dont want.
         """
-        # only permit certain paths
-        path = self.request.path.replace("/maps/kfproxy", "", 1)
-        if path not in ["/orto_foraar", "/topo_skaermkort", "/mat", "/dhm"]:
-            raise PermissionDenied("No thanks")
 
-        # ok, get the full path including querystring, and add our token
-        fullpath = self.request.get_full_path().replace("/maps/kfproxy", "", 1)
-        fullpath += f"&token={settings.KORTFORSYNINGEN_TOKEN}"
+        # Raise PermissionDenied if endpoint isn't valid
+        self.is_endpoint_valid(self.request.path)
+
+        # Sanitize the query
+        path = self.sanitize_path(self.request.get_full_path())
+
+        # Add credentials to query
+        path = self.append_credentials(path)
 
         # make the request
-        r = requests.get("https://services.kortforsyningen.dk" + fullpath)
+        r = requests.get("https://services.datafordeler.dk" + path)
 
         # make the response
         response = HttpResponse(r.content, status=r.status_code)
@@ -52,3 +66,35 @@ class MapProxyView(View):
 
         # all good, return the response
         return response
+
+    def is_endpoint_valid(self, path: str) -> None:
+        """Validate request path against whitelisted endpoints or raise PermDenied
+        """
+        endpoint = path.replace(self.PROXY_URL, "", 1)
+        if endpoint not in self.VALID_ENDPOINTS:
+            logger.warning("Maps endpoint was invalid: '%s' valid endpoints: %s",
+                           endpoint, self.VALID_ENDPOINTS)
+            raise PermissionDenied("No thanks")
+
+    def sanitize_path(self, path: str) -> str:
+        """Sanitize path by removing PROXY_URL and set 'transparent' value to upper
+        """
+        new_path = path.replace(self.PROXY_URL, "", 1)
+        sanitized_path = re.sub(
+            r"(transparent=)(true|false)",
+            lambda match: r"{}{}".format(match.group(1), match.group(2).upper()),
+            new_path)
+        return sanitized_path
+
+    def append_credentials(self, path: str) -> str:
+        """Verify credentials are defined in settings & append or raise exception
+        """
+        username = settings.DATAFORDELER_USER
+        password = settings.DATAFORDELER_PASSWORD
+        if not username or not password:
+            logger.error("Missing credentials for "
+                         "'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'")
+            raise Exception("Internal Error")
+        path += f"&username={username}&password={password}"
+        return path
+

@@ -10,4 +10,4 @@ venv/
 environment_settings.py
 elm-stuff/
 .coverage
-/media
+media
