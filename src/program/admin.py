@@ -114,7 +114,9 @@ class EventInstanceAdmin(admin.ModelAdmin):
 
 @admin.register(EventType)
 class EventTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "order", "description")
+    list_editable = ("order",)
+    search_fields = ("name",)
 
 
 @admin.register(Speaker)

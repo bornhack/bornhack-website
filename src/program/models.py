@@ -821,6 +821,11 @@ class EventType(CreatedUpdatedModel):
         help_text="True if Events of this type should be selectable in the EventConflict m2m for SpeakerProposal and Speaker objects.",
     )
 
+    order = models.IntegerField(
+        default=0,
+        help_text="Order for showing the event type in a list",
+    )
+
     def __str__(self):
         return self.name
 
@@ -847,6 +852,9 @@ class EventType(CreatedUpdatedModel):
         return mark_safe(
             f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>',
         )
+
+    class Meta:
+        ordering = ["order"]
 
 
 class EventSession(CampRelatedModel):
