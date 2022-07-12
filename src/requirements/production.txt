@@ -24,7 +24,7 @@ html5lib==1.1
 icalendar==4.0.9
 ipython==8.4.0
 irc3==1.1.7
-lxml==4.8.0
+lxml==4.9.1
 olefile==0.46
 openpyxl==3.0.10
 pandas==1.4.3
