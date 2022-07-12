@@ -1,5 +1,6 @@
 import logging
 
+from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
@@ -10,7 +11,9 @@ from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
+from utils.models import CampReadOnlyModeError
 from .models import ShopTicket
+
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -54,7 +57,6 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     fields = ["name", "email"]
 
     def form_valid(self, form):
-        messages.info(self.request, "Ticket updated!")
         return super().form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
@@ -62,3 +64,13 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
         if ticket.opr.order.user != request.user:
             raise Http404("Ticket not found")
         return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super().post(request, *args, **kwargs)
+        except CampReadOnlyModeError as exc:
+            messages.error(self.request, "The camp is over. You can't update the ticket.")
+            return redirect(self.get_object().get_absolute_url())
+        else:
+            messages.info(self.request, "Ticket updated!")
+            return response
