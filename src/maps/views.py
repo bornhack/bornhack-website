@@ -1,7 +1,7 @@
 import logging
 import re
-import requests
 
+import requests
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -9,6 +9,10 @@ from django.views.generic import View
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
+
+class MissingCredentials(Exception):
+    pass
 
 
 class MapProxyView(View):
@@ -21,7 +25,7 @@ class MapProxyView(View):
     VALID_ENDPOINTS = [
         "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
         "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
-        "/DHMNedboer/dhm/1.0.0/wms"
+        "/DHMNedboer/dhm/1.0.0/wms",
     ]
 
     def get(self, *args, **kwargs):
@@ -68,33 +72,35 @@ class MapProxyView(View):
         return response
 
     def is_endpoint_valid(self, path: str) -> None:
-        """Validate request path against whitelisted endpoints or raise PermDenied
-        """
+        """Validate request path against whitelisted endpoints or raise PermDenied"""
         endpoint = path.replace(self.PROXY_URL, "", 1)
         if endpoint not in self.VALID_ENDPOINTS:
-            logger.warning("Maps endpoint was invalid: '%s' valid endpoints: %s",
-                           endpoint, self.VALID_ENDPOINTS)
+            logger.warning(
+                "Maps endpoint was invalid: '%s' valid endpoints: %s",
+                endpoint,
+                self.VALID_ENDPOINTS,
+            )
             raise PermissionDenied("No thanks")
 
     def sanitize_path(self, path: str) -> str:
-        """Sanitize path by removing PROXY_URL and set 'transparent' value to upper
-        """
+        """Sanitize path by removing PROXY_URL and set 'transparent' value to upper"""
         new_path = path.replace(self.PROXY_URL, "", 1)
         sanitized_path = re.sub(
             r"(transparent=)(true|false)",
-            lambda match: r"{}{}".format(match.group(1), match.group(2).upper()),
-            new_path)
+            lambda match: rf"{match.group(1)}{match.group(2).upper()}",
+            new_path,
+        )
         return sanitized_path
 
     def append_credentials(self, path: str) -> str:
-        """Verify credentials are defined in settings & append or raise exception
-        """
+        """Verify credentials are defined in settings & append or raise exception"""
         username = settings.DATAFORDELER_USER
         password = settings.DATAFORDELER_PASSWORD
         if not username or not password:
-            logger.error("Missing credentials for "
-                         "'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'")
-            raise Exception("Internal Error")
+            logger.error(
+                "Missing credentials for "
+                "'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'",
+            )
+            raise MissingCredentials()
         path += f"&username={username}&password={password}"
         return path
-

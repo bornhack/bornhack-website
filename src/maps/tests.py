@@ -1,26 +1,30 @@
 from unittest import mock
 
+from django.core.exceptions import PermissionDenied
+from django.test import override_settings
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from django.core.exceptions import PermissionDenied
-
 from .views import MapProxyView
+from .views import MissingCredentials
+
+USER = "user"
+PASSWORD = "password"
 
 
+@override_settings(
+    DATAFORDELER_USER=USER,
+    DATAFORDELER_PASSWORD=PASSWORD,
+)
 class MapProxyViewTest(TestCase):
-
     def setUp(self):
         self.rf = RequestFactory()
 
         self.allowed_endpoints = [
             "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
             "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
-            "/DHMNedboer/dhm/1.0.0/wms"
+            "/DHMNedboer/dhm/1.0.0/wms",
         ]
-
-        self.fix_user = "user"
-        self.fix_pass = "pass"
 
     def test_endpoint_not_allowed_raises_perm_denied(self):
         fix_request = self.rf.get("/maps/kfproxy/not/allowed/endpoint")
@@ -55,18 +59,16 @@ class MapProxyViewTest(TestCase):
 
     def test_append_credentials(self):
         fix_path = "/path"
-        fix_result = (fix_path +
-                      f"&username={self.fix_user}&password={self.fix_pass}")
+        fix_result = fix_path + f"&username={USER}&password={PASSWORD}"
 
-        with self.settings(DATAFORDELER_USER=self.fix_user,
-                           DATAFORDELER_PASSWORD=self.fix_pass):
-            result = MapProxyView().append_credentials(fix_path)
+        result = MapProxyView().append_credentials(fix_path)
 
         self.assertEqual(result, fix_result)
 
     def test_append_credentials_raises_perm_denied_if_no_creds_is_set(self):
-        with self.settings(DATAFORDELER_USER="",
-                           DATAFORDELER_PASSWORD=""):
-            with self.assertRaises(Exception):
+        with self.settings(
+            DATAFORDELER_USER="",
+            DATAFORDELER_PASSWORD="",
+        ):
+            with self.assertRaises(MissingCredentials):
                 MapProxyView().append_credentials("path")
-
