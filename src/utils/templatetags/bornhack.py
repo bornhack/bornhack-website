@@ -62,6 +62,6 @@ def thh(context, fieldname, headerstring=None, tooltip=None, htmlclass=None):
 @register.filter
 def currency(value):
     try:
-        return mark_safe("{0:.2f}&nbsp;DKK".format(Decimal(value)))
+        return mark_safe(f"{Decimal(value):.2f}&nbsp;DKK")
     except ValueError:
         return False

@@ -1,7 +1,8 @@
 from django import forms
 from django.forms import modelformset_factory
 
-from program.models import Event, Speaker
+from program.models import Event
+from program.models import Speaker
 from tickets.models import ShopTicket
 
 
@@ -175,5 +176,7 @@ class ShopTicketRefundForm(forms.ModelForm):
 
 
 ShopTicketRefundFormSet = modelformset_factory(
-    ShopTicket, form=ShopTicketRefundForm, extra=0
+    ShopTicket,
+    form=ShopTicketRefundForm,
+    extra=0,
 )

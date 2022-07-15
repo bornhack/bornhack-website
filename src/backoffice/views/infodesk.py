@@ -7,25 +7,30 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Q
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404
+from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, ListView, TemplateView, UpdateView
-
-from ..mixins import InfoTeamPermissionMixin
-from camps.mixins import CampViewMixin
-from economy.models import Pos
-from shop.models import CreditNote, Invoice, Order, OrderProductRelation, Refund
-from tickets.models import (
-    DiscountTicket,
-    ShopTicket,
-    SponsorTicket,
-    TicketType,
-    TicketTypeUnion,
-)
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import TemplateView
+from django.views.generic import UpdateView
 
 from ..forms import ShopTicketRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
+from camps.mixins import CampViewMixin
+from economy.models import Pos
+from shop.models import CreditNote
+from shop.models import Invoice
+from shop.models import Order
+from shop.models import OrderProductRelation
+from shop.models import Refund
+from tickets.models import DiscountTicket
+from tickets.models import ShopTicket
+from tickets.models import SponsorTicket
+from tickets.models import TicketType
+from tickets.models import TicketTypeUnion
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -286,7 +291,9 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
 
             for opr in oprs:
                 ticket_formset = ShopTicketRefundFormSet(
-                    request.POST, queryset=opr.unused_shoptickets, prefix=opr.id
+                    request.POST,
+                    queryset=opr.unused_shoptickets,
+                    prefix=opr.id,
                 )
                 if not ticket_formset.is_valid():
                     messages.error(
@@ -312,7 +319,7 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
             ShopTicket.objects.filter(pk__in=tickets_to_delete).delete()
 
         return HttpResponseRedirect(
-            reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
+            reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug}),
         )
 
 

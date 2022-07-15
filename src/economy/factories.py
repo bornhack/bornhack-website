@@ -1,19 +1,18 @@
 import factory
 from django.utils import timezone
 
-from .models import (
-    Bank,
-    BankAccount,
-    BankTransaction,
-    ClearhausSettlement,
-    CoinifyBalance,
-    CoinifyInvoice,
-    CoinifyPayout,
-    EpayTransaction,
-    MobilePayTransaction,
-    ZettleBalance,
-    ZettleReceipt, Pos,
-)
+from .models import Bank
+from .models import BankAccount
+from .models import BankTransaction
+from .models import ClearhausSettlement
+from .models import CoinifyBalance
+from .models import CoinifyInvoice
+from .models import CoinifyPayout
+from .models import EpayTransaction
+from .models import MobilePayTransaction
+from .models import Pos
+from .models import ZettleBalance
+from .models import ZettleReceipt
 
 
 class BankFactory(factory.django.DjangoModelFactory):

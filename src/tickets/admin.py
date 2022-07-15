@@ -58,7 +58,13 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "product_quantity",
     ]
 
-    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "opr__order", "product"]
+    list_filter = [
+        "ticket_type__camp",
+        "used_at",
+        "ticket_type",
+        "opr__order",
+        "product",
+    ]
 
     search_fields = [
         "uuid",

@@ -1,25 +1,23 @@
 from django.urls import include
 from django.urls import path
 
-from .views import (
-    BankTransferView,
-    CoinifyCallbackView,
-    CoinifyRedirectView,
-    CoinifyThanksView,
-    CreditNoteListView,
-    DownloadCreditNoteView,
-    DownloadInvoiceView,
-    OrderDetailView,
-    OrderListView,
-    OrderMarkAsPaidView,
-    OrderReviewAndPayView,
-    PayInPersonView,
-    ProductDetailView,
-    QuickPayCallbackView,
-    QuickPayLinkView,
-    QuickPayThanksView,
-    ShopIndexView,
-)
+from .views import BankTransferView
+from .views import CoinifyCallbackView
+from .views import CoinifyRedirectView
+from .views import CoinifyThanksView
+from .views import CreditNoteListView
+from .views import DownloadCreditNoteView
+from .views import DownloadInvoiceView
+from .views import OrderDetailView
+from .views import OrderListView
+from .views import OrderMarkAsPaidView
+from .views import OrderReviewAndPayView
+from .views import PayInPersonView
+from .views import ProductDetailView
+from .views import QuickPayCallbackView
+from .views import QuickPayLinkView
+from .views import QuickPayThanksView
+from .views import ShopIndexView
 
 app_name = "shop"
 
