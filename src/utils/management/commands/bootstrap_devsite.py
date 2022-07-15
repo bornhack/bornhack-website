@@ -1335,7 +1335,7 @@ class Command(BaseCommand):
                 scheduler.apply(autoschedule)
             except ValueError as E:
                 self.output(
-                    f"Got exception while calculating similar autoschedule: {E}"
+                    f"Got exception while calculating similar autoschedule: {E}",
                 )
                 autoschedule = None
             scheduleduration = timezone.now() - schedulestart

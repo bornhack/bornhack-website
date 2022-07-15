@@ -1,24 +1,22 @@
 from django.contrib import admin
 
-from .models import (
-    CoinifyAPICallback,
-    CoinifyAPIInvoice,
-    CoinifyAPIRequest,
-    CreditNote,
-    CustomOrder,
-    EpayCallback,
-    EpayPayment,
-    Invoice,
-    Order,
-    OrderProductRelation,
-    Product,
-    ProductCategory,
-    QuickPayAPICallback,
-    QuickPayAPIObject,
-    QuickPayAPIRequest,
-    Refund,
-    RefundProductRelation,
-)
+from .models import CoinifyAPICallback
+from .models import CoinifyAPIInvoice
+from .models import CoinifyAPIRequest
+from .models import CreditNote
+from .models import CustomOrder
+from .models import EpayCallback
+from .models import EpayPayment
+from .models import Invoice
+from .models import Order
+from .models import OrderProductRelation
+from .models import Product
+from .models import ProductCategory
+from .models import QuickPayAPICallback
+from .models import QuickPayAPIObject
+from .models import QuickPayAPIRequest
+from .models import Refund
+from .models import RefundProductRelation
 
 admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)

@@ -6,8 +6,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
-from django.db import models, transaction
-from django.db.models import Count, F, Sum
+from django.db import models
+from django.db import transaction
+from django.db.models import Count
+from django.db.models import F
+from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -96,7 +99,10 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         IN_PERSON = "in_person", "In Person"
 
     payment_method = models.CharField(
-        max_length=50, choices=PaymentMethods.choices, default="", blank=True
+        max_length=50,
+        choices=PaymentMethods.choices,
+        default="",
+        blank=True,
     )
 
     cancelled = models.BooleanField(default=False)
@@ -353,7 +359,7 @@ class Refund(CreatedUpdatedModel):
     customer_comment = models.TextField(
         verbose_name=_("Customer comment"),
         help_text=_(
-            "If you (the customer) have any comments about the refund please enter them here. This field is not currently being used."
+            "If you (the customer) have any comments about the refund please enter them here. This field is not currently being used.",
         ),
         default="",
         blank=True,
@@ -387,7 +393,9 @@ class RefundProductRelation(CreatedUpdatedModel):
     """
 
     refund = models.ForeignKey(
-        "shop.Refund", related_name="rprs", on_delete=models.PROTECT
+        "shop.Refund",
+        related_name="rprs",
+        on_delete=models.PROTECT,
     )
 
     opr = models.ForeignKey(
@@ -398,7 +406,7 @@ class RefundProductRelation(CreatedUpdatedModel):
     )
 
     quantity = models.PositiveIntegerField(
-        help_text="The number of times this product is being refunded in this Refund"
+        help_text="The number of times this product is being refunded in this Refund",
     )
 
     ticket_deleted = models.DateTimeField(
@@ -593,17 +601,18 @@ class OrderProductRelation(
     CreatedUpdatedModel,
 ):
     def __str__(self):
-        return f'#{self.order}: {self.quantity} {self.product}'
-    ]
+        return f"#{self.order}: {self.quantity} {self.product}"
 
     order = models.ForeignKey(
-        "shop.Order", related_name="oprs", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="oprs",
+        on_delete=models.PROTECT,
     )
 
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
 
     quantity = models.PositiveIntegerField(
-        help_text="The number of times this product has been bought on this order"
+        help_text="The number of times this product has been bought on this order",
     )
 
     ticket_generated = models.DateTimeField(
@@ -616,7 +625,7 @@ class OrderProductRelation(
         null=True,
         blank=True,
         help_text=_(
-            "The price (per product, at the time of purchase, in DKK, including VAT)."
+            "The price (per product, at the time of purchase, in DKK, including VAT).",
         ),
     )
 
@@ -643,10 +652,10 @@ class OrderProductRelation(
                 return tickets
 
             # put reusable kwargs together
-            query_kwargs = dict(
-                product=self.product,
-                ticket_type=self.product.ticket_type,
-            )
+            query_kwargs = {
+                "product": self.product,
+                "ticket_type": self.product.ticket_type,
+            }
 
             if self.product.ticket_type.single_ticket_per_product:
                 # For this ticket type we create one ticket regardless of quantity,
@@ -681,7 +690,7 @@ class OrderProductRelation(
                     return tickets
 
                 # create the number of tickets required
-                for i in range(0, tickets_to_create):
+                for _i in range(tickets_to_create):
                     ticket = self.shoptickets.create(**query_kwargs)
                     tickets.append(ticket)
 
@@ -968,7 +977,9 @@ HttpMethods = models.TextChoices("Method", "GET POST PUT PATCH DELETE")
 
 class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
     order = models.ForeignKey(
-        "shop.Order", related_name="quickpay_api_requests", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="quickpay_api_requests",
+        on_delete=models.PROTECT,
     )
     method = models.CharField(
         max_length=10,
@@ -1003,7 +1014,9 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
 
 class QuickPayAPIObject(CreatedUpdatedModel, UUIDModel):
     order = models.ForeignKey(
-        "shop.Order", related_name="quickpay_api_objects", on_delete=models.PROTECT
+        "shop.Order",
+        related_name="quickpay_api_objects",
+        on_delete=models.PROTECT,
     )
     object_type = models.TextField(help_text="The type of this QuickPayAPIObject")
     object_body = models.JSONField(help_text="The body of the QuickPay API object")

@@ -8,13 +8,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import (
-    Http404,
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseRedirect,
-    HttpResponseServerError,
-)
+from django.http import Http404
+from django.http import HttpResponse
+from django.http import HttpResponseBadRequest
+from django.http import HttpResponseRedirect
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.urls import reverse_lazy
@@ -28,27 +26,24 @@ from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
-from shop.models import (
-    CreditNote,
-    EpayCallback,
-    EpayPayment,
-    Order,
-    OrderProductRelation,
-    Product,
-    ProductCategory,
-    QuickPayAPICallback,
-    QuickPayAPIObject,
-)
-from vendor.coinify.coinify_callback import CoinifyCallback
-
-from .coinify import (
-    create_coinify_invoice,
-    process_coinify_invoice_json,
-    save_coinify_callback,
-)
-from .epay import calculate_epay_hash, validate_epay_callback
-from .forms import OrderProductRelationForm, OrderProductRelationFormSet
+from .coinify import create_coinify_invoice
+from .coinify import process_coinify_invoice_json
+from .coinify import save_coinify_callback
+from .epay import calculate_epay_hash
+from .epay import validate_epay_callback
+from .forms import OrderProductRelationForm
+from .forms import OrderProductRelationFormSet
 from .quickpay import QuickPay
+from shop.models import CreditNote
+from shop.models import EpayCallback
+from shop.models import EpayPayment
+from shop.models import Order
+from shop.models import OrderProductRelation
+from shop.models import Product
+from shop.models import ProductCategory
+from shop.models import QuickPayAPICallback
+from shop.models import QuickPayAPIObject
+from vendor.coinify.coinify_callback import CoinifyCallback
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -358,7 +353,7 @@ class OrderDetailView(
                     "Some of the products you are ordering are out of stock. Review the order and try again.",
                 )
                 return HttpResponseRedirect(
-                    reverse("shop:order_detail", kwargs={"pk": order.pk})
+                    reverse("shop:order_detail", kwargs={"pk": order.pk}),
                 )
 
             # No stock issues, proceed to save OPRs and Order
@@ -373,12 +368,12 @@ class OrderDetailView(
             if "review_and_pay" in request.POST:
                 # user is ready to pay, redirect
                 return HttpResponseRedirect(
-                    reverse("shop:order_review_and_pay", kwargs={"pk": order.pk})
+                    reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
                 )
 
         # redirect remaining cases back to the order page
         return HttpResponseRedirect(
-            reverse("shop:order_detail", kwargs={"pk": order.pk})
+            reverse("shop:order_detail", kwargs={"pk": order.pk}),
         )
 
 
@@ -413,16 +408,20 @@ class OrderReviewAndPayView(
 
             reverses = {
                 Order.PaymentMethods.CREDIT_CARD: reverse_lazy(
-                    "shop:quickpay_link", kwargs={"pk": order.id}
+                    "shop:quickpay_link",
+                    kwargs={"pk": order.id},
                 ),
                 Order.PaymentMethods.BLOCKCHAIN: reverse_lazy(
-                    "shop:coinify_pay", kwargs={"pk": order.id}
+                    "shop:coinify_pay",
+                    kwargs={"pk": order.id},
                 ),
                 Order.PaymentMethods.BANK_TRANSFER: reverse_lazy(
-                    "shop:bank_transfer", kwargs={"pk": order.id}
+                    "shop:bank_transfer",
+                    kwargs={"pk": order.id},
                 ),
                 Order.PaymentMethods.IN_PERSON: reverse_lazy(
-                    "shop:in_person", kwargs={"pk": order.id}
+                    "shop:in_person",
+                    kwargs={"pk": order.id},
                 ),
             }
 
@@ -761,7 +760,10 @@ class QuickPayLinkView(
 
 
 class QuickPayThanksView(
-    LoginRequiredMixin, EnsureUserOwnsOrderMixin, EnsureClosedOrderMixin, DetailView
+    LoginRequiredMixin,
+    EnsureUserOwnsOrderMixin,
+    EnsureClosedOrderMixin,
+    DetailView,
 ):
     model = Order
     template_name = "quickpay_thanks.html"
@@ -777,7 +779,9 @@ class QuickPayCallbackView(View):
     def post(self, request, *args, **kwargs):
         """Validate signature before saving callback."""
         calculated_signature = hmac.new(
-            settings.QUICKPAY_PRIVATE_KEY.encode("utf-8"), request.body, hashlib.sha256
+            settings.QUICKPAY_PRIVATE_KEY.encode("utf-8"),
+            request.body,
+            hashlib.sha256,
         ).hexdigest()
         header_signature = request.META["HTTP_QUICKPAY_CHECKSUM_SHA256"]
         if header_signature != calculated_signature:
@@ -787,7 +791,7 @@ class QuickPayCallbackView(View):
 
         # find the related Order object (where possible)
         body = json.loads(request.body.decode("utf-8"))
-        if request.META["HTTP_QUICKPAY_RESOURCE_TYPE"] == "payment":
+        if request.headers["Quickpay-Resource-Type"] == "payment":
             order = Order.objects.get(id=int(body["order_id"]))
         else:
             order = None
@@ -795,7 +799,7 @@ class QuickPayCallbackView(View):
         # save the new QuickPayAPIObject and the callback
         qpobj = QuickPayAPIObject.objects.create(
             order=order,
-            object_type=request.META["HTTP_QUICKPAY_RESOURCE_TYPE"],
+            object_type=request.headers["Quickpay-Resource-Type"],
             object_body=json.loads(request.body.decode("utf-8")),
         )
         qpcb = QuickPayAPICallback.objects.create(

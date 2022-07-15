@@ -1,147 +1,146 @@
 from django.urls import include
 from django.urls import path
 
-from .views import (
-    AccountingExportCreateView,
-    AccountingExportDeleteView,
-    AccountingExportDetailView,
-    AccountingExportDownloadArchiveView,
-    AccountingExportDownloadFileView,
-    AccountingExportListView,
-    AccountingExportUpdateView,
-    AddRecordingView,
-    ApproveFeedbackView,
-    ApproveNamesView,
-    AutoScheduleApplyView,
-    AutoScheduleCrashCourseView,
-    AutoScheduleDebugEventConflictsView,
-    AutoScheduleDebugEventSlotUnavailabilityView,
-    AutoScheduleDiffView,
-    AutoScheduleManageView,
-    AutoScheduleValidateView,
-    BackofficeIndexView,
-    BackofficeProxyView,
-    BadgeHandoutView,
-    BankAccountDetailView,
-    BankCSVUploadView,
-    BankDetailView,
-    BankListView,
-    BankTransactionDetailView,
-    ChainDetailView,
-    ChainListView,
-    ClearhausSettlementDetailView,
-    ClearhausSettlementImportView,
-    ClearhausSettlementListView,
-    CoinifyBalanceListView,
-    CoinifyCSVImportView,
-    CoinifyDashboardView,
-    CoinifyInvoiceListView,
-    CoinifyPayoutListView,
-    CredebtorDetailView,
-    CreditNoteListView,
-    EpayCSVImportView,
-    EpayTransactionListView,
-    EventDeleteView,
-    EventDetailView,
-    EventListView,
-    EventLocationCreateView,
-    EventLocationDeleteView,
-    EventLocationDetailView,
-    EventLocationListView,
-    EventLocationUpdateView,
-    EventProposalApproveRejectView,
-    EventProposalDetailView,
-    EventProposalListView,
-    EventScheduleView,
-    EventSessionCreateLocationSelectView,
-    EventSessionCreateTypeSelectView,
-    EventSessionCreateView,
-    EventSessionDeleteView,
-    EventSessionDetailView,
-    EventSessionListView,
-    EventSessionUpdateView,
-    EventSlotDetailView,
-    EventSlotListView,
-    EventSlotUnscheduleView,
-    EventTypeDetailView,
-    EventTypeListView,
-    EventUpdateView,
-    ExpenseDetailView,
-    ExpenseListView,
-    FacilityCreateView,
-    FacilityDeleteView,
-    FacilityDetailView,
-    FacilityFeedbackView,
-    FacilityListView,
-    FacilityOpeningHoursCreateView,
-    FacilityOpeningHoursDeleteView,
-    FacilityOpeningHoursUpdateView,
-    FacilityTypeCreateView,
-    FacilityTypeDeleteView,
-    FacilityTypeListView,
-    FacilityTypeUpdateView,
-    FacilityUpdateView,
-    InvoiceDownloadView,
-    InvoiceListCSVView,
-    InvoiceListView,
-    IrcOverView,
-    MerchandiseOrdersView,
-    MerchandiseToOrderView,
-    MobilePayCSVImportView,
-    MobilePayTransactionListView,
-    OrderDetailView,
-    OrderDownloadProformaInvoiceView,
-    OrderListView,
-    OrderUpdateView,
-    OutgoingEmailMassUpdateView,
-    PendingProposalsView,
-    PosCreateView,
-    PosDeleteView,
-    PosDetailView,
-    PosListView,
-    PosReportBankCountEndView,
-    PosReportBankCountStartView,
-    PosReportCreateView,
-    PosReportDetailView,
-    PosReportPosCountEndView,
-    PosReportPosCountStartView,
-    PosReportUpdateView,
-    PosUpdateView,
-    ProductHandoutView,
-    ReimbursementCreateUserSelectView,
-    ReimbursementCreateView,
-    ReimbursementDeleteView,
-    ReimbursementDetailView,
-    ReimbursementListView,
-    ReimbursementUpdateView,
-    RevenueDetailView,
-    RevenueListView,
-    ScanTicketsPosSelectView,
-    ScanTicketsView,
-    ShopTicketOverview,
-    ShopTicketStatsDetailView,
-    ShopTicketStatsView,
-    SpeakerDeleteView,
-    SpeakerDetailView,
-    SpeakerListView,
-    SpeakerProposalApproveRejectView,
-    SpeakerProposalDetailView,
-    SpeakerProposalListView,
-    SpeakerUpdateView,
-    TicketCheckinView,
-    TokenCreateView,
-    TokenDeleteView,
-    TokenDetailView,
-    TokenListView,
-    TokenStatsView,
-    TokenUpdateView,
-    VillageOrdersView,
-    VillageToOrderView,
-    ZettleBalanceListView,
-    ZettleDashboardView,
-    ZettleDataImportView,
-    ZettleReceiptListView, OrderRefundView,
-)
+from .views import AccountingExportCreateView
+from .views import AccountingExportDeleteView
+from .views import AccountingExportDetailView
+from .views import AccountingExportDownloadArchiveView
+from .views import AccountingExportDownloadFileView
+from .views import AccountingExportListView
+from .views import AccountingExportUpdateView
+from .views import AddRecordingView
+from .views import ApproveFeedbackView
+from .views import ApproveNamesView
+from .views import AutoScheduleApplyView
+from .views import AutoScheduleCrashCourseView
+from .views import AutoScheduleDebugEventConflictsView
+from .views import AutoScheduleDebugEventSlotUnavailabilityView
+from .views import AutoScheduleDiffView
+from .views import AutoScheduleManageView
+from .views import AutoScheduleValidateView
+from .views import BackofficeIndexView
+from .views import BackofficeProxyView
+from .views import BadgeHandoutView
+from .views import BankAccountDetailView
+from .views import BankCSVUploadView
+from .views import BankDetailView
+from .views import BankListView
+from .views import BankTransactionDetailView
+from .views import ChainDetailView
+from .views import ChainListView
+from .views import ClearhausSettlementDetailView
+from .views import ClearhausSettlementImportView
+from .views import ClearhausSettlementListView
+from .views import CoinifyBalanceListView
+from .views import CoinifyCSVImportView
+from .views import CoinifyDashboardView
+from .views import CoinifyInvoiceListView
+from .views import CoinifyPayoutListView
+from .views import CredebtorDetailView
+from .views import CreditNoteListView
+from .views import EpayCSVImportView
+from .views import EpayTransactionListView
+from .views import EventDeleteView
+from .views import EventDetailView
+from .views import EventListView
+from .views import EventLocationCreateView
+from .views import EventLocationDeleteView
+from .views import EventLocationDetailView
+from .views import EventLocationListView
+from .views import EventLocationUpdateView
+from .views import EventProposalApproveRejectView
+from .views import EventProposalDetailView
+from .views import EventProposalListView
+from .views import EventScheduleView
+from .views import EventSessionCreateLocationSelectView
+from .views import EventSessionCreateTypeSelectView
+from .views import EventSessionCreateView
+from .views import EventSessionDeleteView
+from .views import EventSessionDetailView
+from .views import EventSessionListView
+from .views import EventSessionUpdateView
+from .views import EventSlotDetailView
+from .views import EventSlotListView
+from .views import EventSlotUnscheduleView
+from .views import EventTypeDetailView
+from .views import EventTypeListView
+from .views import EventUpdateView
+from .views import ExpenseDetailView
+from .views import ExpenseListView
+from .views import FacilityCreateView
+from .views import FacilityDeleteView
+from .views import FacilityDetailView
+from .views import FacilityFeedbackView
+from .views import FacilityListView
+from .views import FacilityOpeningHoursCreateView
+from .views import FacilityOpeningHoursDeleteView
+from .views import FacilityOpeningHoursUpdateView
+from .views import FacilityTypeCreateView
+from .views import FacilityTypeDeleteView
+from .views import FacilityTypeListView
+from .views import FacilityTypeUpdateView
+from .views import FacilityUpdateView
+from .views import InvoiceDownloadView
+from .views import InvoiceListCSVView
+from .views import InvoiceListView
+from .views import IrcOverView
+from .views import MerchandiseOrdersView
+from .views import MerchandiseToOrderView
+from .views import MobilePayCSVImportView
+from .views import MobilePayTransactionListView
+from .views import OrderDetailView
+from .views import OrderDownloadProformaInvoiceView
+from .views import OrderListView
+from .views import OrderRefundView
+from .views import OrderUpdateView
+from .views import OutgoingEmailMassUpdateView
+from .views import PendingProposalsView
+from .views import PosCreateView
+from .views import PosDeleteView
+from .views import PosDetailView
+from .views import PosListView
+from .views import PosReportBankCountEndView
+from .views import PosReportBankCountStartView
+from .views import PosReportCreateView
+from .views import PosReportDetailView
+from .views import PosReportPosCountEndView
+from .views import PosReportPosCountStartView
+from .views import PosReportUpdateView
+from .views import PosUpdateView
+from .views import ProductHandoutView
+from .views import ReimbursementCreateUserSelectView
+from .views import ReimbursementCreateView
+from .views import ReimbursementDeleteView
+from .views import ReimbursementDetailView
+from .views import ReimbursementListView
+from .views import ReimbursementUpdateView
+from .views import RevenueDetailView
+from .views import RevenueListView
+from .views import ScanTicketsPosSelectView
+from .views import ScanTicketsView
+from .views import ShopTicketOverview
+from .views import ShopTicketStatsDetailView
+from .views import ShopTicketStatsView
+from .views import SpeakerDeleteView
+from .views import SpeakerDetailView
+from .views import SpeakerListView
+from .views import SpeakerProposalApproveRejectView
+from .views import SpeakerProposalDetailView
+from .views import SpeakerProposalListView
+from .views import SpeakerUpdateView
+from .views import TicketCheckinView
+from .views import TokenCreateView
+from .views import TokenDeleteView
+from .views import TokenDetailView
+from .views import TokenListView
+from .views import TokenStatsView
+from .views import TokenUpdateView
+from .views import VillageOrdersView
+from .views import VillageToOrderView
+from .views import ZettleBalanceListView
+from .views import ZettleDashboardView
+from .views import ZettleDataImportView
+from .views import ZettleReceiptListView
 
 app_name = "backoffice"
 
@@ -296,10 +295,10 @@ urlpatterns = [
                                             OrderDownloadProformaInvoiceView.as_view(),
                                             name="order_download_proforma_invoice",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -321,7 +320,7 @@ urlpatterns = [
                                             InvoiceDownloadView.as_view(),
                                             name="invoice_download",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
                         ],
