@@ -214,7 +214,7 @@ def import_clearhaus_csv(csvreader):
             defaults={
                 "merchant_id": row[0],
                 "merchant_name": row[1],
-                "settled": True if row[3] == "true" else "False",
+                "settled": True if row[3] == "true" else False,
                 "currency": row[4],
                 "period_start_date": row[5],
                 "period_end_date": row[6] if row[6] else None,
