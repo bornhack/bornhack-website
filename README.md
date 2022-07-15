@@ -2,6 +2,7 @@
 
 [![tests](https://github.com/bornhack/bornhack-website/actions/workflows/main.yml/badge.svg)](https://github.com/bornhack/bornhack-website/actions)
 [![codecov](https://codecov.io/gh/bornhack/bornhack-website/branch/master/graph/badge.svg)](https://codecov.io/gh/bornhack/bornhack-website)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/bornhack/bornhack-website/master.svg)](https://results.pre-commit.ci/latest/github/bornhack/bornhack-website/master)
 
 Django project to power Bornhack. Features include news, villages, webshop, and more.
 
