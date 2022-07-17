@@ -17,6 +17,7 @@ from django.db.models import Subquery
 from django.db.models import Sum
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
@@ -27,7 +28,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        def _make_subquery(annotation: Union[Expression,F]) -> Subquery:
+        def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
                 .filter(pk=OuterRef("pk"))
@@ -63,7 +64,9 @@ class TicketTypeQuerySet(models.QuerySet):
 
 
 # TicketType can be full week, one day, cabins, parking, merch, hax, massage, etc.
-class TicketType(CampRelatedModel, UUIDModel):
+class TicketType(
+    ExportModelOperationsMixin("ticket_type"), CampRelatedModel, UUIDModel
+):
     objects = TicketTypeQuerySet.as_manager()
     name = models.TextField()
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
@@ -174,7 +177,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
         )
 
 
-class SponsorTicket(BaseTicket):
+class SponsorTicket(ExportModelOperationsMixin("sponsor_ticket"), BaseTicket):
     sponsor = models.ForeignKey("sponsors.Sponsor", on_delete=models.PROTECT)
 
     def __str__(self):
@@ -185,7 +188,7 @@ class SponsorTicket(BaseTicket):
         return "sponsor"
 
 
-class DiscountTicket(BaseTicket):
+class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
     price = models.IntegerField(
         help_text=_("Price of the discounted ticket (in DKK, including VAT)."),
     )
@@ -198,7 +201,7 @@ class DiscountTicket(BaseTicket):
         return "discount"
 
 
-class ShopTicket(BaseTicket):
+class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
         related_name="shoptickets",

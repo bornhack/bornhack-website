@@ -1,11 +1,12 @@
 from django.db import models
 from django.urls import reverse
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 
 
-class Ride(UUIDModel, CampRelatedModel):
+class Ride(ExportModelOperationsMixin("ride"), UUIDModel, CampRelatedModel):
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
     user = models.ForeignKey("auth.User", on_delete=models.PROTECT)
     author = models.CharField(

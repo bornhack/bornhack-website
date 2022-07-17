@@ -1,11 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CreatedUpdatedModel
 
 
-class OutgoingIrcMessage(CreatedUpdatedModel):
+class OutgoingIrcMessage(
+    ExportModelOperationsMixin("outgoing_irc_message"), CreatedUpdatedModel
+):
     target = models.CharField(max_length=100)
     message = models.CharField(max_length=200)
     processed = models.BooleanField(default=False)

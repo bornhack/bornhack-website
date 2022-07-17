@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from .dectutils import DectUtils
 from utils.models import CampRelatedModel
@@ -11,7 +12,9 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 dectutil = DectUtils()
 
 
-class DectRegistration(CampRelatedModel):
+class DectRegistration(
+    ExportModelOperationsMixin("dect_registration"), CampRelatedModel
+):
     """
     This model contains DECT registrations for users and services
     """

@@ -122,6 +122,7 @@ BOOTSTRAP3 = {
     "javascript_url": "/static/js/bootstrap.min.js",
 }
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -133,6 +134,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "utils.middleware.RedirectExceptionMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True

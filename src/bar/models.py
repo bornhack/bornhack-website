@@ -1,9 +1,10 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
 
-class ProductCategory(CampRelatedModel):
+class ProductCategory(ExportModelOperationsMixin("product_category"), CampRelatedModel):
     name = models.CharField(max_length=255)
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
@@ -14,7 +15,7 @@ class ProductCategory(CampRelatedModel):
         ordering = ("name",)
 
 
-class Product(models.Model):
+class Product(ExportModelOperationsMixin("product"), models.Model):
     name = models.CharField(max_length=255)
     price = models.IntegerField()
     category = models.ForeignKey(

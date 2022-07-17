@@ -1,10 +1,11 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from teams.models import Team
 from utils.models import CreatedUpdatedModel
 
 
-class Type(CreatedUpdatedModel):
+class Type(ExportModelOperationsMixin("type"), CreatedUpdatedModel):
     """
     The events.Type model contains different types of system events which can happen.
     New event types should be added in data migrations.
@@ -37,7 +38,7 @@ class Type(CreatedUpdatedModel):
         return Team.objects.filter(pk__in=team_ids)
 
 
-class Routing(CreatedUpdatedModel):
+class Routing(ExportModelOperationsMixin("routing"), CreatedUpdatedModel):
     """
     The events.Routing model contains routings for system events.
     Add a new entry to route events of a certain type to a team.

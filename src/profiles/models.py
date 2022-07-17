@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
 
-class Profile(CreatedUpdatedModel, UUIDModel):
+class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = _("Profile")
         verbose_name_plural = _("Profiles")

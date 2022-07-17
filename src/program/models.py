@@ -19,6 +19,7 @@ from django.urls import reverse
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 from taggit.managers import TaggableManager
 
@@ -36,7 +37,7 @@ from utils.slugs import unique_slugify
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class UrlType(CreatedUpdatedModel):
+class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
     """
     Each Url object has a type.
     """
@@ -60,7 +61,7 @@ class UrlType(CreatedUpdatedModel):
         return self.name
 
 
-class Url(CampRelatedModel):
+class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
     """
     This model contains URLs related to
     - SpeakerProposals
@@ -194,7 +195,9 @@ class Availability(CampRelatedModel, UUIDModel):
     )
 
 
-class SpeakerProposalAvailability(Availability):
+class SpeakerProposalAvailability(
+    ExportModelOperationsMixin("speaker_proposal_availability"), Availability
+):
     """Availability info for SpeakerProposal objects"""
 
     class Meta:
@@ -249,7 +252,9 @@ class SpeakerProposalAvailability(Availability):
         return f"SpeakerProposalAvailability: {self.speaker_proposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
 
 
-class SpeakerAvailability(Availability):
+class SpeakerAvailability(
+    ExportModelOperationsMixin("speaker_availability"), Availability
+):
     """Availability info for Speaker objects"""
 
     class Meta:
@@ -365,7 +370,9 @@ class UserSubmittedModel(CampRelatedModel):
         super().delete(**kwargs)
 
 
-class SpeakerProposal(UserSubmittedModel):
+class SpeakerProposal(
+    ExportModelOperationsMixin("speaker_proposal"), UserSubmittedModel
+):
     """A speaker proposal"""
 
     camp = models.ForeignKey(
@@ -495,7 +502,7 @@ class SpeakerProposal(UserSubmittedModel):
             return self.event_proposals.first().event_type.host_title
 
 
-class EventProposal(UserSubmittedModel):
+class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedModel):
     """An event proposal"""
 
     track = models.ForeignKey(
@@ -644,7 +651,7 @@ class EventProposal(UserSubmittedModel):
 ###############################################################################
 
 
-class EventTrack(CampRelatedModel):
+class EventTrack(ExportModelOperationsMixin("event_track"), CampRelatedModel):
     """All events belong to a track. Administration of a track can be delegated to one or more users."""
 
     name = models.CharField(max_length=100, help_text="The name of this Track")
@@ -675,7 +682,7 @@ class EventTrack(CampRelatedModel):
         return {"name": self.name, "slug": self.slug}
 
 
-class EventLocation(CampRelatedModel):
+class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedModel):
     """The places where stuff happens"""
 
     name = models.CharField(max_length=100)
@@ -751,7 +758,7 @@ class EventLocation(CampRelatedModel):
         return True
 
 
-class EventType(CreatedUpdatedModel):
+class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
     """Every event needs to have a type."""
 
     name = models.CharField(
@@ -857,7 +864,7 @@ class EventType(CreatedUpdatedModel):
         ordering = ["order"]
 
 
-class EventSession(CampRelatedModel):
+class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel):
     """
     An EventSession define the "opening hours" for an EventType in an EventLocation.
 
@@ -1042,7 +1049,7 @@ class EventSession(CampRelatedModel):
         return self.event_slots.filter(event__isnull=False)
 
 
-class EventSlot(CampRelatedModel):
+class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
     """
     An EventSlot defines a window where we can schedule an Event.
 
@@ -1248,7 +1255,7 @@ class EventSlot(CampRelatedModel):
         return uuid.UUID(f"{uuidbase}{event_uuid[0:32-len(uuidbase)]}")
 
 
-class Event(CampRelatedModel):
+class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
     """Something that is on the program one or more times."""
 
     uuid = models.UUIDField(
@@ -1371,7 +1378,7 @@ class Event(CampRelatedModel):
         return timedelta(minutes=self.duration_minutes)
 
 
-class EventInstance(CampRelatedModel):
+class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedModel):
     """The old way of scheduling events. Model to be deleted after prod data migration"""
 
     uuid = models.UUIDField(
@@ -1518,7 +1525,7 @@ class EventInstance(CampRelatedModel):
             return 0
 
 
-class Speaker(CampRelatedModel):
+class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
     """A Person (co)anchoring one or more events on a camp."""
 
     name = models.CharField(max_length=150, help_text="Name or alias of the speaker")
@@ -1638,7 +1645,7 @@ class Speaker(CampRelatedModel):
             return self.events.first().event_type.host_title
 
 
-class Favorite(models.Model):
+class Favorite(ExportModelOperationsMixin("favorite"), models.Model):
     user = models.ForeignKey(
         "auth.User",
         related_name="favorites",
@@ -1656,7 +1663,9 @@ class Favorite(models.Model):
 ###############################################################################
 
 
-class EventFeedback(CampRelatedModel, UUIDModel):
+class EventFeedback(
+    ExportModelOperationsMixin("event_feedback"), CampRelatedModel, UUIDModel
+):
     """
     This model contains all feedback for Events
     Each user can submit exactly one feedback per Event

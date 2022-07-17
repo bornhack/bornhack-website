@@ -1,11 +1,12 @@
 from django.db import models
 from django.urls import reverse
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.slugs import unique_slugify
 
 
-class Wish(CampRelatedModel):
+class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
     """
     This model contains the stuff BornHack needs. This can be anything from kitchen equipment
     to network cables, or anything really.

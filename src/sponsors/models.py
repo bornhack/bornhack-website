@@ -1,4 +1,5 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
@@ -10,7 +11,7 @@ def get_sponsor_upload_path(instance, filename):
     )
 
 
-class Sponsor(CampRelatedModel):
+class Sponsor(ExportModelOperationsMixin("sponsor"), CampRelatedModel):
     name = models.CharField(max_length=150, help_text="Name of the sponsor")
 
     tier = models.ForeignKey("sponsors.SponsorTier", on_delete=models.PROTECT)
@@ -49,7 +50,7 @@ class Sponsor(CampRelatedModel):
     camp_filter = "tier__camp"
 
 
-class SponsorTier(CampRelatedModel):
+class SponsorTier(ExportModelOperationsMixin("sponsor_tier"), CampRelatedModel):
     name = models.CharField(
         max_length=25,
         help_text="Name of the tier (gold, silver, etc.)",

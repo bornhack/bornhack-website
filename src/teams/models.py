@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
@@ -38,7 +39,7 @@ TEAM_GUIDE_TEMPLATE = """
 """
 
 
-class Team(CampRelatedModel):
+class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     camp = models.ForeignKey(
         "camps.Camp",
         related_name="teams",
@@ -289,7 +290,7 @@ class Team(CampRelatedModel):
         )
 
 
-class TeamMember(CampRelatedModel):
+class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     user = models.ForeignKey(
         "auth.User",
         on_delete=models.PROTECT,
@@ -336,7 +337,7 @@ class TeamMember(CampRelatedModel):
     camp_filter = "team__camp"
 
 
-class TeamTask(CampRelatedModel):
+class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
     team = models.ForeignKey(
         "teams.Team",
         related_name="tasks",
@@ -396,7 +397,9 @@ class TeamTask(CampRelatedModel):
         super().save(**kwargs)
 
 
-class TaskComment(UUIDModel, CreatedUpdatedModel):
+class TaskComment(
+    ExportModelOperationsMixin("task_comment"), UUIDModel, CreatedUpdatedModel
+):
     task = models.ForeignKey(
         "teams.TeamTask",
         on_delete=models.PROTECT,
@@ -406,7 +409,7 @@ class TaskComment(UUIDModel, CreatedUpdatedModel):
     comment = models.TextField()
 
 
-class TeamShift(CampRelatedModel):
+class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     class Meta:
         ordering = ("shift_range",)
 

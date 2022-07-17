@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 
 from utils.models import CreatedUpdatedModel
@@ -15,7 +16,7 @@ from utils.models import UUIDModel
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class Permission(models.Model):
+class Permission(ExportModelOperationsMixin("permission"), models.Model):
     """
     An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
     """
@@ -56,7 +57,7 @@ class Permission(models.Model):
         )
 
 
-class Camp(CreatedUpdatedModel, UUIDModel):
+class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = "Camp"
         verbose_name_plural = "Camps"

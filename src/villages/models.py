@@ -1,12 +1,13 @@
 from django.db import models
 from django.urls import reverse_lazy
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
 
-class Village(UUIDModel, CampRelatedModel):
+class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel):
     class Meta:
         ordering = ["name"]
         unique_together = ("slug", "camp")

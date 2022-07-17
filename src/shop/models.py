@@ -14,6 +14,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 from unidecode import unidecode
 
 from .managers import OrderQuerySet
@@ -26,7 +27,7 @@ from utils.slugs import unique_slugify
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class CustomOrder(CreatedUpdatedModel):
+class CustomOrder(ExportModelOperationsMixin("custom_order"), CreatedUpdatedModel):
     text = models.TextField(help_text=_("The invoice text"))
 
     customer = models.TextField(help_text=_("The customer info for this order"))
@@ -56,7 +57,7 @@ class CustomOrder(CreatedUpdatedModel):
             return 0
 
 
-class Order(CreatedUpdatedModel):
+class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     class Meta:
         unique_together = ("user", "open")
         ordering = ["-created"]
@@ -386,7 +387,9 @@ class Order(CreatedUpdatedModel):
         return "bornhack_proforma_invoice_order_%s.pdf" % self.pk
 
 
-class ProductCategory(CreatedUpdatedModel, UUIDModel):
+class ProductCategory(
+    ExportModelOperationsMixin("product_category"), CreatedUpdatedModel, UUIDModel
+):
     class Meta:
         verbose_name = "Product category"
         verbose_name_plural = "Product categories"
@@ -426,7 +429,7 @@ class ProductStatsManager(models.Manager):
         )
 
 
-class Product(CreatedUpdatedModel, UUIDModel):
+class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = "Product"
         verbose_name_plural = "Products"
@@ -554,9 +557,12 @@ class Product(CreatedUpdatedModel, UUIDModel):
         return True
 
 
-class OrderProductRelation(CreatedUpdatedModel):
+class OrderProductRelation(
+    ExportModelOperationsMixin("order_product_relation"), CreatedUpdatedModel
+):
     def __str__(self):
-        return f'#{self.order}: {self.quantity} {self.product}'
+        return f"#{self.order}: {self.quantity} {self.product}"
+
     order = models.ForeignKey("shop.Order", on_delete=models.PROTECT)
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
     quantity = models.PositiveIntegerField()
@@ -573,7 +579,9 @@ class OrderProductRelation(CreatedUpdatedModel):
             )
 
 
-class EpayCallback(CreatedUpdatedModel, UUIDModel):
+class EpayCallback(
+    ExportModelOperationsMixin("epay_callback"), CreatedUpdatedModel, UUIDModel
+):
     class Meta:
         verbose_name = "Epay Callback"
         verbose_name_plural = "Epay Callbacks"
@@ -586,7 +594,9 @@ class EpayCallback(CreatedUpdatedModel, UUIDModel):
         return f"callback at {self.created} (md5 valid: {self.md5valid})"
 
 
-class EpayPayment(CreatedUpdatedModel, UUIDModel):
+class EpayPayment(
+    ExportModelOperationsMixin("epay_payment"), CreatedUpdatedModel, UUIDModel
+):
     class Meta:
         verbose_name = "Epay Payment"
         verbose_name_plural = "Epay Payments"
@@ -597,7 +607,7 @@ class EpayPayment(CreatedUpdatedModel, UUIDModel):
     txnid = models.IntegerField()
 
 
-class CreditNote(CreatedUpdatedModel):
+class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel):
     class Meta:
         ordering = ["-created"]
 
@@ -674,7 +684,7 @@ class CreditNote(CreatedUpdatedModel):
         return "bornhack_creditnote_%s.pdf" % self.pk
 
 
-class Invoice(CreatedUpdatedModel):
+class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
     order = models.OneToOneField(
         "shop.Order",
         null=True,
@@ -727,7 +737,9 @@ class Invoice(CreatedUpdatedModel):
             return self.customorder
 
 
-class CoinifyAPIInvoice(CreatedUpdatedModel):
+class CoinifyAPIInvoice(
+    ExportModelOperationsMixin("coinify_api_invoice"), CreatedUpdatedModel
+):
     coinify_id = models.IntegerField(null=True)
     invoicejson = models.JSONField()
     order = models.ForeignKey(
@@ -744,7 +756,9 @@ class CoinifyAPIInvoice(CreatedUpdatedModel):
         return parse_datetime(self.invoicejson["expire_time"]) < timezone.now()
 
 
-class CoinifyAPICallback(CreatedUpdatedModel):
+class CoinifyAPICallback(
+    ExportModelOperationsMixin("coinify_api_callback"), CreatedUpdatedModel
+):
     headers = models.JSONField()
     payload = models.JSONField(blank=True)
     body = models.TextField(default="")
@@ -759,7 +773,9 @@ class CoinifyAPICallback(CreatedUpdatedModel):
         return f"order #{self.order.id} callback at {self.created}"
 
 
-class CoinifyAPIRequest(CreatedUpdatedModel):
+class CoinifyAPIRequest(
+    ExportModelOperationsMixin("coinify_api_request"), CreatedUpdatedModel
+):
     order = models.ForeignKey(
         "shop.Order",
         related_name="coinify_api_requests",

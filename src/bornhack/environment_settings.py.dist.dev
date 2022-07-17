@@ -14,7 +14,7 @@ ALLOWED_HOSTS = ["*"]
 # Database settings - modify to match your database configuration!
 DATABASES = {
     "default": {
-        "ENGINE": 'django.contrib.gis.db.backends.postgis',
+        "ENGINE": "django_prometheus.db.backends.postgis",
         "NAME": os.getenv("POSTGRES_DB", "bornhack"),
         "USER": os.getenv("POSTGRES_USER", "bornhack"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD", "bornhack"),

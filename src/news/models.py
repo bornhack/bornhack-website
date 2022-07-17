@@ -1,12 +1,13 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CreatedUpdatedModel
 from utils.slugs import unique_slugify
 
 
-class NewsItem(CreatedUpdatedModel):
+class NewsItem(ExportModelOperationsMixin("news_item"), CreatedUpdatedModel):
     class Meta:
         ordering = ["-published_at"]
 

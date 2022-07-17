@@ -10,6 +10,7 @@ from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.postgres.fields import RangeOperators
 from django.db import models
 from django.shortcuts import reverse
+from django_prometheus.models import ExportModelOperationsMixin
 
 from maps.utils import LeafletMarkerChoices
 from utils.models import CampRelatedModel
@@ -19,7 +20,9 @@ from utils.slugs import unique_slugify
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class FacilityQuickFeedback(models.Model):
+class FacilityQuickFeedback(
+    ExportModelOperationsMixin("facility_quick_feedback"), models.Model
+):
     """
     This model contains the various options for giving quick feedback which we present to the user
     when giving feedback on facilities. Think "Needs cleaning" or "Doesn't work" and such.
@@ -39,7 +42,7 @@ class FacilityQuickFeedback(models.Model):
         return self.feedback
 
 
-class FacilityType(CampRelatedModel):
+class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel):
     """
     Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
     facilities.Type has a m2m relationship with FeedbackChoice which determines which choices
@@ -104,7 +107,7 @@ class FacilityType(CampRelatedModel):
         super().save(**kwargs)
 
 
-class Facility(CampRelatedModel, UUIDModel):
+class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDModel):
     """
     Facilities are toilets, thrashcans, cooking and dishwashing areas, and any other part of the event which could need attention or maintenance.
     """
@@ -168,7 +171,9 @@ class Facility(CampRelatedModel, UUIDModel):
         return self.feedbacks.filter(handled=False)
 
 
-class FacilityFeedback(CampRelatedModel):
+class FacilityFeedback(
+    ExportModelOperationsMixin("facility_feedback"), CampRelatedModel
+):
     """
     This model contains participant feedback for Facilities.
     It is linked to the user and the facility, and to the
@@ -229,7 +234,9 @@ class FacilityFeedback(CampRelatedModel):
     camp_filter = "facility__facility_type__responsible_team__camp"
 
 
-class FacilityOpeningHours(CampRelatedModel):
+class FacilityOpeningHours(
+    ExportModelOperationsMixin("facility_opening_hours"), CampRelatedModel
+):
     """
     This model contains opening hours for facilities which are not always open.
     If a facility has zero entries in this model it means is always open.

@@ -15,11 +15,11 @@ from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from people.views import PeopleView
 from sponsors.views import SponsorsView
+from villages.views import VillageCreateView
 from villages.views import VillageDeleteView
 from villages.views import VillageDetailView
 from villages.views import VillageListView
 from villages.views import VillageUpdateView
-from villages.views import VillageCreateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
@@ -51,11 +51,10 @@ urlpatterns = [
         name="general-terms",
     ),
     path("admin/", admin.site.urls),
-    # We don't need CSRF checks for the API
-    # path("api/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path("camps/", CampListView.as_view(), name="camp_list"),
     path("token/", include("tokens.urls", namespace="tokens")),
     path("maps/", include("maps.urls", namespace="maps")),
+    path("", include("django_prometheus.urls")),
     # camp redirect views here
     path(
         "",
@@ -121,9 +120,11 @@ urlpatterns = [
                     include(
                         [
                             path("", VillageListView.as_view(), name="village_list"),
-                            path("create/",
+                            path(
+                                "create/",
                                 VillageCreateView.as_view(),
-                                name="village_create"),
+                                name="village_create",
+                            ),
                             path(
                                 "<slug:slug>/delete/",
                                 VillageDeleteView.as_view(),

@@ -1,11 +1,12 @@
 import reversion
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
 
-class InfoCategory(CampRelatedModel):
+class InfoCategory(ExportModelOperationsMixin("info_category"), CampRelatedModel):
     class Meta:
         ordering = ["weight", "headline"]
         verbose_name_plural = "Info Categories"
@@ -53,7 +54,7 @@ class InfoCategory(CampRelatedModel):
 
 # We want to have info items under version control
 @reversion.register()
-class InfoItem(CampRelatedModel):
+class InfoItem(ExportModelOperationsMixin("info_item"), CampRelatedModel):
     class Meta:
         ordering = ["weight", "headline"]
         unique_together = (("anchor", "category"), ("headline", "category"))

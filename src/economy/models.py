@@ -13,6 +13,7 @@ from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+from django_prometheus.models import ExportModelOperationsMixin
 
 from .email import send_accountingsystem_expense_email
 from .email import send_accountingsystem_revenue_email
@@ -63,7 +64,7 @@ class ChainManager(models.Manager):
         return qs
 
 
-class Chain(CreatedUpdatedModel, UUIDModel):
+class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel):
     """
     A chain of Credebtors. Used to group when several Creditors/Debtors
     belong to the same Chain/company, like XL Byg stores or Netto stores.
@@ -131,7 +132,9 @@ class CredebtorManager(models.Manager):
         return qs
 
 
-class Credebtor(CreatedUpdatedModel, UUIDModel):
+class Credebtor(
+    ExportModelOperationsMixin("credebtor"), CreatedUpdatedModel, UUIDModel
+):
     """
     The Credebtor model represents the specific "instance" of a Chain,
     like "XL Byg Rønne" or "Netto Gelsted".
@@ -187,7 +190,7 @@ class Credebtor(CreatedUpdatedModel, UUIDModel):
         super().save(**kwargs)
 
 
-class Revenue(CampRelatedModel, UUIDModel):
+class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel):
     """
     The Revenue model represents any type of income for BornHack.
 
@@ -325,7 +328,7 @@ class Revenue(CampRelatedModel, UUIDModel):
         messages.success(request, "Revenue %s rejected" % self.pk)
 
 
-class Expense(CampRelatedModel, UUIDModel):
+class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel):
     camp = models.ForeignKey(
         "camps.Camp",
         on_delete=models.PROTECT,
@@ -458,7 +461,9 @@ class Expense(CampRelatedModel, UUIDModel):
         messages.success(request, "Expense %s rejected" % self.pk)
 
 
-class Reimbursement(CampRelatedModel, UUIDModel):
+class Reimbursement(
+    ExportModelOperationsMixin("reimbursement"), CampRelatedModel, UUIDModel
+):
     """
     A reimbursement covers one or more expenses.
     """
@@ -556,7 +561,7 @@ class Reimbursement(CampRelatedModel, UUIDModel):
 # Point of Sale
 
 
-class Pos(CampRelatedModel, UUIDModel):
+class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
     """A Pos is a point-of-sale like the bar or infodesk."""
 
     class Meta:
@@ -643,7 +648,7 @@ class Pos(CampRelatedModel, UUIDModel):
         return (self, filename, posreports.count())
 
 
-class PosReport(CampRelatedModel, UUIDModel):
+class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUIDModel):
     """A PosReport contains the HAX/DKK counts and the csv report from the POS system."""
 
     class Meta:
@@ -1015,7 +1020,7 @@ class PosReport(CampRelatedModel, UUIDModel):
 # bank stuff
 
 
-class Bank(CreatedUpdatedUUIDModel):
+class Bank(ExportModelOperationsMixin("bank"), CreatedUpdatedUUIDModel):
     """A bank where we have an account."""
 
     name = models.CharField(max_length=100, help_text="The name of the bank")
@@ -1024,7 +1029,7 @@ class Bank(CreatedUpdatedUUIDModel):
         return self.name
 
 
-class BankAccount(CreatedUpdatedUUIDModel):
+class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUIDModel):
     """An account in our bank."""
 
     bank = models.ForeignKey(
@@ -1124,7 +1129,9 @@ class BankAccount(CreatedUpdatedUUIDModel):
         return (self, filename, transactions.count())
 
 
-class BankTransaction(CreatedUpdatedUUIDModel):
+class BankTransaction(
+    ExportModelOperationsMixin("bank_transaction"), CreatedUpdatedUUIDModel
+):
     """A BankTransaction represents one movement into or out of the bank account."""
 
     class Meta:
@@ -1175,7 +1182,9 @@ class BankTransaction(CreatedUpdatedUUIDModel):
 # Coinify stuff
 
 
-class CoinifyInvoice(CreatedUpdatedUUIDModel):
+class CoinifyInvoice(
+    ExportModelOperationsMixin("coinify_invoice"), CreatedUpdatedUUIDModel
+):
     """Coinify creates one invoice every time a payment is completed."""
 
     class Meta:
@@ -1231,7 +1240,9 @@ class CoinifyInvoice(CreatedUpdatedUUIDModel):
     )
 
 
-class CoinifyPayout(CreatedUpdatedUUIDModel):
+class CoinifyPayout(
+    ExportModelOperationsMixin("coinify_payout"), CreatedUpdatedUUIDModel
+):
     """Coinify makes a payout every time our balance exceeds some preset amount in their end."""
 
     class Meta:
@@ -1291,7 +1302,9 @@ class CoinifyPayout(CreatedUpdatedUUIDModel):
         return self.to_dkk(self.transferred, self.currency)
 
 
-class CoinifyBalance(CreatedUpdatedUUIDModel):
+class CoinifyBalance(
+    ExportModelOperationsMixin("coinify_balance"), CreatedUpdatedUUIDModel
+):
     """Coinify balance objects show our balance in Coinifys end at UTC midnight daily."""
 
     class Meta:
@@ -1323,7 +1336,9 @@ class CoinifyBalance(CreatedUpdatedUUIDModel):
 # ePay / Bambora and Clearhaus stuff
 
 
-class EpayTransaction(CreatedUpdatedUUIDModel):
+class EpayTransaction(
+    ExportModelOperationsMixin("epay_transaction"), CreatedUpdatedUUIDModel
+):
     """ePay creates a transaction every time a card payment is completed through them."""
 
     class Meta:
@@ -1363,7 +1378,9 @@ class EpayTransaction(CreatedUpdatedUUIDModel):
     )
 
 
-class ClearhausSettlement(CreatedUpdatedUUIDModel):
+class ClearhausSettlement(
+    ExportModelOperationsMixin("clearhaus_settlement"), CreatedUpdatedUUIDModel
+):
     """Clearhaus creates a settlement (meaning they transfer money to us) weekly (if our balance is > 0)."""
 
     class Meta:
@@ -1535,7 +1552,9 @@ class ClearhausSettlement(CreatedUpdatedUUIDModel):
 # Zettle
 
 
-class ZettleBalance(CreatedUpdatedUUIDModel):
+class ZettleBalance(
+    ExportModelOperationsMixin("zettle_balance"), CreatedUpdatedUUIDModel
+):
     """Zettle (formerly iZettle) creates an account statement line every time there is a movement affecting our balance."""
 
     class Meta:
@@ -1571,7 +1590,9 @@ class ZettleBalance(CreatedUpdatedUUIDModel):
     )
 
 
-class ZettleReceipt(CreatedUpdatedUUIDModel):
+class ZettleReceipt(
+    ExportModelOperationsMixin("zettle_receipt"), CreatedUpdatedUUIDModel
+):
     """Zettle creates a receipt every time there is a customer payment or refund using Zettle. Not all receipts affect our Zettle balance (e.g. MobilePay payments are paid out by MobilePay directly)."""
 
     class Meta:
@@ -1624,7 +1645,9 @@ class ZettleReceipt(CreatedUpdatedUUIDModel):
 # MobilePay
 
 
-class MobilePayTransaction(CreatedUpdatedUUIDModel):
+class MobilePayTransaction(
+    ExportModelOperationsMixin("mobilepay_transaction"), CreatedUpdatedUUIDModel
+):
     """MobilePay transactions cover payments/refunds, payouts, service fees and everything else."""
 
     event = models.CharField(
@@ -1680,7 +1703,9 @@ class MobilePayTransaction(CreatedUpdatedUUIDModel):
 # AccountingExport
 
 
-class AccountingExport(CreatedUpdatedUUIDModel):
+class AccountingExport(
+    ExportModelOperationsMixin("accounting_export"), CreatedUpdatedUUIDModel
+):
     date_from = models.DateField(
         help_text="The start date for this accounting export (YYYY-MM-DD).",
     )

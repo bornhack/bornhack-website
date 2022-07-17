@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 from taggit.models import GenericUUIDTaggedItemBase
 from taggit.models import TaggedItemBase
 
@@ -113,7 +114,7 @@ class CampRelatedModel(CreatedUpdatedModel):
         return cls.camp_filter
 
 
-class OutgoingEmail(CreatedUpdatedModel):
+class OutgoingEmail(ExportModelOperationsMixin("outgoing_email"), CreatedUpdatedModel):
     """The OutgoingEmail model contains all system emails, both unsent and sent."""
 
     subject = models.CharField(max_length=500, help_text="The subject of the e-mail")

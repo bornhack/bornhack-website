@@ -1,10 +1,11 @@
 from django.db import models
 from django.urls import reverse
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
 
-class Token(CampRelatedModel):
+class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
@@ -30,7 +31,7 @@ class Token(CampRelatedModel):
         )
 
 
-class TokenFind(CampRelatedModel):
+class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
     class Meta:
         unique_together = ("user", "token")
 
