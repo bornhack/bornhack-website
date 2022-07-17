@@ -6,9 +6,9 @@ from .models import TokenFind
 
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
-    list_filter = ["camp"]
-    list_display = ["token", "description", "camp"]
-    search_fields = ["token", "description"]
+    list_filter = ["camp", "category", "active"]
+    list_display = ["token", "description", "camp", "category", "active"]
+    search_fields = ["token", "description", "category"]
 
 
 @admin.register(TokenFind)

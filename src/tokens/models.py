@@ -16,6 +16,8 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     description = models.TextField(help_text="The description of the token")
 
+    active = models.BooleanField(default=False, help_text="An active token is listed and can be found by players, an inactive token is unlisted and returns an error saying 'valid but inactive token found' to players who find it.")
+
     camp_filter = "camp"
 
     def __str__(self):
