@@ -1,4 +1,4 @@
-from django.db import IntegrityError
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -7,6 +7,7 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
+from .models import Refund
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
@@ -419,9 +420,9 @@ class TestOrderProductRelationModel(TestCase):
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=user)
         opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
-        with self.assertRaises(IntegrityError):
-            opr.refunded = 6
-            opr.save()
+        refund = Refund.objects.create(order=order)
+        with self.assertRaises(ValidationError):
+            opr.create_rpr(refund=refund, quantity=6)
 
     def test_refunded_possible(self):
         user = UserFactory()
@@ -441,8 +442,10 @@ class TestOrderProductRelationModel(TestCase):
         # Quantity is 5, but 1 is used, so we should be able to refund 4
         self.assertEqual(opr.possible_refund, 4)
 
+        refund = Refund.objects.create(order=order)
+
         # Refund 1 ticket
-        opr.refunded = 1
+        opr.create_rpr(refund=refund, quantity=1)
         opr.save()
 
         # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
