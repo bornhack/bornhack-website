@@ -46,7 +46,7 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active"]
+    fields = ["token", "category", "description", "active", "valid_when"]
 
     def form_valid(self, form):
         token = form.save(commit=False)
@@ -66,7 +66,7 @@ class TokenUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
     permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active"]
+    fields = ["token", "category", "description", "active", "valid_when"]
 
 
 class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):

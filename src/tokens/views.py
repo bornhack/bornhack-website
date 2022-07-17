@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect
@@ -20,38 +21,53 @@ class TokenFindView(LoginRequiredMixin, DetailView):
     slug_url_kwarg = "token"
 
     def get(self, request, *args, **kwargs):
-        if self.get_object().active:
-            # register this token find if it isn't already
-            try:
-                token, created = TokenFind.objects.get_or_create(
-                    token=self.get_object(),
-                    user=request.user,
-                )
-            except CampReadOnlyModeError:
-                raise Http404
-
-            if created:
-                # user found a new token
-                username = request.user.profile.get_public_credit_name
-                if username == "Unnamed":
-                    username == "anonymous_player_{request.user.id}"
-
-                # register metrics
-                if TokenFind.objects.filter(token=self.get_object()).count() == 1:
-                    # this is the first time this token has been found, count it as such
-                    FIRST_TOKEN_FINDS.labels(token.camp.title, request.user.id, username, token.id).inc()
-                TOKEN_FINDS.labels(token.camp.title, request.user.id, username, token.id).inc()
-
-                # message for the user
-                messages.success(
-                    self.request,
-                    f"Congratulations! You found a secret token: '{self.get_object().description}' - Your visit has been registered! Keep hunting, there might be more tokens out there.",
-                )
-        else:
-            # message for the user about inactive token
+        if not self.get_object().active:
             messages.warning(
                 self.request,
                 f"Patience! You found a valid token, but it is not active. Try again later!",
+            )
+            return redirect(reverse("tokens:tokenfind_list"))
+
+        if self.get_object().valid_when:
+            if self.get_object().valid_when.lower and self.get_object().valid_when.lower > timezone.now():
+                messages.warning(
+                    self.request,
+                    f"This token is not valid yet! Try again after {self.get_object().valid_when.lower}",
+                )
+                return redirect(reverse("tokens:tokenfind_list"))
+
+            if self.get_object().valid_when.upper and self.get_object().valid_when.upper < timezone.now():
+                messages.warning(
+                    self.request,
+                    f"This token is not valid after {self.get_object().valid_when.upper}! Maybe find a flux capacitor?",
+                )
+                return redirect(reverse("tokens:tokenfind_list"))
+
+        # register this token find if it isn't already
+        try:
+            token, created = TokenFind.objects.get_or_create(
+                token=self.get_object(),
+                user=request.user,
+            )
+        except CampReadOnlyModeError:
+            raise Http404
+
+        if created:
+            # user found a new token
+            username = request.user.profile.get_public_credit_name
+            if username == "Unnamed":
+                username == "anonymous_player_{request.user.id}"
+
+            # register metrics
+            if TokenFind.objects.filter(token=self.get_object()).count() == 1:
+                # this is the first time this token has been found, count it as such
+                FIRST_TOKEN_FINDS.labels(token.camp.title, request.user.id, username, token.id).inc()
+            TOKEN_FINDS.labels(token.camp.title, request.user.id, username, token.id).inc()
+
+            # message for the user
+            messages.success(
+                self.request,
+                f"Congratulations! You found a secret token: '{self.get_object().description}' - Your visit has been registered! Keep hunting, there might be more tokens out there.",
             )
         return redirect(reverse("tokens:tokenfind_list"))
 

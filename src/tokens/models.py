@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.urls import reverse
 from django_prometheus.models import ExportModelOperationsMixin
 
@@ -18,6 +20,13 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     active = models.BooleanField(default=False, help_text="An active token is listed and can be found by players, an inactive token is unlisted and returns an error saying 'valid but inactive token found' to players who find it.")
 
+    valid_when = DateTimeRangeField(
+        db_index=True,
+        null=True,
+        blank=True,
+        help_text="Token valid start/end time. YYYY-MM-DD HH:MM:SS. Optional.",
+    )
+
     camp_filter = "camp"
 
     def __str__(self):
@@ -32,6 +41,18 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
             kwargs={"camp_slug": self.camp.slug, "pk": self.pk},
         )
 
+    @property
+    def valid_now(self):
+        if not self.valid_when:
+            # no time limit
+            return True
+        if self.valid_when.lower and self.valid_when.lower > timezone.now():
+            # not valid yet
+            return False
+        if self.valid_when.upper and self.valid_when.upper < timezone.now():
+            # not valid anymore
+            return False
+        return True
 
 class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
     class Meta:

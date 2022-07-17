@@ -29,6 +29,7 @@ Your Secret Tokens | {{ block.super }}
         </tr>
         <tr>
           <th>Category</th>
+          <th>Time Limits</th>
           <th>Token</th>
           <th>Description</th>
           <th>Found</th>
@@ -36,6 +37,23 @@ Your Secret Tokens | {{ block.super }}
         {% endifchanged %}
         <tr>
           <td>{{ token.category }}</td>
+          <td>
+            {% if token.valid_now %}
+            <i class="fas fa-check text-success"></i>
+            {% else %}
+            <i class="fas fa-times text-error"></i>
+            {% endif %}
+
+            {% if token.valid_when.lower %}
+            Not valid before {{ token.valid_when.lower }}<br>
+            {% endif %}
+            {% if token.valid_when.upper %}
+            Not valid after {{ token.valid_when.upper }}<br>
+            {% endif %}
+            {% if not token.valid_when %}
+            No time limit
+            {% endif %}
+          </td>
 
           {% with token|found_by_user:user as user_has_found_token %}
           {% if user_has_found_token %}
