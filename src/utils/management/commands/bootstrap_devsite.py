@@ -738,101 +738,6 @@ class Command(BaseCommand):
 
         return categories
 
-    def create_global_products(self, categories):
-        products = {}
-        self.output("Creating global products...")
-        name = "PROSA bus transport (PROSA members only)"
-        products["product0"] = Product.objects.create(
-            name=name,
-            category=categories["transportation"],
-            price=125,
-            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
-            available_in=(
-                tz.localize(datetime(2017, 3, 1, 11, 0)),
-                tz.localize(datetime(2017, 10, 30, 11, 30)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"],
-                ).values_list("slug", flat=True),
-            ),
-        )
-
-        name = "PROSA bus transport (open for everyone)"
-        products["product1"] = Product.objects.create(
-            name=name,
-            category=categories["transportation"],
-            price=125,
-            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
-            available_in=(
-                tz.localize(datetime(2017, 3, 1, 11, 0)),
-                tz.localize(datetime(2017, 10, 30, 11, 30)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"],
-                ).values_list("slug", flat=True),
-            ),
-        )
-
-        name = "T-shirt (large)"
-        products["product2"] = Product.objects.create(
-            name=name,
-            category=categories["merchandise"],
-            price=160,
-            description="Get a nice t-shirt",
-            available_in=(
-                tz.localize(datetime(2017, 3, 1, 11, 0)),
-                tz.localize(datetime(2017, 10, 30, 11, 30)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"],
-                ).values_list("slug", flat=True),
-            ),
-        )
-
-        name = "Village tent 3x3 meters, no floor"
-        products["tent1"] = Product.objects.create(
-            name=name,
-            description="A description of the tent goes here",
-            price=3325,
-            category=categories["villages"],
-            available_in=(
-                tz.localize(datetime(2017, 3, 1, 12, 0)),
-                tz.localize(datetime(2017, 8, 20, 12, 0)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["villages"],
-                ).values_list("slug", flat=True),
-            ),
-        )
-
-        name = "Village tent 3x3 meters, with floor"
-        products["tent2"] = Product.objects.create(
-            name=name,
-            description="A description of the tent goes here",
-            price=3675,
-            category=categories["villages"],
-            available_in=(
-                tz.localize(datetime(2017, 3, 1, 12, 0)),
-                tz.localize(datetime(2017, 8, 20, 12, 0)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["villages"],
-                ).values_list("slug", flat=True),
-            ),
-        )
-
-        return products
-
     def create_camp_ticket_types(self, camp):
         types = {}
         self.output(f"Creating tickettypes for {camp.camp.lower.year}...")
@@ -850,6 +755,18 @@ class Command(BaseCommand):
         )
         types["child_one_day"] = TicketType.objects.create(
             name="Child One Day",
+            camp=camp,
+        )
+        types["village"] = TicketType.objects.create(
+            name="Village",
+            camp=camp,
+        )
+        types["merchandise"] = TicketType.objects.create(
+            name="Merchandise",
+            camp=camp,
+        )
+        types["transportation"] = TicketType.objects.create(
+            name="Transportation",
             camp=camp,
         )
 
@@ -896,9 +813,104 @@ class Command(BaseCommand):
             ticket_type=ticket_types["adult_full_week"],
         )
 
+        name = "PROSA bus transport (PROSA members only)"
+        products["product0"] = Product.objects.create(
+            name=name,
+            category=categories["transportation"],
+            price=125,
+            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["transportation"],
+        )
+
+        name = "PROSA bus transport (open for everyone)"
+        products["product1"] = Product.objects.create(
+            name=name,
+            category=categories["transportation"],
+            price=125,
+            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["transportation"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["transportation"],
+        )
+
+        name = "T-shirt (large)"
+        products["product2"] = Product.objects.create(
+            name=name,
+            category=categories["merchandise"],
+            price=160,
+            description="Get a nice t-shirt",
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["merchandise"],
+        )
+
+        name = "Village tent 3x3 meters, no floor"
+        products["tent1"] = Product.objects.create(
+            name=name,
+            description="A description of the tent goes here",
+            price=3325,
+            category=categories["villages"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["village"],
+        )
+
+        name = "Village tent 3x3 meters, with floor"
+        products["tent2"] = Product.objects.create(
+            name=name,
+            description="A description of the tent goes here",
+            price=3675,
+            category=categories["villages"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["villages"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["village"],
+        )
+
         return products
 
-    def create_orders(self, users, global_products, camp_products):
+    def create_orders(self, users, camp_products):
         orders = {}
         self.output("Creating orders...")
         orders[0] = Order.objects.create(
@@ -908,7 +920,7 @@ class Command(BaseCommand):
             paid=True,
         )
         orders[0].oprs.create(product=camp_products["ticket1"], quantity=1)
-        orders[0].oprs.create(product=global_products["tent1"], quantity=1)
+        orders[0].oprs.create(product=camp_products["tent1"], quantity=1)
         orders[0].mark_as_paid(request=None)
 
         orders[1] = Order.objects.create(
@@ -917,7 +929,7 @@ class Command(BaseCommand):
             open=None,
         )
         orders[1].oprs.create(product=camp_products["ticket1"], quantity=1)
-        orders[1].oprs.create(product=global_products["tent2"], quantity=1)
+        orders[1].oprs.create(product=camp_products["tent2"], quantity=1)
         orders[1].mark_as_paid(request=None)
 
         orders[2] = Order.objects.create(
@@ -927,7 +939,7 @@ class Command(BaseCommand):
         )
         orders[2].oprs.create(product=camp_products["ticket2"], quantity=1)
         orders[2].oprs.create(product=camp_products["ticket1"], quantity=1)
-        orders[2].oprs.create(product=global_products["tent2"], quantity=1)
+        orders[2].oprs.create(product=camp_products["tent2"], quantity=1)
         orders[2].mark_as_paid(request=None)
 
         orders[3] = Order.objects.create(
@@ -935,9 +947,9 @@ class Command(BaseCommand):
             payment_method="in_person",
             open=None,
         )
-        orders[3].oprs.create(product=global_products["product0"], quantity=1)
+        orders[3].oprs.create(product=camp_products["product0"], quantity=1)
         orders[3].oprs.create(product=camp_products["ticket2"], quantity=1)
-        orders[3].oprs.create(product=global_products["tent1"], quantity=1)
+        orders[3].oprs.create(product=camp_products["tent1"], quantity=1)
         orders[3].mark_as_paid(request=None)
 
         return orders
@@ -1962,8 +1974,6 @@ class Command(BaseCommand):
 
         product_categories = self.create_product_categories()
 
-        global_products = self.create_global_products(product_categories)
-
         quickfeedback_options = self.create_quickfeedback_options()
 
         self.create_mobilepay_transactions()
@@ -1985,7 +1995,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f"----------[ Bornhack {year} ]----------"),
             )
 
-            if year < 2022:
+            if year < 2023:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
@@ -1994,7 +2004,7 @@ class Command(BaseCommand):
                     ticket_types,
                 )
 
-                self.create_orders(users, global_products, camp_products)
+                self.create_orders(users, camp_products)
 
                 self.create_camp_tracks(camp)
 
