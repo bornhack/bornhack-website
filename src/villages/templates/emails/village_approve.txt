@@ -1,0 +1,10 @@
+Hello!
+
+Village "{{ village.name }}" was created or updated. It needs to be approved before it is shown on the public website.
+
+
+Please visit https://bornhack.dk/admin/villages/village/{{ village.uuid }}/change/ to approve it.
+
+Best regards,
+
+The BornHack Website

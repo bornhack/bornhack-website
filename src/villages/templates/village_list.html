@@ -16,12 +16,13 @@ Villages | {{ block.super }}
   tent, chairs and tables in the shop!
 </p>
 <p>
-    <a href="{% url 'village_create' camp_slug=camp.slug %}">Create a village</a>
+<a class="btn btn-success" href="{% url 'village_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create village</a>
     <br>
-    Note, that our <a href="{% url 'conduct'%}">Code of Conduct</a> applies to village names and descriptions.
+    <br>
+    Our <a href="{% url 'conduct'%}">Code of Conduct</a> applies to village names and descriptions!
 </p>
 
-<hr />
+<hr>
 {% if villages %}
 <table class="table table-hover table-condensed table-striped">
   <thead>

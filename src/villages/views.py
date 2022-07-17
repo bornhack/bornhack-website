@@ -12,6 +12,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from .mixins import EnsureWritableCampMixin
 from .models import Village
+from .email import add_village_approve_email
 from camps.mixins import CampViewMixin
 from camps.models import Camp
 
@@ -67,6 +68,7 @@ class VillageCreateView(
             self.request,
             "Your request to create a village has been registered - it will be published after review for CoC compliance"
         )
+        add_village_approve_email(village)
         return HttpResponseRedirect(village.get_absolute_url())
 
     def get_success_url(self):
@@ -105,6 +107,7 @@ class VillageUpdateView(
             self.request,
             "Your village will be republished after the changes have been reviewed for CoC compliance."
         )
+        add_village_approve_email(village)
         return super().form_valid(form)
 
     def get_success_url(self):
