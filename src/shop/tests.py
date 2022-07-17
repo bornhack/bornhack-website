@@ -416,16 +416,18 @@ class TestOrderProductRelationModel(TestCase):
     def test_refunded_cannot_be_larger_than_quantity(self):
         """OrderProductRelation with refunded > quantity should raise an IntegrityError."""
         user = UserFactory()
+        info_user = UserFactory(username="info")
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=user)
         opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
-        refund = Refund.objects.create(order=order)
+        refund = Refund.objects.create(order=order, created_by=info_user)
         with self.assertRaises(ValidationError):
             opr.create_rpr(refund=refund, quantity=6)
 
     def test_refunded_possible(self):
         user = UserFactory()
+        info_user = UserFactory(username="info")
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=user)
@@ -442,7 +444,7 @@ class TestOrderProductRelationModel(TestCase):
         # Quantity is 5, but 1 is used, so we should be able to refund 4
         self.assertEqual(opr.possible_refund, 4)
 
-        refund = Refund.objects.create(order=order)
+        refund = Refund.objects.create(order=order, created_by=info_user)
 
         # Refund 1 ticket
         opr.create_rpr(refund=refund, quantity=1)
