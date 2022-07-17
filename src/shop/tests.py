@@ -447,3 +447,14 @@ class TestOrderProductRelationModel(TestCase):
 
         # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
         self.assertEqual(opr.possible_refund, 3)
+
+
+class TestRefund(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.order = OrderFactory(user=self.user)
+        self.oprs = OrderProductRelationFactory.create_batch(4, order=self.order)
+        self.order.mark_as_paid()
+
+    def test_refundable(self):
+        pass
