@@ -70,7 +70,8 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
             response = super().post(request, *args, **kwargs)
         except CampReadOnlyModeError as exc:
             messages.error(
-                self.request, "The camp is over. You can't update the ticket."
+                self.request,
+                "The camp is over. You can't update the ticket.",
             )
             return redirect(self.get_object().get_absolute_url())
         else:
