@@ -378,11 +378,21 @@ class Refund(CreatedUpdatedModel):
         blank=True,
     )
 
+    created_by = models.ForeignKey(
+        "auth.User",
+        help_text="The user who created this refund",
+        on_delete=models.PROTECT,
+        null=True,  # TODO: Null to support old refunds. Maybe we should have a system user?
+    )
+
     def save(self, **kwargs):
         """Take the invoice_address for the CreditNote from the Order object if we don't have one."""
         if not self.invoice_address:
             self.invoice_address = self.order.invoice_address
         return super().save(**kwargs)
+
+    def __str__(self):
+        return f"Refund #{self.id}"
 
 
 class RefundProductRelation(CreatedUpdatedModel):

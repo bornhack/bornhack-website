@@ -108,6 +108,7 @@ from .views import PosReportPosCountStartView
 from .views import PosReportUpdateView
 from .views import PosUpdateView
 from .views import ProductHandoutView
+from .views import RefundDetailView
 from .views import ReimbursementCreateUserSelectView
 from .views import ReimbursementCreateView
 from .views import ReimbursementDeleteView
@@ -271,6 +272,11 @@ urlpatterns = [
                     include(
                         [
                             path("", OrderListView.as_view(), name="order_list"),
+                            path(
+                                "<int:refund_id>/",
+                                RefundDetailView.as_view(),
+                                name="refund_detail",
+                            ),
                             path(
                                 "<int:order_id>/",
                                 include(

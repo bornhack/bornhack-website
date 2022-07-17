@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load bornhack %}
+
+{% block title %}
+    Refund #{{ refund.pk }} for order #{{ refund.order.pk }} | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading">Refund #{{ refund.pk }} for order #{{ refund.order.pk }} | BackOffice</div>
+        <div class="panel-body">
+            <table class="table">
+                <tr>
+                    <th>Order</th>
+                    <td>{{ refund.order }}</td>
+                </tr>
+                <tr>
+                    <th>Customer Comment</th>
+                    <td>{{ refund.customer_comment|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <th>Invoice Address</th>
+                    <td>{{ refund.get_invoice_address }}</td>
+                </tr>
+                <tr>
+                    <th>Internal Notes</th>
+                    <td>{{ refund.notes|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <th>Refunded by</th>
+                    <td>{{ refund.created_by }}</td>
+                </tr>
+{#                <tr>#}
+{#                    <th>Proforma Invoice</th>#}
+{#                    <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download Proforma Invoice</a></td>#}
+{#                </tr>#}
+{#                <tr>#}
+{#                    <th>Invoice</th>#}
+{#                    <td>{% if order.invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.pk %}" class="btn btn-primary">Download Invoice #{{ order.invoice.pk }}</a>{% else %}N/A{% endif %}</td>#}
+{#                </tr>#}
+                <tr>
+                    <th>Products</th>
+                    <td>
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for rpr in refund.rprs.all %}
+                                <tr>
+                                    <td>{{ rpr.opr.product.name }}</td>
+                                    <td>{{ rpr.quantity }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Order List</a>
+{% endblock content %}

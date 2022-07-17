@@ -26,7 +26,17 @@
       <td>{{ order.payment_method }}</td>
       <td>{{ order.paid|truefalseicon }} {% if order.paid %}paid{% else %}unpaid{% endif %}</td>
       <td>{{ order.cancelled|truefalseicon }}</td>
-      <td><ul>{% for refund in order.refunds.all %}<li>{{ refund }}{% empty %}N/A{% endfor %}</ul></td>
+      <td>
+          <ul>
+              {% for refund in order.refunds.all %}
+                  <li>
+                      <a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=refund.pk %}">
+                          {{ refund }}
+                      </a>
+                  </li>
+                  {% empty %}N/A{% endfor %}
+          </ul>
+      </td>
       <td>{% if order.invoice %}{{ order.invoice }}{% else %}{{ order.pdf }} (proforma){% endif %}</td>
       <td>
         <div class="btn-group btn-group-vertical">

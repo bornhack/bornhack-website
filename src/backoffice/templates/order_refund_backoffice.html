@@ -8,7 +8,7 @@
 
 {% block content %}
 
-<form method="POST" class="form-inline">
+<form method="POST">
     {% csrf_token %}
     {{ formset.management_form }}
 <div class="panel panel-default">
@@ -61,6 +61,11 @@
 
         {% endfor %}
     </table>
+
+        <hr>
+
+        {% bootstrap_form refund_form %}
+
     </div>
     <div class="panel-footer">
         <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>

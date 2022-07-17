@@ -2,6 +2,7 @@ from django import forms
 from django.forms import modelformset_factory
 
 from shop.models import OrderProductRelation
+from shop.models import Refund
 
 
 class OrderProductRelationForm(forms.ModelForm):
@@ -26,3 +27,9 @@ OrderProductRelationFormSet = modelformset_factory(
     form=OrderProductRelationForm,
     extra=0,
 )
+
+
+class RefundForm(forms.ModelForm):
+    class Meta:
+        model = Refund
+        fields = ["customer_comment", "invoice_address", "notes"]
