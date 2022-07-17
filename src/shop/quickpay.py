@@ -6,7 +6,7 @@ from quickpay_api_client import QPClient
 from quickpay_api_client.exceptions import ApiError
 
 from .models import QuickPayAPIRequest
-from .models import QuickPayPayment
+#from .models import QuickPayPayment
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
