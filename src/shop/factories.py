@@ -45,4 +45,3 @@ class OrderProductRelationFactory(DjangoModelFactory):
     product = factory.SubFactory(ProductFactory)
     order = factory.SubFactory(OrderFactory)
     quantity = 1
-    ticket_generated = False

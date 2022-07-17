@@ -420,6 +420,13 @@ class RefundProductRelation(CreatedUpdatedModel):
         """Returns the total price for this RPR considering quantity."""
         return Decimal(self.opr.price * self.quantity)
 
+    def clean(self):
+        """Make sure the quantity is not greater than the quantity in the opr."""
+        if self.quantity > self.opr.quantity:
+            raise ValidationError(
+                "The quantity of this RPR cannot be greater than the quantity in the OPR",
+            )
+
 
 # ########## PRODUCTS ################################################
 
@@ -729,7 +736,7 @@ class OrderProductRelation(
             self.price = self.product.price
         super().save(**kwargs)
 
-    def create_rpr(self, refund, quantity):
+    def create_rpr(self, *, refund: Refund, quantity: int):
         return RefundProductRelation.objects.create(
             refund=refund,
             opr=self,

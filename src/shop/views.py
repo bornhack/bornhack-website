@@ -352,8 +352,8 @@ class OrderDetailView(
                     request,
                     "Some of the products you are ordering are out of stock. Review the order and try again.",
                 )
-                return HttpResponseRedirect(
-                    reverse("shop:order_detail", kwargs={"pk": order.pk}),
+                return self.render_to_response(
+                    context=self.get_context_data(order_product_formset=formset),
                 )
 
             # No stock issues, proceed to save OPRs and Order
@@ -371,10 +371,7 @@ class OrderDetailView(
                     reverse("shop:order_review_and_pay", kwargs={"pk": order.pk}),
                 )
 
-        # redirect remaining cases back to the order page
-        return HttpResponseRedirect(
-            reverse("shop:order_detail", kwargs={"pk": order.pk}),
-        )
+        return super().get(request, *args, **kwargs)
 
 
 class OrderReviewAndPayView(
