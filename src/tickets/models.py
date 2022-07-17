@@ -27,7 +27,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
-        def _make_subquery(annotation: Expression | F) -> Subquery:
+        def _make_subquery(annotation: Union[Expression,F]) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
                 .filter(pk=OuterRef("pk"))
