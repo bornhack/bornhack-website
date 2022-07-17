@@ -58,7 +58,7 @@ jobs:
       - name: Run tests
         run: |
           cd src
-          coverage run manage.py test .
+          coverage run manage.py test . --noinput --parallel=4
           coverage xml
         env:
           POSTGRES_HOST: localhost
