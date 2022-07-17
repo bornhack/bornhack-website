@@ -21,6 +21,7 @@ from ..forms import ShopTicketRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
+from shop.forms import RefundForm
 from shop.models import CreditNote
 from shop.models import Invoice
 from shop.models import Order
@@ -265,16 +266,27 @@ class OrderDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     pk_url_kwarg = "order_id"
 
 
+class RefundDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
+    model = Refund
+    template_name = "refund_detail_backoffice.html"
+    pk_url_kwarg = "refund_id"
+
+
 class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     model = Order
     template_name = "order_refund_backoffice.html"
     pk_url_kwarg = "order_id"
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.object = self.get_object()
 
     def get_context_data(self, **kwargs):
         kwargs["oprs"] = {
             opr: ShopTicketRefundFormSet(queryset=opr.unused_shoptickets, prefix=opr.id)
             for opr in self.get_object().oprs.all()
         }
+        kwargs["refund_form"] = RefundForm()
         return super().get_context_data(**kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -290,6 +302,9 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         with transaction.atomic():
 
             for opr in oprs:
+                # Do not include fully refunded oprs
+                if not opr.possible_refund:
+                    continue
                 ticket_formset = ShopTicketRefundFormSet(
                     request.POST,
                     queryset=opr.unused_shoptickets,
@@ -312,15 +327,32 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                         else:
                             opr_dict[opr] = 1
 
-            refund = Refund.objects.create(order=self.get_object())
-            for opr, quantity in opr_dict.items():
-                opr.create_rpr(refund, quantity)
+            refund_form = RefundForm(request.POST)
+
+            if not opr_dict:
+                messages.error(request, "Nothing to refund!")
+                context = self.get_context_data()
+                context["refund_form"] = refund_form
+                return self.render_to_response(context)
+
+            if opr_dict and refund_form.is_valid():
+                refund = refund_form.save(commit=False)
+                refund.order = self.get_object()
+                refund.created_by = request.user
+                refund.save()
+
+                for opr, quantity in opr_dict.items():
+                    opr.create_rpr(refund=refund, quantity=quantity)
 
             ShopTicket.objects.filter(pk__in=tickets_to_delete).delete()
 
-        return HttpResponseRedirect(
-            reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug}),
-        )
+            return HttpResponseRedirect(
+                reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug}),
+            )
+
+        context = self.get_context_data()
+        context["refund_form"] = refund_form
+        return self.render_to_response(context)
 
 
 class OrderDownloadProformaInvoiceView(LoginRequiredMixin, DetailView):
