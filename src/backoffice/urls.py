@@ -273,11 +273,6 @@ urlpatterns = [
                         [
                             path("", OrderListView.as_view(), name="order_list"),
                             path(
-                                "<int:refund_id>/",
-                                RefundDetailView.as_view(),
-                                name="refund_detail",
-                            ),
-                            path(
                                 "<int:order_id>/",
                                 include(
                                     [
@@ -303,6 +298,11 @@ urlpatterns = [
                                         ),
                                     ],
                                 ),
+                            ),
+                            path(
+                                "refunds/<int:refund_id>/",
+                                RefundDetailView.as_view(),
+                                name="refund_detail",
                             ),
                         ],
                     ),
