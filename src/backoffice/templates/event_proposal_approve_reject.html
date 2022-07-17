@@ -2,11 +2,6 @@
 {% load bootstrap3 %}
 
 {% block content %}
-{% if not form.instance.can_be_approved %}
-  <br>
-  <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
-  <br>
-{% endif %}
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">Approve or Reject {{ form.instance.event_type.name }} Proposal</h3>
@@ -18,10 +13,17 @@
         {% bootstrap_form form %}
         {% if form.instance.can_be_approved %}
         <button type="submit" class="btn btn-success" name="approve"><i class='fas fa-check'></i> Approve Proposal</button>
+        {% else %}
+        <button type="submit" class="btn btn-disabled" name="approve" disabled><i class='fas fa-check'></i> Approve Proposal</button>
         {% endif %}
         <button type="reject" class="btn btn-danger" name="reject"><i class='fas fa-times'></i> Reject Proposal</button>
         <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
     </form>
+{% if not form.instance.can_be_approved %}
+  <br>
+  <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+  <br>
+{% endif %}
   </div>
 </div>
 {% endblock content %}
