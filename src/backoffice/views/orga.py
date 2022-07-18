@@ -42,12 +42,12 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
-            OrderProductRelation.objects.filter(
-                order__refunded=False,
-                order__cancelled=False,
+            OrderProductRelation.objects.not_fully_refunded()
+            .not_cancelled()
+            .filter(
                 product__category__name="Merchandise",
+                product__name__startswith=camp_prefix,
             )
-            .filter(product__name__startswith=camp_prefix)
             .order_by("order")
         )
 
@@ -58,19 +58,26 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
     def get_context_data(self, **kwargs):
         camp_prefix = f"BornHack {timezone.now().year}"
 
-        order_relations = OrderProductRelation.objects.filter(
-            order__refunded=False,
-            order__cancelled=False,
-            product__category__name="Merchandise",
-        ).filter(product__name__startswith=camp_prefix)
+        order_relations = (
+            OrderProductRelation.objects.not_fully_refunded()
+            .not_cancelled()
+            .filter(
+                product__category__name="Merchandise",
+                product__name__startswith=camp_prefix,
+            )
+            .order_by("order")
+        )
 
         merchandise_orders = {}
         for relation in order_relations:
             try:
-                quantity = merchandise_orders[relation.product.name] + relation.quantity
-                merchandise_orders[relation.product.name] = quantity
+                merchandise_orders[
+                    relation.product.name
+                ] += relation.non_refunded_quantity
             except KeyError:
-                merchandise_orders[relation.product.name] = relation.quantity
+                merchandise_orders[
+                    relation.product.name
+                ] = relation.non_refunded_quantity
 
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
@@ -88,14 +95,13 @@ class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
-            OrderProductRelation.objects.filter(
-                ticket_generated=False,
-                order__paid=True,
-                order__refunded=False,
-                order__cancelled=False,
+            OrderProductRelation.objects.paid()
+            .not_fully_refunded()
+            .not_cancelled()
+            .filter(
                 product__category__name="Villages",
+                product__name__startswith=camp_prefix,
             )
-            .filter(product__name__startswith=camp_prefix)
             .order_by("order")
         )
 
@@ -106,21 +112,22 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         camp_prefix = f"BornHack {timezone.now().year}"
 
-        order_relations = OrderProductRelation.objects.filter(
-            ticket_generated=False,
-            order__paid=True,
-            order__refunded=False,
-            order__cancelled=False,
-            product__category__name="Villages",
-        ).filter(product__name__startswith=camp_prefix)
+        order_relations = (
+            OrderProductRelation.objects.paid()
+            .not_fully_refunded()
+            .not_cancelled()
+            .filter(
+                product__category__name="Villages",
+                product__name__startswith=camp_prefix,
+            )
+        )
 
         village_orders = {}
         for relation in order_relations:
             try:
-                quantity = village_orders[relation.product.name] + relation.quantity
-                village_orders[relation.product.name] = quantity
+                village_orders[relation.product.name] += relation.non_refunded_quantity
             except KeyError:
-                village_orders[relation.product.name] = relation.quantity
+                village_orders[relation.product.name] = relation.non_refunded_quantity
 
         context = super().get_context_data(**kwargs)
         context["village"] = village_orders

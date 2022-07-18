@@ -10,6 +10,7 @@ from shop.models import CreditNote
 from shop.models import CustomOrder
 from shop.models import Invoice
 from shop.models import Order
+from shop.models import Refund
 from utils.pdf import generate_pdf_letter
 
 logging.basicConfig(level=logging.INFO)
@@ -46,19 +47,31 @@ def do_work():
         # update order object with the file
         order.pdf.save(str(order.filename), File(pdffile))
         order.save()
-        logger.info("Generated proforma invoice PDF for order %s" % order)
+        logger.info(f"Generated proforma invoice PDF for order {order}")
 
     # check if we need to generate any invoices for shop orders
     for order in Order.objects.filter(paid=True, invoice__isnull=True):
         # generate invoice for this Order
         Invoice.objects.create(order=order)
-        logger.info("Generated Invoice object for %s" % order)
+        logger.info(f"Generated Invoice object for {order}")
 
     # check if we need to generate any invoices for custom orders
     for customorder in CustomOrder.objects.filter(invoice__isnull=True):
         # generate invoice for this CustomOrder
         Invoice.objects.create(customorder=customorder)
-        logger.info("Generated Invoice object for %s" % customorder)
+        logger.info(f"Generated Invoice object for {customorder}")
+
+    # check if we need to generate any creditnotes for refunds
+    for refund in Refund.objects.filter(paid=True, creditnote__isnull=True):
+        # generate CreditNote for this Refund
+        CreditNote.objects.create(
+            refund=refund,
+            invoice=refund.order.invoice,
+            amount=refund.amount,
+            text=f"Refund for order #{refund.order.id}",
+            user=refund.order.user,
+        )
+        logger.info(f"Generated CreditNote object for {refund}")
 
     # check if we need to generate any pdf invoices
     for invoice in Invoice.objects.filter(Q(pdf="") | Q(pdf__isnull=True)):

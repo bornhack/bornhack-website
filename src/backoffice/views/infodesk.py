@@ -1,6 +1,5 @@
 import csv
 import logging
-from itertools import chain
 from typing import Optional
 
 from django.contrib import messages
@@ -34,40 +33,6 @@ from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
 
 logger = logging.getLogger("bornhack.%s" % __name__)
-
-
-class ProductHandoutView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    template_name = "product_handout.html"
-
-    def get_queryset(self, **kwargs):
-        return OrderProductRelation.objects.filter(
-            ticket_generated=False,
-            order__paid=True,
-            order__refunded=False,
-            order__cancelled=False,
-        ).order_by("order")
-
-
-class BadgeHandoutView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    template_name = "badge_handout.html"
-    context_object_name = "tickets"
-
-    def get_queryset(self, **kwargs):
-        shoptickets = ShopTicket.objects.filter(badge_ticket_generated=False)
-        sponsortickets = SponsorTicket.objects.filter(badge_ticket_generated=False)
-        discounttickets = DiscountTicket.objects.filter(badge_ticket_generated=False)
-        return list(chain(shoptickets, sponsortickets, discounttickets))
-
-
-class TicketCheckinView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    template_name = "ticket_checkin.html"
-    context_object_name = "tickets"
-
-    def get_queryset(self, **kwargs):
-        shoptickets = ShopTicket.objects.filter(used=False)
-        sponsortickets = SponsorTicket.objects.filter(used=False)
-        discounttickets = DiscountTicket.objects.filter(used=False)
-        return list(chain(shoptickets, sponsortickets, discounttickets))
 
 
 def _ticket_getter_by_token(token) -> Optional[TicketTypeUnion]:

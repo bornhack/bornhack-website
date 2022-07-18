@@ -8,6 +8,9 @@ from .views import CoinifyThanksView
 from .views import CreditNoteListView
 from .views import DownloadCreditNoteView
 from .views import DownloadInvoiceView
+from .views import EpayCallbackView
+from .views import EpayFormView
+from .views import EpayThanksView
 from .views import OrderDetailView
 from .views import OrderListView
 from .views import OrderMarkAsPaidView
@@ -46,7 +49,7 @@ urlpatterns = [
                     name="mark_order_as_paid",
                 ),
                 path(
-                    "pay/creditcard/",
+                    "pay/creditcard/quickpay/",
                     include(
                         [
                             path("", QuickPayLinkView.as_view(), name="quickpay_link"),
@@ -59,6 +62,24 @@ urlpatterns = [
                                 "thanks/",
                                 QuickPayThanksView.as_view(),
                                 name="quickpay_thanks",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "pay/creditcard/epay/",
+                    include(
+                        [
+                            path("", EpayFormView.as_view(), name="epay_form"),
+                            path(
+                                "callback/",
+                                EpayCallbackView.as_view(),
+                                name="epay_callback",
+                            ),
+                            path(
+                                "thanks/",
+                                EpayThanksView.as_view(),
+                                name="epay_thanks",
                             ),
                         ],
                     ),

@@ -20,7 +20,6 @@ from .views import AutoScheduleManageView
 from .views import AutoScheduleValidateView
 from .views import BackofficeIndexView
 from .views import BackofficeProxyView
-from .views import BadgeHandoutView
 from .views import BankAccountDetailView
 from .views import BankCSVUploadView
 from .views import BankDetailView
@@ -107,7 +106,6 @@ from .views import PosReportPosCountEndView
 from .views import PosReportPosCountStartView
 from .views import PosReportUpdateView
 from .views import PosUpdateView
-from .views import ProductHandoutView
 from .views import RefundDetailView
 from .views import ReimbursementCreateUserSelectView
 from .views import ReimbursementCreateView
@@ -129,7 +127,6 @@ from .views import SpeakerProposalApproveRejectView
 from .views import SpeakerProposalDetailView
 from .views import SpeakerProposalListView
 from .views import SpeakerUpdateView
-from .views import TicketCheckinView
 from .views import TokenCreateView
 from .views import TokenDeleteView
 from .views import TokenDetailView
@@ -348,9 +345,6 @@ urlpatterns = [
         ),
     ),
     path("shop_tickets/", ShopTicketOverview.as_view(), name="shop_ticket_overview"),
-    path("product_handout/", ProductHandoutView.as_view(), name="product_handout"),
-    path("badge_handout/", BadgeHandoutView.as_view(), name="badge_handout"),
-    path("ticket_checkin/", TicketCheckinView.as_view(), name="ticket_checkin"),
     # public names
     path(
         "public_credit_names/",

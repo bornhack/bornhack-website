@@ -775,7 +775,9 @@ class Command(BaseCommand):
     def create_camp_products(self, camp, categories, ticket_types):
         products = {}
         year = camp.camp.lower.year
-        name = f"BornHack {year} Standard ticket"
+        camp_prefix = f"BornHack {year}"
+
+        name = f"{camp_prefix} Standard ticket"
         products["ticket1"] = Product.objects.create(
             name=name,
             description="A ticket",
@@ -794,7 +796,7 @@ class Command(BaseCommand):
             ticket_type=ticket_types["adult_full_week"],
         )
 
-        name = f"BornHack {year} Hacker ticket"
+        name = f"{camp_prefix} Hacker ticket"
         products["ticket2"] = Product.objects.create(
             name=name,
             description="Another ticket",
@@ -813,64 +815,7 @@ class Command(BaseCommand):
             ticket_type=ticket_types["adult_full_week"],
         )
 
-        name = "PROSA bus transport (PROSA members only)"
-        products["product0"] = Product.objects.create(
-            name=name,
-            category=categories["transportation"],
-            price=125,
-            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
-            available_in=(
-                tz.localize(datetime(year, 1, 1, 12, 0)),
-                tz.localize(datetime(year, 12, 20, 12, 0)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"],
-                ).values_list("slug", flat=True),
-            ),
-            ticket_type=ticket_types["transportation"],
-        )
-
-        name = "PROSA bus transport (open for everyone)"
-        products["product1"] = Product.objects.create(
-            name=name,
-            category=categories["transportation"],
-            price=125,
-            description="PROSA is sponsoring a bustrip from Copenhagen to the venue and back.",
-            available_in=(
-                tz.localize(datetime(year, 1, 1, 12, 0)),
-                tz.localize(datetime(year, 12, 20, 12, 0)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["transportation"],
-                ).values_list("slug", flat=True),
-            ),
-            ticket_type=ticket_types["transportation"],
-        )
-
-        name = "T-shirt (large)"
-        products["product2"] = Product.objects.create(
-            name=name,
-            category=categories["merchandise"],
-            price=160,
-            description="Get a nice t-shirt",
-            available_in=(
-                tz.localize(datetime(year, 1, 1, 12, 0)),
-                tz.localize(datetime(year, 12, 20, 12, 0)),
-            ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"],
-                ).values_list("slug", flat=True),
-            ),
-            ticket_type=ticket_types["merchandise"],
-        )
-
-        name = "Village tent 3x3 meters, no floor"
+        name = f"{camp_prefix} Village tent 3x3 meters, no floor"
         products["tent1"] = Product.objects.create(
             name=name,
             description="A description of the tent goes here",
@@ -889,7 +834,7 @@ class Command(BaseCommand):
             ticket_type=ticket_types["village"],
         )
 
-        name = "Village tent 3x3 meters, with floor"
+        name = f"{camp_prefix} Village tent 3x3 meters, with floor"
         products["tent2"] = Product.objects.create(
             name=name,
             description="A description of the tent goes here",
@@ -906,6 +851,63 @@ class Command(BaseCommand):
                 ).values_list("slug", flat=True),
             ),
             ticket_type=ticket_types["village"],
+        )
+
+        name = f"{camp_prefix} T-shirt Large"
+        products["t-shirt-large"] = Product.objects.create(
+            name=name,
+            description="A description of the t-shirt goes here",
+            price=3675,
+            category=categories["merchandise"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["merchandise"],
+        )
+
+        name = f"{camp_prefix} T-shirt Medium"
+        products["t-shirt-medium"] = Product.objects.create(
+            name=name,
+            description="A description of the t-shirt goes here",
+            price=3675,
+            category=categories["merchandise"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["merchandise"],
+        )
+
+        name = f"{camp_prefix} T-shirt Small"
+        products["t-shirt-small"] = Product.objects.create(
+            name=name,
+            description="A description of the t-shirt goes here",
+            price=3675,
+            category=categories["merchandise"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["merchandise"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["merchandise"],
         )
 
         return products
@@ -930,6 +932,7 @@ class Command(BaseCommand):
         )
         orders[1].oprs.create(product=camp_products["ticket1"], quantity=1)
         orders[1].oprs.create(product=camp_products["tent2"], quantity=1)
+        orders[1].oprs.create(product=camp_products["t-shirt-medium"], quantity=1)
         orders[1].mark_as_paid(request=None)
 
         orders[2] = Order.objects.create(
@@ -940,6 +943,8 @@ class Command(BaseCommand):
         orders[2].oprs.create(product=camp_products["ticket2"], quantity=1)
         orders[2].oprs.create(product=camp_products["ticket1"], quantity=1)
         orders[2].oprs.create(product=camp_products["tent2"], quantity=1)
+        orders[2].oprs.create(product=camp_products["t-shirt-small"], quantity=1)
+        orders[2].oprs.create(product=camp_products["t-shirt-large"], quantity=1)
         orders[2].mark_as_paid(request=None)
 
         orders[3] = Order.objects.create(
@@ -947,9 +952,9 @@ class Command(BaseCommand):
             payment_method="in_person",
             open=None,
         )
-        orders[3].oprs.create(product=camp_products["product0"], quantity=1)
         orders[3].oprs.create(product=camp_products["ticket2"], quantity=1)
         orders[3].oprs.create(product=camp_products["tent1"], quantity=1)
+        orders[3].oprs.create(product=camp_products["t-shirt-small"], quantity=1)
         orders[3].mark_as_paid(request=None)
 
         return orders
