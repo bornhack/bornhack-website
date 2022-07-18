@@ -405,7 +405,7 @@ class OrderReviewAndPayView(
 
             reverses = {
                 Order.PaymentMethods.CREDIT_CARD: reverse_lazy(
-                    "shop:quickpay_link",
+                    "shop:epay_form",
                     kwargs={"pk": order.id},
                 ),
                 Order.PaymentMethods.BLOCKCHAIN: reverse_lazy(
