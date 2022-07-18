@@ -142,10 +142,9 @@ class OrderAdmin(admin.ModelAdmin):
         "open",
         "paid",
         "cancelled",
-        "refunded",
     ]
 
-    list_filter = ["payment_method", "open", "paid", "cancelled", "refunded", "user"]
+    list_filter = ["payment_method", "open", "paid", "cancelled", "user"]
 
     exclude = ["products"]
 
@@ -153,7 +152,6 @@ class OrderAdmin(admin.ModelAdmin):
 
     actions = [
         "mark_order_as_paid",
-        "mark_order_as_refunded",
         "mark_order_as_cancelled",
         "create_tickets",
     ]
@@ -163,12 +161,6 @@ class OrderAdmin(admin.ModelAdmin):
             order.mark_as_paid(request)
 
     mark_order_as_paid.description = "Mark order(s) as paid"
-
-    def mark_order_as_refunded(self, request, queryset):
-        for order in queryset.filter(refunded=False):
-            order.mark_as_refunded(request)
-
-    mark_order_as_refunded.description = "Mark order(s) as refunded"
 
     def mark_order_as_cancelled(self, request, queryset):
         for order in queryset.filter(cancelled=False):

@@ -7,7 +7,7 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
-from .models import Refund
+from .models import RefundEnum
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
@@ -421,7 +421,7 @@ class TestOrderProductRelationModel(TestCase):
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=user)
         opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
-        refund = Refund.objects.create(order=order, created_by=info_user)
+        refund = order.create_refund(created_by=info_user)
         with self.assertRaises(ValidationError):
             opr.create_rpr(refund=refund, quantity=6)
 
@@ -444,7 +444,7 @@ class TestOrderProductRelationModel(TestCase):
         # Quantity is 5, but 1 is used, so we should be able to refund 4
         self.assertEqual(opr.possible_refund, 4)
 
-        refund = Refund.objects.create(order=order, created_by=info_user)
+        refund = order.create_refund(created_by=info_user)
 
         # Refund 1 ticket
         opr.create_rpr(refund=refund, quantity=1)
@@ -457,9 +457,24 @@ class TestOrderProductRelationModel(TestCase):
 class TestRefund(TestCase):
     def setUp(self):
         self.user = UserFactory()
+        self.info_user = UserFactory(username="info")
         self.order = OrderFactory(user=self.user)
-        self.oprs = OrderProductRelationFactory.create_batch(4, order=self.order)
+        self.opr1 = OrderProductRelationFactory(order=self.order, quantity=5)
+        self.opr2 = OrderProductRelationFactory(order=self.order, quantity=1)
+        self.opr3 = OrderProductRelationFactory(order=self.order, quantity=10)
         self.order.mark_as_paid()
 
-    def test_refundable(self):
-        pass
+    def test_order_refunded(self):
+        self.assertTrue(self.order.refunded == RefundEnum.NOT_REFUNDED.value)
+
+        refund1 = self.order.create_refund(created_by=self.info_user)
+        self.opr1.create_rpr(refund=refund1, quantity=1)
+
+        self.assertTrue(self.order.refunded == RefundEnum.PARTIALLY_REFUNDED.value)
+
+        refund2 = self.order.create_refund(created_by=self.info_user)
+        self.opr1.create_rpr(refund=refund2, quantity=4)
+        self.opr2.create_rpr(refund=refund2, quantity=1)
+        self.opr3.create_rpr(refund=refund2, quantity=10)
+
+        self.assertTrue(self.order.refunded == RefundEnum.FULLY_REFUNDED.value)

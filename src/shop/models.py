@@ -1,16 +1,21 @@
 import logging
 from datetime import timedelta
 from decimal import Decimal
+from enum import Enum
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db import transaction
+from django.db.models import Case
 from django.db.models import Count
 from django.db.models import F
 from django.db.models import Sum
+from django.db.models import Value
+from django.db.models import When
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -20,7 +25,6 @@ from unidecode import unidecode
 
 from .managers import OrderQuerySet
 from .managers import ProductQuerySet
-from tickets.models import ShopTicket
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
@@ -106,12 +110,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     )
 
     cancelled = models.BooleanField(default=False)
-
-    refunded = models.BooleanField(
-        verbose_name=_("Refunded?"),
-        help_text=_("Whether this order has been refunded."),
-        default=False,
-    )
 
     customer_comment = models.TextField(
         verbose_name=_("Customer comment"),
@@ -239,35 +237,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         self.create_tickets(request)
         self.save()
 
-    def mark_as_refunded(self, request=None):
-        if not self.paid:
-            msg = "Order %s is not paid, so cannot mark it as refunded!" % self.pk
-            if request:
-                messages.error(request, msg)
-            else:
-                print(msg)
-        else:
-            self.refunded = True
-            # delete any tickets related to this order
-            tickets = ShopTicket.objects.filter(opr__order=self)
-            if tickets.exists():
-                msg = "Order {} marked as refunded, deleting {} tickets...".format(
-                    self.pk,
-                    tickets.count(),
-                )
-                if request:
-                    messages.success(request, msg)
-                else:
-                    print(msg)
-                tickets.delete()
-            else:
-                msg = "Order %s marked as refunded, no tickets to delete" % self.pk
-                if request:
-                    messages.success(request, msg)
-                else:
-                    print(msg)
-            self.save()
-
     def mark_as_cancelled(self, request=None):
         if self.paid:
             msg = "Order %s is paid, cannot cancel a paid order!" % self.pk
@@ -322,11 +291,40 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             tickets += opr.unused_shoptickets
         return tickets
 
-    def create_refund(self, notes):
-        return Refund.objects.create(order=self, notes=notes)
+    @property
+    def refunded(self) -> "RefundEnum":
+        return self.oprs.aggregate(
+            # We want to sum the quantity of distinct OPRs
+            total_quantity=Sum("quantity", distinct=True),
+            # We want all RPRs per OPR, so therefore no distinct (distinct would give us one RPR per OPR)
+            total_refunded=Sum("rprs__quantity"),
+            refunded=Case(
+                When(
+                    total_refunded=F("total_quantity"),
+                    then=Value(RefundEnum.FULLY_REFUNDED.value),
+                ),
+                When(
+                    total_refunded__gt=0,
+                    then=Value(RefundEnum.PARTIALLY_REFUNDED.value),
+                ),
+                When(
+                    total_refunded__isnull=True,
+                    then=Value(RefundEnum.NOT_REFUNDED.value),
+                ),
+            ),
+        )["refunded"]
+
+    def create_refund(self, *, created_by: User, notes: str = "") -> "Refund":
+        return Refund.objects.create(order=self, notes=notes, created_by=created_by)
 
 
 # ########## REFUNDS #################################################
+
+
+class RefundEnum(Enum):
+    NOT_REFUNDED = "NOT_REFUNDED"
+    PARTIALLY_REFUNDED = "PARTIALLY_REFUNDED"
+    FULLY_REFUNDED = "FULLY_REFUNDED"
 
 
 class Refund(CreatedUpdatedModel):
@@ -393,6 +391,14 @@ class Refund(CreatedUpdatedModel):
 
     def __str__(self):
         return f"Refund #{self.id}"
+
+    @property
+    def amount(self):
+        return self.rprs.aggregate(
+            amount=Sum(
+                F("opr__product__price") * F("quantity"),
+            ),
+        )["amount"]
 
 
 class RefundProductRelation(CreatedUpdatedModel):
@@ -613,6 +619,37 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         return True
 
 
+class OrderProductRelationQuerySet(models.QuerySet):
+    def paid(self):
+        return self.filter(order__paid=True)
+
+    def with_refunded(self):
+        return self.annotate(
+            total_refunded=Sum("rprs__quantity"),
+            refunded=Case(
+                When(
+                    total_refunded=F("quantity"),
+                    then=Value(RefundEnum.FULLY_REFUNDED.value),
+                ),
+                When(
+                    total_refunded__gt=0,
+                    then=Value(RefundEnum.PARTIALLY_REFUNDED.value),
+                ),
+                When(
+                    total_refunded__isnull=True,
+                    then=Value(RefundEnum.NOT_REFUNDED.value),
+                ),
+            ),
+        )
+
+    def not_fully_refunded(self):
+        print(self.with_refunded())
+        return self.with_refunded().exclude(refunded=RefundEnum.FULLY_REFUNDED.value)
+
+    def not_cancelled(self):
+        return self.filter(order__cancelled=False)
+
+
 class OrderProductRelation(
     ExportModelOperationsMixin("order_product_relation"),
     CreatedUpdatedModel,
@@ -733,12 +770,16 @@ class OrderProductRelation(
         return self.used_shoptickets.count()
 
     @property
-    def refunded(self):
+    def refunded_quantity(self):
         return self.rprs.aggregate(refunded=Sum("quantity"))["refunded"] or 0
 
     @property
     def possible_refund(self):
-        return self.quantity - self.used_tickets_count - self.refunded
+        return self.quantity - self.used_tickets_count - self.refunded_quantity
+
+    @property
+    def non_refunded_quantity(self):
+        return self.quantity - self.refunded_quantity
 
     def save(self, **kwargs):
         """Make sure we save the current price in the OPR."""
@@ -838,6 +879,14 @@ class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel)
         null=True,
         blank=True,
         help_text="The Invoice this CreditNote relates to, if any.",
+    )
+
+    refund = models.OneToOneField(
+        "shop.Refund",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        help_text="The Refund this CreditNote relates to, if any.",
     )
 
     def clean(self):
