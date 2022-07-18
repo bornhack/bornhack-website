@@ -45,7 +45,8 @@ def add_new_membership_email(membership):
         "camp": membership.team.camp.title,
         "memberlist_link": "https://bornhack.dk/{}/teams/{}/members".format(
             membership.team.camp.slug,
-            membership.team.slug)
+            membership.team.slug,
+        ),
     }
 
     return add_outgoing_email(
@@ -61,4 +62,3 @@ def add_new_membership_email(membership):
             membership.team.camp.title,
         ),
     )
-

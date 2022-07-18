@@ -13,7 +13,8 @@ dectutil = DectUtils()
 
 
 class DectRegistration(
-    ExportModelOperationsMixin("dect_registration"), CampRelatedModel
+    ExportModelOperationsMixin("dect_registration"),
+    CampRelatedModel,
 ):
     """
     This model contains DECT registrations for users and services

@@ -21,7 +21,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class FacilityQuickFeedback(
-    ExportModelOperationsMixin("facility_quick_feedback"), models.Model
+    ExportModelOperationsMixin("facility_quick_feedback"),
+    models.Model,
 ):
     """
     This model contains the various options for giving quick feedback which we present to the user
@@ -172,7 +173,8 @@ class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDMod
 
 
 class FacilityFeedback(
-    ExportModelOperationsMixin("facility_feedback"), CampRelatedModel
+    ExportModelOperationsMixin("facility_feedback"),
+    CampRelatedModel,
 ):
     """
     This model contains participant feedback for Facilities.
@@ -235,7 +237,8 @@ class FacilityFeedback(
 
 
 class FacilityOpeningHours(
-    ExportModelOperationsMixin("facility_opening_hours"), CampRelatedModel
+    ExportModelOperationsMixin("facility_opening_hours"),
+    CampRelatedModel,
 ):
     """
     This model contains opening hours for facilities which are not always open.
