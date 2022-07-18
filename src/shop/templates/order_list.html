@@ -35,7 +35,15 @@ Orders | {{ block.super }}
                 <td class="text-right">{{ order.total|currency }}</td>
                 <td class="text-center">{% if order.open %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-danger"></i>{% endif %}</td>
                 <td class="text-center">{{ order.paid|truefalseicon }}</td>
-                <td class="text-center">{{ order.refunded|truefalseicon }}</td>
+                <td class="text-center">
+                    {% if order.refunded == "FULLY_REFUNDED" %}
+                        Fully refunded
+                    {% elif order.refunded == "PARTIALLY_REFUNDED" %}
+                        Partially refunded
+                    {% else %}
+                        <i class="fas fa-times text-danger"></i>
+                    {% endif %}
+                </td>
                 <td class="text-center">{{ order.used_status }}</td>
                 <td>
                 {% if order.paid %}

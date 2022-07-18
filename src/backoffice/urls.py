@@ -315,7 +315,7 @@ urlpatterns = [
                                 name="invoice_list_csv",
                             ),
                             path(
-                                "<int:order_id>/",
+                                "<int:invoice_id>/",
                                 include(
                                     [
                                         path(
