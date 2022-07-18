@@ -240,8 +240,12 @@ class Command(BaseCommand):
     help = "Create mock data for development instances"
 
     def add_arguments(self, parser):
-        parser.add_argument('-s', '--skip-auto-scheduler', action='store_true',
-            help='Don\'t run the auto-scheduler. This is useful on operating systems for which the solver binary is not packaged, such as OpenBSD.')
+        parser.add_argument(
+            "-s",
+            "--skip-auto-scheduler",
+            action="store_true",
+            help="Don't run the auto-scheduler. This is useful on operating systems for which the solver binary is not packaged, such as OpenBSD.",
+        )
 
     def create_camps(self):
         self.output("Creating camps...")
@@ -1360,7 +1364,9 @@ class Command(BaseCommand):
                 autoschedule, diff = scheduler.calculate_similar_autoschedule()
                 scheduler.apply(autoschedule)
             except ValueError as E:
-                self.output(f"Got exception while calculating similar autoschedule: {E}")
+                self.output(
+                    f"Got exception while calculating similar autoschedule: {E}"
+                )
                 autoschedule = None
             scheduleduration = timezone.now() - schedulestart
             self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
@@ -2054,7 +2060,7 @@ class Command(BaseCommand):
 
                 self.approve_event_proposals(camp)
 
-                self.create_camp_scheduling(camp, not options['skip_auto_scheduler'])
+                self.create_camp_scheduling(camp, not options["skip_auto_scheduler"])
 
                 # shuffle it up - delete and create new random availability
                 self.generate_speaker_availability(camp)
@@ -2063,7 +2069,7 @@ class Command(BaseCommand):
                 self.create_camp_speaker_event_conflicts(camp)
 
                 # recalculate the autoschedule
-                self.create_camp_rescheduling(camp, not options['skip_auto_scheduler'])
+                self.create_camp_rescheduling(camp, not options["skip_auto_scheduler"])
 
                 self.create_camp_villages(camp, users)
 

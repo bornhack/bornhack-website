@@ -24,7 +24,7 @@ future==0.18.2
 html5lib==1.1
 icalendar==4.1.0
 ipython==8.4.0
-irc3==1.1.7
+irc3==1.1.8
 lxml==4.9.1
 olefile==0.46
 openpyxl==3.0.10

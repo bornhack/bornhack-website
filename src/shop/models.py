@@ -388,7 +388,9 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
 
 
 class ProductCategory(
-    ExportModelOperationsMixin("product_category"), CreatedUpdatedModel, UUIDModel
+    ExportModelOperationsMixin("product_category"),
+    CreatedUpdatedModel,
+    UUIDModel,
 ):
     class Meta:
         verbose_name = "Product category"
@@ -558,7 +560,8 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
 
 
 class OrderProductRelation(
-    ExportModelOperationsMixin("order_product_relation"), CreatedUpdatedModel
+    ExportModelOperationsMixin("order_product_relation"),
+    CreatedUpdatedModel,
 ):
     def __str__(self):
         return f"#{self.order}: {self.quantity} {self.product}"
@@ -580,7 +583,9 @@ class OrderProductRelation(
 
 
 class EpayCallback(
-    ExportModelOperationsMixin("epay_callback"), CreatedUpdatedModel, UUIDModel
+    ExportModelOperationsMixin("epay_callback"),
+    CreatedUpdatedModel,
+    UUIDModel,
 ):
     class Meta:
         verbose_name = "Epay Callback"
@@ -595,7 +600,9 @@ class EpayCallback(
 
 
 class EpayPayment(
-    ExportModelOperationsMixin("epay_payment"), CreatedUpdatedModel, UUIDModel
+    ExportModelOperationsMixin("epay_payment"),
+    CreatedUpdatedModel,
+    UUIDModel,
 ):
     class Meta:
         verbose_name = "Epay Payment"
@@ -738,7 +745,8 @@ class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
 
 
 class CoinifyAPIInvoice(
-    ExportModelOperationsMixin("coinify_api_invoice"), CreatedUpdatedModel
+    ExportModelOperationsMixin("coinify_api_invoice"),
+    CreatedUpdatedModel,
 ):
     coinify_id = models.IntegerField(null=True)
     invoicejson = models.JSONField()
@@ -757,7 +765,8 @@ class CoinifyAPIInvoice(
 
 
 class CoinifyAPICallback(
-    ExportModelOperationsMixin("coinify_api_callback"), CreatedUpdatedModel
+    ExportModelOperationsMixin("coinify_api_callback"),
+    CreatedUpdatedModel,
 ):
     headers = models.JSONField()
     payload = models.JSONField(blank=True)
@@ -774,7 +783,8 @@ class CoinifyAPICallback(
 
 
 class CoinifyAPIRequest(
-    ExportModelOperationsMixin("coinify_api_request"), CreatedUpdatedModel
+    ExportModelOperationsMixin("coinify_api_request"),
+    CreatedUpdatedModel,
 ):
     order = models.ForeignKey(
         "shop.Order",
