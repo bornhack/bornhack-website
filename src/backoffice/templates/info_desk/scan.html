@@ -169,7 +169,7 @@ Scan | {{ block.super }}
 
         </table>
 
-        {% if not order.paid and order.payment_method == order.CASH %}
+        {% if not order.paid and order.payment_method == "in_person" %}
         <form method="POST">
             {% csrf_token %}
             <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as paid!</button>

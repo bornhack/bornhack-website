@@ -376,6 +376,13 @@ class OrderUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
     template_name = "order_update.html"
     fields = ["notes"]
 
+    def form_valid(self, form):
+        messages.info(request=self.request, message=f"Order #{self.object.id} updated!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
+
 
 class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = CreditNote
