@@ -77,10 +77,16 @@ class TokenFindView(LoginRequiredMixin, DetailView):
             if TokenFind.objects.filter(token=self.get_object()).count() == 1:
                 # this is the first time this token has been found, count it as such
                 FIRST_TOKEN_FINDS.labels(
-                    token.camp.title, request.user.id, username, token.id
+                    token.camp.title,
+                    request.user.id,
+                    username,
+                    token.id,
                 ).inc()
             TOKEN_FINDS.labels(
-                token.camp.title, request.user.id, username, token.id
+                token.camp.title,
+                request.user.id,
+                username,
+                token.id,
             ).inc()
 
             # message for the user
