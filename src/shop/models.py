@@ -775,7 +775,10 @@ class OrderProductRelation(
 
     @property
     def possible_refund(self):
-        return self.quantity - self.used_tickets_count - self.refunded_quantity
+        quantity = (
+            1 if self.product.ticket_type.single_ticket_per_product else self.quantity
+        )
+        return quantity - self.used_tickets_count - self.refunded_quantity
 
     @property
     def non_refunded_quantity(self):

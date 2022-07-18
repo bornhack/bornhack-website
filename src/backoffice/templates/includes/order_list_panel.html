@@ -37,7 +37,16 @@
                   {% empty %}N/A{% endfor %}
           </ul>
       </td>
-      <td>{% if order.invoice %}{{ order.invoice }}{% else %}{{ order.pdf }} (proforma){% endif %}</td>
+      <td>{% if order.invoice %}
+              <a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.id %}">
+              Invoice #{{ order.invoice.id }}
+              </a>
+          {% else %}
+              <a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.id %}">
+                  (proforma)
+              </a>
+          {% endif %}
+      </td>
       <td>
         <div class="btn-group btn-group-vertical">
           <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>

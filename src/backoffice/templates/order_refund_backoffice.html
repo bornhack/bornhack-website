@@ -33,6 +33,9 @@
 
                 <td>
                     {{ opr.quantity }}
+                    {% if opr.product.ticket_type.single_ticket_per_product %}
+                    (1 ticket)
+                    {% endif %}
                 </td>
 
                 <td>
@@ -40,7 +43,7 @@
                 </td>
 
                 <td>
-                    {{ opr.refunded }}
+                    {{ opr.refunded_quantity }}
                 </td>
 
                 <td>

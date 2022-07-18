@@ -217,6 +217,7 @@ class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
             super()
             .get_queryset()
             .prefetch_related(
+                "products",
                 "oprs__product",
                 "user",
                 "invoice",

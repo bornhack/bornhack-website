@@ -735,6 +735,10 @@ class Command(BaseCommand):
             name="Villages",
             slug="villages",
         )
+        categories["facilities"] = ProductCategory.objects.create(
+            name="Facilities",
+            slug="facilities",
+        )
 
         return categories
 
@@ -764,6 +768,11 @@ class Command(BaseCommand):
         types["merchandise"] = TicketType.objects.create(
             name="Merchandise",
             camp=camp,
+        )
+        types["facilities"] = TicketType.objects.create(
+            name="Facilities",
+            camp=camp,
+            single_ticket_per_product=True,
         )
         types["transportation"] = TicketType.objects.create(
             name="Transportation",
@@ -910,6 +919,25 @@ class Command(BaseCommand):
             ticket_type=ticket_types["merchandise"],
         )
 
+        name = "100 HAX"
+        products["hax"] = Product.objects.create(
+            name=name,
+            description="100 HAX",
+            price=100,
+            category=categories["facilities"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["facilities"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["facilities"],
+        )
+
         return products
 
     def create_orders(self, users, camp_products):
@@ -955,6 +983,7 @@ class Command(BaseCommand):
         orders[3].oprs.create(product=camp_products["ticket2"], quantity=1)
         orders[3].oprs.create(product=camp_products["tent1"], quantity=1)
         orders[3].oprs.create(product=camp_products["t-shirt-small"], quantity=1)
+        orders[3].oprs.create(product=camp_products["hax"], quantity=30)
         orders[3].mark_as_paid(request=None)
 
         return orders
