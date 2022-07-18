@@ -181,11 +181,13 @@ def get_user_email(obj):
 
 class RefundInline(admin.TabularInline):
     model = RefundProductRelation
+    raw_id_fields = ["opr"]
 
 
 @admin.register(Refund)
 class RefundAdmin(admin.ModelAdmin):
     inlines = [RefundInline]
+    raw_id_fields = ["order"]
 
 
 @admin.register(QuickPayAPIRequest)

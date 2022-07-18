@@ -36,6 +36,7 @@ from .views import CoinifyDashboardView
 from .views import CoinifyInvoiceListView
 from .views import CoinifyPayoutListView
 from .views import CredebtorDetailView
+from .views import CreditNoteDownloadView
 from .views import CreditNoteListView
 from .views import EpayCSVImportView
 from .views import EpayTransactionListView
@@ -336,7 +337,19 @@ urlpatterns = [
                             path(
                                 "",
                                 CreditNoteListView.as_view(),
-                                name="creditnote_list",
+                                name="credit_note_list",
+                            ),
+                            path(
+                                "<int:credit_note_id>/",
+                                include(
+                                    [
+                                        path(
+                                            "download",
+                                            CreditNoteDownloadView.as_view(),
+                                            name="credit_note_download",
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),

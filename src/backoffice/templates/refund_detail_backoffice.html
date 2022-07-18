@@ -31,14 +31,20 @@
                     <th>Refunded by</th>
                     <td>{{ refund.created_by }}</td>
                 </tr>
-{#                <tr>#}
-{#                    <th>Proforma Invoice</th>#}
-{#                    <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download Proforma Invoice</a></td>#}
-{#                </tr>#}
-{#                <tr>#}
-{#                    <th>Invoice</th>#}
-{#                    <td>{% if order.invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.pk %}" class="btn btn-primary">Download Invoice #{{ order.invoice.pk }}</a>{% else %}N/A{% endif %}</td>#}
-{#                </tr>#}
+                <tr>
+                    <th>Paid</th>
+                    <td>{{ refund.paid|truefalseicon }}</td>
+                </tr>
+                {% if refund.paid %}
+                <tr>
+                    <th>Credit note</th>
+                    <td>
+                        <a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=refund.creditnote.id %}">
+                            <i class="fa fa-file-pdf fa-4x"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endif %}
                 <tr>
                     <th>Products</th>
                     <td>
