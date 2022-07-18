@@ -398,7 +398,9 @@ class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
 
 
 class TaskComment(
-    ExportModelOperationsMixin("task_comment"), UUIDModel, CreatedUpdatedModel
+    ExportModelOperationsMixin("task_comment"),
+    UUIDModel,
+    CreatedUpdatedModel,
 ):
     task = models.ForeignKey(
         "teams.TeamTask",

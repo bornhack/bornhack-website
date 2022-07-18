@@ -65,7 +65,9 @@ class TicketTypeQuerySet(models.QuerySet):
 
 # TicketType can be full week, one day, cabins, parking, merch, hax, massage, etc.
 class TicketType(
-    ExportModelOperationsMixin("ticket_type"), CampRelatedModel, UUIDModel
+    ExportModelOperationsMixin("ticket_type"),
+    CampRelatedModel,
+    UUIDModel,
 ):
     objects = TicketTypeQuerySet.as_manager()
     name = models.TextField()

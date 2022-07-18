@@ -10,9 +10,9 @@ from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
+from .email import add_village_approve_email
 from .mixins import EnsureWritableCampMixin
 from .models import Village
-from .email import add_village_approve_email
 from camps.mixins import CampViewMixin
 from camps.models import Camp
 
@@ -32,7 +32,10 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # If the user is not contact for this village OR is not staff and village not approved
         if not request.user.is_staff:
-            if self.get_object().contact != request.user and not self.get_object().approved:
+            if (
+                self.get_object().contact != request.user
+                and not self.get_object().approved
+            ):
                 raise Http404("Village not found")
 
         return super().dispatch(request, *args, **kwargs)
@@ -66,7 +69,7 @@ class VillageCreateView(
         village.save()
         messages.success(
             self.request,
-            "Your request to create a village has been registered - it will be published after review for CoC compliance"
+            "Your request to create a village has been registered - it will be published after review for CoC compliance",
         )
         add_village_approve_email(village)
         return HttpResponseRedirect(village.get_absolute_url())
@@ -105,7 +108,7 @@ class VillageUpdateView(
             village.name = "noname"
         messages.success(
             self.request,
-            "Your village will be republished after the changes have been reviewed for CoC compliance."
+            "Your village will be republished after the changes have been reviewed for CoC compliance.",
         )
         add_village_approve_email(village)
         return super().form_valid(form)

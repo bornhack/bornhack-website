@@ -1,10 +1,12 @@
 import logging
 
 from django.core.exceptions import ObjectDoesNotExist
+
 from teams.models import Team
 from utils.email import add_outgoing_email
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
 
 def add_village_approve_email(village):
     formatdict = {"village": village}
@@ -24,4 +26,3 @@ def add_village_approve_email(village):
         subject="Village created or updated, approval needed",
         hold=False,
     )
-

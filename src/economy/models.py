@@ -133,7 +133,9 @@ class CredebtorManager(models.Manager):
 
 
 class Credebtor(
-    ExportModelOperationsMixin("credebtor"), CreatedUpdatedModel, UUIDModel
+    ExportModelOperationsMixin("credebtor"),
+    CreatedUpdatedModel,
+    UUIDModel,
 ):
     """
     The Credebtor model represents the specific "instance" of a Chain,
@@ -462,7 +464,9 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
 
 
 class Reimbursement(
-    ExportModelOperationsMixin("reimbursement"), CampRelatedModel, UUIDModel
+    ExportModelOperationsMixin("reimbursement"),
+    CampRelatedModel,
+    UUIDModel,
 ):
     """
     A reimbursement covers one or more expenses.
@@ -1130,7 +1134,8 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
 
 
 class BankTransaction(
-    ExportModelOperationsMixin("bank_transaction"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("bank_transaction"),
+    CreatedUpdatedUUIDModel,
 ):
     """A BankTransaction represents one movement into or out of the bank account."""
 
@@ -1183,7 +1188,8 @@ class BankTransaction(
 
 
 class CoinifyInvoice(
-    ExportModelOperationsMixin("coinify_invoice"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("coinify_invoice"),
+    CreatedUpdatedUUIDModel,
 ):
     """Coinify creates one invoice every time a payment is completed."""
 
@@ -1241,7 +1247,8 @@ class CoinifyInvoice(
 
 
 class CoinifyPayout(
-    ExportModelOperationsMixin("coinify_payout"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("coinify_payout"),
+    CreatedUpdatedUUIDModel,
 ):
     """Coinify makes a payout every time our balance exceeds some preset amount in their end."""
 
@@ -1303,7 +1310,8 @@ class CoinifyPayout(
 
 
 class CoinifyBalance(
-    ExportModelOperationsMixin("coinify_balance"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("coinify_balance"),
+    CreatedUpdatedUUIDModel,
 ):
     """Coinify balance objects show our balance in Coinifys end at UTC midnight daily."""
 
@@ -1337,7 +1345,8 @@ class CoinifyBalance(
 
 
 class EpayTransaction(
-    ExportModelOperationsMixin("epay_transaction"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("epay_transaction"),
+    CreatedUpdatedUUIDModel,
 ):
     """ePay creates a transaction every time a card payment is completed through them."""
 
@@ -1379,7 +1388,8 @@ class EpayTransaction(
 
 
 class ClearhausSettlement(
-    ExportModelOperationsMixin("clearhaus_settlement"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("clearhaus_settlement"),
+    CreatedUpdatedUUIDModel,
 ):
     """Clearhaus creates a settlement (meaning they transfer money to us) weekly (if our balance is > 0)."""
 
@@ -1553,7 +1563,8 @@ class ClearhausSettlement(
 
 
 class ZettleBalance(
-    ExportModelOperationsMixin("zettle_balance"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("zettle_balance"),
+    CreatedUpdatedUUIDModel,
 ):
     """Zettle (formerly iZettle) creates an account statement line every time there is a movement affecting our balance."""
 
@@ -1591,7 +1602,8 @@ class ZettleBalance(
 
 
 class ZettleReceipt(
-    ExportModelOperationsMixin("zettle_receipt"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("zettle_receipt"),
+    CreatedUpdatedUUIDModel,
 ):
     """Zettle creates a receipt every time there is a customer payment or refund using Zettle. Not all receipts affect our Zettle balance (e.g. MobilePay payments are paid out by MobilePay directly)."""
 
@@ -1646,7 +1658,8 @@ class ZettleReceipt(
 
 
 class MobilePayTransaction(
-    ExportModelOperationsMixin("mobilepay_transaction"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("mobilepay_transaction"),
+    CreatedUpdatedUUIDModel,
 ):
     """MobilePay transactions cover payments/refunds, payouts, service fees and everything else."""
 
@@ -1704,7 +1717,8 @@ class MobilePayTransaction(
 
 
 class AccountingExport(
-    ExportModelOperationsMixin("accounting_export"), CreatedUpdatedUUIDModel
+    ExportModelOperationsMixin("accounting_export"),
+    CreatedUpdatedUUIDModel,
 ):
     date_from = models.DateField(
         help_text="The start date for this accounting export (YYYY-MM-DD).",
