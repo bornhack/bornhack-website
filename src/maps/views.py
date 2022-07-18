@@ -5,7 +5,9 @@ import requests
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.views.generic import View
+from django.views.generic import View, CreateView
+from .models import Geometry
+from .widgets import OrtoFotoForaarWMTSWidget
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -30,7 +32,7 @@ class MapProxyView(View):
 
     def get(self, *args, **kwargs):
         """
-        Before we make the request we check that the path is in our whitelist.
+        Before we make the request we check that the path is in our allowlist.
         Before we return the response we copy headers except for a list we dont want.
         """
 
@@ -104,3 +106,14 @@ class MapProxyView(View):
             raise MissingCredentials()
         path += f"&username={username}&password={password}"
         return path
+
+
+class GeometryCreateView(CreateView):
+    model = Geometry
+    template_name = "geometry_create.html"
+    fields = ["name", "description", "responsible_team", "geometry"]
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["geometry"].widget = OrtoFotoForaarWMTSWidget()
+        return form

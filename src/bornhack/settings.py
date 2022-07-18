@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "leaflet",
     "oauth2_provider",
     "taggit",
+    "polymorphic",
 ]
 
 # MEDIA_URL = '/media/'
