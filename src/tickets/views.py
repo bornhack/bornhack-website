@@ -1,18 +1,18 @@
 import logging
 
-from django.shortcuts import redirect
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
-from utils.models import CampReadOnlyModeError
 from .models import ShopTicket
+from utils.models import CampReadOnlyModeError
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -69,7 +69,9 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
         try:
             response = super().post(request, *args, **kwargs)
         except CampReadOnlyModeError as exc:
-            messages.error(self.request, "The camp is over. You can't update the ticket.")
+            messages.error(
+                self.request, "The camp is over. You can't update the ticket."
+            )
             return redirect(self.get_object().get_absolute_url())
         else:
             messages.info(self.request, "Ticket updated!")

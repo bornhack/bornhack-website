@@ -196,7 +196,8 @@ class Availability(CampRelatedModel, UUIDModel):
 
 
 class SpeakerProposalAvailability(
-    ExportModelOperationsMixin("speaker_proposal_availability"), Availability
+    ExportModelOperationsMixin("speaker_proposal_availability"),
+    Availability,
 ):
     """Availability info for SpeakerProposal objects"""
 
@@ -253,7 +254,8 @@ class SpeakerProposalAvailability(
 
 
 class SpeakerAvailability(
-    ExportModelOperationsMixin("speaker_availability"), Availability
+    ExportModelOperationsMixin("speaker_availability"),
+    Availability,
 ):
     """Availability info for Speaker objects"""
 
@@ -371,7 +373,8 @@ class UserSubmittedModel(CampRelatedModel):
 
 
 class SpeakerProposal(
-    ExportModelOperationsMixin("speaker_proposal"), UserSubmittedModel
+    ExportModelOperationsMixin("speaker_proposal"),
+    UserSubmittedModel,
 ):
     """A speaker proposal"""
 
@@ -1664,7 +1667,9 @@ class Favorite(ExportModelOperationsMixin("favorite"), models.Model):
 
 
 class EventFeedback(
-    ExportModelOperationsMixin("event_feedback"), CampRelatedModel, UUIDModel
+    ExportModelOperationsMixin("event_feedback"),
+    CampRelatedModel,
+    UUIDModel,
 ):
     """
     This model contains all feedback for Events

@@ -7,7 +7,8 @@ from utils.models import CreatedUpdatedModel
 
 
 class OutgoingIrcMessage(
-    ExportModelOperationsMixin("outgoing_irc_message"), CreatedUpdatedModel
+    ExportModelOperationsMixin("outgoing_irc_message"),
+    CreatedUpdatedModel,
 ):
     target = models.CharField(max_length=100)
     message = models.CharField(max_length=200)
