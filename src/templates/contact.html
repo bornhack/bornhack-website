@@ -27,10 +27,10 @@ Contact | {{ block.super }}
 
 <p>
   <b>Our bank account details are:</b><br>
-  Bank Name: Folke Sparekassen<br>
-  IBAN: DK0398600000747866<br>
-  BIC: FOSPDK21<br>
-  DK Reg No: 9860<br>
-  DK Account No: 747866<br>
+  Bank Name: {{ bank }}<br>
+  IBAN: {{ bank_iban }}<br>
+  BIC: {{ bank_bic }}<br>
+  DK Reg No: {{ bank_dk_reg }}<br>
+  DK Account No: {{ bank_dk_accno }}<br>
 </p>
 {% endblock %}
