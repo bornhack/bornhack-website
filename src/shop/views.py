@@ -603,6 +603,7 @@ class BankTransferView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["bank"] = settings.BANKACCOUNT_BANK
         context["iban"] = settings.BANKACCOUNT_IBAN
         context["swiftbic"] = settings.BANKACCOUNT_SWIFTBIC
         context["orderid"] = self.get_object().pk

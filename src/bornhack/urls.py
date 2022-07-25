@@ -8,6 +8,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from bar.views import MenuView
+from contact.views import ContactView
 from camps.views import CampDetailView
 from camps.views import CampListView
 from camps.views import CampRedirectView
@@ -34,7 +35,7 @@ urlpatterns = [
     path("news/", include("news.urls", namespace="news")),
     path(
         "contact/",
-        TemplateView.as_view(template_name="contact.html"),
+        ContactView.as_view(),
         name="contact",
     ),
     path("conduct/", TemplateView.as_view(template_name="coc.html"), name="conduct"),
