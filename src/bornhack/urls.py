@@ -8,10 +8,10 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from bar.views import MenuView
-from contact.views import ContactView
 from camps.views import CampDetailView
 from camps.views import CampListView
 from camps.views import CampRedirectView
+from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from people.views import PeopleView

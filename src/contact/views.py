@@ -1,9 +1,9 @@
+from django.conf import settings
 from django.views.generic import TemplateView
 
-from django.conf import settings
 
 class ContactView(TemplateView):
-    template_name="contact.html"
+    template_name = "contact.html"
 
     def get_context_data(self, **kwargs):
         context = {
