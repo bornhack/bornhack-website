@@ -23,11 +23,14 @@ class ScheduleConsumer(JsonWebsocketConsumer):
             camp_slug = content.get("camp_slug")
             try:
                 camp = Camp.objects.get(slug=camp_slug)
-                days = [{
-                            "repr": day.lower.strftime("%A %Y-%m-%d"),
-                            "iso": day.lower.strftime("%Y-%m-%d"),
-                            "day_name": day.lower.strftime("%A"),
-                        } for day in camp.get_days("camp")]
+                days = [
+                    {
+                        "repr": day.lower.strftime("%A %Y-%m-%d"),
+                        "iso": day.lower.strftime("%Y-%m-%d"),
+                        "day_name": day.lower.strftime("%A"),
+                    }
+                    for day in camp.get_days("camp")
+                ]
 
                 events_query_set = Event.objects.filter(track__camp=camp)
                 events = [x.serialize() for x in events_query_set]
