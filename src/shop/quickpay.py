@@ -55,10 +55,11 @@ class QuickPay:
         qpr.headers = {"x-bornhack-quickpay-request-id": str(qpr.uuid)}
         self.do_request(qpr)
         if qpr.response_status_code == 200:
-            return QuickPayPayment.objects.create(
-                qpid=qpr.response_body["id"],
-                body=qpr.response_body,
-            )
+            # return QuickPayPayment.objects.create(
+            #     qpid=qpr.response_body["id"],
+            #     body=qpr.response_body,
+            # )
+            pass
 
     def get_payment_link(self, payment):
         """Get a payment link for this payment."""

@@ -33,7 +33,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
         if not self.get_object().active:
             messages.warning(
                 self.request,
-                f"Patience! You found a valid token, but it is not active. Try again later!",
+                "Patience! You found a valid token, but it is not active. Try again later!",
             )
             return redirect(reverse("tokens:tokenfind_list"))
 
@@ -71,7 +71,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
             # user found a new token
             username = request.user.profile.get_public_credit_name
             if username == "Unnamed":
-                username == "anonymous_player_{request.user.id}"
+                username = "anonymous_player_{request.user.id}"
 
             # register metrics
             if TokenFind.objects.filter(token=self.get_object()).count() == 1:

@@ -68,7 +68,7 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     def post(self, request, *args, **kwargs):
         try:
             response = super().post(request, *args, **kwargs)
-        except CampReadOnlyModeError as exc:
+        except CampReadOnlyModeError:
             messages.error(
                 self.request,
                 "The camp is over. You can't update the ticket.",
