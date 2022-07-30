@@ -13,34 +13,50 @@
         </td>
     </tr>
 </table>
-<h3>Customer: {% if creditnote.user %}{{ creditnote.user.email }}{% else %}{{ creditnote.customer|linebreaks }}{% endif %}</h3>
+<h3>Customer: {% if creditnote.user %}{{ creditnote.user.email }}{% else %}
+    {{ creditnote.customer|linebreaks }}{% endif %}</h3>
 <br>
 <h2>CREDITNOTE</h2>
 <table style="width:90%; margin:1em;">
     <tr>
-      <td>
-        <b>Text
-      <td align="right">
-        <b>Amount
-  <tr>
-    <td width="80%">
-      {{ creditnote.text }}
-    <td align="right">
-      {{ creditnote.amount|currency }}
+        <td>
+            <b>Product</b>
+        <td>
+            <b>Quantity</b>
+        <td align="right">
+            <b>Price
+        <td align="right">
+            <b>Total</b>
 
-  <tr>
-    <td align="right">
-      {% if creditnote.danish_vat %}
-      <strong>Danish VAT (25%)</strong>
-      {% else %}
-      <strong>No VAT</strong>
-      {% endif %}
-    <td align="right">
-      {{ creditnote.vat|currency }}
+    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-  <tr>
-    <td align="right">
-      <strong>Total</strong>
-    <td align="right">
-      {{ creditnote.amount|currency }}
+    {% for rpr in creditnote.refund.rprs.all %}
+    <tr>
+        <td>
+            {{ rpr.opr.product.name }}
+        <td>
+            {{ rpr.quantity }}
+        <td align="right">
+            {{ rpr.opr.product.price|currency }}
+        <td align="right">
+            {{ rpr.total|currency }}
+    {% endfor %}
+
+    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+
+    <tr>
+        <td align="right" colspan="3">
+            {% if creditnote.danish_vat %}
+                <strong>Danish VAT (25%)</strong>
+            {% else %}
+                <strong>No VAT</strong>
+            {% endif %}
+        <td align="right">
+            {{ creditnote.vat|currency }}
+
+    <tr>
+        <td align="right" colspan="3">
+            <strong>Total</strong>
+        <td align="right">
+            {{ creditnote.amount|currency }}
 </table>
