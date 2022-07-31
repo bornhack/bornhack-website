@@ -657,6 +657,8 @@ class OrderProductRelation(
     def __str__(self):
         return f"#{self.order}: {self.quantity} {self.product}"
 
+    objects = OrderProductRelationQuerySet.as_manager()
+
     order = models.ForeignKey(
         "shop.Order",
         related_name="oprs",
