@@ -16,6 +16,7 @@ from django.db.models import F
 from django.db.models import Sum
 from django.db.models import Value
 from django.db.models import When
+from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -480,9 +481,18 @@ class ProductStatsManager(models.Manager):
         return (
             self.filter(
                 orderproductrelation__order__paid=True,
-                orderproductrelation__order__refunded=False,
             )
-            .annotate(total_units_sold=Sum("orderproductrelation__quantity"))
+            .annotate(
+                total_units_refunded=Coalesce(
+                    Sum("orderproductrelation__rprs__quantity"),
+                    0,
+                ),
+            )
+            .annotate(
+                total_units_sold=Sum("orderproductrelation__quantity")
+                - F("total_units_refunded"),
+            )
+            .exclude(total_units_sold=0)
             .annotate(profit=F("price") - F("cost"))
             .annotate(total_income=F("price") * F("total_units_sold"))
             .annotate(total_cost=F("cost") * F("total_units_sold"))

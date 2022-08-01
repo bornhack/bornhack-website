@@ -8,13 +8,19 @@ from typing import Union
 import qrcode
 from django.conf import settings
 from django.db import models
+from django.db.models import Case
 from django.db.models import Count
+from django.db.models import DecimalField
 from django.db.models import Expression
 from django.db.models import ExpressionWrapper
 from django.db.models import F
 from django.db.models import OuterRef
+from django.db.models import Q
 from django.db.models import Subquery
 from django.db.models import Sum
+from django.db.models import Value
+from django.db.models import When
+from django.db.models.functions import Coalesce
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -36,22 +42,30 @@ class TicketTypeQuerySet(models.QuerySet):
                 .values("annotation_value")[:1],
             )
 
-        quantity = F("product__orderproductrelation__quantity")
+        refunded = Coalesce(Sum("product__orderproductrelation__rprs__quantity"), 0)
+        quantity = Sum("product__orderproductrelation__quantity") - refunded
         cost = quantity * F("product__cost")
         income = quantity * F("product__price")
 
         avg_ticket_price = Subquery(
-            TicketType.objects.annotate(units=Sum(quantity))
-            .annotate(income=Sum(income))
+            TicketType.objects.annotate(units=quantity)
+            .annotate(income=income)
             .annotate(
                 avg_ticket_price=ExpressionWrapper(
-                    F("income") * Decimal("1.0") / F("units"),
-                    output_field=models.DecimalField(),
+                    Case(
+                        When(
+                            condition=~Q(units=0),
+                            then=F("income") * Decimal("1.0") / F("units"),
+                        ),
+                        default=Value(0),
+                        output_field=DecimalField(),
+                    ),
+                    output_field=DecimalField(),
                 ),
             )
             .filter(pk=OuterRef("pk"))
             .values("avg_ticket_price")[:1],
-            output_field=models.DecimalField(),
+            output_field=DecimalField(),
         )
 
         return self.annotate(

@@ -866,7 +866,7 @@ class Command(BaseCommand):
         products["t-shirt-large"] = Product.objects.create(
             name=name,
             description="A description of the t-shirt goes here",
-            price=3675,
+            price=150,
             category=categories["merchandise"],
             available_in=(
                 tz.localize(datetime(year, 1, 1, 12, 0)),
@@ -885,7 +885,7 @@ class Command(BaseCommand):
         products["t-shirt-medium"] = Product.objects.create(
             name=name,
             description="A description of the t-shirt goes here",
-            price=3675,
+            price=150,
             category=categories["merchandise"],
             available_in=(
                 tz.localize(datetime(year, 1, 1, 12, 0)),
@@ -904,7 +904,7 @@ class Command(BaseCommand):
         products["t-shirt-small"] = Product.objects.create(
             name=name,
             description="A description of the t-shirt goes here",
-            price=3675,
+            price=150,
             category=categories["merchandise"],
             available_in=(
                 tz.localize(datetime(year, 1, 1, 12, 0)),
