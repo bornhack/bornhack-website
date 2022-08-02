@@ -123,7 +123,7 @@ class ScanTicketsView(
     def check_in_ticket(self, request):
         check_in_ticket_id = request.POST.get("check_in_ticket_id")
         ticket_to_check_in = _ticket_getter_by_pk(check_in_ticket_id)
-        ticket_to_check_in.mark_as_used(pos=self.pos, username=request.user)
+        ticket_to_check_in.mark_as_used(pos=self.pos, user=request.user)
         messages.info(request, "Ticket checked-in!")
         return ticket_to_check_in
 
