@@ -35,6 +35,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
+        # We have to make subqueries to be able to annotate the specific
+        # ticket type. Otherwise values would be accumulative across all types.
         def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
@@ -43,7 +45,13 @@ class TicketTypeQuerySet(models.QuerySet):
             )
 
         refunded = Coalesce(Sum("product__orderproductrelation__rprs__quantity"), 0)
-        quantity = Sum("product__orderproductrelation__quantity") - refunded
+        quantity = (
+            Sum(
+                "product__orderproductrelation__quantity",
+                filter=Q(product__orderproductrelation__order__paid=True),
+            )
+            - refunded
+        )
         cost = quantity * F("product__cost")
         income = quantity * F("product__price")
 
