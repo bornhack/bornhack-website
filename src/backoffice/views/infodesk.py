@@ -100,21 +100,29 @@ class ScanTicketsView(
 
         elif self.order_search:
             context["order"] = self.order
+            if self.order:
+                context["tickets"] = self.order.get_tickets()
 
         return context
+
+    def _set_order(self):
+        self.order_search = True
+        try:
+            order_id = self.request.POST.get("find_order_id")
+            self.order = Order.objects.get(id=order_id)
+        except Order.DoesNotExist:
+            pass
 
     def post(self, request, **kwargs):
         if "check_in_ticket_id" in request.POST:
             self.ticket = self.check_in_ticket(request)
+            if "find_order_id" in self.request.POST:
+                self._set_order()
+                del self.ticket
         elif "badge_ticket_id" in request.POST:
             self.ticket = self.hand_out_badge(request)
         elif "find_order_id" in request.POST:
-            self.order_search = True
-            try:
-                order_id = self.request.POST.get("find_order_id")
-                self.order = Order.objects.get(id=order_id)
-            except Order.DoesNotExist:
-                pass
+            self._set_order()
         elif "mark_as_paid" in request.POST:
             self.mark_order_as_paid(request)
 

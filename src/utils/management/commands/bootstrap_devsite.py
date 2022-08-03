@@ -32,6 +32,7 @@ from economy.factories import ZettleReceiptFactory
 from economy.models import Chain
 from economy.models import Credebtor
 from economy.models import Expense
+from economy.models import Pos
 from economy.models import Reimbursement
 from economy.models import Revenue
 from events.models import Routing
@@ -1423,6 +1424,12 @@ class Command(BaseCommand):
             needs_members=False,
             permission_set="orgateam_permission",
         )
+        teams["info"] = Team.objects.create(
+            name="Info",
+            description="Info team manage the info pages and the info desk.",
+            camp=camp,
+            permission_set="infoteam_permission",
+        )
         teams["noc"] = Team.objects.create(
             name="NOC",
             description="The NOC team is in charge of establishing and running a network onsite.",
@@ -2054,6 +2061,8 @@ class Command(BaseCommand):
 
                 self.create_camp_team_shifts(camp, teams, team_memberships)
 
+                self.create_camp_pos(teams)
+
                 self.create_camp_cfp(camp)
 
                 self.create_camp_proposals(camp, event_types)
@@ -2143,3 +2152,13 @@ class Command(BaseCommand):
         self.output("done!")
         duration = timezone.now() - start
         self.output(f"bootstrap_devsite took {duration}!")
+
+    def create_camp_pos(self, teams):
+        Pos.objects.create(
+            name="Infodesk",
+            team=teams["info"],
+        )
+        Pos.objects.create(
+            name="Bar",
+            team=teams["bar"],
+        )

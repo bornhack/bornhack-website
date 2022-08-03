@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 from decimal import Decimal
 from enum import Enum
+from itertools import chain
 
 from django.conf import settings
 from django.contrib import messages
@@ -231,6 +232,9 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         for opr in self.oprs.all():
             tickets += opr.create_tickets(request)
         return tickets
+
+    def get_tickets(self):
+        return chain(*[opr.shoptickets.all() for opr in self.oprs.all()])
 
     def mark_as_paid(self, request=None):
         self.paid = True
