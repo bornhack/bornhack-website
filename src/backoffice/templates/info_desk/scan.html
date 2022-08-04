@@ -169,48 +169,50 @@ Scan | {{ block.super }}
 
         </table>
 
-        <h4>Tickets</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                        Product
-                    <th>
-                        Ticket Type
-                    <th>
-                        Name?
-                    <th>
-                        Status?
+        {% if order.paid %}
+            <h4>Tickets</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Product
+                        <th>
+                            Ticket Type
+                        <th>
+                            Name?
+                        <th>
+                            Status?
 
-            <tbody>
-                {% for ticket in tickets %}
-                <tr>
-                    <td>
-                        {{ ticket.product.name }}
-                    <td>
-                        {{ ticket.ticket_type.name }}
-                    <td>
-                        {{ ticket.name }}
-                    <td>
-                        {% if ticket.used_at %}
-                            <i class="fas fa-check"></i> Checked in
-                        {% else %}
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden"
-                                        name="find_order_id"
-                                        value="{{ order.pk }}">
-                                <button class="btn btn-primary"
-                                        name="check_in_ticket_id"
-                                        type="submit"
-                                        value="{{ ticket.pk }}">Checkin
-                                </button>
-                            </form>
-                        {% endif %}
-                {% endfor %}
+                <tbody>
+                    {% for ticket in tickets %}
+                    <tr>
+                        <td>
+                            {{ ticket.product.name }}
+                        <td>
+                            {{ ticket.ticket_type.name }}
+                        <td>
+                            {{ ticket.name }}
+                        <td>
+                            {% if ticket.used_at %}
+                                <i class="fas fa-check"></i> Checked in
+                            {% else %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden"
+                                            name="find_order_id"
+                                            value="{{ order.pk }}">
+                                    <button class="btn btn-primary"
+                                            name="check_in_ticket_id"
+                                            type="submit"
+                                            value="{{ ticket.pk }}">Checkin
+                                    </button>
+                                </form>
+                            {% endif %}
+                    {% endfor %}
 
 
-        </table>
+            </table>
+        {% endif %}
 
         {% if not order.paid and order.payment_method == "in_person" %}
         <form method="POST">
