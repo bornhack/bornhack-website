@@ -118,7 +118,7 @@ class ScanTicketsView(
             self.ticket = self.check_in_ticket(request)
             if "find_order_id" in self.request.POST:
                 self._set_order()
-                del self.ticket
+                self.ticket = None
         elif "badge_ticket_id" in request.POST:
             self.ticket = self.hand_out_badge(request)
         elif "find_order_id" in request.POST:
