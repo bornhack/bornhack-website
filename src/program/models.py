@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.postgres.constraints import ExclusionConstraint
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.contrib.postgres.fields import RangeOperators
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
@@ -1204,7 +1205,15 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
             return False
         ievent = icalendar.Event()
         ievent["summary"] = self.event.title
-        ievent["description"] = self.event.abstract
+        domain = Site.objects.get_current().domain
+        speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
+        recorded = "Yes" if self.event.video_recording else "No"
+        ievent["description"] = (
+            f"URL: https://{domain}/{self.event.get_absolute_url()}\n\n"
+            f"Speaker(s): {speakers}\n\n"
+            f"Recorded: {recorded}\n\n"
+            f"{self.event.abstract}"
+        )
         ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
         ievent["dtend"] = icalendar.vDatetime(
             self.when.lower + self.event.duration,
@@ -1213,6 +1222,9 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         ievent["uid"] = self.uuid
         ievent["location"] = icalendar.vText(self.event_location.name)
         return ievent
+
+    def get_absolute_url(self):
+        return reverse("program:event_detail", kwargs={"event_slug": self.slug})
 
     @property
     def uuid(self):

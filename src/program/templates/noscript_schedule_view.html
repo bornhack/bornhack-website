@@ -10,7 +10,20 @@ Schedule | {{ block.super }}
 {% block program_content %}
 
 <div class="row">
-<p class="lead">Schedule for {{ camp.title }}. All times are {{ event_slots.0.when.lower|date:"T" }}!</p>
+    <div class="col-md-10">
+        <h3>Schedule for {{ camp.title }}. All times are {{ event_slots.0.when.lower|date:"T" }}!</h3>
+    </div>
+
+    <div class="col-md-2">
+        <a class="btn btn-success btn-lg pull-right clearfix" href="{% url "program:ics_view" camp_slug=camp.slug %}">
+            <i class="fa fa-calendar"></i>
+            ICS feed
+        </a>
+    </div>
+</div>
+
+<hr>
+
 <table class="table">
   <thead>
     <th>When?</th>
@@ -48,5 +61,4 @@ Schedule | {{ block.super }}
   </tbody>
 </table>
 
-</div>
 {% endblock %}
