@@ -7,8 +7,6 @@ from utils import range_fields  # noqa: F401
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# TODO: remove this and update references to DJANGO_BASE_PATH to use BASE_DIR
-DJANGO_BASE_PATH = BASE_DIR
 
 WSGI_APPLICATION = "bornhack.wsgi.application"
 ASGI_APPLICATION = "bornhack.routing.application"

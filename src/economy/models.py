@@ -552,7 +552,7 @@ class Reimbursement(
             "na.jpg",
             File(
                 open(
-                    os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/na.jpg"),
+                    os.path.join(settings.BASE_DIR, "static_src/img/na.jpg"),
                     "rb",
                 ),
             ),

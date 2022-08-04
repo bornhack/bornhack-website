@@ -17,14 +17,14 @@ class Command(BaseCommand):
         )
 
     def local_dir(self, entry):
-        return os.path.join(settings.DJANGO_BASE_PATH, entry)
+        return os.path.join(settings.BASE_DIR, entry)
 
     def handle(self, *args, **options):
 
-        # files to create, relative to DJANGO_BASE_PATH
+        # files to create, relative to BASE_DIR
         files = ["camps/templates/{camp_slug}_camp_detail.html"]
 
-        # directories to create, relative to DJANGO_BASE_PATH
+        # directories to create, relative to BASE_DIR
         dirs = ["static_src/img/{camp_slug}/logo"]
 
         camp_slug = options["camp_slug"]

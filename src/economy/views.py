@@ -360,7 +360,7 @@ class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
         # check if we have a PDF, no preview if so, load a pdf icon instead
         if mimetype == "application/pdf" and "preview" in request.GET:
             invoicedata = open(
-                os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/pdf.png"),
+                os.path.join(settings.BASE_DIR, "static_src/img/pdf.png"),
                 "rb",
             ).read()
             mimetype = magic.from_buffer(invoicedata, mime=True)
@@ -535,7 +535,7 @@ class RevenueInvoiceView(CampViewMixin, RevenuePermissionMixin, DetailView):
         # check if we have a PDF, no preview if so, load a pdf icon instead
         if mimetype == "application/pdf" and "preview" in request.GET:
             invoicedata = open(
-                os.path.join(settings.DJANGO_BASE_PATH, "static_src/img/pdf.png"),
+                os.path.join(settings.BASE_DIR, "static_src/img/pdf.png"),
                 "rb",
             ).read()
             mimetype = magic.from_buffer(invoicedata, mime=True)
