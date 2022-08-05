@@ -124,7 +124,7 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
 
     model = PosReport
     fields = [
-        "date",
+        "period",
         "bank_responsible",
         "pos_responsible",
         "hax_sold_izettle",
