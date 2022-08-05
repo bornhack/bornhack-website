@@ -372,7 +372,6 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
         messages.success(
             self.request,
             f"Reimbursement {reimbursement} has been created with payback expense {reimbursement.payback_expense}"
-            % (reimbursement.pk, timezone.now()),
         )
         return redirect(
             reverse(
