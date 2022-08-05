@@ -837,6 +837,15 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
         help_text="Order for showing the event type in a list",
     )
 
+    recordable = models.BooleanField(
+        default=True,
+        help_text=(
+            "Whether or not events of this type are something which can be recorded. "
+            'This gives "video_recording" on an event of this type meaning. '
+            'Ie. "Talk" is recordable, "Recreational Event" is not.'
+        ),
+    )
+
     def __str__(self):
         return self.name
 
@@ -1206,12 +1215,23 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         ievent = icalendar.Event()
         ievent["summary"] = self.event.title
         domain = Site.objects.get_current().domain
-        speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
-        recorded = "Yes" if self.event.video_recording else "No"
+
+        speakers_text = ""
+        if self.event.speakers.exists():
+            speakers = ", ".join(
+                self.event.speakers.all().values_list("name", flat=True),
+            )
+            speakers_text = f"Speaker(s): {speakers}\n\n"
+
+        recorded_text = ""
+        if self.event.event_type.recordable:
+            recorded = "Yes" if self.event.video_recording else "No"
+            recorded_text = f"Recorded: {recorded}\n\n"
+
         ievent["description"] = (
             f"URL: https://{domain}/{self.event.get_absolute_url()}\n\n"
-            f"Speaker(s): {speakers}\n\n"
-            f"Recorded: {recorded}\n\n"
+            f"{speakers_text}"
+            f"{recorded_text}"
             f"{self.event.abstract}"
         )
         ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
