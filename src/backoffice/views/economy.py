@@ -371,7 +371,7 @@ class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateV
 
         messages.success(
             self.request,
-            f"Reimbursement {reimbursement} has been created with payback expense {reimbursement.payback_expense}"
+            f"Reimbursement {reimbursement} has been created with payback expense {reimbursement.payback_expense}",
         )
         return redirect(
             reverse(

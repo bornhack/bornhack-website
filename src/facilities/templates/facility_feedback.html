@@ -27,4 +27,6 @@
   <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit Feedback</button>
   <a href="{% url 'facilities:facility_detail' camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 </form>
+<br>
+<p>Token: TeamShitMakesStuffWork</p>
 {% endblock content %}
