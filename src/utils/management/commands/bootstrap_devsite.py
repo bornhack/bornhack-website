@@ -546,6 +546,7 @@ class Command(BaseCommand):
             event_duration_minutes="180",
             support_autoscheduling=True,
             support_speaker_event_conflicts=True,
+            recordable=False,
         )
 
         types["talk"] = EventType.objects.create(
@@ -587,6 +588,7 @@ class Command(BaseCommand):
             event_duration_minutes="180",
             support_autoscheduling=True,
             support_speaker_event_conflicts=True,
+            recordable=False,
         )
 
         types["keynote"] = EventType.objects.create(
@@ -627,6 +629,7 @@ class Command(BaseCommand):
             host_title="Host",
             event_duration_minutes="720",
             support_speaker_event_conflicts=False,
+            recordable=False,
         )
 
         types["recreational"] = EventType.objects.create(
@@ -641,6 +644,7 @@ class Command(BaseCommand):
             event_duration_minutes="600",
             support_autoscheduling=False,
             support_speaker_event_conflicts=True,
+            recordable=False,
         )
 
         return types

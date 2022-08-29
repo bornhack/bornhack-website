@@ -44,7 +44,9 @@ Schedule | {{ block.super }}
     <tr>
       <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
       <td>
-        <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
+        {% if slot.event.event_type.recordable %}
+          <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
+        {% endif %}
         <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
       </td>
       <td>{{ slot.event_location.icon_html }} {{ slot.event_location.name }}</td>
