@@ -386,6 +386,7 @@ class Refund(CreatedUpdatedModel):
         help_text="The user who created this refund",
         on_delete=models.PROTECT,
         null=True,  # TODO: Null to support old refunds. Maybe we should have a system user?
+        blank=True,  # TODO: Blank to support old refunds. Maybe we should have a system user?
     )
 
     def save(self, **kwargs):

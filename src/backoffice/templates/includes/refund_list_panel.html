@@ -20,7 +20,7 @@
       <tr>
         <td>{{ refund.id }}</td>
         <td>{{ refund.order.user.username }} &lt;{{ refund.order.user.email }}&gt;</td>
-        <td data-order="{{ refund.amount }}">{{ refund.amount }}</td>
+        <td data-order="{{ refund.amount }}">{{ refund.amount }} DKK</td>
         <td data-order="{{ refund.created|sortable }}">{{ refund.created }}</td>
         <td data-order="{{ refund.updated|sortable }}">{{ refund.updated }}</td>
         <td><ul>{% for rpr in refund.rprs.all %}<li>{{ rpr.opr.product.name }} ({{ rpr.quantity }}){% endfor %}</ul></td>
