@@ -13,7 +13,7 @@
       <table class="table">
         <tr>
           <th>Order</th>
-          <td>{{ refund.order }}</td>
+          <td><a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=refund.order.pk %}">{{ refund.order }}</a></td>
         </tr>
         <tr>
           <th>Customer Comment</th>
