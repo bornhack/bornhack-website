@@ -362,8 +362,15 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
 
             ShopTicket.objects.filter(pk__in=tickets_to_delete).delete()
 
+            messages.success(
+                self.request,
+                f"Refund {refund.id} created, {len(tickets_to_delete)} tickets deleted.",
+            )
             return HttpResponseRedirect(
-                reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug}),
+                reverse(
+                    "backoffice:refund_detail",
+                    kwargs={"camp_slug": self.camp.slug, "refund_id": refund.id},
+                ),
             )
 
         context = self.get_context_data()
