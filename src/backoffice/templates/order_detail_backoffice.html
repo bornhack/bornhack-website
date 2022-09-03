@@ -16,6 +16,14 @@
           <td>{{ order.user }}</td>
         </tr>
         <tr>
+          <th>Created</th>
+          <td>{{ order.created }}</td>
+        </tr>
+        <tr>
+          <th>Updated</th>
+          <td>{{ order.updated }}</td>
+        </tr>
+        <tr>
           <th>Payment Method</th>
           <td>{{ order.payment_method }}</td>
         </tr>
@@ -74,7 +82,7 @@
                     <td>{{ opr.product.price|currency }}</td>
                     <td>{{ opr.total|currency }}</td>
                     <td>{{ opr.used_shoptickets.count }}</td>
-                    <td>{{ opr.refunded }}</td>
+                    <td>{{ opr.refunded_quantity }}</td>
                     <td>{{ opr.unused_shoptickets.count }}</td>
                   </tr>
                 {% endfor %}
