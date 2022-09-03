@@ -210,7 +210,7 @@ class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailVie
         response = HttpResponse(content_type="application/pdf")
         response[
             "Content-Disposition"
-        ] = f"attachment; filename='{self.get_object().filename}'"
+        ] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response
 
@@ -386,6 +386,6 @@ class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, Detail
         response = HttpResponse(content_type="application/pdf")
         response[
             "Content-Disposition"
-        ] = f"attachment; filename='{self.get_object().filename}'"
+        ] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response
