@@ -1,0 +1,19 @@
+name: "IRC Notification on push"
+on:
+  - "push"
+  - "issues"
+
+jobs:
+  notification:
+    runs-on: "ubuntu-latest"
+    name: "IRC Notifications"
+    steps:
+    - name: "IRC notification"
+      if: ${{ github.repository == 'bornhack/bornhack-website' }}
+      uses: "Gottox/irc-message-action@v2"
+      with:
+        server: "ircd.tyknet.dk"
+        channel: "#bornhack-website"
+        nickname: "webteambot"
+        message: |-
+          ${{ github.actor }} pushed new commits: ${{ github.event.compare }} - latest commit msg: "${{ github.event.head_commit.message }}"
