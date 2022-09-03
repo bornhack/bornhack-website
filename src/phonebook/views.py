@@ -14,7 +14,7 @@ from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
-from oauth2_provider.views.generic import ProtectedResourceView
+from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
@@ -28,13 +28,13 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class DectExportView(
     CampViewMixin,
     RaisePermissionRequiredMixin,
-    ProtectedResourceView,
+    ScopedProtectedResourceView,
 ):
     """
     CSV export for the POC team / DECT system
     """
 
-    permission_required = "camps.pocteam_permission"
+    required_scopes = ["phonebook:read"]
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
