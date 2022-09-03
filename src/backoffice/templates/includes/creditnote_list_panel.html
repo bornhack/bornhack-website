@@ -1,0 +1,33 @@
+{% load bornhack %}
+{% if creditnote_list %}
+<table class="table table-hover datatable">
+  <thead>
+  <tr>
+    <th>CreditNote #</th>
+    <th>Customer</th>
+    <th>CreditNote Date</th>
+    <th>Amount</th>
+    <th>Refund</th>
+    <th>Paid</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+    {% for cn in creditnote_list %}
+    <tr>
+      <td>{{ cn.id }}</td>
+      <td>{% if cn.refund %}{{ cn.refund.order.user.username }} &lt;{{ cn.refund.order.user.email }}&gt;{% else %}{{ cn.customer }}{% endif %}</td>
+      <td>{{ cn.created|date }}</td>
+      <td>{{ cn.amount }}&nbsp;DKK</td>
+      <td>{{ invoice.refund|default:"N/A" }}</td>
+      <td>{{ cn.paid|truefalseicon }} {% if cn.paid %}paid{% else %}unpaid{% endif %}</td>
+      <td>
+       {% if cn.pdf %}<a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=invoice.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download</a>{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <h4>No creditnotes found.</h4>
+{% endif %}

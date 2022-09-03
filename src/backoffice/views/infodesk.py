@@ -215,21 +215,6 @@ class InvoiceDownloadView(LoginRequiredMixin, DetailView):
         return response
 
 
-class CreditNoteDownloadView(LoginRequiredMixin, DetailView):
-    model = CreditNote
-    pk_url_kwarg = "credit_note_id"
-
-    def get(self, request, *args, **kwargs):
-        if not self.get_object().pdf:
-            raise Http404
-        response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename='{self.get_object().filename}'"
-        response.write(self.get_object().pdf.read())
-        return response
-
-
 class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Order
     template_name = "order_list_backoffice.html"
@@ -253,6 +238,39 @@ class OrderDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     model = Order
     template_name = "order_detail_backoffice.html"
     pk_url_kwarg = "order_id"
+
+
+class OrderUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
+    model = Order
+    pk_url_kwarg = "order_id"
+    template_name = "order_update.html"
+    fields = ["notes"]
+
+    def form_valid(self, form):
+        messages.info(request=self.request, message=f"Order #{self.object.id} updated!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
+
+
+class OrderDownloadProformaInvoiceView(LoginRequiredMixin, DetailView):
+    model = Order
+    pk_url_kwarg = "order_id"
+
+    def get(self, request, *args, **kwargs):
+        if not self.get_object().pdf:
+            raise Http404
+        response = HttpResponse(content_type="application/pdf")
+        response[
+            "Content-Disposition"
+        ] = f"attachment; filename='{self.get_object().filename}'"
+        response.write(self.get_object().pdf.read())
+        return response
+
+
+################################
+# REFUNDS & CREDITNOTES
 
 
 class RefundDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
@@ -344,9 +362,14 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         return self.render_to_response(context)
 
 
-class OrderDownloadProformaInvoiceView(LoginRequiredMixin, DetailView):
-    model = Order
-    pk_url_kwarg = "order_id"
+class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    model = CreditNote
+    template_name = "creditnote_list.html"
+
+
+class CreditNoteDownloadView(LoginRequiredMixin, DetailView):
+    model = CreditNote
+    pk_url_kwarg = "credit_note_id"
 
     def get(self, request, *args, **kwargs):
         if not self.get_object().pdf:
@@ -357,22 +380,3 @@ class OrderDownloadProformaInvoiceView(LoginRequiredMixin, DetailView):
         ] = f"attachment; filename='{self.get_object().filename}'"
         response.write(self.get_object().pdf.read())
         return response
-
-
-class OrderUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
-    model = Order
-    pk_url_kwarg = "order_id"
-    template_name = "order_update.html"
-    fields = ["notes"]
-
-    def form_valid(self, form):
-        messages.info(request=self.request, message=f"Order #{self.object.id} updated!")
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
-
-
-class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    model = CreditNote
-    template_name = "creditnote_list.html"
