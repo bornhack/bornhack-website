@@ -20,6 +20,10 @@
           <td>{{ refund.customer_comment|default:"N/A" }}</td>
         </tr>
         <tr>
+          <th>Amount</th>
+          <td>{{ refund.amount }}</td>
+        </tr>
+        <tr>
           <th>Invoice Address</th>
           <td>{{ refund.get_invoice_address }}</td>
         </tr>
@@ -35,16 +39,18 @@
           <th>Paid</th>
           <td>{{ refund.paid|truefalseicon }}</td>
         </tr>
-        {% if refund.paid %}
-          <tr>
-            <th>Credit note</th>
-            <td>
+        <tr>
+          <th>Credit note</th>
+          <td>
+            {% if refund.creditnote %}
               <a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=refund.creditnote.id %}">
                 <i class="fa fa-file-pdf fa-4x"></i>
               </a>
-            </td>
-          </tr>
-        {% endif %}
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+        </tr>
         <tr>
           <th>Products</th>
           <td>
