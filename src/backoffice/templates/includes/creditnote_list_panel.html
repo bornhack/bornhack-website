@@ -22,7 +22,7 @@
           <td>{{ invoice.refund|default:"N/A" }}</td>
           <td>{{ cn.paid|truefalseicon }} {% if cn.paid %}paid{% else %}unpaid{% endif %}</td>
           <td>
-            {% if cn.pdf %}<a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=invoice.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download</a>{% endif %}
+            {% if cn.pdf %}<a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=cn.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download</a>{% endif %}
           </td>
         </tr>
       {% endfor %}
