@@ -20,27 +20,29 @@
       <tr>
         <td>{{ refund.id }}</td>
         <td>{{ refund.order.user.username }} &lt;{{ refund.order.user.email }}&gt;</td>
-        <td>{{ refund.amount }}</td>
+        <td data-order="{{ refund.amount }}">{{ refund.amount }}</td>
         <td data-order="{{ refund.created|sortable }}">{{ refund.created }}</td>
         <td data-order="{{ refund.updated|sortable }}">{{ refund.updated }}</td>
         <td><ul>{% for rpr in refund.rprs.all %}<li>{{ rpr.opr.product.name }} ({{ rpr.quantity }}){% endfor %}</ul></td>
         <td>{{ refund.paid|truefalseicon }} {% if refund.paid %}paid{% else %}unpaid{% endif %}</td>
         <td><a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=refund.order.pk %}">{{ refund.order }}</a></td>
-        <td><a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=refund.order.invoice.id %}">
+        <td data-order="{{ refund.order.invoice.id }}"><a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=refund.order.invoice.id %}">
           Invoice #{{ refund.order.invoice.id }}
         </a>
         </td>
-        <td>{% if refund.creditnote %}
-          <a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=refund.creditnote.id %}">CreditNote #{{ refund.creditnote.id }}</a>
+        {% if refund.creditnote %}
+          <td data-order="{{ refund.creditnote.id }}">
+            <a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=refund.creditnote.id %}">CreditNote #{{ refund.creditnote.id }}</a>
         {% else %}
-          N/A
+          <td>
+            N/A
         {% endif %}
-        </td>
-        <td>
-          <div class="btn-group btn-group-vertical">
-            <a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=refund.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          </div>
-        </td>
+      </td>
+      <td>
+        <div class="btn-group btn-group-vertical">
+          <a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=refund.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+        </div>
+      </td>
       </tr>
     {% endfor %}
   </tbody>
