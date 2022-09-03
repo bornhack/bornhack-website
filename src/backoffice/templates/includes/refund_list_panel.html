@@ -4,6 +4,7 @@
     <tr>
       <th>Refund #</th>
       <th>User</th>
+      <th>Amount</th>
       <th>Created</th>
       <th>Updated</th>
       <th>Products</th>
@@ -19,11 +20,12 @@
       <tr>
         <td>{{ refund.id }}</td>
         <td>{{ refund.order.user.username }} &lt;{{ refund.order.user.email }}&gt;</td>
+        <td>{{ refund.amount }}</td>
         <td data-order="{{ refund.created|sortable }}">{{ refund.created }}</td>
         <td data-order="{{ refund.updated|sortable }}">{{ refund.updated }}</td>
         <td><ul>{% for rpr in refund.rprs.all %}<li>{{ rpr.opr.product.name }} ({{ rpr.quantity }}){% endfor %}</ul></td>
         <td>{{ refund.paid|truefalseicon }} {% if refund.paid %}paid{% else %}unpaid{% endif %}</td>
-        <td><a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=refund.order.pk %}">{{ order }}</a></td>
+        <td><a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=refund.order.pk %}">{{ refund.order }}</a></td>
         <td><a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=refund.order.invoice.id %}">
           Invoice #{{ refund.order.invoice.id }}
         </a>

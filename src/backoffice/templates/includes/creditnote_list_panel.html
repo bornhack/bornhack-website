@@ -8,6 +8,7 @@
         <th>CreditNote Date</th>
         <th>Amount</th>
         <th>Refund</th>
+        <th>Text</th>
         <th>Paid</th>
         <th>Actions</th>
       </tr>
@@ -19,7 +20,8 @@
           <td>{% if cn.refund %}{{ cn.refund.order.user.username }} &lt;{{ cn.refund.order.user.email }}&gt;{% else %}{{ cn.customer }}{% endif %}</td>
           <td>{{ cn.created|date }}</td>
           <td>{{ cn.amount }}&nbsp;DKK</td>
-          <td>{{ invoice.refund|default:"N/A" }}</td>
+          <td>{{ cn.refund|default:"N/A" }}</td>
+          <td>{{ cn.text|default:"N/A" }}</td>
           <td>{{ cn.paid|truefalseicon }} {% if cn.paid %}paid{% else %}unpaid{% endif %}</td>
           <td>
             {% if cn.pdf %}<a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=cn.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download</a>{% endif %}
