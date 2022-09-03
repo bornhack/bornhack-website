@@ -3,16 +3,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                {{ invoice.created|date:"b jS, Y" }}<br>
-                Custom Order #{{ invoice.customorder.pk }}<br>
-                Invoice #{{ invoice.pk }}
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        {{ invoice.created|date:"b jS, Y" }}<br>
+        Custom Order #{{ invoice.customorder.pk }}<br>
+        Invoice #{{ invoice.pk }}
+      </h3>
+    </td>
+  </tr>
 </table>
 
 <h2>CUSTOMER</h2>
@@ -21,42 +21,42 @@
 
 <h2>INVOICE</h2>
 <table style="width:90%">
-    <tr>
-      <td>
-        <b>Text
-      <td align="center" style="width: 20%">
-        <b>Price
   <tr>
     <td>
-      {{ invoice.customorder.text|linebreaks }}
-    <td align="right">
-      {{ invoice.customorder.amount|currency }}
+      <b>Text
+        <td align="center" style="width: 20%">
+          <b>Price
+            <tr>
+              <td>
+                {{ invoice.customorder.text|linebreaks }}
+                <td align="right">
+                  {{ invoice.customorder.amount|currency }}
 
-  <tr>
-    <td align="right">
-      {% if invoice.customorder.danish_vat %}
-      <strong>Included Danish VAT (25%)</strong>
-      {% else %}
-      <strong>No VAT</strong>
-      {% endif %}
-    <td align="right">
-      {{ invoice.customorder.vat|currency }}
+                  <tr>
+                    <td align="right">
+                      {% if invoice.customorder.danish_vat %}
+                        <strong>Included Danish VAT (25%)</strong>
+                      {% else %}
+                        <strong>No VAT</strong>
+                      {% endif %}
+                      <td align="right">
+                        {{ invoice.customorder.vat|currency }}
 
-  <tr>
-    <td align="right">
-      <strong>Total</strong>
-    <td align="right">
-      {{ invoice.customorder.amount|currency }}
-</table>
-<br>
+                        <tr>
+                          <td align="right">
+                            <strong>Total</strong>
+                            <td align="right">
+                              {{ invoice.customorder.amount|currency }}
+                            </table>
+                            <br>
 
-<p class="lead">
-  Payment should be made by bank transfer to our account in {{ bank }}:
-</p>
-<ul>
-  <li>Reg. {{ bank_dk_reg }}, account no. {{ bank_dk_accno }}</li>
-  <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
-  <li>Add invoice number in the transfer notes.</li>
-  <li>Within two weeks from: {{ invoice.created|date:"b jS, Y" }}</li>
-  <li>Thank you!</li>
-</ul>
+                            <p class="lead">
+                              Payment should be made by bank transfer to our account in {{ bank }}:
+                            </p>
+                            <ul>
+                              <li>Reg. {{ bank_dk_reg }}, account no. {{ bank_dk_accno }}</li>
+                              <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
+                              <li>Add invoice number in the transfer notes.</li>
+                              <li>Within two weeks from: {{ invoice.created|date:"b jS, Y" }}</li>
+                              <li>Thank you!</li>
+                            </ul>

@@ -4,36 +4,36 @@
 {% load imageutils %}
 
 {% block title %}
-Village Gear To Order | {{ block.super }}
+  Village Gear To Order | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h2>Village Gear To Order</h2>
-  <div class="lead">
-    This is a list of village gear to order from our supplier
+  <div class="row">
+    <h2>Village Gear To Order</h2>
+    <div class="lead">
+      This is a list of village gear to order from our supplier
+    </div>
+    <div>
+      This table shows all different village stuff that needs to be ordered
+    </div>
   </div>
-  <div>
-    This table shows all different village stuff that needs to be ordered
-  </div>
-</div>
-<br>
-<div class="row">
+  <br>
+  <div class="row">
     <table class="table table-hover datatable">
       <thead>
-      <tr>
+        <tr>
           <th>Type</th>
           <th>Quantity</th>
-       </tr>
+        </tr>
       </thead>
       <tbody>
-      {% for key, val in village.items %}
-      <tr>
-        <td>{{ key }}</td>
-        <td>{{ val }}</td>
-      </tr>
-      {% endfor %}
+        {% for key, val in village.items %}
+          <tr>
+            <td>{{ key }}</td>
+            <td>{{ val }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
-</div>
+  </div>
 {% endblock content %}

@@ -3,31 +3,31 @@
 {% load bornhack %}
 
 {% block title %}
-    Update order #{{ order.pk }} | BackOffice | {{ block.super }}
+  Update order #{{ order.pk }} | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-    <form action="" method="post">
-        {% csrf_token %}
-        <div class="panel panel-default">
+  <form action="" method="post">
+    {% csrf_token %}
+    <div class="panel panel-default">
 
-            <div class="panel-heading">
-                Update order #{{ order.pk }} | BackOffice
-            </div>
+      <div class="panel-heading">
+        Update order #{{ order.pk }} | BackOffice
+      </div>
 
-            <div class="panel-body">
-                {% bootstrap_form form %}
-            </div>
+      <div class="panel-body">
+        {% bootstrap_form form %}
+      </div>
 
-            <div class="panel-footer">
-                <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
-                <button type="submit" class="btn btn-primary pull-right">Save</button>
-                <span class="clearfix"></span>
-            </div>
+      <div class="panel-footer">
+        <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
+        <button type="submit" class="btn btn-primary pull-right">Save</button>
+        <span class="clearfix"></span>
+      </div>
 
-        </div>
+    </div>
 
-    </form>
+  </form>
 
 {% endblock %}

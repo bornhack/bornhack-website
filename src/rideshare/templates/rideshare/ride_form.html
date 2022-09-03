@@ -3,17 +3,17 @@
 {% load bootstrap3 %}
 
 {% block title %}
-{% if object.pk %}Update{% else %}Create{% endif %} ride | {{ block.super }}
+  {% if object.pk %}Update{% else %}Create{% endif %} ride | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<form method="POST">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button type="submit" class="btn btn-success">
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-success">
       {% if object.pk %}Update{% else %}Create{% endif %}
-  </button>
-</form>
+    </button>
+  </form>
 
 {% endblock %}

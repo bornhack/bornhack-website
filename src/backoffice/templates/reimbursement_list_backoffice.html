@@ -2,22 +2,22 @@
 {% load static %}
 
 {% block title %}
-Reimbursements for {{ camp.title }} | BackOffice | {{ block.super }}
+  Reimbursements for {{ camp.title }} | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>BackOffice: Reimbursements for {{ camp.title }}</h2>
-<p class="lead">This view shows all existing reimbursements for {{ camp.title }}. Creating a new reimbursement for a user can only be done after the users expenses have been approved. Only unpaid reimbursements can be deleted.</p>
+  <h2>BackOffice: Reimbursements for {{ camp.title }}</h2>
+  <p class="lead">This view shows all existing reimbursements for {{ camp.title }}. Creating a new reimbursement for a user can only be done after the users expenses have been approved. Only unpaid reimbursements can be deleted.</p>
 
-<p>
-<a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
-<a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-</p>
+  <p>
+    <a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+  </p>
 
-{% include 'includes/reimbursement_list_panel.html' %}
+  {% include 'includes/reimbursement_list_panel.html' %}
 
-<p>
-<a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
-<a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-</p>
+  <p>
+    <a class="btn btn-success" href="{% url "backoffice:reimbursement_create_userselect" camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+  </p>
 {% endblock content %}

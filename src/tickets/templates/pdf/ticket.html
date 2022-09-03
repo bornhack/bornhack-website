@@ -1,24 +1,24 @@
 {% load static %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                Ticket Created:<br>
-                {{ ticket.created|date:"b jS, Y" }}<br>
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        Ticket Created:<br>
+        {{ ticket.created|date:"b jS, Y" }}<br>
+      </h3>
+    </td>
+  </tr>
 </table>
 <br>
 <h2>{{ ticket.ticket_type.camp.title }} Ticket</h2>
 <h3>Type: {{ ticket.ticket_type.name }}</h3>
 {% if ticket.product %}
-<h3>Product: {{ ticket.product.name }}</h3>
+  <h3>Product: {{ ticket.product.name }}</h3>
 {% endif %}
 {% if quantity %}
-<h3>Quantity: {{ quantity }}</h3>
+  <h3>Quantity: {{ quantity }}</h3>
 {% endif %}
 
 {% if ticket.name %}
@@ -52,25 +52,25 @@
 <h5>Teardown (volunteers only): From {{ ticket.camp.teardown.lower }} to {{ ticket.camp.teardown.upper }}</h5>
 
 {% if ticket.ticket_type.includes_badge %}
-<div style="display:block; clear:both; page-break-after:always;"></div>
+  <div style="display:block; clear:both; page-break-after:always;"></div>
 
-<table style="width:100%;">
+  <table style="width:100%;">
     <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                {{ ticket.created|date:"b jS, Y" }}<br>
-            </h3>
-        </td>
+      <td style="width: 75%;">&nbsp;</td>
+      <td>
+        <h3>
+          {{ ticket.created|date:"b jS, Y" }}<br>
+        </h3>
+      </td>
     </tr>
-</table>
-<br />
+  </table>
+  <br />
 
-<h2>Badge voucher</h2>
+  <h2>Badge voucher</h2>
 
-<center>
+  <center>
     <img src="{{ ticket.get_qr_badge_code_url }}"></img>
     <p>{{ ticket.badge_token }}</p>
-</center>
+  </center>
 
 {% endif %}

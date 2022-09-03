@@ -35,118 +35,118 @@
     <script src="{% static 'js/bornhack.js' %}"></script>
 
     <!-- favicon.ico stuff -->
-	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
-	<link rel="manifest" href="{% static 'img/favicon/site.webmanifest' %}">
-	<link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#000000">
-	<link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}">
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-config" content="{% static 'img/favicon/browserconfig.xml' %}">
-	<meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'img/favicon/site.webmanifest' %}">
+    <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#000000">
+    <link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="{% static 'img/favicon/browserconfig.xml' %}">
+    <meta name="theme-color" content="#000000">
 
     {% block extra_head %}
     {% endblock %}
   </head>
 
   <body class="no-js">
-  {% block body %}
+    {% block body %}
 
-    <div id="main" class="container container-fluid">
-    <nav class="navbar navbar-fixed-top">
-      <div class="container container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          {% if request.resolver_match.kwargs.camp_slug and camp %}
-            <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
-            </a>
-          {% else %}
-            <a class="navbar-brand" href="/">
-              <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
-            </a>
-            {% endif %}
-        </div>
-        <div id="top-navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="{% url 'news:index' %}">News</a></li>
-            <li><a href="{% url 'shop:index' %}">Shop</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2022' %}">BornHack 2022</a></li>
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2021' %}">BornHack 2021</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'camp_list' %}">Camp List</a></li>
-              </ul>
-            </li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-            <li><a href="{% url 'people' %}">People</a></li>
-            <li><a href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
-            <li><a href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
+      <div id="main" class="container container-fluid">
+        <nav class="navbar navbar-fixed-top">
+          <div class="container container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              {% if request.resolver_match.kwargs.camp_slug and camp %}
+                <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
+                  <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
+                </a>
+              {% else %}
+                <a class="navbar-brand" href="/">
+                  <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
+                </a>
+              {% endif %}
+            </div>
+            <div id="top-navbar" class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li><a href="{% url 'news:index' %}">News</a></li>
+                <li><a href="{% url 'shop:index' %}">Shop</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url 'camp_detail' camp_slug='bornhack-2022' %}">BornHack 2022</a></li>
+                    <li><a href="{% url 'camp_detail' camp_slug='bornhack-2021' %}">BornHack 2021</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="{% url 'camp_list' %}">Camp List</a></li>
+                  </ul>
+                </li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+                <li><a href="{% url 'people' %}">People</a></li>
+                <li><a href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
+                <li><a href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
 
-            {% if request.user.is_staff %}
-            <li><a href="{% url 'admin:index' %}">Admin</a></li>
-            {% endif %}
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            {% if user.is_authenticated %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
-                {% if user.orders.exists %}
-                {% url 'shop:order_list' as orders_list_url %}
-                <li><a href="{{ orders_list_url }}">Orders</a></li>
-
-                {% url 'tickets:shopticket_list' as ticket_list_url %}
-                <li><a href="{{ ticket_list_url }}">Tickets</a></li>
-
-                {% if user.creditnotes.exists %}
-                {% url 'shop:creditnote_list' as creditnote_list_url %}
-                <li><a href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                {% if request.user.is_staff %}
+                  <li><a href="{% url 'admin:index' %}">Admin</a></li>
                 {% endif %}
-                {% endif %}
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'account_logout' %}">Logout</a></li>
               </ul>
-            </li>
-            {% else %}
-            <li><a href="{% url 'account_login' %}">Login</a></li>
-            {% endif %}
-         </ul>
-        </div>
-      </div>
-    </nav>
-      {% if camp %}
-        <div class="row">
-          <div class="btn-group btn-group-justified hidden-xs">
-              {% include 'includes/menuitems.html' %}
+              <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                  <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
+                      {% if user.orders.exists %}
+                        {% url 'shop:order_list' as orders_list_url %}
+                        <li><a href="{{ orders_list_url }}">Orders</a></li>
+
+                        {% url 'tickets:shopticket_list' as ticket_list_url %}
+                        <li><a href="{{ ticket_list_url }}">Tickets</a></li>
+
+                        {% if user.creditnotes.exists %}
+                          {% url 'shop:creditnote_list' as creditnote_list_url %}
+                          <li><a href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                        {% endif %}
+                      {% endif %}
+                      <li role="separator" class="divider"></li>
+                      <li><a href="{% url 'account_logout' %}">Logout</a></li>
+                    </ul>
+                  </li>
+                {% else %}
+                  <li><a href="{% url 'account_login' %}">Login</a></li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
-          <div class="btn-group-vertical visible-xs">
+        </nav>
+        {% if camp %}
+          <div class="row">
+            <div class="btn-group btn-group-justified hidden-xs">
               {% include 'includes/menuitems.html' %}
-          </div>
-        <p>
+            </div>
+            <div class="btn-group-vertical visible-xs">
+              {% include 'includes/menuitems.html' %}
+            </div>
+            <p>
+            </div>
+        {% endif %}
+        {% bootstrap_messages %}
+        {% block content %}{% endblock %}
       </div>
-      {% endif %}
-      {% bootstrap_messages %}
-      {% block content %}{% endblock %}
-    </div>
-    <footer>
-      <div class="col-sm-12 col-md-12 col-lg-12">
+      <footer>
+        <div class="col-sm-12 col-md-12 col-lg-12">
           {% block footer %}
-          <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
-          <a href="{% url 'conduct' %}">Code of Conduct</a> |
-          <a href="{% url 'privacy-policy' %}">Privacy Policy</a> |
-          <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
+            <a href="{% url 'conduct' %}">Code of Conduct</a> |
+            <a href="{% url 'privacy-policy' %}">Privacy Policy</a> |
+            <a href="{% url 'contact' %}">Contact</a>
           {% endblock %}
-      </div>
-    </footer>
-  {% endblock body %}
+        </div>
+      </footer>
+    {% endblock body %}
   </body>
 </html>

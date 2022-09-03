@@ -2,12 +2,12 @@
 {% load static %}
 
 {% block title %}
-Expenses | {{ block.super }}
+  Expenses | {{ block.super }}
 {% endblock %}
 
 <{% block content %}
-<h3>Your {{ camp.title }} Reimbursements</h3>
+  <h3>Your {{ camp.title }} Reimbursements</h3>
 
-{% include 'includes/reimbursement_list_panel.html' %}
+  {% include 'includes/reimbursement_list_panel.html' %}
 
 {% endblock %}

@@ -13,15 +13,15 @@
   </thead>
   <tbody>
     {% for zb in zettlebalance_list %}
-    <tr>
-      <td>{{ zb.pk }}</td>
-      <td data-order="{{ zb.statement_time|sortable }}">{{ zb.statement_time }}</td>
-      <td data-order="{{ zb.payment_time|sortable }}">{{ zb.payment_time|default:"N/A" }}</td>
-      <td>{{ zb.payment_reference|default:"N/A" }}</td>
-      <td>{{ zb.description }}</td>
-      <td data-order="{{ zb.amount }}">{{ zb.amount }}&nbsp;DKK</td>
-      <td data-order="{{ zb.balance }}">{{ zb.balance }}&nbsp;DKK</td>
-    </tr>
+      <tr>
+        <td>{{ zb.pk }}</td>
+        <td data-order="{{ zb.statement_time|sortable }}">{{ zb.statement_time }}</td>
+        <td data-order="{{ zb.payment_time|sortable }}">{{ zb.payment_time|default:"N/A" }}</td>
+        <td>{{ zb.payment_reference|default:"N/A" }}</td>
+        <td>{{ zb.description }}</td>
+        <td data-order="{{ zb.amount }}">{{ zb.amount }}&nbsp;DKK</td>
+        <td data-order="{{ zb.balance }}">{{ zb.balance }}&nbsp;DKK</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

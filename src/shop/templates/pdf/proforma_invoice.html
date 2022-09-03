@@ -3,84 +3,84 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                Order Date: {{ order.created|date:"b jS, Y" }}<br>
-                Order #{{ order.pk }}<br>
-                Proforma Invoice
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        Order Date: {{ order.created|date:"b jS, Y" }}<br>
+        Order #{{ order.pk }}<br>
+        Proforma Invoice
+      </h3>
+    </td>
+  </tr>
 </table>
 {% if order.invoice_address %}
-<h2>CUSTOMER</h2>
-<p class="lead">{{ order.invoice_address|linebreaks }}</p>
+  <h2>CUSTOMER</h2>
+  <p class="lead">{{ order.invoice_address|linebreaks }}</p>
 {% else %}
-<h3>Customer: {{ order.user.email }}</h3>
+  <h3>Customer: {{ order.user.email }}</h3>
 {% endif %}
 <br>
 <h2>PROFORMA INVOICE</h2>
 <table style="width:90%; margin:1em;">
-    <tr>
-      <td>
-        <b>Name
-      <td>
-        <b>Quantity
-      <td align="right">
-        <b>Price
-      <td align="right">
-        <b>Total
-
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
-
-{% for order_product in order.oprs.all %}
   <tr>
-      <td>
-      {{ order_product.product.name }}
     <td>
-      {{ order_product.quantity }}
-    <td align="right">
-      {{ order_product.product.price|currency }}
-    <td align="right">
-      {{ order_product.total|currency }}
-{% endfor %}
+      <b>Name
+        <td>
+          <b>Quantity
+            <td align="right">
+              <b>Price
+                <td align="right">
+                  <b>Total
 
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+                    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Included Danish VAT (25%)</strong>
-    <td align="right">
-      {{ order.vat|currency }}
+                    {% for order_product in order.oprs.all %}
+                      <tr>
+                        <td>
+                          {{ order_product.product.name }}
+                          <td>
+                            {{ order_product.quantity }}
+                            <td align="right">
+                              {{ order_product.product.price|currency }}
+                              <td align="right">
+                                {{ order_product.total|currency }}
+                    {% endfor %}
 
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Invoice Total</strong>
-    <td align="right">
-      {{ order.total|currency }}
+                    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-  <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+                    <tr>
+                      <td colspan="2">
+                        <td>
+                          <strong>Included Danish VAT (25%)</strong>
+                          <td align="right">
+                            {{ order.vat|currency }}
 
-</table>
+                            <tr>
+                              <td colspan="2">
+                                <td>
+                                  <strong>Invoice Total</strong>
+                                  <td align="right">
+                                    {{ order.total|currency }}
 
-<br>
+                                    <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-<h3>This is a proforma invoice. The order has not been paid. The payment options are:</h3>
-<h4>Bank Transfer</h4>
-<ul>
-  <li>Bank: {{ bank }}
-  <li>DK Reg. {{ bank_dk_reg }}, DK account no. {{ bank_dk_accno }}</li>
-  <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
-  <li>Please remember to add Order number in the transfer notes, and pay the transfer fees in your end.</li>
-</ul>
+                                  </table>
 
-<h4>Other Payment Methods</h4>
-<ul>
-    <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
-    <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
-    <li><b>In person:</b> https://{{ hostname }}{% url 'shop:in_person' pk=order.pk %} (requires geographical proximity to infodesk or an organiser)</li>
-</ul>
+                                  <br>
+
+                                  <h3>This is a proforma invoice. The order has not been paid. The payment options are:</h3>
+                                  <h4>Bank Transfer</h4>
+                                  <ul>
+                                    <li>Bank: {{ bank }}
+                                      <li>DK Reg. {{ bank_dk_reg }}, DK account no. {{ bank_dk_accno }}</li>
+                                      <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
+                                      <li>Please remember to add Order number in the transfer notes, and pay the transfer fees in your end.</li>
+                                    </ul>
+
+                                    <h4>Other Payment Methods</h4>
+                                    <ul>
+                                      <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
+                                      <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
+                                      <li><b>In person:</b> https://{{ hostname }}{% url 'shop:in_person' pk=order.pk %} (requires geographical proximity to infodesk or an organiser)</li>
+                                    </ul>

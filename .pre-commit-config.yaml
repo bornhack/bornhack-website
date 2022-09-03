@@ -40,14 +40,8 @@ repos:
         args:
           - --py39-plus
         exclude: migrations/
-  - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.7.0
-    hooks:
-      - id: django-upgrade
-        args:
-          - --target-version=4.0
   - repo: https://github.com/asottile/yesqa
-    rev: v1.3.0
+    rev: v1.4.0
     hooks:
       -   id: yesqa
   - repo: https://github.com/asottile/add-trailing-comma
@@ -59,11 +53,11 @@ repos:
     hooks:
       -   id: pycln
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 22.8.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8
-    rev: 5.0.2
+    rev: 5.0.4
     hooks:
       - id: flake8
         additional_dependencies:
@@ -71,3 +65,15 @@ repos:
           - flake8-comprehensions
           - flake8-tidy-imports
         args: [--max-line-length=120]
+  - repo: "https://github.com/rtts/djhtml"
+    rev: 'v1.5.2'
+    hooks:
+      - id: "djhtml"
+        args: ["-t", "2"]
+        stages: ["commit"]
+     #- id: "djcss"
+     #  exclude: "static_src/css/vendor/.*"
+     #  stages: ["commit"]
+     #- id: "djjs"
+     #  exclude: "static_src/js/vendor/.*"
+     #  stages: ["commit"]

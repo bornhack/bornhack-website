@@ -2,25 +2,25 @@
   <thead>
     <tr>
       {% with bank_list.0 as b %}
-      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Internal BornHack UUID for this bank">ID</th>
-      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ b.get_name_help_text }}">Name</th>
-      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Number of accounts in this bank">Accounts</th>
-      <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Available actions for this bank">Actions</th>
+        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Internal BornHack UUID for this bank">ID</th>
+        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ b.get_name_help_text }}">Name</th>
+        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Number of accounts in this bank">Accounts</th>
+        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Available actions for this bank">Actions</th>
       {% endwith %}
     </tr>
   </thead>
   <tbody>
     {% for bank in bank_list %}
-    <tr>
-      <td><a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bank.pk %}">{{ bank.pk }}</a></td>
-      <td>{{ bank.name }}</td>
-      <td class="text-center"><span class="badge">{{ bank.accounts.count }}</span></td>
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bank.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td><a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bank.pk %}">{{ bank.pk }}</a></td>
+        <td>{{ bank.name }}</td>
+        <td class="text-center"><span class="badge">{{ bank.accounts.count }}</span></td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bank.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          </div>
+        </td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

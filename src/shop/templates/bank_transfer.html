@@ -3,38 +3,38 @@
 {% load bornhack %}
 
 {% block title %}
-Pay by Bank Transfer | {{ block.super }}
+  Pay by Bank Transfer | {{ block.super }}
 {% endblock %}
 
 {% block shop_content %}
 
-<h2>Pay by Bank Transfer</h2>
-<p>To pay order #{{ orderid }} you need to make a bank transfer
-of the <strong>full</strong> amount of <b>{{ total|currency }}</b> using the following information:</p>
+  <h2>Pay by Bank Transfer</h2>
+  <p>To pay order #{{ orderid }} you need to make a bank transfer
+    of the <strong>full</strong> amount of <b>{{ total|currency }}</b> using the following information:</p>
 
-<ul class="lead">
-  <li><strong>Bank Name</strong>: {{ bank }}</li>
-  <li><strong>Account Holder/Payee</strong>: BornHack ApS</li>
-  <li><strong>Swift/BIC</strong>: {{ swiftbic }} (Danish reg. no. {{ regno }})</li>
-  <li><strong>IBAN</strong>: {{ iban }} (Danish account no. {{ accountno }})</li>
-  <li><strong>Danish bank transfer</strong>:  Reg: {{ regno }} Account: {{ accountno }}</li>
-  <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
-</ul>
+  <ul class="lead">
+    <li><strong>Bank Name</strong>: {{ bank }}</li>
+    <li><strong>Account Holder/Payee</strong>: BornHack ApS</li>
+    <li><strong>Swift/BIC</strong>: {{ swiftbic }} (Danish reg. no. {{ regno }})</li>
+    <li><strong>IBAN</strong>: {{ iban }} (Danish account no. {{ accountno }})</li>
+    <li><strong>Danish bank transfer</strong>:  Reg: {{ regno }} Account: {{ accountno }}</li>
+    <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
+  </ul>
 
-<div class="alert alert-info" role="alert">
-<p class="lead">
-  <strong>
-    Remember:
-  </strong>
-    If you transfer from outside of Denmark please make sure that you pay the
-    sender fees. Please allow for up to a week before we register your bank transfer,
-    especially if you are outside of the SEPA region.
-</p>
-</div>
+  <div class="alert alert-info" role="alert">
+    <p class="lead">
+      <strong>
+        Remember:
+      </strong>
+      If you transfer from outside of Denmark please make sure that you pay the
+      sender fees. Please allow for up to a week before we register your bank transfer,
+      especially if you are outside of the SEPA region.
+    </p>
+  </div>
 
-<p>
-  <strong>*</strong> This reference is a message to the payee (BornHack) and
-  enables us to register your payment.
-</p>
+  <p>
+    <strong>*</strong> This reference is a message to the payee (BornHack) and
+    enables us to register your payment.
+  </p>
 
 {% endblock %}

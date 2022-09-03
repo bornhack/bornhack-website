@@ -2,18 +2,18 @@
 {% load bootstrap3 %}
 
 {% block title %}
-Update Reimbursement for User {{ reimbursement_user }} | {{ block.super }}
+  Update Reimbursement for User {{ reimbursement_user }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Update Reimbursement for User {{ reimbursement_user }}</h3>
+  <h3>Update Reimbursement for User {{ reimbursement_user }}</h3>
 
-<p class="lead">The total amount for this reimbursement is <b>{{ reimbursement.amount }} DKK</b></p>
+  <p class="lead">The total amount for this reimbursement is <b>{{ reimbursement.amount }} DKK</b></p>
 
-<form method="POST">
+  <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "<i class='fas fa-check'></i> Update" button_type="submit" button_class="btn-success" name="Update" %}
     <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  </form>
 {% endblock content %}

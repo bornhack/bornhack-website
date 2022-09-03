@@ -15,17 +15,17 @@
   </thead>
   <tbody>
     {% for et in epaytransaction_list %}
-    <tr>
-      <td>{{ et.transaction_id }}</td>
-      <td>{{ et.order_id }}</td>
-      <td data-order="{{ et.auth_date|sortable }}">{{ et.auth_date }}</td>
-      <td data-order="{{ et.auth_amount }}">{{ et.auth_amount }}&nbsp;{{ et.currency }}</td>
-      <td data-order="{{ et.captured_date|sortable }}">{{ et.captured_date }}</td>
-      <td data-order="{{ et.captured_amount }}">{{ et.captured_amount }}&nbsp;{{ et.currency }}</td>
-      <td>{{ et.card_type }}</td>
-      <td>{{ et.description }}</td>
-      <td data-order="{{ et.transaction_fee }}">{{ et.transaction_fee }}&nbsp;{{ et.currency }}</td>
-    </tr>
+      <tr>
+        <td>{{ et.transaction_id }}</td>
+        <td>{{ et.order_id }}</td>
+        <td data-order="{{ et.auth_date|sortable }}">{{ et.auth_date }}</td>
+        <td data-order="{{ et.auth_amount }}">{{ et.auth_amount }}&nbsp;{{ et.currency }}</td>
+        <td data-order="{{ et.captured_date|sortable }}">{{ et.captured_date }}</td>
+        <td data-order="{{ et.captured_amount }}">{{ et.captured_amount }}&nbsp;{{ et.currency }}</td>
+        <td>{{ et.card_type }}</td>
+        <td>{{ et.description }}</td>
+        <td data-order="{{ et.transaction_fee }}">{{ et.transaction_fee }}&nbsp;{{ et.currency }}</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

@@ -15,17 +15,17 @@
   </thead>
   <tbody>
     {% for mt in mobilepaytransaction_list %}
-    <tr>
-      <td>{{ mt.event }}</td>
-      <td data-order="{{ mt.amount }}">{{ mt.amount }}&nbsp;{{ mt.currency }}</td>
-      <td data-order="{{ mt.mobilepay_created|sortable }}">{{ mt.mobilepay_created }}</td>
-      <td>{{ mt.comment|default:"N/A" }}</td>
-      <td>{{ mt.transaction_id|default:"N/A" }}</td>
-      <td>{{ mt.transfer_id|default:"N/A" }}</td>
-      <td>{{ mt.payment_point }}</td>
-      <td>{{ mt.myshop_number }}</td>
-      <td>{{ mt.bank_account|default:"N/A" }}</td>
-    </tr>
+      <tr>
+        <td>{{ mt.event }}</td>
+        <td data-order="{{ mt.amount }}">{{ mt.amount }}&nbsp;{{ mt.currency }}</td>
+        <td data-order="{{ mt.mobilepay_created|sortable }}">{{ mt.mobilepay_created }}</td>
+        <td>{{ mt.comment|default:"N/A" }}</td>
+        <td>{{ mt.transaction_id|default:"N/A" }}</td>
+        <td>{{ mt.transfer_id|default:"N/A" }}</td>
+        <td>{{ mt.payment_point }}</td>
+        <td>{{ mt.myshop_number }}</td>
+        <td>{{ mt.bank_account|default:"N/A" }}</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

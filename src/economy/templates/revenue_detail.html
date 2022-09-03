@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Revenue Details | {{ block.super }}
+  Revenue Details | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-{% include 'includes/revenue_detail_panel.html' %}
-</div>
-<a class="btn btn-primary" href="{% url 'economy:revenue_list' camp_slug=camp.slug %}">Back to Revenue List</a>
+  <div class="row">
+    {% include 'includes/revenue_detail_panel.html' %}
+  </div>
+  <a class="btn btn-primary" href="{% url 'economy:revenue_list' camp_slug=camp.slug %}">Back to Revenue List</a>
 {% endblock %}

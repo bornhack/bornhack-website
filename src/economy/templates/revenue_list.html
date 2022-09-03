@@ -2,18 +2,18 @@
 {% load static %}
 
 {% block title %}
-Revenues | {{ block.super }}
+  Revenues | {{ block.super }}
 {% endblock %}
 
 <{% block content %}
-<h3>Your {{ camp.title }} Revenues</h3>
+  <h3>Your {{ camp.title }} Revenues</h3>
 
-{% include 'includes/revenue_list_panel.html' %}
+  {% include 'includes/revenue_list_panel.html' %}
 
-{% if perms.camps.revenue_create_permission %}
-<a class="btn btn-success" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Revenue</a>
-{% else %}
-<div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add revenue. Please ask someone from the Economy team to add the permission if you need it.</p></div>
-{% endif %}
+  {% if perms.camps.revenue_create_permission %}
+    <a class="btn btn-success" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Revenue</a>
+  {% else %}
+    <div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add revenue. Please ask someone from the Economy team to add the permission if you need it.</p></div>
+  {% endif %}
 
 {% endblock %}

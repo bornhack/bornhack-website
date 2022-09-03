@@ -11,9 +11,9 @@
       $(document).ready(function(){
         // enable datatables for all tables on the page,
         $('.datatable').DataTable( {
-            "stateSave": true,
-            "pageLength": 100,
-            "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+          "stateSave": true,
+          "pageLength": 100,
+          "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
         } );
       } );
     </script>
@@ -39,15 +39,15 @@
         </thead>
         <tbody>
           {% for ba, csv, txcount in bankaccounts %}
-          <tr>
-            <td>{{ ba.pk }}</td>
-            <td>{{ ba.bank }}</td>
-            <td>{{ ba.name }}</td>
-            <td>{{ ba.reg_no }}</td>
-            <td>{{ ba.account_no }}</td>
-            <td>{{ txcount }}</td>
-            <td><a href="{{ csv }}">CSV</a></td>
-          </tr>
+            <tr>
+              <td>{{ ba.pk }}</td>
+              <td>{{ ba.bank }}</td>
+              <td>{{ ba.name }}</td>
+              <td>{{ ba.reg_no }}</td>
+              <td>{{ ba.account_no }}</td>
+              <td>{{ txcount }}</td>
+              <td><a href="{{ csv }}">CSV</a></td>
+            </tr>
           {% endfor %}
         </tbody>
       </table>
@@ -221,5 +221,5 @@
         </tbody>
       </table>
       <hr>
-  </body
-</html>
+      </body
+    </html>

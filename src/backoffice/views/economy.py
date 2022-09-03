@@ -13,7 +13,6 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView

@@ -200,7 +200,7 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
         return response
 
 
-class InvoiceDownloadView(LoginRequiredMixin, DetailView):
+class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailView):
     model = Invoice
     pk_url_kwarg = "invoice_id"
 
@@ -254,7 +254,11 @@ class OrderUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
         return reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class OrderDownloadProformaInvoiceView(LoginRequiredMixin, DetailView):
+class OrderDownloadProformaInvoiceView(
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    DetailView,
+):
     model = Order
     pk_url_kwarg = "order_id"
 
@@ -364,10 +368,10 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
 
 class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = CreditNote
-    template_name = "creditnote_list.html"
+    template_name = "creditnote_list_backoffice.html"
 
 
-class CreditNoteDownloadView(LoginRequiredMixin, DetailView):
+class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailView):
     model = CreditNote
     pk_url_kwarg = "credit_note_id"
 

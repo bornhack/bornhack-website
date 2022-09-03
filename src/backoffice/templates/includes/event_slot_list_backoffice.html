@@ -1,29 +1,29 @@
-    <table class="table table-condensed">
-      <thead>
-        <tr>
-          {% if not notitle %}<th>Event</th>{% endif %}
-          <th>Slot</th>
-          <th>Location</th>
-          <th>Duration</th>
-          <th class="text-center">Overflow</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for slot in event_slot_list %}
-        <tr>
-          {% if not notitle %}
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      {% if not notitle %}<th>Event</th>{% endif %}
+      <th>Slot</th>
+      <th>Location</th>
+      <th>Duration</th>
+      <th class="text-center">Overflow</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slot in event_slot_list %}
+      <tr>
+        {% if not notitle %}
           <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=slot.event.slug %}">{{ slot.event.title }}</a></td>
-          {% endif %}
-          <td><a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.when.lower }}</a></td>
-          <td>{{ slot.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.event_location.slug %}">{{ slot.event_location.name }}</a></td>
-          <td>{{ slot.duration }}</td>
-          <td class="text-center"><span class="badge">{{ slot.overflow }}</span></td>
-          <td>
-            <a class="btn btn-primary" href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}"><i class="fas fa-search"></i> Show</a>
-            <a class="btn btn-danger" href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=slot.pk %}"><i class="fas fa-times"></i> Unschedule</a>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+        {% endif %}
+        <td><a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.when.lower }}</a></td>
+        <td>{{ slot.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.event_location.slug %}">{{ slot.event_location.name }}</a></td>
+        <td>{{ slot.duration }}</td>
+        <td class="text-center"><span class="badge">{{ slot.overflow }}</span></td>
+        <td>
+          <a class="btn btn-primary" href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}"><i class="fas fa-search"></i> Show</a>
+          <a class="btn btn-danger" href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=slot.pk %}"><i class="fas fa-times"></i> Unschedule</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

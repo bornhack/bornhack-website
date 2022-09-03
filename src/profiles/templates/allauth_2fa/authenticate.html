@@ -4,7 +4,7 @@
 {% load i18n %}
 
 {% block title %}
-Two-Factor Authentication | {{ block.super }}
+  Two-Factor Authentication | {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -19,7 +19,7 @@ Two-Factor Authentication | {{ block.super }}
         {% bootstrap_form form %}
 
         <button type="submit"
-                class="btn btn-primary form-control">
+          class="btn btn-primary form-control">
           {% trans 'Authenticate' %}
         </button>
       </form>

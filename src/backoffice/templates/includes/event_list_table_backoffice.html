@@ -1,65 +1,65 @@
 <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
-    <thead>
+  <thead>
     <tr>
-        <th>Title</th>
-        <th>Event Type</th>
-        <th>Tags</th>
-        {% if not noduration %}<th>Duration</th>{% endif %}
-        {% if not nopeople %}<th>People</th>{% endif %}
-        {% if not noschedule %}<th>Scheduled</th>{% endif %}
-        {% if not noemail %}<th>Submitter Email</th>{% endif %}
-        {% if not noactions %}<th>Actions</th>{% endif %}
-     </tr>
-    </thead>
-    <tbody>
-    {% for event in event_list %}
-    <tr>
-        <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
-      <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event.event_type.slug %}">{{ event.event_type }}</a></td>
-      <td>
-        {% for tag in event.tags.all %}
-        <span class="badge">{{ tag }}</span><br>
-        {% empty %}
-        N/A
-        {% endfor %}
-      </td>
-      {% if not noduration %}
-      <td>{{ event.duration }}</td>
-      {% endif %}
-      {% if not nopeople %}
-      <td>
-        {% for speaker in event.speakers.all %}
-        <i class="fas fa-user"></i> <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
-        {% empty %}
-          N/A
-        {% endfor %}
-      </td>
-      {% endif %}
-      {% if not noschedule %}
-      <td>
-        {% if event.event_slots.exists %}
-        {% for slot in event.event_slots.all %}
-        {{ slot.event_location.icon_html }}
-        <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.event_location.name }}, {{ slot.when.lower }}</a><br>
-        {% endfor %}
-        {% else %}
-        Not scheduled yet
-        {% endif %}
-      </td>
-      {% endif %}
-      {% if not noemail %}
-      <td>{{ event.proposal.user.email }}</td>
-      {% endif %}
-      {% if not noactions %}
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-          <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-        </div>
-      </td>
-      {% endif %}
+      <th>Title</th>
+      <th>Event Type</th>
+      <th>Tags</th>
+      {% if not noduration %}<th>Duration</th>{% endif %}
+      {% if not nopeople %}<th>People</th>{% endif %}
+      {% if not noschedule %}<th>Scheduled</th>{% endif %}
+      {% if not noemail %}<th>Submitter Email</th>{% endif %}
+      {% if not noactions %}<th>Actions</th>{% endif %}
     </tr>
+  </thead>
+  <tbody>
+    {% for event in event_list %}
+      <tr>
+        <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
+        <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event.event_type.slug %}">{{ event.event_type }}</a></td>
+        <td>
+          {% for tag in event.tags.all %}
+            <span class="badge">{{ tag }}</span><br>
+          {% empty %}
+            N/A
+          {% endfor %}
+        </td>
+        {% if not noduration %}
+          <td>{{ event.duration }}</td>
+        {% endif %}
+        {% if not nopeople %}
+          <td>
+            {% for speaker in event.speakers.all %}
+              <i class="fas fa-user"></i> <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
+        {% endif %}
+        {% if not noschedule %}
+          <td>
+            {% if event.event_slots.exists %}
+              {% for slot in event.event_slots.all %}
+                {{ slot.event_location.icon_html }}
+                <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.event_location.name }}, {{ slot.when.lower }}</a><br>
+              {% endfor %}
+            {% else %}
+              Not scheduled yet
+            {% endif %}
+          </td>
+        {% endif %}
+        {% if not noemail %}
+          <td>{{ event.proposal.user.email }}</td>
+        {% endif %}
+        {% if not noactions %}
+          <td>
+            <div class="btn-group-vertical">
+              <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+              <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+            </div>
+          </td>
+        {% endif %}
+      </tr>
     {% endfor %}
-    </tbody>
-  </table>
+  </tbody>
+</table>

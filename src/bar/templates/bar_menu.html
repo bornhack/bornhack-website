@@ -35,14 +35,14 @@
 
   <body class="bar-menu">
 
-{% block content %}
-    <h1 class="container">WIP - Work In Progress-Bar</h1>
-    <hr />
+    {% block content %}
+      <h1 class="container">WIP - Work In Progress-Bar</h1>
+      <hr />
 
-    <div class="bar-row container container-fluid">
+      <div class="bar-row container container-fluid">
 
 
-          {% for category in categories %}
+        {% for category in categories %}
           <h3><strong>{{ category.name }}</strong></h3>
 
           {% for product in category.products.all %}
@@ -54,8 +54,8 @@
             {% endif %}
           {% endfor %}
 
-          {% endfor %}
-    </div>
-{% endblock %}
+        {% endfor %}
+      </div>
+    {% endblock %}
   </body>
 </html>
