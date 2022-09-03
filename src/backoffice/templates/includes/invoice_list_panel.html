@@ -22,7 +22,7 @@
       <td>{{ invoice.get_order }}</td>
       <td>{{ invoice.get_order.paid|truefalseicon }} {% if invoice.get_order.paid %}paid{% else %}unpaid{% endif %}</td>
       <td>
-          n/a
+        {% if invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=invoice.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download Invoice #{{ invoice.pk }}</a>{% endif %}
       </td>
     </tr>
     {% endfor %}
