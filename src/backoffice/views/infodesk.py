@@ -277,6 +277,11 @@ class OrderDownloadProformaInvoiceView(
 # REFUNDS & CREDITNOTES
 
 
+class RefundListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
+    model = Refund
+    template_name = "refund_list_backoffice.html"
+
+
 class RefundDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     model = Refund
     template_name = "refund_detail_backoffice.html"

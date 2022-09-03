@@ -50,6 +50,15 @@
 
         {% if perms.camps.infoteam_permission %}
           <h3>Info Team</h3>
+          <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}"
+            class="list-group-item">
+            <h4 class="list-group-item-heading">
+              Orders
+            </h4>
+            <p class="list-group-item-text">
+              Use this view see and manage webshop orders
+            </p>
+          </a>
           <a href="{% url 'backoffice:invoice_list' camp_slug=camp.slug %}"
             class="list-group-item">
             <h4 class="list-group-item-heading">
@@ -59,6 +68,15 @@
               Use this view see a list of all Invoices in the system
             </p>
           </a>
+          <a href="{% url 'backoffice:refund_list' camp_slug=camp.slug %}"
+            class="list-group-item">
+            <h4 class="list-group-item-heading">
+              Refunds
+            </h4>
+            <p class="list-group-item-text">
+              Use this view see and manage webshop refunds
+            </p>
+          </a>
           <a href="{% url 'backoffice:credit_note_list' camp_slug=camp.slug %}"
             class="list-group-item">
             <h4 class="list-group-item-heading">
@@ -66,15 +84,6 @@
             </h4>
             <p class="list-group-item-text">
               Use this view see a list of all Credit Notes in the system
-            </p>
-          </a>
-          <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}"
-            class="list-group-item">
-            <h4 class="list-group-item-heading">
-              Orders
-            </h4>
-            <p class="list-group-item-text">
-              Use this view see and manage webshop orders
             </p>
           </a>
           <a href="{% url 'backoffice:scan_tickets_pos_select' camp_slug=camp.slug %}"

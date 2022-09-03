@@ -108,6 +108,7 @@ from .views import PosReportPosCountStartView
 from .views import PosReportUpdateView
 from .views import PosUpdateView
 from .views import RefundDetailView
+from .views import RefundListView
 from .views import ReimbursementCreateUserSelectView
 from .views import ReimbursementCreateView
 from .views import ReimbursementDeleteView
@@ -297,8 +298,20 @@ urlpatterns = [
                                     ],
                                 ),
                             ),
+                        ],
+                    ),
+                ),
+                path(
+                    "refunds/",
+                    include(
+                        [
                             path(
-                                "refunds/<int:refund_id>/",
+                                "",
+                                RefundListView.as_view(),
+                                name="refund_list",
+                            ),
+                            path(
+                                "<int:refund_id>/",
                                 RefundDetailView.as_view(),
                                 name="refund_detail",
                             ),
