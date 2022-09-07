@@ -288,6 +288,13 @@ class RefundDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     pk_url_kwarg = "refund_id"
 
 
+class RefundUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
+    model = Refund
+    template_name = "refund_update_backoffice.html"
+    fields = ["paid", "notes"]
+    pk_url_kwarg = "refund_id"
+
+
 class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     model = Order
     template_name = "order_refund_backoffice.html"
