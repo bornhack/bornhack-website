@@ -313,13 +313,20 @@ urlpatterns = [
                             ),
                             path(
                                 "<int:refund_id>/",
-                                RefundDetailView.as_view(),
-                                name="refund_detail",
-                            ),
-                            path(
-                                "<int:refund_id>/",
-                                RefundUpdateView.as_view(),
-                                name="refund_update",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            RefundDetailView.as_view(),
+                                            name="refund_detail",
+                                        ),
+                                        path(
+                                            "update/",
+                                            RefundUpdateView.as_view(),
+                                            name="refund_update",
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),
