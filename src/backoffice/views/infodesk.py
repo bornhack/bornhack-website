@@ -294,6 +294,9 @@ class RefundUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
     fields = ["paid", "notes"]
     pk_url_kwarg = "refund_id"
 
+    def get_success_url(self):
+        return reverse("backoffice:refund_list", kwargs={"camp_slug": self.camp.slug})
+
 
 class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
     model = Order
