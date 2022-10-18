@@ -29,6 +29,7 @@
       <th>When?</th>
       <th>What?</th>
       <th>Where?</th>
+      <th>Who?</th>
       <th>Type</th>
       <th>Tags</th>
     </thead>
@@ -48,6 +49,20 @@
             <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
           </td>
           <td>{{ slot.event_location.icon_html }} {{ slot.event_location.name }}</td>
+          <td>
+            {% for speaker in slot.event.speakers.all %}
+              <span class="speaker">
+                <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}"><i class="fas fa-user fa-fw"></i>
+                  {{ speaker.name }}
+                  {% for speakerevent in speaker.events.all %}
+                    {{ speakerevent.event_type.icon_html}}
+                  {% endfor %}
+                </a>
+              </span><br />
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
           <td>{{ slot.event_type.icon_html }} {{ slot.event.event_type }}</td>
           <td>
             {% for tag in slot.event.tags.all %}
