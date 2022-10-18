@@ -7,7 +7,7 @@ codecov==2.1.12
 black==22.6.0
 pre-commit==2.20.0
 isort==5.10.1
-hypothesis==6.52.1
+hypothesis==6.56.3
 flake8==4.0.1
 tblib==1.7.0
 unittest-xml-reporting==3.2.0
