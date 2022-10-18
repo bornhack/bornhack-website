@@ -42,6 +42,13 @@
           {% endif %}
 
           <hr />
+      {% else %}
+        {% if product.available_for_days < 20 %}
+          <h3>
+            <small>Availability</small><br />
+            <small>This product is available for {{ product.available_for_days }} more days.</small>
+          </h3>
+        {% endif %}
       {% endif %}
 
       {% if product.is_stock_available %}
