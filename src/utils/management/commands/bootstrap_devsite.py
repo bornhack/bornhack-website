@@ -274,6 +274,7 @@ class Command(BaseCommand):
                 "tagline": "a new /home",
                 "colour": "#ffed00",
                 "read_only": True,
+                "light_text": False,
             },
             {
                 "year": 2020,
@@ -304,18 +305,21 @@ class Command(BaseCommand):
                 "tagline": "Undecided",
                 "colour": "#73d7ee",
                 "read_only": False,
+                "light_text": False,
             },
             {
                 "year": 2025,
                 "tagline": "Undecided",
                 "colour": "#ffafc7",
                 "read_only": False,
+                "light_text": False,
             },
             {
                 "year": 2026,
                 "tagline": "Undecided",
                 "colour": "#ffffff",
                 "read_only": False,
+                "light_text": False,
             },
         ]
 
