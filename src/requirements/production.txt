@@ -32,7 +32,7 @@ pandas==1.4.3
 pipdeptree==2.2.1
 psycopg2-binary==2.9.3
 pyOpenSSL==22.0.0
-PyPDF2==2.6.0
+PyPDF2==2.11.1
 python-magic==0.4.27
 quickpay-api-client==2.0.1
 service-identity==21.1.0
