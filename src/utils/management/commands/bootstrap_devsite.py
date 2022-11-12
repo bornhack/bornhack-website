@@ -285,12 +285,36 @@ class Command(BaseCommand):
                 "year": 2021,
                 "tagline": "Continuous Delivery",
                 "colour": "#e40303",
-                "read_only": False,
+                "read_only": True,
             },
             {
                 "year": 2022,
+                "tagline": "black ~/hack",
+                "colour": "#000000",
+                "read_only": True,
+            },
+            {
+                "year": 2023,
                 "tagline": "Undecided",
-                "colour": "#004dff",
+                "colour": "#613915",
+                "read_only": False,
+            },
+            {
+                "year": 2024,
+                "tagline": "Undecided",
+                "colour": "#73d7ee",
+                "read_only": False,
+            },
+            {
+                "year": 2025,
+                "tagline": "Undecided",
+                "colour": "#ffafc7",
+                "read_only": False,
+            },
+            {
+                "year": 2026,
+                "tagline": "Undecided",
+                "colour": "#ffffff",
                 "read_only": False,
             },
         ]
