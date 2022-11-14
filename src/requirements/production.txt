@@ -11,7 +11,7 @@ django-allauth-2fa==0.10.0
 django-bleach==3.0.0
 django-bootstrap3==22.1
 django-cors-headers==3.13.0
-django-extensions==3.2.0
+django-extensions==3.2.1
 django-filter==22.1
 django-leaflet==0.28.3
 django-jsonview==2.0.0
