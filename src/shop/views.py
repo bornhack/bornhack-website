@@ -725,7 +725,7 @@ class QuickPayCallbackView(View):
         qpobj, created = QuickPayAPIObject.objects.get_or_create(
             id=body["id"],
             defaults={
-                "order": self.order,
+                "order": order,
                 "object_type": body["type"],
                 "object_body": body,
             },
@@ -740,7 +740,7 @@ class QuickPayCallbackView(View):
         if (
             body["type"] == "Payment"
             and body["state"] == "processed"
-            and body["balance"] == 0
+            and body["balance"] == int(order.total * 100)
             and not body["test_mode"]
         ):
             order.mark_as_paid()
