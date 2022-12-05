@@ -47,8 +47,9 @@ MEDIA_ROOT='{{ django_media_root }}'
 PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 
 # PSP settings
-EPAY_MERCHANT_NUMBER='{{ epay_merchant_number }}'
-EPAY_MD5_SECRET='{{ epay_md5_secret }}'
+QUICKPAY_API_KEY="{{ quickpay_api_key }}"
+QUICKPAY_PRIVATE_KEY="{{ quickpay_private_key }}"
+
 COINIFY_API_KEY='{{ coinify_api_key }}'
 COINIFY_API_SECRET='{{ coinify_api_secret }}'
 COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'

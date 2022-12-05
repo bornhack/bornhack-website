@@ -21,25 +21,36 @@ class QuickPay:
 
     def do_request(self, request):
         """Perform an API request and save the response."""
+        # make sure we include request id
+        if "x-bornhack-quickpay-request-id" not in request.headers:
+            request.headers["x-bornhack-quickpay-request-id"] = str(request.uuid)
+            request.save()
+        # call the method
         method = getattr(self.client, request.method.lower())
         try:
             status, body, headers = method(
                 path=request.endpoint,
-                body=json.dumps(request.body),
-                headers=request.headers,
-                query=request.query,
+                body=request.body,
+                headers=request.headers if request.headers else None,
+                query=request.query if request.query else None,
                 raw=True,
             )
         except ApiError as e:
             logger.error(f"QuickPay API error: {e}")
             request.response_status_code = e.status_code
-            request.response_body = e.body
+            # no headers returned in the ApiError object
+            # request.response_headers = dict(e.headers)
+            request.response_body = json.loads(e.body)
             request.save()
             return
+        # save the response in the request object
         request.response_status_code = status
-        request.response_headers = headers
-        request.response_body = body
+        request.response_headers = dict(headers)
+        request.response_body = json.loads(body)
         request.save()
+        # create or update related QuickPayAPIObject
+        if request.response_status_code in [200, 201]:
+            return request.create_or_update_object()
 
     def create_payment(self, order):
         """Create and return a QuickPayAPIPayment object."""
@@ -52,29 +63,24 @@ class QuickPay:
                 "currency": "DKK",
             },
         )
-        qpr.headers = {"x-bornhack-quickpay-request-id": str(qpr.uuid)}
-        self.do_request(qpr)
-        if qpr.response_status_code == 200:
-            # return QuickPayPayment.objects.create(
-            #     qpid=qpr.response_body["id"],
-            #     body=qpr.response_body,
-            # )
-            pass
+        qpr.save()
+        payment = self.do_request(qpr)
+        return payment
 
-    def get_payment_link(self, payment):
+    def get_payment_link(self, payment, request):
         """Get a payment link for this payment."""
+        body = {
+            "amount": int(payment.order.total * 100),
+            "continue_url": payment.order.get_quickpay_accept_url(request),
+            "cancel_url": payment.order.get_cancel_url(request),
+            "callback_url": payment.order.get_quickpay_callback_url(request),
+            "auto_capture": True,
+        }
         qpr = QuickPayAPIRequest.objects.create(
-            order=payment.request.order,
+            order=payment.order,
             method="PUT",
-            endpoint="/payments/{payment['id']}/link",
-            body={
-                "amount": payment.request.order.total,
-                "continue_url": payment.request.order.get_quickpay_accept_url(),
-                "cancel_url": payment.request.order.get_cancel_url(),
-                "callback_url": payment.request.order.get_quickpay_callback_url(),
-                "auto_capture": True,
-            },
-            raw=True,
+            endpoint=f"/payments/{payment.object_body['id']}/link",
+            body=body,
         )
         self.do_request(qpr)
-        return qpr.body["url"]
+        return qpr.response_body["url"]

@@ -198,13 +198,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             + str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
         )
 
-    def get_epay_callback_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:epay_callback", kwargs={"pk": self.pk}))
-        )
-
     def get_quickpay_accept_url(self, request):
         return (
             "https://"
@@ -1001,6 +994,9 @@ class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
             return self.customorder
 
 
+# ########## COINIFY #################################################
+
+
 class CoinifyAPIInvoice(
     ExportModelOperationsMixin("coinify_api_invoice"),
     CreatedUpdatedModel,
@@ -1073,7 +1069,7 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
         help_text="The HTTP method for this request",
     )
     endpoint = models.TextField(help_text="The API endpoint for this request")
-    body = models.TextField(default="", blank=True)
+    body = models.JSONField(default=dict)
     headers = models.JSONField(default=dict, null=True, blank=True)
     query = models.JSONField(default=dict, null=True, blank=True)
     response_status_code = models.IntegerField(
@@ -1096,6 +1092,23 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
         return (
             f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
         )
+
+    def create_or_update_object(self):
+        """Create or update the QuickPayAPIObject in the response_body."""
+        if (
+            self.response_body
+            and "type" in self.response_body
+            and "id" in self.response_body
+        ):
+            obj, created = QuickPayAPIObject.objects.get_or_create(
+                id=self.response_body["id"],
+                defaults={
+                    "order": self.order,
+                    "object_type": self.response_body["type"],
+                    "object_body": self.response_body,
+                },
+            )
+            return obj
 
 
 class QuickPayAPIObject(CreatedUpdatedModel, UUIDModel):

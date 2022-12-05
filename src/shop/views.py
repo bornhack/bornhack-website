@@ -2,7 +2,6 @@ import hashlib
 import hmac
 import json
 import logging
-from collections import OrderedDict
 
 from django.conf import settings
 from django.contrib import messages
@@ -12,8 +11,6 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseRedirect
-from django.http import HttpResponseServerError
-from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.utils import timezone
@@ -29,14 +26,10 @@ from django.views.generic.detail import SingleObjectMixin
 from .coinify import create_coinify_invoice
 from .coinify import process_coinify_invoice_json
 from .coinify import save_coinify_callback
-from .epay import calculate_epay_hash
-from .epay import validate_epay_callback
 from .forms import OrderProductRelationForm
 from .forms import OrderProductRelationFormSet
 from .quickpay import QuickPay
 from shop.models import CreditNote
-from shop.models import EpayCallback
-from shop.models import EpayPayment
 from shop.models import Order
 from shop.models import OrderProductRelation
 from shop.models import Product
@@ -46,6 +39,7 @@ from shop.models import QuickPayAPIObject
 from vendor.coinify.coinify_callback import CoinifyCallback
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+qp = QuickPay()
 
 
 # Mixins
@@ -405,7 +399,7 @@ class OrderReviewAndPayView(
 
             reverses = {
                 Order.PaymentMethods.CREDIT_CARD: reverse_lazy(
-                    "shop:epay_form",
+                    "shop:quickpay_link",
                     kwargs={"pk": order.id},
                 ),
                 Order.PaymentMethods.BLOCKCHAIN: reverse_lazy(
@@ -496,96 +490,6 @@ class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
             order = self.get_object()
             order.mark_as_paid()
             return HttpResponseRedirect(request.headers.get("Referer"))
-
-
-# Epay views
-class EpayFormView(
-    LoginRequiredMixin,
-    EnsureUserOwnsOrderMixin,
-    EnsureUnpaidOrderMixin,
-    EnsureClosedOrderMixin,
-    EnsureOrderHasProductsMixin,
-    DetailView,
-):
-    model = Order
-    template_name = "epay_form.html"
-
-    def get_context_data(self, **kwargs):
-        order = self.get_object()
-        context = super().get_context_data(**kwargs)
-        context["merchant_number"] = settings.EPAY_MERCHANT_NUMBER
-        context["description"] = order.description
-        context["amount"] = order.total * 100
-        context["order_id"] = order.pk
-        context["accept_url"] = order.get_epay_accept_url(self.request)
-        context["cancel_url"] = order.get_cancel_url(self.request)
-        context["callback_url"] = order.get_epay_callback_url(self.request)
-        context["epay_hash"] = calculate_epay_hash(order, self.request)
-        return context
-
-
-class EpayCallbackView(SingleObjectMixin, View):
-    model = Order
-
-    def get(self, request, *args, **kwargs):
-        callback = EpayCallback.objects.create(payload=request.GET)
-
-        if "orderid" in request.GET:
-            query = OrderedDict(
-                [tuple(x.split("=")) for x in request.META["QUERY_STRING"].split("&")],
-            )
-            order = get_object_or_404(Order, pk=query.get("orderid"))
-            if order.pk != self.get_object().pk:
-                logger.error("bad epay callback, orders do not match!")
-                return HttpResponse(status=400)
-
-            if validate_epay_callback(query):
-                callback.md5valid = True
-                callback.save()
-            else:
-                logger.error("bad epay callback!")
-                return HttpResponse(status=400)
-
-            if order.paid:
-                # this order is already paid, perhaps we are seeing a double callback?
-                return HttpResponse("OK")
-
-            # epay callback is valid - has the order been paid in full?
-            if int(query["amount"]) == order.total * 100:
-                # create an EpayPayment object linking the callback to the order
-                EpayPayment.objects.create(
-                    order=order,
-                    callback=callback,
-                    txnid=query.get("txnid"),
-                )
-                # and mark order as paid (this will create tickets)
-                order.mark_as_paid(request)
-            else:
-                logger.error("valid epay callback with wrong amount detected")
-        else:
-            return HttpResponse(status=400)
-
-        return HttpResponse("OK")
-
-
-class EpayThanksView(
-    LoginRequiredMixin,
-    EnsureUserOwnsOrderMixin,
-    EnsureClosedOrderMixin,
-    DetailView,
-):
-    model = Order
-    template_name = "epay_thanks.html"
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.GET:
-            # epay redirects the user back to our accepturl with a long
-            # and ugly querystring, redirect user to the clean url
-            return HttpResponseRedirect(
-                reverse("shop:epay_thanks", kwargs={"pk": self.get_object().pk}),
-            )
-
-        return super().dispatch(request, *args, **kwargs)
 
 
 # Bank Transfer view
@@ -730,7 +634,6 @@ class CoinifyThanksView(
 # QuickPay views
 
 
-# Epay views
 class QuickPayLinkView(
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
@@ -744,11 +647,35 @@ class QuickPayLinkView(
 
     def dispatch(self, *args, **kwargs):
         order = self.get_object()
-        qp = QuickPay()
-        payment = qp.create_payment(order)
-        if not payment:
-            return HttpResponseServerError("Something isn't working :(")
-        self.payment_link = qp.get_payment_link(payment)
+        # do we already have a payment object?
+        if order.quickpay_api_objects.filter(object_type="Payment"):
+            payment = order.quickpay_api_objects.get(object_type="Payment")
+        else:
+            payment = qp.create_payment(order)
+            if not payment:
+                logger.error("Unable to get QuickPay payment object :(")
+                messages.error(
+                    self.request,
+                    "Credit card payment is not working properly at the moment.",
+                )
+                return HttpResponseRedirect(
+                    reverse_lazy("shop:order_detail", kwargs={"pk": order.pk}),
+                )
+        # get a payment link for this payment object
+        try:
+            self.payment_link = qp.get_payment_link(
+                payment=payment,
+                request=self.request,
+            )
+        except Exception:
+            logger.exception("Unable to get QuickPay payment link :(")
+            messages.error(
+                self.request,
+                "Credit card payment is not working properly at the moment.",
+            )
+            return HttpResponseRedirect(
+                reverse_lazy("shop:order_detail", kwargs={"pk": order.pk}),
+            )
         return super().dispatch(*args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -789,23 +716,32 @@ class QuickPayCallbackView(View):
 
         # find the related Order object (where possible)
         body = json.loads(request.body.decode("utf-8"))
-        if request.headers["Quickpay-Resource-Type"] == "payment":
+        if body["type"] == "Payment":
             order = Order.objects.get(id=int(body["order_id"]))
         else:
             order = None
 
-        # save the new QuickPayAPIObject and the callback
-        qpobj = QuickPayAPIObject.objects.create(
-            order=order,
-            object_type=request.headers["Quickpay-Resource-Type"],
-            object_body=json.loads(request.body.decode("utf-8")),
+        # save the new or updated QuickPayAPIObject and the callback
+        qpobj, created = QuickPayAPIObject.objects.get_or_create(
+            id=body["id"],
+            defaults={
+                "order": self.order,
+                "object_type": body["type"],
+                "object_body": body,
+            },
         )
-        qpcb = QuickPayAPICallback.objects.create(
+        QuickPayAPICallback.objects.create(
             qpobject=qpobj,
             headers={k: v for k, v in request.META.items() if k.startswith("HTTP_")},
-            body=json.loads(request.body.decode("utf-8")),
+            body=body,
         )
-        print(qpcb)
-        # TODO check if payment has been accepted and change order status if so
+
+        # do we need to mark an order as paid?
+        if (
+            body["type"] == "Payment"
+            and body["state"] == "processed"
+            and body["balance"] == 0
+        ):
+            order.mark_as_paid()
 
         return HttpResponse("OK")
