@@ -741,6 +741,7 @@ class QuickPayCallbackView(View):
             body["type"] == "Payment"
             and body["state"] == "processed"
             and body["balance"] == 0
+            and not body["test_mode"]
         ):
             order.mark_as_paid()
 

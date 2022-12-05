@@ -1112,6 +1112,7 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
 
 
 class QuickPayAPIObject(CreatedUpdatedModel, UUIDModel):
+    id = models.IntegerField(help_text="The object ID in QuickPays end", unique=True)
     order = models.ForeignKey(
         "shop.Order",
         related_name="quickpay_api_objects",

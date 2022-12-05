@@ -40,7 +40,7 @@ class QuickPay:
             request.response_status_code = e.status_code
             # no headers returned in the ApiError object
             # request.response_headers = dict(e.headers)
-            request.response_body = json.loads(e.body)
+            request.response_body = e.body
             request.save()
             return
         # save the response in the request object
@@ -59,7 +59,7 @@ class QuickPay:
             method="POST",
             endpoint="/payments",
             body={
-                "order_id": str(order.id).zfill(5),
+                "order_id": str(order.id).zfill(4),
                 "currency": "DKK",
             },
         )
