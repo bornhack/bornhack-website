@@ -87,7 +87,6 @@ class CampReadOnlyModeError(ValidationError):
 
 
 class CampRelatedModel(CreatedUpdatedModel):
-
     camp_filter = "camp"
 
     class Meta:

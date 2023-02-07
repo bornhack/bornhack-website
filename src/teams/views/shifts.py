@@ -41,7 +41,6 @@ class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
 
 
 def date_choices(camp):
-
     index = 0
     minute_choices = []
     # To begin with we assume a shift can not be shorter than an hour
@@ -253,7 +252,6 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 
 
 class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
-
     http_methods = ["get"]
 
     def get(self, request, **kwargs):
@@ -290,7 +288,6 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 
 
 class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
-
     http_methods = ["get"]
 
     def get(self, request, **kwargs):

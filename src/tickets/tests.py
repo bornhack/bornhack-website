@@ -7,7 +7,6 @@ from shop.factories import OrderProductRelationFactory
 
 class TicketTests(TestCase):
     def test_correct_token_and_badge_token_are_different(self):
-
         ticket_type = TicketTypeFactory()
         opr = OrderProductRelationFactory()
         shop_ticket = ShopTicket.objects.create(

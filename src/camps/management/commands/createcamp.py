@@ -20,7 +20,6 @@ class Command(BaseCommand):
         return os.path.join(settings.BASE_DIR, entry)
 
     def handle(self, *args, **options):
-
         # files to create, relative to BASE_DIR
         files = ["camps/templates/{camp_slug}_camp_detail.html"]
 

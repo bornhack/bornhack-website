@@ -18,7 +18,6 @@ def do_work():
         logger.debug(f"about to process {len(not_processed_email)} emails")
 
     for email in not_processed_email:
-
         attachment = None
         attachment_filename = ""
         if email.attachment:

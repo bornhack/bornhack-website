@@ -478,7 +478,6 @@ class DownloadCreditNoteView(
 
 
 class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
-
     model = Order
 
     def get(self, request, *args, **kwargs):
