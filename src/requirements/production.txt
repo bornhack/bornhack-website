@@ -1,5 +1,5 @@
 Django==3.2.16
-channels==3.0.5
+channels==4.0.0
 channels-redis==4.0.0
 
 
