@@ -2057,7 +2057,7 @@ class Command(BaseCommand):
 
         self.create_epay_transactions()
 
-        for (camp, read_only) in camps:
+        for camp, read_only in camps:
             year = camp.camp.lower.year
 
             self.output(

@@ -36,7 +36,6 @@ class MapProxyViewTest(TestCase):
         for endpoint in self.allowed_endpoints:
             fix_request = self.rf.get("/maps/kfproxy" + endpoint)
             with self.subTest(request=fix_request):
-
                 with mock.patch("maps.views.requests") as mock_req:
                     mock_req.get.return_value.status_code = 200
                     result = MapProxyView.as_view()(fix_request)

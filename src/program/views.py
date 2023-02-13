@@ -888,6 +888,7 @@ class CombinedProposalSubmitView(
         We must show two forms on the page.
         We use betterforms.MultiModelForm to combine two forms
         """
+
         # build our MultiModelForm
         class CombinedProposalSubmitForm(MultiModelForm):
             form_classes = OrderedDict(

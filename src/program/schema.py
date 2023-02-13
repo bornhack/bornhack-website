@@ -35,7 +35,6 @@ class EventTrackNode(DjangoObjectType):
 
 
 class EventInstanceNode(DjangoObjectType):
-
     start = graphene.Int(
         required=True,
         description="When this instance of the event starts. In posix time.",

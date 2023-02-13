@@ -86,7 +86,6 @@ class ScanTicketsView(
             context["ticket"] = self.ticket
 
         elif "ticket_token" in self.request.POST:
-
             # Slice to get rid of the first character which is a '#'
             ticket_token = self.request.POST.get("ticket_token")[1:]
 
@@ -326,7 +325,6 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         opr_dict = {}
         tickets_to_delete = []
         with transaction.atomic():
-
             for opr in oprs:
                 # Do not include fully refunded oprs
                 if not opr.possible_refund:
