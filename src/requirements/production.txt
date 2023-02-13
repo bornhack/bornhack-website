@@ -1,6 +1,6 @@
 Django==3.2.16
 channels==3.0.5
-channels-redis==3.4.1
+channels-redis==4.0.0
 
 
 asyncio==3.4.3
