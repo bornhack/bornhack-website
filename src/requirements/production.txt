@@ -36,7 +36,7 @@ PyPDF2==2.11.1
 python-magic==0.4.27
 quickpay-api-client==2.0.1
 service-identity==21.1.0
-Unidecode==1.3.4
+Unidecode==1.3.6
 wheel==0.38.4
 
 # pillow is only here to make old migrations run
