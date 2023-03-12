@@ -278,14 +278,14 @@ class ZettleExcelImporter:
             fh,
             skiprows=16,
             skipfooter=3,
-            usecols="A,C:I,K:M",
+            usecols="A,C:H,J,L:N",
             dtype={
                 "Dato": datetime,  # A
                 "Betalingsmetode": str,  # H
-                "Kortudsteder": str,  # I
-                "Personale": str,  # K
-                "Beskrivelse": str,  # L
-                "Solgt via": str,  # M
+                "Kortudsteder": str,  # J
+                "Personale": str,  # L
+                "Beskrivelse": str,  # M
+                "Solgt via": str,  # N
             },
             converters={
                 "Kvitteringsnummer": optional_int,  # C
