@@ -99,16 +99,16 @@
 
                 <form id="check_in_form" method="POST" action="">{% csrf_token %}
                   <input type="checkbox"
-                    name="check_in_ticket_id"
-                    id="check_in_input"
-                    value="{{ ticket.pk }}"
-                    style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+                         name="check_in_ticket_id"
+                         id="check_in_input"
+                         value="{{ ticket.pk }}"
+                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
 
                   <input type="checkbox"
-                    name="badge_ticket_id"
-                    id="hand_out_badge_input"
-                    value="{{ ticket.pk }}"
-                    style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+                         name="badge_ticket_id"
+                         id="hand_out_badge_input"
+                         value="{{ ticket.pk }}"
+                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
                 </form>
 
                 <div class="row">
@@ -133,7 +133,7 @@
   <hr />
 
   <form method="POST"
-    class="form-inline">
+        class="form-inline">
     {% csrf_token %}
 
     <input type="text" class="form-control input-lg" name="find_order_id" />
@@ -199,12 +199,12 @@
                                                         <form method="POST">
                                                           {% csrf_token %}
                                                           <input type="hidden"
-                                                            name="find_order_id"
-                                                            value="{{ order.pk }}">
+                                                                 name="find_order_id"
+                                                                 value="{{ order.pk }}">
                                                           <button class="btn btn-primary"
-                                                            name="check_in_ticket_id"
-                                                            type="submit"
-                                                            value="{{ ticket.pk }}">Checkin
+                                                                  name="check_in_ticket_id"
+                                                                  type="submit"
+                                                                  value="{{ ticket.pk }}">Checkin
                                                           </button>
                                                         </form>
                                                       {% endif %}
