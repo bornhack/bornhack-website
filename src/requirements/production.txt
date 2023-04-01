@@ -6,7 +6,7 @@ channels-redis==4.0.0
 asyncio==3.4.3
 commonmark==0.9.1
 conference-scheduler==3.0.1
-django-allauth==0.51.0
+django-allauth==0.54.0
 django-allauth-2fa==0.10.0
 django-bleach==3.0.1
 django-bootstrap3==22.2
