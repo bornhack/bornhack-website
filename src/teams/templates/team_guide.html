@@ -11,8 +11,8 @@
     <div class="panel-heading">
       <div class="btn-group pull-right">
         <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
-          class="btn btn-default"
-          target="_blank">
+           class="btn btn-default"
+           target="_blank">
           Print
         </a>
         {% if request.user in team.responsible_members.all %}

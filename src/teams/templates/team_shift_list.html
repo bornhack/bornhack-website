@@ -10,11 +10,11 @@
 
   {% if request.user in team.responsible_members.all %}
     <a class="btn btn-success"
-      href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
+       href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
       Create a single shift
     </a>
     <a class="btn btn-success"
-      href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
+       href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
       Create multiple shifts
     </a>
   {% endif %}
@@ -58,22 +58,22 @@
                   <td>
                     {% if request.user in team.responsible_members.all %}
                       <a class="btn btn-info"
-                        href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                         href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                         <i class="fas fa-edit"></i> Edit
                       </a>
                       <a class="btn btn-danger"
-                        href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                         href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                         <i class="fas fa-trash"></i> Delete
                       </a>
                     {% endif %}
                     {% if user in shift.users %}
                       <a class="btn btn-danger"
-                        href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                         href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                         <i class="fas fa-thumbs-down"></i> Unassign me
                       </a>
                     {% elif shift.people_required > shift.team_members.count %}
                       <a class="btn btn-success"
-                        href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                         href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                         <i class="fas fa-thumbs-up"></i> Assign me
                       </a>
                     {% endif %}

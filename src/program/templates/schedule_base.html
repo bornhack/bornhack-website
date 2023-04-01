@@ -27,10 +27,10 @@
               {% for type in camp.event_types %}
                 <li>
                   <input type="checkbox"
-                    name="event-type-{{ type.slug }}"
-                    id="event-type-{{ type.slug }}"
-                    value="{{ type.slug }}"
-                    class="form-control event-type-checkbox schedule-checkbox" />
+                         name="event-type-{{ type.slug }}"
+                         id="event-type-{{ type.slug }}"
+                         value="{{ type.slug }}"
+                         class="form-control event-type-checkbox schedule-checkbox" />
 
                   <div class="btn-group">
                     <label for="event-type-{{ type.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
@@ -54,11 +54,11 @@
               {% for location in camp.event_locations %}
                 <li>
                   <input type="checkbox"
-                    name="location-{{ location.slug }}"
-                    id="location-{{ location.slug }}"
-                    name="locations"
-                    value="{{ location.slug }}"
-                    class="form-control location-checkbox schedule-checkbox" />
+                         name="location-{{ location.slug }}"
+                         id="location-{{ location.slug }}"
+                         name="locations"
+                         value="{{ location.slug }}"
+                         class="form-control location-checkbox schedule-checkbox" />
 
                   <div class="btn-group">
                     <label for="location-{{ location.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">

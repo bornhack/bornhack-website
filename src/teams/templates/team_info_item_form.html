@@ -32,7 +32,7 @@
         <button type="submit" class="btn btn-primary">{% if object.id %}Save{% else %}Create{% endif %}</button>
         {% if object %}
           <a href="{% url 'teams:info_item_delete' camp_slug=camp.slug team_slug=object.category.team.slug category_anchor=object.category.anchor item_anchor=object.anchor %}"
-            class="btn btn-danger">
+             class="btn btn-danger">
             <i class="fa fa-remove"></i> Delete
           </a>
         {% endif %}
