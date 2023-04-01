@@ -82,3 +82,6 @@ REIMBURSEMENT_MAIL = "reimbursement@example.com"
 
 TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
 TEST_OUTPUT_FILE_NAME = "test_report.xml"
+
+QUICKPAY_API_KEY="secret"
+QUICKPAY_PRIVATE_KEY="alsosecret"
