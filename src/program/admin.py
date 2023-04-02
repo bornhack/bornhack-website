@@ -84,6 +84,7 @@ class EventProposalAdmin(admin.ModelAdmin):
 class EventLocationAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
     list_display = ("name", "camp", "capacity")
+    save_as = True
 
 
 @admin.register(EventTrack)
@@ -117,6 +118,7 @@ class EventTypeAdmin(admin.ModelAdmin):
     list_display = ("name", "order", "description")
     list_editable = ("order",)
     search_fields = ("name",)
+    save_as = True
 
 
 @admin.register(Speaker)
