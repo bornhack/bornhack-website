@@ -32,8 +32,10 @@ class AllSponsorsView(ListView):
             s["score"] = years.annotate(score=10 - Sum("tier__weight")).aggregate(
                 Sum("score"),
             )["score__sum"]
-            s["years"] = [
-                x["tier__camp__buildup"].lower.year
-                for x in years.values("tier__camp__buildup")
-            ]
+            s["years"] = sorted(
+                [
+                    x["tier__camp__buildup"].lower.year
+                    for x in years.values("tier__camp__buildup")
+                ],
+            )
         return sorted(sponsors, key=lambda item: item["score"], reverse=True)
