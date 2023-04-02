@@ -15,6 +15,7 @@ from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from people.views import PeopleView
+from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
 from villages.views import VillageCreateView
 from villages.views import VillageDeleteView
@@ -77,9 +78,8 @@ urlpatterns = [
     ),
     path(
         "sponsors/",
-        CampRedirectView.as_view(),
-        kwargs={"page": "sponsors"},
-        name="sponsors_redirect",
+        AllSponsorsView.as_view(),
+        name="allsponsors",
     ),
     path(
         "villages/",
