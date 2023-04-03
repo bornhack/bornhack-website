@@ -707,7 +707,7 @@ class QuickPayCallbackView(View):
             request.body,
             hashlib.sha256,
         ).hexdigest()
-        header_signature = request.META["HTTP_QUICKPAY_CHECKSUM_SHA256"]
+        header_signature = request.headers["quickpay-checksum-sha256"]
         if header_signature != calculated_signature:
             # signature is not valid
             logger.error("invalid quickpay callback signature detected")

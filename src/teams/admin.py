@@ -22,12 +22,13 @@ class TeamMemberInline(admin.TabularInline):
 class TeamAdmin(admin.ModelAdmin):
     save_as = True
 
+    @admin.display(
+        description="Responsible",
+    )
     def get_responsible(self, obj):
         return ", ".join(
             [resp.profile.public_credit_name for resp in obj.responsible_members.all()],
         )
-
-    get_responsible.short_description = "Responsible"
 
     list_display = [
         "name",

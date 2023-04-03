@@ -72,22 +72,22 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     list_display = ["name"]
 
 
+@admin.display(
+    description="Available from",
+)
 def available_from(product):
     if product.available_in.lower:
         return product.available_in.lower.strftime("%c")
     return "None"
 
 
-available_from.short_description = "Available from"
-
-
+@admin.display(
+    description="Available to",
+)
 def available_to(product):
     if product.available_in.upper:
         return product.available_in.upper.strftime("%c")
     return "None"
-
-
-available_to.short_description = "Available to"
 
 
 def stock_info(product):

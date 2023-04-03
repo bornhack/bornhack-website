@@ -39,20 +39,20 @@ class CredebtorAdmin(admin.ModelAdmin):
 # expenses
 
 
+@admin.action(
+    description="Approve Expenses",
+)
 def approve_expenses(modeladmin, request, queryset):
     for expense in queryset.all():
         expense.approve(request)
 
 
-approve_expenses.short_description = "Approve Expenses"
-
-
+@admin.action(
+    description="Reject Expenses",
+)
 def reject_expenses(modeladmin, request, queryset):
     for expense in queryset.all():
         expense.reject(request)
-
-
-reject_expenses.short_description = "Reject Expenses"
 
 
 @admin.register(Expense)
@@ -84,20 +84,20 @@ class ExpenseAdmin(admin.ModelAdmin):
 # revenues
 
 
+@admin.action(
+    description="Approve Revenues",
+)
 def approve_revenues(modeladmin, request, queryset):
     for revenue in queryset.all():
         revenue.approve(request)
 
 
-approve_revenues.short_description = "Approve Revenues"
-
-
+@admin.action(
+    description="Reject Revenues",
+)
 def reject_revenues(modeladmin, request, queryset):
     for revenue in queryset.all():
         revenue.reject(request)
-
-
-reject_revenues.short_description = "Reject Revenues"
 
 
 @admin.register(Revenue)

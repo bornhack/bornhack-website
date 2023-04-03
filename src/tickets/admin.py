@@ -74,10 +74,11 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "email",
     ]
 
+    @admin.display(
+        description="Quantity",
+    )
     def product_quantity(self, ticket):
         return str(ticket.opr.quantity)
-
-    product_quantity.short_description = "Quantity"
 
 
 class ShopTicketInline(admin.TabularInline):
