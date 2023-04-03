@@ -44,6 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
+          requirements: 'src/requirements/dev.txt'
 
       - name: Install python dependencies
         run: |
