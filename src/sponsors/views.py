@@ -28,10 +28,11 @@ class AllSponsorsView(ListView):
         )
         for s in sponsors:
             years = Sponsor.objects.filter(name=s["name"])
-            # score is 10 for each year minus tier weight, aggregated across all years
-            s["score"] = years.annotate(score=10 - Sum("tier__weight")).aggregate(
-                Sum("score"),
-            )["score__sum"]
+            # score is 100 for each year minus tier weight*10, aggregated across all years
+            s["score"] = years.annotate(
+                score=100 - (Sum("tier__weight") * 10),
+            ).aggregate(Sum("score"))["score__sum"]
+            # years is a list of all the years this sponsor has been a sponsor
             s["years"] = sorted(
                 [
                     x["tier__camp__buildup"].lower.year
