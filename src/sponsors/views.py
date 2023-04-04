@@ -46,7 +46,7 @@ class AllSponsorsView(ListView):
                 ),
                 # Calculate the difference between the year of the camp and this year, this is to
                 # make sure that more recent sponsors are ranked higher than older sponsors
-                year_score=ExtractYear("camp_start") - this_year,
+                year_score=this_year - ExtractYear("camp_start"),
                 # Calculate the score for this sponsor
                 score=100 - (Sum("tier__weight") * 20) - F("year_score"),
             ).aggregate(Sum("score"))["score__sum"]
