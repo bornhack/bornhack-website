@@ -1,3 +1,4 @@
+---
 name: "IRC Notification on push"
 on:
   - "push"
@@ -8,11 +9,12 @@ jobs:
     name: "IRC Notifications"
     steps:
     - name: "IRC notification"
-      if: ${{ github.repository == 'bornhack/bornhack-website' }}
+      if: ${{ (github.repository == 'bornhack/bornhack-website') && (github.actor != 'dependabot[bot]') }}
       uses: "Gottox/irc-message-action@v2"
       with:
-        server: "ircd.tyknet.dk"
+        server: "irc.baconsvin.org"
         channel: "#bornhack-website"
         nickname: "webteambot"
         message: |-
           ${{ github.actor }} pushed new commits: ${{ github.event.compare }} - latest commit msg: "${{ github.event.head_commit.message }}"
+...
