@@ -30,7 +30,7 @@ olefile==0.46
 openpyxl==3.1.2
 pandas==1.5.3
 pipdeptree==2.7.0
-psycopg2-binary==2.9.5
+psycopg2-binary==2.9.6
 pyOpenSSL==23.1.1
 PyPDF2==3.0.1
 python-magic==0.4.27
