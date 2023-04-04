@@ -290,27 +290,26 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         return tickets
 
     @property
-    def refunded(self) -> "RefundEnum":
-        return self.oprs.aggregate(
+    def refunded(self) -> str:
+        aggregate = self.oprs.aggregate(
             # We want to sum the quantity of distinct OPRs
             total_quantity=Sum("quantity", distinct=True),
             # We want all RPRs per OPR, so therefore no distinct (distinct would give us one RPR per OPR)
             total_refunded=Sum("rprs__quantity"),
-            refunded=Case(
-                When(
-                    total_refunded=F("total_quantity"),
-                    then=Value(RefundEnum.FULLY_REFUNDED.value),
-                ),
-                When(
-                    total_refunded__gt=0,
-                    then=Value(RefundEnum.PARTIALLY_REFUNDED.value),
-                ),
-                When(
-                    total_refunded__isnull=True,
-                    then=Value(RefundEnum.NOT_REFUNDED.value),
-                ),
-            ),
-        )["refunded"]
+        )
+
+        total_refunded = aggregate["total_refunded"]
+        total_quantity = aggregate["total_quantity"]
+
+        if total_refunded is None:
+            return RefundEnum.NOT_REFUNDED.value
+
+        if total_refunded == total_quantity:
+            return RefundEnum.FULLY_REFUNDED.value
+        elif total_refunded > 0:
+            return RefundEnum.PARTIALLY_REFUNDED.value
+        else:
+            return RefundEnum.NOT_REFUNDED.value
 
     def create_refund(self, *, created_by: User, notes: str = "") -> "Refund":
         return Refund.objects.create(order=self, notes=notes, created_by=created_by)

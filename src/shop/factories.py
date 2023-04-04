@@ -18,7 +18,7 @@ class ProductFactory(DjangoModelFactory):
         model = "shop.Product"
 
     name = factory.Faker("word")
-    slug = factory.Faker("word")
+    slug = factory.Faker("slug")
     category = factory.SubFactory(ProductCategoryFactory)
     description = factory.Faker("paragraph")
     price = factory.Faker("pyint")

@@ -46,11 +46,11 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
     list_filter = ("camp", "proposal_status", "user")
 
 
+@admin.display(
+    description="Speakers",
+)
 def get_speakers_string(event_proposal):
     return ", ".join(event_proposal.speakers.all().values_list("email", flat=True))
-
-
-get_speakers_string.short_description = "Speakers"
 
 
 @admin.register(EventProposal)

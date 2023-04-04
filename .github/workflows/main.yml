@@ -17,7 +17,7 @@ jobs:
 
     services:
       postgres:
-        image: postgis/postgis:10-2.5-alpine
+        image: postgis/postgis:14-3.3-alpine
         env:
           POSTGRES_USER: bornhack
           POSTGRES_PASSWORD: bornhack
