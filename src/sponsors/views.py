@@ -36,7 +36,8 @@ class AllSponsorsView(ListView):
 
         for s in sponsors:
             years = Sponsor.objects.filter(name=s["name"])
-            # score is 100 for each year minus tier weight*10, aggregated across all years
+            # sponsor score is 100 for each year, minus sponsor tier weight*20, minus 1 per year
+            # passed since the sponsorship, aggregated across all sponsorship years
             s["score"] = years.annotate(
                 # Get the year of the camp
                 camp_start=Lower(
