@@ -22,7 +22,7 @@ django-taggit==3.1.0
 django-wkhtmltopdf==3.4.0
 future==0.18.3
 html5lib==1.1
-icalendar==5.0.4
+icalendar==5.0.5
 ipython==8.12.0
 irc3==1.1.9
 lxml==4.9.2
