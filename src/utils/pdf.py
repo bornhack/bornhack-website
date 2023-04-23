@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
 from PyPDF2 import PdfFileReader
-from PyPDF2 import PdfFileWriter
+from PyPDF2 import PdfWriter
 from wkhtmltopdf.views import PDFTemplateResponse
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -33,7 +33,7 @@ def generate_pdf_letter(filename, template, formatdict):
     textonlypdf.write(pdfgenerator.rendered_content)
 
     # create a blank pdf to work with
-    finalpdf = PdfFileWriter()
+    finalpdf = PdfWriter()
 
     # open the text-only pdf
     pdfreader = PdfFileReader(textonlypdf)
