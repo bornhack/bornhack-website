@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.test.client import RequestFactory
-from PyPDF2 import PdfFileReader
+from PyPDF2 import PdfReader
 from PyPDF2 import PdfWriter
 from wkhtmltopdf.views import PDFTemplateResponse
 
@@ -36,10 +36,10 @@ def generate_pdf_letter(filename, template, formatdict):
     finalpdf = PdfWriter()
 
     # open the text-only pdf
-    pdfreader = PdfFileReader(textonlypdf)
+    pdfreader = PdfReader(textonlypdf)
 
     # get watermark from watermark file
-    watermark = PdfFileReader(
+    watermark = PdfReader(
         open(
             os.path.join(
                 settings.STATICFILES_DIRS[0],
