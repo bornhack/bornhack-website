@@ -54,12 +54,12 @@ def generate_pdf_letter(filename, template, formatdict):
     for pagenum in range(len(pdfreader.pages)):
         page = pdfreader.pages[pagenum]
         try:
-            page.mergePage(watermark.pages[0])
+            page.merge_page(watermark.pages[0])
         except ValueError:
             # watermark pdf might be broken?
             return False
         # add page to output
-        finalpdf.addPage(page)
+        finalpdf.add_page(page)
 
     # save the generated pdf to the archive
     fullpath = os.path.join(settings.PDF_ARCHIVE_PATH, filename)
