@@ -102,6 +102,12 @@ def add_outgoing_email(
     if not isinstance(to_recipients, list):
         to_recipients = [to_recipients]
 
+    if not isinstance(cc_recipients, list):
+        cc_recipients = [cc_recipients]
+
+    if not isinstance(bcc_recipients, list):
+        bcc_recipients = [bcc_recipients]
+
     # loop over recipients and validate each
     for recipient in to_recipients + cc_recipients + bcc_recipients:
         try:
