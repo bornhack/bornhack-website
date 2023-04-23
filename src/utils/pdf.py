@@ -51,7 +51,7 @@ def generate_pdf_letter(filename, template, formatdict):
     )
 
     # add the watermark to all pages
-    for pagenum in range(pdfreader.getNumPages()):
+    for pagenum in range(len(pdfreader.pages)):
         page = pdfreader.getPage(pagenum)
         try:
             page.mergePage(watermark.getPage(0))
