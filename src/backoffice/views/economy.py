@@ -1,4 +1,3 @@
-import contextlib
 import csv
 import logging
 import zipfile
@@ -1007,9 +1006,8 @@ def find_economy_entities(*, uuid: str) -> list[EconomyEntity]:
     results = []
 
     for entity_model in entity_models:
-        with contextlib.suppress(entity_model.DoesNotExist):
-            entity_results = entity_model.objects.filter(uuid__icontains=uuid)
-            results.extend(list(entity_results))
+        entity_results = entity_model.objects.filter(uuid__icontains=uuid)
+        results.extend(list(entity_results))
 
     return results
 
