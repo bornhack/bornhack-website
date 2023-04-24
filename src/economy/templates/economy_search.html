@@ -8,13 +8,21 @@
 
 {% block content %}
 
+  {% url "backoffice:economy_search" camp_slug=camp.slug as get_url %}
+
+  <label for="uuid">Search for a UUID:</label>
   <input type="text"
          id="uuid"
          name="uuid"
          placeholder="UUID"
-         value="{{ uuid }}"/>
+         value="{{ uuid }}"
+         hx-get="{{ get_url }}"
+         hx-target="#search-result"
+         hx-select="#search-result"
+         hx-push-url="true"
+         hx-trigger="keyup changed delay:500ms" />
 
-  <button hx-get="{% url "backoffice:economy_search" camp_slug=camp.slug %}"
+  <button hx-get="{{ get_url }}"
           hx-include="#uuid"
           hx-target="#search-result"
           hx-select="#search-result"
@@ -40,7 +48,7 @@
           <tr>
             <td>
               <a href="{{ entity.get_backoffice_url }}">
-                {{ entity.uuid }}
+                {{ entity.uuid|highlight_search:uuid }}
               </a>
             </td>
             <td>

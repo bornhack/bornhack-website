@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from uuid import UUID
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -70,3 +71,11 @@ def currency(value):
 @register.filter
 def model_name(value):
     return value._meta.model_name
+
+
+@register.filter
+def highlight_search(text, search):
+    if isinstance(text, UUID):
+        text = str(text)
+    highlighted = text.replace(search, f"<strong>{search}</strong>")
+    return mark_safe(highlighted)

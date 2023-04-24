@@ -1016,6 +1016,7 @@ def find_economy_entities(*, uuid: str) -> list[EconomyEntity]:
 
 def economy_search_view(request: HttpRequest, camp_slug: str) -> HttpResponse:
     uuid = request.GET.get("uuid", "")
+    uuid = uuid.strip()
     entities = find_economy_entities(uuid=uuid) if uuid else None
     context = {
         "uuid": uuid,
