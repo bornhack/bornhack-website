@@ -276,6 +276,12 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         if self.amount < 0:
             raise ValidationError("Amount of a Revenue object can not be negative")
 
+    def get_backoffice_url(self):
+        return reverse(
+            "backoffice:revenue_detail",
+            kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
+        )
+
     @property
     def invoice_filename(self):
         return os.path.basename(self.invoice.file.name)
@@ -422,6 +428,12 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         else:
             return "Rejected"
 
+    def get_backoffice_url(self):
+        return reverse(
+            "backoffice:expense_detail",
+            kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
+        )
+
     def approve(self, request):
         """
         This method marks an expense as approved.
@@ -502,6 +514,12 @@ class Reimbursement(
         default=False,
         help_text="Check when this reimbursement has been paid to the user. Do not check until the bank transfer has been fully approved.",
     )
+
+    def get_backoffice_url(self):
+        return reverse(
+            "backoffice:reimbursement_detail",
+            kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
+        )
 
     @property
     def covered_expenses(self):

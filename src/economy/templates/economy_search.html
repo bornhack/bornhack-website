@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Economy Search | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <input type="text"
+         id="uuid"
+         name="uuid"
+         placeholder="UUID"
+         value="{{ uuid }}"/>
+
+  <button hx-get="{% url "backoffice:economy_search" camp_slug=camp.slug %}"
+          hx-include="#uuid"
+          hx-target="#search-result"
+          hx-select="#search-result"
+          hx-push-url="true">
+    Search
+  </button>
+
+  <div id="search-result">
+    {% if entity %}
+      <a href="{{ entity.get_backoffice_url }}">
+        {{ entity }}
+      </a>
+    {% else %}
+      <p>No results</p>
+    {% endif %}
+  </div>
+
+{% endblock %}
