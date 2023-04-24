@@ -994,31 +994,32 @@ class AccountingExportDownloadFileView(
 EconomyEntity = Union[Expense, Revenue, Reimbursement]
 
 
-def find_economy_entity(*, uuid: str, camp_slug: str) -> EconomyEntity:
+def find_economy_entities(*, uuid: str) -> list[EconomyEntity]:
     """
     Search for economy entities with the given uuid
     """
-    entities = [
+    entity_models = [
         Expense,
         Revenue,
         Reimbursement,
     ]
 
-    for entity in entities:
-        with contextlib.suppress(entity.DoesNotExist):
-            _filter = {
-                "uuid": uuid,
-                entity.get_camp_filter_slug(): camp_slug,
-            }
-            return entity.objects.get(**_filter)
+    results = []
+
+    for entity_model in entity_models:
+        with contextlib.suppress(entity_model.DoesNotExist):
+            entity_results = entity_model.objects.filter(uuid__icontains=uuid)
+            results.extend(list(entity_results))
+
+    return results
 
 
 def economy_search_view(request: HttpRequest, camp_slug: str) -> HttpResponse:
     uuid = request.GET.get("uuid", "")
-    entity = find_economy_entity(uuid=uuid, camp_slug=camp_slug) if uuid else None
+    entities = find_economy_entities(uuid=uuid) if uuid else None
     context = {
         "uuid": uuid,
-        "entity": entity,
+        "entities": entities,
     }
 
     return render(

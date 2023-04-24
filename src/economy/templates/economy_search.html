@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load bornhack %}
 
 {% block title %}
   Economy Search | {{ block.super }}
@@ -17,15 +18,41 @@
           hx-include="#uuid"
           hx-target="#search-result"
           hx-select="#search-result"
-          hx-push-url="true">
+          hx-push-url="true"
+          class="btn btn-primary">
     Search
   </button>
 
   <div id="search-result">
-    {% if entity %}
-      <a href="{{ entity.get_backoffice_url }}">
-        {{ entity }}
-      </a>
+    {% if entities %}
+
+      <h2>Results</h2>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Entity type</th>
+            <th>Camp</th>
+          </tr>
+        </thead>
+        {% for entity in entities %}
+          <tr>
+            <td>
+              <a href="{{ entity.get_backoffice_url }}">
+                {{ entity.uuid }}
+              </a>
+            </td>
+            <td>
+              {{ entity|model_name|capfirst }}
+            </td>
+            <td>
+              {{ entity.camp }}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+
     {% else %}
       <p>No results</p>
     {% endif %}

@@ -65,3 +65,8 @@ def currency(value):
         return mark_safe(f"{Decimal(value):.2f}&nbsp;DKK")
     except ValueError:
         return False
+
+
+@register.filter
+def model_name(value):
+    return value._meta.model_name

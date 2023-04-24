@@ -112,10 +112,6 @@ class CampRelatedModel(CreatedUpdatedModel):
     def get_camp_filter(cls):
         return cls.camp_filter
 
-    @classmethod
-    def get_camp_filter_slug(cls):
-        return cls.camp_filter + "__slug"
-
 
 class OutgoingEmail(ExportModelOperationsMixin("outgoing_email"), CreatedUpdatedModel):
     """The OutgoingEmail model contains all system emails, both unsent and sent."""
