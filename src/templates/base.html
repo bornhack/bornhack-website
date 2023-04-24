@@ -34,6 +34,9 @@
     <!-- misc. bornhack javascript bits we want on all pages -->
     <script src="{% static 'js/bornhack.js' %}"></script>
 
+    <!-- htmx -->
+    <script src="{% static 'js/htmx.min.js' %}"></script>
+
     <!-- favicon.ico stuff -->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
@@ -52,7 +55,7 @@
     {% endblock %}
   </head>
 
-  <body class="no-js">
+  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% block body %}
 
       <div id="main" class="container container-fluid">

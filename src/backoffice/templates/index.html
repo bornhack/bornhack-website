@@ -199,6 +199,10 @@
 
         {% if perms.camps.economyteam_permission %}
           <h3>Economy Team</h3>
+          <a href="{% url 'backoffice:economy_search' camp_slug=camp.slug %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Search</h4>
+            <p class="list-group-item-text"></p>
+          </a>
           <a href="{% url 'backoffice:chain_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Chains</h4>
             <p class="list-group-item-text">Use this view to see the Chains and Credebtors registered in the system.</p>

@@ -2,6 +2,7 @@ import csv
 import logging
 import zipfile
 from io import StringIO
+from typing import Union
 
 import magic
 from django.contrib import messages
@@ -9,9 +10,11 @@ from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models import Sum
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -985,3 +988,41 @@ class AccountingExportDownloadFileView(
         response["Content-Disposition"] = f"attachment; filename={filename}"
         response.write(data)
         return response
+
+
+EconomyEntity = Union[Expense, Revenue, Reimbursement]
+
+
+def find_economy_entities(*, uuid: str) -> list[EconomyEntity]:
+    """
+    Search for economy entities with the given uuid
+    """
+    entity_models = [
+        Expense,
+        Revenue,
+        Reimbursement,
+    ]
+
+    results = []
+
+    for entity_model in entity_models:
+        entity_results = entity_model.objects.filter(uuid__icontains=uuid)
+        results.extend(list(entity_results))
+
+    return results
+
+
+def economy_search_view(request: HttpRequest, camp_slug: str) -> HttpResponse:
+    uuid = request.GET.get("uuid", "")
+    uuid = uuid.strip()
+    entities = find_economy_entities(uuid=uuid) if uuid else None
+    context = {
+        "uuid": uuid,
+        "entities": entities,
+    }
+
+    return render(
+        request=request,
+        template_name="economy_search.html",
+        context=context,
+    )
