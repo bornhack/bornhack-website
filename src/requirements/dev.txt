@@ -2,7 +2,7 @@
 
 django-debug-toolbar==4.0.0
 factory_boy==3.2.1
-coverage==7.2.3
+coverage==7.2.5
 black==23.3.0
 pre-commit==3.2.2
 isort==5.12.0
