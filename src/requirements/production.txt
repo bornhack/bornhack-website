@@ -23,7 +23,7 @@ django-wkhtmltopdf==3.4.0
 future==0.18.3
 html5lib==1.1
 icalendar==5.0.5
-ipython==8.12.0
+ipython==8.13.2
 irc3==1.1.10
 lxml==4.9.2
 olefile==0.46
