@@ -39,14 +39,13 @@
       <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
         <thead>
           <tr>
-            <th>Username</th>
+            <th>Email</th>
             <th>Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {% for tf in token.tokenfind_set.all %}
             <tr>
-              <td>{{ tf.user.username }}</td>
               <td>{{ tf.user.email }}</td>
               <td>{{ tf.created }}</td>
             </tr>
