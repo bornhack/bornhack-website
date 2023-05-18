@@ -7,6 +7,7 @@ from datetime import timedelta
 import factory
 import pytz
 from allauth.account.models import EmailAddress
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
@@ -15,7 +16,6 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from django.conf import settings
 from faker import Faker
 
 from camps.models import Camp
