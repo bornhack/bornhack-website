@@ -15,11 +15,11 @@ ALLOWED_HOSTS = ["*"]
 DATABASES = {
     "default": {
         "ENGINE": "django_prometheus.db.backends.postgis",
-        "NAME": os.getenv("POSTGRES_DB", "bornhack"),
-        "USER": os.getenv("POSTGRES_USER", "bornhack"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD", "bornhack"),
-        "HOST": os.getenv("POSTGRES_HOST", "localhost"),
-        "PORT": os.getenv("POSTGRES_PORT", "5432"),
+        "NAME": os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "bornhack")),
+        "USER": os.getenv("POSTGRES_USER", os.getenv("PGUSER", "bornhack")),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD", "bornhack")),
+        "HOST": os.getenv("POSTGRES_HOST", os.getenv("PGHOST", "localhost")),
+        "PORT": os.getenv("POSTGRES_PORT", os.getenv("PGPORT", "5432")),
     }
 }
 DEBUG = True
