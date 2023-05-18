@@ -214,3 +214,5 @@ OAUTH2_PROVIDER = {
     },
     "PKCE_REQUIRED": False,  # False only until https://github.com/pennersr/django-allauth/issues/2998 is resolved so BMA can use PKCE
 }
+
+UPCOMING_CAMP_YEAR = 2023

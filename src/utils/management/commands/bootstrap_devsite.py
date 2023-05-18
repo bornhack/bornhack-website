@@ -15,6 +15,7 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
+from django.conf import settings
 from faker import Faker
 
 from camps.models import Camp
@@ -2064,7 +2065,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f"----------[ Bornhack {year} ]----------"),
             )
 
-            if year < 2023:
+            if year <= settings.UPCOMING_CAMP_YEAR:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
