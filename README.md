@@ -130,6 +130,13 @@ Is this for local development? Bootstrap the database with dummy data and users:
 (venv) $ python src/manage.py bootstrap_devsite
 ```
 
+This creates some user accounts. Run the following command to see their email
+addresses and passwords.
+
+```
+(venv) $ python src/manage.py dbshell -- -c 'select email, username as password from auth_user;'
+```
+
 If you run software other than GNU/Linux or on architecture other than amd64,
 you may get an error like this.
 
