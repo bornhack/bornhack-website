@@ -84,7 +84,7 @@
                 <table class="table">
                   <thead>
                     <tr>
-                      <th>Username</th>
+                      <th>Email</th>
                       <th>Created</th>
                       <th>Facility</th>
                       <th>Quick Feedback</th>
@@ -96,7 +96,7 @@
                   <tbody>
                     {% for feedback in facility.feedbacks.all %}
                       <tr>
-                        <td>{{ feedback.user|default:"N/A" }}</td>
+                        <td>{{ feedback.user.email|default:"N/A" }}</td>
                         <td>{{ feedback.created }}</td>
                         <td>{{ feedback.facility }}</td>
                         <td><i class="{{ feedback.quick_feedback.icon }} fa-2x"></i> {{ feedback.quick_feedback }}</td>
