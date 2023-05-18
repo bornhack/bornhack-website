@@ -523,7 +523,6 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
 
     abstract = models.TextField(
         help_text="The abstract for this event. Describe what the audience can expect to see/hear.",
-        blank=True,
     )
 
     event_type = models.ForeignKey(
