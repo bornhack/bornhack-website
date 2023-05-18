@@ -43,18 +43,15 @@
                   </td>
                   <td>{{ task.completed }}</td>
                   <td>
-                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fas fa-search"></i> Details</a>
+                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-default{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-search"></i> Details</a>
                     {% if request.user in team.responsible_members.all %}
-                      <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
+                      <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-default{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
                     {% endif %}
                   </td>
                 </tr>
           {% endfor %}
         </tbody>
       </table>
-      {% if request.user in team.responsible_members.all %}
-        <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Task</a>
-      {% endif %}
     </div>
   </div>
 {% endblock %}
