@@ -15,7 +15,6 @@
         <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
           <thead>
             <tr>
-              <th>Username</th>
               <th>Email</th>
               <th>Finds</th>
             </tr>
@@ -23,7 +22,6 @@
           <tbody>
             {% for user in user_list %}
               <tr>
-                <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.token_find_count }}</td>
               </tr>
