@@ -1592,7 +1592,7 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
 
     class Meta:
         ordering = ["name"]
-        unique_together = (("camp", "name"), ("camp", "slug"))
+        unique_together = ("camp", "slug")
 
     def __str__(self):
         return f"{self.name} ({self.camp})"
