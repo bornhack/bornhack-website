@@ -67,13 +67,15 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Guest Name"
             self.fields[
                 "name"
-            ].help_text = "The name of a debate guest. Can be a real name or an alias (public)."
+            ].help_text = (
+                "The name of a debate guest. Can be a real name or an alias (public)."
+            )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Guest Email"
             self.fields[
-                    "email"
-                ].help_text = "The email for this guest. Will default to the logged-in users email if left empty (not public)."
+                "email"
+            ].help_text = "The email for this guest. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Guest Biography"
@@ -92,7 +94,9 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Speaker Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the speaker. Can be a real name or an alias (public)."
+            ].help_text = (
+                "The name of the speaker. Can be a real name or an alias (public)."
+            )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
@@ -117,7 +121,9 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Artist Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the artist. Can be a real name or artist alias (public)."
+            ].help_text = (
+                "The name of the artist. Can be a real name or artist alias (public)."
+            )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Artist Email"
@@ -127,7 +133,9 @@ class SpeakerProposalForm(forms.ModelForm):
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Artist Description"
-            self.fields["biography"].help_text = "The description of the artist (public)."
+            self.fields[
+                "biography"
+            ].help_text = "The description of the artist (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
@@ -142,7 +150,9 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Speaker Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the speaker. Can be a real name or an alias (public)."
+            ].help_text = (
+                "The name of the speaker. Can be a real name or an alias (public)."
+            )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
@@ -152,7 +162,9 @@ class SpeakerProposalForm(forms.ModelForm):
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
-            self.fields["biography"].help_text = "The biography of the speaker (public)."
+            self.fields[
+                "biography"
+            ].help_text = "The biography of the speaker (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
@@ -164,9 +176,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Host Name"
             self.fields[
                 "name"
-            ].help_text = (
-                "The name of the workshop host. Can be a real name or an alias (public)."
-            )
+            ].help_text = "The name of the workshop host. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
@@ -214,7 +224,9 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Host Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the meetup host. Can be a real name or an alias (public)."
+            ].help_text = (
+                "The name of the meetup host. Can be a real name or an alias (public)."
+            )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
