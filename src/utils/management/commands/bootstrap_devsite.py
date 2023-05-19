@@ -7,6 +7,7 @@ from datetime import timedelta
 import factory
 import pytz
 from allauth.account.models import EmailAddress
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
@@ -2064,7 +2065,7 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f"----------[ Bornhack {year} ]----------"),
             )
 
-            if year < 2023:
+            if year <= settings.UPCOMING_CAMP_YEAR:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
