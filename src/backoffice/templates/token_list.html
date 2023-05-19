@@ -19,6 +19,7 @@
             <thead>
               <tr>
                 <th>Token</th>
+                <th>Active</th>
                 <th>Category</th>
                 <th>Description</th>
                 <th>Finds</th>
@@ -29,6 +30,18 @@
               {% for token in token_list %}
                 <tr>
                   <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
+                  <td>
+                    {% if token.active %}
+                      <i class="fas fa-check text-success"></i>
+                    {% else %}
+                      <i class="fas fa-ban text-danger"></i>
+                    {% endif %}
+                    {% if token.valid_when %}
+                      <span data-toggle="tooltip" data-placement="top" title="{{ token.valid_when }}">
+                        <i class="fas fa-clock text-success"></i>
+                      </span>
+                    {% endif %}
+                  </td>
                   <td>{{ token.category }}</td>
                   <td>{{ token.description }}</td>
                   <td>{{ token.tokenfind_set.count }}</td>
