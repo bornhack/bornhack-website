@@ -3,7 +3,7 @@
   <thead>
     <tr>
       <th>Order #</th>
-      <th>User</th>
+      <th>Email</th>
       <th>Created</th>
       <th>Updated</th>
       <th>Products</th>
@@ -19,7 +19,7 @@
     {% for order in order_list %}
       <tr>
         <td>{{ order.id }}</td>
-        <td>{{ order.user.username }} &lt;{{ order.user.email }}&gt;</td>
+        <td>{{ order.user.email }}</td>
         <td data-order="{{ order.created|sortable }}">{{ order.created }}</td>
         <td data-order="{{ order.updated|sortable }}">{{ order.updated }}</td>
         <td><ul>{% for opr in order.oprs.all %}<li>{{ opr.product.name }} ({{ opr.quantity }}){% endfor %}</ul></td>

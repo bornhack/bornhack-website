@@ -22,7 +22,6 @@
       <thead>
         <tr>
           <th>Order</th>
-          <th>User</th>
           <th>Email</th>
           <th>OPR Id</th>
           <th>Product</th>
@@ -33,7 +32,6 @@
         {% for productrel in orderproductrelation_list %}
           <tr>
             <td><a href="/admin/shop/order/{{ productrel.order.id }}/change/">Order #{{ productrel.order.id }}</a></td>
-            <td>{{ productrel.order.user }}</td>
             <td>{{ productrel.order.user.email }}</td>
             <td>{{ productrel.id }}</td>
             <td>{{ productrel.product.name }}</td>

@@ -19,7 +19,7 @@
         <tr>
           <td>{{ revenue.pk }}</td>
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
-          <td>{{ revenue.user }}</td>
+          <td>{{ revenue.user.email }}</td>
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
           <td>{{ revenue.description }}</td>
