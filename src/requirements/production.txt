@@ -10,7 +10,7 @@ django-allauth==0.54.0
 django-allauth-2fa==0.10.0
 django-bleach==3.0.1
 django-bootstrap3==23.1
-django-cors-headers==3.14.0
+django-cors-headers==4.0.0
 django-extensions==3.2.1
 django-filter==23.2
 django-leaflet==0.28.3
