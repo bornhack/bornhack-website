@@ -67,22 +67,22 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Guest Name"
             self.fields[
                 "name"
-            ].help_text = "The name of a debate guest. Can be a real name or an alias (Public)."
+            ].help_text = "The name of a debate guest. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Guest Email"
             self.fields[
-                "email"
-            ].help_text = "The email for this guest. Will default to the logged-in users email if left empty (Not public)."
+                    "email"
+                ].help_text = "The email for this guest. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Guest Biography"
-            self.fields["biography"].help_text = "The biography of the guest (Public)."
+            self.fields["biography"].help_text = "The biography of the guest (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this guest (Not public)."
+            ].help_text = "Private notes regarding this guest (not public)."
 
             # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
@@ -92,22 +92,22 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Speaker Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the speaker. Can be a real name or an alias (Public)."
+            ].help_text = "The name of the speaker. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
             self.fields[
                 "email"
-            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty. (Not public)"
+            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty. (not public)"
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
-            self.fields["biography"].help_text = "The biography of the speaker (Public)"
+            self.fields["biography"].help_text = "The biography of the speaker (public)"
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this speaker (Not public)."
+            ].help_text = "Private notes regarding this speaker (not public)."
 
             # no free tickets for lightning talks
             del self.fields["needs_oneday_ticket"]
@@ -117,22 +117,22 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Artist Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the artist. Can be a real name or artist alias (Public)."
+            ].help_text = "The name of the artist. Can be a real name or artist alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Artist Email"
             self.fields[
                 "email"
-            ].help_text = "The email for this artist. Will default to the logged-in users email if left empty (Not public)."
+            ].help_text = "The email for this artist. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Artist Description"
-            self.fields["biography"].help_text = "The description of the artist (Public)."
+            self.fields["biography"].help_text = "The description of the artist (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this artist (Not public)."
+            ].help_text = "Private notes regarding this artist (not public)."
 
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
@@ -142,22 +142,22 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Speaker Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the speaker. Can be a real name or an alias (Public)."
+            ].help_text = "The name of the speaker. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
             self.fields[
                 "email"
-            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty (Not public)."
+            ].help_text = "The email for this speaker. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
-            self.fields["biography"].help_text = "The biography of the speaker (Public)."
+            self.fields["biography"].help_text = "The biography of the speaker (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this speaker (Not public)"
+            ].help_text = "Private notes regarding this speaker (not public)"
 
         elif event_type.name == "Workshop":
             # fix label and help_text for the name field
@@ -165,23 +165,23 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields[
                 "name"
             ].help_text = (
-                "The name of the workshop host. Can be a real name or an alias (Public)."
+                "The name of the workshop host. Can be a real name or an alias (public)."
             )
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
             self.fields[
                 "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (Not public)."
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host (Public)."
+            self.fields["biography"].help_text = "The biography of the host (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this host (Not public)."
+            ].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
@@ -189,22 +189,22 @@ class SpeakerProposalForm(forms.ModelForm):
         elif event_type.name == "Recreational Event":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
-            self.fields["name"].help_text = "Can be a real name or an alias (Public)."
+            self.fields["name"].help_text = "Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
             self.fields[
                 "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (Not public)."
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
-            self.fields["biography"].help_text = "The biography of the host (Public)."
+            self.fields["biography"].help_text = "The biography of the host (public)."
 
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this host (Not public)."
+            ].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for recreational events
             del self.fields["needs_oneday_ticket"]
@@ -214,13 +214,13 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["name"].label = "Host Name"
             self.fields[
                 "name"
-            ].help_text = "The name of the meetup host. Can be a real name or an alias (Public)."
+            ].help_text = "The name of the meetup host. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
             self.fields[
                 "email"
-            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (Not public)."
+            ].help_text = "The email for the host. Will default to the logged-in users email if left empty (not public)."
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
@@ -229,7 +229,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the submission_notes field
             self.fields[
                 "submission_notes"
-            ].help_text = "Private notes regarding this host (Not public)."
+            ].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
