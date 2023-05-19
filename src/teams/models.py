@@ -96,7 +96,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         null=True,
         unique=True,
         max_length=1000,
-        help_text="The private Signal group for this team. Will be shown to team members on the team page. Leave empty if the team has no Signal group."
+        help_text="The private Signal group for this team. Will be shown to team members on the team page. Leave empty if the team has no Signal group.",
     )
 
     # IRC related fields
