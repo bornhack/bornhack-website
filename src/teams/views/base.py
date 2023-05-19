@@ -61,6 +61,7 @@ class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     fields = [
         "description",
         "needs_members",
+        "signal_group",
         "public_irc_channel_name",
         "public_irc_channel_bot",
         "public_irc_channel_managed",

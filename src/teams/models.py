@@ -91,6 +91,14 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         help_text="Check if the mailinglist allows non-list-members to post",
     )
 
+    signal_group = models.CharField(
+        blank=True,
+        null=True,
+        unique=True,
+        max_length=1000,
+        help_text="The private Signal group for this team. Will be shown to team members on the team page. Leave empty if the team has no Signal group."
+    )
+
     # IRC related fields
     public_irc_channel_name = models.CharField(
         blank=True,
