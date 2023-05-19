@@ -31,16 +31,16 @@
                 <tr>
                   <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
                   <td>
-                      {% if token.active %}
+                    {% if token.active %}
                       <i class="fas fa-check text-success"></i>
-                      {% else %}
+                    {% else %}
                       <i class="fas fa-ban text-danger"></i>
-                      {% endif %}
-                      {% if token.valid_when %}
+                    {% endif %}
+                    {% if token.valid_when %}
                       <span data-toggle="tooltip" data-placement="top" title="{{ token.valid_when }}">
-                          <i class="fas fa-clock text-success"></i>
+                        <i class="fas fa-clock text-success"></i>
                       </span>
-                      {% endif %}
+                    {% endif %}
                   </td>
                   <td>{{ token.category }}</td>
                   <td>{{ token.description }}</td>
