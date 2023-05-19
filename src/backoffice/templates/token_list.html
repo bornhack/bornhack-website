@@ -36,6 +36,9 @@
                       {% else %}
                       <i class="fas fa-ban text-danger"></i>
                       {% endif %}
+                      {% if token.valid_when %}
+                      <i class="fas fa-clock"></i>
+                      {% endif %}
                   </td>
                   <td>{{ token.category }}</td>
                   <td>{{ token.description }}</td>
