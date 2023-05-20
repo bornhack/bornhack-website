@@ -321,6 +321,12 @@ body.bar-menu {
   width: 300px;
 }
 
+@media (min-width: 600px) {
+    .event-table-tags {
+        width: 20%;
+    }
+}
+
 .team-guide-markdown
 {
     background-color: #f9f9f9;
