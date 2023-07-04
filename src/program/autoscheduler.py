@@ -197,7 +197,7 @@ class AutoScheduler:
                         s
                         for s in self.autoslots
                         if not self.autoslots.index(s) in available
-                    ]
+                    ],
                 )
 
         return autoevents, autoeventindex

@@ -187,7 +187,9 @@ def save_speaker_availability(form, obj):
         if fieldcounter == 1:
             # we only have one field in the form, no field merging to be done
             AvailabilityModel.objects.create(
-                when=daychunk, available=available, **kwargs
+                when=daychunk,
+                available=available,
+                **kwargs,
             )
             continue
 
@@ -220,7 +222,9 @@ def save_speaker_availability(form, obj):
     # save the last chunk?
     if formerchunk:
         AvailabilityModel.objects.create(
-            when=formerchunk, available=available, **kwargs
+            when=formerchunk,
+            available=available,
+            **kwargs,
         )
 
 
