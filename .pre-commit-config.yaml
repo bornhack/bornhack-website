@@ -18,7 +18,7 @@ repos:
       - id: mixed-line-ending
         args: [--fix=lf]
   - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.9.0
+    rev: v3.10.0
     hooks:
       - id: reorder-python-imports
         args:
@@ -34,27 +34,27 @@ repos:
       - id: python-no-log-warn
       - id: rst-backticks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.4.0
+    rev: v3.8.0
     hooks:
       - id: pyupgrade
         args:
           - --py39-plus
         exclude: migrations/
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.13.0
+    rev: 1.14.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
   - repo: https://github.com/asottile/yesqa
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       -   id: yesqa
   - repo: https://github.com/asottile/add-trailing-comma
-    rev: v2.4.0
+    rev: v3.0.0
     hooks:
       -   id: add-trailing-comma
   - repo: https://github.com/hadialqattan/pycln
-    rev: v2.1.3
+    rev: v2.1.5
     hooks:
       -   id: pycln
   - repo: https://github.com/psf/black
