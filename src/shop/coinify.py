@@ -138,7 +138,9 @@ def create_coinify_invoice(order, request):
 
     # perform the API request
     apireq = coinify_api_request(
-        api_method="invoice_create", order=order, **invoicedict
+        api_method="invoice_create",
+        order=order,
+        **invoicedict,
     )
 
     coinifyinvoice = handle_coinify_api_response(apireq, order, request)

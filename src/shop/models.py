@@ -736,7 +736,7 @@ class OrderProductRelation(
                 # For this ticket type we create a ticket per item,
                 # find out if any have already been created
                 already_created_tickets = self.shoptickets.filter(
-                    **query_kwargs
+                    **query_kwargs,
                 ).count()
 
                 # find out how many we need to create
