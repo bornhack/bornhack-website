@@ -29,7 +29,7 @@ lxml==4.9.2
 olefile==0.46
 openpyxl==3.1.2
 pandas==2.0.1
-pipdeptree==2.7.1
+pipdeptree==2.9.4
 psycopg2-binary==2.9.6
 pyOpenSSL==23.1.1
 PyPDF2==3.0.1
