@@ -23,9 +23,9 @@
             <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>
             </a>
           </td>
-          <td class="text-center">
+          <td class="text-center event-table-tags">
             {% for tag in event.tags.all %}
-              <span class="badge">{{ tag }}</span><br>
+              <span class="badge">{{ tag }}</span>
             {% empty %}
               N/A
             {% endfor %}
