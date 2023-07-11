@@ -31,7 +31,7 @@ openpyxl==3.1.2
 pandas==2.0.1
 pipdeptree==2.7.1
 psycopg2-binary==2.9.6
-pyOpenSSL==23.1.1
+pyOpenSSL==23.2.0
 PyPDF2==3.0.1
 python-magic==0.4.27
 quickpay-api-client==2.0.1
