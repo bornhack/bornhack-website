@@ -635,7 +635,6 @@ class TicketTypeProductRelation(
     ExportModelOperationsMixin("ticket_type_product_relation"),
     CreatedUpdatedModel,
 ):
-
     ticket_type = models.ForeignKey(
         "tickets.TicketType",
         related_name="ttprs",
@@ -645,7 +644,6 @@ class TicketTypeProductRelation(
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
 
     number_of_tickets = models.IntegerField(default=1)
-
 
 
 class OrderProductRelationQuerySet(models.QuerySet):
