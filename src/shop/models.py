@@ -642,7 +642,11 @@ class TicketTypeProductRelation(
         on_delete=models.PROTECT,
     )
 
-    product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
+    product = models.ForeignKey(
+        "shop.Product",
+        related_name="ttprs",
+        on_delete=models.PROTECT,
+    )
 
     number_of_tickets = models.IntegerField(default=1)
 
@@ -735,7 +739,8 @@ class OrderProductRelation(
             if not self.product.ticket_types:
                 return tickets
 
-            for ticket_type in self.product.ticket_types.all():
+            for ticket_type_relation in self.product.ttprs.all():
+                ticket_type = ticket_type_relation.ticket_type
                 # put reusable kwargs together
                 query_kwargs = {
                     "product": self.product,
@@ -745,6 +750,9 @@ class OrderProductRelation(
                 if ticket_type.single_ticket_per_product:
                     # For this ticket type we create one ticket regardless of quantity,
                     # so 20 chairs don't result in 20 tickets
+
+                    # TODO: do ticket_type_relation.number_of_tickets times
+
                     ticket, created = self.shoptickets.get_or_create(**query_kwargs)
 
                     if request:
@@ -762,15 +770,26 @@ class OrderProductRelation(
                     ).count()
 
                     # find out how many we need to create
-                    tickets_to_create = max(
-                        0,
-                        self.quantity
-                        - already_created_tickets
-                        - (
-                            self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
-                            or 0
-                        ),
+                    # TODO: currently we multiply by ticket_type_relation.number_of_tickets
+                    #       this is because we have no way of discerning multiple tickets
+                    #       created based on ticket_type_relation.number_of_tickets or order_product_relation.quantity.
+                    #       Seen from the ticket creation perspective these two numbers have the same function.
+                    #       There is no difference between ordering 5 x <product of 1 ticket> and 1 x <product of 5 tickets>.
+                    tickets_to_create = (
+                        max(
+                            0,
+                            self.quantity
+                            - already_created_tickets
+                            - (
+                                self.rprs.aggregate(models.Sum("quantity"))[
+                                    "quantity__sum"
+                                ]
+                                or 0
+                            ),
+                        )
+                        * ticket_type_relation.number_of_tickets
                     )
+
                     if not tickets_to_create:
                         return tickets
 
