@@ -535,7 +535,8 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
 
     ticket_types = models.ManyToManyField(
         "tickets.TicketType",
-        through="shop.ProductTicketTypeRelation",
+        through="shop.TicketTypeProductRelation",
+        related_name="+",  # todo: temporary
     )
 
     stock_amount = models.IntegerField(
@@ -730,8 +731,8 @@ class OrderProductRelation(
         """
         tickets = []
         with transaction.atomic():
-            # do we evem generate tickets for this type of product?
-            if not self.product.ticket_type:
+            # do we even generate tickets for this type of product?
+            if not self.product.ticket_types:
                 return tickets
 
             # put reusable kwargs together
