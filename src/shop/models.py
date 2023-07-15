@@ -533,6 +533,11 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         blank=True,
     )
 
+    ticket_types = models.ManyToManyField(
+        "tickets.TicketType",
+        through="shop.ProductTicketTypeRelation",
+    )
+
     stock_amount = models.IntegerField(
         help_text=(
             "Initial amount available in stock if there is a limited "
@@ -624,6 +629,23 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
             return stock_available
         # If there is no stock defined the product is generally available.
         return True
+
+
+class TicketTypeProductRelation(
+    ExportModelOperationsMixin("ticket_type_product_relation"),
+    CreatedUpdatedModel,
+):
+
+    ticket_type = models.ForeignKey(
+        "tickets.TicketType",
+        related_name="ttprs",
+        on_delete=models.PROTECT,
+    )
+
+    product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
+
+    number_of_tickets = models.IntegerField(default=1)
+
 
 
 class OrderProductRelationQuerySet(models.QuerySet):
