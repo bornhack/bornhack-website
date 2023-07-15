@@ -7,6 +7,7 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
+from .factories import TicketTypeProductRelationFactory
 from .models import RefundEnum
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
@@ -387,12 +388,22 @@ class TestOrderListView(TestCase):
 
 
 class TestTicketCreation(TestCase):
+
+    """
+    This test case tests that the logic behind ticket creation from products is sane.
+
+    """
+
     def test_multiple_tickets_created(self):
         user = UserFactory()
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
-        product = ProductFactory(ticket_type=ticket_type)
+
+        product = ProductFactory()
+        TicketTypeProductRelationFactory(product=product, ticket_type=ticket_type)
+
         order = OrderFactory(user=user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
+
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=product, opr__order=order).count(),
@@ -402,9 +413,13 @@ class TestTicketCreation(TestCase):
     def test_single_ticket_created(self):
         user = UserFactory()
         ticket_type = TicketTypeFactory(single_ticket_per_product=True)
-        product = ProductFactory(ticket_type=ticket_type)
+
+        product = ProductFactory()
+        TicketTypeProductRelationFactory(product=product, ticket_type=ticket_type)
+
         order = OrderFactory(user=user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
+
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=product, opr__order=order).count(),

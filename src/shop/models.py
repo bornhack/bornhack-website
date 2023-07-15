@@ -735,56 +735,58 @@ class OrderProductRelation(
             if not self.product.ticket_types:
                 return tickets
 
-            # put reusable kwargs together
-            query_kwargs = {
-                "product": self.product,
-                "ticket_type": self.product.ticket_type,
-            }
+            for ticket_type in self.product.ticket_types.all():
+                # put reusable kwargs together
+                query_kwargs = {
+                    "product": self.product,
+                    "ticket_type": ticket_type,
+                }
 
-            if self.product.ticket_type.single_ticket_per_product:
-                # For this ticket type we create one ticket regardless of quantity,
-                # so 20 chairs don't result in 20 tickets
-                ticket, created = self.shoptickets.get_or_create(**query_kwargs)
+                if ticket_type.single_ticket_per_product:
+                    # For this ticket type we create one ticket regardless of quantity,
+                    # so 20 chairs don't result in 20 tickets
+                    ticket, created = self.shoptickets.get_or_create(**query_kwargs)
 
-                if request:
-                    if created:
-                        msg = f"Created ticket for product {self.product} on order {self.order} (quantity: {self.quantity})"
+                    if request:
+                        if created:
+                            msg = f"Created ticket for product {self.product} on order {self.order} (quantity: {self.quantity})"
+                            tickets.append(ticket)
+                        else:
+                            msg = f"Ticket already exists for product {self.product} on order {self.order} (quantity: {self.quantity})"
+                            messages.success(request, msg)
+                else:
+                    # For this ticket type we create a ticket per item,
+                    # find out if any have already been created
+                    already_created_tickets = self.shoptickets.filter(
+                        **query_kwargs,
+                    ).count()
+
+                    # find out how many we need to create
+                    tickets_to_create = max(
+                        0,
+                        self.quantity
+                        - already_created_tickets
+                        - (
+                            self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
+                            or 0
+                        ),
+                    )
+                    if not tickets_to_create:
+                        return tickets
+
+                    # create the number of tickets required
+                    for _i in range(tickets_to_create):
+                        ticket = self.shoptickets.create(**query_kwargs)
                         tickets.append(ticket)
-                    else:
-                        msg = f"Ticket already exists for product {self.product} on order {self.order} (quantity: {self.quantity})"
+
+                    if request:
+                        msg = f"Created {self.quantity} tickets of type: {ticket_type.name}"
                         messages.success(request, msg)
-            else:
-                # For this ticket type we create a ticket per item,
-                # find out if any have already been created
-                already_created_tickets = self.shoptickets.filter(
-                    **query_kwargs,
-                ).count()
 
-                # find out how many we need to create
-                tickets_to_create = max(
-                    0,
-                    self.quantity
-                    - already_created_tickets
-                    - (
-                        self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
-                        or 0
-                    ),
-                )
-                if not tickets_to_create:
-                    return tickets
+                # and mark the OPR as ticket_generated=True
+                self.ticket_generated = timezone.now()
+                self.save()
 
-                # create the number of tickets required
-                for _i in range(tickets_to_create):
-                    ticket = self.shoptickets.create(**query_kwargs)
-                    tickets.append(ticket)
-
-                if request:
-                    msg = f"Created {self.quantity} tickets of type: {self.product.ticket_type.name}"
-                    messages.success(request, msg)
-
-            # and mark the OPR as ticket_generated=True
-            self.ticket_generated = timezone.now()
-            self.save()
             return tickets
 
     @property
