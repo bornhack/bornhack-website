@@ -469,12 +469,15 @@ class TestTicketCreation(TestCase):
         """
         # Define a product
         product = ProductFactory()
+        sub_product_1 = ProductFactory()
+        sub_product_2 = ProductFactory()
 
         ticket_type_1 = TicketTypeFactory()
         TicketTypeProductRelationFactory(
             product=product,
             ticket_type=ticket_type_1,
             number_of_tickets=5,
+            ticket_product=sub_product_1,
         )
 
         ticket_type_2 = TicketTypeFactory()
@@ -482,6 +485,7 @@ class TestTicketCreation(TestCase):
             product=product,
             ticket_type=ticket_type_2,
             number_of_tickets=1,
+            ticket_product=sub_product_2,
         )
 
         # Create an order
@@ -493,25 +497,12 @@ class TestTicketCreation(TestCase):
         order.mark_as_paid()
 
         self.assertEqual(
-            ShopTicket.objects.filter(product=product, opr__order=order).count(),
-            6,
-        )
-
-        self.assertEqual(
-            ShopTicket.objects.filter(
-                product=product,
-                opr__order=order,
-                ticket_type=ticket_type_1,
-            ).count(),
+            ShopTicket.objects.filter(product=sub_product_1, opr__order=order).count(),
             5,
         )
 
         self.assertEqual(
-            ShopTicket.objects.filter(
-                product=product,
-                opr__order=order,
-                ticket_type=ticket_type_2,
-            ).count(),
+            ShopTicket.objects.filter(product=sub_product_2, opr__order=order).count(),
             1,
         )
 

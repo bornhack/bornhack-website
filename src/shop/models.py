@@ -541,6 +541,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     ticket_types = models.ManyToManyField(
         "tickets.TicketType",
         through="shop.TicketTypeProductRelation",
+        through_fields=("product", "ticket_type"),
         related_name="+",  # todo: temporary
     )
 
@@ -647,6 +648,8 @@ class TicketTypeProductRelation(
         on_delete=models.PROTECT,
     )
 
+    # TODO: Should we call this `shop_product` to indicate that it
+    #       is what product will be used in the shop?
     product = models.ForeignKey(
         "shop.Product",
         related_name="ttprs",
@@ -654,6 +657,15 @@ class TicketTypeProductRelation(
     )
 
     number_of_tickets = models.IntegerField(default=1)
+
+    ticket_product = models.ForeignKey(
+        "shop.Product",
+        help_text="What product should tickets created from this TicketTypeProductRelation point at.",
+        related_name="+",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )
 
 
 class OrderProductRelationQuerySet(models.QuerySet):
@@ -748,7 +760,7 @@ class OrderProductRelation(
                 ticket_type = ticket_type_relation.ticket_type
                 # put reusable kwargs together
                 query_kwargs = {
-                    "product": self.product,
+                    "product": ticket_type_relation.ticket_product or self.product,
                     "ticket_type": ticket_type,
                 }
 

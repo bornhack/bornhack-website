@@ -43,6 +43,17 @@ class Migration(migrations.Migration):
                         to="tickets.tickettype",
                     ),
                 ),
+                (
+                    "ticket_product",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="+",
+                        to="shop.product",
+                        help_text="What product should tickets created from this TicketTypeProductRelation point at.",
+                        null=True,
+                        blank=True,
+                    ),
+                ),
             ],
             options={
                 "abstract": False,
@@ -60,6 +71,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 related_name="+",
                 through="shop.TicketTypeProductRelation",
+                through_fields=("product", "ticket_type"),
                 to="tickets.tickettype",
             ),
         ),
