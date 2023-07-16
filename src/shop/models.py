@@ -419,6 +419,11 @@ class RefundProductRelation(CreatedUpdatedModel):
         on_delete=models.PROTECT,
     )
 
+    ticket_type = models.ForeignKey(
+        "tickets.TicketType",
+        on_delete=models.PROTECT,
+    )
+
     quantity = models.PositiveIntegerField(
         help_text="The number of times this product is being refunded in this Refund",
     )
