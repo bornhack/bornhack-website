@@ -3,6 +3,7 @@ from datetime import timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import chain
+from typing import Optional
 
 from django.conf import settings
 from django.contrib import messages
@@ -18,6 +19,7 @@ from django.db.models import Sum
 from django.db.models import Value
 from django.db.models import When
 from django.db.models.functions import Coalesce
+from django.http import HttpRequest
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -419,11 +421,6 @@ class RefundProductRelation(CreatedUpdatedModel):
         on_delete=models.PROTECT,
     )
 
-    ticket_type = models.ForeignKey(
-        "tickets.TicketType",
-        on_delete=models.PROTECT,
-    )
-
     quantity = models.PositiveIntegerField(
         help_text="The number of times this product is being refunded in this Refund",
     )
@@ -538,10 +535,11 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         blank=True,
     )
 
-    ticket_types = models.ManyToManyField(
-        "tickets.TicketType",
-        through="shop.TicketTypeProductRelation",
-        through_fields=("product", "ticket_type"),
+    sub_products = models.ManyToManyField(
+        "self",
+        through="shop.SubProductRelation",
+        through_fields=("container_product", "sub_product"),
+        symmetrical=False,
         related_name="+",  # todo: temporary
     )
 
@@ -638,34 +636,23 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         return True
 
 
-class TicketTypeProductRelation(
-    ExportModelOperationsMixin("ticket_type_product_relation"),
+class SubProductRelation(
+    ExportModelOperationsMixin("sub_product_relation"),
     CreatedUpdatedModel,
 ):
-    ticket_type = models.ForeignKey(
-        "tickets.TicketType",
-        related_name="ttprs",
+    container_product = models.ForeignKey(
+        "shop.Product",
+        related_name="sub_product_relations",
         on_delete=models.PROTECT,
     )
 
-    # TODO: Should we call this `shop_product` to indicate that it
-    #       is what product will be used in the shop?
-    product = models.ForeignKey(
+    sub_product = models.ForeignKey(
         "shop.Product",
-        related_name="ttprs",
         on_delete=models.PROTECT,
+        related_name="container_product_relations",
     )
 
     number_of_tickets = models.IntegerField(default=1)
-
-    ticket_product = models.ForeignKey(
-        "shop.Product",
-        help_text="What product should tickets created from this TicketTypeProductRelation point at.",
-        related_name="+",
-        on_delete=models.PROTECT,
-        null=True,
-        blank=True,
-    )
 
 
 class OrderProductRelationQuerySet(models.QuerySet):
@@ -739,7 +726,7 @@ class OrderProductRelation(
         """Returns the total price for this OPR considering quantity."""
         return Decimal(self.product.price * self.quantity)
 
-    def create_tickets(self, request=None):
+    def create_tickets(self, request: Optional[HttpRequest] = None):
         """This method generates the needed tickets for this OPR.
 
         We run this in a transaction so everything is undone in case something fails,
@@ -750,78 +737,87 @@ class OrderProductRelation(
         Calling this method multiple times will not result in duplicate tickets being created,
         and the number of tickets created takes the number of refunded into consideration too.
         """
+
+        def create_ticket(product: Product, number_of_tickets: int = 1):
+            if not product.ticket_type:
+                return
+
+            # put reusable kwargs together
+            query_kwargs = {
+                "product": product,
+                "ticket_type": product.ticket_type,
+            }
+
+            if product.ticket_type.single_ticket_per_product:
+                # For this ticket type we create one ticket regardless of quantity,
+                # so 20 chairs don't result in 20 tickets
+
+                ticket, created = self.shoptickets.get_or_create(**query_kwargs)
+
+                if request:
+                    if created:
+                        msg = (
+                            f"Created ticket for product {self.product} on "
+                            f"order {self.order} (quantity: {self.quantity})"
+                        )
+                        tickets.append(ticket)
+                    else:
+                        msg = (
+                            f"Ticket already exists for product {self.product} on "
+                            f"order {self.order} (quantity: {number_of_tickets})"
+                        )
+                    messages.success(request, msg)
+            else:
+                # For this ticket type we create a ticket per item,
+                # find out if any have already been created
+                already_created_tickets = self.shoptickets.filter(
+                    **query_kwargs,
+                ).count()
+
+                # find out how many we need to create
+                tickets_to_create = max(
+                    0,
+                    number_of_tickets
+                    - already_created_tickets
+                    - (
+                        self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
+                        or 0
+                    ),
+                )
+
+                if not tickets_to_create:
+                    return tickets
+
+                # create the number of tickets required
+                for _i in range(tickets_to_create):
+                    ticket = self.shoptickets.create(**query_kwargs)
+                    tickets.append(ticket)
+
+                if request:
+                    msg = f"Created {number_of_tickets} tickets of type: {product.ticket_type.name}"
+                    messages.success(request, msg)
+
         tickets = []
         with transaction.atomic():
             # do we even generate tickets for this type of product?
-            if not self.product.ticket_types:
+            sub_products = self.product.sub_product_relations.all()
+            if not self.product.ticket_type and not sub_products:
                 return tickets
 
-            for ticket_type_relation in self.product.ttprs.all():
-                ticket_type = ticket_type_relation.ticket_type
-                # put reusable kwargs together
-                query_kwargs = {
-                    "product": ticket_type_relation.ticket_product or self.product,
-                    "ticket_type": ticket_type,
-                }
-
-                if ticket_type.single_ticket_per_product:
-                    # For this ticket type we create one ticket regardless of quantity,
-                    # so 20 chairs don't result in 20 tickets
-
-                    # TODO: do ticket_type_relation.number_of_tickets times
-
-                    ticket, created = self.shoptickets.get_or_create(**query_kwargs)
-
-                    if request:
-                        if created:
-                            msg = f"Created ticket for product {self.product} on order {self.order} (quantity: {self.quantity})"
-                            tickets.append(ticket)
-                        else:
-                            msg = f"Ticket already exists for product {self.product} on order {self.order} (quantity: {self.quantity})"
-                            messages.success(request, msg)
-                else:
-                    # For this ticket type we create a ticket per item,
-                    # find out if any have already been created
-                    already_created_tickets = self.shoptickets.filter(
-                        **query_kwargs,
-                    ).count()
-
-                    # find out how many we need to create
-                    # TODO: currently we multiply by ticket_type_relation.number_of_tickets
-                    #       this is because we have no way of discerning multiple tickets
-                    #       created based on ticket_type_relation.number_of_tickets or order_product_relation.quantity.
-                    #       Seen from the ticket creation perspective these two numbers have the same function.
-                    #       There is no difference between ordering 5 x <product of 1 ticket> and 1 x <product of 5 tickets>.
-                    tickets_to_create = (
-                        max(
-                            0,
-                            self.quantity
-                            - already_created_tickets
-                            - (
-                                self.rprs.aggregate(models.Sum("quantity"))[
-                                    "quantity__sum"
-                                ]
-                                or 0
-                            ),
-                        )
-                        * ticket_type_relation.number_of_tickets
+            if sub_products:
+                # Iterate over all ticket types that are related to this product
+                for sub_product in sub_products:
+                    create_ticket(
+                        sub_product.sub_product,
+                        sub_product.number_of_tickets,
                     )
+            else:
+                # If there are no sub products, we just create a ticket for the product
+                create_ticket(self.product, self.quantity)
 
-                    if not tickets_to_create:
-                        return tickets
-
-                    # create the number of tickets required
-                    for _i in range(tickets_to_create):
-                        ticket = self.shoptickets.create(**query_kwargs)
-                        tickets.append(ticket)
-
-                    if request:
-                        msg = f"Created {self.quantity} tickets of type: {ticket_type.name}"
-                        messages.success(request, msg)
-
-                # and mark the OPR as ticket_generated=True
-                self.ticket_generated = timezone.now()
-                self.save()
+            # and mark the OPR as ticket_generated=True
+            self.ticket_generated = timezone.now()
+            self.save()
 
             return tickets
 
@@ -831,6 +827,9 @@ class OrderProductRelation(
 
     @property
     def unused_shoptickets(self):
+        if self.product.sub_products.exists():
+            return self.shoptickets.filter(used_at__isnull=True).first()
+
         return self.shoptickets.filter(used_at__isnull=True)
 
     @property
@@ -842,7 +841,15 @@ class OrderProductRelation(
         return self.rprs.aggregate(refunded=Sum("quantity"))["refunded"] or 0
 
     @property
-    def possible_refund(self):
+    def possible_refund(self) -> int:
+        """
+        Returns the number of tickets that can be refunded for this OPR.
+        """
+
+        # If the product has sub products, we can only refund the entire product
+        if self.product.sub_products.exists():
+            return 1  # TODO: This does not take into account if the sub products have been used
+
         quantity = (
             1 if self.product.ticket_type.single_ticket_per_product else self.quantity
         )

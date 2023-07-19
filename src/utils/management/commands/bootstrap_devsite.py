@@ -769,6 +769,10 @@ class Command(BaseCommand):
             name="Facilities",
             slug="facilities",
         )
+        categories["packages"] = ProductCategory.objects.create(
+            name="Packages",
+            slug="packages",
+        )
 
         return categories
 
@@ -852,6 +856,25 @@ class Command(BaseCommand):
                 ).values_list("slug", flat=True),
             ),
             ticket_type=ticket_types["adult_full_week"],
+        )
+
+        name = f"{camp_prefix} One day ticket"
+        products["one_day_ticket"] = Product.objects.create(
+            name=name,
+            description="One day ticket",
+            price=300,
+            category=categories["tickets"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["tickets"],
+                ).values_list("slug", flat=True),
+            ),
+            ticket_type=ticket_types["adult_one_day"],
         )
 
         name = f"{camp_prefix} Village tent 3x3 meters, no floor"
@@ -966,6 +989,42 @@ class Command(BaseCommand):
                 ).values_list("slug", flat=True),
             ),
             ticket_type=ticket_types["facilities"],
+        )
+
+        name = "Corporate Hackers Small"
+        products["corporate_hackers_small"] = Product.objects.create(
+            name=name,
+            description="Send your company to BornHack 2023 in style with one of our corporate packages!",
+            price=18000,
+            category=categories["packages"],
+            available_in=(
+                tz.localize(datetime(year, 1, 1, 12, 0)),
+                tz.localize(datetime(year, 12, 20, 12, 0)),
+            ),
+            slug=unique_slugify(
+                name,
+                slugs_in_use=Product.objects.filter(
+                    category=categories["packages"],
+                ).values_list("slug", flat=True),
+            ),
+        )
+        products["corporate_hackers_small"].sub_products.add(
+            products["ticket1"],
+            through_defaults={
+                "number_of_tickets": 3,
+            },
+        )
+        products["corporate_hackers_small"].sub_products.add(
+            products["one_day_ticket"],
+            through_defaults={
+                "number_of_tickets": 3,
+            },
+        )
+        products["corporate_hackers_small"].sub_products.add(
+            products["tent2"],
+            through_defaults={
+                "number_of_tickets": 1,
+            },
         )
 
         return products

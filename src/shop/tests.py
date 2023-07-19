@@ -7,7 +7,6 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
-from .factories import TicketTypeProductRelationFactory
 from .models import RefundEnum
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
@@ -388,29 +387,15 @@ class TestOrderListView(TestCase):
 
 
 class TestTicketCreation(TestCase):
-
-    """
-    This test case tests that the logic behind ticket creation from products is sane.
-    """
-
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
 
     def test_multiple_tickets_created(self):
-        """
-        Test that when a TicketType has single_ticket_per_product set to False
-        multiple tickets are created.
-        """
-
-        product = ProductFactory()
-
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
-        TicketTypeProductRelationFactory(product=product, ticket_type=ticket_type)
-
+        product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=self.user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
-
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=product, opr__order=order).count(),
@@ -418,91 +403,47 @@ class TestTicketCreation(TestCase):
         )
 
     def test_single_ticket_created(self):
-        """
-        Test that when a TicketType has single_ticket_per_product set to True
-        only a single ticket is created.
-        """
-
-        product = ProductFactory()
-
         ticket_type = TicketTypeFactory(single_ticket_per_product=True)
-        TicketTypeProductRelationFactory(product=product, ticket_type=ticket_type)
-
+        product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=self.user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
-
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=product, opr__order=order).count(),
             1,
         )
 
-    def test_ttpr_number_of_tickets(self):
-        """
-        Test that when a TicketTypeProductRelation has number_of_tickets > 1
-        that number of tickets are created.
-        """
-
-        product = ProductFactory()
-
-        ticket_type = TicketTypeFactory()
-        TicketTypeProductRelationFactory(
-            product=product,
-            ticket_type=ticket_type,
-            number_of_tickets=2,
+    def test_sub_products_created_sub_product_single_ticket_per_product_false(self):
+        container_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(single_ticket_per_product=False),
         )
-
+        container_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
         order = OrderFactory(user=self.user)
-        OrderProductRelationFactory(order=order, product=product, quantity=1)
-
+        OrderProductRelationFactory(order=order, product=container_product, quantity=1)
         order.mark_as_paid()
-
         self.assertEqual(
-            ShopTicket.objects.filter(product=product, opr__order=order).count(),
-            2,
-        )
-
-    def test_multiple_ticket_types(self):
-        """
-        Test that when an Order has multiple TicketTypeProductRelations
-        that tickets are generated correctly.
-        """
-        # Define a product
-        product = ProductFactory()
-        sub_product_1 = ProductFactory()
-        sub_product_2 = ProductFactory()
-
-        ticket_type_1 = TicketTypeFactory()
-        TicketTypeProductRelationFactory(
-            product=product,
-            ticket_type=ticket_type_1,
-            number_of_tickets=5,
-            ticket_product=sub_product_1,
-        )
-
-        ticket_type_2 = TicketTypeFactory()
-        TicketTypeProductRelationFactory(
-            product=product,
-            ticket_type=ticket_type_2,
-            number_of_tickets=1,
-            ticket_product=sub_product_2,
-        )
-
-        # Create an order
-        order = OrderFactory(user=self.user)
-
-        # Add the product to the shopping cart
-        OrderProductRelationFactory(order=order, product=product, quantity=1)
-
-        order.mark_as_paid()
-
-        self.assertEqual(
-            ShopTicket.objects.filter(product=sub_product_1, opr__order=order).count(),
+            ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
             5,
         )
 
+    def test_sub_products_created_sub_product_single_ticket_per_product_true(self):
+        container_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(single_ticket_per_product=True),
+        )
+        container_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
+        order = OrderFactory(user=self.user)
+        OrderProductRelationFactory(order=order, product=container_product, quantity=1)
+        order.mark_as_paid()
         self.assertEqual(
-            ShopTicket.objects.filter(product=sub_product_2, opr__order=order).count(),
+            ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
             1,
         )
 
@@ -524,8 +465,7 @@ class TestOrderProductRelationModel(TestCase):
         user = UserFactory()
         info_user = UserFactory(username="info")
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
-        product = ProductFactory()
-        TicketTypeProductRelationFactory(product=product, ticket_type=ticket_type)
+        product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=user)
         opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
         opr.create_tickets()

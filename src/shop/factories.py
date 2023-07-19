@@ -46,10 +46,10 @@ class OrderProductRelationFactory(DjangoModelFactory):
     quantity = 1
 
 
-class TicketTypeProductRelationFactory(DjangoModelFactory):
+class SubProductRelationFactory(DjangoModelFactory):
     class Meta:
-        model = "shop.TicketTypeProductRelation"
+        model = "shop.SubProductRelation"
 
-    product = factory.SubFactory(ProductFactory)
-    ticket_type = factory.SubFactory("tickets.TicketTypeFactory")
+    container_product = factory.SubFactory(ProductFactory)
+    sub_product = factory.SubFactory(ProductFactory)
     number_of_tickets = 1
