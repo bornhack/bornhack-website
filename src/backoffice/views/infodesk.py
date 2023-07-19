@@ -16,6 +16,7 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
+from ..forms import ShopTicketRefundForm
 from ..forms import ShopTicketRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
@@ -307,10 +308,18 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         self.object = self.get_object()
 
     def get_context_data(self, **kwargs):
-        kwargs["oprs"] = {
-            opr: ShopTicketRefundFormSet(queryset=opr.unused_shoptickets, prefix=opr.id)
-            for opr in self.get_object().oprs.all()
-        }
+        kwargs["oprs"] = {}
+        for opr in self.get_object().oprs.all():
+            if opr.product.sub_products.exists():
+                opr.has_subproducts = True
+                kwargs["oprs"][opr] = ShopTicketRefundForm(
+                    instance=opr.unused_shoptickets.first(),
+                )
+            else:
+                kwargs["oprs"][opr] = ShopTicketRefundFormSet(
+                    queryset=opr.unused_shoptickets,
+                    prefix=opr.id,
+                )
         kwargs["refund_form"] = RefundForm()
         return super().get_context_data(**kwargs)
 
@@ -322,6 +331,22 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
             .select_for_update()
         )
 
+        def add_ticket_to_refund_from_form(form):
+            refund = form.cleaned_data["refund"]
+            ticket: ShopTicket = form.cleaned_data["uuid"]
+            if refund:
+                if ticket.container_product:
+                    # Ticket has container product, refund all tickets in container
+                    for _ticket in opr.shoptickets.all():
+                        tickets_to_delete.append(_ticket.pk)
+                else:
+                    tickets_to_delete.append(ticket.pk)
+
+                if opr in opr_dict:
+                    opr_dict[opr] += 1
+                else:
+                    opr_dict[opr] = 1
+
         opr_dict = {}
         tickets_to_delete = []
         with transaction.atomic():
@@ -329,27 +354,27 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                 # Do not include fully refunded oprs
                 if not opr.possible_refund:
                     continue
-                ticket_formset = ShopTicketRefundFormSet(
-                    request.POST,
-                    queryset=opr.unused_shoptickets,
-                    prefix=opr.id,
-                )
-                if not ticket_formset.is_valid():
-                    messages.error(
-                        request,
-                        "Some error!",
+
+                if opr.product.sub_products.exists():
+                    ticket_form = ShopTicketRefundForm(request.POST, prefix=opr.id)
+                    if ticket_form.is_valid():
+                        add_ticket_to_refund_from_form(ticket_form)
+                else:
+                    ticket_formset = ShopTicketRefundFormSet(
+                        request.POST,
+                        queryset=opr.unused_shoptickets,
+                        prefix=opr.id,
                     )
-                    return self.get(request, *args, **kwargs)
+
+                    if not ticket_formset.is_valid():
+                        messages.error(
+                            request,
+                            "Some error!",
+                        )
+                        return self.get(request, *args, **kwargs)
 
                 for form in ticket_formset:
-                    refund = form.cleaned_data["refund"]
-                    ticket: ShopTicket = form.cleaned_data["uuid"]
-                    if refund:
-                        tickets_to_delete.append(ticket.pk)
-                        if opr in opr_dict:
-                            opr_dict[opr] += 1
-                        else:
-                            opr_dict[opr] = 1
+                    add_ticket_to_refund_from_form(form)
 
             refund_form = RefundForm(request.POST)
 

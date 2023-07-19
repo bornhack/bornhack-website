@@ -240,6 +240,14 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
 
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
 
+    container_product = models.ForeignKey(
+        "shop.Product",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
     name = models.CharField(
         max_length=100,
         help_text=(

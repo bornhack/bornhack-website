@@ -540,7 +540,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         through="shop.SubProductRelation",
         through_fields=("container_product", "sub_product"),
         symmetrical=False,
-        related_name="+",  # todo: temporary
+        related_name="+",
     )
 
     stock_amount = models.IntegerField(
@@ -679,7 +679,6 @@ class OrderProductRelationQuerySet(models.QuerySet):
         )
 
     def not_fully_refunded(self):
-        print(self.with_refunded())
         return self.with_refunded().exclude(refunded=RefundEnum.FULLY_REFUNDED.value)
 
     def not_cancelled(self):
@@ -738,7 +737,12 @@ class OrderProductRelation(
         and the number of tickets created takes the number of refunded into consideration too.
         """
 
-        def create_ticket(product: Product, number_of_tickets: int = 1):
+        def create_ticket(
+            *,
+            product: Product,
+            number_of_tickets: int = 1,
+            container_product: Optional[Product] = None,
+        ):
             if not product.ticket_type:
                 return
 
@@ -747,6 +751,9 @@ class OrderProductRelation(
                 "product": product,
                 "ticket_type": product.ticket_type,
             }
+
+            if container_product:
+                query_kwargs["container_product"] = container_product
 
             if product.ticket_type.single_ticket_per_product:
                 # For this ticket type we create one ticket regardless of quantity,
@@ -800,20 +807,21 @@ class OrderProductRelation(
         tickets = []
         with transaction.atomic():
             # do we even generate tickets for this type of product?
-            sub_products = self.product.sub_product_relations.all()
-            if not self.product.ticket_type and not sub_products:
+            sub_product_relations = self.product.sub_product_relations.all()
+            if not self.product.ticket_type and not sub_product_relations:
                 return tickets
 
-            if sub_products:
+            if sub_product_relations:
                 # Iterate over all ticket types that are related to this product
-                for sub_product in sub_products:
+                for sub_product_relation in sub_product_relations:
                     create_ticket(
-                        sub_product.sub_product,
-                        sub_product.number_of_tickets,
+                        product=sub_product_relation.sub_product,
+                        number_of_tickets=sub_product_relation.number_of_tickets,
+                        container_product=self.product,
                     )
             else:
                 # If there are no sub products, we just create a ticket for the product
-                create_ticket(self.product, self.quantity)
+                create_ticket(product=self.product, number_of_tickets=self.quantity)
 
             # and mark the OPR as ticket_generated=True
             self.ticket_generated = timezone.now()
@@ -823,12 +831,23 @@ class OrderProductRelation(
 
     @property
     def used_shoptickets(self):
+        if self.product.sub_products.exists():
+            tickets = self.shoptickets.filter(
+                container_product=self.product,
+                used_at__isnull=False,
+            )
+            print(tickets)
+            return tickets
+
         return self.shoptickets.filter(used_at__isnull=False)
 
     @property
     def unused_shoptickets(self):
         if self.product.sub_products.exists():
-            return self.shoptickets.filter(used_at__isnull=True).first()
+            return self.shoptickets.filter(
+                container_product=self.product,
+                used_at__isnull=True,
+            )
 
         return self.shoptickets.filter(used_at__isnull=True)
 
@@ -848,7 +867,9 @@ class OrderProductRelation(
 
         # If the product has sub products, we can only refund the entire product
         if self.product.sub_products.exists():
-            return 1  # TODO: This does not take into account if the sub products have been used
+            # We can only refund the entire product, so no tickets should be used
+            has_used_tickets = self.used_tickets_count > 0
+            return 0 if has_used_tickets else 1
 
         quantity = (
             1 if self.product.ticket_type.single_ticket_per_product else self.quantity

@@ -29,6 +29,14 @@
             <tr>
               <td>
                 {{ opr.product }}
+                {% if opr.has_subproducts %}
+                  {% for subproduct in opr.product.sub_product_relations.all %}
+                    <br>
+                    <small>
+                      {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
+                    </small>
+                  {% endfor %}
+                {% endif %}
               </td>
 
               <td>
@@ -54,10 +62,15 @@
                 {% if opr.possible_refund == 0 %}
                   No refund possible
                 {% else %}
-                  {{ formset.management_form }}
-                  {% for form in formset %}
-                    {{ form.as_p }}
-                  {% endfor %}
+                  {% if opr.has_subproducts %}
+                    {{ formset.as_p }}
+                    <input type="hidden" name="uuid" value="{{ formset.instance.uuid }}" />
+                  {% else %}
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                      {{ form.as_p }}
+                    {% endfor %}
+                  {% endif %}
                 {% endif %}
               </td>
             </tr>
