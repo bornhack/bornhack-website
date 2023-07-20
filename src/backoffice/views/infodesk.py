@@ -312,9 +312,17 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         for opr in self.get_object().oprs.all():
             if opr.product.sub_products.exists():
                 opr.has_subproducts = True
+
+                try:
+                    form_kwargs = {"uuid": opr.unused_shoptickets.first().uuid}
+                except AttributeError:
+                    form_kwargs = {}
+
                 kwargs["oprs"][opr] = ShopTicketRefundForm(
                     instance=opr.unused_shoptickets.first(),
+                    data=form_kwargs,
                 )
+
             else:
                 kwargs["oprs"][opr] = ShopTicketRefundFormSet(
                     queryset=opr.unused_shoptickets,
@@ -334,6 +342,8 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
         def add_ticket_to_refund_from_form(form):
             refund = form.cleaned_data["refund"]
             ticket: ShopTicket = form.cleaned_data["uuid"]
+            if isinstance(ticket, str):
+                ticket = ShopTicket.objects.get(uuid=ticket)
             if refund:
                 if ticket.container_product:
                     # Ticket has container product, refund all tickets in container
@@ -356,9 +366,16 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                     continue
 
                 if opr.product.sub_products.exists():
-                    ticket_form = ShopTicketRefundForm(request.POST, prefix=opr.id)
-                    if ticket_form.is_valid():
-                        add_ticket_to_refund_from_form(ticket_form)
+                    try:
+                        ticket = opr.shoptickets.get(uuid=request.POST.get("uuid"))
+                        ticket_form = ShopTicketRefundForm(
+                            instance=ticket,
+                            data=request.POST,
+                        )
+                        if ticket_form.is_valid():
+                            add_ticket_to_refund_from_form(ticket_form)
+                    except ShopTicket.DoesNotExist:
+                        pass
                 else:
                     ticket_formset = ShopTicketRefundFormSet(
                         request.POST,
@@ -373,8 +390,8 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                         )
                         return self.get(request, *args, **kwargs)
 
-                for form in ticket_formset:
-                    add_ticket_to_refund_from_form(form)
+                    for form in ticket_formset:
+                        add_ticket_to_refund_from_form(form)
 
             refund_form = RefundForm(request.POST)
 

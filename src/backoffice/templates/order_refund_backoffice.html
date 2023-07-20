@@ -64,7 +64,6 @@
                 {% else %}
                   {% if opr.has_subproducts %}
                     {{ formset.as_p }}
-                    <input type="hidden" name="uuid" value="{{ formset.instance.uuid }}" />
                   {% else %}
                     {{ formset.management_form }}
                     {% for form in formset %}

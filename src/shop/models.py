@@ -868,8 +868,12 @@ class OrderProductRelation(
         # If the product has sub products, we can only refund the entire product
         if self.product.sub_products.exists():
             # We can only refund the entire product, so no tickets should be used
+            # TODO: What if the quantity is above 1? Ie. 2 packages of tickets
+            #       - then we should be able to refund the package that has not been used.
+            #       Or should we disallow orders with more than one package?
             has_used_tickets = self.used_tickets_count > 0
-            return 0 if has_used_tickets else 1
+            is_refunded = self.refunded_quantity == self.quantity
+            return 0 if has_used_tickets or is_refunded else 1
 
         quantity = (
             1 if self.product.ticket_type.single_ticket_per_product else self.quantity
