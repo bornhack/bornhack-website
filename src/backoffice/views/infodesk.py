@@ -328,6 +328,7 @@ class OrderRefundView(
                     kwargs["ticket_groups"][ticket_group] = ShopTicketRefundForm(
                         instance=ticket,
                         data=form_kwargs,
+                        show_label=False,
                     )
 
             else:

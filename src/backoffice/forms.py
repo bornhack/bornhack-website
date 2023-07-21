@@ -171,9 +171,10 @@ class ShopTicketRefundForm(forms.ModelForm):
     refund = forms.BooleanField(required=False)
     uuid = forms.CharField(widget=forms.HiddenInput(), required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, show_label: bool = True, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["refund"].label = self.instance.name or "Unnamed ticket"
+        if show_label:
+            self.fields["refund"].label = self.instance.name or "Unnamed ticket"
 
 
 ShopTicketRefundFormSet = modelformset_factory(
