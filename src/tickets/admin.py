@@ -74,11 +74,29 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "email",
     ]
 
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .with_quantity()
+            .select_related(
+                "ticket_type",
+                "ticket_type__camp",
+                "product",
+                "product__ticket_type__camp",
+                "bundle_product",
+            )
+        )
+
     @admin.display(
         description="Quantity",
     )
     def product_quantity(self, ticket):
         return str(ticket.opr.quantity)
+
+    def generate_pdf(self, request, queryset):
+        for ticket in queryset.with_quantity().all():
+            ticket.generate_pdf()
 
 
 class ShopTicketInline(admin.TabularInline):

@@ -44,7 +44,9 @@
                                 <td>
                                   {{ ticket.product.name }}
                                   <td>
-                                    {% if ticket.ticket_type.single_ticket_per_product %}{{ ticket.opr.quantity }} &times; {% endif %}
+                                    {% if ticket.ticket_type.single_ticket_per_product %}
+                                      {{ ticket.quantity }} &times;
+                                    {% endif %}
                                     {{ ticket.product.price|currency }}
                                     <td>
                                       {% if ticket.used_at %}

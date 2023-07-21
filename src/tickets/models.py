@@ -16,6 +16,7 @@ from django.db.models import ExpressionWrapper
 from django.db.models import F
 from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import QuerySet
 from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import Value
@@ -188,15 +189,13 @@ class BaseTicket(CampRelatedModel, UUIDModel):
             qr_code_base64(self._get_badge_token()).decode("utf-8"),
         )
 
+    def get_pdf_formatdict(self):
+        return {"ticket": self}
+
     def generate_pdf(self):
-        formatdict = {"ticket": self}
-
-        if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
-            formatdict["quantity"] = self.get_quantity()
-
         return generate_pdf_letter(
             filename=f"{self.shortname}_ticket_{self.pk}.pdf",
-            formatdict=formatdict,
+            formatdict=self.get_pdf_formatdict(),
             template="pdf/ticket.html",
         )
 
@@ -244,6 +243,39 @@ class TicketGroup(ExportModelOperationsMixin("ticket_group"), UUIDModel):
 
 
 class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
+    class QuerySet(QuerySet):
+        def with_quantity(self):
+            """Annotate the quantity of tickets for each ticket.
+
+            If the ticket is a bundle ticket, the quantity is the number of tickets in the bundle.
+            If the ticket is not a bundle ticket, the quantity is the quantity of the order product relation.
+            """
+            from shop.models import SubProductRelation
+
+            sub_product_relation_sub_query = SubProductRelation.objects.filter(
+                bundle_product=OuterRef("bundle_product"),
+                sub_product=OuterRef("product"),
+            )
+            return self.annotate(
+                quantity=Case(
+                    When(
+                        bundle_product__isnull=True,
+                        then=F("opr__quantity"),
+                    ),
+                    When(
+                        bundle_product__isnull=False,
+                        then=Subquery(
+                            sub_product_relation_sub_query.values("number_of_tickets")[
+                                :1
+                            ],
+                        ),
+                    ),
+                    default=Value(1),
+                ),
+            )
+
+    objects = QuerySet.as_manager()
+
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
         related_name="shoptickets",
@@ -307,13 +339,11 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     def order(self):
         return self.opr.order
 
-    def get_quantity(self):
-        if self.bundle_product:
-            return self.bundle_product.sub_product_relations.get(
-                product=self.product,
-            ).number_of_tickets
-
-        return self.opr.quantity
+    def get_pdf_formatdict(self):
+        formatdict = super().get_pdf_formatdict()
+        if self.ticket_type.single_ticket_per_product and hasattr(self, "quantity"):
+            formatdict["quantity"] = self.quantity
+        return formatdict
 
 
 TicketTypeUnion = Union[ShopTicket, SponsorTicket, DiscountTicket]

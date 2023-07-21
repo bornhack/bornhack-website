@@ -1026,6 +1026,12 @@ class Command(BaseCommand):
                 "number_of_tickets": 1,
             },
         )
+        products["corporate_hackers_small"].sub_products.add(
+            products["hax"],
+            through_defaults={
+                "number_of_tickets": 25,
+            },
+        )
 
         return products
 

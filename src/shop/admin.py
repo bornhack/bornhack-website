@@ -114,10 +114,11 @@ class ProductAdmin(admin.ModelAdmin):
         available_to,
     ]
 
-    list_editable = ["ticket_type"]
     list_filter = ["category", "ticket_type"]
     search_fields = ["name"]
     save_as = True
+
+    list_select_related = ["ticket_type", "category", "ticket_type__camp"]
 
     inlines = [SubProductInline]
 
