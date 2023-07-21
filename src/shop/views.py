@@ -150,11 +150,15 @@ class ShopIndexView(ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.available().order_by(
-            "category__weight",
-            "category__name",
-            "price",
-            "name",
+        return (
+            queryset.available()
+            .annotate_subproducts()
+            .order_by(
+                "category__weight",
+                "category__name",
+                "price",
+                "name",
+            )
         )
 
     def get_context_data(self, **kwargs):
@@ -189,6 +193,9 @@ class ProductDetailView(FormView, DetailView):
     template_name = "product_detail.html"
     form_class = OrderProductRelationForm
     context_object_name = "product"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("sub_products")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

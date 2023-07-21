@@ -78,6 +78,12 @@
                   </dev>
                 {% endif %}
 
+                {% if product.has_subproducts %}
+                  <div class="label label-info" style="margin-left: 1em;"><!-- We can replace the style when we upgrade to Bootstrap 5. -->
+                    Bundle
+                  </div>
+                {% endif %}
+
               </td>
               <td>
                 <div class="pull-right">

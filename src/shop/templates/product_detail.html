@@ -23,6 +23,19 @@
         {{ product.price|currency }}<br />
       </h3>
 
+      {% if product.sub_products %}
+        <hr />
+        <h3>
+          Bundle!
+        </h3>
+        This bundle contains:<br />
+        {% for sub_product_relation in product.sub_product_relations.all %}
+          {{ sub_product_relation.number_of_tickets }} x <a href="{% url 'shop:product_detail' slug=sub_product_relation.sub_product.slug %}">
+            {{ sub_product_relation.sub_product.name }}
+          </a><br />
+        {% endfor %}
+      {% endif  %}
+
       <hr />
 
       {% if product.stock_amount and product.is_time_available %}
