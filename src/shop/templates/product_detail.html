@@ -23,7 +23,7 @@
         {{ product.price|currency }}<br />
       </h3>
 
-      {% if product.sub_products %}
+      {% if product.sub_product_relations.all %}
         <hr />
         <h3>
           Bundle!

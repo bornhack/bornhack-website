@@ -36,6 +36,7 @@ from shop.models import Product
 from shop.models import ProductCategory
 from shop.models import QuickPayAPICallback
 from shop.models import QuickPayAPIObject
+from utils.mixins import GetObjectMixin
 from vendor.coinify.coinify_callback import CoinifyCallback
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -152,6 +153,7 @@ class ShopIndexView(ListView):
         queryset = super().get_queryset()
         return (
             queryset.available()
+            .select_related("category")
             .annotate_subproducts()
             .order_by(
                 "category__weight",
@@ -188,14 +190,18 @@ class ShopIndexView(ListView):
         return context
 
 
-class ProductDetailView(FormView, DetailView):
+class ProductDetailView(GetObjectMixin, FormView, DetailView):
     model = Product
     template_name = "product_detail.html"
     form_class = OrderProductRelationForm
     context_object_name = "product"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("sub_products")
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("sub_product_relations__sub_product")
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -216,8 +222,6 @@ class ProductDetailView(FormView, DetailView):
         return super().get_context_data(**kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
         if not self.object.category.public:
             # this product is not publicly available
             raise Http404("Product not found")
@@ -272,6 +276,7 @@ class OrderListView(LoginRequiredMixin, ListView):
 
 
 class OrderDetailView(
+    GetObjectMixin,
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
     EnsureOrderHasProductsMixin,
@@ -318,7 +323,6 @@ class OrderDetailView(
         Then the user is redirected either back to the order page or to the
         payment page, depending on which submit button was pressed.
         """
-        self.object = self.get_object()
         order = self.object
 
         # First check if the user is removing a product from the order.
@@ -376,6 +380,7 @@ class OrderDetailView(
 
 
 class OrderReviewAndPayView(
+    GetObjectMixin,
     LoginRequiredMixin,
     EnsureUserOwnsOrderMixin,
     EnsureOrderHasProductsMixin,
@@ -387,7 +392,6 @@ class OrderReviewAndPayView(
     context_object_name = "order"
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
         order = self.object
 
         payment_method = request.POST.get("payment_method")

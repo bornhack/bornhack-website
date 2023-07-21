@@ -45,6 +45,7 @@ from .utils import get_speaker_availability_form_matrix
 from .utils import save_speaker_availability
 from camps.mixins import CampViewMixin
 from utils.middleware import RedirectException
+from utils.mixins import GetObjectMixin
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -1306,6 +1307,7 @@ class UrlUpdateView(
 
 
 class UrlDeleteView(
+    GetObjectMixin,
     LoginRequiredMixin,
     CampViewMixin,
     EnsureWritableCampMixin,
@@ -1352,7 +1354,6 @@ class UrlDeleteView(
                     % self.speaker_proposal.name,
                 )
 
-        self.object = self.get_object()
         self.object.delete()
         messages.success(self.request, "URL deleted.")
 

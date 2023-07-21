@@ -32,6 +32,7 @@ from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
 from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
+from utils.mixins import GetObjectMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -298,14 +299,15 @@ class RefundUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
         return reverse("backoffice:refund_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
+class OrderRefundView(
+    GetObjectMixin,
+    CampViewMixin,
+    InfoTeamPermissionMixin,
+    DetailView,
+):
     model = Order
     template_name = "order_refund_backoffice.html"
     pk_url_kwarg = "order_id"
-
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.object = self.get_object()
 
     def get_context_data(self, **kwargs):
         kwargs["oprs"] = {}
