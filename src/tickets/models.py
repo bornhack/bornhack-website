@@ -192,7 +192,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
         formatdict = {"ticket": self}
 
         if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
-            formatdict["quantity"] = self.opr.quantity
+            formatdict["quantity"] = self.get_quantity()
 
         return generate_pdf_letter(
             filename=f"{self.shortname}_ticket_{self.pk}.pdf",
@@ -306,6 +306,14 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     @property
     def order(self):
         return self.opr.order
+
+    def get_quantity(self):
+        if self.container_product:
+            return self.container_product.sub_product_relations.get(
+                product=self.product,
+            ).number_of_tickets
+
+        return self.opr.quantity
 
 
 TicketTypeUnion = Union[ShopTicket, SponsorTicket, DiscountTicket]
