@@ -422,16 +422,16 @@ class TestTicketCreation(TestCase):
         )
 
     def test_sub_products_created_sub_product_single_ticket_per_product_false(self):
-        container_product = ProductFactory()
+        bundle_product = ProductFactory()
         sub_product = ProductFactory(
             ticket_type=TicketTypeFactory(single_ticket_per_product=False),
         )
-        container_product.sub_products.add(
+        bundle_product.sub_products.add(
             sub_product,
             through_defaults={"number_of_tickets": 5},
         )
         order = OrderFactory(user=self.user)
-        OrderProductRelationFactory(order=order, product=container_product, quantity=1)
+        OrderProductRelationFactory(order=order, product=bundle_product, quantity=1)
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
@@ -439,16 +439,16 @@ class TestTicketCreation(TestCase):
         )
 
     def test_sub_products_created_sub_product_single_ticket_per_product_true(self):
-        container_product = ProductFactory()
+        bundle_product = ProductFactory()
         sub_product = ProductFactory(
             ticket_type=TicketTypeFactory(single_ticket_per_product=True),
         )
-        container_product.sub_products.add(
+        bundle_product.sub_products.add(
             sub_product,
             through_defaults={"number_of_tickets": 5},
         )
         order = OrderFactory(user=self.user)
-        OrderProductRelationFactory(order=order, product=container_product, quantity=1)
+        OrderProductRelationFactory(order=order, product=bundle_product, quantity=1)
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
@@ -503,7 +503,7 @@ class TestRefund(TestCase):
     user: User
     info_user: User
     order: Order
-    container_product: Product
+    bundle_product: Product
     sub_product: Product
     opr1: OrderProductRelation
     opr2: OrderProductRelation
@@ -520,10 +520,10 @@ class TestRefund(TestCase):
 
         cls.camp = CampFactory()
 
-        cls.container_product = ProductFactory()
+        cls.bundle_product = ProductFactory()
         cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
         SubProductRelationFactory(
-            container_product=cls.container_product,
+            bundle_product=cls.bundle_product,
             sub_product=cls.sub_product,
             number_of_tickets=3,
         )
@@ -534,7 +534,7 @@ class TestRefund(TestCase):
         cls.opr3 = OrderProductRelationFactory(order=cls.order, quantity=10)
         cls.opr4 = OrderProductRelationFactory(
             order=cls.order,
-            product=cls.container_product,
+            product=cls.bundle_product,
             quantity=2,
         )
         cls.order.mark_as_paid()

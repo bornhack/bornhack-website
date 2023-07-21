@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="shopticket",
-            name="container_product",
+            name="bundle_product",
             field=models.ForeignKey(
                 blank=True,
                 null=True,

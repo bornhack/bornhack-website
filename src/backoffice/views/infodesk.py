@@ -350,8 +350,8 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
             if isinstance(ticket, str):
                 ticket = ShopTicket.objects.get(uuid=ticket)
             if refund:
-                if ticket.container_product:
-                    # Ticket has container product, refund all tickets in container
+                if ticket.bundle_product:
+                    # Ticket is part of a bundle product, refund all tickets in bundle
                     for _ticket in opr.shoptickets.filter(
                         ticket_group=ticket.ticket_group,
                     ):

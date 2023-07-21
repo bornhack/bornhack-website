@@ -99,7 +99,7 @@ def stock_info(product):
 
 class SubProductInline(admin.TabularInline):
     model = SubProductRelation
-    fk_name = "container_product"
+    fk_name = "bundle_product"
 
 
 @admin.register(Product)

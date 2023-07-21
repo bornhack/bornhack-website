@@ -50,6 +50,6 @@ class SubProductRelationFactory(DjangoModelFactory):
     class Meta:
         model = "shop.SubProductRelation"
 
-    container_product = factory.SubFactory(ProductFactory)
+    bundle_product = factory.SubFactory(ProductFactory)
     sub_product = factory.SubFactory(ProductFactory)
     number_of_tickets = 1

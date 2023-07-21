@@ -540,7 +540,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     sub_products = models.ManyToManyField(
         "self",
         through="shop.SubProductRelation",
-        through_fields=("container_product", "sub_product"),
+        through_fields=("bundle_product", "sub_product"),
         symmetrical=False,
         related_name="+",
     )
@@ -642,7 +642,7 @@ class SubProductRelation(
     ExportModelOperationsMixin("sub_product_relation"),
     CreatedUpdatedModel,
 ):
-    container_product = models.ForeignKey(
+    bundle_product = models.ForeignKey(
         "shop.Product",
         related_name="sub_product_relations",
         on_delete=models.PROTECT,
@@ -651,7 +651,7 @@ class SubProductRelation(
     sub_product = models.ForeignKey(
         "shop.Product",
         on_delete=models.PROTECT,
-        related_name="container_product_relations",
+        related_name="bundle_product_relations",
     )
 
     number_of_tickets = models.IntegerField(default=1)
@@ -732,7 +732,7 @@ class OrderProductRelation(
         *,
         product: Product,
         number_of_tickets: int = 1,
-        container_product: Optional[Product] = None,
+        bundle_product: Optional[Product] = None,
         ticket_group: Optional[TicketGroup] = None,
         request: Optional[HttpRequest] = None,
     ) -> list[ShopTicket]:
@@ -745,8 +745,8 @@ class OrderProductRelation(
             "ticket_type": product.ticket_type,
         }
 
-        if container_product:
-            query_kwargs["container_product"] = container_product
+        if bundle_product:
+            query_kwargs["bundle_product"] = bundle_product
 
         if ticket_group:
             query_kwargs["ticket_group"] = ticket_group
@@ -833,7 +833,7 @@ class OrderProductRelation(
                     for sub_product_relation in sub_product_relations:
                         new_tickets = self._create_tickets_helper(
                             product=sub_product_relation.sub_product,
-                            container_product=self.product,
+                            bundle_product=self.product,
                             number_of_tickets=sub_product_relation.number_of_tickets,
                             ticket_group=ticket_group,
                             request=request,
@@ -858,7 +858,7 @@ class OrderProductRelation(
     def used_shoptickets(self):
         if self.product.sub_products.exists():
             tickets = self.shoptickets.filter(
-                container_product=self.product,
+                bundle_product=self.product,
                 used_at__isnull=False,
             )
             return tickets
@@ -869,7 +869,7 @@ class OrderProductRelation(
     def unused_shoptickets(self):
         if self.product.sub_products.exists():
             return self.shoptickets.filter(
-                container_product=self.product,
+                bundle_product=self.product,
                 used_at__isnull=True,
             )
 

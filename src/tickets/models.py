@@ -252,7 +252,7 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
 
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
 
-    container_product = models.ForeignKey(
+    bundle_product = models.ForeignKey(
         "shop.Product",
         on_delete=models.PROTECT,
         null=True,
@@ -308,8 +308,8 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         return self.opr.order
 
     def get_quantity(self):
-        if self.container_product:
-            return self.container_product.sub_product_relations.get(
+        if self.bundle_product:
+            return self.bundle_product.sub_product_relations.get(
                 product=self.product,
             ).number_of_tickets
 

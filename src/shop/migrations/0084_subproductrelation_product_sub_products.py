@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(auto_now=True)),
                 ("number_of_tickets", models.IntegerField(default=1)),
                 (
-                    "container_product",
+                    "bundle_product",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
                         related_name="sub_product_relations",
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                     "sub_product",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.PROTECT,
-                        related_name="container_product_relations",
+                        related_name="bundle_product_relations",
                         to="shop.product",
                     ),
                 ),
