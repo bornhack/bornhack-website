@@ -309,19 +309,24 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         kwargs["oprs"] = {}
+        kwargs["ticket_groups"] = {}
         for opr in self.get_object().oprs.all():
             if opr.product.sub_products.exists():
                 opr.has_subproducts = True
 
-                try:
-                    form_kwargs = {"uuid": opr.unused_shoptickets.first().uuid}
-                except AttributeError:
-                    form_kwargs = {}
+                for ticket_group in opr.ticketgroups.all():
+                    ticket = opr.unused_shoptickets.filter(
+                        ticket_group=ticket_group,
+                    ).first()
 
-                kwargs["oprs"][opr] = ShopTicketRefundForm(
-                    instance=opr.unused_shoptickets.first(),
-                    data=form_kwargs,
-                )
+                    form_kwargs = {}
+                    if ticket:
+                        form_kwargs["uuid"] = ticket.uuid
+
+                    kwargs["ticket_groups"][ticket_group] = ShopTicketRefundForm(
+                        instance=ticket,
+                        data=form_kwargs,
+                    )
 
             else:
                 kwargs["oprs"][opr] = ShopTicketRefundFormSet(
@@ -347,7 +352,9 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
             if refund:
                 if ticket.container_product:
                     # Ticket has container product, refund all tickets in container
-                    for _ticket in opr.shoptickets.all():
+                    for _ticket in opr.shoptickets.filter(
+                        ticket_group=ticket.ticket_group,
+                    ):
                         tickets_to_delete.append(_ticket.pk)
                 else:
                     tickets_to_delete.append(ticket.pk)

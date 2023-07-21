@@ -29,6 +29,7 @@ from unidecode import unidecode
 
 from .managers import OrderQuerySet
 from .managers import ProductQuerySet
+from tickets.models import TicketGroup
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
@@ -742,6 +743,7 @@ class OrderProductRelation(
             product: Product,
             number_of_tickets: int = 1,
             container_product: Optional[Product] = None,
+            ticket_group: Optional[TicketGroup] = None,
         ):
             if not product.ticket_type:
                 return
@@ -754,6 +756,9 @@ class OrderProductRelation(
 
             if container_product:
                 query_kwargs["container_product"] = container_product
+
+            if ticket_group:
+                query_kwargs["ticket_group"] = ticket_group
 
             if product.ticket_type.single_ticket_per_product:
                 # For this ticket type we create one ticket regardless of quantity,
@@ -812,13 +817,19 @@ class OrderProductRelation(
                 return tickets
 
             if sub_product_relations:
-                # Iterate over all ticket types that are related to this product
-                for sub_product_relation in sub_product_relations:
-                    create_ticket(
-                        product=sub_product_relation.sub_product,
-                        number_of_tickets=sub_product_relation.number_of_tickets,
-                        container_product=self.product,
-                    )
+                # For each bought product we create a ticket for each sub product
+                for _i in range(self.quantity):
+                    # Iterate over all ticket types that are related to this product
+
+                    ticket_group = TicketGroup.objects.create(opr=self)
+
+                    for sub_product_relation in sub_product_relations:
+                        create_ticket(
+                            product=sub_product_relation.sub_product,
+                            container_product=self.product,
+                            number_of_tickets=sub_product_relation.number_of_tickets,
+                            ticket_group=ticket_group,
+                        )
             else:
                 # If there are no sub products, we just create a ticket for the product
                 create_ticket(product=self.product, number_of_tickets=self.quantity)
@@ -836,7 +847,6 @@ class OrderProductRelation(
                 container_product=self.product,
                 used_at__isnull=False,
             )
-            print(tickets)
             return tickets
 
         return self.shoptickets.filter(used_at__isnull=False)

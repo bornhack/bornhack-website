@@ -19,6 +19,36 @@
         <table class="table">
           <tr>
             <th>Product</th>
+            <th>Possible refund</th>
+          </tr>
+
+          {% for ticket_group, form in ticket_groups.items %}
+            <tr>
+              <td>
+                {{ ticket_group.opr.product }}
+                {% for subproduct in ticket_group.opr.product.sub_product_relations.all %}
+                  <br>
+                  <small>
+                    {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
+                  </small>
+                {% endfor %}
+              </td>
+
+              <td>
+                {% if ticket_group.has_tickets %}
+                  {{ form.as_p }}
+                {% else %}
+                  No refund possible
+                {% endif %}
+              </td>
+            </tr>
+
+          {% endfor %}
+        </table>
+
+        <table class="table">
+          <tr>
+            <th>Product</th>
             <th>Quantity</th>
             <th>Used</th>
             <th>Refunded</th>
@@ -29,14 +59,6 @@
             <tr>
               <td>
                 {{ opr.product }}
-                {% if opr.has_subproducts %}
-                  {% for subproduct in opr.product.sub_product_relations.all %}
-                    <br>
-                    <small>
-                      {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
-                    </small>
-                  {% endfor %}
-                {% endif %}
               </td>
 
               <td>
@@ -62,14 +84,10 @@
                 {% if opr.possible_refund == 0 %}
                   No refund possible
                 {% else %}
-                  {% if opr.has_subproducts %}
-                    {{ formset.as_p }}
-                  {% else %}
-                    {{ formset.management_form }}
-                    {% for form in formset %}
-                      {{ form.as_p }}
-                    {% endfor %}
-                  {% endif %}
+                  {{ formset.management_form }}
+                  {% for form in formset %}
+                    {{ form.as_p }}
+                  {% endfor %}
                 {% endif %}
               </td>
             </tr>

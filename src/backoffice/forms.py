@@ -169,7 +169,7 @@ class ShopTicketRefundForm(forms.ModelForm):
         fields = ["refund"]
 
     refund = forms.BooleanField(required=False)
-    uuid = forms.CharField(widget=forms.HiddenInput())
+    uuid = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

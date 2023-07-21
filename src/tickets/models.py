@@ -231,6 +231,18 @@ class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
         return "discount"
 
 
+class TicketGroup(ExportModelOperationsMixin("ticket_group"), UUIDModel):
+    opr = models.ForeignKey(
+        "shop.OrderProductRelation",
+        related_name="ticketgroups",
+        on_delete=models.PROTECT,
+    )
+
+    @property
+    def has_tickets(self):
+        return self.tickets.exists()
+
+
 class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
@@ -246,6 +258,14 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         null=True,
         blank=True,
         related_name="+",
+    )
+
+    ticket_group = models.ForeignKey(
+        "tickets.TicketGroup",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="tickets",
     )
 
     name = models.CharField(
