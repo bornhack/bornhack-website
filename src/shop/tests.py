@@ -529,9 +529,21 @@ class TestRefund(TestCase):
         )
 
         cls.order = OrderFactory(user=cls.user)
-        cls.opr1 = OrderProductRelationFactory(order=cls.order, quantity=5)
-        cls.opr2 = OrderProductRelationFactory(order=cls.order, quantity=1)
-        cls.opr3 = OrderProductRelationFactory(order=cls.order, quantity=10)
+        cls.opr1 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=5,
+            product__ticket_type=TicketTypeFactory(),
+        )
+        cls.opr2 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=1,
+            product__ticket_type=TicketTypeFactory(),
+        )
+        cls.opr3 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=10,
+            product__ticket_type=TicketTypeFactory(),
+        )
         cls.opr4 = OrderProductRelationFactory(
             order=cls.order,
             product=cls.bundle_product,
@@ -564,4 +576,46 @@ class TestRefund(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # TODO: Test refunding view
+        # We show both bundles and tickets
+        self.assertInHTML("<h4>Bundles</h4>", response.rendered_content)
+        self.assertInHTML("<h4>Tickets</h4>", response.rendered_content)
+
+        # We show the correct number of tickets
+        for opr in [self.opr1, self.opr2, self.opr3]:
+            self.assertInHTML(
+                f"<td>{opr.product}</td><td>{opr.quantity}</td>",
+                response.rendered_content,
+            )
+
+        # OPR 4 is a bundle, so we test that separately
+        self.assertInHTML(
+            f"<td>{self.bundle_product}<br><small>3 x {self.sub_product.name}</small></td>",
+            response.rendered_content,
+            count=2,
+        )
+
+        # Now to refunding
+        self.assertEqual(self.opr1.non_refunded_quantity, 5)
+        form_data = {
+            f"{self.opr1.id}-TOTAL_FORMS": "1",
+            f"{self.opr1.id}-INITIAL_FORMS": "1",
+            f"{self.opr1.id}-MIN_NUM_FORMS": "0",
+            f"{self.opr1.id}-MAX_NUM_FORMS": "1000",
+            f"{self.opr1.id}-0-refund": "on",
+            f"{self.opr1.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
+            f"{self.opr2.id}-TOTAL_FORMS": "1",
+            f"{self.opr2.id}-INITIAL_FORMS": "1",
+            f"{self.opr2.id}-MIN_NUM_FORMS": "0",
+            f"{self.opr2.id}-MAX_NUM_FORMS": "1000",
+            f"{self.opr2.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
+            f"{self.opr3.id}-TOTAL_FORMS": "1",
+            f"{self.opr3.id}-INITIAL_FORMS": "1",
+            f"{self.opr3.id}-MIN_NUM_FORMS": "0",
+            f"{self.opr3.id}-MAX_NUM_FORMS": "1000",
+            f"{self.opr3.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
+        }
+        response = self.client.post(url, form_data)
+        self.assertEqual(response.status_code, 302)
+        self.opr1.refresh_from_db()
+        self.assertEqual(self.opr1.refunded_quantity, 1)
+        self.assertEqual(self.opr1.non_refunded_quantity, 4)
