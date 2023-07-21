@@ -1,3 +1,5 @@
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -7,7 +9,13 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
+from .factories import SubProductRelationFactory
+from .models import Order
+from .models import OrderProductRelation
+from .models import Product
 from .models import RefundEnum
+from camps.factories import CampFactory
+from camps.models import Camp
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
@@ -491,14 +499,45 @@ class TestOrderProductRelationModel(TestCase):
 
 
 class TestRefund(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.info_user = UserFactory(username="info")
-        self.order = OrderFactory(user=self.user)
-        self.opr1 = OrderProductRelationFactory(order=self.order, quantity=5)
-        self.opr2 = OrderProductRelationFactory(order=self.order, quantity=1)
-        self.opr3 = OrderProductRelationFactory(order=self.order, quantity=10)
-        self.order.mark_as_paid()
+    camp: Camp
+    user: User
+    info_user: User
+    order: Order
+    container_product: Product
+    sub_product: Product
+    opr1: OrderProductRelation
+    opr2: OrderProductRelation
+    opr3: OrderProductRelation
+    opr4: OrderProductRelation
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.info_user = UserFactory(username="info")
+        backoffice_permission = Permission.objects.get(codename="backoffice_permission")
+        infoteam_permission = Permission.objects.get(codename="infoteam_permission")
+        cls.info_user.user_permissions.set([backoffice_permission, infoteam_permission])
+
+        cls.camp = CampFactory()
+
+        cls.container_product = ProductFactory()
+        cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
+        SubProductRelationFactory(
+            container_product=cls.container_product,
+            sub_product=cls.sub_product,
+            number_of_tickets=3,
+        )
+
+        cls.order = OrderFactory(user=cls.user)
+        cls.opr1 = OrderProductRelationFactory(order=cls.order, quantity=5)
+        cls.opr2 = OrderProductRelationFactory(order=cls.order, quantity=1)
+        cls.opr3 = OrderProductRelationFactory(order=cls.order, quantity=10)
+        cls.opr4 = OrderProductRelationFactory(
+            order=cls.order,
+            product=cls.container_product,
+            quantity=2,
+        )
+        cls.order.mark_as_paid()
 
     def test_order_refunded(self):
         self.assertTrue(self.order.refunded == RefundEnum.NOT_REFUNDED.value)
@@ -512,5 +551,17 @@ class TestRefund(TestCase):
         self.opr1.create_rpr(refund=refund2, quantity=4)
         self.opr2.create_rpr(refund=refund2, quantity=1)
         self.opr3.create_rpr(refund=refund2, quantity=10)
+        self.opr4.create_rpr(refund=refund2, quantity=2)
 
         self.assertTrue(self.order.refunded == RefundEnum.FULLY_REFUNDED.value)
+
+    def test_refund_backoffice_view(self):
+        url = reverse(
+            "backoffice:order_refund",
+            kwargs={"camp_slug": self.camp.slug, "order_id": self.order.id},
+        )
+        self.client.force_login(self.info_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # TODO: Test refunding view

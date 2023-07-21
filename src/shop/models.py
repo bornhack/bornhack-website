@@ -29,6 +29,7 @@ from unidecode import unidecode
 
 from .managers import OrderQuerySet
 from .managers import ProductQuerySet
+from tickets.models import ShopTicket
 from tickets.models import TicketGroup
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -726,6 +727,83 @@ class OrderProductRelation(
         """Returns the total price for this OPR considering quantity."""
         return Decimal(self.product.price * self.quantity)
 
+    def _create_tickets_helper(
+        self,
+        *,
+        product: Product,
+        number_of_tickets: int = 1,
+        container_product: Optional[Product] = None,
+        ticket_group: Optional[TicketGroup] = None,
+        request: Optional[HttpRequest] = None,
+    ) -> list[ShopTicket]:
+        if not product.ticket_type:
+            return []
+
+        # put reusable kwargs together
+        query_kwargs = {
+            "product": product,
+            "ticket_type": product.ticket_type,
+        }
+
+        if container_product:
+            query_kwargs["container_product"] = container_product
+
+        if ticket_group:
+            query_kwargs["ticket_group"] = ticket_group
+
+        if product.ticket_type.single_ticket_per_product:
+            # For this ticket type we create one ticket regardless of quantity,
+            # so 20 chairs don't result in 20 tickets
+
+            new_tickets = []
+            ticket, created = self.shoptickets.get_or_create(**query_kwargs)
+
+            if created:
+                new_tickets.append(ticket)
+
+            if request:
+                if created:
+                    msg = (
+                        f"Created ticket for product {self.product} on "
+                        f"order {self.order} (quantity: {self.quantity})"
+                    )
+                else:
+                    msg = (
+                        f"Ticket already exists for product {self.product} on "
+                        f"order {self.order} (quantity: {number_of_tickets})"
+                    )
+                messages.success(request, msg)
+        else:
+            # For this ticket type we create a ticket per item,
+            # find out if any have already been created
+            already_created_tickets = self.shoptickets.filter(
+                **query_kwargs,
+            ).count()
+
+            # find out how many we need to create
+            tickets_to_create = max(
+                0,
+                number_of_tickets
+                - already_created_tickets
+                - (self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"] or 0),
+            )
+
+            if not tickets_to_create:
+                return []
+
+            query_kwargs["opr"] = self
+            # create the number of tickets required
+            new_tickets = [
+                ShopTicket(**query_kwargs) for _i in range(tickets_to_create)
+            ]
+            self.shoptickets.bulk_create(new_tickets)
+
+            if request:
+                msg = f"Created {number_of_tickets} tickets of type: {product.ticket_type.name}"
+                messages.success(request, msg)
+
+        return new_tickets
+
     def create_tickets(self, request: Optional[HttpRequest] = None):
         """This method generates the needed tickets for this OPR.
 
@@ -737,77 +815,6 @@ class OrderProductRelation(
         Calling this method multiple times will not result in duplicate tickets being created,
         and the number of tickets created takes the number of refunded into consideration too.
         """
-
-        def create_ticket(
-            *,
-            product: Product,
-            number_of_tickets: int = 1,
-            container_product: Optional[Product] = None,
-            ticket_group: Optional[TicketGroup] = None,
-        ):
-            if not product.ticket_type:
-                return
-
-            # put reusable kwargs together
-            query_kwargs = {
-                "product": product,
-                "ticket_type": product.ticket_type,
-            }
-
-            if container_product:
-                query_kwargs["container_product"] = container_product
-
-            if ticket_group:
-                query_kwargs["ticket_group"] = ticket_group
-
-            if product.ticket_type.single_ticket_per_product:
-                # For this ticket type we create one ticket regardless of quantity,
-                # so 20 chairs don't result in 20 tickets
-
-                ticket, created = self.shoptickets.get_or_create(**query_kwargs)
-
-                if request:
-                    if created:
-                        msg = (
-                            f"Created ticket for product {self.product} on "
-                            f"order {self.order} (quantity: {self.quantity})"
-                        )
-                        tickets.append(ticket)
-                    else:
-                        msg = (
-                            f"Ticket already exists for product {self.product} on "
-                            f"order {self.order} (quantity: {number_of_tickets})"
-                        )
-                    messages.success(request, msg)
-            else:
-                # For this ticket type we create a ticket per item,
-                # find out if any have already been created
-                already_created_tickets = self.shoptickets.filter(
-                    **query_kwargs,
-                ).count()
-
-                # find out how many we need to create
-                tickets_to_create = max(
-                    0,
-                    number_of_tickets
-                    - already_created_tickets
-                    - (
-                        self.rprs.aggregate(models.Sum("quantity"))["quantity__sum"]
-                        or 0
-                    ),
-                )
-
-                if not tickets_to_create:
-                    return tickets
-
-                # create the number of tickets required
-                for _i in range(tickets_to_create):
-                    ticket = self.shoptickets.create(**query_kwargs)
-                    tickets.append(ticket)
-
-                if request:
-                    msg = f"Created {number_of_tickets} tickets of type: {product.ticket_type.name}"
-                    messages.success(request, msg)
 
         tickets = []
         with transaction.atomic():
@@ -824,15 +831,22 @@ class OrderProductRelation(
                     ticket_group = TicketGroup.objects.create(opr=self)
 
                     for sub_product_relation in sub_product_relations:
-                        create_ticket(
+                        new_tickets = self._create_tickets_helper(
                             product=sub_product_relation.sub_product,
                             container_product=self.product,
                             number_of_tickets=sub_product_relation.number_of_tickets,
                             ticket_group=ticket_group,
+                            request=request,
                         )
             else:
                 # If there are no sub products, we just create a ticket for the product
-                create_ticket(product=self.product, number_of_tickets=self.quantity)
+                new_tickets = self._create_tickets_helper(
+                    product=self.product,
+                    number_of_tickets=self.quantity,
+                    request=request,
+                )
+
+            tickets.extend(new_tickets)
 
             # and mark the OPR as ticket_generated=True
             self.ticket_generated = timezone.now()
@@ -875,12 +889,13 @@ class OrderProductRelation(
         Returns the number of tickets that can be refunded for this OPR.
         """
 
+        # If the product has no ticket type, we should be able to refund everything
+        if not self.product.ticket_type:
+            return self.quantity - self.refunded_quantity
+
         # If the product has sub products, we can only refund the entire product
         if self.product.sub_products.exists():
             # We can only refund the entire product, so no tickets should be used
-            # TODO: What if the quantity is above 1? Ie. 2 packages of tickets
-            #       - then we should be able to refund the package that has not been used.
-            #       Or should we disallow orders with more than one package?
             has_used_tickets = self.used_tickets_count > 0
             is_refunded = self.refunded_quantity == self.quantity
             return 0 if has_used_tickets or is_refunded else 1

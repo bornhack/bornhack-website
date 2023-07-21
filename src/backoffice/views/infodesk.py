@@ -430,10 +430,6 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                 ),
             )
 
-        context = self.get_context_data()
-        context["refund_form"] = refund_form
-        return self.render_to_response(context)
-
 
 class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = CreditNote
