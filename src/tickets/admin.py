@@ -64,6 +64,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "ticket_type",
         "opr__order",
         "product",
+        "ticket_group",
     ]
 
     search_fields = [

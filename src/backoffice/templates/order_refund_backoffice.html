@@ -25,27 +25,30 @@
               <th>Possible refund</th>
             </tr>
 
-            {% for ticket_group, form in ticket_groups.items %}
-              <tr>
-                <td>
-                  {{ ticket_group.opr.product }}
-                  {% for subproduct in ticket_group.opr.product.sub_product_relations.all %}
-                    <br>
-                    <small>
-                      {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
-                    </small>
-                  {% endfor %}
-                </td>
+            {% for opr, ticket_group_formset in ticket_groups.items %}
+              {{ ticket_group_formset.management_form }}
+              {% for form in ticket_group_formset %}
+                <tr>
+                  <td>
+                    {{ opr.product }}
+                    {% for subproduct in opr.product.sub_product_relations.all %}
+                      <br>
+                      <small>
+                        {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
+                      </small>
+                    {% endfor %}
+                  </td>
 
-                <td>
-                  {% if ticket_group.has_tickets %}
-                    {{ form.as_p }}
-                  {% else %}
-                    No refund possible
-                  {% endif %}
-                </td>
-              </tr>
+                  <td>
+                    {% if form.instance.has_tickets %}
+                      {{ form.as_p }}
+                    {% else %}
+                      No refund possible
+                    {% endif %}
+                  </td>
+                </tr>
 
+              {% endfor %}
             {% endfor %}
           </table>
         {% endif %}

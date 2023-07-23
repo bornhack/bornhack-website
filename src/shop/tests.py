@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -20,6 +22,7 @@ from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
+from tickets.models import TicketGroup
 from utils.factories import UserFactory
 
 
@@ -596,26 +599,61 @@ class TestRefund(TestCase):
 
         # Now to refunding
         self.assertEqual(self.opr1.non_refunded_quantity, 5)
-        form_data = {
-            f"{self.opr1.id}-TOTAL_FORMS": "1",
-            f"{self.opr1.id}-INITIAL_FORMS": "1",
-            f"{self.opr1.id}-MIN_NUM_FORMS": "0",
-            f"{self.opr1.id}-MAX_NUM_FORMS": "1000",
-            f"{self.opr1.id}-0-refund": "on",
-            f"{self.opr1.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
-            f"{self.opr2.id}-TOTAL_FORMS": "1",
-            f"{self.opr2.id}-INITIAL_FORMS": "1",
-            f"{self.opr2.id}-MIN_NUM_FORMS": "0",
-            f"{self.opr2.id}-MAX_NUM_FORMS": "1000",
-            f"{self.opr2.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
-            f"{self.opr3.id}-TOTAL_FORMS": "1",
-            f"{self.opr3.id}-INITIAL_FORMS": "1",
-            f"{self.opr3.id}-MIN_NUM_FORMS": "0",
-            f"{self.opr3.id}-MAX_NUM_FORMS": "1000",
-            f"{self.opr3.id}-0-uuid": str(self.opr1.shoptickets.first().uuid),
-        }
+        form_data = self._get_form_data(
+            refund_tickets=[self.opr1.shoptickets.order_by("created").first()],
+        )
         response = self.client.post(url, form_data)
+
         self.assertEqual(response.status_code, 302)
         self.opr1.refresh_from_db()
         self.assertEqual(self.opr1.refunded_quantity, 1)
         self.assertEqual(self.opr1.non_refunded_quantity, 4)
+
+        # Now to refunding a bundle
+        form_data = self._get_form_data(
+            refund_ticket_groups=[self.opr4.ticketgroups.order_by("created").first()],
+        )
+        response = self.client.post(url, form_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.opr4.refresh_from_db()
+        self.assertEqual(self.opr4.refunded_quantity, 1)
+        self.assertEqual(self.opr4.non_refunded_quantity, 1)
+
+    def _get_form_data(
+        self,
+        *,
+        refund_tickets: Optional[list[ShopTicket]] = None,
+        refund_ticket_groups: Optional[list[TicketGroup]] = None,
+    ):
+        """Helper method to get the form data for a refund"""
+        refund_tickets = refund_tickets or []
+        refund_ticket_groups = refund_ticket_groups or []
+        form_data = {}
+
+        for opr in [self.opr1, self.opr2, self.opr3]:
+            form_data[f"ticket-{opr.id}-TOTAL_FORMS"] = "1"
+            form_data[f"ticket-{opr.id}-INITIAL_FORMS"] = "1"
+            form_data[f"ticket-{opr.id}-MIN_NUM_FORMS"] = "0"
+            form_data[f"ticket-{opr.id}-MAX_NUM_FORMS"] = "1000"
+            for index, ticket in enumerate(opr.shoptickets.all()):
+                form_data[f"ticket-{opr.id}-{index}-uuid"] = str(ticket.uuid)
+                if ticket in refund_tickets:
+                    print(
+                        f"Refunding ticket {ticket}, index {index}, uuid {ticket.uuid}",
+                    )
+                    form_data[f"ticket-{opr.id}-{index}-refund"] = "on"
+
+        for opr in [self.opr4]:
+            form_data[f"ticket-group-{opr.id}-TOTAL_FORMS"] = "1"
+            form_data[f"ticket-group-{opr.id}-INITIAL_FORMS"] = "1"
+            form_data[f"ticket-group-{opr.id}-MIN_NUM_FORMS"] = "0"
+            form_data[f"ticket-group-{opr.id}-MAX_NUM_FORMS"] = "1000"
+            for index, ticket_group in enumerate(opr.ticketgroups.all()):
+                form_data[f"ticket-group-{opr.id}-{index}-uuid"] = str(
+                    ticket_group.uuid,
+                )
+                if ticket_group in refund_ticket_groups:
+                    form_data[f"ticket-group-{opr.id}-{index}-refund"] = "on"
+
+        return form_data

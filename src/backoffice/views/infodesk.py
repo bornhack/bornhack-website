@@ -16,8 +16,8 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
-from ..forms import ShopTicketRefundForm
 from ..forms import ShopTicketRefundFormSet
+from ..forms import TicketGroupRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
@@ -314,27 +314,14 @@ class OrderRefundView(
         kwargs["ticket_groups"] = {}
         for opr in self.get_object().oprs.all():
             if opr.product.sub_products.exists():
-                opr.has_subproducts = True
-
-                for ticket_group in opr.ticketgroups.all():
-                    ticket = opr.unused_shoptickets.filter(
-                        ticket_group=ticket_group,
-                    ).first()
-
-                    form_kwargs = {}
-                    if ticket:
-                        form_kwargs["uuid"] = ticket.uuid
-
-                    kwargs["ticket_groups"][ticket_group] = ShopTicketRefundForm(
-                        instance=ticket,
-                        data=form_kwargs,
-                        show_label=False,
-                    )
-
+                kwargs["ticket_groups"][opr] = TicketGroupRefundFormSet(
+                    queryset=opr.ticketgroups.all(),
+                    prefix=f"ticket-group-{opr.id}",
+                )
             else:
                 kwargs["oprs"][opr] = ShopTicketRefundFormSet(
                     queryset=opr.unused_shoptickets,
-                    prefix=opr.id,
+                    prefix=f"ticket-{opr.id}",
                 )
         kwargs["refund_form"] = RefundForm()
         return super().get_context_data(**kwargs)
@@ -347,26 +334,6 @@ class OrderRefundView(
             .select_for_update()
         )
 
-        def add_ticket_to_refund_from_form(form):
-            refund = form.cleaned_data["refund"]
-            ticket: ShopTicket = form.cleaned_data["uuid"]
-            if isinstance(ticket, str):
-                ticket = ShopTicket.objects.get(uuid=ticket)
-            if refund:
-                if ticket.bundle_product:
-                    # Ticket is part of a bundle product, refund all tickets in bundle
-                    for _ticket in opr.shoptickets.filter(
-                        ticket_group=ticket.ticket_group,
-                    ):
-                        tickets_to_delete.append(_ticket.pk)
-                else:
-                    tickets_to_delete.append(ticket.pk)
-
-                if opr in opr_dict:
-                    opr_dict[opr] += 1
-                else:
-                    opr_dict[opr] = 1
-
         opr_dict = {}
         tickets_to_delete = []
         with transaction.atomic():
@@ -375,22 +342,11 @@ class OrderRefundView(
                 if not opr.possible_refund:
                     continue
 
-                if opr.product.sub_products.exists():
-                    try:
-                        ticket = opr.shoptickets.get(uuid=request.POST.get("uuid"))
-                        ticket_form = ShopTicketRefundForm(
-                            instance=ticket,
-                            data=request.POST,
-                        )
-                        if ticket_form.is_valid():
-                            add_ticket_to_refund_from_form(ticket_form)
-                    except ShopTicket.DoesNotExist:
-                        pass
-                else:
+                if not opr.product.sub_products.exists():
                     ticket_formset = ShopTicketRefundFormSet(
                         request.POST,
                         queryset=opr.unused_shoptickets,
-                        prefix=opr.id,
+                        prefix=f"ticket-{opr.id}",
                     )
 
                     if not ticket_formset.is_valid():
@@ -401,9 +357,45 @@ class OrderRefundView(
                         return self.get(request, *args, **kwargs)
 
                     for form in ticket_formset:
-                        add_ticket_to_refund_from_form(form)
+                        refund = form.cleaned_data["refund"]
+                        ticket: ShopTicket = form.cleaned_data["uuid"]
+                        if isinstance(ticket, str):
+                            ticket = ShopTicket.objects.get(uuid=ticket)
+                        if refund:
+                            tickets_to_delete.append(ticket.pk)
+                            if opr in opr_dict:
+                                opr_dict[opr] += 1
+                            else:
+                                opr_dict[opr] = 1
+                else:
+                    # The OPR points at a bundle
+                    ticket_group_formset = TicketGroupRefundFormSet(
+                        request.POST,
+                        queryset=opr.ticketgroups.all(),
+                        prefix=f"ticket-group-{opr.id}",
+                    )
 
-            refund_form = RefundForm(request.POST)
+                    if not ticket_group_formset.is_valid():
+                        messages.error(
+                            request,
+                            "Some error!",
+                        )
+                        return self.get(request, *args, **kwargs)
+
+                    for form in ticket_group_formset:
+                        refund = form.cleaned_data["refund"]
+                        ticket_group = form.cleaned_data["uuid"]
+                        if refund:
+                            tickets_to_delete += list(
+                                ticket_group.tickets.values_list("pk", flat=True),
+                            )
+                            # TODO: ... this is not correct, but it's a start
+                            if opr in opr_dict:
+                                opr_dict[opr] += 1
+                            else:
+                                opr_dict[opr] = 1
+
+                refund_form = RefundForm(request.POST)
 
             if not opr_dict:
                 messages.error(request, "Nothing to refund!")

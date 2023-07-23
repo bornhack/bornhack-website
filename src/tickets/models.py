@@ -28,6 +28,7 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.pdf import generate_pdf_letter
 
@@ -230,7 +231,11 @@ class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
         return "discount"
 
 
-class TicketGroup(ExportModelOperationsMixin("ticket_group"), UUIDModel):
+class TicketGroup(
+    ExportModelOperationsMixin("ticket_group"),
+    CreatedUpdatedModel,
+    UUIDModel,
+):
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
         related_name="ticketgroups",
