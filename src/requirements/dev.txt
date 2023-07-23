@@ -1,7 +1,7 @@
 -r production.txt
 
 django-debug-toolbar==4.1.0
-factory_boy==3.2.1
+factory_boy==3.3.0
 coverage==7.2.7
 black==23.7.0
 pre-commit==3.3.3
