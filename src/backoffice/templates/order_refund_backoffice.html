@@ -44,6 +44,10 @@
                       {{ form.as_p }}
                     {% else %}
                       No refund possible
+                      <span class="hidden">
+                        {# We include the form here to make the formset happy #}
+                        {{ form.as_p }}
+                      </span>
                     {% endif %}
                   </td>
                 </tr>
