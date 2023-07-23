@@ -23,100 +23,122 @@
           <tr>
             <th>
               Name
-              <th class="text-right">
-                Quantity
-                <th class="text-right">
-                  Price
-                  <th class="text-right">
-                    Total
-                    <th>
-                      Remove
+            </th>
+            <th class="text-right">
+              Quantity
+            </th>
+            <th class="text-right">
+              Price
+            </th>
+            <th class="text-right">
+              Total
+            </th>
+            <th>
+              Remove
+            </th>
+          </tr>
+        </thead>
 
-                      <tbody>
-                        {% for form in order_product_formset %}
-                          {{ form.id }}
-                          <tr>
-                            <td>
-                              {{ form.instance.product.name }}
-                              {% if form.instance.product.stock_amount %}
-                                <br /><small>{{ form.instance.product.left_in_stock }} left in stock</small>
-                              {% endif %}
-                              <td class="text-right">
-                                {% bootstrap_field form.quantity show_help=False show_label=False size="small" %}
-                                <td class="text-right">
-                                  {{ form.instance.product.price|currency }}
-                                  <td class="text-right">
-                                    {{ form.instance.total|currency }}
-                                    <td>
-                                      {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
-                        {% endfor %}
+        <tbody>
+          {% for form in order_product_formset %}
+            {{ form.id }}
+            <tr>
+              <td>
+                {{ form.instance.product.name }}
+                {% if form.instance.product.stock_amount %}
+                  <br/><small>{{ form.instance.product.left_in_stock }} left in stock</small>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                {% bootstrap_field form.quantity show_help=False show_label=False size="small" %}
+              </td>
+              <td class="text-right">
+                {{ form.instance.product.price|currency }}
+              </td>
+              <td class="text-right">
+                {{ form.instance.total|currency }}
+              </td>
+              <td>
+                {% bootstrap_button '<i class="glyphicon glyphicon-remove"></i>' button_type="submit" button_class="btn-danger" name="remove_product" value=form.instance.pk %}
+              </td>
+            </tr>
+          {% endfor %}
 
-                        <tr>
-                          <td colspan="2">All our products include 25% Danish VAT</td>
-                          <td>
-                            <strong>Included VAT (25%)</strong>
-                            <td class="text-right">
-                              {{ order.vat|currency }}
+          <tr>
+            <td colspan="2">All our products include 25% Danish VAT</td>
+            <td>
+              <strong>Included VAT (25%)</strong>
+            </td>
+            <td class="text-right">
+              {{ order.vat|currency }}
+            </td>
 
-                              <tr>
-                                <td colspan="2">
-                                  <td>
-                                    <strong>Total</strong>
-                                    <td class="text-right">
-                                      {{ order.total|currency }}<br />
+            <tr>
+              <td colspan="2">
+              </td>
+              <td>
+                <strong>Total</strong>
+              </td>
+              <td class="text-right">
+                {{ order.total|currency }}<br/>
+              </td>
+            </tr>
 
-                                    </table>
+          </table>
 
-                                    {% if not order.open == None %}
-                                      <h4>Comment:</h4>
-                                      <textarea class="form-control" name="customer_comment" style="width: 100%;" placeholder="Please enter any comments here...">{{ order.customer_comment }}</textarea></p>
-                                    {% elif order.open == None and order.customer_comment %}
-                                      <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
-                                    {% endif %}
+          {% if not order.open == None %}
+            <h4>Comment:</h4>
+            <textarea class="form-control" name="customer_comment" style="width: 100%;"
+                      placeholder="Please enter any comments here...">{{ order.customer_comment }}</textarea></p>
+          {% elif order.open == None and order.customer_comment %}
+            <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
+          {% endif %}
 
-                                    {% if not order.open == None %}
-                                      <h4>Invoice Address:</h4>
-                                      <textarea class="form-control" name="invoice_address" style="width: 100%;" placeholder="Please enter the invoice address. Leave blank to use the email associated with the logged in user.">{{ order.invoice_address }}</textarea></p>
-                                    {% elif order.open == None and order.invoice_address %}
-                                      <h4>Invoice Address:</h4>
-                                      <div class="alert alert-info">{{ order.invoice_address|linebreaks }}</div>
-                                    {% endif %}
+          {% if not order.open == None %}
+            <h4>Invoice Address:</h4>
+            <textarea class="form-control" name="invoice_address" style="width: 100%;"
+                      placeholder="Please enter the invoice address. Leave blank to use the email associated with the logged in user.">{{ order.invoice_address }}</textarea>
+            </p>
+          {% elif order.open == None and order.invoice_address %}
+            <h4>Invoice Address:</h4>
+            <div class="alert alert-info">{{ order.invoice_address|linebreaks }}</div>
+          {% endif %}
 
-                                    {% if order.open %}
-                                      {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary btn-lg" name="update_order" icon="edit" %}
-                                    {% endif %}
+          {% if order.open %}
+            {% bootstrap_button "Update order" button_type="submit" button_class="btn-primary btn-lg" name="update_order" icon="edit" %}
+          {% endif %}
 
-                                    {% if not order.paid %}
-                                      {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
-                                    {% endif %}
+          {% if not order.paid %}
+            {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
+          {% endif %}
 
-                                    {% if not order.paid %}
-                                      {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg pull-right" name="review_and_pay" icon="check" %}
-                                    {% endif %}
+          {% if not order.paid %}
+            {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg pull-right" name="review_and_pay" icon="check" %}
+          {% endif %}
 
-                                    {% if order.paid %}
-                                      {% if order.invoice.pdf %}
-                                        {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                                        {% bootstrap_button "Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
-                                      {% endif %}
-                                    {% else %}
-                                      {% if order.pdf %}
-                                        {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                                        {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
-                                      {% endif %}
-                                    {% endif %}
-                                  </div>
-                                  {% if order.paid %}
-                                    <div class="panel-footer">
-                                      {% if order.refunded == "FULLY_REFUNDED" %}
-                                        <h4>This order has been fully refunded, tickets related to it are no longer valid.</h4>
-                                      {% elif order.refunded == "PARTIALLY_REFUNDED" %}
-                                        <h4>This order has been partially refunded, some tickets related to it are no longer valid.</h4>
-                                      {% else %}
-                                        <h4>This order is paid in full.</h4>
-                                      {% endif %}
-                                    </div>
-                                  {% endif %}
-                                </div>
+          {% if order.paid %}
+            {% if order.invoice.pdf %}
+              {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+              {% bootstrap_button "Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
+            {% endif %}
+          {% else %}
+            {% if order.pdf %}
+              {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+              {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
+            {% endif %}
+          {% endif %}
+        </div>
+        {% if order.paid %}
+          <div class="panel-footer">
+            {% if order.refunded == "FULLY_REFUNDED" %}
+              <h4>This order has been fully refunded, tickets related to it are no longer valid.</h4>
+            {% elif order.refunded == "PARTIALLY_REFUNDED" %}
+              <h4>This order has been partially refunded, some tickets related to it are no longer valid.</h4>
+            {% else %}
+              <h4>This order is paid in full.</h4>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
 
 {% endblock %}

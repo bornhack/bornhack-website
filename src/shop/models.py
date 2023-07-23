@@ -305,15 +305,13 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         total_refunded = aggregate["total_refunded"]
         total_quantity = aggregate["total_quantity"]
 
-        if total_refunded is None:
-            return RefundEnum.NOT_REFUNDED.value
+        if total_refunded:
+            if total_refunded == total_quantity:
+                return RefundEnum.FULLY_REFUNDED.value
+            elif total_refunded > 0:
+                return RefundEnum.PARTIALLY_REFUNDED.value
 
-        if total_refunded == total_quantity:
-            return RefundEnum.FULLY_REFUNDED.value
-        elif total_refunded > 0:
-            return RefundEnum.PARTIALLY_REFUNDED.value
-        else:
-            return RefundEnum.NOT_REFUNDED.value
+        return RefundEnum.NOT_REFUNDED.value
 
     def create_refund(self, *, created_by: User, notes: str = "") -> "Refund":
         return Refund.objects.create(order=self, notes=notes, created_by=created_by)
