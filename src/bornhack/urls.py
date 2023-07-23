@@ -88,6 +88,30 @@ urlpatterns = [
         name="village_list_redirect",
     ),
     path(
+        "teams/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "teams:list"},
+        name="teams_list_redirect",
+    ),
+    path(
+        "rideshare/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "rideshare:list"},
+        name="rideshare_list_redirect",
+    ),
+    path(
+        "feedback/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "feedback"},
+        name="feedback_redirect",
+    ),
+    path(
+        "facilities/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "facilities:facility_type_list"},
+        name="facilities_list_redirect",
+    ),
+    path(
         "wishlist/",
         CampRedirectView.as_view(),
         kwargs={"page": "wishlist:list"},
@@ -98,6 +122,12 @@ urlpatterns = [
         CampRedirectView.as_view(),
         kwargs={"page": "backoffice:index"},
         name="backoffice_redirect",
+    ),
+    path(
+        "economy/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "economy:dashboard"},
+        name="economy_dashboard_redirect",
     ),
     path(
         "phonebook/",
