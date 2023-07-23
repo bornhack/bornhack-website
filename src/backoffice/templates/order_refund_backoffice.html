@@ -40,14 +40,14 @@
                   </td>
 
                   <td>
-                    {% if form.instance.has_tickets %}
-                      {{ form.as_p }}
-                    {% else %}
+                    {% if form.instance.has_used_tickets or not form.instance.has_tickets %}
                       No refund possible
                       <span class="hidden">
                         {# We include the form here to make the formset happy #}
                         {{ form.as_p }}
                       </span>
+                    {% else %}
+                      {{ form.as_p }}
                     {% endif %}
                   </td>
                 </tr>

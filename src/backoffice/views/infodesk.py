@@ -315,7 +315,7 @@ class OrderRefundView(
         for opr in self.get_object().oprs.all():
             if opr.product.sub_products.exists():
                 kwargs["ticket_groups"][opr] = TicketGroupRefundFormSet(
-                    queryset=opr.ticketgroups.all(),
+                    queryset=opr.ticketgroups.annotate_ticket_info(),
                     prefix=f"ticket-group-{opr.id}",
                 )
             else:

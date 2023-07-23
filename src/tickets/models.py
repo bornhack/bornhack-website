@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import DecimalField
+from django.db.models import Exists
 from django.db.models import Expression
 from django.db.models import ExpressionWrapper
 from django.db.models import F
@@ -236,15 +237,25 @@ class TicketGroup(
     CreatedUpdatedModel,
     UUIDModel,
 ):
+    class QuerySet(QuerySet):
+        def annotate_ticket_info(self):
+            used_tickets_subquery = ShopTicket.objects.filter(
+                ticket_group=OuterRef("pk"),
+                used_at__isnull=False,
+            )
+            tickets = ShopTicket.objects.filter(ticket_group=OuterRef("pk"))
+            return self.annotate(
+                has_used_tickets=Exists(used_tickets_subquery),
+                has_tickets=Exists(tickets),
+            ).distinct("uuid")
+
+    objects = QuerySet.as_manager()
+
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
         related_name="ticketgroups",
         on_delete=models.PROTECT,
     )
-
-    @property
-    def has_tickets(self):
-        return self.tickets.exists()
 
 
 class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
