@@ -826,7 +826,7 @@ class OrderProductRelation(
                 for _i in range(self.quantity):
                     # Iterate over all ticket types that are related to this product
 
-                    ticket_group = TicketGroup.objects.create(opr=self)
+                    ticket_group, _ = TicketGroup.objects.get_or_create(opr=self)
 
                     for sub_product_relation in sub_product_relations:
                         new_tickets = self._create_tickets_helper(
