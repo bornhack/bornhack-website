@@ -54,9 +54,6 @@
               <span class="speaker">
                 <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}"><i class="fas fa-user fa-fw"></i>
                   {{ speaker.name }}
-                  {% for speakerevent in speaker.events.all %}
-                    {{ speakerevent.event_type.icon_html}}
-                  {% endfor %}
                 </a>
               </span><br />
             {% empty %}
