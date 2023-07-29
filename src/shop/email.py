@@ -8,6 +8,12 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def add_creditnote_email(creditnote):
+    if not hasattr(settings, "ACCOUNTINGSYSTEM_EMAIL"):
+        logger.warning(
+            "No ACCOUNTINGSYSTEM_EMAIL setting found, not sending creditnote email",
+        )
+        return False
+
     # put formatdict together
     formatdict = {"creditnote": creditnote}
 
@@ -27,6 +33,12 @@ def add_creditnote_email(creditnote):
 
 
 def add_invoice_email(invoice):
+    if not hasattr(settings, "ACCOUNTINGSYSTEM_EMAIL"):
+        logger.warning(
+            "No ACCOUNTINGSYSTEM_EMAIL setting found, not sending invoice email",
+        )
+        return False
+
     # put formatdict together
     formatdict = {
         "ordernumber": invoice.order.pk,

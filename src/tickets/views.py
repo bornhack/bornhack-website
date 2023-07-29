@@ -1,12 +1,14 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.shortcuts import render
 from django.views.generic import DetailView
-from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
@@ -18,15 +20,30 @@ from utils.models import CampReadOnlyModeError
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class ShopTicketListView(LoginRequiredMixin, ListView):
-    model = ShopTicket
-    template_name = "tickets/ticket_list.html"
-    context_object_name = "tickets"
+@login_required
+def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
+    """List all tickets for the logged-in user."""
+    base_queryset = (
+        ShopTicket.objects.with_quantity()
+        .select_related(
+            "ticket_type",
+            "ticket_type__camp",
+            "product",
+            "product__ticket_type__camp",
+            "bundle_product",
+        )
+        .filter(opr__order__user=request.user)
+        .order_by("ticket_type__camp", "ticket_group")
+    )
 
-    def get_queryset(self):
-        tickets = super().get_queryset()
-        user = self.request.user
-        return tickets.filter(opr__order__user=user).order_by("ticket_type__camp")
+    context = {
+        "tickets": (base_queryset.filter(ticket_group__isnull=True)),
+        "tickets_in_groups": (
+            base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")
+        ),
+    }
+
+    return render(request, "tickets/ticket_list.html", context)
 
 
 class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):

@@ -11,11 +11,13 @@ from django.db import models
 from django.db.models import Case
 from django.db.models import Count
 from django.db.models import DecimalField
+from django.db.models import Exists
 from django.db.models import Expression
 from django.db.models import ExpressionWrapper
 from django.db.models import F
 from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import QuerySet
 from django.db.models import Subquery
 from django.db.models import Sum
 from django.db.models import Value
@@ -27,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.pdf import generate_pdf_letter
 
@@ -188,15 +191,13 @@ class BaseTicket(CampRelatedModel, UUIDModel):
             qr_code_base64(self._get_badge_token()).decode("utf-8"),
         )
 
+    def get_pdf_formatdict(self):
+        return {"ticket": self}
+
     def generate_pdf(self):
-        formatdict = {"ticket": self}
-
-        if self.ticket_type.single_ticket_per_product and self.shortname == "shop":
-            formatdict["quantity"] = self.opr.quantity
-
         return generate_pdf_letter(
             filename=f"{self.shortname}_ticket_{self.pk}.pdf",
-            formatdict=formatdict,
+            formatdict=self.get_pdf_formatdict(),
             template="pdf/ticket.html",
         )
 
@@ -231,7 +232,66 @@ class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
         return "discount"
 
 
+class TicketGroup(
+    ExportModelOperationsMixin("ticket_group"),
+    CreatedUpdatedModel,
+    UUIDModel,
+):
+    class QuerySet(QuerySet):
+        def annotate_ticket_info(self):
+            used_tickets_subquery = ShopTicket.objects.filter(
+                ticket_group=OuterRef("pk"),
+                used_at__isnull=False,
+            )
+            tickets = ShopTicket.objects.filter(ticket_group=OuterRef("pk"))
+            return self.annotate(
+                has_used_tickets=Exists(used_tickets_subquery),
+                has_tickets=Exists(tickets),
+            ).distinct("uuid")
+
+    objects = QuerySet.as_manager()
+
+    opr = models.ForeignKey(
+        "shop.OrderProductRelation",
+        related_name="ticketgroups",
+        on_delete=models.PROTECT,
+    )
+
+
 class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
+    class QuerySet(QuerySet):
+        def with_quantity(self):
+            """Annotate the quantity of tickets for each ticket.
+
+            If the ticket is a bundle ticket, the quantity is the number of tickets in the bundle.
+            If the ticket is not a bundle ticket, the quantity is the quantity of the order product relation.
+            """
+            from shop.models import SubProductRelation
+
+            sub_product_relation_sub_query = SubProductRelation.objects.filter(
+                bundle_product=OuterRef("bundle_product"),
+                sub_product=OuterRef("product"),
+            )
+            return self.annotate(
+                quantity=Case(
+                    When(
+                        bundle_product__isnull=True,
+                        then=F("opr__quantity"),
+                    ),
+                    When(
+                        bundle_product__isnull=False,
+                        then=Subquery(
+                            sub_product_relation_sub_query.values("number_of_tickets")[
+                                :1
+                            ],
+                        ),
+                    ),
+                    default=Value(1),
+                ),
+            )
+
+    objects = QuerySet.as_manager()
+
     opr = models.ForeignKey(
         "shop.OrderProductRelation",
         related_name="shoptickets",
@@ -239,6 +299,22 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     )
 
     product = models.ForeignKey("shop.Product", on_delete=models.PROTECT)
+
+    bundle_product = models.ForeignKey(
+        "shop.Product",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+
+    ticket_group = models.ForeignKey(
+        "tickets.TicketGroup",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="tickets",
+    )
 
     name = models.CharField(
         max_length=100,
@@ -278,6 +354,12 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     @property
     def order(self):
         return self.opr.order
+
+    def get_pdf_formatdict(self):
+        formatdict = super().get_pdf_formatdict()
+        if self.ticket_type.single_ticket_per_product and hasattr(self, "quantity"):
+            formatdict["quantity"] = self.quantity
+        return formatdict
 
 
 TicketTypeUnion = Union[ShopTicket, SponsorTicket, DiscountTicket]

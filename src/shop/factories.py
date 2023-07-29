@@ -28,7 +28,6 @@ class ProductFactory(DjangoModelFactory):
             upper=timezone.now() + timezone.timedelta(31),
         ),
     )
-    ticket_type = factory.SubFactory("tickets.factories.TicketTypeFactory")
 
 
 class OrderFactory(DjangoModelFactory):
@@ -45,3 +44,12 @@ class OrderProductRelationFactory(DjangoModelFactory):
     product = factory.SubFactory(ProductFactory)
     order = factory.SubFactory(OrderFactory)
     quantity = 1
+
+
+class SubProductRelationFactory(DjangoModelFactory):
+    class Meta:
+        model = "shop.SubProductRelation"
+
+    bundle_product = factory.SubFactory(ProductFactory)
+    sub_product = factory.SubFactory(ProductFactory)
+    number_of_tickets = 1

@@ -17,6 +17,7 @@ from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
 from ..forms import ShopTicketRefundFormSet
+from ..forms import TicketGroupRefundFormSet
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
@@ -31,6 +32,7 @@ from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
 from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
+from utils.mixins import GetObjectMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -297,20 +299,30 @@ class RefundUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
         return reverse("backoffice:refund_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
+class OrderRefundView(
+    GetObjectMixin,
+    CampViewMixin,
+    InfoTeamPermissionMixin,
+    DetailView,
+):
     model = Order
     template_name = "order_refund_backoffice.html"
     pk_url_kwarg = "order_id"
 
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.object = self.get_object()
-
     def get_context_data(self, **kwargs):
-        kwargs["oprs"] = {
-            opr: ShopTicketRefundFormSet(queryset=opr.unused_shoptickets, prefix=opr.id)
-            for opr in self.get_object().oprs.all()
-        }
+        kwargs["oprs"] = {}
+        kwargs["ticket_groups"] = {}
+        for opr in self.get_object().oprs.all():
+            if opr.product.sub_products.exists():
+                kwargs["ticket_groups"][opr] = TicketGroupRefundFormSet(
+                    queryset=opr.ticketgroups.annotate_ticket_info(),
+                    prefix=f"ticket-group-{opr.id}",
+                )
+            else:
+                kwargs["oprs"][opr] = ShopTicketRefundFormSet(
+                    queryset=opr.unused_shoptickets,
+                    prefix=f"ticket-{opr.id}",
+                )
         kwargs["refund_form"] = RefundForm()
         return super().get_context_data(**kwargs)
 
@@ -329,29 +341,61 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                 # Do not include fully refunded oprs
                 if not opr.possible_refund:
                     continue
-                ticket_formset = ShopTicketRefundFormSet(
-                    request.POST,
-                    queryset=opr.unused_shoptickets,
-                    prefix=opr.id,
-                )
-                if not ticket_formset.is_valid():
-                    messages.error(
-                        request,
-                        "Some error!",
+
+                if not opr.product.sub_products.exists():
+                    ticket_formset = ShopTicketRefundFormSet(
+                        request.POST,
+                        queryset=opr.unused_shoptickets,
+                        prefix=f"ticket-{opr.id}",
                     )
-                    return self.get(request, *args, **kwargs)
 
-                for form in ticket_formset:
-                    refund = form.cleaned_data["refund"]
-                    ticket: ShopTicket = form.cleaned_data["uuid"]
-                    if refund:
-                        tickets_to_delete.append(ticket.pk)
-                        if opr in opr_dict:
-                            opr_dict[opr] += 1
-                        else:
-                            opr_dict[opr] = 1
+                    if not ticket_formset.is_valid():
+                        messages.error(
+                            request,
+                            "Some error!",
+                        )
+                        return self.get(request, *args, **kwargs)
 
-            refund_form = RefundForm(request.POST)
+                    for form in ticket_formset:
+                        refund = form.cleaned_data["refund"]
+                        ticket: ShopTicket = form.cleaned_data["uuid"]
+                        if isinstance(ticket, str):
+                            ticket = ShopTicket.objects.get(uuid=ticket)
+                        if refund:
+                            tickets_to_delete.append(ticket.pk)
+                            if opr in opr_dict:
+                                opr_dict[opr] += 1
+                            else:
+                                opr_dict[opr] = 1
+                else:
+                    # The OPR points at a bundle
+                    ticket_group_formset = TicketGroupRefundFormSet(
+                        request.POST,
+                        queryset=opr.ticketgroups.all(),
+                        prefix=f"ticket-group-{opr.id}",
+                    )
+
+                    if not ticket_group_formset.is_valid():
+                        messages.error(
+                            request,
+                            "Some error!",
+                        )
+                        return self.get(request, *args, **kwargs)
+
+                    for form in ticket_group_formset:
+                        refund = form.cleaned_data["refund"]
+                        ticket_group = form.cleaned_data["uuid"]
+                        if refund:
+                            tickets_to_delete += list(
+                                ticket_group.tickets.values_list("pk", flat=True),
+                            )
+                            # TODO: ... this is not correct, but it's a start
+                            if opr in opr_dict:
+                                opr_dict[opr] += 1
+                            else:
+                                opr_dict[opr] = 1
+
+                refund_form = RefundForm(request.POST)
 
             if not opr_dict:
                 messages.error(request, "Nothing to refund!")
@@ -380,10 +424,6 @@ class OrderRefundView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
                     kwargs={"camp_slug": self.camp.slug, "refund_id": refund.id},
                 ),
             )
-
-        context = self.get_context_data()
-        context["refund_form"] = refund_form
-        return self.render_to_response(context)
 
 
 class CreditNoteListView(CampViewMixin, InfoTeamPermissionMixin, ListView):

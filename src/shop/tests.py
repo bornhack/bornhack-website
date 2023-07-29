@@ -1,3 +1,7 @@
+from typing import Optional
+
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -7,11 +11,18 @@ from psycopg2.extras import DateTimeTZRange
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
 from .factories import ProductFactory
+from .factories import SubProductRelationFactory
+from .models import Order
+from .models import OrderProductRelation
+from .models import Product
 from .models import RefundEnum
+from camps.factories import CampFactory
+from camps.models import Camp
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
+from tickets.models import TicketGroup
 from utils.factories import UserFactory
 
 
@@ -387,11 +398,14 @@ class TestOrderListView(TestCase):
 
 
 class TestTicketCreation(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+
     def test_multiple_tickets_created(self):
-        user = UserFactory()
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
         product = ProductFactory(ticket_type=ticket_type)
-        order = OrderFactory(user=user)
+        order = OrderFactory(user=self.user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
         self.assertEqual(
@@ -400,14 +414,47 @@ class TestTicketCreation(TestCase):
         )
 
     def test_single_ticket_created(self):
-        user = UserFactory()
         ticket_type = TicketTypeFactory(single_ticket_per_product=True)
         product = ProductFactory(ticket_type=ticket_type)
-        order = OrderFactory(user=user)
+        order = OrderFactory(user=self.user)
         OrderProductRelationFactory(order=order, product=product, quantity=5)
         order.mark_as_paid()
         self.assertEqual(
             ShopTicket.objects.filter(product=product, opr__order=order).count(),
+            1,
+        )
+
+    def test_sub_products_created_sub_product_single_ticket_per_product_false(self):
+        bundle_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(single_ticket_per_product=False),
+        )
+        bundle_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
+        order = OrderFactory(user=self.user)
+        OrderProductRelationFactory(order=order, product=bundle_product, quantity=1)
+        order.mark_as_paid()
+        self.assertEqual(
+            ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
+            5,
+        )
+
+    def test_sub_products_created_sub_product_single_ticket_per_product_true(self):
+        bundle_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(single_ticket_per_product=True),
+        )
+        bundle_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
+        order = OrderFactory(user=self.user)
+        OrderProductRelationFactory(order=order, product=bundle_product, quantity=1)
+        order.mark_as_paid()
+        self.assertEqual(
+            ShopTicket.objects.filter(product=sub_product, opr__order=order).count(),
             1,
         )
 
@@ -455,14 +502,57 @@ class TestOrderProductRelationModel(TestCase):
 
 
 class TestRefund(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.info_user = UserFactory(username="info")
-        self.order = OrderFactory(user=self.user)
-        self.opr1 = OrderProductRelationFactory(order=self.order, quantity=5)
-        self.opr2 = OrderProductRelationFactory(order=self.order, quantity=1)
-        self.opr3 = OrderProductRelationFactory(order=self.order, quantity=10)
-        self.order.mark_as_paid()
+    camp: Camp
+    user: User
+    info_user: User
+    order: Order
+    bundle_product: Product
+    sub_product: Product
+    opr1: OrderProductRelation
+    opr2: OrderProductRelation
+    opr3: OrderProductRelation
+    opr4: OrderProductRelation
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.info_user = UserFactory(username="info")
+        backoffice_permission = Permission.objects.get(codename="backoffice_permission")
+        infoteam_permission = Permission.objects.get(codename="infoteam_permission")
+        cls.info_user.user_permissions.set([backoffice_permission, infoteam_permission])
+
+        cls.camp = CampFactory()
+
+        cls.bundle_product = ProductFactory()
+        cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
+        SubProductRelationFactory(
+            bundle_product=cls.bundle_product,
+            sub_product=cls.sub_product,
+            number_of_tickets=3,
+        )
+
+        cls.order = OrderFactory(user=cls.user)
+        cls.opr1 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=5,
+            product__ticket_type=TicketTypeFactory(),
+        )
+        cls.opr2 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=1,
+            product__ticket_type=TicketTypeFactory(),
+        )
+        cls.opr3 = OrderProductRelationFactory(
+            order=cls.order,
+            quantity=10,
+            product__ticket_type=TicketTypeFactory(),
+        )
+        cls.opr4 = OrderProductRelationFactory(
+            order=cls.order,
+            product=cls.bundle_product,
+            quantity=2,
+        )
+        cls.order.mark_as_paid()
 
     def test_order_refunded(self):
         self.assertTrue(self.order.refunded == RefundEnum.NOT_REFUNDED.value)
@@ -476,5 +566,94 @@ class TestRefund(TestCase):
         self.opr1.create_rpr(refund=refund2, quantity=4)
         self.opr2.create_rpr(refund=refund2, quantity=1)
         self.opr3.create_rpr(refund=refund2, quantity=10)
+        self.opr4.create_rpr(refund=refund2, quantity=2)
 
         self.assertTrue(self.order.refunded == RefundEnum.FULLY_REFUNDED.value)
+
+    def test_refund_backoffice_view(self):
+        url = reverse(
+            "backoffice:order_refund",
+            kwargs={"camp_slug": self.camp.slug, "order_id": self.order.id},
+        )
+        self.client.force_login(self.info_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # We show both bundles and tickets
+        self.assertInHTML("<h4>Bundles</h4>", response.rendered_content)
+        self.assertInHTML("<h4>Tickets</h4>", response.rendered_content)
+
+        # We show the correct number of tickets
+        for opr in [self.opr1, self.opr2, self.opr3]:
+            self.assertInHTML(
+                f"<td>{opr.product}</td><td>{opr.quantity}</td>",
+                response.rendered_content,
+            )
+
+        # OPR 4 is a bundle, so we test that separately
+        self.assertInHTML(
+            f"<td>{self.bundle_product}<br><small>3 x {self.sub_product.name}</small></td>",
+            response.rendered_content,
+            count=2,
+        )
+
+        # Now to refunding
+        self.assertEqual(self.opr1.non_refunded_quantity, 5)
+        form_data = self._get_form_data(
+            refund_tickets=[self.opr1.shoptickets.order_by("created").first()],
+        )
+        response = self.client.post(url, form_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.opr1.refresh_from_db()
+        self.assertEqual(self.opr1.refunded_quantity, 1)
+        self.assertEqual(self.opr1.non_refunded_quantity, 4)
+
+        # Now to refunding a bundle
+        form_data = self._get_form_data(
+            refund_ticket_groups=[self.opr4.ticketgroups.order_by("created").first()],
+        )
+        response = self.client.post(url, form_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.opr4.refresh_from_db()
+        self.assertEqual(self.opr4.refunded_quantity, 1)
+        self.assertEqual(self.opr4.non_refunded_quantity, 1)
+
+    def _get_form_data(
+        self,
+        *,
+        refund_tickets: Optional[list[ShopTicket]] = None,
+        refund_ticket_groups: Optional[list[TicketGroup]] = None,
+    ):
+        """Helper method to get the form data for a refund"""
+        refund_tickets = refund_tickets or []
+        refund_ticket_groups = refund_ticket_groups or []
+        form_data = {}
+
+        for opr in [self.opr1, self.opr2, self.opr3]:
+            form_data[f"ticket-{opr.id}-TOTAL_FORMS"] = "1"
+            form_data[f"ticket-{opr.id}-INITIAL_FORMS"] = "1"
+            form_data[f"ticket-{opr.id}-MIN_NUM_FORMS"] = "0"
+            form_data[f"ticket-{opr.id}-MAX_NUM_FORMS"] = "1000"
+            for index, ticket in enumerate(opr.shoptickets.all()):
+                form_data[f"ticket-{opr.id}-{index}-uuid"] = str(ticket.uuid)
+                if ticket in refund_tickets:
+                    print(
+                        f"Refunding ticket {ticket}, index {index}, uuid {ticket.uuid}",
+                    )
+                    form_data[f"ticket-{opr.id}-{index}-refund"] = "on"
+
+        for opr in [self.opr4]:
+            form_data[f"ticket-group-{opr.id}-TOTAL_FORMS"] = "1"
+            form_data[f"ticket-group-{opr.id}-INITIAL_FORMS"] = "1"
+            form_data[f"ticket-group-{opr.id}-MIN_NUM_FORMS"] = "0"
+            form_data[f"ticket-group-{opr.id}-MAX_NUM_FORMS"] = "1000"
+            for index, ticket_group in enumerate(opr.ticketgroups.all()):
+                form_data[f"ticket-group-{opr.id}-{index}-uuid"] = str(
+                    ticket_group.uuid,
+                )
+                if ticket_group in refund_ticket_groups:
+                    form_data[f"ticket-group-{opr.id}-{index}-refund"] = "on"
+
+        return form_data

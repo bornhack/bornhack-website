@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import Model
+from django.views.generic.detail import SingleObjectMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -35,3 +37,16 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
 class UserIsObjectOwnerMixin(UserPassesTestMixin):
     def test_func(self):
         return self.get_object().user == self.request.user
+
+
+class GetObjectMixin(SingleObjectMixin):
+    object: Model
+
+    def get_object(self, **kwargs):
+        if hasattr(self, "object"):
+            return self.object
+        return super().get_object(**kwargs)
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.object = self.get_object()

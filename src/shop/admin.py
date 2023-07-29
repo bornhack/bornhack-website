@@ -17,6 +17,7 @@ from .models import QuickPayAPIObject
 from .models import QuickPayAPIRequest
 from .models import Refund
 from .models import RefundProductRelation
+from .models import SubProductRelation
 
 admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)
@@ -96,6 +97,11 @@ def stock_info(product):
     return "N/A"
 
 
+class SubProductInline(admin.TabularInline):
+    model = SubProductRelation
+    fk_name = "bundle_product"
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = [
@@ -108,10 +114,13 @@ class ProductAdmin(admin.ModelAdmin):
         available_to,
     ]
 
-    list_editable = ["ticket_type"]
     list_filter = ["category", "ticket_type"]
     search_fields = ["name"]
     save_as = True
+
+    list_select_related = ["ticket_type", "category", "ticket_type__camp"]
+
+    inlines = [SubProductInline]
 
 
 class ProductInline(admin.TabularInline):

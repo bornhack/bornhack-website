@@ -4,6 +4,7 @@ from django.forms import modelformset_factory
 from program.models import Event
 from program.models import Speaker
 from tickets.models import ShopTicket
+from tickets.models import TicketGroup
 
 
 class AddRecordingForm(forms.ModelForm):
@@ -178,5 +179,20 @@ class ShopTicketRefundForm(forms.ModelForm):
 ShopTicketRefundFormSet = modelformset_factory(
     ShopTicket,
     form=ShopTicketRefundForm,
+    extra=0,
+)
+
+
+class TicketGroupRefundForm(forms.ModelForm):
+    class Meta:
+        model = TicketGroup
+        fields = ["refund"]
+
+    refund = forms.BooleanField(required=False)
+
+
+TicketGroupRefundFormSet = modelformset_factory(
+    TicketGroup,
+    form=TicketGroupRefundForm,
     extra=0,
 )
