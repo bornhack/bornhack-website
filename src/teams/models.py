@@ -195,42 +195,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         ):
             raise ValidationError("The private IRC channel name is reserved")
 
-        # make sure public_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
-        if self.public_irc_channel_name:
-            if (
-                Team.objects.filter(
-                    private_irc_channel_name__iexact=self.public_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-                or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.public_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    "The public IRC channel name is already in use on another team!",
-                )
-
-        # make sure private_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
-        if self.private_irc_channel_name:
-            if (
-                Team.objects.filter(
-                    private_irc_channel_name__iexact=self.private_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-                or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.private_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    "The private IRC channel name is already in use on another team!",
-                )
-
     @property
     def memberships(self):
         """
