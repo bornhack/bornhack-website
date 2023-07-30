@@ -822,12 +822,22 @@ class OrderProductRelation(
                 return tickets
 
             if sub_product_relations:
+                # If there are sub products, we need to create a ticket group to match
+                # the quantity of the OPR.
+
+                # Get the pre-existing ticket groups - cast to list, so we can append to it
+                ticket_groups = list(self.ticketgroups.all())
+
+                # If we have less ticket groups than the quantity of the OPR, we need to create more
+                if len(ticket_groups) < self.quantity:
+                    # We want to create the difference between the quantity of the OPR and the number of ticket groups
+                    difference = self.quantity - len(ticket_groups)
+                    for _i in range(difference):
+                        ticket_group = TicketGroup.objects.create(opr=self)
+                        ticket_groups.append(ticket_group)
+
                 # For each bought product we create a ticket for each sub product
-                for _i in range(self.quantity):
-                    # Iterate over all ticket types that are related to this product
-
-                    ticket_group, _ = TicketGroup.objects.get_or_create(opr=self)
-
+                for ticket_group in ticket_groups:
                     for sub_product_relation in sub_product_relations:
                         new_tickets = self._create_tickets_helper(
                             product=sub_product_relation.sub_product,

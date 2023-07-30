@@ -458,6 +458,71 @@ class TestTicketCreation(TestCase):
             1,
         )
 
+    def test_ticket_generation_is_idempotent(self):
+        """Test that calling create_tickets multiple times does not create more tickets."""
+        bundle_product = ProductFactory()
+        sub_product = ProductFactory(
+            ticket_type=TicketTypeFactory(),
+        )
+        bundle_product.sub_products.add(
+            sub_product,
+            through_defaults={"number_of_tickets": 5},
+        )
+        order = OrderFactory(user=self.user)
+        OrderProductRelationFactory(order=order, product=bundle_product, quantity=2)
+
+        order.mark_as_paid()
+        self.assertEqual(
+            ShopTicket.objects.filter(opr__order=order).count(),
+            10,
+        )
+        self.assertEqual(
+            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
+            2,
+        )
+
+        # Calling create_tickets again should not create more tickets
+        order.create_tickets()
+        self.assertEqual(
+            ShopTicket.objects.filter(opr__order=order).count(),
+            10,
+        )
+        self.assertEqual(
+            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
+            2,
+        )
+
+        # Add a new sub product to the bundle
+        sub_product_2 = ProductFactory(
+            ticket_type=TicketTypeFactory(),
+        )
+        bundle_product.sub_products.add(
+            sub_product_2,
+            through_defaults={"number_of_tickets": 5},
+        )
+
+        # Calling create_tickets again should create 10 new tickets
+        order.create_tickets()
+        self.assertEqual(
+            ShopTicket.objects.filter(opr__order=order).count(),
+            20,
+        )
+        self.assertEqual(
+            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
+            2,
+        )
+
+        # Calling create_tickets again should not create more tickets
+        order.create_tickets()
+        self.assertEqual(
+            ShopTicket.objects.filter(opr__order=order).count(),
+            20,
+        )
+        self.assertEqual(
+            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
+            2,
+        )
+
 
 class TestOrderProductRelationModel(TestCase):
     def test_refunded_cannot_be_larger_than_quantity(self):
