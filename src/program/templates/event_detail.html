@@ -65,7 +65,7 @@
       <h4>Schedule for <i>{{ event.title }}</i></h4>
       <ul class="list-group">
         {% for slot in event.event_slots.all %}
-          <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }} at {{ slot.event_location.name }} <i class="fas fa-{{ slot.event_location.icon }}"></i></li>
+          <li class="list-group-item">{{ slot.when.lower|date:"Y-m-d H:i" }} - {{ slot.when.upper|date:"Y-m-d H:i" }} at {{ slot.event_location.name }} <i class="fas fa-{{ slot.event_location.icon }}"></i></li>
         {% empty %}
           Not scheduled yet
         {% endfor %}

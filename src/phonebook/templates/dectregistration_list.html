@@ -36,8 +36,8 @@
               <td>{{ entry.description|default:"N/A" }}</td>
               <td>{{ entry.publish_in_phonebook|yesno }}</td>
               <td>{{ entry.activation_code }}</td>
-              <td>{{ entry.created }}</td>
-              <td>{{ entry.updated }}</td>
+              <td>{{ entry.created|date:"Y-m-d H:i" }}</td>
+              <td>{{ entry.updated|date:"Y-m-d H:i" }}</td>
               <td>
                 <a href="{% url 'phonebook:dectregistration_update' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
                 <a href="{% url 'phonebook:dectregistration_delete' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
