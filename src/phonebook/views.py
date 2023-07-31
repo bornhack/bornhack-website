@@ -60,45 +60,6 @@ class DectExportJsonView(
         return phonebook
 
 
-class DectExportCsvView(
-    CampViewMixin, RaisePermissionRequiredMixin,
-    ScopedProtectedResourceView,
-):
-    """
-    CSV export for the POC team / DECT system
-    """
-
-    required_scopes = ["phonebook:read"]
-
-
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{self.camp.slug}-dect-export-{timezone.now()}.csv"'
-        writer = csv.writer(response)
-        writer.writerow(
-            [
-                "number",
-                "letters",
-                "description",
-                "activation_code",
-                "publish_in_phonebook",
-            ],
-        )
-        for dect in DectRegistration.objects.filter(camp=self.camp):
-            writer.writerow(
-                [
-                    dect.number,
-                    dect.letters,
-                    dect.description,
-                    dect.activation_code,
-                    dect.publish_in_phonebook,
-                ],
-            )
-        return response
-
-
 class PhonebookListView(CampViewMixin, ListView):
     """
     Our phonebook view currently only shows DectRegistration entries,

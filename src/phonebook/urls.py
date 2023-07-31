@@ -2,7 +2,6 @@ from django.urls import include
 from django.urls import path
 from django.urls import re_path
 
-from .views import DectExportCsvView
 from .views import DectExportJsonView
 from .views import DectRegistrationCreateView
 from .views import DectRegistrationDeleteView
@@ -13,7 +12,6 @@ from .views import PhonebookListView
 app_name = "phonebook"
 urlpatterns = [
     path("", PhonebookListView.as_view(), name="list"),
-    path("csv/", DectExportCsvView.as_view(), name="csv"),
     path("json/", DectExportJsonView.as_view(), name="json"),
     path(
         "dectregistrations/",
