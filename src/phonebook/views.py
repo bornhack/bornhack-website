@@ -5,8 +5,8 @@ import string
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ValidationError
 from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -15,8 +15,8 @@ from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
-from oauth2_provider.views.generic import ScopedProtectedResourceView
 from jsonview.views import JsonView
+from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
@@ -61,7 +61,8 @@ class DectExportJsonView(
 
 
 class DectExportCsvView(
-    CampViewMixin, RaisePermissionRequiredMixin,
+    CampViewMixin,
+    RaisePermissionRequiredMixin,
     ScopedProtectedResourceView,
 ):
     """
@@ -69,7 +70,6 @@ class DectExportCsvView(
     """
 
     required_scopes = ["phonebook:read"]
-
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
