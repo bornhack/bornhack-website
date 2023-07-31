@@ -1,10 +1,10 @@
-import csv
 import logging
 import secrets
 import string
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -14,54 +14,49 @@ from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
 from camps.mixins import CampViewMixin
+from teams.models import Team
 from utils.mixins import RaisePermissionRequiredMixin
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class DectExportView(
+class DectExportJsonView(
     CampViewMixin,
-    RaisePermissionRequiredMixin,
-    ScopedProtectedResourceView,
+    JsonView,
 ):
     """
-    CSV export for the POC team / DECT system
+    JSON export for the POC team / DECT system
     """
 
     required_scopes = ["phonebook:read"]
 
-    def get(self, request, *args, **kwargs):
-        response = HttpResponse(content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{self.camp.slug}-dect-export-{timezone.now()}.csv"'
-        writer = csv.writer(response)
-        writer.writerow(
-            [
-                "number",
-                "letters",
-                "description",
-                "activation_code",
-                "publish_in_phonebook",
-            ],
-        )
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(name="POC", camp=self.camp)
+        if self.request.user not in team.responsible_members:
+            raise PermissionDenied("Permission denied")
+        context["phonebook"] = self.dump_phonebook()
+        return context
+
+    def dump_phonebook(self):
+        phonebook = []
         for dect in DectRegistration.objects.filter(camp=self.camp):
-            writer.writerow(
-                [
-                    dect.number,
-                    dect.letters,
-                    dect.description,
-                    dect.activation_code,
-                    dect.publish_in_phonebook,
-                ],
+            phonebook.append(
+                {
+                    "number": dect.number,
+                    "letters": dect.letters,
+                    "description": dect.description,
+                    "activation_code": dect.activation_code,
+                },
             )
-        return response
+        return phonebook
 
 
 class PhonebookListView(CampViewMixin, ListView):
