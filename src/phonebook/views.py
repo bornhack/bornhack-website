@@ -6,6 +6,7 @@ import string
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -15,19 +16,52 @@ from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
+from jsonview.views import JsonView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
 from camps.mixins import CampViewMixin
+from teams.models import Team
 from utils.mixins import RaisePermissionRequiredMixin
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class DectExportView(
+class DectExportJsonView(
     CampViewMixin,
-    RaisePermissionRequiredMixin,
+    JsonView,
+):
+    """
+    JSON export for the POC team / DECT system
+    """
+
+    required_scopes = ["phonebook:read"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        team = Team.objects.get(name="POC", camp=self.camp)
+        if self.request.user not in team.responsible_members:
+            raise PermissionDenied("Permission denied")
+        context["phonebook"] = self.dump_phonebook()
+        return context
+
+    def dump_phonebook(self):
+        phonebook = []
+        for dect in DectRegistration.objects.filter(camp=self.camp):
+            phonebook.append(
+                {
+                    "number": dect.number,
+                    "letters": dect.letters,
+                    "description": dect.description,
+                    "activation_code": dect.activation_code,
+                },
+            )
+        return phonebook
+
+
+class DectExportCsvView(
+    CampViewMixin, RaisePermissionRequiredMixin,
     ScopedProtectedResourceView,
 ):
     """
@@ -35,6 +69,7 @@ class DectExportView(
     """
 
     required_scopes = ["phonebook:read"]
+
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
