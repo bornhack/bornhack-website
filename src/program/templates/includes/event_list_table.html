@@ -38,7 +38,7 @@
             {% endfor %}
           </td>
           <td class="text-center"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
-          <td>
+          <td data-order="{{ event.event_slots.all.0.when.lower|date:"YmdHis" }}">
             {% for slot in event.event_slots.all %}
               {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
             {% empty %}
