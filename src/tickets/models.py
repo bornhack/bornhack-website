@@ -259,38 +259,40 @@ class TicketGroup(
 
 
 class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
-    class QuerySet(QuerySet):
-        def with_quantity(self):
-            """Annotate the quantity of tickets for each ticket.
+    class Manager(models.Manager):
+        def get_queryset(self):
+            """Return a queryset which has quantity of annotated on each ticket.
 
             If the ticket is a bundle ticket, the quantity is the number of tickets in the bundle.
             If the ticket is not a bundle ticket, the quantity is the quantity of the order product relation.
             """
             from shop.models import SubProductRelation
 
-            sub_product_relation_sub_query = SubProductRelation.objects.filter(
-                bundle_product=OuterRef("bundle_product"),
-                sub_product=OuterRef("product"),
+            sub_product_relation_sub_query = Subquery(
+                SubProductRelation.objects.filter(
+                    bundle_product=OuterRef("bundle_product"),
+                    sub_product=OuterRef("product"),
+                ).values("number_of_tickets")[:1],
             )
-            return self.annotate(
-                quantity=Case(
-                    When(
-                        bundle_product__isnull=True,
-                        then=F("opr__quantity"),
-                    ),
-                    When(
-                        bundle_product__isnull=False,
-                        then=Subquery(
-                            sub_product_relation_sub_query.values("number_of_tickets")[
-                                :1
-                            ],
+            return (
+                super()
+                .get_queryset()
+                .annotate(
+                    quantity=Case(
+                        When(
+                            bundle_product__isnull=True,
+                            then=F("opr__quantity"),
                         ),
+                        When(
+                            bundle_product__isnull=False,
+                            then=sub_product_relation_sub_query,
+                        ),
+                        default=Value(1),
                     ),
-                    default=Value(1),
-                ),
+                )
             )
 
-    objects = QuerySet.as_manager()
+    objects = Manager()
 
     opr = models.ForeignKey(
         "shop.OrderProductRelation",

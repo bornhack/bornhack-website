@@ -24,8 +24,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
     """List all tickets for the logged-in user."""
     base_queryset = (
-        ShopTicket.objects.with_quantity()
-        .select_related(
+        ShopTicket.objects.select_related(
             "ticket_type",
             "ticket_type__camp",
             "product",

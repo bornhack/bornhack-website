@@ -79,7 +79,6 @@ class ShopTicketAdmin(BaseTicketAdmin):
         return (
             super()
             .get_queryset(request)
-            .with_quantity()
             .select_related(
                 "ticket_type",
                 "ticket_type__camp",
@@ -93,10 +92,10 @@ class ShopTicketAdmin(BaseTicketAdmin):
         description="Quantity",
     )
     def product_quantity(self, ticket):
-        return str(ticket.opr.quantity)
+        return str(ticket.quantity)
 
     def generate_pdf(self, request, queryset):
-        for ticket in queryset.with_quantity().all():
+        for ticket in queryset.all():
             ticket.generate_pdf()
 
 
