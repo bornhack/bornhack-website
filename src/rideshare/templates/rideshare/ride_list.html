@@ -50,7 +50,7 @@
                               {% else %}
                                 <i class="fas fa-thumbs-up"></i> Needs ride
                               {% endif %}
-                              <td>
+                              <td data-order="{{ ride.when|date:"YmdHis"}}">
                                 {{ ride.when|date:"c" }}
                                 <td>
                                   {{ ride.from_location }}
