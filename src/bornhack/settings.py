@@ -72,13 +72,12 @@ STATIC_URL = "/static/"
 STATIC_ROOT = str(BASE_DIR / "static")
 STATICFILES_DIRS = [BASE_DIR / "static_src"]
 LANGUAGE_CODE = "en-us"
-# USE_I18N = True
-# USE_L10N = True
+
+FORMAT_MODULE_PATH = [
+    "bornhack.formats",
+]
+
 USE_TZ = True
-SHORT_DATE_FORMAT = "Ymd"
-DATE_FORMAT = "l, M jS, Y"
-DATETIME_FORMAT = "l, M jS, Y, H:i (e)"
-TIME_FORMAT = "H:i"
 
 TEMPLATES = [
     {
