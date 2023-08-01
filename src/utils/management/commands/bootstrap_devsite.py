@@ -297,7 +297,7 @@ class Command(BaseCommand):
             },
             {
                 "year": 2023,
-                "tagline": "Undecided",
+                "tagline": "make legacy",
                 "colour": "#613915",
                 "read_only": False,
             },
