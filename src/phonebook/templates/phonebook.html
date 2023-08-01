@@ -36,7 +36,7 @@
             <td>{{ entry.number }}</td>
             <td>{{ entry.letters|default:"N/A" }}</td>
             <td>{{ entry.description|default:"N/A" }}</td>
-            <td>{{ entry.created }}</td>
+            <td data-order="{{ entry.created|date:"YmdHis" }}">{{ entry.created }}</td>
           </tr>
         {% endfor %}
       </tbody>
