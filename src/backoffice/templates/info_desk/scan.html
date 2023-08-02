@@ -16,11 +16,12 @@
       <div class="col-md-12">
         <h3>PoS: {{ pos.name }}</h3>
         <h3>Scan the ticket!</h3>
-        <input type="text" name="ticket_token" id="ticket_token_input" autocomplete="off" style="color: #fff; background: #fff; border: 0; height: 0; width: 0;"/>
+        <input type="text" name="ticket_token" id="ticket_token_input" autocomplete="off"
+               style="color: #fff; background: #fff; border: 0; height: 0; width: 0;"/>
 
         <div id="scan_again" hidden>
           Scan again!
-          <hr />
+          <hr/>
         </div>
 
       </div>
@@ -32,7 +33,7 @@
 
   {% if ticket %}
 
-    <br />
+    <br/>
 
     <table class="table">
       <tr>
@@ -70,7 +71,7 @@
                               <td>
                                 <strong>Quantity:</strong>
                                 <td>
-                                  {{ ticket.opr.quantity }}
+                                  {{ ticket.quantity }}
                           {% endif %}
                           <tr>
                             <td>
@@ -95,20 +96,20 @@
 
                 </table>
 
-                <hr />
+                <hr/>
 
                 <form id="check_in_form" method="POST" action="">{% csrf_token %}
                   <input type="checkbox"
                          name="check_in_ticket_id"
                          id="check_in_input"
                          value="{{ ticket.pk }}"
-                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
 
                   <input type="checkbox"
                          name="badge_ticket_id"
                          id="hand_out_badge_input"
                          value="{{ ticket.pk }}"
-                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;" />
+                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
                 </form>
 
                 <div class="row">
@@ -130,13 +131,13 @@
                 </div>
   {% endif %}
 
-  <hr />
+  <hr/>
 
   <form method="POST"
         class="form-inline">
     {% csrf_token %}
 
-    <input type="text" class="form-control input-lg" name="find_order_id" />
+    <input type="text" class="form-control input-lg" name="find_order_id"/>
 
     <button type="submit" class="btn btn-lg btn-primary">
       Find an order
@@ -176,48 +177,66 @@
                               <tr>
                                 <th>
                                   Product
-                                  <th>
-                                    Ticket Type
-                                    <th>
-                                      Name?
-                                      <th>
-                                        Status?
+                                </th>
+                                <th>
+                                  Quantity
+                                </th>
+                                <th>
+                                  Ticket Type
+                                </th>
+                                <th>
+                                  Name?
+                                </th>
+                                <th>
+                                  Status?
+                                </th>
 
-                                        <tbody>
-                                          {% for ticket in tickets %}
-                                            <tr>
-                                              <td>
-                                                {{ ticket.product.name }}
-                                                <td>
-                                                  {{ ticket.ticket_type.name }}
-                                                  <td>
-                                                    {{ ticket.name }}
-                                                    <td>
-                                                      {% if ticket.used_at %}
-                                                        <i class="fas fa-check"></i> Checked in
-                                                      {% else %}
-                                                        <form method="POST">
-                                                          {% csrf_token %}
-                                                          <input type="hidden"
-                                                                 name="find_order_id"
-                                                                 value="{{ order.pk }}">
-                                                          <button class="btn btn-primary"
-                                                                  name="check_in_ticket_id"
-                                                                  type="submit"
-                                                                  value="{{ ticket.pk }}">Checkin
-                                                          </button>
-                                                        </form>
-                                                      {% endif %}
-                                          {% endfor %}
+                                <tbody>
+                                  {% for ticket in tickets %}
+                                    <tr>
+                                      <td>
+                                        {{ ticket.product.name }}
+                                      </td>
+                                      <td>
+                                        {{ ticket.quantity }}
+                                      </td>
+                                      <td>
+                                        {{ ticket.ticket_type.name }}
+                                      </td>
+                                      <td>
+                                        {{ ticket.name }}
+                                      </td>
+                                      <td>
+                                        {% if ticket.used_at %}
+                                          <i class="fas fa-check"></i> Checked in
+                                        {% else %}
+                                          <form method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden"
+                                                   name="find_order_id"
+                                                   value="{{ order.pk }}">
+                                            <button class="btn btn-primary"
+                                                    name="check_in_ticket_id"
+                                                    type="submit"
+                                                    value="{{ ticket.pk }}">Checkin
+                                            </button>
+                                          </form>
+                                        {% endif %}
+                                      </td>
+                                    </tr>
+                                  {% endfor %}
+                                </tbody>
 
 
-                                        </table>
+                              </table>
                         {% endif %}
 
                         {% if not order.paid and order.payment_method == "in_person" %}
                           <form method="POST">
                             {% csrf_token %}
-                            <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as paid!</button>
+                            <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as
+                              paid!
+                            </button>
                           </form>
                         {% endif %}
 
