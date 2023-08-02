@@ -198,7 +198,11 @@
                                         {{ ticket.product.name }}
                                       </td>
                                       <td>
-                                        {{ ticket.quantity }}
+                                        {% if ticket.ticket_type.single_ticket_per_product and ticket.shortname == "shop" %}
+                                          {{ ticket.quantity }}
+                                        {% else %}
+                                          -
+                                        {% endif %}
                                       </td>
                                       <td>
                                         {{ ticket.ticket_type.name }}
