@@ -185,7 +185,7 @@ def range_contains(self, other):
     if self._bounds is None:
         return False
 
-    if type(self) == type(other):
+    if type(self) is type(other):
         return self & other and self + other == self
 
     # We have two tests to make in each case - is the value out of the lower bound,

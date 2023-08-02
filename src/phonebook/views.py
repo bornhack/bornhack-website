@@ -6,22 +6,18 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from jsonview.views import JsonView
-from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
 from camps.mixins import CampViewMixin
 from teams.models import Team
-from utils.mixins import RaisePermissionRequiredMixin
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
