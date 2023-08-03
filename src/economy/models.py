@@ -1034,7 +1034,7 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
             # and only in the PoS period
             used_at__contained_by=self.period,
         ):
-            total += st.opr.quantity * 100
+            total += st.quantity * 100
         return total
 
 
