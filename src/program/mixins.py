@@ -12,7 +12,7 @@ from program.utils import get_speaker_availability_form_matrix
 
 
 class EnsureCFPOpenMixin:
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         # do not permit this action if call for participation is not open
         if not self.camp.call_for_participation_open:
             messages.error(request, "The Call for Participation is not open.")
@@ -20,12 +20,9 @@ class EnsureCFPOpenMixin:
                 reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
-
 
 class EnsureUnapprovedProposalMixin(SingleObjectMixin):
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         # do not permit editing if the proposal is already approved
         if (
             self.get_object().proposal_status
@@ -39,12 +36,9 @@ class EnsureUnapprovedProposalMixin(SingleObjectMixin):
                 reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
-
 
 class EnsureWritableCampMixin:
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         # do not permit view if camp is in readonly mode
         if self.camp.read_only:
             messages.error(request, "No thanks")
@@ -52,12 +46,9 @@ class EnsureWritableCampMixin:
                 reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
-
 
 class EnsureUserOwnsProposalMixin(SingleObjectMixin):
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         # make sure that this proposal belongs to the logged in user
         if self.get_object().user.username != request.user.username:
             messages.error(request, "No thanks")
@@ -65,16 +56,13 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
                 reverse("program:proposal_list", kwargs={"camp_slug": self.camp.slug}),
             )
 
-        # alright, continue with the request
-        return super().dispatch(request, *args, **kwargs)
-
 
 class UrlViewMixin:
     """
     Mixin with code shared between all the Url views
     """
 
-    def dispatch(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs):
         """
         Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user
         """
@@ -94,7 +82,6 @@ class UrlViewMixin:
         else:
             # fuckery afoot
             raise Http404
-        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """
