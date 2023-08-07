@@ -12,7 +12,7 @@
         --secondary-color: #144272;
         --text-color: #fff;
         --contrast-text-color: #2C74B3;
-        
+
     }
     .navbar .navbar-brand img {
         -webkit-filter: invert(100%);
@@ -68,10 +68,10 @@ a, a:active, a:focus {
   border-bottom: 1px solid var(--secondary-color);
 }
 .navbar .nav a:hover {
-  background-color: var(--secondary-color); 
+  background-color: var(--secondary-color);
 }
 .navbar .nav a:focus {
-  background-color: var(--secondary-color); 
+  background-color: var(--secondary-color);
 }
 
 .navbar .navbar-brand {
@@ -94,13 +94,13 @@ a, a:active, a:focus {
 
 #top-navbar > .nav > li > a {
   padding: 30px 7px;
-  color: var(--contrast-text-color); 
+  color: var(--contrast-text-color);
 }
 
 .nav .dropdown-menu  {
   padding: 0;
-  background-color: var(--primary-color); 
-  
+  background-color: var(--primary-color);
+
 }
 
 .nav .dropdown-menu .divider {
@@ -110,14 +110,14 @@ a, a:active, a:focus {
 .nav .dropdown-menu > li > a {
   padding-top: 15px;
   padding-bottom: 15px;
-  color: var(--text-color); 
+  color: var(--text-color);
 }
 .nav .dropdown-menu a:hover {
-    background-color: var(--secondary-color); 
+    background-color: var(--secondary-color);
 }
 
 .dropdown-menu {
-    background-color: var(--secondary-color); 
+    background-color: var(--secondary-color);
 }
 
 @media (max-width: 767px) {
@@ -157,18 +157,18 @@ a, a:active, a:focus {
   border-color: #2e6da4;
 }
 .btn-group.open .dropdown-toggle {
-  background-color: var(--primary-color); 
-  color: var(--text-color); 
+  background-color: var(--primary-color);
+  color: var(--text-color);
 }
 .btn-group.open .dropdown-toggle:hover {
     background-color: var(--secondary-color);
 
 }
 .btn-group.open .dropdown-menu a {
-    color: var(--text-color); 
+    color: var(--text-color);
 }
 .btn-group.open .dropdown-menu a:hover {
-    background-color: var(--primary-color); 
+    background-color: var(--primary-color);
 }
 
 .btn-default {
@@ -177,15 +177,15 @@ a, a:active, a:focus {
   border: 1px solid var(--secondary-color);
 }
 .btn-default:hover {
-    background-color: var(--secondary-color); 
+    background-color: var(--secondary-color);
     color: var(--text-color);
-    border: 1px solid var(--primary-color); 
-    
+    border: 1px solid var(--primary-color);
+
 }
 .btn-primary {
     background-color: var(--contrast-text-color);
-    border: 1px solid var(--secondary-color); 
-    
+    border: 1px solid var(--secondary-color);
+
 }
 
 /* Form stuff */
