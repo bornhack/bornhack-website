@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     "maps",
     "allauth",
     "allauth.account",
+    "allauth.socialaccount",
     "allauth_2fa",
     "django_otp",
     "django_otp.plugins.otp_totp",
