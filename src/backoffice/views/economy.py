@@ -6,13 +6,11 @@ from typing import Union
 
 import magic
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.db.models import Count
 from django.db.models import Q
 from django.db.models import Sum
 from django.http import HttpRequest
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -262,131 +260,17 @@ class ReimbursementDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailV
     template_name = "reimbursement_detail_backoffice.html"
 
 
-class ReimbursementCreateUserSelectView(
-    CampViewMixin,
-    EconomyTeamPermissionMixin,
-    ListView,
-):
-    template_name = "reimbursement_create_userselect.html"
-
-    def get_queryset(self):
-        queryset = User.objects.filter(
-            id__in=Expense.objects.filter(
-                camp=self.camp,
-                reimbursement__isnull=True,
-                paid_by_bornhack=False,
-                approved=True,
-            )
-            .values_list("user", flat=True)
-            .distinct(),
-        )
-        return queryset
-
-
-class ReimbursementCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateView):
-    model = Reimbursement
-    template_name = "reimbursement_create.html"
-    fields = ["notes", "paid"]
-
-    def dispatch(self, request, *args, **kwargs):
-        """Get the user from kwargs"""
-        self.reimbursement_user = get_object_or_404(User, pk=kwargs["user_id"])
-
-        # get response now so we have self.camp available below
-        response = super().dispatch(request, *args, **kwargs)
-
-        # return the response
-        return response
-
-    def get(self, request, *args, **kwargs):
-        # does this user have any approved and un-reimbursed expenses?
-        if not self.reimbursement_user.expenses.filter(
-            reimbursement__isnull=True,
-            approved=True,
-            paid_by_bornhack=False,
-        ):
-            messages.error(
-                request,
-                "This user has no approved and unreimbursed expenses!",
-            )
-            return redirect(
-                reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug}),
-            )
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["expenses"] = Expense.objects.filter(
-            user=self.reimbursement_user,
-            approved=True,
-            reimbursement__isnull=True,
-            paid_by_bornhack=False,
-        )
-        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
-        context["reimbursement_user"] = self.reimbursement_user
-        return context
-
-    def form_valid(self, form):
-        """
-        Set user and camp for the Reimbursement before saving
-        """
-        # get the expenses for this user
-        expenses = Expense.objects.filter(
-            user=self.reimbursement_user,
-            approved=True,
-            reimbursement__isnull=True,
-            paid_by_bornhack=False,
-        )
-        if not expenses:
-            messages.error(self.request, "No expenses found")
-            return redirect(
-                reverse(
-                    "backoffice:reimbursement_list",
-                    kwargs={"camp_slug": self.camp.slug},
-                ),
-            )
-
-        # do we have an Economy team for this camp?
-        if not self.camp.economy_team:
-            messages.error(self.request, "No economy team found")
-            return redirect(
-                reverse(
-                    "backoffice:reimbursement_list",
-                    kwargs={"camp_slug": self.camp.slug},
-                ),
-            )
-
-        # create reimbursement in database
-        reimbursement = form.save(commit=False)
-        reimbursement.reimbursement_user = self.reimbursement_user
-        reimbursement.user = self.request.user
-        reimbursement.camp = self.camp
-        reimbursement.save()
-
-        # add all expenses to reimbursement
-        for expense in expenses:
-            expense.reimbursement = reimbursement
-            expense.save()
-
-        # create payback expense for this reimbursement
-        reimbursement.create_payback_expense()
-
-        messages.success(
-            self.request,
-            f"Reimbursement {reimbursement} has been created with payback expense {reimbursement.payback_expense}",
-        )
-        return redirect(
-            reverse(
-                "backoffice:reimbursement_detail",
-                kwargs={"camp_slug": self.camp.slug, "pk": reimbursement.pk},
-            ),
-        )
-
-
 class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Reimbursement
     template_name = "reimbursement_form.html"
     fields = ["notes", "paid"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
+        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["reimbursement_user"] = self.object.reimbursement_user
+        return context
 
     def get_success_url(self):
         return reverse(
@@ -398,7 +282,6 @@ class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateV
 class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteView):
     model = Reimbursement
     template_name = "reimbursement_delete.html"
-    fields = ["notes", "paid"]
 
     def get(self, request, *args, **kwargs):
         if self.get_object().paid:

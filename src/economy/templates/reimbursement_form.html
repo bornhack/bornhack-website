@@ -2,15 +2,14 @@
 {% load bootstrap3 %}
 
 {% block title %}
-  Create Reimbursement for User {{ reimbursement_user }} | {{ block.super }}
+  {% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-  <h3>Create Reimbursement for User {{ reimbursement_user }}</h3>
-
+  <h3>{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">The following approved expenses will be covered by this reimbursement:</h3>
+      <h3 class="panel-title">This reimbursement covers the following approved expenses:</h3>
     </div>
     <div class="panel-body">
       <table class="table">
@@ -42,6 +41,6 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
-    <a href="{% url 'backoffice:reimbursement_create_userselect' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
   </form>
 {% endblock content %}

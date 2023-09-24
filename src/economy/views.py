@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView
+from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
@@ -23,6 +24,7 @@ from .mixins import ChainViewMixin
 from .mixins import CredebtorViewMixin
 from .mixins import ExpensePermissionMixin
 from .mixins import ReimbursementPermissionMixin
+from .mixins import ReimbursementUnpaidMixin
 from .mixins import RevenuePermissionMixin
 from .models import Chain
 from .models import Credebtor
@@ -386,6 +388,147 @@ class ReimbursementListView(LoginRequiredMixin, CampViewMixin, ListView):
 class ReimbursementDetailView(CampViewMixin, ReimbursementPermissionMixin, DetailView):
     model = Reimbursement
     template_name = "reimbursement_detail.html"
+
+
+class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView):
+    model = Reimbursement
+    template_name = "reimbursement_form.html"
+    fields = ["bank_account"]
+
+    def get(self, request, *args, **kwargs):
+        """Check if this user has any approved and un-reimbursed expenses."""
+        if not request.user.expenses.filter(
+            reimbursement__isnull=True,
+            approved=True,
+            paid_by_bornhack=False,
+        ):
+            messages.error(
+                request,
+                "You have no approved and unreimbursed expenses!",
+            )
+            return redirect(
+                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
+            )
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["expenses"] = Expense.objects.filter(
+            user=self.request.user,
+            approved=True,
+            reimbursement__isnull=True,
+            paid_by_bornhack=False,
+        )
+        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["reimbursement_user"] = self.request.user
+        return context
+
+    def form_valid(self, form):
+        """
+        Set user and camp for the Reimbursement before saving
+        """
+        # get the expenses for this user
+        expenses = Expense.objects.filter(
+            user=self.request.user,
+            approved=True,
+            reimbursement__isnull=True,
+            paid_by_bornhack=False,
+        )
+        if not expenses:
+            messages.error(self.request, "No expenses found")
+            return redirect(
+                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
+            )
+
+        # do we have an Economy team for this camp?
+        if not self.camp.economy_team:
+            messages.error(self.request, "No economy team found")
+            return redirect(
+                reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
+            )
+
+        # create reimbursement in database
+        reimbursement = form.save(commit=False)
+        reimbursement.reimbursement_user = self.request.user
+        reimbursement.user = self.request.user
+        reimbursement.camp = self.camp
+        reimbursement.save()
+
+        # add all expenses to reimbursement
+        for expense in expenses:
+            expense.reimbursement = reimbursement
+            expense.save()
+
+        # create payback expense for this reimbursement
+        reimbursement.create_payback_expense()
+
+        messages.success(
+            self.request,
+            f"Reimbursement {reimbursement.pk} has been created. It will be paid by the economy team to the specified bank account.",
+        )
+
+        # send an email to the economy team
+        add_outgoing_email(
+            responsible_team=Team.objects.get(
+                camp=self.camp,
+                name=settings.ECONOMY_TEAM_NAME,
+            ),
+            text_template="emails/reimbursement_created.txt",
+            formatdict={"reimbursement": reimbursement},
+            subject=f"New {self.camp.title} reimbursement {reimbursement.pk} for user {reimbursement.reimbursement_user.username} created",
+            to_recipients=[settings.ECONOMYTEAM_EMAIL],
+        )
+
+        return redirect(
+            reverse(
+                "economy:reimbursement_detail",
+                kwargs={"camp_slug": self.camp.slug, "pk": reimbursement.pk},
+            ),
+        )
+
+
+class ReimbursementUpdateView(
+    CampViewMixin,
+    ReimbursementPermissionMixin,
+    ReimbursementUnpaidMixin,
+    UpdateView,
+):
+    model = Reimbursement
+    template_name = "reimbursement_form.html"
+    fields = ["bank_account"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
+        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["reimbursement_user"] = self.request.user
+        return context
+
+    def get_success_url(self):
+        return reverse(
+            "economy:reimbursement_detail",
+            kwargs={"camp_slug": self.camp.slug, "pk": self.get_object().pk},
+        )
+
+
+class ReimbursementDeleteView(
+    CampViewMixin,
+    ReimbursementPermissionMixin,
+    ReimbursementUnpaidMixin,
+    DeleteView,
+):
+    model = Reimbursement
+    template_name = "reimbursement_delete.html"
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"Reimbursement {self.kwargs['pk']} deleted successfully!",
+        )
+        return reverse(
+            "economy:reimbursement_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
 
 
 ############################################

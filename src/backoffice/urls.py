@@ -111,8 +111,6 @@ from .views import PosUpdateView
 from .views import RefundDetailView
 from .views import RefundListView
 from .views import RefundUpdateView
-from .views import ReimbursementCreateUserSelectView
-from .views import ReimbursementCreateView
 from .views import ReimbursementDeleteView
 from .views import ReimbursementDetailView
 from .views import ReimbursementListView
@@ -825,16 +823,6 @@ urlpatterns = [
                                         ),
                                     ],
                                 ),
-                            ),
-                            path(
-                                "create/",
-                                ReimbursementCreateUserSelectView.as_view(),
-                                name="reimbursement_create_userselect",
-                            ),
-                            path(
-                                "create/<int:user_id>/",
-                                ReimbursementCreateView.as_view(),
-                                name="reimbursement_create",
                             ),
                         ],
                     ),
