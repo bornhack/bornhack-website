@@ -377,6 +377,7 @@ class Command(BaseCommand):
             EmailAddressFactory.create(
                 user=user,
                 email=f"{username}@example.com",
+                primary=True,
             )
 
         admin = User.objects.create_superuser(
