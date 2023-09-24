@@ -965,6 +965,11 @@ class AutoScheduleDebugEventSlotUnavailabilityView(
 
     def get_context_data(self, **kwargs):
         scheduler = AutoScheduler(camp=self.camp)
+        for autoevent, event in zip(scheduler.autoevents, scheduler.events.all()):
+            autoevent.possible_slots = 0
+            for slot in scheduler.autoslots:
+                if slot not in autoevent.unavailability:
+                    autoevent.possible_slots += 1
         context = {
             "scheduler": scheduler,
         }
