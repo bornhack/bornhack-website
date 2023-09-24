@@ -1,4 +1,5 @@
 import hashlib
+from decimal import Decimal
 import hmac
 import json
 import logging
@@ -524,6 +525,7 @@ class BankTransferView(
         context["regno"] = settings.BANKACCOUNT_REG
         context["accountno"] = settings.BANKACCOUNT_ACCOUNT
         context["total"] = self.get_object().total
+        context["eur"] = round(self.get_object().total / Decimal(7.42), 2) # EUR rate
         return context
 
 
