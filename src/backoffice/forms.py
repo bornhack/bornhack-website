@@ -35,6 +35,30 @@ class AutoScheduleValidateForm(forms.Form):
         help_text="What to validate?",
     )
 
+    event_type_constraint = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text="Add event type based constraints (so a talk is not scheduled in a workshop slot and vice versa)",
+    )
+
+    speakers_other_events_constraint = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text="Add constraints for each speakers other events (so a speaker isn't scheduled to be in two or more places at once)",
+    )
+
+    speaker_event_conflicts_constraint = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text="Add constraints for each speakers event conflicts (so a speaker isn't scheduled at the same time as something they want to participate in)",
+    )
+
+    speaker_availability_constraint = forms.BooleanField(
+        initial=True,
+        required=False,
+        help_text="Add constraints for each speakers availability (so a speaker isn't scheduled when they are not available)",
+    )
+
 
 class AutoScheduleApplyForm(forms.Form):
     schedule = forms.ChoiceField(
