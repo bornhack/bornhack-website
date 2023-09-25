@@ -41,6 +41,6 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
-    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    <a href="{{ cancelurl }}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
   </form>
 {% endblock content %}

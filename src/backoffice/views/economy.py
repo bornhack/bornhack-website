@@ -270,6 +270,9 @@ class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateV
         context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.object.reimbursement_user
+        context["cancelurl"] = reverse(
+            "backoffice:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+        )
         return context
 
     def get_success_url(self):

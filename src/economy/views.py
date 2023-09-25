@@ -421,6 +421,9 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         )
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.request.user
+        context["cancelurl"] = reverse(
+            "economy:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+        )
         return context
 
     def form_valid(self, form):
@@ -502,6 +505,9 @@ class ReimbursementUpdateView(
         context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.request.user
+        context["cancelurl"] = reverse(
+            "economy:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+        )
         return context
 
     def get_success_url(self):
