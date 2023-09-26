@@ -34,14 +34,14 @@ repos:
       - id: python-no-log-warn
       - id: rst-backticks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.11.0
+    rev: v3.13.0
     hooks:
       - id: pyupgrade
         args:
           - --py39-plus
         exclude: migrations/
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.14.1
+    rev: 1.15.0
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
