@@ -41,3 +41,7 @@ wheel==0.41.2
 
 # pillow is only here to make old migrations run
 Pillow==10.0.1
+
+# numpy 1.26.0 doesn't work on freebsd
+# numpy: /usr/local/virtualenv/lib/python3.9/site-packages/numpy/core/_multiarray_tests.cpython-39.so: Undefined symbol "ccosl"
+numpy==1.25.2
