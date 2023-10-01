@@ -2,7 +2,7 @@
 {% load bootstrap3 %}
 
 {% block title %}
-  {% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement | {{ block.super }}
+{{ verb }} Reimbursement | {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -40,7 +40,7 @@
   <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
-    {% bootstrap_button "<i class='fas fa-check'></i> Approve" button_type="submit" button_class="btn-success" name="approve" %}
+    {% bootstrap_button "<i class='fas fa-check'></i> "|add:verb button_type="submit" button_class="btn-success" name="submit" %}
     <a href="{{ cancelurl }}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
   </form>
 {% endblock content %}

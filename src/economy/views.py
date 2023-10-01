@@ -9,12 +9,12 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import CreateView
+from utils.mixins import VerbCreateView as CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
-from django.views.generic import UpdateView
+from utils.mixins import VerbUpdateView as UpdateView
 
 from .forms import ExpenseCreateForm
 from .forms import ExpenseUpdateForm
