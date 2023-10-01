@@ -271,7 +271,8 @@ class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateV
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.object.reimbursement_user
         context["cancelurl"] = reverse(
-            "backoffice:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+            "backoffice:reimbursement_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
         return context
 

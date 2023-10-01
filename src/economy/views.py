@@ -9,12 +9,10 @@ from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
-from utils.mixins import VerbCreateView as CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
-from utils.mixins import VerbUpdateView as UpdateView
 
 from .forms import ExpenseCreateForm
 from .forms import ExpenseUpdateForm
@@ -35,6 +33,8 @@ from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import RaisePermissionRequiredMixin
+from utils.mixins import VerbCreateView as CreateView
+from utils.mixins import VerbUpdateView as UpdateView
 
 
 class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
@@ -422,7 +422,8 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.request.user
         context["cancelurl"] = reverse(
-            "economy:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+            "economy:reimbursement_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
         return context
 
@@ -506,7 +507,8 @@ class ReimbursementUpdateView(
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
         context["reimbursement_user"] = self.request.user
         context["cancelurl"] = reverse(
-            "economy:reimbursement_list", kwargs={"camp_slug": self.camp.slug},
+            "economy:reimbursement_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
         return context
 

@@ -5,9 +5,9 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Model
-from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import CreateView
 from django.views.generic import UpdateView
+from django.views.generic.detail import SingleObjectMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -56,6 +56,7 @@ class GetObjectMixin(SingleObjectMixin):
 
 class VerbView:
     """Base class for VerbCreateView and VerbUpdateView."""
+
     verb = "UnknownVerb"
 
     def get_context_data(self, **kwargs):
@@ -66,9 +67,11 @@ class VerbView:
 
 class VerbCreateView(VerbView, CreateView):
     """Subclass of CreateView where self.verb is set for use in headlines and form buttons."""
+
     verb = "Create"
 
 
 class VerbUpdateView(VerbView, UpdateView):
     """Subclass of UpdateView where self.verb is set for use in headlines and form buttons."""
+
     verb = "Update"
