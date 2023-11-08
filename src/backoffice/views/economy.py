@@ -53,6 +53,7 @@ from economy.utils import import_clearhaus_csv
 from economy.utils import import_epay_csv
 from economy.utils import MobilePayCSVImporter
 from economy.utils import ZettleExcelImporter
+from utils.mixins import VerbUpdateView
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -260,7 +261,11 @@ class ReimbursementDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailV
     template_name = "reimbursement_detail_backoffice.html"
 
 
-class ReimbursementUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+class ReimbursementUpdateView(
+    CampViewMixin,
+    EconomyTeamPermissionMixin,
+    VerbUpdateView,
+):
     model = Reimbursement
     template_name = "reimbursement_form.html"
     fields = ["notes", "paid"]
