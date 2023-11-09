@@ -1,0 +1,11 @@
+Hi,
+
+A new reimbursement {{ reimbursement.pk }} for username {{ reimbursement.reimbursement_user }} was just created. The reimbursement covers {{ reimbursement.expenses.count|add:-1 }} expense(s) for a total amount of DKK {{ reimbursement.amount }}.
+
+Go to backoffice[1] to see the reimbursement including the bank account to use for the transfer.
+
+Have a nice day!
+
+The {{ expense.camp.title }} Team
+
+[1] https://bornhack.dk{{ reimbursement.get_backoffice_url }}

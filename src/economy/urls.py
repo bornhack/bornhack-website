@@ -12,8 +12,11 @@ from .views import ExpenseDetailView
 from .views import ExpenseInvoiceView
 from .views import ExpenseListView
 from .views import ExpenseUpdateView
+from .views import ReimbursementCreateView
+from .views import ReimbursementDeleteView
 from .views import ReimbursementDetailView
 from .views import ReimbursementListView
+from .views import ReimbursementUpdateView
 from .views import RevenueCreateView
 from .views import RevenueDeleteView
 from .views import RevenueDetailView
@@ -112,9 +115,31 @@ urlpatterns = [
             [
                 path("", ReimbursementListView.as_view(), name="reimbursement_list"),
                 path(
+                    "create/",
+                    ReimbursementCreateView.as_view(),
+                    name="reimbursement_create",
+                ),
+                path(
                     "<uuid:pk>/",
-                    ReimbursementDetailView.as_view(),
-                    name="reimbursement_detail",
+                    include(
+                        [
+                            path(
+                                "",
+                                ReimbursementDetailView.as_view(),
+                                name="reimbursement_detail",
+                            ),
+                            path(
+                                "update/",
+                                ReimbursementUpdateView.as_view(),
+                                name="reimbursement_update",
+                            ),
+                            path(
+                                "delete/",
+                                ReimbursementDeleteView.as_view(),
+                                name="reimbursement_delete",
+                            ),
+                        ],
+                    ),
                 ),
             ],
         ),
