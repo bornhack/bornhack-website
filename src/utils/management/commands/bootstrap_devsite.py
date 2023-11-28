@@ -377,6 +377,7 @@ class Command(BaseCommand):
             EmailAddressFactory.create(
                 user=user,
                 email=f"{username}@example.com",
+                primary=True,
             )
 
         admin = User.objects.create_superuser(
@@ -2066,8 +2067,9 @@ class Command(BaseCommand):
             )
             reimbursement = Reimbursement.objects.create(
                 camp=camp,
-                user=camp.economy_team.members.first(),
+                user=user,
                 reimbursement_user=user,
+                bank_account=random.randint(1000000000, 100000000000),
                 notes=f"bootstrap created reimbursement for user {user.username}",
                 paid=random.choice([True, True, False]),
             )

@@ -1,3 +1,4 @@
+import copy
 import logging
 
 from django import forms
@@ -864,33 +865,56 @@ class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormVi
     form_class = AutoScheduleValidateForm
 
     def form_valid(self, form):
+        kwargs = copy.deepcopy(form.cleaned_data)
+        del kwargs["schedule"]
+
         # initialise AutoScheduler
-        scheduler = AutoScheduler(camp=self.camp)
+        scheduler = AutoScheduler(camp=self.camp, **kwargs)
+        autoschedule = None
 
         # get autoschedule
         if form.cleaned_data["schedule"] == "current":
-            autoschedule = scheduler.build_current_autoschedule()
-            message = f"The currently scheduled Events form a valid schedule! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. {scheduler.events.count()} Events in the schedule."
+            try:
+                autoschedule = scheduler.build_current_autoschedule()
+                message = f"The currently scheduled Events form a valid schedule! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. {scheduler.events.count()} Events in the schedule."
+            except ValueError:
+                messages.error(
+                    self.request,
+                    "Unable to calculate autoschedule, no valid solution found!",
+                )
         elif form.cleaned_data["schedule"] == "similar":
-            original_autoschedule = scheduler.build_current_autoschedule()
-            autoschedule, diff = scheduler.calculate_similar_autoschedule(
-                original_autoschedule,
-            )
-            message = f"The new similar schedule is valid! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. Differences to the current schedule: {len(diff['event_diffs'])} Event diffs and {len(diff['slot_diffs'])} Slot diffs."
+            try:
+                original_autoschedule = scheduler.build_current_autoschedule()
+                autoschedule, diff = scheduler.calculate_similar_autoschedule(
+                    original_autoschedule,
+                )
+                message = f"The new similar schedule is valid! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. Differences to the current schedule: {len(diff['event_diffs'])} Event diffs and {len(diff['slot_diffs'])} Slot diffs."
+            except ValueError:
+                messages.error(
+                    self.request,
+                    "Unable to calculate autoschedule, no valid solution found!",
+                )
         elif form.cleaned_data["schedule"] == "new":
-            autoschedule = scheduler.calculate_autoschedule()
-            message = f"The new schedule is valid! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. {scheduler.events.count()} Events in the schedule."
+            try:
+                autoschedule = scheduler.calculate_autoschedule()
+                message = f"The new schedule is valid! AutoScheduler has {len(scheduler.autoslots)} Slots based on {scheduler.event_sessions.count()} EventSessions for {scheduler.event_types.count()} EventTypes. {scheduler.events.count()} Events in the schedule."
+            except ValueError:
+                messages.error(
+                    self.request,
+                    "Unable to calculate autoschedule, no valid solution found!",
+                )
 
-        # check validity
-        valid, violations = scheduler.is_valid(autoschedule, return_violations=True)
-        if valid:
-            messages.success(self.request, message)
-        else:
-            messages.error(self.request, "Schedule is NOT valid!")
-            message = "Schedule violations:<br>"
-            for v in violations:
-                message += v + "<br>"
-            messages.error(self.request, mark_safe(message))
+        if autoschedule:
+            # check validity
+            valid, violations = scheduler.is_valid(autoschedule, return_violations=True)
+            if valid:
+                messages.success(self.request, message)
+            else:
+                messages.error(self.request, "Schedule is NOT valid!")
+                message = "Schedule violations:<br>"
+                for v in violations:
+                    message += v + "<br>"
+                messages.error(self.request, mark_safe(message))
         return redirect(
             reverse(
                 "backoffice:autoschedule_validate",
@@ -965,6 +989,11 @@ class AutoScheduleDebugEventSlotUnavailabilityView(
 
     def get_context_data(self, **kwargs):
         scheduler = AutoScheduler(camp=self.camp)
+        for autoevent, _ in zip(scheduler.autoevents, scheduler.events.all()):
+            autoevent.possible_slots = 0
+            for slot in scheduler.autoslots:
+                if slot not in autoevent.unavailability:
+                    autoevent.possible_slots += 1
         context = {
             "scheduler": scheduler,
         }

@@ -425,7 +425,7 @@ body.bar-menu {
 .team-guide-markdown h1,
 .team-guide-markdown h2,
 .team-guide-markdown h3,
-.team-guide-markdown h4,
+.team-guide-markdown h4
 {
     font-size: 80%;
     font-weight: bold;
@@ -447,7 +447,28 @@ div #id_location-map {
   word-break: break-word;
 }
 
+
 .table {
   overflow: auto;
   display: block;
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* tabbed panel tweaks in bootstrap v3 */
+
+.panel-heading-nav {
+  border-bottom: 0;
+  padding: 10px 0 0;
+}
+
+.panel-heading-nav .nav {
+  padding-left: 10px;
+  padding-right: 10px;
 }

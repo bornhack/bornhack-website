@@ -1,5 +1,8 @@
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse
 
 from .models import Chain
 from .models import Credebtor
@@ -74,3 +77,20 @@ class ReimbursementPermissionMixin:
         else:
             # the current user is different from the user who "owns" the reimbursement, and current user is not in the economy team; fuckery is afoot, no thanks
             raise Http404()
+
+
+class ReimbursementUnpaidMixin:
+    def get(self, request, *args, **kwargs):
+        if self.get_object().paid:
+            messages.error(
+                request,
+                "This reimbursement has already been paid so it cannot be modified or deleted.",
+            )
+            return redirect(
+                reverse(
+                    "economy:reimbursement_list",
+                    kwargs={"camp_slug": self.camp.slug},
+                ),
+            )
+        # continue with the request
+        return super().get(request, *args, **kwargs)

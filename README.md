@@ -76,7 +76,7 @@ Install system dependencies (method depends on OS):
   - FreeBSD: databases/postgresql11-client
   - macOS: If using the PostgreSQL.app, the headers are included, only path needs to be added
 - libjpeg (for pdf generation)
-  - OpenBSD: pkg_add turbo
+  - OpenBSD: pkg_add jpeg
   - Debian: libjpeg-dev
   - FreeBSD: graphics/jpeg-turbo
   - macOS: brew install libjpeg

@@ -89,7 +89,7 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
         null=True,
         blank=True,
         help_text="The speaker proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -98,7 +98,7 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
         null=True,
         blank=True,
         help_text="The event proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -107,7 +107,7 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
         null=True,
         blank=True,
         help_text="The speaker proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -116,7 +116,7 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
         null=True,
         blank=True,
         help_text="The event proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 

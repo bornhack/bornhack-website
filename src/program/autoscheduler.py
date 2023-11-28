@@ -27,7 +27,7 @@ class AutoScheduler:
     Initialising this class takes a while because all the objects have to be created.
     """
 
-    def __init__(self, camp):
+    def __init__(self, camp, **kwargs):
         """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects"""
         self.camp = camp
 
@@ -62,7 +62,10 @@ class AutoScheduler:
                     break
 
         # get autoevents and a lookup dict which maps Event id to autoevent index
-        self.autoevents, self.autoeventindex = self.get_autoevents(self.events)
+        self.autoevents, self.autoeventindex = self.get_autoevents(
+            self.events,
+            **kwargs,
+        )
 
     def get_event_types(self):
         """Return all EventTypes which support autoscheduling"""
@@ -94,7 +97,14 @@ class AutoScheduler:
                 autoslots.append(slot.get_autoscheduler_slot())
         return autoslots
 
-    def get_autoevents(self, events):
+    def get_autoevents(
+        self,
+        events,
+        event_type_constraint=True,
+        speakers_other_events_constraint=True,
+        speaker_event_conflicts_constraint=True,
+        speaker_availability_constraint=True,
+    ):
         """Return a list of resources.Event objects, one for each Event"""
         autoevents = []
         autoeventindex = {}
@@ -116,89 +126,93 @@ class AutoScheduler:
         # loop over all autoevents to add unavailability...
         # (we have to do this in a seperate loop because we need all the autoevents to exist)
         for autoevent in autoevents:
-            # get the Event
-            event = autoeventindex[autoevents.index(autoevent)]
-            # loop over all other event_types...
-            for et in self.event_types.all().exclude(pk=event.event_type.pk):
-                if et in self.event_type_slots:
-                    # and add all slots for this EventType as unavailable for this event,
-                    # this means we don't schedule a talk in a workshop slot and vice versa.
-                    autoevent.add_unavailability(*self.event_type_slots[et])
+            if event_type_constraint:
+                # get the Event
+                event = autoeventindex[autoevents.index(autoevent)]
+                # loop over all other event_types...
+                for et in self.event_types.all().exclude(pk=event.event_type.pk):
+                    if et in self.event_type_slots:
+                        # and add all slots for this EventType as unavailable for this event,
+                        # this means we don't schedule a talk in a workshop slot and vice versa.
+                        autoevent.add_unavailability(*self.event_type_slots[et])
 
             # loop over all speakers for this event and add event conflicts
             for speaker in event.speakers.all():
-                # loop over other events featuring this speaker, register each conflict,
-                # this means we dont schedule two events for the same speaker at the same time
-                conflict_ids = speaker.events.exclude(id=event.id).values_list(
-                    "id",
-                    flat=True,
-                )
-                for conflictevent in autoevents:
-                    if conflictevent.name in conflict_ids:
-                        # only the event with the lowest index gets the unavailability,
-                        if autoevents.index(conflictevent) > autoevents.index(
-                            autoevent,
-                        ):
-                            autoevent.add_unavailability(conflictevent)
-
-                # loop over event_conflicts for this speaker, register unavailability for each,
-                # this means we dont schedule this event at the same time as something the
-                # speaker wishes to attend.
-                # Only process Events which the AutoScheduler is handling
-                for conflictevent in speaker.event_conflicts.filter(
-                    pk__in=events.values_list("pk", flat=True),
-                ):
-                    # only the event with the lowest index gets the unavailability
-                    if eventindex[conflictevent] > autoevents.index(autoevent):
-                        autoevent.add_unavailability(
-                            autoevents[eventindex[conflictevent]],
-                        )
-
-                # loop over event_conflicts for this speaker, register unavailability for each,
-                # only process Events which the AutoScheduler is not handling, and which have
-                # been scheduled in one or more EventSlots
-                for conflictevent in speaker.event_conflicts.filter(
-                    event_slots__isnull=False,
-                ).exclude(pk__in=events.values_list("pk", flat=True)):
-                    # loop over the EventSlots this conflict is scheduled in
-                    for conflictslot in conflictevent.event_slots.all():
-                        # loop over all slots
-                        for slot in self.autoslots:
-                            # check if this slot overlaps with the conflictevents slot
-                            if conflictslot.when & DateTimeTZRange(
-                                slot.starts_at,
-                                slot.starts_at + timedelta(minutes=slot.duration),
-                            ):
-                                # this slot overlaps with the conflicting event
-                                autoevent.add_unavailability(slot)
-
-                # Register all slots where we have no positive availability
-                # for this speaker as unavailable
-                available = []
-                for availability in speaker.availabilities.filter(
-                    available=True,
-                ).values_list("when", flat=True):
-                    availability = DateTimeTZRange(
-                        availability.lower,
-                        availability.upper,
-                        "()",
+                if speakers_other_events_constraint:
+                    # loop over other events featuring this speaker, register each conflict,
+                    # this means we dont schedule two events for the same speaker at the same time
+                    conflict_ids = speaker.events.exclude(id=event.id).values_list(
+                        "id",
+                        flat=True,
                     )
-                    for slot in self.autoslots:
-                        slotrange = DateTimeTZRange(
-                            slot.starts_at,
-                            slot.starts_at + timedelta(minutes=slot.duration),
+                    for conflictevent in autoevents:
+                        if conflictevent.name in conflict_ids:
+                            # only the event with the lowest index gets the unavailability,
+                            if autoevents.index(conflictevent) > autoevents.index(
+                                autoevent,
+                            ):
+                                autoevent.add_unavailability(conflictevent)
+
+                if speaker_event_conflicts_constraint:
+                    # loop over event_conflicts for this speaker, register unavailability for each,
+                    # this means we dont schedule this event at the same time as something the
+                    # speaker wishes to attend.
+                    # Only process Events which the AutoScheduler is handling
+                    for conflictevent in speaker.event_conflicts.filter(
+                        pk__in=events.values_list("pk", flat=True),
+                    ):
+                        # only the event with the lowest index gets the unavailability
+                        if eventindex[conflictevent] > autoevents.index(autoevent):
+                            autoevent.add_unavailability(
+                                autoevents[eventindex[conflictevent]],
+                            )
+
+                    # loop over event_conflicts for this speaker, register unavailability for each,
+                    # only process Events which the AutoScheduler is not handling, and which have
+                    # been scheduled in one or more EventSlots
+                    for conflictevent in speaker.event_conflicts.filter(
+                        event_slots__isnull=False,
+                    ).exclude(pk__in=events.values_list("pk", flat=True)):
+                        # loop over the EventSlots this conflict is scheduled in
+                        for conflictslot in conflictevent.event_slots.all():
+                            # loop over all slots
+                            for slot in self.autoslots:
+                                # check if this slot overlaps with the conflictevents slot
+                                if conflictslot.when & DateTimeTZRange(
+                                    slot.starts_at,
+                                    slot.starts_at + timedelta(minutes=slot.duration),
+                                ):
+                                    # this slot overlaps with the conflicting event
+                                    autoevent.add_unavailability(slot)
+
+                if speaker_availability_constraint:
+                    # Register all slots where we have no positive availability
+                    # for this speaker as unavailable
+                    available = []
+                    for availability in speaker.availabilities.filter(
+                        available=True,
+                    ).values_list("when", flat=True):
+                        availability = DateTimeTZRange(
+                            availability.lower,
+                            availability.upper,
                             "()",
                         )
-                        if slotrange in availability:
-                            # the speaker is available for this slot
-                            available.append(self.autoslots.index(slot))
-                autoevent.add_unavailability(
-                    *[
-                        s
-                        for s in self.autoslots
-                        if not self.autoslots.index(s) in available
-                    ],
-                )
+                        for slot in self.autoslots:
+                            slotrange = DateTimeTZRange(
+                                slot.starts_at,
+                                slot.starts_at + timedelta(minutes=slot.duration),
+                                "()",
+                            )
+                            if slotrange in availability:
+                                # the speaker is available for this slot
+                                available.append(self.autoslots.index(slot))
+                    autoevent.add_unavailability(
+                        *[
+                            s
+                            for s in self.autoslots
+                            if not self.autoslots.index(s) in available
+                        ],
+                    )
 
         return autoevents, autoeventindex
 

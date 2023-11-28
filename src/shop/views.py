@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import logging
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib import messages
@@ -524,6 +525,7 @@ class BankTransferView(
         context["regno"] = settings.BANKACCOUNT_REG
         context["accountno"] = settings.BANKACCOUNT_ACCOUNT
         context["total"] = self.get_object().total
+        context["eur"] = round(self.get_object().total / Decimal(7.42), 2)  # EUR rate
         return context
 
 
