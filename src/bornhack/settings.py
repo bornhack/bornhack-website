@@ -2,8 +2,10 @@ from pathlib import Path
 
 from .environment_settings import *  # noqa: F403
 from utils import range_fields  # noqa: F401
+from utils import allauth_pwreset_nospam
 
-# monkeypatch postgres Range object to support lookups
+# range_fields monkeypatches postgres Range object to support lookups
+# allauth_pwreset_nospam monkeypatches AllAuth for https://github.com/pennersr/django-allauth/issues/3333
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
