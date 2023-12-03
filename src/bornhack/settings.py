@@ -197,7 +197,7 @@ ECONOMY_TEAM_NAME = "Economy"
 # we have some large formsets sometimes
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
-# use captcha form
+# include captcha field in signup form
 ACCOUNT_SIGNUP_FORM_CLASS = "bornhack.forms.AllAuthSignupCaptchaForm"
 
 # django 3.2 https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
