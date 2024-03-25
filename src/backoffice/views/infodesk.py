@@ -181,9 +181,9 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        )
         writer = csv.writer(response)
         writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
         for invoice in Invoice.objects.all().order_by("-id"):
@@ -191,9 +191,11 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
                 [
                     invoice.id,
                     invoice.created.date(),
-                    invoice.order.total
-                    if invoice.order
-                    else invoice.customorder.amount,
+                    (
+                        invoice.order.total
+                        if invoice.order
+                        else invoice.customorder.amount
+                    ),
                     invoice.get_order,
                     invoice.get_order.paid,
                 ],
@@ -209,9 +211,9 @@ class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailVie
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={self.get_object().filename}"
+        response["Content-Disposition"] = (
+            f"attachment; filename={self.get_object().filename}"
+        )
         response.write(self.get_object().pdf.read())
         return response
 
@@ -267,9 +269,9 @@ class OrderDownloadProformaInvoiceView(
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename='{self.get_object().filename}'"
+        response["Content-Disposition"] = (
+            f"attachment; filename='{self.get_object().filename}'"
+        )
         response.write(self.get_object().pdf.read())
         return response
 
@@ -439,8 +441,8 @@ class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, Detail
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={self.get_object().filename}"
+        response["Content-Disposition"] = (
+            f"attachment; filename={self.get_object().filename}"
+        )
         response.write(self.get_object().pdf.read())
         return response

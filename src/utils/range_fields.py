@@ -10,6 +10,7 @@ There is also a more complete `isempty()` method, which examines the bounds type
 and determines if the object is indeed empty. This is required when python-created range objects
 are dealt with, as these are not normalised the same way that postgres does.
 """
+
 import datetime
 
 from psycopg2.extras import Range

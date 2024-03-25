@@ -44,9 +44,11 @@ def _send_email(
             text_template,
             sender,
             to_recipients,
-            bcc_recipients + [settings.ARCHIVE_EMAIL]
-            if bcc_recipients
-            else [settings.ARCHIVE_EMAIL],
+            (
+                bcc_recipients + [settings.ARCHIVE_EMAIL]
+                if bcc_recipients
+                else [settings.ARCHIVE_EMAIL]
+            ),
             cc_recipients,
         )
 
