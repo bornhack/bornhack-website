@@ -75,9 +75,9 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
                     relation.product.name
                 ] += relation.non_refunded_quantity
             except KeyError:
-                merchandise_orders[
-                    relation.product.name
-                ] = relation.non_refunded_quantity
+                merchandise_orders[relation.product.name] = (
+                    relation.non_refunded_quantity
+                )
 
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
