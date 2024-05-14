@@ -16,7 +16,7 @@ def add_added_membership_email(membership):
         to_recipients=membership.user.email,
         formatdict=formatdict,
         subject=f"Team update from {membership.team.camp.title}",
-        hold=True,
+        hold=False,
     )
 
 
@@ -63,5 +63,5 @@ def add_new_membership_email(membership):
             membership.team.name,
             membership.team.camp.title,
         ),
-        hold=True,
+        hold=False,
     )
