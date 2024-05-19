@@ -50,6 +50,7 @@ class DectExportJsonView(
                     "letters": dect.letters,
                     "description": dect.description,
                     "activation_code": dect.activation_code,
+                    "publish_in_phonebook": dect.publish_in_phonebook,
                 },
             )
         return phonebook
