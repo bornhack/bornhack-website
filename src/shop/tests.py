@@ -565,6 +565,23 @@ class TestOrderProductRelationModel(TestCase):
         # Quantity is 4, but 1 is used and 1 is refunded, so we should be able to refund 4
         self.assertEqual(opr.possible_refund, 3)
 
+    def test_unused_shoptickets(self):
+        # Make sure that the unused_shoptickets property returns the correct number of tickets
+        user = UserFactory()
+        ticket_type = TicketTypeFactory(single_ticket_per_product=False)
+        product = ProductFactory(ticket_type=ticket_type)
+        order = OrderFactory(user=user)
+        opr = OrderProductRelationFactory(order=order, product=product, quantity=5)
+        opr.create_tickets()
+
+        self.assertEqual(opr.unused_shoptickets.count(), 5)
+
+        # Mark a ticket as used
+        ticket1 = opr.shoptickets.first()
+        ticket1.mark_as_used(pos=PosFactory(), user=UserFactory())
+
+        self.assertEqual(opr.unused_shoptickets.count(), 4)
+
 
 class TestRefund(TestCase):
     camp: Camp
