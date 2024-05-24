@@ -20,8 +20,8 @@ class BaseTicketAdmin(admin.ModelAdmin):
 
 @admin.register(TicketType)
 class TicketTypeAdmin(admin.ModelAdmin):
-    list_display = ["name", "camp"]
-    list_filter = ["name", "camp"]
+    list_display = ["name", "camp", "includes_badge", "single_ticket_per_product"]
+    list_filter = ["name", "camp", "includes_badge", "single_ticket_per_product"]
     save_as = True
 
 
