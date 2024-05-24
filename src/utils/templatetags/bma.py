@@ -1,6 +1,8 @@
 from django import template
 from django.conf import settings
+
 register = template.Library()
+
 
 @register.inclusion_tag("bma_widget.html", takes_context=True)
 def bma(context, uuid, style="embedtest"):
