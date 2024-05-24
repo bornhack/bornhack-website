@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 {% load static %}
+{% load bornhack %}
 
 {% block title %}
   News | {{ block.super }}
@@ -20,7 +21,7 @@
     <div>
       <h3><a href="{% url 'news:detail' slug=item.slug %}">{{ item.title }}</a> <small>{{ item.published_at }}</small></h3>
     </div>
-    {{ item.content|trustedcommonmark }}
+    {{ item.content|templaterender|trustedcommonmark }}
     {% if not forloop.last %}
       <hr />
     {% endif %}

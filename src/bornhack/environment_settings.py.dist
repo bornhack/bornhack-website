@@ -106,3 +106,5 @@ BACKOFFICE_PROXY_URLS = {{ backoffice_proxy_urls }}
 
 QUICKPAY_API_KEY="{{ quickpay_api_key }}"
 QUICKPAY_PRIVATE_KEY="{{ quickpay_private_key }}"
+
+BMA_BASEURL="{{ bma_baseurl }}"

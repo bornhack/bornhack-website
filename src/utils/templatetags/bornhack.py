@@ -4,6 +4,8 @@ from uuid import UUID
 
 from django import template
 from django.utils.safestring import mark_safe
+from django.template import Template, Context, Engine
+from django.template.loader import render_to_string
 
 register = template.Library()
 
@@ -79,3 +81,17 @@ def highlight_search(text, search):
         text = str(text)
     highlighted = text.replace(search, f"<strong>{search}</strong>")
     return mark_safe(highlighted)
+
+@register.filter
+def templaterender(template):
+    engine = Engine(
+        libraries={
+            "bma": "utils.templatetags.bma",
+        },
+        loaders={
+            'django.template.loaders.filesystem.Loader',
+            'django.template.loaders.app_directories.Loader',
+        },
+    )
+    template_obj = engine.from_string(template)
+    return template_obj.render(context=Context())
