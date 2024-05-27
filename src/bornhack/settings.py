@@ -110,6 +110,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
+# include captcha field in signup form
+ACCOUNT_FORMS = {'signup': "bornhack.forms.AllAuthSignupCaptchaForm"}
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
@@ -196,9 +199,6 @@ ECONOMY_TEAM_NAME = "Economy"
 
 # we have some large formsets sometimes
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
-
-# include captcha field in signup form
-ACCOUNT_SIGNUP_FORM_CLASS = "bornhack.forms.AllAuthSignupCaptchaForm"
 
 # django 3.2 https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
