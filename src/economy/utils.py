@@ -310,9 +310,9 @@ class ZettleExcelImporter:
                 fee=row["Afgift"],
                 net=row["Netto"],
                 payment_method=row["Betalingsmetode"],
-                card_issuer=row["Kortudsteder"]
-                if not pd.isnull(row["Kortudsteder"])
-                else None,
+                card_issuer=(
+                    row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None
+                ),
                 staff=row["Personale"],
                 description=row["Beskrivelse"],
                 sold_via=row["Solgt via"],
@@ -351,12 +351,14 @@ class ZettleExcelImporter:
             # create balance
             zb, created = ZettleBalance.objects.get_or_create(
                 statement_time=timezone.make_aware(row["Opgørelsesdato"], timezone=cph),
-                payment_time=timezone.make_aware(row["Betalingsdato"], timezone=cph)
-                if not pd.isnull(row["Betalingsdato"])
-                else None,
-                payment_reference=row["Reference"]
-                if not pd.isnull(row["Reference"])
-                else None,
+                payment_time=(
+                    timezone.make_aware(row["Betalingsdato"], timezone=cph)
+                    if not pd.isnull(row["Betalingsdato"])
+                    else None
+                ),
+                payment_reference=(
+                    row["Reference"] if not pd.isnull(row["Reference"]) else None
+                ),
                 description=row["Type"],
                 amount=row["Beløb"],
                 balance=row["Saldo"],
