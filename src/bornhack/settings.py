@@ -112,7 +112,7 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
 # include captcha field in signup form
-ACCOUNT_FORMS = {'signup': "bornhack.forms.AllAuthSignupCaptchaForm"}
+ACCOUNT_FORMS = {"signup": "bornhack.forms.AllAuthSignupCaptchaForm"}
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
