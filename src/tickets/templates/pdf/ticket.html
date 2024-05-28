@@ -11,6 +11,8 @@
     </td>
   </tr>
 </table>
+<img src="{{ ticket.get_qr_code_url }}"></img>
+<p>{{ ticket.token }}</p>
 <br>
 <h2>{{ ticket.ticket_type.camp.title }} Ticket</h2>
 <h3>Type: {{ ticket.ticket_type.name }}</h3>
@@ -35,11 +37,6 @@
 {% if ticket.used_at %}
   <h2>This ticket has been used.</h2>
 {% endif %}
-
-<center>
-  <img src="{{ ticket.get_qr_code_url }}"></img>
-  <p>{{ ticket.token }}</p>
-</center>
 
 <br>
 <h3>Venue</h3>
