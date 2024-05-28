@@ -43,6 +43,12 @@
       <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
     {% endif %}
 
+
+    {% if request.user in team.approved_members.all and team.signal_group %}
+      <h5>Signal Group</h5>
+      <p>The {{ team.name }} Team private Signal group is <a href="{{team.signal_group}}">{{team.signal_group}}</a>.</p>
+    {% endif %}
+
   </div>
   </div>
 {% endblock %}
