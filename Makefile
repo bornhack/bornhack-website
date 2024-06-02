@@ -34,7 +34,8 @@ build_docker_image:
 	${DOCKER_COMPOSE} build app
 
 copy_env_file:
-	cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
+	test -f src/bornhack/environment_settings.py || cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
+	test -f docker/.env || cp docker/.env.dev docker/.env
 
 update_submodules:
 	git submodule update --init --recursive
