@@ -2,7 +2,7 @@
 
 django-debug-toolbar==4.3.0
 factory_boy==3.3.0
-coverage==7.5.2
+coverage==7.5.4
 pre-commit==3.7.1
 hypothesis==6.102.6
 tblib==3.0.0
