@@ -36,12 +36,13 @@ class DectExportJsonView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(name="POC", camp=self.camp)
-        if self.request.user not in team.responsible_members:
-            raise PermissionDenied("Permission denied")
-        context["phonebook"] = self.dump_phonebook()
+        if self.request.user in team.responsible_members:
+            context["phonebook"] = self.dump_phonebook_poc()
+        else:
+            context["phonebook"] = self.dump_phonebook()
         return context
 
-    def dump_phonebook(self):
+    def dump_phonebook_poc(self):
         phonebook = []
         for dect in DectRegistration.objects.filter(camp=self.camp):
             phonebook.append(
@@ -51,6 +52,18 @@ class DectExportJsonView(
                     "description": dect.description,
                     "activation_code": dect.activation_code,
                     "publish_in_phonebook": dect.publish_in_phonebook,
+                },
+            )
+        return phonebook
+
+    def dump_phonebook(self):
+        phonebook = []
+        for dect in DectRegistration.objects.filter(camp=self.camp, publish_in_phonebook=True):
+            phonebook.append(
+                {
+                    "number": dect.number,
+                    "letters": dect.letters,
+                    "description": dect.description,
                 },
             )
         return phonebook
