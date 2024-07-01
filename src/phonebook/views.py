@@ -58,7 +58,9 @@ class DectExportJsonView(
 
     def dump_phonebook(self):
         phonebook = []
-        for dect in DectRegistration.objects.filter(camp=self.camp, publish_in_phonebook=True):
+        for dect in DectRegistration.objects.filter(
+            camp=self.camp, publish_in_phonebook=True
+        ):
             phonebook.append(
                 {
                     "number": dect.number,
