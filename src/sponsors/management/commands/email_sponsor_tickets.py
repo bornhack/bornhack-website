@@ -27,7 +27,6 @@ class Command(BaseCommand):
 
         for sponsor in sponsors:
             if (
-                sponsor.tier.tickets
                 and sponsor.tickets_generated
                 and sponsor.ticket_email
                 and sponsor.ticket_ready
