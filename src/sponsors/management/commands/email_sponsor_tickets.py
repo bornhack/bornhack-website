@@ -23,15 +23,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         camp = Camp.objects.get(slug=options["camp_slug"])
-        sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=True)
+        sponsors = Sponsor.objects.filter(tier__camp=camp, tickets_generated=True, ticket_ready=True, tickets_sent=False)
 
         for sponsor in sponsors:
-            if (
-                and sponsor.tickets_generated
-                and sponsor.ticket_email
-                and sponsor.ticket_ready
-                and not sponsor.tickets_sent
-            ):
+            if sponsor.ticket_email:
                 self.output(
                     "# Generating outgoing emails to send tickets for {}:".format(
                         sponsor,
