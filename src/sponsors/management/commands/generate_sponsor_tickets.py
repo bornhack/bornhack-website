@@ -32,10 +32,18 @@ class Command(BaseCommand):
 
         for sponsor in sponsors:
             # get week ticket count from Sponsor or fall back to tier
-            week_tickets = sponsor.week_tickets if sponsor.week_tickets else sponsor.tier.week_tickets
-            existing = SponsorTicket.objects.filter(sponsor=sponsor, ticket_type=week_ticket_type).count()
+            week_tickets = (
+                sponsor.week_tickets
+                if sponsor.week_tickets
+                else sponsor.tier.week_tickets
+            )
+            existing = SponsorTicket.objects.filter(
+                sponsor=sponsor, ticket_type=week_ticket_type
+            ).count()
             missing = week_tickets - existing if week_tickets > existing else 0
-            self.output(f"# Generating {missing} missing out of {week_tickets} total full week tickets for {sponsor}...")
+            self.output(
+                f"# Generating {missing} missing out of {week_tickets} total full week tickets for {sponsor}..."
+            )
             for _ in range(missing):
                 ticket = SponsorTicket(sponsor=sponsor, ticket_type=week_ticket_type)
                 ticket.save()
@@ -44,10 +52,18 @@ class Command(BaseCommand):
                     f"- {ticket.shortname}_ticket_{ticket.pk}.pdf",
                 )
             # get oneday ticket count from Sponsor or fall back to tier
-            oneday_tickets = sponsor.oneday_tickets if sponsor.oneday_tickets else sponsor.tier.oneday_tickets
-            existing = SponsorTicket.objects.filter(sponsor=sponsor, ticket_type=day_ticket_type).count()
+            oneday_tickets = (
+                sponsor.oneday_tickets
+                if sponsor.oneday_tickets
+                else sponsor.tier.oneday_tickets
+            )
+            existing = SponsorTicket.objects.filter(
+                sponsor=sponsor, ticket_type=day_ticket_type
+            ).count()
             missing = oneday_tickets - existing if oneday_tickets > existing else 0
-            self.output(f"# Generating {missing} missing out of {oneday_tickets} total oneday tickets for {sponsor}...")
+            self.output(
+                f"# Generating {missing} missing out of {oneday_tickets} total oneday tickets for {sponsor}..."
+            )
             for _ in range(missing):
                 ticket = SponsorTicket(sponsor=sponsor, ticket_type=day_ticket_type)
                 ticket.save()
