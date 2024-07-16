@@ -1208,7 +1208,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
         recorded = "Yes" if self.event.video_recording else "No"
         ievent["description"] = (
-            f"URL: https://{domain}/{self.event.get_absolute_url()}\n\n"
+            f"URL: https://{domain}{self.event.get_absolute_url()}\n\n"
             f"Speaker(s): {speakers}\n\n"
             f"Recorded: {recorded}\n\n"
             f"{self.event.abstract}"
