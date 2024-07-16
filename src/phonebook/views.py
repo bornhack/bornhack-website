@@ -60,7 +60,7 @@ class DectExportJsonView(
                     {
                         "activation_code": dect.activation_code,
                         "publish_in_phonebook": dect.publish_in_phonebook,
-                    }
+                    },
                 )
             phonebook.append(entry)
         return phonebook

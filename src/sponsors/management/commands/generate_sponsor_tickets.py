@@ -38,11 +38,12 @@ class Command(BaseCommand):
                 else sponsor.tier.week_tickets
             )
             existing = SponsorTicket.objects.filter(
-                sponsor=sponsor, ticket_type=week_ticket_type
+                sponsor=sponsor,
+                ticket_type=week_ticket_type,
             ).count()
             missing = week_tickets - existing if week_tickets > existing else 0
             self.output(
-                f"# Generating {missing} missing out of {week_tickets} total full week tickets for {sponsor}..."
+                f"# Generating {missing} missing out of {week_tickets} total full week tickets for {sponsor}...",
             )
             for _ in range(missing):
                 ticket = SponsorTicket(sponsor=sponsor, ticket_type=week_ticket_type)
@@ -58,11 +59,12 @@ class Command(BaseCommand):
                 else sponsor.tier.oneday_tickets
             )
             existing = SponsorTicket.objects.filter(
-                sponsor=sponsor, ticket_type=day_ticket_type
+                sponsor=sponsor,
+                ticket_type=day_ticket_type,
             ).count()
             missing = oneday_tickets - existing if oneday_tickets > existing else 0
             self.output(
-                f"# Generating {missing} missing out of {oneday_tickets} total oneday tickets for {sponsor}..."
+                f"# Generating {missing} missing out of {oneday_tickets} total oneday tickets for {sponsor}...",
             )
             for _ in range(missing):
                 ticket = SponsorTicket(sponsor=sponsor, ticket_type=day_ticket_type)
