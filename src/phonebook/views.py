@@ -56,10 +56,12 @@ class DectExportJsonView(
             }
             if poc:
                 # POC member, include extra info
-                entry.update({
-                    "activation_code": dect.activation_code,
-                    "publish_in_phonebook": dect.publish_in_phonebook,
-                })
+                entry.update(
+                    {
+                        "activation_code": dect.activation_code,
+                        "publish_in_phonebook": dect.publish_in_phonebook,
+                    },
+                )
             phonebook.append(entry)
         return phonebook
 
