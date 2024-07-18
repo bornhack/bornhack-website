@@ -279,7 +279,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     def used_status(self):
         used = len(self.get_used_shoptickets())
         unused = len(self.get_unused_shoptickets())
-        return f"{used} / {used+unused}"
+        return f"{used} / {used + unused}"
 
     def get_used_shoptickets(self):
         tickets = []
@@ -859,6 +859,10 @@ class OrderProductRelation(
             # and mark the OPR as ticket_generated=True
             self.ticket_generated = timezone.now()
             self.save()
+
+            # At last save all tickets to persist the token to the database.
+            for ticket in tickets:
+                ticket.save()
 
             return tickets
 
