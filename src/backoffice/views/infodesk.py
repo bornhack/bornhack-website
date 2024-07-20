@@ -66,6 +66,7 @@ class ScanTicketsPosSelectView(
     def dispatch(self, *args, **kwargs):
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
 
 
 class ScanTicketsView(
