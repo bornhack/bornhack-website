@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponse
+from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
@@ -62,6 +63,10 @@ class ScanTicketsPosSelectView(
     model = Pos
     template_name = "scan_ticket_pos_select.html"
 
+    def dispatch(self, *args, **kwargs):
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
+
 
 class ScanTicketsView(
     LoginRequiredMixin,
@@ -74,6 +79,10 @@ class ScanTicketsView(
     ticket = None
     order = None
     order_search = False
+
+    def dispatch(self, *args, **kwargs):
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
