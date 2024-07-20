@@ -46,6 +46,9 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
                 responsible_team__camp=self.camp,
             ).count()
         )
+
+        context["camp"] = self.camp
+
         return context
 
 

@@ -1928,28 +1928,28 @@ class Command(BaseCommand):
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe\n- sponsored social event",
             camp=camp,
             weight=0,
-            tickets=10,
+            week_tickets=10,
         )
         tiers["gold"] = SponsorTier.objects.create(
             name="Gold sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe",
             camp=camp,
             weight=1,
-            tickets=10,
+            week_tickets=10,
         )
         tiers["silver"] = SponsorTier.objects.create(
             name="Silver sponsors",
             description="- 5 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers",
             camp=camp,
             weight=2,
-            tickets=5,
+            week_tickets=5,
         )
         tiers["sponsor"] = SponsorTier.objects.create(
             name="Sponsors",
             description="- 2 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area",
             camp=camp,
             weight=3,
-            tickets=2,
+            week_tickets=2,
         )
 
         return tiers

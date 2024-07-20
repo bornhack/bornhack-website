@@ -1,4 +1,4 @@
-DOCKER_COMPOSE = COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose -p bornhack -f docker/docker-compose.yml
+DOCKER_COMPOSE = COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker compose -p bornhack -f docker/docker-compose.yml
 DOCKER_RUN = ${DOCKER_COMPOSE} run -u `id -u`
 MANAGE_EXEC = ${DOCKER_COMPOSE} exec app python /app/src/manage.py
 MANAGE_RUN = ${DOCKER_RUN} app python /app/src/manage.py
