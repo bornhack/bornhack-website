@@ -84,6 +84,7 @@ class ScanTicketsView(
     def dispatch(self, *args, **kwargs):
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
