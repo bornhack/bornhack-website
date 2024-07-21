@@ -75,11 +75,21 @@
                     {% endif %}
 
                   {% endif %}
-                {% endif %}
-                {% if product.available_for_days < 20 %}
-                  <div class="label label-info" style="margin-left: 1em;">
-                    Sales end in {{ product.available_for_days }} days!
-                  </dev>
+
+                  {% if product.left_in_stock > 0 %}
+                    <div class="label label-info" style="margin-left: 1em;">
+                      Sales end in {{ product.available_for_days }} days!
+                    </dev>
+                  {% endif %}
+
+                {% else %}
+
+                  {% if product.available_for_days < 20 %}
+                    <div class="label label-info" style="margin-left: 1em;">
+                      Sales end in {{ product.available_for_days }} days!
+                    </dev>
+                  {% endif %}
+
                 {% endif %}
 
                 {% if product.has_subproducts %}
