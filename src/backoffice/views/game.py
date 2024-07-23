@@ -3,9 +3,9 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count
-from django.db.models import Subquery
 from django.db.models import OuterRef
 from django.db.models import Q
+from django.db.models import Subquery
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView
@@ -101,10 +101,14 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
             .distinct("user")
             .values_list("user", flat=True)
         )
-        last_token_find_subquery = TokenFind.objects.filter(
-            user=OuterRef('pk'),
-            token__camp=self.camp
-        ).order_by('-created').values('created')[:1]
+        last_token_find_subquery = (
+            TokenFind.objects.filter(
+                user=OuterRef("pk"),
+                token__camp=self.camp,
+            )
+            .order_by("-created")
+            .values("created")[:1]
+        )
         return (
             User.objects.filter(id__in=tokenusers)
             .annotate(
@@ -112,7 +116,7 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
                     "token_finds",
                     filter=Q(token_finds__token__camp=self.camp),
                 ),
-                last_token_find=Subquery(last_token_find_subquery)
+                last_token_find=Subquery(last_token_find_subquery),
             )
             .exclude(token_find_count=0)
         )
