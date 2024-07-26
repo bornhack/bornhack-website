@@ -13,6 +13,17 @@
       Create {{ camp.title }} Expense for {{ creditor.name }}
     {% endif %}
   </h3>
+
+  <div class="alert alert-warning" role="alert">
+    <p><b>Note:</b> Please make sure to get the BornHack company info added on <b>ALL</b> invoices.</p>
+    <p>
+      <ul>
+        <li>Name: BornHack ApS</li>
+        <li>VAT: 37666521</li>
+      </ul>
+    </p>
+  </div>
+
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <b>Chain</b>

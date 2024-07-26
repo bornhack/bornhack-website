@@ -19,7 +19,7 @@ class SponsorAdmin(admin.ModelAdmin):
 
 @admin.register(SponsorTier)
 class SponsorTierAdmin(admin.ModelAdmin):
-    list_display = ("name", "camp", "weight")
+    list_display = ("name", "camp", "weight", "week_tickets", "oneday_tickets")
     list_editable = ("weight",)
     list_filter = ("camp",)
     ordering = ("weight",)

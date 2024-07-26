@@ -854,9 +854,9 @@ class AccountingExportDownloadArchiveView(
         archive = ae.archive.read()
         mimetype = magic.from_buffer(archive, mime=True)
         response = HttpResponse(content_type=mimetype)
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename=bornhack_accounting_export_from_{ae.date_from}_to_{ae.date_to}_{ae.uuid}.zip"
+        response["Content-Disposition"] = (
+            f"attachment; filename=bornhack_accounting_export_from_{ae.date_from}_to_{ae.date_to}_{ae.uuid}.zip"
+        )
         response.write(archive)
         return response
 

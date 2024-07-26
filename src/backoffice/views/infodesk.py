@@ -8,6 +8,7 @@ from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
 from django.http import HttpResponse
+from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils import timezone
@@ -62,6 +63,11 @@ class ScanTicketsPosSelectView(
     model = Pos
     template_name = "scan_ticket_pos_select.html"
 
+    def dispatch(self, *args, **kwargs):
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
+
 
 class ScanTicketsView(
     LoginRequiredMixin,
@@ -74,6 +80,11 @@ class ScanTicketsView(
     ticket = None
     order = None
     order_search = False
+
+    def dispatch(self, *args, **kwargs):
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -181,9 +192,9 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        response["Content-Disposition"] = (
+            f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
+        )
         writer = csv.writer(response)
         writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
         for invoice in Invoice.objects.all().order_by("-id"):
@@ -191,9 +202,11 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
                 [
                     invoice.id,
                     invoice.created.date(),
-                    invoice.order.total
-                    if invoice.order
-                    else invoice.customorder.amount,
+                    (
+                        invoice.order.total
+                        if invoice.order
+                        else invoice.customorder.amount
+                    ),
                     invoice.get_order,
                     invoice.get_order.paid,
                 ],
@@ -209,9 +222,9 @@ class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailVie
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={self.get_object().filename}"
+        response["Content-Disposition"] = (
+            f"attachment; filename={self.get_object().filename}"
+        )
         response.write(self.get_object().pdf.read())
         return response
 
@@ -267,9 +280,9 @@ class OrderDownloadProformaInvoiceView(
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename='{self.get_object().filename}'"
+        response["Content-Disposition"] = (
+            f"attachment; filename='{self.get_object().filename}'"
+        )
         response.write(self.get_object().pdf.read())
         return response
 
@@ -439,8 +452,8 @@ class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, Detail
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response[
-            "Content-Disposition"
-        ] = f"attachment; filename={self.get_object().filename}"
+        response["Content-Disposition"] = (
+            f"attachment; filename={self.get_object().filename}"
+        )
         response.write(self.get_object().pdf.read())
         return response

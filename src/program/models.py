@@ -737,7 +737,7 @@ class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedMod
 
     @property
     def icon_html(self):
-        return mark_safe(f'<i class="fas fa-{ self.icon } fa-fw"></i>')
+        return mark_safe(f'<i class="fas fa-{ self.icon} fa-fw"></i>')
 
     @property
     def event_slots(self):
@@ -860,7 +860,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
 
     def icon_html(self):
         return mark_safe(
-            f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>',
+            f'<i class="fas fa-{ self.icon} fa-fw" style="color: { self.color};"></i>',
         )
 
     class Meta:
@@ -1208,7 +1208,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
         recorded = "Yes" if self.event.video_recording else "No"
         ievent["description"] = (
-            f"URL: https://{domain}/{self.event.get_absolute_url()}\n\n"
+            f"URL: https://{domain}{self.event.get_absolute_url()}\n\n"
             f"Speaker(s): {speakers}\n\n"
             f"Recorded: {recorded}\n\n"
             f"{self.event.abstract}"

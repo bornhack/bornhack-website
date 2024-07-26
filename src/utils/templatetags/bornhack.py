@@ -3,6 +3,10 @@ from decimal import Decimal
 from uuid import UUID
 
 from django import template
+from django.template import Context
+from django.template import Engine
+from django.template import Template
+from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -79,3 +83,18 @@ def highlight_search(text, search):
         text = str(text)
     highlighted = text.replace(search, f"<strong>{search}</strong>")
     return mark_safe(highlighted)
+
+
+@register.filter
+def templaterender(template):
+    engine = Engine(
+        libraries={
+            "bma": "utils.templatetags.bma",
+        },
+        loaders={
+            "django.template.loaders.filesystem.Loader",
+            "django.template.loaders.app_directories.Loader",
+        },
+    )
+    template_obj = engine.from_string(template)
+    return template_obj.render(context=Context())

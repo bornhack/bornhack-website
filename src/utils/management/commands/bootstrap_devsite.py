@@ -299,11 +299,11 @@ class Command(BaseCommand):
                 "year": 2023,
                 "tagline": "make legacy",
                 "colour": "#613915",
-                "read_only": False,
+                "read_only": True,
             },
             {
                 "year": 2024,
-                "tagline": "Undecided",
+                "tagline": "Feature Creep",
                 "colour": "#73d7ee",
                 "read_only": False,
                 "light_text": False,
@@ -995,7 +995,7 @@ class Command(BaseCommand):
         name = "Corporate Hackers Small"
         products["corporate_hackers_small"] = Product.objects.create(
             name=name,
-            description="Send your company to BornHack 2023 in style with one of our corporate packages!",
+            description="Send your company to BornHack in style with one of our corporate packages!",
             price=18000,
             category=categories["packages"],
             available_in=(
@@ -1525,6 +1525,12 @@ class Command(BaseCommand):
             camp=camp,
             permission_set="infoteam_permission",
         )
+        teams["poc"] = Team.objects.create(
+            name="POC",
+            description="The POC team is in charge of establishing and running a phone network onsite.",
+            camp=camp,
+            permission_set="pocteam_permission",
+        )
         teams["noc"] = Team.objects.create(
             name="NOC",
             description="The NOC team is in charge of establishing and running a network onsite.",
@@ -1922,28 +1928,28 @@ class Command(BaseCommand):
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe\n- sponsored social event",
             camp=camp,
             weight=0,
-            tickets=10,
+            week_tickets=10,
         )
         tiers["gold"] = SponsorTier.objects.create(
             name="Gold sponsors",
             description="- 10 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers\n- promoted HackMe",
             camp=camp,
             weight=1,
-            tickets=10,
+            week_tickets=10,
         )
         tiers["silver"] = SponsorTier.objects.create(
             name="Silver sponsors",
             description="- 5 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area\n- sponsor meeting with organizers",
             camp=camp,
             weight=2,
-            tickets=5,
+            week_tickets=5,
         )
         tiers["sponsor"] = SponsorTier.objects.create(
             name="Sponsors",
             description="- 2 tickets\n- logo on website\n- physical banner in the speaker's tent\n- thanks from the podium\n- recruitment area",
             camp=camp,
             weight=3,
-            tickets=2,
+            week_tickets=2,
         )
 
         return tiers

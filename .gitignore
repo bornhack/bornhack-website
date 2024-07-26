@@ -11,3 +11,4 @@ environment_settings.py
 elm-stuff/
 .coverage
 media
+docker/.env

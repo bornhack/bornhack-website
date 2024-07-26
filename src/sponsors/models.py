@@ -22,6 +22,18 @@ class Sponsor(ExportModelOperationsMixin("sponsor"), CampRelatedModel):
 
     url = models.URLField(null=True, blank=True, help_text="An URL to the sponsor.")
 
+    week_tickets = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The number of full week tickets to generate for this sponsor.",
+    )
+
+    oneday_tickets = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text="The number of one day tickets to generate for this sponsor.",
+    )
+
     tickets_generated = models.BooleanField(default=False)
 
     ticket_email = models.EmailField(
@@ -72,10 +84,13 @@ class SponsorTier(ExportModelOperationsMixin("sponsor_tier"), CampRelatedModel):
         gold should have a lower value than silver.""",
     )
 
-    tickets = models.IntegerField(
-        null=True,
-        blank=True,
-        help_text="If set this is the number of tickets generated for a sponsor in this tier.",
+    week_tickets = models.IntegerField(
+        help_text="The default number of full week tickets generated for a sponsor in this tier.",
+    )
+
+    oneday_tickets = models.IntegerField(
+        default=0,
+        help_text="The default number of one day tickets generated for a sponsor in this tier.",
     )
 
     def __str__(self):

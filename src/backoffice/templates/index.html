@@ -86,15 +86,17 @@
               Use this view see a list of all Credit Notes in the system
             </p>
           </a>
-          <a href="{% url 'backoffice:scan_tickets_pos_select' camp_slug=camp.slug %}"
-             class="list-group-item">
-            <h4 class="list-group-item-heading">
-              Scan tickets
-            </h4>
-            <p class="list-group-item-text">
-              Use this view to scan tickets QR codes to check in visitors, hand out merch and HAX, etc.
-            </p>
-          </a>
+          {% if not camp.read_only %}
+            <a href="{% url 'backoffice:scan_tickets_pos_select' camp_slug=camp.slug %}"
+               class="list-group-item">
+              <h4 class="list-group-item-heading">
+                Scan tickets
+              </h4>
+              <p class="list-group-item-text">
+                Use this view to scan tickets QR codes to check in visitors, hand out merch and HAX, etc.
+              </p>
+            </a>
+          {% endif %}
           <a href="{% url 'backoffice:shop_ticket_overview' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Shop Ticket Overview</h4>
             <p class="list-group-item-text">Use this to list shop tickets</p>

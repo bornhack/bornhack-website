@@ -3,7 +3,7 @@ from pathlib import Path
 from .environment_settings import *  # noqa: F403
 from utils import range_fields  # noqa: F401
 
-# monkeypatch postgres Range object to support lookups
+# range_fields monkeypatches postgres Range object to support lookups
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,6 +110,9 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
+# include captcha field in signup form
+ACCOUNT_FORMS = {"signup": "bornhack.forms.AllAuthSignupCaptchaForm"}
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
@@ -197,9 +200,6 @@ ECONOMY_TEAM_NAME = "Economy"
 # we have some large formsets sometimes
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 
-# use captcha form
-ACCOUNT_SIGNUP_FORM_CLASS = "bornhack.forms.AllAuthSignupCaptchaForm"
-
 # django 3.2 https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -216,4 +216,4 @@ OAUTH2_PROVIDER = {
     "PKCE_REQUIRED": False,  # False only until https://github.com/pennersr/django-allauth/issues/2998 is resolved so BMA can use PKCE
 }
 
-UPCOMING_CAMP_YEAR = 2023
+UPCOMING_CAMP_YEAR = 2025

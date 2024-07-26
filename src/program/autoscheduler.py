@@ -277,9 +277,9 @@ class AutoScheduler:
             kwargs["objective_function"] = objective_functions.number_of_changes
         else:
             # otherwise use the capacity demand difference thing
-            kwargs[
-                "objective_function"
-            ] = objective_functions.efficiency_capacity_demand_difference
+            kwargs["objective_function"] = (
+                objective_functions.efficiency_capacity_demand_difference
+            )
         # calculate the new schedule
         autoschedule = scheduler.schedule(**kwargs)
         return autoschedule
@@ -391,15 +391,15 @@ class AutoScheduler:
             )
             # do we have an old slot for this event?
             if item.old_slot:
-                event_output[-1]["old"][
-                    "event_location"
-                ] = self.camp.event_locations.get(id=item.old_slot.venue)
+                event_output[-1]["old"]["event_location"] = (
+                    self.camp.event_locations.get(id=item.old_slot.venue)
+                )
                 event_output[-1]["old"]["starttime"] = item.old_slot.starts_at
             # do we have a new slot for this event?
             if item.new_slot:
-                event_output[-1]["new"][
-                    "event_location"
-                ] = self.camp.event_locations.get(id=item.new_slot.venue)
+                event_output[-1]["new"]["event_location"] = (
+                    self.camp.event_locations.get(id=item.new_slot.venue)
+                )
                 event_output[-1]["new"]["starttime"] = item.new_slot.starts_at
 
         # all good

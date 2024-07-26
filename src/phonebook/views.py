@@ -36,22 +36,33 @@ class DectExportJsonView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(name="POC", camp=self.camp)
-        if self.request.user not in team.responsible_members:
-            raise PermissionDenied("Permission denied")
-        context["phonebook"] = self.dump_phonebook()
+        poc = self.request.user in team.responsible_members
+        context["phonebook"] = self.dump_phonebook(poc=poc)
         return context
 
-    def dump_phonebook(self):
+    def dump_phonebook(self, poc: bool) -> list[DectRegistration]:
+        """Dump phonebook for poc and non-poc use."""
         phonebook = []
-        for dect in DectRegistration.objects.filter(camp=self.camp):
-            phonebook.append(
-                {
-                    "number": dect.number,
-                    "letters": dect.letters,
-                    "description": dect.description,
-                    "activation_code": dect.activation_code,
-                },
-            )
+        dects = DectRegistration.objects.filter(camp=self.camp)
+        if not poc:
+            # not a POC member, only return public numbers
+            dects = dects.filter(publish_in_phonebook=True)
+        # build list
+        for dect in dects:
+            entry = {
+                "number": dect.number,
+                "letters": dect.letters,
+                "description": dect.description,
+            }
+            if poc:
+                # POC member, include extra info
+                entry.update(
+                    {
+                        "activation_code": dect.activation_code,
+                        "publish_in_phonebook": dect.publish_in_phonebook,
+                    },
+                )
+            phonebook.append(entry)
         return phonebook
 
 

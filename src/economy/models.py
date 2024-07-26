@@ -607,6 +607,9 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
         help_text="The Team managing this POS",
     )
 
+    def __str__(self):
+        return f"{self.name} POS ({self.camp})"
+
     def save(self, **kwargs):
         """Generate slug if needed."""
         if not self.slug:

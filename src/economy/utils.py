@@ -279,8 +279,8 @@ class ZettleExcelImporter:
             skiprows=16,
             skipfooter=3,
             usecols="A,C:H,J,L:N",
+            parse_dates=True,
             dtype={
-                "Dato": datetime,  # A
                 "Betalingsmetode": str,  # H
                 "Kortudsteder": str,  # J
                 "Personale": str,  # L
@@ -289,7 +289,7 @@ class ZettleExcelImporter:
             },
             converters={
                 "Kvitteringsnummer": optional_int,  # C
-                "Moms (25%)": to_decimal,  # D
+                "Moms (25.0%)": to_decimal,  # D
                 "Total": to_decimal,  # E
                 "Afgift": to_decimal,  # F
                 "Netto": to_decimal,  # G
@@ -305,14 +305,14 @@ class ZettleExcelImporter:
             zr, created = ZettleReceipt.objects.get_or_create(
                 zettle_created=pd.to_datetime(row["Dato"]).replace(tzinfo=cph),
                 receipt_number=row["Kvitteringsnummer"],
-                vat=to_decimal(row[2]),
+                vat=row["Moms (25.0%)"],
                 total=row["Total"],
                 fee=row["Afgift"],
                 net=row["Netto"],
                 payment_method=row["Betalingsmetode"],
-                card_issuer=row["Kortudsteder"]
-                if not pd.isnull(row["Kortudsteder"])
-                else None,
+                card_issuer=(
+                    row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None
+                ),
                 staff=row["Personale"],
                 description=row["Beskrivelse"],
                 sold_via=row["Solgt via"],
@@ -331,9 +331,8 @@ class ZettleExcelImporter:
         """
         df = pd.read_excel(
             fh,
+            parse_dates=True,
             dtype={
-                "Opgørelsesdato": datetime,  # A
-                "Betalingsdato": datetime,  # B
                 "Type": str,  # D
             },
             converters={
@@ -352,12 +351,14 @@ class ZettleExcelImporter:
             # create balance
             zb, created = ZettleBalance.objects.get_or_create(
                 statement_time=timezone.make_aware(row["Opgørelsesdato"], timezone=cph),
-                payment_time=timezone.make_aware(row["Betalingsdato"], timezone=cph)
-                if not pd.isnull(row["Betalingsdato"])
-                else None,
-                payment_reference=row["Reference"]
-                if not pd.isnull(row["Reference"])
-                else None,
+                payment_time=(
+                    timezone.make_aware(row["Betalingsdato"], timezone=cph)
+                    if not pd.isnull(row["Betalingsdato"])
+                    else None
+                ),
+                payment_reference=(
+                    row["Reference"] if not pd.isnull(row["Reference"]) else None
+                ),
                 description=row["Type"],
                 amount=row["Beløb"],
                 balance=row["Saldo"],
