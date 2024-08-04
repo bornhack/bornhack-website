@@ -3,10 +3,10 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count
+from django.db.models import DateTimeField
 from django.db.models import OuterRef
 from django.db.models import Q
 from django.db.models import Subquery
-from django.db.models import DateTimeField 
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -103,10 +103,14 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
             .distinct("user")
             .values_list("user", flat=True)
         )
-        last_token_find_subquery = TokenFind.objects.filter(
-            user=OuterRef('pk'),
-            token__camp=self.camp,
-        ).order_by('-created').values('created')[:1]
+        last_token_find_subquery = (
+            TokenFind.objects.filter(
+                user=OuterRef("pk"),
+                token__camp=self.camp,
+            )
+            .order_by("-created")
+            .values("created")[:1]
+        )
         return (
             User.objects.filter(id__in=tokenusers)
             .annotate(
@@ -114,7 +118,9 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
                     "token_finds",
                     filter=Q(token_finds__token__camp=self.camp),
                 ),
-                token_last_find=Subquery(last_token_find_subquery, output_field=DateTimeField()),
+                token_last_find=Subquery(
+                    last_token_find_subquery, output_field=DateTimeField()
+                ),
             )
             .exclude(token_find_count=0)
         )
