@@ -5,9 +5,12 @@
 
 {% block extra_head %}
   {% leaflet_css %}
+  <link href="{% static 'css/leaflet.css' %}" rel="stylesheet">
+  <link href="{% static 'css/leaflet.awesome-markers.css' %}" rel="stylesheet">
   <script src="{% static 'js/leaflet-1.6.0.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/proj4.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/proj4leaflet.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/leaflet.awesome-markers.min.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/leaflet-color-markers.js' %}" type="text/javascript"></script>
 {% endblock extra_head %}
 
@@ -112,7 +115,7 @@
             <tr>
               <th>Location</th>
               <td>
-                Lat {{ facility.location.y }} Long {{ facility.location.x }}<br>
+                  Lat {{ facility.location.y }} Long {{ facility.location.x }} Grid: <span id="gridLocator"></span><br>
                 <div id="map" class="map"></div>
               </td>
             </tr>
@@ -121,16 +124,37 @@
       </div>
     </div>
 
+    <script src="{% static 'js/mapVars.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
     <script type="text/javascript">
-      function MapReadyCallback() {
-        // add a marker for this facility
-        var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}})
-        marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p>").addTo(this);
-        // max zoom since we have only one marker
-        this.setView(marker.getLatLng(), 13);
-      };
+      const mapObject = new BHMap("map");
+      {% if request.user.is_authenticated %}
+      const loggedIn = true;
+      {% else %}
+      const loggedIn = false;
+      {% endif %}
+      mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
+          onEachFeature: mapObject.onEachGrid,
+          style: {
+            color: "gray",
+            fillOpacity: 0.0,
+            weight: 0.5
+          },
+      }, true, function(_json) {
+          const layer = mapObject.findGridLoc({{ facility.location.y }}, {{ facility.location.x }});
+          console.log(mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1));
+          document.getElementById('gridLocator').innerHTML = mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1);
+      });
+
+      var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: L.AwesomeMarkers.icon({
+          icon: "{{ facility.facility_type.icon }}".replace('fas fa-',''),
+          markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
+        prefix: 'fa',
+      })});
+      marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p>").addTo(mapObject.map);
+      // max zoom since we have only one marker
+      mapObject.map.setView(marker.getLatLng(), 20);
     </script>
 
-    <script src="{% static 'js/kfmap.js' %}" type="text/javascript"></script>
 
 {% endblock %}

@@ -1,0 +1,51 @@
+const iconColors = {
+  blueIcon: 'blue',
+  goldIcon: 'cadetblue',
+  redIcon: 'red',
+  greenIcon: 'green',
+  orangeIcon: 'orange',
+  yellowIcon: 'cadetblue',
+  violetIcon: 'darkpurple',
+  greyIcon: 'darkgreen',
+  blackIcon: 'blue',
+}
+
+const facilityOptions = {     
+  onEachFeature: function(feature, layer) {
+    const content = `<b>${feature.properties.name}</b><br><p>${feature.properties.description}</p><p>Responsible team: ${feature.properties.team} Team</p>` 
+    const authContent = `<p><a href='${feature.properties.detail_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a><a href='${feature.properties.feedback_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>`
+    if (loggedIn)
+      layer.bindPopup(content + authContent, { maxHeight: 400});
+    else
+      layer.bindPopup(content, { maxHeight: 400});
+    layer.setIcon(L.AwesomeMarkers.icon({
+      icon: feature.properties.icon.replace('fas fa-',''),
+      markerColor: iconColors[feature.properties.marker],
+      prefix: 'fa',
+    }))
+  }
+}
+
+const popOptions = {
+  onEachFeature: function(feature, layer) {
+    const content = `${feature.properties['name']}`
+    layer.bindPopup(content, { maxHeight: 400});
+  }
+}
+
+const connectionOptions = {
+  style: {
+    opacity: 1,
+    color: 'rgba(213,180,60,1.0)',
+    dashArray: '',
+    lineCap: 'square',
+    lineJoin: 'bevel',
+    weight: 8.0,
+    fillOpacity: 0,
+    interactive: true,
+  },
+  onEachFeature: function(feature, layer) {
+    const content = `${feature.properties['name']}<br><b>From:</b> ${feature.properties['POP_A']}<br>To: ${feature.properties['POP_B']}`
+    layer.bindPopup(content, { maxHeight: 400});
+  }
+}

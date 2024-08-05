@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
+from jsonview.views import JsonView
 
 from .mixins import FacilityTypeViewMixin
 from .mixins import FacilityViewMixin
@@ -18,6 +19,41 @@ class FacilityTypeListView(CampViewMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list.html"
 
+class FacilityMapView(CampViewMixin, ListView):
+    model = FacilityType
+    template_name = "facility_map.html"
+
+class FacilityListGeoJSONView(CampViewMixin, JsonView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["type"] = "FeatureCollection"
+        context["features"] = self.dump_features()
+        return context
+
+    def dump_features(self) -> list[object]:
+        output = []
+        for ft in FacilityType.objects.filter(
+                responsible_team__camp=self.camp,
+                slug=self.kwargs["facility_type_slug"]):
+            for facility in Facility.objects.filter(facility_type=ft.pk):
+                entry = {
+                    "type": "Feature",
+                    "id": facility.pk,
+                    "geometry": {"type": "Point", "coordinates": [facility.location.x, facility.location.y]},
+                    "properties": {
+                        "name": facility.name,
+                        "marker": facility.facility_type.marker,
+                        "icon": facility.facility_type.icon,
+                        "description": facility.description,
+                        "team": facility.facility_type.responsible_team.name,
+                        "uuid": facility.uuid,
+                        "type": ft.name,
+                        "detail_url": reverse('facilities:facility_detail', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
+                        "feedback_url": reverse('facilities:facility_feedback', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
+                        },
+                }
+                output.append(entry)
+        return list(output)
 
 class FacilityListView(FacilityTypeViewMixin, ListView):
     model = Facility
@@ -26,7 +62,6 @@ class FacilityListView(FacilityTypeViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(facility_type=self.facility_type)
-
 
 class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     model = Facility

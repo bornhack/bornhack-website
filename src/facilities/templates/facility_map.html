@@ -22,23 +22,10 @@
     <div class="panel-heading">
       <h3 class="panel-title">Facilities</h3>
     </div>
-    <div class="panel-body">
-      <p class="lead">The {{ camp.title }} facilities are grouped in categories. Pick a category to limit the facilities shown.</p>
-      <div class="list-group">
-        {% for ft in facilitytype_list %}
-          <a href="{% url 'facilities:facility_list' camp_slug=camp.slug facility_type_slug=ft.slug %}" class="list-group-item">
-            <h4 class="list-group-item-heading">
-              <i class="{{ ft.icon }} fa-2x fa-pull-left fa-fw"></i> {{ ft.name }}
-              <img class="pull-right" src="{% static 'img/leaflet/marker-icon-'|add:ft.marker|slice:"-4"|add:'.png' %}">
-            </h4>
-            <p class="list-group-item-text">{{ ft.description }}</p>
-          </a>
-        {% endfor %}
-      </div>
-      <p>
-        <div id="map" class="map"></div>
-      </div>
+    <div class="panel-body" id="container">
+      <div id="map" class="map"></div>
     </div>
+
     <script src="{% static 'js/mapVars.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
     <script type="text/javascript">
@@ -60,6 +47,13 @@
           weight: 0.5
         },
       }, false);
+      mapObject.loadLayer("https://bh.gigafreak.net/postgis/bh{{ camp.camp.lower.year }}-noc-pops/", "NOC - Pops", popOptions, false);
+      mapObject.loadLayer("https://bh.gigafreak.net/postgis/bh{{ camp.camp.lower.year }}-noc-connections/", "NOC - Connections", connectionOptions, false);
+      mapObject.onGridClick = function (e) {
+            e.target.setStyle({fillOpacity: 1.0});
+            let center = e.target.getCenter();
+            alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
+      }
     </script>
 
 {% endblock %}
