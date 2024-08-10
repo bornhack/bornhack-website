@@ -13,19 +13,32 @@
       <h3 class="panel-title">Import Facility Types - BackOffice</h3>
     </div>
     <div class="panel-body">
-      {% if error %}
-        <p style="color: red;">{{ error }}</p>
-      {% endif %}
       <p>
-      Import from file: <input type="file" id="selectFiles" value="Import" /><br />
+      Only the properties <b>name</b> and <b>description</b> will be imported!
       </p>
-      <p>
-      Import from URL: <input id="importURL" /><button class="btn btn-success" id="importURLFetch">Fetch</button><br />
-      </p>
-      <form method="post">
+      <div class="mb-3">
+          <label for="selectFiles" class="form-label">Import from file</label>
+          <input type="file" class="form-control" id="selectFiles" value="Import" />
+      </div>
+      <div class="mb-3">
+          <div class="mb-1">
+              <label for="importURL" class="form-label">Import from URL</label>
+              <input id="importURL" class="form-control" />
+          </div>
+          <div class="mb-1">
+              <button class="btn btn-success" id="importURLFetch">Fetch</button>
+          </div>
+      </div>
+      <br/><br/>
+      <form class="mb-3" method="post">
         {% csrf_token %}
-        <label for="geojson_data">GeoJSON:</label>
-        <textarea id="geojson_data" name="geojson_data"></textarea>
+        <label class="form-label" for="geojson_data">GeoJSON:</label>
+        <textarea class="form-control" id="geojson_data" name="geojson_data"></textarea>
+        {% if error %}
+        <div class="invalid-feedback">
+            <p style="color: red;">{{ error }}</p>
+        </div>
+        {% endif %}
         {% buttons %}
         <button type="submit" class="btn btn-success">Import</button>
         <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>

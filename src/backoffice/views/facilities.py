@@ -63,12 +63,26 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
         
         createdCount = 0
         updateCount = 0
+        errorCount = 0
         for feature in geojson['features']:
-            geom = GEOSGeometry(json.dumps(feature['geometry']))
+            try:
+                geom = GEOSGeometry(json.dumps(feature['geometry']))
+            except:
+                errorCount += 1
+                continue
             props = feature['properties']
+            if 'description' in props:
+                if props['description']:
+                    description=props['description']
+                else:
+                    errorCount += 1
+                    continue
+            else:
+                errorCount += 1
+                continue
             obj, created = Facility.objects.update_or_create(
                     name=props['name'],
-                    description=props['description'] if 'description' in props else "NA",
+                    description=description,
                     facility_type=facility_type,
                     location=geom
                     )
@@ -76,7 +90,10 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
                 createdCount += 1
             else:
                 updateCount += 1
-        messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount) )
+        if (createdCount > 0 or updateCount > 0):
+            messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount) )
+        if errorCount > 0:
+            messages.error(self.request, "%i features with errors not imported" % (errorCount) )
         return HttpResponseRedirect(reverse(
             "backoffice:facility_type_list",
             kwargs={"camp_slug": camp_slug},
