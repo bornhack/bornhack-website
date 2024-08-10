@@ -21,7 +21,7 @@ class BHMap {
 
     this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 20,
+      maxZoom: 18,
     }).addTo(this.map);
 
     this.baseLayers['Ortophoto Map'] = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS?REQUEST=GetTile&VERSION=1.0.0&service=WMTS&Layer=orto_foraar_wmts&style=default&format=image/jpeg&TileMatrixSet=KortforsyningTilingDK&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
@@ -91,14 +91,20 @@ class BHMap {
   // Find the grid locator by lat lng
   findGridLoc(lat, lon) {
     const m1 = L.latLng([lat, lon]);
-    this.layers['Grid squares'].eachLayer(e => this.findGridLocEach(e,m1));
-    return this.selectedLayer;
+    if (this.layers['Grid squares'] && this.layers['Grid squares']._layers) {
+      for (var i in this.layers['Grid squares']._layers) {
+        if (this.findGridLocEach(this.layers['Grid squares']._layers[i], m1)) {
+          return this.layers['Grid squares']._layers[i];
+        }
+      }
+    }
   }
 
   findGridLocEach(e, m1) {
     if (e.getBounds().contains(m1)) {
       this.resetStyle();
       this.selectedLayer = e;
+      return e;
     }
   }
 

@@ -24,6 +24,7 @@ from villages.views import VillageListView
 from villages.views import VillageUpdateView
 from villages.views import VillageListGeoJSONView
 from villages.views import VillageMapView
+from maps.views import MapView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
@@ -147,6 +148,7 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
+                path("map/", MapView.as_view(), name="maps_map"),
                 path("bar/menu/", MenuView.as_view(), name="menu"),
                 path(
                     "villages/",

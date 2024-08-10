@@ -8,11 +8,15 @@
 
 {% block extra_head %}
   {% leaflet_css %}
+  <link href="{% static 'css/leaflet.css' %}" rel="stylesheet">
+  <link href="{% static 'css/leaflet.awesome-markers.css' %}" rel="stylesheet">
+  <link href="{% static 'modules/leaflet-fullscreen/leaflet.fullscreen.css' %}" rel="stylesheet">
   <script src="{% static 'js/leaflet-1.6.0.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/proj4.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/proj4leaflet.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/leaflet.awesome-markers.min.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/leaflet-color-markers.js' %}" type="text/javascript"></script>
+  <script src="{% static 'modules/leaflet-fullscreen/Leaflet.fullscreen.min.js' %}" type="text/javascript"></script>
 {% endblock extra_head %}
 
 {% block content %}
@@ -66,6 +70,11 @@
       <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
       <script type="text/javascript">
         const mapObject = new BHMap("map");
+        mapObject.setDefaultView();
+        mapObject.map.addControl(new L.Control.Fullscreen({
+          pseudoFullscreen: true,
+        }));
+
         {% if request.user.is_authenticated %}
         const loggedIn = true;
         {% else %}
@@ -85,7 +94,16 @@
         }, false);
         {% for facility in facility_list %}
         {% url "backoffice:facility_detail" camp_slug=facility.camp.slug facility_uuid=facility.uuid as detail %}
-        L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: {{ facility.facility_type.marker }}}).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(mapObject.map);
+        L.marker([
+            {{ facility.location.y }},
+            {{ facility.location.x }}
+        ], {
+            icon: L.AwesomeMarkers.icon({
+                icon: "{{ facility.facility_type.icon }}".replace('fas fa-',''),
+                markerColor: iconColors['{{ facility.facility_type.marker }}'],
+                prefix: 'fa',
+            }) 
+        }).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(mapObject.map);
         {% endfor %}
       </script>
 

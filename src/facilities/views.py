@@ -19,10 +19,6 @@ class FacilityTypeListView(CampViewMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list.html"
 
-class FacilityMapView(CampViewMixin, ListView):
-    model = FacilityType
-    template_name = "facility_map.html"
-
 class FacilityListGeoJSONView(CampViewMixin, JsonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

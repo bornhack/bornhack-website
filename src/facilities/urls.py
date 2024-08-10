@@ -5,13 +5,11 @@ from .views import FacilityDetailView
 from .views import FacilityFeedbackView
 from .views import FacilityListView
 from .views import FacilityTypeListView
-from .views import FacilityMapView
 from .views import FacilityListGeoJSONView
 
 app_name = "facilities"
 urlpatterns = [
     path("", FacilityTypeListView.as_view(), name="facility_type_list"),
-    path("map/", FacilityMapView.as_view(), name="facility_map"),
     path(
         "<slug:facility_type_slug>/",
         include(

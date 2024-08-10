@@ -6,6 +6,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import View
+from django.views.generic.base import TemplateView 
+
+from facilities.models import FacilityType
+from camps.mixins import CampViewMixin
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -14,6 +18,14 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class MissingCredentials(Exception):
     pass
 
+class MapView(CampViewMixin, TemplateView):
+    template_name = "maps_map.html"
+    context_object_name = "maps_map"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['facilitytype_list'] = FacilityType.objects.filter(responsible_team__camp=self.camp) 
+        return context
 
 class MapProxyView(View):
     """
