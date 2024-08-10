@@ -149,7 +149,7 @@ class VillageUpdateView(
 ):
     model = Village
     template_name = "village_form.html"
-    fields = ["name", "description", "private","location"]
+    fields = ["name", "description", "private", "location"]
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)

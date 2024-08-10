@@ -1,14 +1,19 @@
 import logging
+import json
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import PermissionDenied
 from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
+from django.views.generic.base import View
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
@@ -32,6 +37,50 @@ class FacilityTypeListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "facility_type_list_backoffice.html"
     context_object_name = "facility_type_list"
 
+class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
+    model = FacilityType
+    template_name = "facility_type_import_backoffice.html"
+    context_object_name = "facility_type_import"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'facility_type_import_backoffice.html')
+
+    def post(self, request, camp_slug, slug):
+        geojson_data = request.POST.get('geojson_data')
+        facility_type = get_object_or_404(
+            FacilityType,
+            responsible_team__camp=self.camp,
+            slug=slug,
+        )
+        try:
+            geojson = json.loads(geojson_data)
+        except json.JSONDecodeError:
+            return render(request, 'facility_type_import_backoffice.html', {'error': "Invalid GeoJSON data"})
+
+        # Basic validation, you can add more checks
+        if 'type' not in geojson or geojson['type'] != 'FeatureCollection':
+            return render(request, 'facility_type_import_backoffice.html', {'error': "Invalid GeoJSON format"})
+        
+        createdCount = 0
+        updateCount = 0
+        for feature in geojson['features']:
+            geom = GEOSGeometry(json.dumps(feature['geometry']))
+            props = feature['properties']
+            obj, created = Facility.objects.update_or_create(
+                    name=props['name'],
+                    description=props['description'] if 'description' in props else "NA",
+                    facility_type=facility_type,
+                    location=geom
+                    )
+            if created:
+                createdCount += 1
+            else:
+                updateCount += 1
+        messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount) )
+        return HttpResponseRedirect(reverse(
+            "backoffice:facility_type_list",
+            kwargs={"camp_slug": camp_slug},
+        ))
 
 class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
     model = FacilityType
@@ -114,7 +163,6 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
 class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
-
 
 class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     model = Facility

@@ -80,6 +80,7 @@ from .views import FacilityTypeCreateView
 from .views import FacilityTypeDeleteView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
+from .views import FacilityTypeImportView
 from .views import FacilityUpdateView
 from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
@@ -168,6 +169,11 @@ urlpatterns = [
                     "<slug:slug>/",
                     include(
                         [
+                            path(
+                                "import/",
+                                FacilityTypeImportView.as_view(),
+                                name="facility_type_import",
+                            ),
                             path(
                                 "update/",
                                 FacilityTypeUpdateView.as_view(),

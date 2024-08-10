@@ -74,7 +74,7 @@
       {% endif %}
       function gridLoaded() {
       {% url "facilities:facility_list_geojson" camp_slug=facilitytype.responsible_team.camp.slug facility_type_slug=facilitytype.slug as layerUrl %}
-      mapObject.loadLayer("{{ layerUrl }}", "{{ facility.name }}", facilityOptions);
+      mapObject.loadLayer("{{ layerUrl }}", "{{ facilitytype.name }}", facilityOptions);
       }
     </script>
 
