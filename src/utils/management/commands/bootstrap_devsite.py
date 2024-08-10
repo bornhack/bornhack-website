@@ -2002,36 +2002,42 @@ class Command(BaseCommand):
             token=get_random_string(length=32),
             category="Physical",
             description="Token in the back of the speakers tent (in binary)",
+            active=True,
         )
         tokens[1] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Internet",
             description="Twitter",
+            active=True,
         )
         tokens[2] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Website",
             description="Token hidden in the X-Secret-Token HTTP header on the BornHack website",
+            active=True,
         )
         tokens[3] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Physical",
             description="Token in infodesk (QR code)",
+            active=True,
         )
         tokens[4] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Physical",
             description=f"Token on the back of the BornHack {year} badge",
+            active=True,
         )
         tokens[5] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Website",
             description="Token hidden in EXIF data in the logo posted on the website sunday",
+            active=True,
         )
 
         return tokens
