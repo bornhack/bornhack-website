@@ -19,6 +19,9 @@
       <p>
       Import from file: <input type="file" id="selectFiles" value="Import" /><br />
       </p>
+      <p>
+      Import from URL: <input id="importURL" /><button class="btn btn-success" id="importURLFetch">Fetch</button><br />
+      </p>
       <form method="post">
         {% csrf_token %}
         <label for="geojson_data">GeoJSON:</label>
@@ -31,6 +34,14 @@
     </div>
   </div>
   <script>
+      document.getElementById("importURLFetch").onclick = function () {
+        const url = document.getElementById('importURL').value;
+          fetch(url)
+            .then(r => r.text())
+            .then(r => {
+              document.getElementById('geojson_data').value = r; 
+            })
+      };
       document.getElementById('selectFiles').onchange = function() {
         var files = document.getElementById('selectFiles').files;
         if (files.length <= 0) {
@@ -38,7 +49,7 @@
         }
         var fr = new FileReader();
         fr.onload = function(e) {
-          var result = {}; 
+          var result = {};
           try {
             result = JSON.parse(e.target.result);
           } catch(e) {
