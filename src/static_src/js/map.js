@@ -13,11 +13,15 @@ class BHMap {
     this.layers = {};
     this.overlays = {};
     this.cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ'];
-    this.map = L.map(div).setView([55.38806, 9.93970], 17);
+    if (typeof div === 'string' || div instanceof String)
+      this.map = L.map(div);
+    else
+      this.map = div;
     this.myAttributionText = '&copy; <a target="_blank" href="https://download.kortforsyningen.dk/content/vilk%C3%A5r-og-betingelser">Styrelsen for Dataforsyning og Effektivisering</a>';
 
     this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 20,
     }).addTo(this.map);
 
     this.baseLayers['Ortophoto Map'] = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS?REQUEST=GetTile&VERSION=1.0.0&service=WMTS&Layer=orto_foraar_wmts&style=default&format=image/jpeg&TileMatrixSet=KortforsyningTilingDK&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
@@ -60,6 +64,11 @@ class BHMap {
     this.overlays['Venue Overlay'] = L.polygon(venuepolygons, {color: 'red'}).addTo(this.map);
 
     this.controls = L.control.layers(this.baseLayers, this.overlays).addTo(this.map);
+  }
+
+  //Set the default view of the map
+  setDefaultView() {
+    this.map.setView([55.38723, 9.94080], 17);
   }
 
   //Load a layer and add it to overlay/map

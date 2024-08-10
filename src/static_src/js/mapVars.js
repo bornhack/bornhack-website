@@ -26,6 +26,18 @@ const facilityOptions = {
   }
 }
 
+const villageOptions = {
+  onEachFeature: function(feature, layer) {
+    const content = `<b>${feature.properties.name}</b><br><p>${feature.properties.description}</p><p><a href='${feature.properties.detail_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>`;
+    layer.bindPopup(content, { maxHeight: 400});
+    layer.setIcon(L.AwesomeMarkers.icon({
+      icon: "campground",
+      markerColor: "green",
+      prefix: 'fa',
+    }))
+  }
+}
+
 const popOptions = {
   onEachFeature: function(feature, layer) {
     const content = `${feature.properties['name']}`

@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-  Facility Types | {{ block.super }}
+  Villages | {{ block.super }}
 {% endblock %}
 
 {% block extra_head %}
@@ -20,7 +20,7 @@
 {% block content %}
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h3 class="panel-title">Facilities</h3>
+      <h3 class="panel-title">Villages</h3>
     </div>
     <div class="panel-body" id="container">
       <div id="map" class="map"></div>
@@ -36,13 +36,9 @@
       {% else %}
       const loggedIn = false;
       {% endif %}
-      {% for facility in facilitytype_list %}
-      {% url "facilities:facility_list_geojson" camp_slug=facility.responsible_team.camp.slug facility_type_slug=facility.slug as layerUrl %}
-      mapObject.loadLayer("{{layerUrl}}", "{{facility.name}}", facilityOptions);
-      {% endfor %}
-      mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", { 
+      mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
         onEachFeature: mapObject.onEachGrid,
-        style: { 
+        style: {
           color: "gray",
           fillOpacity: 0.0,
           weight: 0.5
@@ -50,8 +46,6 @@
       }, false);
       {% url "villages_geojson" camp_slug=camp.slug as villageLayerUrl %}
       mapObject.loadLayer("{{ villageLayerUrl }}", "Villages", villageOptions, true);
-      mapObject.loadLayer("https://bh.gigafreak.net/postgis/bh{{ camp.camp.lower.year }}-noc-pops/", "NOC - Pops", popOptions, false);
-      mapObject.loadLayer("https://bh.gigafreak.net/postgis/bh{{ camp.camp.lower.year }}-noc-connections/", "NOC - Connections", connectionOptions, false);
       mapObject.onGridClick = function (e) {
             e.target.setStyle({fillOpacity: 1.0});
             let center = e.target.getCenter();

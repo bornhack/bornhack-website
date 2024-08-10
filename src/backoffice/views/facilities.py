@@ -166,6 +166,7 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
+                "map_height": "500px",
             },
         )
         return form

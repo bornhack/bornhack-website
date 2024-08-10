@@ -3,12 +3,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.urls import reverse
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from jsonview.views import JsonView
+from leaflet.forms.widgets import LeafletWidget
 
 from .email import add_village_approve_email
 from .mixins import EnsureWritableCampMixin
@@ -20,6 +23,14 @@ from camps.models import Camp
 class VillageListView(CampViewMixin, ListView):
     model = Village
     template_name = "village_list.html"
+    context_object_name = "villages"
+
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted=False, approved=True)
+
+class VillageMapView(CampViewMixin, ListView):
+    model = Village
+    template_name = "village_map.html"
     context_object_name = "villages"
 
     def get_queryset(self):
@@ -40,6 +51,35 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
 
         return super().dispatch(request, *args, **kwargs)
 
+class VillageListGeoJSONView(CampViewMixin, JsonView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["type"] = "FeatureCollection"
+        context["features"] = self.dump_features()
+        return context
+
+    def dump_features(self) -> list[object]:
+        output = []
+        for village in Village.objects.all():
+            if village.location == None:
+                continue
+            entry = {
+                "type": "Feature",
+                "id": village.pk,
+                "geometry": {"type": "Point", "coordinates": [village.location.x, village.location.y]},
+                "properties": {
+                    "name": village.name,
+                    "marker": "greenIcon",
+                    "icon": "campground",
+                    "description": village.description,
+                    "uuid": None ,
+                    "type": "village",
+                    "detail_url": reverse('village_detail', kwargs={'camp_slug': village.camp.slug, 'slug': village.slug}),
+                },
+            }
+            output.append(entry)
+        return list(output)
+
 
 class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailView):
     model = Village
@@ -58,7 +98,17 @@ class VillageCreateView(
 ):
     model = Village
     template_name = "village_form.html"
-    fields = ["name", "description", "private"]
+    fields = ["name", "description", "private", "location"]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+                "map_height": "500px",
+            },
+        )
+        return form
 
     def form_valid(self, form):
         village = form.save(commit=False)
@@ -99,7 +149,17 @@ class VillageUpdateView(
 ):
     model = Village
     template_name = "village_form.html"
-    fields = ["name", "description", "private"]
+    fields = ["name", "description", "private","location"]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+                "map_height": "500px",
+            },
+        )
+        return form
 
     def form_valid(self, form):
         village = form.save(commit=False)
