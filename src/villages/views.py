@@ -60,7 +60,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
 
     def dump_features(self) -> list[object]:
         output = []
-        for village in Village.objects.all():
+        for village in Village.objects.filter(camp=self.camp):
             if village.location == None:
                 continue
             entry = {
