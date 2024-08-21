@@ -30,6 +30,8 @@
 
               <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
+              {% if creditnote.refund %}
+              {# creditnote belongs to a refund, loop over oprs #}
               {% for rpr in creditnote.refund.rprs.all %}
                 <tr>
                   <td>
@@ -41,7 +43,18 @@
                         <td align="right">
                           {{ rpr.total|currency }}
               {% endfor %}
-
+              {% else %}
+              {# creditnote does not belong to a refund, use the text #}
+                <tr>
+                  <td>
+                    {{ creditnote.text }}
+                    <td>
+                      1
+                      <td align="right">
+                        {{ creditnote.amount|currency }}
+                        <td align="right">
+                          {{ creditnote.amount|currency }}
+              {% endif %}
               <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
               <tr>
