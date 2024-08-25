@@ -1,5 +1,7 @@
 import logging
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.db.models import Count
@@ -11,13 +13,12 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
-
-from ..mixins import RaisePermissionRequiredMixin
-from camps.mixins import CampViewMixin
 from tokens.models import Token
 from tokens.models import TokenFind
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..mixins import RaisePermissionRequiredMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 ################################
@@ -46,7 +47,7 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active", "valid_when"]
+    fields = ("token", "category", "description", "active", "valid_when")
 
     def form_valid(self, form):
         token = form.save(commit=False)
@@ -66,7 +67,7 @@ class TokenUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
     permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active", "valid_when"]
+    fields = ("token", "category", "description", "active", "valid_when")
 
 
 class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
@@ -74,11 +75,11 @@ class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
     model = Token
     template_name = "token_delete.html"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         self.get_object().tokenfind_set.all().delete()
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             "The Token and all related TokenFinds has been deleted",
@@ -93,12 +94,8 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     model = User
     template_name = "token_stats.html"
 
-    def get_queryset(self, **kwargs):
-        tokenusers = (
-            TokenFind.objects.filter(token__camp=self.camp)
-            .distinct("user")
-            .values_list("user", flat=True)
-        )
+    def get_queryset(self, **kwargs: dict[str, Any]):
+        tokenusers = TokenFind.objects.filter(token__camp=self.camp).distinct("user").values_list("user", flat=True)
         return (
             User.objects.filter(id__in=tokenusers)
             .annotate(

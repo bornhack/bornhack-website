@@ -39,7 +39,7 @@ datetime_range = tuples(DATETIMES, DATETIMES, BOUNDS).filter(valid_range)
 
 
 class TestRange__and__(TestCase):
-    def test_normalised(self):
+    def test_normalised(self) -> None:
         self.assertTrue(normalise(NumericRange(0, 1, "()")).isempty)
         self.assertFalse(
             normalise(
@@ -49,27 +49,27 @@ class TestRange__and__(TestCase):
         self.assertTrue(normalise(NumericRange(2, 2, "()")).isempty)
 
     @given(num_range)
-    def test_normalise_hypothesis(self, a):
+    def test_normalise_hypothesis(self, a) -> None:
         a = NumericRange(*a)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::int8range", [a])
         self.assertEqual(cursor.fetchone()[0], normalise(a), a)
 
     @given(date_range)
-    def test_normalise_hypothesis_daterange(self, a):
+    def test_normalise_hypothesis_daterange(self, a) -> None:
         a = DateRange(*a)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::daterange", [a])
         self.assertEqual(cursor.fetchone()[0], normalise(a), a)
 
     @given(datetime_range)
-    def test_normalise_hypothesis_tsrange(self, a):
+    def test_normalise_hypothesis_tsrange(self, a) -> None:
         a = DateTimeRange(*a)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::tsrange", [a])
         self.assertEqual(cursor.fetchone()[0], normalise(a), a)
 
-    def test_can_query_db(self):
+    def test_can_query_db(self) -> None:
         cursor = connection.cursor()
         cursor.execute(
             "SELECT %s::int8range && %s::int8range",
@@ -77,19 +77,19 @@ class TestRange__and__(TestCase):
         )
         self.assertTrue(cursor.fetchone()[0])
 
-    def test_may_not_compare_different_range_types(self):
+    def test_may_not_compare_different_range_types(self) -> None:
         with self.assertRaises(TypeError):
             NumericRange() & DateRange()
 
-    def test_empty_ranges_do_not_overlap(self):
+    def test_empty_ranges_do_not_overlap(self) -> None:
         self.assertFalse(NumericRange(0, 0, "()") & NumericRange())
         self.assertFalse(NumericRange(0, 1, "()") & NumericRange(None, None, "[]"))
 
-    def test_two_full_ranges_overlap(self):
+    def test_two_full_ranges_overlap(self) -> None:
         self.assertTrue(NumericRange() & NumericRange())
         self.assertTrue(NumericRange(None, None, "[]") & NumericRange(None, None, "[]"))
 
-    def test_full_range_overlaps_non_full_range(self):
+    def test_full_range_overlaps_non_full_range(self) -> None:
         self.assertTrue(NumericRange() & NumericRange(-12, 55))
         self.assertTrue(NumericRange(-12, 55) & NumericRange())
 
@@ -120,7 +120,7 @@ class TestRange__and__(TestCase):
         self.assertTrue(NumericRange(1, None), NumericRange(100, None))
 
     @given(num_range, num_range)
-    def test_with_hypothesis(self, a, b):
+    def test_with_hypothesis(self, a, b) -> None:
         a = NumericRange(*a)
         b = NumericRange(*b)
         cursor = connection.cursor()
@@ -128,7 +128,7 @@ class TestRange__and__(TestCase):
         self.assertEqual(cursor.fetchone()[0], a & b, f"{a} && {b}")
 
     @given(date_range, date_range)
-    def test_with_hypothesis_dates(self, a, b):
+    def test_with_hypothesis_dates(self, a, b) -> None:
         a = DateRange(*a)
         b = DateRange(*b)
         cursor = connection.cursor()
@@ -136,7 +136,7 @@ class TestRange__and__(TestCase):
         self.assertEqual(cursor.fetchone()[0], a & b, f"{a} && {b}")
 
     @given(datetime_range, datetime_range)
-    def test_with_hypothesis_datetimes(self, a, b):
+    def test_with_hypothesis_datetimes(self, a, b) -> None:
         a = DateTimeRange(*a)
         b = DateTimeRange(*b)
         cursor = connection.cursor()
@@ -160,7 +160,7 @@ class TestRange__and__(TestCase):
     def test_manual_equality(self):
         self.assertFalse(NumericRange(0, 2, "[]") is None)
 
-    def test_timedelta_ranges(self):
+    def test_timedelta_ranges(self) -> None:
         a = Range(datetime.timedelta(0), datetime.timedelta(1))
         b = Range(datetime.timedelta(hours=5), datetime.timedelta(hours=9))
 
@@ -252,8 +252,7 @@ class TestRangeIntersect(TestCase):
 
 class TestRangeSubtract(TestCase):
     def test_source_within_subtract(self):
-        """
-           [ source )
+        """[ source )
         [    subtract    )
         [    subtract    ]
         (    subtract    )
@@ -286,9 +285,7 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(11, 16, "(]"), Range(0, 44, "[]")))
 
     def test_subtract_upper_bound_matches_source_lower_bound(self):
-        """
-
-                 [ source )
+        """[ source )
         [subtract]
 
         """
@@ -298,9 +295,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_lower_bound_below_bounds_only(self):
-        """
-
-                 [source)
+        """[source)
         [subtract)
         (subtract)
 
@@ -324,8 +319,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_lower_bound_below_completely(self):
-        """
-                    [source)
+        """[source)
         [subtract]
         [subtract)
         [subtract]
@@ -402,9 +396,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_upper_bound_above_bounds_only(self):
-        """
-
-        [source)
+        """[source)
                [subtract]
 
         [source]
@@ -429,13 +421,11 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_upper_bound_above_completely(self):
-        """
-
-        [source)
-                    [subtract]
-                    (subtract)
-                    [subtract)
-                    (subtract]
+        """[source)
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
 
         """
         self.assertEqual(
@@ -456,9 +446,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_intersects_lower_bounds(self):
-        """
-
-                 [source)
+        """[source)
         [subtract]
              [subtract]
              [subtract)
@@ -483,9 +471,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_lower_bounds_same(self):
-        """
-
-        [source        )
+        """[source        )
 
         [subtract]
         [subtract)
@@ -494,7 +480,6 @@ class TestRangeSubtract(TestCase):
         (   subtract   )
         (   subtract   ]
         """
-
         self.assertEqual(
             [Range(6, 8, "()")],
             safe_subtract(Range(4, 8), Range(4, 6, "[]")),
@@ -514,8 +499,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_lower_bound_inclusive_difference_only(self):
-        """
-        [source   )
+        """[source   )
         (subtract )
         (subtract ]
         """
@@ -529,11 +513,10 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_intersects_upper_bound(self):
-        """
-        [source)
+        """[source)
 
-            [subtract]
-            (subtract)
+        [subtract]
+        (subtract)
         """
         self.assertEqual(
             [Range(4, 6, "[)")],
@@ -545,9 +528,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_exact_match(self):
-        """
-
-        [  source  )
+        """[  source  )
         [ subtract )
 
 
@@ -567,13 +548,10 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(4, 8, "(]"), Range(4, 8, "(]")))
 
     def test_upper_bounds_match(self):
+        """[  source  )
+        [subtract)
+        (subtract)
         """
-
-        [  source  )
-          [subtract)
-          (subtract)
-        """
-
         self.assertEqual(
             [Range(4, 5, "[)")],
             safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[)")),
@@ -599,14 +577,12 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_within(self):
+        """[    source    )
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
         """
-        [    source    )
-           [subtract]
-           (subtract)
-           [subtract)
-           (subtract]
-        """
-
         self.assertEqual(
             [Range(4, 5, "[)"), Range(7, 8, "()")],
             safe_subtract(Range(4, 8, "[)"), Range(5, 7, "[]")),
@@ -625,8 +601,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_bounds_only_differ(self):
-        """
-        [ source ]
+        """[ source ]
         (subtract)
         [subtract)
         (subtract]

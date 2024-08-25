@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -8,10 +9,10 @@ from django.utils import timezone
 class Command(BaseCommand):
     help = "Creates html files needed for a camp"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("camp_slug", type=str)
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
@@ -19,7 +20,7 @@ class Command(BaseCommand):
     def local_dir(self, entry):
         return os.path.join(settings.BASE_DIR, entry)
 
-    def handle(self, *args, **options):
+    def handle(self, *args: list[Any], **options) -> None:
         # files to create, relative to BASE_DIR
         files = ["camps/templates/{camp_slug}_camp_detail.html"]
 
@@ -48,15 +49,11 @@ class Command(BaseCommand):
         self.output("All there is left is to create:")
         self.output(
             self.local_dir(
-                "static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png".format(
-                    camp_slug=camp_slug,
-                ),
+                f"static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png",
             ),
         )
         self.output(
             self.local_dir(
-                "static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png".format(
-                    camp_slug=camp_slug,
-                ),
+                f"static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png",
             ),
         )

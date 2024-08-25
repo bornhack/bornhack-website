@@ -1,5 +1,7 @@
 import logging
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
@@ -8,9 +10,6 @@ from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
-
-from ..mixins import OrgaTeamPermissionMixin
-from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
 from shop.models import Product
@@ -18,14 +17,16 @@ from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..mixins import OrgaTeamPermissionMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "approve_public_credit_names.html"
     context_object_name = "profiles"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         return Profile.objects.filter(public_credit_name_approved=False).exclude(
             public_credit_name="",
         )
@@ -38,7 +39,7 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_merchandise.html"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
@@ -55,7 +56,7 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
     template_name = "merchandise_to_order.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         order_relations = (
@@ -71,13 +72,9 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
         merchandise_orders = {}
         for relation in order_relations:
             try:
-                merchandise_orders[
-                    relation.product.name
-                ] += relation.non_refunded_quantity
+                merchandise_orders[relation.product.name] += relation.non_refunded_quantity
             except KeyError:
-                merchandise_orders[relation.product.name] = (
-                    relation.non_refunded_quantity
-                )
+                merchandise_orders[relation.product.name] = relation.non_refunded_quantity
 
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
@@ -91,7 +88,7 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
 class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_village.html"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         return (
@@ -109,7 +106,7 @@ class VillageOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
     template_name = "village_to_order.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         camp_prefix = f"BornHack {timezone.now().year}"
 
         order_relations = (
@@ -139,13 +136,11 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
 
 
 class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
-    """
-    This view shows a list with forms to edit OutgoingEmail objects with hold=True
-    """
+    """This view shows a list with forms to edit OutgoingEmail objects with hold=True"""
 
     template_name = "outgoing_email_mass_update.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         """Get emails with no team and emails with a team for the current camp."""
         super().setup(*args, **kwargs)
         self.queryset = OutgoingEmail.objects.filter(
@@ -167,7 +162,7 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
             extra=0,
         )
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Include the formset in the context."""
         context = super().get_context_data(*args, **kwargs)
         context["formset"] = self.form_class(queryset=self.queryset)
@@ -183,7 +178,7 @@ class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormVi
             )
         return redirect(self.get_success_url())
 
-    def get_success_url(self, *args, **kwargs):
+    def get_success_url(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Return to the backoffice index."""
         return reverse("backoffice:index", kwargs={"camp_slug": self.camp.slug})
 
@@ -214,11 +209,10 @@ class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "ticket_stats.html"
 
     def get_queryset(self):
-        query = TicketType.objects.filter(
+        return TicketType.objects.filter(
             camp=self.camp,
             shopticket__isnull=False,
         ).with_price_stats()
-        return query
 
 
 class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
@@ -230,7 +224,7 @@ class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView
             ticket_type_id=self.kwargs["pk"],
         )
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["total_orders"] = 0
         context["total_units"] = 0

@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 import hashlib
 import hmac
 import json
 import logging
 from decimal import Decimal
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.conf import settings
 from django.contrib import messages
@@ -23,13 +27,9 @@ from django.views.generic import ListView
 from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
+from utils.mixins import GetObjectMixin
+from vendor.coinify.coinify_callback import CoinifyCallback
 
-from .coinify import create_coinify_invoice
-from .coinify import process_coinify_invoice_json
-from .coinify import save_coinify_callback
-from .forms import OrderProductRelationForm
-from .forms import OrderProductRelationFormSet
-from .quickpay import QuickPay
 from shop.models import CreditNote
 from shop.models import Order
 from shop.models import OrderProductRelation
@@ -37,10 +37,18 @@ from shop.models import Product
 from shop.models import ProductCategory
 from shop.models import QuickPayAPICallback
 from shop.models import QuickPayAPIObject
-from utils.mixins import GetObjectMixin
-from vendor.coinify.coinify_callback import CoinifyCallback
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from .coinify import create_coinify_invoice
+from .coinify import process_coinify_invoice_json
+from .coinify import save_coinify_callback
+from .forms import OrderProductRelationForm
+from .forms import OrderProductRelationFormSet
+from .quickpay import QuickPay
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 qp = QuickPay()
 
 
@@ -48,7 +56,7 @@ qp = QuickPay()
 class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
     model = CreditNote
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().pdf:
             messages.error(request, "This creditnote has no PDF yet!")
             return HttpResponseRedirect(reverse_lazy("shop:creditnote_list"))
@@ -59,11 +67,10 @@ class EnsureCreditNoteHasPDFMixin(SingleObjectMixin):
 class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
     model = CreditNote
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # If the user does not own this creditnote OR is not staff
-        if not request.user.is_staff:
-            if self.get_object().user != request.user:
-                raise Http404("CreditNote not found")
+        if not request.user.is_staff and self.get_object().user != request.user:
+            raise Http404("CreditNote not found")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -71,11 +78,10 @@ class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
 class EnsureUserOwnsOrderMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # If the user does not own this order OR is not staff
-        if not request.user.is_staff:
-            if self.get_object().user != request.user:
-                raise Http404("Order not found")
+        if not request.user.is_staff and self.get_object().user != request.user:
+            raise Http404("Order not found")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -83,7 +89,7 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
 class EnsureUnpaidOrderMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if self.get_object().paid:
             messages.error(request, "This order is already paid for!")
             return HttpResponseRedirect(
@@ -96,7 +102,7 @@ class EnsureUnpaidOrderMixin(SingleObjectMixin):
 class EnsurePaidOrderMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().paid:
             messages.error(request, "This order is not paid for!")
             return HttpResponseRedirect(
@@ -109,7 +115,7 @@ class EnsurePaidOrderMixin(SingleObjectMixin):
 class EnsureClosedOrderMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if self.get_object().open is not None:
             messages.error(request, "This order is still open!")
             return HttpResponseRedirect(
@@ -122,7 +128,7 @@ class EnsureClosedOrderMixin(SingleObjectMixin):
 class EnsureOrderHasProductsMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().products.count() > 0:
             messages.error(request, "This order has no products!")
             return HttpResponseRedirect(reverse_lazy("shop:index"))
@@ -133,7 +139,7 @@ class EnsureOrderHasProductsMixin(SingleObjectMixin):
 class EnsureOrderIsNotCancelledMixin(SingleObjectMixin):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if self.get_object().cancelled:
             messages.error(
                 request,
@@ -164,7 +170,7 @@ class ShopIndexView(ListView):
             )
         )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         if "category" in self.request.GET:
@@ -198,11 +204,7 @@ class ProductDetailView(GetObjectMixin, FormView, DetailView):
     context_object_name = "product"
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .prefetch_related("sub_product_relations__sub_product")
-        )
+        return super().get_queryset().prefetch_related("sub_product_relations__sub_product")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -215,14 +217,14 @@ class ProductDetailView(GetObjectMixin, FormView, DetailView):
             return {"quantity": self.opr.quantity}
         return None
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         # If the OrderProductRelation already exists it has a primary key in the database
         if self.request.user.is_authenticated and self.opr.pk:
             kwargs["already_in_order"] = True
 
         return super().get_context_data(**kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.object.category.public:
             # this product is not publicly available
             raise Http404("Product not found")
@@ -253,16 +255,13 @@ class ProductDetailView(GetObjectMixin, FormView, DetailView):
 
         messages.info(
             self.request,
-            "{}x {} has been added to your order.".format(
-                opr.quantity,
-                opr.product.name,
-            ),
+            f"{opr.quantity}x {opr.product.name} has been added to your order.",
         )
 
         # done
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("shop:index")
 
 
@@ -287,7 +286,7 @@ class OrderDetailView(
     model = Order
     context_object_name = "order"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         if "order_product_formset" not in kwargs:
             kwargs["order_product_formset"] = OrderProductRelationFormSet(
                 queryset=OrderProductRelation.objects.filter(order=self.get_object()),
@@ -295,7 +294,7 @@ class OrderDetailView(
 
         return super().get_context_data(**kwargs)
 
-    def get_template_names(self):
+    def get_template_names(self) -> str | bool:
         if self.get_object().open is None:
             return "order_detail_closed.html"
         elif self.get_object().open is True:
@@ -303,7 +302,7 @@ class OrderDetailView(
         else:
             return False
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         order = self.get_object()
         if order.open is None and not order.paid:
             # order is already closed, go straight to the payment page
@@ -312,7 +311,7 @@ class OrderDetailView(
             )
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         """The main webshop order handling method.
 
         Start out by handling two special cases, deleting OPR and
@@ -392,7 +391,7 @@ class OrderReviewAndPayView(
     template_name = "order_review.html"
     context_object_name = "order"
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         order = self.object
 
         payment_method = request.POST.get("payment_method")
@@ -429,6 +428,7 @@ class OrderReviewAndPayView(
             }
 
             return HttpResponseRedirect(reverses[payment_method])
+        return None
 
 
 class DownloadInvoiceView(
@@ -439,16 +439,12 @@ class DownloadInvoiceView(
 ):
     model = Order
 
-    def get(self, request, *args, **kwargs):
-        """
-        The file we return is determined by the orders paid status.
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
+        """The file we return is determined by the orders paid status.
         If the order is unpaid we return a proforma invoice PDF
         If the order is paid we return a normal Invoice PDF
         """
-        if self.get_object().paid:
-            pdfobj = self.get_object().invoice
-        else:
-            pdfobj = self.get_object()
+        pdfobj = self.get_object().invoice if self.get_object().paid else self.get_object()
 
         if not pdfobj.pdf:
             messages.error(request, "No PDF has been generated yet!")
@@ -456,7 +452,7 @@ class DownloadInvoiceView(
                 reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="%s"' % pdfobj.filename
+        response["Content-Disposition"] = f'attachment; filename="{pdfobj.filename}"'
         response.write(pdfobj.pdf.read())
         return response
 
@@ -480,11 +476,9 @@ class DownloadCreditNoteView(
 ):
     model = CreditNote
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            'attachment; filename="%s"' % self.get_object().filename
-        )
+        response["Content-Disposition"] = f'attachment; filename="{self.get_object().filename}"'
         response.write(self.get_object().pdf.read())
         return response
 
@@ -492,7 +486,7 @@ class DownloadCreditNoteView(
 class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
     model = Order
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not request.user.is_staff:
             messages.error(request, "You do not have permissions to do that.")
             return HttpResponseRedirect(reverse_lazy("shop:index"))
@@ -516,7 +510,7 @@ class BankTransferView(
     model = Order
     template_name = "bank_transfer.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["bank"] = settings.BANKACCOUNT_BANK
         context["iban"] = settings.BANKACCOUNT_IBAN
@@ -557,7 +551,7 @@ class CoinifyRedirectView(
 ):
     model = Order
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         order = self.get_object()
 
         # create a new coinify invoice if needed
@@ -577,7 +571,7 @@ class CoinifyRedirectView(
 
         return super().dispatch(request, *args, **kwargs)
 
-    def get_redirect_url(self, *args, **kwargs):
+    def get_redirect_url(self, *args: list[Any], **kwargs: dict[str, Any]):
         return self.get_object().coinifyapiinvoice.invoicejson["payment_url"]
 
 
@@ -585,10 +579,10 @@ class CoinifyCallbackView(SingleObjectMixin, View):
     model = Order
 
     @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args: list[Any], **kwargs: dict[str, Any]):
         return super().dispatch(*args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # save callback and parse json payload
         callbackobject = save_coinify_callback(request, self.get_object())
 
@@ -596,8 +590,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
         if not callbackobject.payload:
             # no, return an error
             logger.error(
-                "unable to parse JSON body in callback for order %s"
-                % callbackobject.order.id,
+                f"unable to parse JSON body in callback for order {callbackobject.order.id}",
             )
             return HttpResponseBadRequest("unable to parse json")
 
@@ -628,7 +621,7 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             return HttpResponse("OK")
         else:
             logger.error(
-                "unsupported callback event %s" % callbackobject.payload["event"],
+                "unsupported callback event {}".format(callbackobject.payload["event"]),
             )
             return HttpResponseBadRequest("unsupported event")
 
@@ -657,7 +650,7 @@ class QuickPayLinkView(
     model = Order
     template_name = "quickpay_link.html"
 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args: list[Any], **kwargs: dict[str, Any]):
         order = self.get_object()
         # do we already have a payment object?
         if order.quickpay_api_objects.filter(object_type="Payment"):
@@ -690,7 +683,7 @@ class QuickPayLinkView(
             )
         return super().dispatch(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["payment_link"] = self.payment_link
         return context
@@ -710,10 +703,10 @@ class QuickPayCallbackView(View):
     """QuickPay sends callbacks whenever an object is created, updated or deleted."""
 
     @method_decorator(csrf_exempt)
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args: list[Any], **kwargs: dict[str, Any]):
         return super().dispatch(*args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         """Validate signature before saving callback."""
         calculated_signature = hmac.new(
             settings.QUICKPAY_PRIVATE_KEY.encode("utf-8"),
@@ -728,10 +721,7 @@ class QuickPayCallbackView(View):
 
         # find the related Order object (where possible)
         body = json.loads(request.body.decode("utf-8"))
-        if body["type"] == "Payment":
-            order = Order.objects.get(id=int(body["order_id"]))
-        else:
-            order = None
+        order = Order.objects.get(id=int(body["order_id"])) if body["type"] == "Payment" else None
 
         # save the new or updated QuickPayAPIObject and the callback
         qpobj, created = QuickPayAPIObject.objects.get_or_create(

@@ -1,5 +1,7 @@
 import logging
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
@@ -9,16 +11,15 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
-
-from ..mixins import OrgaTeamPermissionMixin
-from ..mixins import PosViewMixin
-from ..mixins import RaisePermissionRequiredMixin
-from camps.mixins import CampViewMixin
 from economy.models import Pos
 from economy.models import PosReport
 from teams.models import Team
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import PosViewMixin
+from ..mixins import RaisePermissionRequiredMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class PosListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
@@ -42,9 +43,9 @@ class PosCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
 
     model = Pos
     template_name = "pos_form.html"
-    fields = ["name", "team"]
+    fields = ("name", "team")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"].fields["team"].queryset = Team.objects.filter(camp=self.camp)
         return context
@@ -56,9 +57,9 @@ class PosUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     model = Pos
     template_name = "pos_form.html"
     slug_url_kwarg = "pos_slug"
-    fields = ["name", "team"]
+    fields = ("name", "team")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"].fields["team"].queryset = Team.objects.filter(camp=self.camp)
         return context
@@ -69,11 +70,11 @@ class PosDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
     template_name = "pos_delete.html"
     slug_url_kwarg = "pos_slug"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         self.get_object().pos_reports.all().delete()
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             "The Pos and all related PosReports has been deleted",
@@ -85,24 +86,20 @@ class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
     model = PosReport
-    fields = ["period", "bank_responsible", "pos_responsible", "comments"]
+    fields = ("period", "bank_responsible", "pos_responsible", "comments")
     template_name = "posreport_form.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"].fields["bank_responsible"].queryset = Team.objects.get(
             camp=self.camp,
             name="Orga",
         ).approved_members.all()
-        context["form"].fields[
-            "pos_responsible"
-        ].queryset = self.pos.team.responsible_members.all()
+        context["form"].fields["pos_responsible"].queryset = self.pos.team.responsible_members.all()
         return context
 
     def form_valid(self, form):
-        """
-        Set Pos before saving
-        """
+        """Set Pos before saving"""
         pr = form.save(commit=False)
         pr.pos = self.pos
         pr.save()
@@ -123,26 +120,24 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
     """Use this view to update PosReports."""
 
     model = PosReport
-    fields = [
+    fields = (
         "period",
         "bank_responsible",
         "pos_responsible",
         "hax_sold_izettle",
         "dkk_sales_izettle",
         "comments",
-    ]
+    )
     template_name = "posreport_form.html"
     pk_url_kwarg = "posreport_uuid"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"].fields["bank_responsible"].queryset = Team.objects.get(
             camp=self.camp,
             name="Orga",
         ).approved_members.all()
-        context["form"].fields[
-            "pos_responsible"
-        ].queryset = self.pos.team.responsible_members.all()
+        context["form"].fields["pos_responsible"].queryset = self.pos.team.responsible_members.all()
         return context
 
 
@@ -159,17 +154,17 @@ class PosReportBankCountStartView(PosViewMixin, UpdateView):
 
     model = PosReport
     template_name = "posreport_form.html"
-    fields = [
+    fields = (
         "bank_count_dkk_start",
         "bank_count_hax5_start",
         "bank_count_hax10_start",
         "bank_count_hax20_start",
         "bank_count_hax50_start",
         "bank_count_hax100_start",
-    ]
+    )
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().bank_responsible:
             raise PermissionDenied("Only the bank responsible can do this")
@@ -180,17 +175,17 @@ class PosReportBankCountEndView(PosViewMixin, UpdateView):
 
     model = PosReport
     template_name = "posreport_form.html"
-    fields = [
+    fields = (
         "bank_count_dkk_end",
         "bank_count_hax5_end",
         "bank_count_hax10_end",
         "bank_count_hax20_end",
         "bank_count_hax50_end",
         "bank_count_hax100_end",
-    ]
+    )
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().bank_responsible:
             raise PermissionDenied("Only the bank responsible can do this")
@@ -201,17 +196,17 @@ class PosReportPosCountStartView(PosViewMixin, UpdateView):
 
     model = PosReport
     template_name = "posreport_form.html"
-    fields = [
+    fields = (
         "pos_count_dkk_start",
         "pos_count_hax5_start",
         "pos_count_hax10_start",
         "pos_count_hax20_start",
         "pos_count_hax50_start",
         "pos_count_hax100_start",
-    ]
+    )
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().pos_responsible:
             raise PermissionDenied("Only the Pos responsible can do this")
@@ -222,7 +217,7 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
 
     model = PosReport
     template_name = "posreport_form.html"
-    fields = [
+    fields = (
         "pos_count_dkk_end",
         "pos_count_hax5_end",
         "pos_count_hax10_end",
@@ -230,10 +225,10 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
         "pos_count_hax50_end",
         "pos_count_hax100_end",
         "pos_json",
-    ]
+    )
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().pos_responsible:
             raise PermissionDenied("Only the pos responsible can do this")

@@ -1,10 +1,10 @@
+from camps.mixins import CampViewMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import DetailView
 
 from ..models import Team
 from ..models import TeamMember
-from camps.mixins import CampViewMixin
 
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, DetailView):
@@ -14,7 +14,7 @@ class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, Deta
     slug_url_kwarg = "team_slug"
     active_menu = "guide"
 
-    def test_func(self):
+    def test_func(self) -> bool:
         # Make sure that the user is an approved member of the team
         try:
             TeamMember.objects.get(

@@ -1,6 +1,7 @@
 import logging
 import uuid
 from functools import partial
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.postgres.fields import ArrayField
@@ -10,7 +11,7 @@ from django_prometheus.models import ExportModelOperationsMixin
 from taggit.models import GenericUUIDTaggedItemBase
 from taggit.models import TaggedItemBase
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class HelpTextModel(models.Model):
@@ -19,7 +20,7 @@ class HelpTextModel(models.Model):
     class Meta:
         abstract = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         """Loop over fields and add a new help_text getter method for each."""
         super().__init__(*args, **kwargs)
         for field in self._meta.fields:
@@ -32,13 +33,14 @@ class HelpTextModel(models.Model):
         for field in self._meta.fields:
             if field.name == field_name:
                 return field.help_text
+        return None
 
 
 class CleanedModel(HelpTextModel):
     class Meta:
         abstract = True
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         try:
             # call this models full_clean() method before saving,
             # which in turn calls .clean_fields(), .clean() and .validate_unique()
@@ -49,10 +51,10 @@ class CleanedModel(HelpTextModel):
             self.clean()
             self.validate_unique(exclude=None)
         except ValidationError as e:
-            message = "Got ValidationError while saving: %s" % e
+            message = f"Got ValidationError while saving: {e}"
             if hasattr(self, "request"):
                 messages.error(self.request, message)
-            logger.error(message)
+            logger.exception(message)
             # dont save, re-raise the exception
             raise
         super().save(**kwargs)
@@ -92,7 +94,7 @@ class CampRelatedModel(CreatedUpdatedModel):
     class Meta:
         abstract = True
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         if self.camp.read_only:
             if hasattr(self, "request"):
                 messages.error(self.request, f"Camp {self.camp} is in read only mode.")
@@ -100,7 +102,7 @@ class CampRelatedModel(CreatedUpdatedModel):
 
         super().save(**kwargs)
 
-    def delete(self, **kwargs):
+    def delete(self, **kwargs: dict[str, Any]) -> None:
         if self.camp.read_only:
             if hasattr(self, "request"):
                 messages.error(self.request, "Camp is in read only mode.")
@@ -161,15 +163,11 @@ class OutgoingEmail(ExportModelOperationsMixin("outgoing_email"), CreatedUpdated
         help_text="The Team responsible for this email.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"OutgoingEmail Object id: {self.id} "
 
-    def clean(self):
-        if (
-            not self.to_recipients
-            and not self.bcc_recipients
-            and not self.cc_recipients
-        ):
+    def clean(self) -> None:
+        if not self.to_recipients and not self.bcc_recipients and not self.cc_recipients:
             raise ValidationError(
                 {
                     "recipient": "either to_recipient, bcc_recipient or cc_recipient required.",

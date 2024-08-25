@@ -23,5 +23,5 @@ class InfoCategoryAdmin(admin.ModelAdmin):
     save_as = True
     list_filter = ["team__camp"]
     list_display = ["headline"]
-    search_fields = ["headline", "body"]
+    search_fields = ("headline", "body")
     inlines = [InfoItemInlineAdmin]

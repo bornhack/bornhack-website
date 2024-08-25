@@ -1,6 +1,5 @@
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 
 
@@ -8,7 +7,7 @@ class ProductCategory(ExportModelOperationsMixin("product_category"), CampRelate
     name = models.CharField(max_length=255)
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     class Meta:
@@ -28,5 +27,5 @@ class Product(ExportModelOperationsMixin("product"), models.Model):
     class Meta:
         ordering = ("name",)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

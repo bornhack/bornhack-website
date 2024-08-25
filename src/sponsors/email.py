@@ -2,11 +2,10 @@ import logging
 import os
 
 from django.conf import settings
-
 from teams.models import Team
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_sponsorticket_email(ticket):
@@ -15,11 +14,7 @@ def add_sponsorticket_email(ticket):
         "ticket": ticket,
     }
 
-    subject = "{} {} Sponsor Ticket {}".format(
-        ticket.sponsor.camp.title,
-        ticket.sponsor.name,
-        ticket.uuid,
-    )
+    subject = f"{ticket.sponsor.camp.title} {ticket.sponsor.name} Sponsor Ticket {ticket.uuid}"
 
     filename = f"sponsor_ticket_{ticket.pk}.pdf"
     with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:

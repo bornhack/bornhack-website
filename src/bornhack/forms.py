@@ -1,6 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
 from allauth.account.forms import SignupForm
 from django import forms
 from django.core.exceptions import ValidationError
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class AllAuthSignupCaptchaForm(SignupForm):
@@ -11,15 +19,15 @@ class AllAuthSignupCaptchaForm(SignupForm):
         help_text="Please help us prevent a few bot signups by telling us the year of the first BornHack. You can find a list of all BornHack events in the <a href='/camps/'>camp list</a>.",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
-        self.fields["email"].help_text = (
-            "NOTE WELL: Microsoft blocks email from BornHack. If your email ends with @hotmail.com or @outlook.com it is likely we will be unable to send email to you. Please use a different email address."
-        )
+        self.fields[
+            "email"
+        ].help_text = "NOTE WELL: Microsoft blocks email from BornHack. If your email ends with @hotmail.com or @outlook.com it is likely we will be unable to send email to you. Please use a different email address."
 
-    def clean_first_bornhack_year(self):
+    def clean_first_bornhack_year(self) -> None:
         if self.cleaned_data["first_bornhack_year"] != "2016":
             raise ValidationError("To error is human. Please try to be less human! :)")
 
-    def signup(self, request, user):
+    def signup(self, request: HttpRequest, user) -> None:
         user.save()

@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.conf import settings
 from django.shortcuts import redirect
@@ -9,18 +13,20 @@ from django.views.generic import ListView
 
 from .models import Camp
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class CampRedirectView(View):
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         now = timezone.now()
 
         try:
             camp = Camp.objects.get(camp__contains=now)
             logger.debug(
-                "Redirecting to camp '%s' for page '%s' because it is now!"
-                % (camp.slug, kwargs["page"]),
+                "Redirecting to camp '{}' for page '{}' because it is now!".format(camp.slug, kwargs["page"]),
             )
             return redirect(kwargs["page"], camp_slug=camp.slug)
         except Camp.DoesNotExist:
@@ -28,17 +34,13 @@ class CampRedirectView(View):
 
         # no ongoing camp, find the closest camp in the past
         try:
-            prevcamp = (
-                Camp.objects.filter(camp__endswith__lt=now).order_by("-camp").first()
-            )
+            prevcamp = Camp.objects.filter(camp__endswith__lt=now).order_by("-camp").first()
         except Camp.DoesNotExist:
             prevcamp = None
 
         # find the closest upcoming camp
         try:
-            nextcamp = (
-                Camp.objects.filter(camp__startswith__gt=now).order_by("camp").first()
-            )
+            nextcamp = Camp.objects.filter(camp__startswith__gt=now).order_by("camp").first()
         except Camp.DoesNotExist:
             nextcamp = None
 
@@ -69,8 +71,8 @@ class CampDetailView(DetailView):
     model = Camp
     slug_url_kwarg = "camp_slug"
 
-    def get_template_names(self):
-        return "%s_camp_detail.html" % self.get_object().slug
+    def get_template_names(self) -> str:
+        return f"{self.get_object().slug}_camp_detail.html"
 
 
 class CampListView(ListView):

@@ -1,10 +1,16 @@
-import logging
+from __future__ import annotations
 
+import logging
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.views.generic import DetailView
 from django.views.generic import UpdateView
+from profiles.models import Profile
 
 from ..email import add_added_membership_email
 from ..email import add_removed_membership_email
@@ -12,10 +18,11 @@ from ..models import Team
 from ..models import TeamMember
 from .mixins import EnsureTeamMemberResponsibleMixin
 from .mixins import TeamViewMixin
-from camps.mixins import CampViewMixin
-from profiles.models import Profile
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamMembersView(CampViewMixin, DetailView):
@@ -29,11 +36,11 @@ class TeamMembersView(CampViewMixin, DetailView):
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "team_join.html"
     model = Team
-    fields = []
+    fields = ()
     slug_url_kwarg = "team_slug"
     active_menu = "members"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not Profile.objects.get(user=request.user).description:
             messages.warning(
                 request,
@@ -55,8 +62,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
         TeamMember.objects.create(team=self.get_object(), user=self.request.user)
         messages.success(
             self.request,
-            "You request to join the team %s has been registered, thank you."
-            % self.get_object().name,
+            f"You request to join the team {self.get_object().name} has been registered, thank you.",
         )
         return redirect("teams:list", camp_slug=self.get_object().camp.slug)
 
@@ -64,11 +70,11 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
 class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "team_leave.html"
     model = Team
-    fields = []
+    fields = ()
     slug_url_kwarg = "team_slug"
     active_menu = "members"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if request.user not in self.get_object().members.all():
             messages.warning(request, "You are not a member of this team")
             return redirect("teams:list", camp_slug=self.get_object().camp.slug)
@@ -82,7 +88,7 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         ).delete()
         messages.success(
             self.request,
-            "You are no longer a member of the team %s" % self.get_object().name,
+            f"You are no longer a member of the team {self.get_object().name}",
         )
         return redirect("teams:list", camp_slug=self.get_object().camp.slug)
 
@@ -96,7 +102,7 @@ class TeamMemberRemoveView(
 ):
     template_name = "teammember_remove.html"
     model = TeamMember
-    fields = []
+    fields = ()
     active_menu = "members"
 
     def form_valid(self, form):
@@ -109,9 +115,7 @@ class TeamMemberRemoveView(
                 "Team member removed (unable to add email to outgoing queue).",
             )
             logger.error(
-                "Unable to add removed email to outgoing queue for teammember: {}".format(
-                    form.instance,
-                ),
+                f"Unable to add removed email to outgoing queue for teammember: {form.instance}",
             )
         return redirect(
             "teams:general",
@@ -129,7 +133,7 @@ class TeamMemberApproveView(
 ):
     template_name = "teammember_approve.html"
     model = TeamMember
-    fields = []
+    fields = ()
     active_menu = "members"
 
     def form_valid(self, form):
@@ -143,9 +147,7 @@ class TeamMemberApproveView(
                 "Team member removed (unable to add email to outgoing queue).",
             )
             logger.error(
-                "Unable to add approved email to outgoing queue for teammember: {}".format(
-                    form.instance,
-                ),
+                f"Unable to add approved email to outgoing queue for teammember: {form.instance}",
             )
         return redirect(
             "teams:general",

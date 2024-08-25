@@ -10,7 +10,7 @@ from django.template.loader import render_to_string
 
 from .models import OutgoingEmail
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def _send_email(
@@ -23,7 +23,7 @@ def _send_email(
     sender="BornHack <info@bornhack.dk>",
     attachment=None,
     attachment_filename="",
-):
+) -> bool:
     to_recipients = to_recipients or []
     cc_recipients = cc_recipients or []
     bcc_recipients = bcc_recipients or []
@@ -44,11 +44,7 @@ def _send_email(
             text_template,
             sender,
             to_recipients,
-            (
-                bcc_recipients + [settings.ARCHIVE_EMAIL]
-                if bcc_recipients
-                else [settings.ARCHIVE_EMAIL]
-            ),
+            ([*bcc_recipients, settings.ARCHIVE_EMAIL] if bcc_recipients else [settings.ARCHIVE_EMAIL]),
             cc_recipients,
         )
 
@@ -88,8 +84,8 @@ def add_outgoing_email(
     attachment_filename="",
     responsible_team=None,
     hold=False,
-):
-    """adds an email to the outgoing queue
+) -> bool:
+    """Adds an email to the outgoing queue
     recipients is a list of to recipients
     """
     to_recipients = to_recipients or []
@@ -115,7 +111,7 @@ def add_outgoing_email(
         try:
             validate_email(recipient)
         except ValidationError:
-            logger.error(
+            logger.exception(
                 f"There was a problem validating the email {recipient} - returning False",
             )
             return False

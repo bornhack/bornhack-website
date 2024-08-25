@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
@@ -7,10 +12,13 @@ from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from prometheus_client import Gauge
+from utils.models import CampReadOnlyModeError
 
 from .models import Token
 from .models import TokenFind
-from utils.models import CampReadOnlyModeError
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 TOKEN_FINDS = Gauge(
     "bornhack_tokengame_token_finds_total",
@@ -29,7 +37,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
     slug_field = "token"
     slug_url_kwarg = "token"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().active:
             messages.warning(
                 self.request,
@@ -38,20 +46,14 @@ class TokenFindView(LoginRequiredMixin, DetailView):
             return redirect(reverse("tokens:tokenfind_list"))
 
         if self.get_object().valid_when:
-            if (
-                self.get_object().valid_when.lower
-                and self.get_object().valid_when.lower > timezone.now()
-            ):
+            if self.get_object().valid_when.lower and self.get_object().valid_when.lower > timezone.now():
                 messages.warning(
                     self.request,
                     f"This token is not valid yet! Try again after {self.get_object().valid_when.lower}",
                 )
                 return redirect(reverse("tokens:tokenfind_list"))
 
-            if (
-                self.get_object().valid_when.upper
-                and self.get_object().valid_when.upper < timezone.now()
-            ):
+            if self.get_object().valid_when.upper and self.get_object().valid_when.upper < timezone.now():
                 messages.warning(
                     self.request,
                     f"This token is not valid after {self.get_object().valid_when.upper}! Maybe find a flux capacitor?",

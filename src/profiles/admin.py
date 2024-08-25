@@ -1,6 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 
 from .models import Profile
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 @admin.register(Profile)
@@ -17,7 +24,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
     list_filter = ["public_credit_name_approved"]
 
-    def approve_public_credit_names(self, request, queryset):
+    def approve_public_credit_names(self, request: HttpRequest, queryset) -> None:
         for profile in queryset.filter(public_credit_name_approved=False):
             profile.approve_public_credit_name()
 

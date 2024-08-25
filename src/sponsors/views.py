@@ -1,3 +1,6 @@
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.db.models import DateTimeField
 from django.db.models import F
 from django.db.models import Sum
@@ -7,7 +10,6 @@ from django.utils import timezone
 from django.views.generic import ListView
 
 from .models import Sponsor
-from camps.mixins import CampViewMixin
 
 
 class SponsorsView(CampViewMixin, ListView):
@@ -15,7 +17,7 @@ class SponsorsView(CampViewMixin, ListView):
     template_name = "sponsors.html"
     context_object_name = "sponsors"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         queryset = super().get_queryset()
         return queryset.filter(tier__camp=self.camp).order_by("tier__weight", "name")
 
@@ -25,12 +27,8 @@ class AllSponsorsView(ListView):
     template_name = "allsponsors.html"
     context_object_name = "sponsors"
 
-    def get_queryset(self, **kwargs):
-        sponsors = (
-            Sponsor.objects.order_by("name", "tier__camp__buildup")
-            .distinct("name")
-            .values()
-        )
+    def get_queryset(self, **kwargs: dict[str, Any]):
+        sponsors = Sponsor.objects.order_by("name", "tier__camp__buildup").distinct("name").values()
 
         this_year = timezone.now().year
 
@@ -52,9 +50,6 @@ class AllSponsorsView(ListView):
             ).aggregate(Sum("score"))["score__sum"]
             # years is a list of all the years this sponsor has been a sponsor
             s["years"] = sorted(
-                [
-                    x["tier__camp__buildup"].lower.year
-                    for x in years.values("tier__camp__buildup")
-                ],
+                [x["tier__camp__buildup"].lower.year for x in years.values("tier__camp__buildup")],
             )
         return sorted(sponsors, key=lambda item: item["score"], reverse=True)

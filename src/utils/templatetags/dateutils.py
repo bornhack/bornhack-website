@@ -5,7 +5,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def get_weekday(year, month, day):
+def get_weekday(year: str, month: str, day: str) -> str:
     return parse_date(
         f"{year}-{month}-{day}",
     ).strftime("%A")

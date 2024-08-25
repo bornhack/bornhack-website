@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 
 from .models import CoinifyAPICallback
@@ -23,6 +27,9 @@ admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)
 admin.site.register(CoinifyAPICallback)
 admin.site.register(CoinifyAPIRequest)
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 @admin.register(EpayPayment)
@@ -91,7 +98,7 @@ def available_to(product):
     return "None"
 
 
-def stock_info(product):
+def stock_info(product) -> str:
     if product.stock_amount:
         return f"{product.left_in_stock} / {product.stock_amount}"
     return "N/A"
@@ -115,7 +122,7 @@ class ProductAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ["category", "ticket_type"]
-    search_fields = ["name"]
+    search_fields = ("name",)
     save_as = True
 
     list_select_related = ["ticket_type", "category", "ticket_type__camp"]
@@ -165,19 +172,19 @@ class OrderAdmin(admin.ModelAdmin):
         "create_tickets",
     ]
 
-    def mark_order_as_paid(self, request, queryset):
+    def mark_order_as_paid(self, request: HttpRequest, queryset) -> None:
         for order in queryset.filter(paid=False):
             order.mark_as_paid(request)
 
     mark_order_as_paid.description = "Mark order(s) as paid"
 
-    def mark_order_as_cancelled(self, request, queryset):
+    def mark_order_as_cancelled(self, request: HttpRequest, queryset) -> None:
         for order in queryset.filter(cancelled=False):
             order.mark_as_cancelled(request)
 
     mark_order_as_cancelled.description = "Mark order(s) as cancelled"
 
-    def create_tickets(self, request, queryset):
+    def create_tickets(self, request: HttpRequest, queryset) -> None:
         for order in queryset.filter(paid=True):
             order.create_tickets(request)
 
@@ -190,13 +197,13 @@ def get_user_email(obj):
 
 class RefundInline(admin.TabularInline):
     model = RefundProductRelation
-    raw_id_fields = ["opr"]
+    raw_id_fields = ("opr",)
 
 
 @admin.register(Refund)
 class RefundAdmin(admin.ModelAdmin):
     inlines = [RefundInline]
-    raw_id_fields = ["order"]
+    raw_id_fields = ("order",)
 
 
 @admin.register(QuickPayAPIRequest)
@@ -215,7 +222,7 @@ class QuickPayAPIRequestAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ["order", "method", "endpoint"]
-    search_fields = ["headers", "body"]
+    search_fields = ("headers", "body")
 
 
 @admin.register(QuickPayAPIObject)
@@ -229,7 +236,7 @@ class QuickPayAPIObjectAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ["order", "object_type"]
-    search_fields = ["object_body"]
+    search_fields = ("object_body",)
 
 
 @admin.register(QuickPayAPICallback)
@@ -242,4 +249,4 @@ class QuickPayAPICallbackAdmin(admin.ModelAdmin):
     ]
 
     list_filter = ["qpobject"]
-    search_fields = ["headers", "body"]
+    search_fields = ("headers", "body")

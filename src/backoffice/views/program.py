@@ -1,6 +1,8 @@
 import copy
 import logging
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django import forms
 from django.conf import settings
 from django.contrib import messages
@@ -17,13 +19,6 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
-
-from ..forms import AutoScheduleApplyForm
-from ..forms import AutoScheduleValidateForm
-from ..forms import EventScheduleForm
-from ..forms import SpeakerForm
-from ..mixins import ContentTeamPermissionMixin
-from camps.mixins import CampViewMixin
 from program.autoscheduler import AutoScheduler
 from program.email import add_event_scheduled_email
 from program.mixins import AvailabilityMatrixViewMixin
@@ -37,7 +32,13 @@ from program.models import Speaker
 from program.models import SpeakerProposal
 from program.utils import save_speaker_availability
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..forms import AutoScheduleApplyForm
+from ..forms import AutoScheduleValidateForm
+from ..forms import EventScheduleForm
+from ..forms import SpeakerForm
+from ..mixins import ContentTeamPermissionMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 #######################################
@@ -51,12 +52,11 @@ class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     template_name = "pending_proposals.html"
     context_object_name = "speaker_proposal_list"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         qs = super().get_queryset(**kwargs).filter(proposal_status="pending")
-        qs = qs.prefetch_related("user", "urls", "speaker")
-        return qs
+        return qs.prefetch_related("user", "urls", "speaker")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["event_proposal_list"] = self.camp.event_proposals.filter(
             proposal_status=EventProposal.PROPOSAL_PENDING,
@@ -65,16 +65,12 @@ class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class ProposalApproveBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
-    """
-    Shared logic between SpeakerProposalApproveView and EventProposalApproveView
-    """
+    """Shared logic between SpeakerProposalApproveView and EventProposalApproveView"""
 
-    fields = ["reason"]
+    fields = ("reason",)
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         if "approve" in form.data:
             # approve button was pressed
             form.instance.mark_as_approved(self.request)
@@ -98,10 +94,9 @@ class SpeakerProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListVie
     template_name = "speaker_proposal_list.html"
     context_object_name = "speaker_proposal_list"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         qs = super().get_queryset(**kwargs)
-        qs = qs.prefetch_related("user", "urls", "speaker")
-        return qs
+        return qs.prefetch_related("user", "urls", "speaker")
 
 
 class SpeakerProposalDetailView(
@@ -115,10 +110,9 @@ class SpeakerProposalDetailView(
     template_name = "speaker_proposal_detail_backoffice.html"
     context_object_name = "speaker_proposal"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related("user", "urls")
-        return qs
+        return qs.prefetch_related("user", "urls")
 
 
 class SpeakerProposalApproveRejectView(ProposalApproveBaseView):
@@ -136,9 +130,9 @@ class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
     template_name = "event_proposal_list.html"
     context_object_name = "event_proposal_list"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "user",
             "urls",
             "event",
@@ -147,7 +141,6 @@ class EventProposalListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
             "track",
             "tags",
         )
-        return qs
 
 
 class EventProposalDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
@@ -176,15 +169,14 @@ class SpeakerListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     model = Speaker
     template_name = "speaker_list_backoffice.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "proposal__user",
             "events__event_slots",
             "events__event_type",
             "event_conflicts",
         )
-        return qs
 
 
 class SpeakerDetailView(
@@ -197,14 +189,13 @@ class SpeakerDetailView(
     model = Speaker
     template_name = "speaker_detail_backoffice.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "event_conflicts",
             "events__event_slots",
             "events__event_type",
         )
-        return qs
 
 
 class SpeakerUpdateView(
@@ -243,14 +234,14 @@ class SpeakerDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
     model = Speaker
     template_name = "speaker_delete.html"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         speaker = self.get_object()
         # delete related objects first
         speaker.availabilities.all().delete()
         speaker.urls.all().delete()
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Speaker '{self.get_object().name}' has been deleted",
@@ -269,9 +260,9 @@ class EventTypeListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     template_name = "event_type_list.html"
     context_object_name = "event_type_list"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.annotate(
+        return qs.annotate(
             # only count events for the current camp
             event_count=Count(
                 "events",
@@ -291,7 +282,6 @@ class EventTypeListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
                 filter=Q(event_sessions__camp=self.camp),
             ),
         )
-        return qs
 
 
 class EventTypeDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
@@ -301,7 +291,7 @@ class EventTypeDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView)
     template_name = "event_type_detail.html"
     context_object_name = "event_type"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["event_sessions"] = self.camp.event_sessions.filter(
             event_type=self.get_object(),
@@ -327,10 +317,9 @@ class EventLocationListView(CampViewMixin, ContentTeamPermissionMixin, ListView)
     template_name = "event_location_list.html"
     context_object_name = "event_location_list"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related("event_sessions__event_slots", "conflicts")
-        return qs
+        return qs.prefetch_related("event_sessions__event_slots", "conflicts")
 
 
 class EventLocationDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
@@ -340,24 +329,23 @@ class EventLocationDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailV
     template_name = "event_location_detail.html"
     context_object_name = "event_location"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "conflicts",
             "event_sessions__event_slots",
             "event_sessions__event_type",
         )
-        return qs
 
 
 class EventLocationCreateView(CampViewMixin, ContentTeamPermissionMixin, CreateView):
     """This view is used by the Content Team to create EventLocation objects"""
 
     model = EventLocation
-    fields = ["name", "icon", "capacity", "conflicts"]
+    fields = ("name", "icon", "capacity", "conflicts")
     template_name = "event_location_form.html"
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args: list[Any], **kwargs: dict[str, Any]):
         form = super().get_form(*args, **kwargs)
         form.fields["conflicts"].queryset = self.camp.event_locations.all()
         return form
@@ -383,17 +371,17 @@ class EventLocationUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
     """This view is used by the Content Team to update EventLocation objects"""
 
     model = EventLocation
-    fields = ["name", "icon", "capacity", "conflicts"]
+    fields = ("name", "icon", "capacity", "conflicts")
     template_name = "event_location_form.html"
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args: list[Any], **kwargs: dict[str, Any]):
         form = super().get_form(*args, **kwargs)
         form.fields["conflicts"].queryset = self.camp.event_locations.exclude(
             pk=self.get_object().pk,
         )
         return form
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"EventLocation {self.get_object().name} has been updated",
@@ -411,15 +399,13 @@ class EventLocationDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteV
     template_name = "event_location_delete.html"
     context_object_name = "event_location"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         slotsdeleted, slotdetails = self.get_object().event_slots.all().delete()
-        sessionsdeleted, sessiondetails = (
-            self.get_object().event_sessions.all().delete()
-        )
+        sessionsdeleted, sessiondetails = self.get_object().event_sessions.all().delete()
 
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"EventLocation '{self.get_object().name}' has been deleted.",
@@ -440,15 +426,14 @@ class EventListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     model = Event
     template_name = "event_list_backoffice.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "speakers__events",
             "event_type",
             "event_slots__event_session__event_location",
             "tags",
         )
-        return qs
 
 
 class EventDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
@@ -462,17 +447,17 @@ class EventUpdateView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
     """This view is used by the Content Team to update Event objects"""
 
     model = Event
-    fields = [
+    fields = (
         "title",
         "abstract",
         "video_recording",
         "duration_minutes",
         "demand",
         "tags",
-    ]
+    )
     template_name = "event_update.html"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(self.request, "Event has been updated")
         return reverse(
             "backoffice:event_detail",
@@ -486,11 +471,11 @@ class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
     model = Event
     template_name = "event_delete.html"
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         self.get_object().urls.all().delete()
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Event '{self.get_object().title}' has been deleted!",
@@ -501,12 +486,13 @@ class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
 class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     """This view is used by the Content Team to manually schedule Events.
     It shows a table with radioselect buttons for the available slots for the
-    EventType of the Event"""
+    EventType of the Event
+    """
 
     form_class = EventScheduleForm
     template_name = "event_schedule.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.event = get_object_or_404(
             Event,
@@ -514,7 +500,7 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             slug=kwargs["slug"],
         )
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args: list[Any], **kwargs: dict[str, Any]):
         form = super().get_form(*args, **kwargs)
         self.slots = []
         slotindex = 0
@@ -540,19 +526,15 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
         return form
 
-    def get_context_data(self, *args, **kwargs):
-        """
-        Add event to context
-        """
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Add event to context"""
         context = super().get_context_data(*args, **kwargs)
         context["event"] = self.event
         context["event_slots"] = self.slots
         return context
 
     def form_valid(self, form):
-        """
-        Set needed values, save slot and return
-        """
+        """Set needed values, save slot and return"""
         slot = self.slots[int(form.cleaned_data["slot"])]["slot"]
         slot.event = self.event
         slot.autoscheduled = False
@@ -579,9 +561,7 @@ class EventSessionCreateTypeSelectView(
     ContentTeamPermissionMixin,
     ListView,
 ):
-    """
-    This view is shown first when creating a new EventSession
-    """
+    """This view is shown first when creating a new EventSession"""
 
     model = EventType
     template_name = "event_session_create_type_select.html"
@@ -593,35 +573,28 @@ class EventSessionCreateLocationSelectView(
     ContentTeamPermissionMixin,
     ListView,
 ):
-    """
-    This view is shown second when creating a new EventSession
-    """
+    """This view is shown second when creating a new EventSession"""
 
     model = EventLocation
     template_name = "event_session_create_location_select.html"
     context_object_name = "event_location_list"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.event_type = get_object_or_404(EventType, slug=kwargs["event_type_slug"])
 
-    def get_context_data(self, *args, **kwargs):
-        """
-        Add event_type to context
-        """
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Add event_type to context"""
         context = super().get_context_data(*args, **kwargs)
         context["event_type"] = self.event_type
         return context
 
 
 class EventSessionFormViewMixin:
-    """
-    A mixin with the stuff shared between EventSession{Create|Update}View
-    """
+    """A mixin with the stuff shared between EventSession{Create|Update}View"""
 
-    def get_form(self, *args, **kwargs):
-        """
-        The default range widgets are a bit shit because they eat the help_text and
+    def get_form(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """The default range widgets are a bit shit because they eat the help_text and
         have no indication of which field is for what. So we add a nice placeholder.
         We also limit the event_location dropdown to only the current camps locations.
         """
@@ -638,10 +611,8 @@ class EventSessionFormViewMixin:
             )
         return form
 
-    def get_context_data(self, *args, **kwargs):
-        """
-        Add event_type and location and existing sessions to context
-        """
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Add event_type and location and existing sessions to context"""
         context = super().get_context_data(*args, **kwargs)
         if not hasattr(self, "event_type"):
             self.event_type = self.get_object().event_type
@@ -661,15 +632,13 @@ class EventSessionCreateView(
     EventSessionFormViewMixin,
     CreateView,
 ):
-    """
-    This view is used by the Content Team to create EventSession objects
-    """
+    """This view is used by the Content Team to create EventSession objects"""
 
     model = EventSession
-    fields = ["description", "when", "event_duration_minutes"]
+    fields = ("description", "when", "event_duration_minutes")
     template_name = "event_session_form.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.event_type = get_object_or_404(EventType, slug=kwargs["event_type_slug"])
         self.event_location = get_object_or_404(
@@ -679,9 +648,7 @@ class EventSessionCreateView(
         )
 
     def form_valid(self, form):
-        """
-        Set camp and event_type, check for overlaps and save
-        """
+        """Set camp and event_type, check for overlaps and save"""
         session = form.save(commit=False)
         session.event_type = self.event_type
         session.event_location = self.event_location
@@ -697,24 +664,19 @@ class EventSessionCreateView(
 
 
 class EventSessionListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """
-    This view is used by the Content Team to see EventSession objects.
-    """
+    """This view is used by the Content Team to see EventSession objects."""
 
     model = EventSession
     template_name = "event_session_list.html"
     context_object_name = "event_session_list"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related("event_type", "event_location", "event_slots")
-        return qs
+        return qs.prefetch_related("event_type", "event_location", "event_slots")
 
 
 class EventSessionDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """
-    This view is used by the Content Team to see details for EventSession objects
-    """
+    """This view is used by the Content Team to see details for EventSession objects"""
 
     model = EventSession
     template_name = "event_session_detail.html"
@@ -727,18 +689,14 @@ class EventSessionUpdateView(
     EventSessionFormViewMixin,
     UpdateView,
 ):
-    """
-    This view is used by the Content Team to update EventSession objects
-    """
+    """This view is used by the Content Team to update EventSession objects"""
 
     model = EventSession
-    fields = ["when", "description", "event_duration_minutes"]
+    fields = ("when", "description", "event_duration_minutes")
     template_name = "event_session_form.html"
 
     def form_valid(self, form):
-        """
-        Just save, we have a post_save signal which takes care of fixing EventSlots
-        """
+        """Just save, we have a post_save signal which takes care of fixing EventSlots"""
         session = form.save()
         messages.success(self.request, f"{session} has been updated successfully!")
         return redirect(
@@ -750,15 +708,13 @@ class EventSessionUpdateView(
 
 
 class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
-    """
-    This view is used by the Content Team to delete EventSession objects
-    """
+    """This view is used by the Content Team to delete EventSession objects"""
 
     model = EventSession
     template_name = "event_session_delete.html"
     context_object_name = "session"
 
-    def get(self, *args, **kwargs):
+    def get(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Show a warning if we have something scheduled in this EventSession"""
         if self.get_object().event_slots.filter(event__isnull=False).exists():
             messages.warning(
@@ -767,12 +723,12 @@ class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteVi
             )
         return super().get(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
+    def delete(self, *args: list[Any], **kwargs: dict[str, Any]):
         session = self.get_object()
         session.event_slots.all().delete()
         return super().delete(*args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             "EventSession and related EventSlots was deleted successfully!",
@@ -794,14 +750,13 @@ class EventSlotListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
     template_name = "event_slot_list.html"
     context_object_name = "event_slot_list"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.prefetch_related(
+        return qs.prefetch_related(
             "event__speakers",
             "event_session__event_location",
             "event_session__event_type",
         )
-        return qs
 
 
 class EventSlotDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
@@ -817,7 +772,7 @@ class EventSlotUnscheduleView(CampViewMixin, ContentTeamPermissionMixin, UpdateV
 
     model = EventSlot
     template_name = "event_slot_unschedule.html"
-    fields = []
+    fields = ()
     context_object_name = "event_slot"
 
     def form_valid(self, form):
@@ -859,7 +814,8 @@ class AutoScheduleCrashCourseView(
 class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     """This view is used to validate schedules. It uses the AutoScheduler and can
     either validate the currently applied schedule or a new similar schedule, or a
-    brand new schedule"""
+    brand new schedule
+    """
 
     template_name = "autoschedule_validate.html"
     form_class = AutoScheduleValidateForm
@@ -926,7 +882,7 @@ class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormVi
 class AutoScheduleDiffView(CampViewMixin, ContentTeamPermissionMixin, TemplateView):
     template_name = "autoschedule_diff.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         scheduler = AutoScheduler(camp=self.camp)
         autoschedule, diff = scheduler.calculate_similar_autoschedule()
@@ -987,17 +943,16 @@ class AutoScheduleDebugEventSlotUnavailabilityView(
 ):
     template_name = "autoschedule_debug_slots.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         scheduler = AutoScheduler(camp=self.camp)
-        for autoevent, _ in zip(scheduler.autoevents, scheduler.events.all()):
+        for autoevent, _ in zip(scheduler.autoevents, scheduler.events.all(), strict=False):
             autoevent.possible_slots = 0
             for slot in scheduler.autoslots:
                 if slot not in autoevent.unavailability:
                     autoevent.possible_slots += 1
-        context = {
+        return {
             "scheduler": scheduler,
         }
-        return context
 
 
 class AutoScheduleDebugEventConflictsView(
@@ -1007,9 +962,8 @@ class AutoScheduleDebugEventConflictsView(
 ):
     template_name = "autoschedule_debug_events.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         scheduler = AutoScheduler(camp=self.camp)
-        context = {
+        return {
             "scheduler": scheduler,
         }
-        return context

@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -7,23 +12,22 @@ from django.urls import reverse
 from .models import Chain
 from .models import Credebtor
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 
 class ChainViewMixin:
-    """
-    The ChainViewMixin sets self.chain based on chain_slug from the URL
-    """
+    """The ChainViewMixin sets self.chain based on chain_slug from the URL"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.chain = get_object_or_404(Chain, slug=self.kwargs["chain_slug"])
 
 
 class CredebtorViewMixin(ChainViewMixin):
-    """
-    The CredebtorViewMixin sets self.credebtor based on credebtor_slug from the URL
-    """
+    """The CredebtorViewMixin sets self.credebtor based on credebtor_slug from the URL"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.credebtor = get_object_or_404(
             Credebtor,
@@ -33,9 +37,7 @@ class CredebtorViewMixin(ChainViewMixin):
 
 
 class ExpensePermissionMixin:
-    """
-    This mixin checks if request.user submitted the Expense, or if request.user has camps.economyteam_permission
-    """
+    """This mixin checks if request.user submitted the Expense, or if request.user has camps.economyteam_permission"""
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
@@ -45,13 +47,11 @@ class ExpensePermissionMixin:
             return obj
         else:
             # the current user is different from the user who submitted the expense, and current user is not in the economy team; fuckery is afoot, no thanks
-            raise Http404()
+            raise Http404
 
 
 class RevenuePermissionMixin:
-    """
-    This mixin checks if request.user submitted the Revenue, or if request.user has camps.economyteam_permission
-    """
+    """This mixin checks if request.user submitted the Revenue, or if request.user has camps.economyteam_permission"""
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
@@ -61,13 +61,11 @@ class RevenuePermissionMixin:
             return obj
         else:
             # the current user is different from the user who submitted the revenue, and current user is not in the economy team; fuckery is afoot, no thanks
-            raise Http404()
+            raise Http404
 
 
 class ReimbursementPermissionMixin:
-    """
-    This mixin checks if request.user owns the Reimbursement, or if request.user has camps.economyteam_permission
-    """
+    """This mixin checks if request.user owns the Reimbursement, or if request.user has camps.economyteam_permission"""
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset=queryset)
@@ -77,11 +75,11 @@ class ReimbursementPermissionMixin:
             return obj
         else:
             # the current user is different from the user who "owns" the reimbursement, and current user is not in the economy team; fuckery is afoot, no thanks
-            raise Http404()
+            raise Http404
 
 
 class ReimbursementUnpaidMixin:
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if self.get_object().paid:
             messages.error(
                 request,

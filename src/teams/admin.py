@@ -1,3 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from camps.utils import CampPropertyListFilter
 from django.contrib import admin
 
 from .email import add_added_membership_email
@@ -6,7 +11,9 @@ from .models import Team
 from .models import TeamMember
 from .models import TeamShift
 from .models import TeamTask
-from camps.utils import CampPropertyListFilter
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 @admin.register(TeamTask)
@@ -60,7 +67,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     actions = ["approve_membership", "remove_member"]
 
-    def approve_membership(self, request, queryset):
+    def approve_membership(self, request: HttpRequest, queryset) -> None:
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 
@@ -72,15 +79,12 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            "Membership(s) approved: Added {} user(s) to {} team(s).".format(
-                updated,
-                teams_count,
-            ),
+            f"Membership(s) approved: Added {updated} user(s) to {teams_count} team(s).",
         )
 
     approve_membership.description = "Approve membership."
 
-    def remove_member(self, request, queryset):
+    def remove_member(self, request: HttpRequest, queryset) -> None:
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 

@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from .environment_settings import *  # noqa: F403
 from utils import range_fields  # noqa: F401
+
+from .environment_settings import *  # noqa: F403
 
 # range_fields monkeypatches postgres Range object to support lookups
 
@@ -145,8 +146,10 @@ CORS_URLS_REGEX = r"^/api/*$"
 if DEBUG:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     INSTALLED_APPS += ["debug_toolbar"]
-    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
-    INTERNAL_IPS = "127.0.0.1"
+    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware", *MIDDLEWARE]
+    INTERNAL_IPS = ["127.0.0.1"]
+    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}
+
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.versions.VersionsPanel",
         "debug_toolbar.panels.timer.TimerPanel",

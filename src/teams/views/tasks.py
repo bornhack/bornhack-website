@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,7 +19,9 @@ from ..models import TeamMember
 from ..models import TeamTask
 from .mixins import EnsureTeamResponsibleMixin
 from .mixins import TeamViewMixin
-from camps.mixins import CampViewMixin
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class TeamTasksView(CampViewMixin, DetailView):
@@ -27,7 +35,7 @@ class TeamTasksView(CampViewMixin, DetailView):
 class TaskCommentForm(forms.ModelForm):
     class Meta:
         model = TaskComment
-        fields = ["comment"]
+        fields = ("comment",)
 
 
 class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
@@ -36,12 +44,12 @@ class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
     model = TeamTask
     active_menu = "tasks"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["comment_form"] = TaskCommentForm()
         return context
 
-    def post(self, request, **kwargs):
+    def post(self, request: HttpRequest, **kwargs: dict[str, Any]):
         task = self.get_object()
         if request.user not in task.team.members.all():
             return HttpResponseNotAllowed("Nope")
@@ -61,9 +69,9 @@ class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
 class TaskForm(forms.ModelForm):
     class Meta:
         model = TeamTask
-        fields = ["name", "description", "when", "completed"]
+        fields = ("name", "description", "when", "completed")
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: dict[str, Any]) -> None:
         super().__init__(**kwargs)
         self.fields["when"].widget.widgets = [
             forms.DateTimeInput(attrs={"placeholder": "Start"}),
@@ -97,7 +105,7 @@ class TaskCreateView(
         task.save()
         return HttpResponseRedirect(task.get_absolute_url())
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return self.get_object().get_absolute_url()
 
 
@@ -113,7 +121,7 @@ class TaskUpdateView(
     form_class = TaskForm
     active_menu = "tasks"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = self.team
         return context
@@ -126,5 +134,5 @@ class TaskUpdateView(
         task.save()
         return HttpResponseRedirect(task.get_absolute_url())
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return self.get_object().get_absolute_url()

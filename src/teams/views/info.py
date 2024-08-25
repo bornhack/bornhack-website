@@ -1,17 +1,19 @@
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from info.models import InfoCategory
+from info.models import InfoItem
 from reversion.views import RevisionMixin
 
 from ..models import Team
 from .mixins import EnsureTeamResponsibleMixin
 from .mixins import TeamViewMixin
-from camps.mixins import CampViewMixin
-from info.models import InfoCategory
-from info.models import InfoItem
 
 
 class InfoCategoriesListView(
@@ -42,7 +44,7 @@ class InfoItemCreateView(
 ):
     model = InfoItem
     template_name = "team_info_item_form.html"
-    fields = ["headline", "body", "anchor", "weight"]
+    fields = ("headline", "body", "anchor", "weight")
     slug_field = "anchor"
     active_menu = "info_categories"
 
@@ -62,10 +64,10 @@ class InfoItemCreateView(
         info_item.save()
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return self.team.get_absolute_url()
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["category"] = InfoCategory.objects.get(
             team__camp__slug=self.kwargs["camp_slug"],
@@ -84,7 +86,7 @@ class InfoItemUpdateView(
 ):
     model = InfoItem
     template_name = "team_info_item_form.html"
-    fields = ["headline", "body", "anchor", "weight"]
+    fields = ("headline", "body", "anchor", "weight")
     slug_field = "anchor"
     slug_url_kwarg = "item_anchor"
     active_menu = "info_categories"
@@ -95,7 +97,7 @@ class InfoItemUpdateView(
             slug=self.kwargs["team_slug"],
         )
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         next = self.request.GET.get("next")
         if next:
             return next
@@ -122,7 +124,7 @@ class InfoItemDeleteView(
             slug=self.kwargs["team_slug"],
         )
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         next = self.request.GET.get("next")
         if next:
             return next

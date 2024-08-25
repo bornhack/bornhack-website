@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.conf import settings
 from django.views.generic import TemplateView
 
@@ -5,12 +7,11 @@ from django.views.generic import TemplateView
 class ContactView(TemplateView):
     template_name = "contact.html"
 
-    def get_context_data(self, **kwargs):
-        context = {
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        return {
             "bank": settings.BANKACCOUNT_BANK,
             "bank_iban": settings.BANKACCOUNT_IBAN,
             "bank_bic": settings.BANKACCOUNT_SWIFTBIC,
             "bank_dk_reg": settings.BANKACCOUNT_REG,
             "bank_dk_accno": settings.BANKACCOUNT_ACCOUNT,
         }
-        return context

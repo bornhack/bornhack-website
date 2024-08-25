@@ -7,16 +7,16 @@ from django.utils import timezone
 from .models import Bank
 from .models import BankAccount
 from .utils import CoinifyCSVImporter
-from .utils import import_clearhaus_csv
-from .utils import import_epay_csv
 from .utils import MobilePayCSVImporter
 from .utils import ZettleExcelImporter
+from .utils import import_clearhaus_csv
+from .utils import import_epay_csv
 
 
 class BankAccountCsvImportTest(TestCase):
     """Test importing a CSV file with bank transactions."""
 
-    def test_bank_account_csv_import(self):
+    def test_bank_account_csv_import(self) -> None:
         bank = Bank.objects.create(
             name="NiceBank",
         )
@@ -53,7 +53,7 @@ class BankAccountCsvImportTest(TestCase):
 
 
 class CoinifyCSVImportTest(TestCase):
-    def test_coinify_invoice_csv_import(self):
+    def test_coinify_invoice_csv_import(self) -> None:
         # make sure we create 4 invoices
         with open(
             "testdata/coinify-invoices-20200101-20200630.csv",
@@ -70,9 +70,9 @@ class CoinifyCSVImportTest(TestCase):
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_invoice_csv(reader)
-            self.assertEqual(created, 0)
+            assert created == 0
 
-    def test_coinify_payout_csv_import(self):
+    def test_coinify_payout_csv_import(self) -> None:
         # make sure we create 2 payouts
         with open(
             "testdata/coinify-payouts-20210701-20210904.csv",
@@ -89,9 +89,9 @@ class CoinifyCSVImportTest(TestCase):
         ) as f:
             reader = csv.reader(f, delimiter=",", quotechar='"')
             created = CoinifyCSVImporter.import_coinify_payout_csv(reader)
-            self.assertEqual(created, 0)
+            assert created == 0
 
-    def test_coinify_balance_csv_import(self):
+    def test_coinify_balance_csv_import(self) -> None:
         # make sure we create 66 balances
         with open(
             "testdata/coinify-account-balances-20210701-20210904.csv",

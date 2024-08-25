@@ -8,7 +8,7 @@ from shop.models import Refund
 class OrderProductRelationForm(forms.ModelForm):
     class Meta:
         model = OrderProductRelation
-        fields = ["quantity"]
+        fields = ("quantity",)
 
     def clean_quantity(self):
         product = self.instance.product
@@ -32,4 +32,4 @@ OrderProductRelationFormSet = modelformset_factory(
 class RefundForm(forms.ModelForm):
     class Meta:
         model = Refund
-        fields = ["customer_comment", "invoice_address", "notes"]
+        fields = ("customer_comment", "invoice_address", "notes")

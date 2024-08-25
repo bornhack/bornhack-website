@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
@@ -9,27 +13,27 @@ from django.views.generic import CreateView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class StaffMemberRequiredMixin:
-    """
-    A CBV mixin for when a view should only be permitted for staff users
-    """
+    """A CBV mixin for when a view should only be permitted for staff users"""
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # only permit staff users
         if not request.user.is_staff:
             messages.error(request, "No thanks")
-            raise PermissionDenied()
+            raise PermissionDenied
 
         # continue with the request
         return super().dispatch(request, *args, **kwargs)
 
 
 class RaisePermissionRequiredMixin(PermissionRequiredMixin):
-    """
-    A subclass of PermissionRequiredMixin which raises an exception to return 403 rather than a redirect to the login page
+    """A subclass of PermissionRequiredMixin which raises an exception to return 403 rather than a redirect to the login page
     We use this to avoid a redirect loop since our login page redirects back to the ?next= url when a user is logged in...
     """
 
@@ -44,12 +48,12 @@ class UserIsObjectOwnerMixin(UserPassesTestMixin):
 class GetObjectMixin(SingleObjectMixin):
     object: Model
 
-    def get_object(self, **kwargs):
+    def get_object(self, **kwargs: dict[str, Any]):
         if hasattr(self, "object"):
             return self.object
         return super().get_object(**kwargs)
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(request, *args, **kwargs)
         self.object = self.get_object()
 
@@ -59,7 +63,7 @@ class VerbView:
 
     verb = "UnknownVerb"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["verb"] = self.verb
         return context

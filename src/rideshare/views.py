@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -8,12 +14,14 @@ from django.views.generic import DeleteView
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
-
-from .models import Ride
-from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import UserIsObjectOwnerMixin
+
+from .models import Ride
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class ContactRideForm(forms.Form):
@@ -33,12 +41,12 @@ class RideList(LoginRequiredMixin, CampViewMixin, ListView):
 class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
     model = Ride
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["form"] = ContactRideForm()
         return context
 
-    def post(self, request, **kwargs):
+    def post(self, request: HttpRequest, **kwargs: dict[str, Any]):
         form = ContactRideForm(request.POST)
         if form.is_valid():
             ride = self.get_object()
@@ -64,7 +72,7 @@ class RideDetail(LoginRequiredMixin, CampViewMixin, DetailView):
 
 class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     model = Ride
-    fields = [
+    fields = (
         "author",
         "has_car",
         "from_location",
@@ -72,18 +80,14 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         "when",
         "seats",
         "description",
-    ]
+    )
 
     def get_initial(self):
-        """
-        Default 'author' to users public_credit_name where relevant
-        """
+        """Default 'author' to users public_credit_name where relevant"""
         return {"author": self.request.user.profile.get_public_credit_name}
 
-    def form_valid(self, form, **kwargs):
-        """
-        Set camp and user before saving
-        """
+    def form_valid(self, form, **kwargs: dict[str, Any]):
+        """Set camp and user before saving"""
         ride = form.save(commit=False)
         ride.camp = self.camp
         ride.user = self.request.user
@@ -94,7 +98,7 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
 
 class RideUpdate(LoginRequiredMixin, CampViewMixin, UserIsObjectOwnerMixin, UpdateView):
     model = Ride
-    fields = [
+    fields = (
         "author",
         "has_car",
         "from_location",
@@ -102,11 +106,11 @@ class RideUpdate(LoginRequiredMixin, CampViewMixin, UserIsObjectOwnerMixin, Upda
         "when",
         "seats",
         "description",
-    ]
+    )
 
 
 class RideDelete(LoginRequiredMixin, CampViewMixin, UserIsObjectOwnerMixin, DeleteView):
     model = Ride
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("rideshare:list", kwargs={"camp_slug": self.camp.slug})

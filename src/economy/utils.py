@@ -13,6 +13,10 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
+from shop.models import CreditNote
+from shop.models import CustomOrder
+from shop.models import Invoice
+from shop.models import Order
 
 from economy.models import BankAccount
 from economy.models import ClearhausSettlement
@@ -27,10 +31,6 @@ from economy.models import Reimbursement
 from economy.models import Revenue
 from economy.models import ZettleBalance
 from economy.models import ZettleReceipt
-from shop.models import CreditNote
-from shop.models import CustomOrder
-from shop.models import Invoice
-from shop.models import Order
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
@@ -214,7 +214,7 @@ def import_clearhaus_csv(csvreader):
             defaults={
                 "merchant_id": row[0],
                 "merchant_name": row[1],
-                "settled": True if row[3] == "true" else False,
+                "settled": row[3] == "true",
                 "currency": row[4],
                 "period_start_date": row[5],
                 "period_end_date": row[6] if row[6] else None,
@@ -254,6 +254,7 @@ def import_clearhaus_csv(csvreader):
 def optional_int(value):
     if not pd.isnull(value):
         return value
+    return None
 
 
 def to_decimal(value):
@@ -274,7 +275,7 @@ class ZettleExcelImporter:
         The receipts sheet has 16 rows header and 3 rows footer to skip.
         Also skip columns B (redundant) and J (part of cardnumber).
         """
-        df = pd.read_excel(
+        return pd.read_excel(
             fh,
             skiprows=16,
             skipfooter=3,
@@ -295,7 +296,6 @@ class ZettleExcelImporter:
                 "Netto": to_decimal,  # G
             },
         )
-        return df
 
     @staticmethod
     def import_zettle_receipts_df(df):
@@ -310,9 +310,7 @@ class ZettleExcelImporter:
                 fee=row["Afgift"],
                 net=row["Netto"],
                 payment_method=row["Betalingsmetode"],
-                card_issuer=(
-                    row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None
-                ),
+                card_issuer=(row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None),
                 staff=row["Personale"],
                 description=row["Beskrivelse"],
                 sold_via=row["Solgt via"],
@@ -329,7 +327,7 @@ class ZettleExcelImporter:
 
         The receipts sheet has no header or footer rows, and no columns to skip.
         """
-        df = pd.read_excel(
+        return pd.read_excel(
             fh,
             parse_dates=True,
             dtype={
@@ -341,7 +339,6 @@ class ZettleExcelImporter:
                 "Saldo": to_decimal,  # F
             },
         )
-        return df
 
     @staticmethod
     def import_zettle_balances_df(df):
@@ -356,9 +353,7 @@ class ZettleExcelImporter:
                     if not pd.isnull(row["Betalingsdato"])
                     else None
                 ),
-                payment_reference=(
-                    row["Reference"] if not pd.isnull(row["Reference"]) else None
-                ),
+                payment_reference=(row["Reference"] if not pd.isnull(row["Reference"]) else None),
                 description=row["Type"],
                 amount=row["Beløb"],
                 balance=row["Saldo"],
@@ -447,11 +442,11 @@ class MobilePayCSVImporter:
 class AccountingExporter:
     """A class with methods for exporting all the financial data for the bookkeeper."""
 
-    def __init__(self, startdate, enddate):
+    def __init__(self, startdate, enddate) -> None:
         """Requires startdate and enddate."""
         self.period = DateTimeTZRange(startdate, enddate)
 
-    def doit(self):
+    def doit(self) -> None:
         """Do all the things."""
         with tempfile.TemporaryDirectory(prefix="django-accounting-") as tmpdir:
             workdir = Path(tmpdir)
@@ -584,10 +579,7 @@ class AccountingExporter:
                 created__lte=self.period.upper,
             )
             for order in orders:
-                if order.invoice:
-                    invoiceid = order.invoice.id
-                else:
-                    invoiceid = "N/A"
+                invoiceid = order.invoice.id if order.invoice else "N/A"
                 writer.writerow(
                     [
                         order.id,
@@ -605,9 +597,7 @@ class AccountingExporter:
     def customorder_csv_export(self, workdir, filename=None):
         """Export customorders in our system."""
         if not filename:
-            filename = (
-                f"bornhack_custom_orders_{self.period.lower}_{self.period.upper}.csv"
-            )
+            filename = f"bornhack_custom_orders_{self.period.lower}_{self.period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["id", "amount", "vat", "paid", "customer"])
@@ -712,9 +702,7 @@ class AccountingExporter:
     def reimbursement_csv_export(self, workdir, filename=None):
         """Export reimbursements in our system."""
         if not filename:
-            filename = (
-                f"bornhack_reimbursements_{self.period.lower}_{self.period.upper}.csv"
-            )
+            filename = f"bornhack_reimbursements_{self.period.lower}_{self.period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
@@ -762,9 +750,7 @@ class AccountingExporter:
     def coinify_csv_export(self, workdir):
         """Export coinify data in our system. Three different CSV files is created."""
         # invoices
-        invoices_filename = (
-            f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
-        )
+        invoices_filename = f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
         invoices = CoinifyInvoice.objects.filter(
             coinify_created__gte=self.period.lower,
             coinify_created__lte=self.period.upper,
@@ -808,9 +794,7 @@ class AccountingExporter:
                 )
 
         # payouts
-        payouts_filename = (
-            f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
-        )
+        payouts_filename = f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
         payouts = CoinifyPayout.objects.filter(
             coinify_created__gte=self.period.lower,
             coinify_created__lte=self.period.upper,
@@ -848,9 +832,7 @@ class AccountingExporter:
                 )
 
         # balances
-        balances_filename = (
-            f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
-        )
+        balances_filename = f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
         balances = CoinifyBalance.objects.filter(
             date__gte=self.period.lower,
             date__lte=self.period.upper,
@@ -878,9 +860,7 @@ class AccountingExporter:
 
     def epay_csv_export(self, workdir):
         """Export ePay/bambora transactions in our system."""
-        filename = (
-            f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
-        )
+        filename = f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
         transactions = EpayTransaction.objects.filter(
             auth_date__gte=self.period.lower,
             auth_date__lte=self.period.upper,
@@ -1013,9 +993,7 @@ class AccountingExporter:
     def zettle_csv_export(self, workdir):
         """Export Zettle data in our system. Two different CSV files will be created."""
         # balances
-        balances_filename = (
-            f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
-        )
+        balances_filename = f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
         balances = ZettleBalance.objects.filter(
             statement_time__gte=self.period.lower,
             statement_time__lte=self.period.upper,
@@ -1046,9 +1024,7 @@ class AccountingExporter:
                 )
 
         # receipts
-        receipts_filename = (
-            f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
-        )
+        receipts_filename = f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
         receipts = ZettleReceipt.objects.filter(
             zettle_created__gte=self.period.lower,
             zettle_created__lte=self.period.upper,
@@ -1136,7 +1112,7 @@ class AccountingExporter:
                 )
         return (filename, transactions.count())
 
-    def create_index_html(self, workdir):
+    def create_index_html(self, workdir) -> None:
         """Create a HTML file with links for everything"""
         context = {
             "period": self.period,
@@ -1160,7 +1136,7 @@ class AccountingExporter:
         with open(workdir / "index.html", "w") as f:
             f.write(rendered)
 
-    def create_archive(self, workdir):
+    def create_archive(self, workdir) -> None:
         """Create an in-memory zip-file with all the CSV data and the HTML file"""
         self.archivedata = io.BytesIO()
         subdir = "bornhack_accounting_export"

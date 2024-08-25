@@ -1,7 +1,10 @@
+from __future__ import annotations
+
+from typing import Any
+
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
@@ -9,7 +12,7 @@ from utils.slugs import unique_slugify
 
 class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel):
     class Meta:
-        ordering = ["name"]
+        ordering = ("name",)
         unique_together = ("slug", "camp")
 
     contact = models.ForeignKey("auth.User", on_delete=models.PROTECT)
@@ -28,16 +31,16 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
     deleted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse_lazy(
             "village_detail",
             kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
         )
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -48,6 +51,6 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
             )
         super().save(**kwargs)
 
-    def delete(self, using=None, keep_parents=False):
+    def delete(self, using: Any | None = None, keep_parents: bool = False) -> None:  # noqa: ARG002, FBT001, FBT002, ANN401
         self.deleted = True
         self.save()

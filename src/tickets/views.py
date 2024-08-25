@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -12,12 +16,14 @@ from django.views.generic import DetailView
 from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
-
-from .models import ShopTicket
 from utils.models import CampReadOnlyModeError
 
+from .models import ShopTicket
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 @login_required
@@ -37,9 +43,7 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
 
     context = {
         "tickets": (base_queryset.filter(ticket_group__isnull=True)),
-        "tickets_in_groups": (
-            base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")
-        ),
+        "tickets_in_groups": (base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")),
     }
 
     return render(request, "tickets/ticket_list.html", context)
@@ -48,19 +52,16 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
 class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
     model = ShopTicket
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not request.user == self.get_object().opr.order.user:
             raise Http404("Ticket not found")
 
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
-            'attachment; filename="{type}_ticket_{pk}.pdf"'.format(
-                type=self.get_object().shortname,
-                pk=self.get_object().pk,
-            )
+            f'attachment; filename="{self.get_object().shortname}_ticket_{self.get_object().pk}.pdf"'
         )
         response.write(self.get_object().generate_pdf().getvalue())
         return response
@@ -70,18 +71,18 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     model = ShopTicket
     template_name = "tickets/ticket_detail.html"
     context_object_name = "ticket"
-    fields = ["name", "email"]
+    fields = ("name", "email")
 
     def form_valid(self, form):
         return super().form_valid(form)
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         ticket = self.get_object()
         if ticket.opr.order.user != request.user:
             raise Http404("Ticket not found")
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         try:
             response = super().post(request, *args, **kwargs)
         except CampReadOnlyModeError:

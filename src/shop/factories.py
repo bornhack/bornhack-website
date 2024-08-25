@@ -2,7 +2,6 @@ import factory
 from django.utils import timezone
 from factory.django import DjangoModelFactory
 from psycopg2.extras import DateTimeTZRange
-
 from utils.factories import UserFactory
 
 

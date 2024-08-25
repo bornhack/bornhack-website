@@ -9,15 +9,15 @@ register = template.Library()
 
 
 @register.simple_tag
-def qr_code(value):
+def qr_code(value: str) -> str:
     stream = io.BytesIO()
     img = qrcode.make(value, box_size=7)
     img.save(stream, "PNG")
     data = base64.b64encode(stream.getvalue())
 
-    return mark_safe(
+    return mark_safe(  # noqa: S308
         "<figure style='text-align: center;'>"
-        "<figcaption style='text-align: center;'>{}</figcaption>"
-        '<img src="data:image/png;base64,{}" alt="">'
-        "</figure>".format(value, data.decode()),
+        f"<figcaption style='text-align: center;'>{value}</figcaption>"
+        f'<img src="data:image/png;base64,{data.decode()}" alt="">'
+        "</figure>",
     )

@@ -1,26 +1,28 @@
-from django.core.management.base import BaseCommand
-from django.utils import timezone
+from typing import Any
 
 from camps.models import Camp
-from sponsors.models import Sponsor
+from django.core.management.base import BaseCommand
+from django.utils import timezone
 from tickets.models import SponsorTicket
 from tickets.models import TicketType
+
+from sponsors.models import Sponsor
 
 
 class Command(BaseCommand):
     help = "Creates sponsor tickets"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("camp_slug", type=str)
         parser.add_argument("week_ticket_type_pk", type=str)
         parser.add_argument("day_ticket_type_pk", type=str)
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: list[Any], **options) -> None:
         week_ticket_type = TicketType.objects.get(pk=options["week_ticket_type_pk"])
         day_ticket_type = TicketType.objects.get(pk=options["day_ticket_type_pk"])
         camp = Camp.objects.get(slug=options["camp_slug"])
@@ -32,11 +34,7 @@ class Command(BaseCommand):
 
         for sponsor in sponsors:
             # get week ticket count from Sponsor or fall back to tier
-            week_tickets = (
-                sponsor.week_tickets
-                if sponsor.week_tickets
-                else sponsor.tier.week_tickets
-            )
+            week_tickets = sponsor.week_tickets if sponsor.week_tickets else sponsor.tier.week_tickets
             existing = SponsorTicket.objects.filter(
                 sponsor=sponsor,
                 ticket_type=week_ticket_type,
@@ -53,11 +51,7 @@ class Command(BaseCommand):
                     f"- {ticket.shortname}_ticket_{ticket.pk}.pdf",
                 )
             # get oneday ticket count from Sponsor or fall back to tier
-            oneday_tickets = (
-                sponsor.oneday_tickets
-                if sponsor.oneday_tickets
-                else sponsor.tier.oneday_tickets
-            )
+            oneday_tickets = sponsor.oneday_tickets if sponsor.oneday_tickets else sponsor.tier.oneday_tickets
             existing = SponsorTicket.objects.filter(
                 sponsor=sponsor,
                 ticket_type=day_ticket_type,

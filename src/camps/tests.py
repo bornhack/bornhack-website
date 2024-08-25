@@ -5,7 +5,7 @@ from django.urls import reverse
 
 
 class CampMenuTest(TestCase):
-    def test_this_year_shown_on_homepage(self):
+    def test_this_year_shown_on_homepage(self) -> None:
         """By March, the current year's camp should be on the homepage."""
         response = self.client.get(
             "/news/",

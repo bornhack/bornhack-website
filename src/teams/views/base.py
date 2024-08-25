@@ -1,5 +1,10 @@
-import logging
+from __future__ import annotations
 
+import logging
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -12,9 +17,11 @@ from django.views.generic.edit import UpdateView
 from ..models import Team
 from ..models import TeamMember
 from .mixins import EnsureTeamResponsibleMixin
-from camps.mixins import CampViewMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -22,17 +29,16 @@ class TeamListView(CampViewMixin, ListView):
     model = Team
     context_object_name = "teams"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related("members")
-        qs = qs.prefetch_related("members__profile")
+        return qs.prefetch_related("members__profile")
         # FIXME: there is more to be gained here but the templatetag we use to see if
         # the logged-in user is a member of the current team does not benefit from the prefetching,
         # also the getting of team responsible members and their profiles do not use the prefetching
         # :( /tyk
-        return qs
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs: dict[str, Any]):
         context = super().get_context_data(object_list=object_list, **kwargs)
         if self.request.user.is_authenticated:
             context["user_teams"] = self.request.user.teammember_set.filter(
@@ -48,7 +54,7 @@ class TeamGeneralView(CampViewMixin, DetailView):
     slug_url_kwarg = "team_slug"
     active_menu = "general"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["IRCBOT_SERVER_HOSTNAME"] = settings.IRCBOT_SERVER_HOSTNAME
         context["IRCBOT_PUBLIC_CHANNEL"] = settings.IRCBOT_PUBLIC_CHANNEL
@@ -58,7 +64,7 @@ class TeamGeneralView(CampViewMixin, DetailView):
 class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
-    fields = [
+    fields = (
         "description",
         "needs_members",
         "public_irc_channel_name",
@@ -68,10 +74,10 @@ class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
         "private_irc_channel_bot",
         "private_irc_channel_managed",
         "guide",
-    ]
+    )
     slug_url_kwarg = "team_slug"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse_lazy(
             "teams:general",
             kwargs={"camp_slug": self.camp.slug, "team_slug": self.get_object().slug},
@@ -85,10 +91,10 @@ class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
 class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "fix_irc_acl.html"
     model = Team
-    fields = []
+    fields = ()
     slug_url_kwarg = "team_slug"
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # we need to call the super().dispatch() method early so self.camp gets populated by CampViewMixin,
         # because the lookups below depend on self.camp being set :)
         response = super().dispatch(request, *args, **kwargs)
@@ -103,10 +109,7 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
             )
 
         # check if we manage the channel for this team
-        if (
-            not self.get_object().irc_channel
-            or not self.get_object().irc_channel_managed
-        ):
+        if not self.get_object().irc_channel or not self.get_object().irc_channel_managed:
             messages.error(
                 request,
                 "IRC functionality is disabled for this team, or the team channel is not managed by the bot",
@@ -131,7 +134,7 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
         return response
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # get membership
         try:
             TeamMember.objects.get(
@@ -166,11 +169,7 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         membership.save()
         messages.success(
             self.request,
-            "OK, hang on while we fix the permissions for your NickServ user '%s' for IRC channel '%s'"
-            % (
-                self.request.user.profile.nickserv_username,
-                form.instance.irc_channel_name,
-            ),
+            f"OK, hang on while we fix the permissions for your NickServ user '{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'",
         )
         return redirect(
             "teams:general",

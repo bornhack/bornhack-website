@@ -2,7 +2,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CreatedUpdatedModel
 
 
@@ -16,14 +15,14 @@ class OutgoingIrcMessage(
     timeout = models.DateTimeField()
     expired = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "PRIVMSG {} {} ({})".format(
             self.target,
             self.message,
             "processed" if self.processed else "unprocessed",
         )
 
-    def clean(self):
+    def clean(self) -> None:
         if not self.pk:
             # this is a new outgoing message being saved
             if self.timeout < timezone.now():

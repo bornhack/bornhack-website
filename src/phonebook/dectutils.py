@@ -1,12 +1,10 @@
 import logging
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class DectUtils:
-    """
-    This class contains dect number <> letter related utilities
-    """
+    """This class contains dect number <> letter related utilities"""
 
     DECT_MATRIX = {
         "0": ["0"],
@@ -21,19 +19,15 @@ class DectUtils:
         "9": ["9", "W", "X", "Y", "Z"],
     }
 
-    def __init__(self):
-        """
-        Build a reverse lookup matrix based on self.DECT_MATRIX
-        """
+    def __init__(self) -> None:
+        """Build a reverse lookup matrix based on self.DECT_MATRIX"""
         self.REVERSE_DECT_MATRIX = {}
-        for digit in self.DECT_MATRIX.keys():
+        for digit in self.DECT_MATRIX:
             for letter in self.DECT_MATRIX[digit]:
                 self.REVERSE_DECT_MATRIX[letter] = digit
 
     def get_dect_letter_combinations(self, numbers):
-        """
-        Generator to recursively get all combinations of letters for this number
-        """
+        """Generator to recursively get all combinations of letters for this number"""
         # loop over the possible letters for the first digit
         for letter in self.DECT_MATRIX[numbers[0]]:
             # if we have more digits..
@@ -46,9 +40,7 @@ class DectUtils:
                 yield letter
 
     def letters_to_number(self, letters):
-        """
-        Coverts "TYKL" to "8955"
-        """
+        """Coverts "TYKL" to "8955" """
         result = ""
         for letter in letters:
             result += self.REVERSE_DECT_MATRIX[letter.upper()]

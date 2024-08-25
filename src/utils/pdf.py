@@ -9,7 +9,7 @@ from PyPDF2 import PdfReader
 from PyPDF2 import PdfWriter
 from wkhtmltopdf.views import PDFTemplateResponse
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def generate_pdf_letter(filename, template, formatdict):
@@ -66,7 +66,7 @@ def generate_pdf_letter(filename, template, formatdict):
     fullpath = os.path.join(settings.PDF_ARCHIVE_PATH, filename)
     with open(fullpath, "wb") as fh:
         finalpdf.write(fh)
-        logger.info("Saved pdf to archive: %s" % fullpath)
+        logger.info(f"Saved pdf to archive: {fullpath}")
 
     returnfile = io.BytesIO()
     finalpdf.write(returnfile)

@@ -1,29 +1,34 @@
+from __future__ import annotations
+
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 
 import requests
+from camps.mixins import CampViewMixin
 from django.conf import settings
 from django.http import Http404
 from django.http import HttpResponse
 from django.views.generic import TemplateView
-
-from ..mixins import RaisePermissionRequiredMixin
-from camps.mixins import CampViewMixin
 from facilities.models import FacilityFeedback
 from teams.models import Team
 from utils.models import OutgoingEmail
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..mixins import RaisePermissionRequiredMixin
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
-    """
-    The Backoffice index view only requires camps.backoffice_permission so we use RaisePermissionRequiredMixin directly
-    """
+    """The Backoffice index view only requires camps.backoffice_permission so we use RaisePermissionRequiredMixin directly"""
 
     permission_required = "camps.backoffice_permission"
     template_name = "index.html"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["facilityfeedback_teams"] = Team.objects.filter(
             id__in=set(
@@ -53,22 +58,21 @@ class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
 
 
 class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
-    """
-    Show proxied stuff, only for simple HTML pages with no external content
+    """Show proxied stuff, only for simple HTML pages with no external content
     Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of slug: (description, url) pairs
     """
 
     permission_required = "camps.backoffice_permission"
     template_name = "backoffice_proxy.html"
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         """Perform the request and return the response if we have a slug"""
         # list available stuff if we have no slug
         if "proxy_slug" not in kwargs:
             return super().dispatch(request, *args, **kwargs)
 
         # is the slug valid?
-        if kwargs["proxy_slug"] not in settings.BACKOFFICE_PROXY_URLS.keys():
+        if kwargs["proxy_slug"] not in settings.BACKOFFICE_PROXY_URLS:
             raise Http404
 
         # perform the request
@@ -78,7 +82,7 @@ class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateV
         # return the response, keeping the status code but no headers
         return HttpResponse(r.content, status=r.status_code)
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["urls"] = settings.BACKOFFICE_PROXY_URLS
         return context

@@ -1,6 +1,5 @@
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 
 
@@ -52,7 +51,7 @@ class Sponsor(ExportModelOperationsMixin("sponsor"), CampRelatedModel):
         help_text="True when the tickets have been emailed to the sponsor",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.tier.camp})"
 
     @property
@@ -93,5 +92,5 @@ class SponsorTier(ExportModelOperationsMixin("sponsor_tier"), CampRelatedModel):
         help_text="The default number of one day tickets generated for a sponsor in this tier.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"

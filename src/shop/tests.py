@@ -1,12 +1,21 @@
 from typing import Optional
 
+from camps.factories import CampFactory
+from camps.models import Camp
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from economy.factories import PosFactory
 from psycopg2.extras import DateTimeTZRange
+from tickets.factories import TicketTypeFactory
+from tickets.models import ShopTicket
+from tickets.models import TicketGroup
+from utils.factories import UserFactory
+
+from shop.forms import OrderProductRelationForm
 
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
@@ -16,26 +25,18 @@ from .models import Order
 from .models import OrderProductRelation
 from .models import Product
 from .models import RefundEnum
-from camps.factories import CampFactory
-from camps.models import Camp
-from economy.factories import PosFactory
-from shop.forms import OrderProductRelationForm
-from tickets.factories import TicketTypeFactory
-from tickets.models import ShopTicket
-from tickets.models import TicketGroup
-from utils.factories import UserFactory
 
 
 class ProductAvailabilityTest(TestCase):
     """Test logic about availability of products."""
 
-    def test_product_available_by_stock(self):
+    def test_product_available_by_stock(self) -> None:
         """If no orders have been made, the product is still available."""
         product = ProductFactory(stock_amount=10)
         self.assertEqual(product.left_in_stock, 10)
         self.assertTrue(product.is_available())
 
-    def test_product_not_available_by_stock(self):
+    def test_product_not_available_by_stock(self) -> None:
         """If max orders have been made, the product is NOT available."""
         product = ProductFactory(stock_amount=2)
 
@@ -54,14 +55,14 @@ class ProductAvailabilityTest(TestCase):
         self.assertTrue(product.is_stock_available)
         self.assertTrue(product.is_available())
 
-    def test_product_available_by_time(self):
+    def test_product_available_by_time(self) -> None:
         """The product is available if now is in the right timeframe."""
         product = ProductFactory()
         # The factory defines the timeframe as now and 31 days forward.
         self.assertTrue(product.is_time_available)
         self.assertTrue(product.is_available())
 
-    def test_product_not_available_by_time(self):
+    def test_product_not_available_by_time(self) -> None:
         """The product is not available if now is outside the timeframe."""
         available_in = DateTimeTZRange(
             lower=timezone.now() - timezone.timedelta(5),
@@ -69,32 +70,32 @@ class ProductAvailabilityTest(TestCase):
         )
         product = ProductFactory(available_in=available_in)
         # The factory defines the timeframe as now and 31 days forward.
-        self.assertFalse(product.is_time_available)
-        self.assertFalse(product.is_available())
+        assert not product.is_time_available
+        assert not product.is_available()
 
-    def test_product_is_not_available_yet(self):
+    def test_product_is_not_available_yet(self) -> None:
         """The product is not available because we are before lower bound."""
         available_in = DateTimeTZRange(lower=timezone.now() + timezone.timedelta(5))
         product = ProductFactory(available_in=available_in)
         # Make sure there is no upper - just in case.
-        self.assertEqual(product.available_in.upper, None)
+        assert product.available_in.upper is None
         # The factory defines the timeframe as now and 31 days forward.
-        self.assertFalse(product.is_time_available)
-        self.assertFalse(product.is_available())
+        assert not product.is_time_available
+        assert not product.is_available()
 
-    def test_product_is_available_from_now_on(self):
+    def test_product_is_available_from_now_on(self) -> None:
         """The product is available because we are after lower bound."""
         available_in = DateTimeTZRange(lower=timezone.now() - timezone.timedelta(1))
         product = ProductFactory(available_in=available_in)
         # Make sure there is no upper - just in case.
-        self.assertEqual(product.available_in.upper, None)
+        assert product.available_in.upper is None
         # The factory defines the timeframe as now and 31 days forward.
-        self.assertTrue(product.is_time_available)
-        self.assertTrue(product.is_available())
+        assert product.is_time_available
+        assert product.is_available()
 
 
 class TestOrderProductRelationForm(TestCase):
-    def test_clean_quantity_succeeds_when_stock_not_exceeded(self):
+    def test_clean_quantity_succeeds_when_stock_not_exceeded(self) -> None:
         product = ProductFactory(stock_amount=2)
 
         # Mark an order as paid/reserved by setting open to None
@@ -105,7 +106,7 @@ class TestOrderProductRelationForm(TestCase):
         form = OrderProductRelationForm({"quantity": 1}, instance=opr)
         self.assertTrue(form.is_valid())
 
-    def test_clean_quantity_fails_when_stock_exceeded(self):
+    def test_clean_quantity_fails_when_stock_exceeded(self) -> None:
         product = ProductFactory(stock_amount=2)
         # Mark an order as paid/reserved by setting open to None
         OrderProductRelationFactory(product=product, quantity=1, order__open=None)
@@ -116,7 +117,7 @@ class TestOrderProductRelationForm(TestCase):
         form = OrderProductRelationForm({"quantity": 2}, instance=opr2)
         self.assertFalse(form.is_valid())
 
-    def test_clean_quantity_when_no_stock_amount(self):
+    def test_clean_quantity_when_no_stock_amount(self) -> None:
         product = ProductFactory()
         opr = OrderProductRelationFactory(product=product)
         form = OrderProductRelationForm({"quantity": 3}, instance=opr)
@@ -124,24 +125,24 @@ class TestOrderProductRelationForm(TestCase):
 
 
 class TestProductDetailView(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = UserFactory()
         self.product = ProductFactory()
         self.path = reverse("shop:product_detail", kwargs={"slug": self.product.slug})
 
-    def test_product_is_available_for_anonymous_user(self):
+    def test_product_is_available_for_anonymous_user(self) -> None:
         response = self.client.get(self.path)
 
         self.assertEqual(response.status_code, 200)
 
-    def test_product_is_available_for_logged_in_user(self):
+    def test_product_is_available_for_logged_in_user(self) -> None:
         self.client.force_login(self.user)
         response = self.client.get(self.path)
 
         self.assertContains(response, "Add to order")
         self.assertEqual(response.status_code, 200)
 
-    def test_product_is_available_with_stock_left(self):
+    def test_product_is_available_with_stock_left(self) -> None:
         self.product.stock_amount = 2
         self.product.save()
 
@@ -153,7 +154,7 @@ class TestProductDetailView(TestCase):
         self.assertContains(response, "<bold>1</bold> available")
         self.assertEqual(response.status_code, 200)
 
-    def test_product_is_sold_out(self):
+    def test_product_is_sold_out(self) -> None:
         self.product.stock_amount = 1
         self.product.save()
 
@@ -165,14 +166,14 @@ class TestProductDetailView(TestCase):
         self.assertContains(response, "Sold out.")
         self.assertEqual(response.status_code, 200)
 
-    def test_adding_product_to_new_order(self):
+    def test_adding_product_to_new_order(self) -> None:
         self.client.force_login(self.user)
 
         response = self.client.post(self.path, data={"quantity": 1})
 
         self.assertRedirects(response, reverse("shop:index"))
 
-    def test_product_is_in_order(self):
+    def test_product_is_in_order(self) -> None:
         # Put the product in an order owned by the user
         OrderProductRelationFactory(
             product=self.product,
@@ -186,7 +187,7 @@ class TestProductDetailView(TestCase):
 
         self.assertContains(response, "Update order")
 
-    def test_product_is_in_order_update(self):
+    def test_product_is_in_order_update(self) -> None:
         self.product.stock_amount = 2
         self.product.save()
 
@@ -204,17 +205,17 @@ class TestProductDetailView(TestCase):
 
         self.assertRedirects(response, reverse("shop:index"))
         opr.refresh_from_db()
-        self.assertEqual(opr.quantity, 2)
+        assert opr.quantity == 2
 
-    def test_product_category_not_public(self):
+    def test_product_category_not_public(self) -> None:
         self.product.category.public = False
         self.product.category.save()
         response = self.client.get(self.path)
-        self.assertEqual(response.status_code, 404)
+        assert response.status_code == 404
 
 
 class TestOrderDetailView(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = UserFactory()
         self.order = OrderFactory(user=self.user)
         self.path = reverse("shop:order_detail", kwargs={"pk": self.order.pk})
@@ -226,13 +227,13 @@ class TestOrderDetailView(TestCase):
             "form-MAX_NUM_FORMS": "",
         }
 
-    def test_redirects_when_no_products(self):
+    def test_redirects_when_no_products(self) -> None:
         self.client.force_login(self.user)
         response = self.client.get(self.path)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
-    def test_redirects_when_cancelled(self):
+    def test_redirects_when_cancelled(self) -> None:
         self.client.force_login(self.user)
 
         OrderProductRelationFactory(order=self.order)
@@ -245,7 +246,7 @@ class TestOrderDetailView(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("shop:index"))
 
-    def test_remove_product(self):
+    def test_remove_product(self) -> None:
         self.client.force_login(self.user)
 
         OrderProductRelationFactory(order=self.order)
@@ -263,7 +264,7 @@ class TestOrderDetailView(TestCase):
 
         self.assertEqual(order.products.count(), 1)
 
-    def test_remove_last_product_cancels_order(self):
+    def test_remove_last_product_cancels_order(self) -> None:
         self.client.force_login(self.user)
 
         opr = OrderProductRelationFactory(order=self.order)
@@ -281,7 +282,7 @@ class TestOrderDetailView(TestCase):
 
         self.assertTrue(order.cancelled)
 
-    def test_cancel_order(self):
+    def test_cancel_order(self) -> None:
         self.client.force_login(self.user)
 
         opr = OrderProductRelationFactory(order=self.order)
@@ -298,7 +299,7 @@ class TestOrderDetailView(TestCase):
 
         self.assertTrue(order.cancelled)
 
-    def test_incrementing_product_quantity(self):
+    def test_incrementing_product_quantity(self) -> None:
         self.client.force_login(self.user)
 
         opr = OrderProductRelationFactory(order=self.order)
@@ -315,7 +316,7 @@ class TestOrderDetailView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(opr.quantity, 11)
 
-    def test_incrementing_product_quantity_beyond_stock_fails(self):
+    def test_incrementing_product_quantity_beyond_stock_fails(self) -> None:
         self.client.force_login(self.user)
 
         opr = OrderProductRelationFactory(order=self.order)
@@ -331,7 +332,7 @@ class TestOrderDetailView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("quantity", response.context["order_product_formset"].errors[0])
 
-    def test_review_and_pay_saves_and_redirects(self):
+    def test_review_and_pay_saves_and_redirects(self) -> None:
         self.client.force_login(self.user)
 
         opr = OrderProductRelationFactory(order=self.order)
@@ -360,14 +361,14 @@ class TestOrderDetailView(TestCase):
 
 
 class TestOrderReviewAndPay(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.user = UserFactory()
         self.order = OrderFactory(user=self.user)
         # Add order
         OrderProductRelationFactory(order=self.order)
         self.path = reverse("shop:order_review_and_pay", kwargs={"pk": self.order.pk})
 
-    def test_terms_have_to_be_accepted(self):
+    def test_terms_have_to_be_accepted(self) -> None:
         self.client.force_login(self.user)
 
         data = {"payment_method": "bank_transfer"}
@@ -375,7 +376,7 @@ class TestOrderReviewAndPay(TestCase):
         response = self.client.post(self.path, data=data)
         self.assertEqual(response.status_code, 200)
 
-    def test_accepted_terms_and_chosen_payment_method(self):
+    def test_accepted_terms_and_chosen_payment_method(self) -> None:
         self.client.force_login(self.user)
 
         data = {"payment_method": "bank_transfer", "accept_terms": True}
@@ -389,7 +390,7 @@ class TestOrderReviewAndPay(TestCase):
 
 
 class TestOrderListView(TestCase):
-    def test_order_list_view_as_logged_in(self):
+    def test_order_list_view_as_logged_in(self) -> None:
         user = UserFactory()
         self.client.force_login(user)
         path = reverse("shop:order_list")
@@ -399,10 +400,10 @@ class TestOrderListView(TestCase):
 
 class TestTicketCreation(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         cls.user = UserFactory()
 
-    def test_multiple_tickets_created(self):
+    def test_multiple_tickets_created(self) -> None:
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=self.user)
@@ -413,7 +414,7 @@ class TestTicketCreation(TestCase):
             5,
         )
 
-    def test_single_ticket_created(self):
+    def test_single_ticket_created(self) -> None:
         ticket_type = TicketTypeFactory(single_ticket_per_product=True)
         product = ProductFactory(ticket_type=ticket_type)
         order = OrderFactory(user=self.user)
@@ -424,7 +425,7 @@ class TestTicketCreation(TestCase):
             1,
         )
 
-    def test_sub_products_created_sub_product_single_ticket_per_product_false(self):
+    def test_sub_products_created_sub_product_single_ticket_per_product_false(self) -> None:
         bundle_product = ProductFactory()
         sub_product = ProductFactory(
             ticket_type=TicketTypeFactory(single_ticket_per_product=False),
@@ -441,7 +442,7 @@ class TestTicketCreation(TestCase):
             5,
         )
 
-    def test_sub_products_created_sub_product_single_ticket_per_product_true(self):
+    def test_sub_products_created_sub_product_single_ticket_per_product_true(self) -> None:
         bundle_product = ProductFactory()
         sub_product = ProductFactory(
             ticket_type=TicketTypeFactory(single_ticket_per_product=True),
@@ -458,7 +459,7 @@ class TestTicketCreation(TestCase):
             1,
         )
 
-    def test_ticket_generation_is_idempotent(self):
+    def test_ticket_generation_is_idempotent(self) -> None:
         """Test that calling create_tickets multiple times does not create more tickets."""
         bundle_product = ProductFactory()
         sub_product = ProductFactory(
@@ -503,29 +504,17 @@ class TestTicketCreation(TestCase):
 
         # Calling create_tickets again should create 10 new tickets
         order.create_tickets()
-        self.assertEqual(
-            ShopTicket.objects.filter(opr__order=order).count(),
-            20,
-        )
-        self.assertEqual(
-            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
-            2,
-        )
+        assert ShopTicket.objects.filter(opr__order=order).count() == 20
+        assert TicketGroup.objects.filter(opr=order.oprs.first()).count() == 2
 
         # Calling create_tickets again should not create more tickets
         order.create_tickets()
-        self.assertEqual(
-            ShopTicket.objects.filter(opr__order=order).count(),
-            20,
-        )
-        self.assertEqual(
-            TicketGroup.objects.filter(opr=order.oprs.first()).count(),
-            2,
-        )
+        assert ShopTicket.objects.filter(opr__order=order).count() == 20
+        assert TicketGroup.objects.filter(opr=order.oprs.first()).count() == 2
 
 
 class TestOrderProductRelationModel(TestCase):
-    def test_refunded_cannot_be_larger_than_quantity(self):
+    def test_refunded_cannot_be_larger_than_quantity(self) -> None:
         """OrderProductRelation with refunded > quantity should raise an IntegrityError."""
         user = UserFactory()
         info_user = UserFactory(username="info")
@@ -537,7 +526,7 @@ class TestOrderProductRelationModel(TestCase):
         with self.assertRaises(ValidationError):
             opr.create_rpr(refund=refund, quantity=6)
 
-    def test_refunded_possible(self):
+    def test_refunded_possible(self) -> None:
         user = UserFactory()
         info_user = UserFactory(username="info")
         ticket_type = TicketTypeFactory(single_ticket_per_product=False)
@@ -579,7 +568,7 @@ class TestRefund(TestCase):
     opr4: OrderProductRelation
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         cls.user = UserFactory()
         cls.info_user = UserFactory(username="info")
         backoffice_permission = Permission.objects.get(codename="backoffice_permission")
@@ -635,7 +624,7 @@ class TestRefund(TestCase):
 
         self.assertTrue(self.order.refunded == RefundEnum.FULLY_REFUNDED.value)
 
-    def test_refund_backoffice_view(self):
+    def test_refund_backoffice_view(self) -> None:
         url = reverse(
             "backoffice:order_refund",
             kwargs={"camp_slug": self.camp.slug, "order_id": self.order.id},

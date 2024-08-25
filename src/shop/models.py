@@ -3,6 +3,7 @@ from datetime import timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import chain
+from typing import Any
 from typing import Optional
 
 from django.conf import settings
@@ -25,17 +26,17 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
-from unidecode import unidecode
-
-from .managers import OrderQuerySet
-from .managers import ProductQuerySet
 from tickets.models import ShopTicket
 from tickets.models import TicketGroup
+from unidecode import unidecode
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from .managers import OrderQuerySet
+from .managers import ProductQuerySet
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class CustomOrder(ExportModelOperationsMixin("custom_order"), CreatedUpdatedModel):
@@ -57,8 +58,8 @@ class CustomOrder(ExportModelOperationsMixin("custom_order"), CreatedUpdatedMode
 
     danish_vat = models.BooleanField(help_text="Danish VAT?", default=True)
 
-    def __str__(self):
-        return "custom order id #%s" % self.pk
+    def __str__(self) -> str:
+        return f"custom order id #{self.pk}"
 
     @property
     def vat(self):
@@ -141,8 +142,8 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
 
     objects = OrderQuerySet.as_manager()
 
-    def __str__(self):
-        return "shop order id #%s" % self.pk
+    def __str__(self) -> str:
+        return f"shop order id #{self.pk}"
 
     def get_number_of_items(self):
         return self.products.aggregate(sum=Sum("orderproductrelation__quantity"))["sum"]
@@ -157,8 +158,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             return Decimal(
                 self.products.aggregate(
                     sum=Sum(
-                        models.F("orderproductrelation__product__price")
-                        * models.F("orderproductrelation__quantity"),
+                        models.F("orderproductrelation__product__price") * models.F("orderproductrelation__quantity"),
                         output_field=models.IntegerField(),
                     ),
                 )["sum"],
@@ -166,64 +166,37 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         else:
             return False
 
-    def get_coinify_callback_url(self, request):
+    def get_coinify_callback_url(self, request: HttpRequest):
         """Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request"""
-        if (
-            hasattr(settings, "COINIFY_CALLBACK_HOSTNAME")
-            and settings.COINIFY_CALLBACK_HOSTNAME
-        ):
+        if hasattr(settings, "COINIFY_CALLBACK_HOSTNAME") and settings.COINIFY_CALLBACK_HOSTNAME:
             host = settings.COINIFY_CALLBACK_HOSTNAME
         else:
             host = request.get_host()
-        return (
-            "https://"
-            + host
-            + str(reverse_lazy("shop:coinify_callback", kwargs={"pk": self.pk}))
-        )
+        return "https://" + host + str(reverse_lazy("shop:coinify_callback", kwargs={"pk": self.pk}))
 
-    def get_coinify_thanks_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:coinify_thanks", kwargs={"pk": self.pk}))
-        )
+    def get_coinify_thanks_url(self, request: HttpRequest):
+        return "https://" + request.get_host() + str(reverse_lazy("shop:coinify_thanks", kwargs={"pk": self.pk}))
 
-    def get_epay_accept_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:epay_thanks", kwargs={"pk": self.pk}))
-        )
+    def get_epay_accept_url(self, request: HttpRequest):
+        return "https://" + request.get_host() + str(reverse_lazy("shop:epay_thanks", kwargs={"pk": self.pk}))
 
-    def get_cancel_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
-        )
+    def get_cancel_url(self, request: HttpRequest):
+        return "https://" + request.get_host() + str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
-    def get_quickpay_accept_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:quickpay_thanks", kwargs={"pk": self.pk}))
-        )
+    def get_quickpay_accept_url(self, request: HttpRequest):
+        return "https://" + request.get_host() + str(reverse_lazy("shop:quickpay_thanks", kwargs={"pk": self.pk}))
 
-    def get_quickpay_callback_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:quickpay_callback", kwargs={"pk": self.pk}))
-        )
+    def get_quickpay_callback_url(self, request: HttpRequest):
+        return "https://" + request.get_host() + str(reverse_lazy("shop:quickpay_callback", kwargs={"pk": self.pk}))
 
     @property
-    def description(self):
-        return "Order #%s" % self.pk
+    def description(self) -> str:
+        return f"Order #{self.pk}"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
-    def create_tickets(self, request=None):
+    def create_tickets(self, request: HttpRequest = None):
         """Calls create_tickets() on each OPR and returns a list of all created tickets."""
         tickets = []
         for opr in self.oprs.all():
@@ -233,19 +206,19 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     def get_tickets(self):
         return chain(*[opr.shoptickets.all() for opr in self.oprs.all()])
 
-    def mark_as_paid(self, request=None):
+    def mark_as_paid(self, request: HttpRequest = None) -> None:
         self.paid = True
         self.open = None
         self.create_tickets(request)
         self.save()
 
-    def mark_as_cancelled(self, request=None):
+    def mark_as_cancelled(self, request: HttpRequest = None) -> None:
         if self.paid:
-            msg = "Order %s is paid, cannot cancel a paid order!" % self.pk
+            msg = f"Order {self.pk} is paid, cannot cancel a paid order!"
             if request:
                 messages.error(request, msg)
             else:
-                print(msg)
+                pass
         else:
             self.cancelled = True
             self.open = None
@@ -266,8 +239,8 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         return False
 
     @property
-    def filename(self):
-        return "bornhack_proforma_invoice_order_%s.pdf" % self.pk
+    def filename(self) -> str:
+        return f"bornhack_proforma_invoice_order_{self.pk}.pdf"
 
     def get_invoice_address(self):
         if self.invoice_address:
@@ -276,7 +249,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             return self.user.email
 
     @property
-    def used_status(self):
+    def used_status(self) -> str:
         used = len(self.get_used_shoptickets())
         unused = len(self.get_unused_shoptickets())
         return f"{used} / {used + unused}"
@@ -383,13 +356,13 @@ class Refund(CreatedUpdatedModel):
         blank=True,  # TODO: Blank to support old refunds. Maybe we should have a system user?
     )
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]):
         """Take the invoice_address for the CreditNote from the Order object if we don't have one."""
         if not self.invoice_address:
             self.invoice_address = self.order.invoice_address
         return super().save(**kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Refund #{self.id}"
 
     @property
@@ -436,7 +409,7 @@ class RefundProductRelation(CreatedUpdatedModel):
         """Returns the total price for this RPR considering quantity."""
         return Decimal(self.opr.price * self.quantity)
 
-    def clean(self):
+    def clean(self) -> None:
         """Make sure the quantity is not greater than the quantity in the opr."""
         if self.quantity > self.opr.quantity:
             raise ValidationError(
@@ -464,10 +437,10 @@ class ProductCategory(
         help_text="Sorting weight. Heavier items sink to the bottom.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         self.slug = unique_slugify(
             self.name,
             slugs_in_use=self.__class__.objects.all().values_list("slug", flat=True),
@@ -488,8 +461,7 @@ class ProductStatsManager(models.Manager):
                 ),
             )
             .annotate(
-                total_units_sold=Sum("orderproductrelation__quantity")
-                - F("total_units_refunded"),
+                total_units_sold=Sum("orderproductrelation__quantity") - F("total_units_refunded"),
             )
             .exclude(total_units_sold=0)
             .annotate(profit=F("price") - F("cost"))
@@ -544,10 +516,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     )
 
     stock_amount = models.IntegerField(
-        help_text=(
-            "Initial amount available in stock if there is a limited "
-            "supply, e.g. fridge space"
-        ),
+        help_text=("Initial amount available in stock if there is a limited " "supply, e.g. fridge space"),
         null=True,
         blank=True,
     )
@@ -565,10 +534,10 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     objects = ProductQuerySet.as_manager()
     statsobjects = ProductStatsManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.price} DKK)"
 
-    def clean(self):
+    def clean(self) -> None:
         if self.category.name == "Tickets" and not self.ticket_type:
             raise ValidationError("Products with category Tickets need a ticket_type")
 
@@ -588,8 +557,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     @property
     def is_time_available(self):
         now = timezone.now()
-        time_available = now in self.available_in
-        return time_available
+        return now in self.available_in
 
     def is_old(self):
         now = timezone.now()
@@ -606,6 +574,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
         if self.available_in.upper is not None:
             now = timezone.now()
             return (self.available_in.upper - now).days
+        return None
 
     @property
     def left_in_stock(self):
@@ -622,16 +591,14 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
                 order__cancelled=False,
             ).aggregate(Sum("quantity"))["quantity__sum"]
 
-            total_left = self.stock_amount - (sold or 0)
+            return self.stock_amount - (sold or 0)
 
-            return total_left
         return None
 
     @property
     def is_stock_available(self):
         if self.stock_amount:
-            stock_available = self.left_in_stock > 0
-            return stock_available
+            return self.left_in_stock > 0
         # If there is no stock defined the product is generally available.
         return True
 
@@ -689,7 +656,7 @@ class OrderProductRelation(
     ExportModelOperationsMixin("order_product_relation"),
     CreatedUpdatedModel,
 ):
-    def __str__(self):
+    def __str__(self) -> str:
         return f"#{self.order}: {self.quantity} {self.product}"
 
     objects = OrderProductRelationQuerySet.as_manager()
@@ -791,9 +758,7 @@ class OrderProductRelation(
 
             query_kwargs["opr"] = self
             # create the number of tickets required
-            new_tickets = [
-                ShopTicket(**query_kwargs) for _i in range(tickets_to_create)
-            ]
+            new_tickets = [ShopTicket(**query_kwargs) for _i in range(tickets_to_create)]
             self.shoptickets.bulk_create(new_tickets)
 
             if request:
@@ -813,7 +778,6 @@ class OrderProductRelation(
         Calling this method multiple times will not result in duplicate tickets being created,
         and the number of tickets created takes the number of refunded into consideration too.
         """
-
         tickets = []
         with transaction.atomic():
             # do we even generate tickets for this type of product?
@@ -869,11 +833,10 @@ class OrderProductRelation(
     @property
     def used_shoptickets(self):
         if self.product.sub_products.exists():
-            tickets = self.shoptickets.filter(
+            return self.shoptickets.filter(
                 bundle_product=self.product,
                 used_at__isnull=False,
             )
-            return tickets
 
         return self.shoptickets.filter(used_at__isnull=False)
 
@@ -897,10 +860,7 @@ class OrderProductRelation(
 
     @property
     def possible_refund(self) -> int:
-        """
-        Returns the number of tickets that can be refunded for this OPR.
-        """
-
+        """Returns the number of tickets that can be refunded for this OPR."""
         # If the product has no ticket type, we should be able to refund everything
         if not self.product.ticket_type:
             return self.quantity - self.refunded_quantity
@@ -912,16 +872,14 @@ class OrderProductRelation(
             is_refunded = self.refunded_quantity == self.quantity
             return 0 if has_used_tickets or is_refunded else 1
 
-        quantity = (
-            1 if self.product.ticket_type.single_ticket_per_product else self.quantity
-        )
+        quantity = 1 if self.product.ticket_type.single_ticket_per_product else self.quantity
         return quantity - self.used_tickets_count - self.refunded_quantity
 
     @property
     def non_refunded_quantity(self):
         return self.quantity - self.refunded_quantity
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         """Make sure we save the current price in the OPR."""
         if not self.price:
             self.price = self.product.price
@@ -951,7 +909,7 @@ class EpayCallback(
     payload = models.JSONField()
     md5valid = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"callback at {self.created} (md5 valid: {self.md5valid})"
 
 
@@ -1029,7 +987,7 @@ class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel)
         help_text="The Refund this CreditNote relates to, if any.",
     )
 
-    def clean(self):
+    def clean(self) -> None:
         errors = []
         if self.user and self.customer:
             msg = "Customer info should be blank if a user is selected."
@@ -1042,19 +1000,11 @@ class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel)
         if errors:
             raise ValidationError(errors)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.user:
-            return "creditnote#{} - {} DKK (customer: user {})".format(
-                self.id,
-                self.amount,
-                self.user.email,
-            )
+            return f"creditnote#{self.id} - {self.amount} DKK (customer: user {self.user.email})"
         else:
-            return "creditnote#{} - {} DKK (customer: {})".format(
-                self.id,
-                self.amount,
-                self.customer,
-            )
+            return f"creditnote#{self.id} - {self.amount} DKK (customer: {self.customer})"
 
     @property
     def vat(self):
@@ -1064,8 +1014,8 @@ class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel)
             return 0
 
     @property
-    def filename(self):
-        return "bornhack_creditnote_%s.pdf" % self.pk
+    def filename(self) -> str:
+        return f"bornhack_creditnote_{self.pk}.pdf"
 
 
 class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
@@ -1084,31 +1034,16 @@ class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
     pdf = models.FileField(null=True, blank=True, upload_to="invoices/")
     sent_to_customer = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.order:
-            return "invoice#{} - shop order {} - {} - total {} DKK (sent to {}: {})".format(
-                self.id,
-                self.order.id,
-                self.order.created,
-                self.order.total,
-                self.order.user.email,
-                self.sent_to_customer,
-            )
+            return f"invoice#{self.id} - shop order {self.order.id} - {self.order.created} - total {self.order.total} DKK (sent to {self.order.user.email}: {self.sent_to_customer})"
         elif self.customorder:
-            return (
-                "invoice#%s - custom order %s - %s - amount %s DKK (customer: %s)"
-                % (
-                    self.id,
-                    self.customorder.id,
-                    self.customorder.created,
-                    self.customorder.amount,
-                    unidecode(self.customorder.customer),
-                )
-            )
+            return f"invoice#{self.id} - custom order {self.customorder.id} - {self.customorder.created} - amount {self.customorder.amount} DKK (customer: {unidecode(self.customorder.customer)})"
+        return None
 
     @property
-    def filename(self):
-        return "bornhack_invoice_%s.pdf" % self.pk
+    def filename(self) -> str:
+        return f"bornhack_invoice_{self.pk}.pdf"
 
     def regretdate(self):
         return self.created + timedelta(days=15)
@@ -1136,8 +1071,8 @@ class CoinifyAPIInvoice(
         on_delete=models.PROTECT,
     )
 
-    def __str__(self):
-        return "coinifyinvoice for order #%s" % self.order.id
+    def __str__(self) -> str:
+        return f"coinifyinvoice for order #{self.order.id}"
 
     @property
     def expired(self):
@@ -1158,7 +1093,7 @@ class CoinifyAPICallback(
     )
     authenticated = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"order #{self.order.id} callback at {self.created}"
 
 
@@ -1175,7 +1110,7 @@ class CoinifyAPIRequest(
     payload = models.JSONField()
     response = models.JSONField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"order {self.order.id} api request {self.method}"
 
 
@@ -1215,18 +1150,12 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
         help_text="The API response body. This field remains empty until we get an API response.",
     )
 
-    def __str__(self):
-        return (
-            f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
-        )
+    def __str__(self) -> str:
+        return f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
 
     def create_or_update_object(self):
         """Create or update the QuickPayAPIObject in the response_body."""
-        if (
-            self.response_body
-            and "type" in self.response_body
-            and "id" in self.response_body
-        ):
+        if self.response_body and "type" in self.response_body and "id" in self.response_body:
             obj, created = QuickPayAPIObject.objects.get_or_create(
                 id=self.response_body["id"],
                 defaults={
@@ -1236,6 +1165,7 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
                 },
             )
             return obj
+        return None
 
 
 class QuickPayAPIObject(CreatedUpdatedModel, UUIDModel):

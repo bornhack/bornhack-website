@@ -2,9 +2,11 @@ import csv
 import logging
 import zipfile
 from io import StringIO
+from typing import Any
 from typing import Union
 
 import magic
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.db.models import Count
 from django.db.models import Q
@@ -21,15 +23,6 @@ from django.views.generic import FormView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
-
-from ..forms import BankCSVForm
-from ..forms import ClearhausSettlementForm
-from ..forms import CoinifyCSVForm
-from ..forms import EpayCSVForm
-from ..forms import MobilePayCSVForm
-from ..forms import ZettleUploadForm
-from ..mixins import EconomyTeamPermissionMixin
-from camps.mixins import CampViewMixin
 from economy.models import AccountingExport
 from economy.models import Bank
 from economy.models import BankAccount
@@ -49,13 +42,21 @@ from economy.models import ZettleBalance
 from economy.models import ZettleReceipt
 from economy.utils import AccountingExporter
 from economy.utils import CoinifyCSVImporter
-from economy.utils import import_clearhaus_csv
-from economy.utils import import_epay_csv
 from economy.utils import MobilePayCSVImporter
 from economy.utils import ZettleExcelImporter
+from economy.utils import import_clearhaus_csv
+from economy.utils import import_epay_csv
 from utils.mixins import VerbUpdateView
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..forms import BankCSVForm
+from ..forms import ClearhausSettlementForm
+from ..forms import CoinifyCSVForm
+from ..forms import EpayCSVForm
+from ..forms import MobilePayCSVForm
+from ..forms import ZettleUploadForm
+from ..mixins import EconomyTeamPermissionMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 ################################
@@ -66,9 +67,9 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Chain
     template_name = "chain_list_backoffice.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Annotate the total count and amount for expenses and revenues for all credebtors in each chain."""
-        qs = Chain.objects.annotate(
+        return Chain.objects.annotate(
             camp_expenses_amount=Sum(
                 "credebtors__expenses__amount",
                 filter=Q(credebtors__expenses__camp=self.camp),
@@ -90,7 +91,6 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
                 distinct=True,
             ),
         )
-        return qs
 
 
 class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
@@ -98,10 +98,10 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
     template_name = "chain_detail_backoffice.html"
     slug_url_kwarg = "chain_slug"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Annotate the Chain object with the camp filtered expense and revenue info."""
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.annotate(
+        return qs.annotate(
             camp_expenses_amount=Sum(
                 "credebtors__expenses__amount",
                 filter=Q(credebtors__expenses__camp=self.camp),
@@ -123,9 +123,8 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
                 distinct=True,
             ),
         )
-        return qs
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Add credebtors, expenses and revenues to the context in camp-filtered versions."""
         context = super().get_context_data(*args, **kwargs)
 
@@ -174,17 +173,13 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
     template_name = "credebtor_detail_backoffice.html"
     slug_url_kwarg = "credebtor_slug"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["expenses"] = (
-            self.get_object()
-            .expenses.filter(camp=self.camp)
-            .prefetch_related("responsible_team", "user", "creditor")
+            self.get_object().expenses.filter(camp=self.camp).prefetch_related("responsible_team", "user", "creditor")
         )
         context["revenues"] = (
-            self.get_object()
-            .revenues.filter(camp=self.camp)
-            .prefetch_related("responsible_team", "user", "debtor")
+            self.get_object().revenues.filter(camp=self.camp).prefetch_related("responsible_team", "user", "debtor")
         )
         return context
 
@@ -197,10 +192,8 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Expense
     template_name = "expense_list_backoffice.html"
 
-    def get_queryset(self, **kwargs):
-        """
-        Exclude unapproved expenses, they are shown seperately
-        """
+    def get_queryset(self, **kwargs: dict[str, Any]):
+        """Exclude unapproved expenses, they are shown seperately"""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "creditor",
@@ -208,10 +201,8 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
             "responsible_team",
         )
 
-    def get_context_data(self, **kwargs):
-        """
-        Include unapproved expenses seperately
-        """
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        """Include unapproved expenses seperately"""
         context = super().get_context_data(**kwargs)
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp,
@@ -227,12 +218,10 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
 class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Expense
     template_name = "expense_detail_backoffice.html"
-    fields = ["notes"]
+    fields = ("notes",)
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         expense = form.save()
         if "approve" in form.data:
             # approve button was pressed
@@ -268,9 +257,9 @@ class ReimbursementUpdateView(
 ):
     model = Reimbursement
     template_name = "reimbursement_form.html"
-    fields = ["notes", "paid"]
+    fields = ("notes", "paid")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
         context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
@@ -281,7 +270,7 @@ class ReimbursementUpdateView(
         )
         return context
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse(
             "backoffice:reimbursement_detail",
             kwargs={"camp_slug": self.camp.slug, "pk": self.get_object().pk},
@@ -292,7 +281,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
     model = Reimbursement
     template_name = "reimbursement_delete.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if self.get_object().paid:
             messages.error(
                 request,
@@ -307,7 +296,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
         # continue with the request
         return super().get(request, *args, **kwargs)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Reimbursement {self.kwargs['pk']} deleted successfully!",
@@ -326,10 +315,8 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = Revenue
     template_name = "revenue_list_backoffice.html"
 
-    def get_queryset(self, **kwargs):
-        """
-        Exclude unapproved revenues, they are shown seperately
-        """
+    def get_queryset(self, **kwargs: dict[str, Any]):
+        """Exclude unapproved revenues, they are shown seperately"""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "debtor",
@@ -337,10 +324,8 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
             "responsible_team",
         )
 
-    def get_context_data(self, **kwargs):
-        """
-        Include unapproved revenues seperately
-        """
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        """Include unapproved revenues seperately"""
         context = super().get_context_data(**kwargs)
         context["unapproved_revenues"] = Revenue.objects.filter(
             camp=self.camp,
@@ -352,12 +337,10 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
 class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     model = Revenue
     template_name = "revenue_detail_backoffice.html"
-    fields = ["notes"]
+    fields = ("notes",)
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         revenue = form.save()
         if "approve" in form.data:
             # approve button was pressed
@@ -391,16 +374,16 @@ class BankCSVUploadView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
     form_class = BankCSVForm
     template_name = "bank_csv_upload_form.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.bank = Bank.objects.get(pk=kwargs["bank_uuid"])
 
-    def get_form_kwargs(self, *args, **kwargs):
+    def get_form_kwargs(self, *args: list[Any], **kwargs: dict[str, Any]):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
         form_kwargs["bank"] = self.bank
         return form_kwargs
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["bank"] = self.bank
         return context
@@ -448,7 +431,7 @@ class BankTransactionDetailView(CampViewMixin, EconomyTeamPermissionMixin, Detai
 class CoinifyDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateView):
     template_name = "coinify_dashboard.html"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         try:
             latest = CoinifyBalance.objects.latest()
@@ -632,7 +615,7 @@ class ClearhausSettlementImportView(
 class ZettleDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateView):
     template_name = "zettle_dashboard.html"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         try:
             latest = ZettleBalance.objects.latest()
@@ -755,7 +738,7 @@ class MobilePayCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView
 class AccountingExportCreateView(CampViewMixin, EconomyTeamPermissionMixin, CreateView):
     template_name = "accountingexport_form.html"
     model = AccountingExport
-    fields = ["date_from", "date_to", "comment"]
+    fields = ("date_from", "date_to", "comment")
 
     def form_valid(self, form):
         """Gather data and create a zipfile with all of it."""
@@ -798,7 +781,7 @@ class AccountingExportDetailView(CampViewMixin, EconomyTeamPermissionMixin, Deta
     template_name = "accountingexport_detail.html"
     pk_url_kwarg = "accountingexport_uuid"
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         z = zipfile.ZipFile(self.get_object().archive.path)
         # we need a list of just filenames without the folder name
@@ -812,9 +795,9 @@ class AccountingExportUpdateView(CampViewMixin, EconomyTeamPermissionMixin, Upda
     model = AccountingExport
     template_name = "accountingexport_form.html"
     pk_url_kwarg = "accountingexport_uuid"
-    fields = ["comment"]
+    fields = ("comment",)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Accounting Export {self.kwargs['accountingexport_uuid']} updated successfully!",
@@ -830,7 +813,7 @@ class AccountingExportDeleteView(CampViewMixin, EconomyTeamPermissionMixin, Dele
     template_name = "accountingexport_delete.html"
     pk_url_kwarg = "accountingexport_uuid"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Accounting Export {self.kwargs['accountingexport_uuid']} deleted successfully!",
@@ -849,7 +832,7 @@ class AccountingExportDownloadArchiveView(
     model = AccountingExport
     pk_url_kwarg = "accountingexport_uuid"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         ae = self.get_object()
         archive = ae.archive.read()
         mimetype = magic.from_buffer(archive, mime=True)
@@ -869,12 +852,11 @@ class AccountingExportDownloadFileView(
     model = AccountingExport
     pk_url_kwarg = "accountingexport_uuid"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         ae = self.get_object()
         filename = kwargs["filename"]
-        with zipfile.ZipFile(ae.archive.path) as z:
-            with z.open("bornhack_accounting_export/" + filename) as f:
-                data = f.read()
+        with zipfile.ZipFile(ae.archive.path) as z, z.open("bornhack_accounting_export/" + filename) as f:
+            data = f.read()
         mimetype = magic.from_buffer(data, mime=True)
         response = HttpResponse(content_type=mimetype)
         response["Content-Disposition"] = f"attachment; filename={filename}"
@@ -886,9 +868,7 @@ EconomyEntity = Union[Expense, Revenue, Reimbursement]
 
 
 def find_economy_entities(*, uuid: str) -> list[EconomyEntity]:
-    """
-    Search for economy entities with the given uuid
-    """
+    """Search for economy entities with the given uuid"""
     entity_models = [
         Expense,
         Revenue,

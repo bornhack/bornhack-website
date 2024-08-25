@@ -1,6 +1,5 @@
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 

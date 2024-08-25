@@ -1,18 +1,25 @@
+from __future__ import annotations
+
 import json
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 
 import requests
 from django.conf import settings
+from vendor.coinify.coinify_api import CoinifyAPI
 
 from .models import CoinifyAPICallback
 from .models import CoinifyAPIInvoice
 from .models import CoinifyAPIRequest
-from vendor.coinify.coinify_api import CoinifyAPI
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def process_coinify_invoice_json(invoicejson, order, request):
+def process_coinify_invoice_json(invoicejson, order, request: HttpRequest):
     # create or update the invoice object in our database
     coinifyinvoice, created = CoinifyAPIInvoice.objects.update_or_create(
         coinify_id=invoicejson["id"],
@@ -27,7 +34,7 @@ def process_coinify_invoice_json(invoicejson, order, request):
     return coinifyinvoice
 
 
-def save_coinify_callback(request, order):
+def save_coinify_callback(request: HttpRequest, order):
     # first make a dict with all HTTP_ headers
     headerdict = {}
     for key, value in list(request.META.items()):
@@ -41,17 +48,15 @@ def save_coinify_callback(request, order):
         parsed = ""
 
     # save this callback to db
-    callbackobject = CoinifyAPICallback.objects.create(
+    return CoinifyAPICallback.objects.create(
         headers=headerdict,
         body=request.body,
         payload=parsed,
         order=order,
     )
 
-    return callbackobject
 
-
-def coinify_api_request(api_method, order, **kwargs):
+def coinify_api_request(api_method, order, **kwargs: dict[str, Any]):
     # Initiate coinify API
     coinifyapi = CoinifyAPI(settings.COINIFY_API_KEY, settings.COINIFY_API_SECRET)
 
@@ -78,22 +83,21 @@ def coinify_api_request(api_method, order, **kwargs):
         payload=kwargs,
         response=response,
     )
-    logger.debug("saved coinify api request %s in db" % req.id)
+    logger.debug(f"saved coinify api request {req.id} in db")
 
     return req
 
 
-def handle_coinify_api_response(apireq, order, request):
-    if apireq.method == "invoice_create" or apireq.method == "invoice_get":
+def handle_coinify_api_response(apireq, order, request: HttpRequest):
+    if apireq.method in ("invoice_create", "invoice_get"):
         # Parse api response
         if apireq.response["success"]:
             # save this new coinify invoice to the DB
-            coinifyinvoice = process_coinify_invoice_json(
+            return process_coinify_invoice_json(
                 invoicejson=apireq.response["data"],
                 order=order,
                 request=request,
             )
-            return coinifyinvoice
         else:
             api_error = apireq.response["error"]
             logger.error(
@@ -112,25 +116,24 @@ def handle_coinify_api_response(apireq, order, request):
 # API CALLS
 
 
-def get_coinify_invoice(coinify_invoiceid, order, request):
+def get_coinify_invoice(coinify_invoiceid, order, request: HttpRequest):
     # put args for API request together
     invoicedict = {"invoice_id": coinify_invoiceid}
 
     # perform the api request
     apireq = coinify_api_request(api_method="invoice_get", order=order, **invoicedict)
 
-    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
-    return coinifyinvoice
+    return handle_coinify_api_response(apireq, order, request)
 
 
-def create_coinify_invoice(order, request):
+def create_coinify_invoice(order, request: HttpRequest):
     # put args for API request together
     invoicedict = {
         "amount": float(order.total),
         "currency": "DKK",
         "plugin_name": "BornHack webshop",
         "plugin_version": "1.0",
-        "description": "BornHack order id #%s" % order.id,
+        "description": f"BornHack order id #{order.id}",
         "callback_url": order.get_coinify_callback_url(request),
         "return_url": order.get_coinify_thanks_url(request),
         "cancel_url": order.get_cancel_url(request),
@@ -143,5 +146,4 @@ def create_coinify_invoice(order, request):
         **invoicedict,
     )
 
-    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
-    return coinifyinvoice
+    return handle_coinify_api_response(apireq, order, request)
