@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import json
 import logging
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from quickpay_api_client import QPClient
@@ -7,19 +10,20 @@ from quickpay_api_client.exceptions import ApiError
 
 from .models import QuickPayAPIRequest
 
-# from .models import QuickPayPayment
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class QuickPay:
     """A small wrapper around the QuickPay client to log API requests and responses."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise the QuickPay client."""
         self.client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
-    def do_request(self, request):
+    def do_request(self, request: HttpRequest):
         """Perform an API request and save the response."""
         # make sure we include request id
         if "x-bornhack-quickpay-request-id" not in request.headers:
@@ -36,13 +40,13 @@ class QuickPay:
                 raw=True,
             )
         except ApiError as e:
-            logger.error(f"QuickPay API error: {e}")
+            logger.exception(f"QuickPay API error: {e}")
             request.response_status_code = e.status_code
             # no headers returned in the ApiError object
             # request.response_headers = dict(e.headers)
             request.response_body = e.body
             request.save()
-            return
+            return None
         # save the response in the request object
         request.response_status_code = status
         request.response_headers = dict(headers)
@@ -51,6 +55,7 @@ class QuickPay:
         # create or update related QuickPayAPIObject
         if request.response_status_code in [200, 201]:
             return request.create_or_update_object()
+        return None
 
     def create_payment(self, order):
         """Create and return a QuickPayAPIPayment object."""
@@ -64,10 +69,9 @@ class QuickPay:
             },
         )
         qpr.save()
-        payment = self.do_request(qpr)
-        return payment
+        return self.do_request(qpr)
 
-    def get_payment_link(self, payment, request):
+    def get_payment_link(self, payment, request: HttpRequest):
         """Get a payment link for this payment."""
         body = {
             "amount": int(payment.order.total * 100),

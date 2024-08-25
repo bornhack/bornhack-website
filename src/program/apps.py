@@ -6,12 +6,11 @@ from django.db.models.signals import post_save
 class ProgramConfig(AppConfig):
     name = "program"
 
-    def ready(self):
-        from .models import EventSession, Speaker
-        from .signal_handlers import (
-            check_speaker_event_camp_consistency,
-            event_session_post_save,
-        )
+    def ready(self) -> None:
+        from .models import EventSession
+        from .models import Speaker
+        from .signal_handlers import check_speaker_event_camp_consistency
+        from .signal_handlers import event_session_post_save
 
         m2m_changed.connect(
             check_speaker_event_camp_consistency,

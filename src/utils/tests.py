@@ -8,6 +8,6 @@ class TestBootstrapScript(TestCase):
     """Test bootstrap_devsite script (touching many codepaths)"""
 
     @skip
-    def test_bootstrap_script(self):
+    def test_bootstrap_script(self) -> None:
         """If no orders have been made, the product is still available."""
         call_command("bootstrap_devsite")

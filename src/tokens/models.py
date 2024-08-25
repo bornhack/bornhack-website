@@ -3,7 +3,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 
 
@@ -32,20 +31,20 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     camp_filter = "camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.description} ({self.camp})"
 
     class Meta:
         ordering = ["camp"]
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse(
             "backoffice:token_detail",
             kwargs={"camp_slug": self.camp.slug, "pk": self.pk},
         )
 
     @property
-    def valid_now(self):
+    def valid_now(self) -> bool:
         if not self.valid_when:
             # no time limit
             return True
@@ -72,7 +71,7 @@ class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
 
     camp_filter = "token__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.token} found by {self.user}"
 
     @property

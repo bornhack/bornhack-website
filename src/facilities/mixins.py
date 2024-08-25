@@ -1,16 +1,16 @@
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.shortcuts import get_object_or_404
 
 from .models import Facility
 from .models import FacilityType
-from camps.mixins import CampViewMixin
 
 
 class FacilityTypeViewMixin(CampViewMixin):
-    """
-    A mixin to get the FacilityType object based on facility_type_slug in url kwargs
-    """
+    """A mixin to get the FacilityType object based on facility_type_slug in url kwargs"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.facility_type = get_object_or_404(
             FacilityType,
@@ -18,18 +18,16 @@ class FacilityTypeViewMixin(CampViewMixin):
             slug=self.kwargs["facility_type_slug"],
         )
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["facilitytype"] = self.facility_type
         return context
 
 
 class FacilityViewMixin(FacilityTypeViewMixin):
-    """
-    A mixin to get the Facility object based on facility_uuid in url kwargs
-    """
+    """A mixin to get the Facility object based on facility_uuid in url kwargs"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.facility = get_object_or_404(
             Facility,
@@ -37,7 +35,7 @@ class FacilityViewMixin(FacilityTypeViewMixin):
             uuid=self.kwargs["facility_uuid"],
         )
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["facility"] = self.facility
         return context

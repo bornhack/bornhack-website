@@ -1,9 +1,15 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .models import Camp
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
-def camp(request):
-    """
-    if we have a camp_slug url component then get the "current" Camp object.
+
+def camp(request: HttpRequest):
+    """If we have a camp_slug url component then get the "current" Camp object.
     Return it after adding the slug to request.session along with a "camps"
     queryset containing all camps (used to build the menu and such)
     """

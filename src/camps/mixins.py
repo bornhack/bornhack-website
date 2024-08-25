@@ -1,15 +1,16 @@
+from typing import Any
+
 from django.shortcuts import get_object_or_404
 
 from camps.models import Camp
 
 
 class CampViewMixin:
-    """
-    This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
+    """This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
     It also filters out objects that belong to other camps when the queryset has a camp_filter
     """
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.camp = get_object_or_404(Camp, slug=self.kwargs["camp_slug"])
 

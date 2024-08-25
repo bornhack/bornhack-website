@@ -1,14 +1,15 @@
 import logging
+from typing import Any
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
-
-from .dectutils import DectUtils
 from utils.models import CampRelatedModel
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from .dectutils import DectUtils
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 dectutil = DectUtils()
 
 
@@ -16,9 +17,7 @@ class DectRegistration(
     ExportModelOperationsMixin("dect_registration"),
     CampRelatedModel,
 ):
-    """
-    This model contains DECT registrations for users and services
-    """
+    """This model contains DECT registrations for users and services"""
 
     class Meta:
         unique_together = [("camp", "number")]
@@ -63,18 +62,15 @@ class DectRegistration(
         help_text="Check to list this registration in the phonebook",
     )
 
-    def save(self, *args, **kwargs):
-        """
-        This is just here so we get the validation in the admin as well.
-        """
+    def save(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
+        """This is just here so we get the validation in the admin as well."""
         # validate that the phonenumber and letters are valid and then save()
         self.clean_number()
         self.clean_letters()
         super().save(*args, **kwargs)
 
-    def clean_number(self):
-        """
-        We call this from the views form_valid() so we have a Camp object available for the validation.
+    def clean_number(self) -> None:
+        """We call this from the views form_valid() so we have a Camp object available for the validation.
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """
@@ -95,11 +91,7 @@ class DectRegistration(
             raise ValidationError("Phonenumber must be numeric!")
 
         # check for conflicts with the same number
-        if (
-            DectRegistration.objects.filter(camp=self.camp, number=self.number)
-            .exclude(pk=self.pk)
-            .exists()
-        ):
+        if DectRegistration.objects.filter(camp=self.camp, number=self.number).exclude(pk=self.pk).exists():
             raise ValidationError(f"The DECT number {self.number} is in use")
 
         # check for conflicts with a longer number
@@ -118,19 +110,14 @@ class DectRegistration(
         # check if a shorter number is blocking
         i = len(self.number) - 1
         while i:
-            if (
-                DectRegistration.objects.filter(camp=self.camp, number=self.number[:i])
-                .exclude(pk=self.pk)
-                .exists()
-            ):
+            if DectRegistration.objects.filter(camp=self.camp, number=self.number[:i]).exclude(pk=self.pk).exists():
                 raise ValidationError(
                     f"The DECT number {self.number} is not available, it conflicts with a shorter number.",
                 )
             i -= 1
 
-    def clean_letters(self):
-        """
-        We call this from the views form_valid() so we have a Camp object available for the validation.
+    def clean_letters(self) -> None:
+        """We call this from the views form_valid() so we have a Camp object available for the validation.
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """

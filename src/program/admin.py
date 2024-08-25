@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError
@@ -18,6 +22,9 @@ from .models import SpeakerProposalAvailability
 from .models import Url
 from .models import UrlType
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 
 @admin.register(SpeakerProposalAvailability)
 class SpeakerProposalAvailabilityAdmin(admin.ModelAdmin):
@@ -29,18 +36,16 @@ class SpeakerProposalAvailabilityAdmin(admin.ModelAdmin):
 class SpeakerAvailabilityAdmin(admin.ModelAdmin):
     list_display = ["speaker", "available", "when"]
     list_filter = ["speaker__camp", "available", "speaker"]
-    readonly_fields = ["speaker"]
+    readonly_fields = ("speaker",)
 
 
 @admin.register(SpeakerProposal)
 class SpeakerProposalAdmin(admin.ModelAdmin):
-    def mark_speaker_proposal_as_approved(self, request, queryset):
+    def mark_speaker_proposal_as_approved(self, request: HttpRequest, queryset) -> None:
         for sp in queryset:
             sp.mark_as_approved(request)
 
-    mark_speaker_proposal_as_approved.description = (
-        "Approve and create Speaker object(s)"
-    )
+    mark_speaker_proposal_as_approved.description = "Approve and create Speaker object(s)"
 
     actions = ["mark_speaker_proposal_as_approved"]
     list_filter = ("camp", "proposal_status", "user")
@@ -55,7 +60,7 @@ def get_speakers_string(event_proposal):
 
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
-    def mark_event_proposal_as_approved(self, request, queryset):
+    def mark_event_proposal_as_approved(self, request: HttpRequest, queryset) -> bool:
         for ep in queryset:
             if not ep.speakers.all():
                 messages.error(
@@ -69,10 +74,11 @@ class EventProposalAdmin(admin.ModelAdmin):
                 except ValidationError as e:
                     messages.error(request, e)
                     return False
+        return None
 
     mark_event_proposal_as_approved.description = "Approve and create Event object(s)"
 
-    def get_speakers(self):
+    def get_speakers(self) -> None:
         return
 
     actions = ["mark_event_proposal_as_approved"]
@@ -97,7 +103,7 @@ class EventTrackAdmin(admin.ModelAdmin):
 class EventSessionAdmin(admin.ModelAdmin):
     list_display = ("camp", "event_type", "event_location", "when")
     list_filter = ("camp", "event_type", "event_location")
-    search_fields = ["id", "event_type__name", "event_location__name"]
+    search_fields = ("id", "event_type__name", "event_location__name")
 
 
 @admin.register(EventSlot)
@@ -110,7 +116,7 @@ class EventSlotAdmin(admin.ModelAdmin):
 class EventInstanceAdmin(admin.ModelAdmin):
     list_display = ("event", "when", "location", "autoscheduled")
     list_filter = ("event__track__camp", "event", "autoscheduled")
-    search_fields = ["event__title"]
+    search_fields = ("event__title",)
 
 
 @admin.register(EventType)
@@ -124,7 +130,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
     list_filter = ("camp",)
-    readonly_fields = ["proposal", "camp"]
+    readonly_fields = ("proposal", "camp")
 
 
 class SpeakerInline(admin.StackedInline):
@@ -138,7 +144,7 @@ class EventAdmin(admin.ModelAdmin):
 
     inlines = [SpeakerInline]
 
-    readonly_fields = ["uuid", "proposal"]
+    readonly_fields = ("uuid", "proposal")
 
 
 @admin.register(UrlType)
@@ -172,4 +178,4 @@ class EventFeedbackAdmin(admin.ModelAdmin):
         "rating",
         "approved",
     ]
-    search_fields = ["event__title", "user__username"]
+    search_fields = ("event__title", "user__username")

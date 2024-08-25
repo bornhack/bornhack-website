@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 import csv
 import logging
+from typing import TYPE_CHECKING
+from typing import Any
 from typing import Optional
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
@@ -16,11 +21,6 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
-
-from ..forms import ShopTicketRefundFormSet
-from ..forms import TicketGroupRefundFormSet
-from ..mixins import InfoTeamPermissionMixin
-from camps.mixins import CampViewMixin
 from economy.models import Pos
 from shop.forms import RefundForm
 from shop.models import CreditNote
@@ -35,7 +35,14 @@ from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
 from utils.mixins import GetObjectMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from backoffice.forms import ShopTicketRefundFormSet
+from backoffice.forms import TicketGroupRefundFormSet
+from backoffice.mixins import InfoTeamPermissionMixin
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def _ticket_getter_by_token(token) -> Optional[TicketTypeUnion]:
@@ -44,6 +51,7 @@ def _ticket_getter_by_token(token) -> Optional[TicketTypeUnion]:
             return ticket_class.objects.get(Q(token=token) | Q(badge_token=token))
         except ticket_class.DoesNotExist:
             continue
+    return None
 
 
 def _ticket_getter_by_pk(pk):
@@ -52,6 +60,7 @@ def _ticket_getter_by_pk(pk):
             return ticket_class.objects.get(pk=pk)
         except ticket_class.DoesNotExist:
             pass
+    return None
 
 
 class ScanTicketsPosSelectView(
@@ -63,7 +72,7 @@ class ScanTicketsPosSelectView(
     model = Pos
     template_name = "scan_ticket_pos_select.html"
 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args: list[Any], **kwargs: dict[str, Any]):
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
         return super().dispatch(*args, **kwargs)
@@ -81,16 +90,16 @@ class ScanTicketsView(
     order = None
     order_search = False
 
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, *args: list[Any], **kwargs: dict[str, Any]):
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
         return super().dispatch(*args, **kwargs)
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.pos = Pos.objects.get(team__camp=self.camp, slug=kwargs["pos_slug"])
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
 
         context["pos"] = self.pos
@@ -117,7 +126,7 @@ class ScanTicketsView(
 
         return context
 
-    def _set_order(self):
+    def _set_order(self) -> None:
         self.order_search = True
         try:
             order_id = self.request.POST.get("find_order_id")
@@ -125,7 +134,7 @@ class ScanTicketsView(
         except Order.DoesNotExist:
             pass
 
-    def post(self, request, **kwargs):
+    def post(self, request: HttpRequest, **kwargs: dict[str, Any]):
         if "check_in_ticket_id" in request.POST:
             self.ticket = self.check_in_ticket(request)
             if "find_order_id" in self.request.POST:
@@ -140,14 +149,14 @@ class ScanTicketsView(
 
         return super().get(request, **kwargs)
 
-    def check_in_ticket(self, request):
+    def check_in_ticket(self, request: HttpRequest):
         check_in_ticket_id = request.POST.get("check_in_ticket_id")
         ticket_to_check_in = _ticket_getter_by_pk(check_in_ticket_id)
         ticket_to_check_in.mark_as_used(pos=self.pos, user=request.user)
         messages.info(request, "Ticket checked-in!")
         return ticket_to_check_in
 
-    def hand_out_badge(self, request):
+    def hand_out_badge(self, request: HttpRequest):
         badge_ticket_id = request.POST.get("badge_ticket_id")
         ticket_to_handout_badge_for = _ticket_getter_by_pk(badge_ticket_id)
         ticket_to_handout_badge_for.badge_handed_out = True
@@ -155,7 +164,7 @@ class ScanTicketsView(
         messages.info(request, "Badge marked as handed out!")
         return ticket_to_handout_badge_for
 
-    def mark_order_as_paid(self, request):
+    def mark_order_as_paid(self, request: HttpRequest) -> None:
         order = Order.objects.get(id=request.POST.get("mark_as_paid"))
         order.mark_as_paid()
         messages.success(request, f"Order #{order.id} has been marked as paid!")
@@ -171,7 +180,7 @@ class ShopTicketOverview(
     template_name = "shop_ticket_overview.html"
     context_object_name = "shop_tickets"
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs: dict[str, Any]):
         kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
 
@@ -186,15 +195,11 @@ class InvoiceListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    """
-    CSV export of invoices for bookkeeping stuff
-    """
+    """CSV export of invoices for bookkeeping stuff"""
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = (
-            f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
         writer = csv.writer(response)
         writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
         for invoice in Invoice.objects.all().order_by("-id"):
@@ -202,11 +207,7 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
                 [
                     invoice.id,
                     invoice.created.date(),
-                    (
-                        invoice.order.total
-                        if invoice.order
-                        else invoice.customorder.amount
-                    ),
+                    (invoice.order.total if invoice.order else invoice.customorder.amount),
                     invoice.get_order,
                     invoice.get_order.paid,
                 ],
@@ -218,13 +219,11 @@ class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailVie
     model = Invoice
     pk_url_kwarg = "invoice_id"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename={self.get_object().filename}"
-        )
+        response["Content-Disposition"] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response
 
@@ -233,7 +232,7 @@ class OrderListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Order
     template_name = "order_list_backoffice.html"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs: dict[str, Any]):
         """Preload stuff for speed."""
         return (
             super()
@@ -258,13 +257,13 @@ class OrderUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
     model = Order
     pk_url_kwarg = "order_id"
     template_name = "order_update.html"
-    fields = ["notes"]
+    fields = ("notes",)
 
     def form_valid(self, form):
         messages.info(request=self.request, message=f"Order #{self.object.id} updated!")
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("backoffice:order_list", kwargs={"camp_slug": self.camp.slug})
 
 
@@ -276,13 +275,11 @@ class OrderDownloadProformaInvoiceView(
     model = Order
     pk_url_kwarg = "order_id"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename='{self.get_object().filename}'"
-        )
+        response["Content-Disposition"] = f"attachment; filename='{self.get_object().filename}'"
         response.write(self.get_object().pdf.read())
         return response
 
@@ -305,10 +302,10 @@ class RefundDetailView(CampViewMixin, InfoTeamPermissionMixin, DetailView):
 class RefundUpdateView(CampViewMixin, InfoTeamPermissionMixin, UpdateView):
     model = Refund
     template_name = "refund_update_backoffice.html"
-    fields = ["paid", "notes"]
+    fields = ("paid", "notes")
     pk_url_kwarg = "refund_id"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("backoffice:refund_list", kwargs={"camp_slug": self.camp.slug})
 
 
@@ -322,7 +319,7 @@ class OrderRefundView(
     template_name = "order_refund_backoffice.html"
     pk_url_kwarg = "order_id"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         kwargs["oprs"] = {}
         kwargs["ticket_groups"] = {}
         for opr in self.get_object().oprs.all():
@@ -339,7 +336,7 @@ class OrderRefundView(
         kwargs["refund_form"] = RefundForm()
         return super().get_context_data(**kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # lock all the OPRS we are updating
         oprs = (
             OrderProductRelation.objects.prefetch_related("shoptickets")
@@ -448,12 +445,10 @@ class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, Detail
     model = CreditNote
     pk_url_kwarg = "credit_note_id"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename={self.get_object().filename}"
-        )
+        response["Content-Disposition"] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response

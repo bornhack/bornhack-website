@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.test.client import RequestFactory
 
 from .views import MapProxyView
@@ -17,7 +17,7 @@ PASSWORD = "password"
     DATAFORDELER_PASSWORD=PASSWORD,
 )
 class MapProxyViewTest(TestCase):
-    def setUp(self):
+    def setUp(self) -> None:
         self.rf = RequestFactory()
 
         self.allowed_endpoints = [
@@ -26,13 +26,13 @@ class MapProxyViewTest(TestCase):
             "/DHMNedboer/dhm/1.0.0/wms",
         ]
 
-    def test_endpoint_not_allowed_raises_perm_denied(self):
+    def test_endpoint_not_allowed_raises_perm_denied(self) -> None:
         fix_request = self.rf.get("/maps/kfproxy/not/allowed/endpoint")
 
         with self.assertRaises(PermissionDenied):
             MapProxyView.as_view()(fix_request)
 
-    def test_all_allowed_endpoints(self):
+    def test_all_allowed_endpoints(self) -> None:
         for endpoint in self.allowed_endpoints:
             fix_request = self.rf.get("/maps/kfproxy" + endpoint)
             with self.subTest(request=fix_request):

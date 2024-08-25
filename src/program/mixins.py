@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -5,14 +11,17 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
 
-from . import models
-from camps.mixins import CampViewMixin
 from program.utils import add_existing_availability_to_matrix
 from program.utils import get_speaker_availability_form_matrix
 
+from . import models
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 
 class EnsureCFPOpenMixin:
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # do not permit this action if call for participation is not open
         if not self.camp.call_for_participation_open:
             messages.error(request, "The Call for Participation is not open.")
@@ -25,12 +34,9 @@ class EnsureCFPOpenMixin:
 
 
 class EnsureUnapprovedProposalMixin(SingleObjectMixin):
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # do not permit editing if the proposal is already approved
-        if (
-            self.get_object().proposal_status
-            == models.UserSubmittedModel.PROPOSAL_APPROVED
-        ):
+        if self.get_object().proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
             messages.error(
                 request,
                 "This proposal has already been approved. Please contact the organisers if you need to modify something.",
@@ -44,7 +50,7 @@ class EnsureUnapprovedProposalMixin(SingleObjectMixin):
 
 
 class EnsureWritableCampMixin:
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # do not permit view if camp is in readonly mode
         if self.camp.read_only:
             messages.error(request, "No thanks")
@@ -57,7 +63,7 @@ class EnsureWritableCampMixin:
 
 
 class EnsureUserOwnsProposalMixin(SingleObjectMixin):
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
         # make sure that this proposal belongs to the logged in user
         if self.get_object().user.username != request.user.username:
             messages.error(request, "No thanks")
@@ -70,14 +76,10 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
 
 
 class UrlViewMixin:
-    """
-    Mixin with code shared between all the Url views
-    """
+    """Mixin with code shared between all the Url views"""
 
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user
-        """
+    def dispatch(self, request: HttpRequest, *args: list[Any], **kwargs: dict[str, Any]):
+        """Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user"""
         # get the proposal
         if "event_uuid" in self.kwargs:
             self.event_proposal = get_object_or_404(
@@ -96,10 +98,8 @@ class UrlViewMixin:
             raise Http404
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        """
-        Include the proposal in the template context
-        """
+    def get_context_data(self, **kwargs: dict[str, Any]):
+        """Include the proposal in the template context"""
         context = super().get_context_data(**kwargs)
         if hasattr(self, "event_proposal") and self.event_proposal:
             context["event_proposal"] = self.event_proposal
@@ -107,10 +107,8 @@ class UrlViewMixin:
             context["speaker_proposal"] = self.speaker_proposal
         return context
 
-    def get_success_url(self):
-        """
-        Return to the detail view of the proposal
-        """
+    def get_success_url(self) -> str:
+        """Return to the detail view of the proposal"""
         if hasattr(self, "event_proposal"):
             return self.event_proposal.get_absolute_url()
         else:
@@ -118,11 +116,9 @@ class UrlViewMixin:
 
 
 class EventViewMixin(CampViewMixin):
-    """
-    A mixin to get the Event object based on event_uuid in url kwargs
-    """
+    """A mixin to get the Event object based on event_uuid in url kwargs"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.event = get_object_or_404(
             models.Event,
@@ -130,18 +126,16 @@ class EventViewMixin(CampViewMixin):
             slug=self.kwargs["event_slug"],
         )
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["event"] = self.event
         return context
 
 
 class EventFeedbackViewMixin(EventViewMixin):
-    """
-    A mixin to get the EventFeedback object based on self.event and self.request.user
-    """
+    """A mixin to get the EventFeedback object based on self.event and self.request.user"""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.event_feedback = get_object_or_404(
             models.EventFeedback,
@@ -154,14 +148,13 @@ class EventFeedbackViewMixin(EventViewMixin):
 
 
 class AvailabilityMatrixViewMixin(CampViewMixin):
-    """
-    Mixin with shared code between all availability matrix views,
+    """Mixin with shared code between all availability matrix views,
     meaning all views that show an availability matrix (form or not)
     for a SpeakerProposal or Speaker object. Used by SpeakerProposal
     submitters and in backoffice.
     """
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         """Get the availability matrix"""
         super().setup(*args, **kwargs)
         # do we have an Event or an EventProposal?
@@ -187,14 +180,14 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         kwargs["matrix"] = self.matrix
         return kwargs
 
-    def get_initial(self, *args, **kwargs):
+    def get_initial(self, *args: list[Any], **kwargs: dict[str, Any]):
         """Populate the speaker_availability checkboxes, only used if the view has a form"""
         initial = super().get_initial(*args, **kwargs)
 
         # add initial checkbox states
-        for date in self.matrix.keys():
+        for date in self.matrix:
             # loop over daychunks and check if we need a checkbox
-            for daychunk in self.matrix[date].keys():
+            for daychunk in self.matrix[date]:
                 if not self.matrix[date][daychunk]:
                     # we have no event_session here, carry on
                     continue
@@ -206,7 +199,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         # we are ready to render the form
         return initial
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         """Add the matrix to context"""
         context = super().get_context_data(**kwargs)
         context["matrix"] = self.matrix

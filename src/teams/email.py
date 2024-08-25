@@ -2,8 +2,7 @@ import logging
 
 from utils.email import add_outgoing_email
 
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_added_membership_email(membership):
@@ -45,23 +44,15 @@ def add_new_membership_email(membership):
     formatdict = {
         "team": membership.team.name,
         "camp": membership.team.camp.title,
-        "memberlist_link": "https://bornhack.dk/{}/teams/{}/members".format(
-            membership.team.camp.slug,
-            membership.team.slug,
-        ),
+        "memberlist_link": f"https://bornhack.dk/{membership.team.camp.slug}/teams/{membership.team.slug}/members",
     }
 
     return add_outgoing_email(
         responsible_team=membership.team,
         text_template="emails/new_membership_email.txt",
         html_template="emails/new_membership_email.html",
-        to_recipients=[
-            resp.email for resp in membership.team.responsible_members.all()
-        ],
+        to_recipients=[resp.email for resp in membership.team.responsible_members.all()],
         formatdict=formatdict,
-        subject="New membership request for {} at {}".format(
-            membership.team.name,
-            membership.team.camp.title,
-        ),
+        subject=f"New membership request for {membership.team.name} at {membership.team.camp.title}",
         hold=False,
     )

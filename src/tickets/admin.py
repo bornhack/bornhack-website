@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 
 from .models import DiscountTicket
@@ -5,13 +9,16 @@ from .models import ShopTicket
 from .models import SponsorTicket
 from .models import TicketType
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 
 class BaseTicketAdmin(admin.ModelAdmin):
     actions = ["generate_pdf"]
     exclude = ["qrcode_base64"]
-    readonly_fields = ["token", "badge_token"]
+    readonly_fields = ("token", "badge_token")
 
-    def generate_pdf(self, request, queryset):
+    def generate_pdf(self, request: HttpRequest, queryset) -> None:
         for ticket in queryset.all():
             ticket.generate_pdf()
 
@@ -37,7 +44,7 @@ class SponsorTicketAdmin(BaseTicketAdmin):
 
     list_filter = ["ticket_type__camp", "used_at", "ticket_type", "sponsor"]
 
-    search_fields = ["pk", "sponsor__name"]
+    search_fields = ("pk", "sponsor__name")
 
 
 @admin.register(DiscountTicket)
@@ -73,15 +80,15 @@ class ShopTicketAdmin(BaseTicketAdmin):
         "ticket_group",
     ]
 
-    search_fields = [
+    search_fields = (
         "uuid",
         "opr__order__id",
         "opr__order__user__email",
         "name",
         "email",
-    ]
+    )
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest):
         return (
             super()
             .get_queryset(request)
@@ -100,7 +107,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
     def product_quantity(self, ticket):
         return str(ticket.quantity)
 
-    def generate_pdf(self, request, queryset):
+    def generate_pdf(self, request: HttpRequest, queryset) -> None:
         for ticket in queryset.all():
             ticket.generate_pdf()
 

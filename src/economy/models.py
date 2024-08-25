@@ -1,7 +1,11 @@
+from __future__ import annotations
+
 import csv
 import os
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
+from typing import Any
 
 import pytz
 from django.conf import settings
@@ -14,13 +18,6 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_prometheus.models import ExportModelOperationsMixin
-
-from .email import send_accountingsystem_expense_email
-from .email import send_accountingsystem_revenue_email
-from .email import send_expense_approved_email
-from .email import send_expense_rejected_email
-from .email import send_revenue_approved_email
-from .email import send_revenue_rejected_email
 from shop.models import Product
 from tickets.models import ShopTicket
 from utils.models import CampRelatedModel
@@ -29,10 +26,19 @@ from utils.models import CreatedUpdatedUUIDModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
+from .email import send_accountingsystem_expense_email
+from .email import send_accountingsystem_revenue_email
+from .email import send_expense_approved_email
+from .email import send_expense_rejected_email
+from .email import send_revenue_approved_email
+from .email import send_revenue_rejected_email
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 
 class ChainManager(models.Manager):
-    """
-    ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
+    """ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
     Also adds 'expenses_count' and 'revenues_count' and prefetches all expenses
     and revenues for the credebtors.
     """
@@ -58,15 +64,13 @@ class ChainManager(models.Manager):
                 distinct=True,
             ),
         )
-        qs = qs.annotate(
+        return qs.annotate(
             all_revenues_count=models.Count("credebtors__revenues", distinct=True),
         )
-        return qs
 
 
 class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel):
-    """
-    A chain of Credebtors. Used to group when several Creditors/Debtors
+    """A chain of Credebtors. Used to group when several Creditors/Debtors
     belong to the same Chain/company, like XL Byg stores or Netto stores.
     """
 
@@ -92,10 +96,10 @@ class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel)
         blank=True,
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -116,8 +120,7 @@ class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel)
 
 
 class CredebtorManager(models.Manager):
-    """
-    CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs,
+    """CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs,
     and prefetches expenses and revenues for the credebtor(s).
     """
 
@@ -128,8 +131,7 @@ class CredebtorManager(models.Manager):
             models.Prefetch("revenues", to_attr="all_revenues"),
         )
         qs = qs.annotate(all_expenses_amount=models.Sum("expenses__amount"))
-        qs = qs.annotate(all_revenues_amount=models.Sum("revenues__amount"))
-        return qs
+        return qs.annotate(all_revenues_amount=models.Sum("revenues__amount"))
 
 
 class Credebtor(
@@ -137,8 +139,7 @@ class Credebtor(
     CreatedUpdatedModel,
     UUIDModel,
 ):
-    """
-    The Credebtor model represents the specific "instance" of a Chain,
+    """The Credebtor model represents the specific "instance" of a Chain,
     like "XL Byg Rønne" or "Netto Gelsted".
     The model is used for both creditors and debtors, since there is a
     lot of overlap between them.
@@ -175,13 +176,11 @@ class Credebtor(
         help_text="Any notes for this Credebtor. Shown when creating an Expense or Revenue for this Credebtor.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, **kwargs):
-        """
-        Generate slug as needed
-        """
+    def save(self, **kwargs: dict[str, Any]) -> None:
+        """Generate slug as needed"""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -193,8 +192,7 @@ class Credebtor(
 
 
 class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel):
-    """
-    The Revenue model represents any type of income for BornHack.
+    """The Revenue model represents any type of income for BornHack.
 
     Most Revenue objects will have a FK to the Invoice model,
     but only if the revenue relates directly to an Invoice in our system.
@@ -272,7 +270,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         help_text="Economy Team notes for this revenue. Only visible to the Economy team and the submitting user.",
     )
 
-    def clean(self):
+    def clean(self) -> None:
         if self.amount < 0:
             raise ValidationError("Amount of a Revenue object can not be negative")
 
@@ -287,7 +285,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         return os.path.basename(self.invoice.file.name)
 
     @property
-    def approval_status(self):
+    def approval_status(self) -> str:
         if self.approved is None:
             return "Pending approval"
         elif self.approved:
@@ -295,9 +293,8 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         else:
             return "Rejected"
 
-    def approve(self, request):
-        """
-        This method marks a revenue as approved.
+    def approve(self, request: HttpRequest) -> None:
+        """This method marks a revenue as approved.
         Approving a revenue triggers an email to the economy system, and another email to the user who submitted the revenue
         """
         if request.user == self.user:
@@ -318,11 +315,10 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         send_revenue_approved_email(revenue=self)
 
         # message to the browser
-        messages.success(request, "Revenue %s approved" % self.pk)
+        messages.success(request, f"Revenue {self.pk} approved")
 
-    def reject(self, request):
-        """
-        This method marks a revenue as not approved.
+    def reject(self, request: HttpRequest) -> None:
+        """This method marks a revenue as not approved.
         Not approving a revenue triggers an email to the user who submitted the revenue in the first place.
         """
         # mark as not approved and save
@@ -333,7 +329,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         send_revenue_rejected_email(revenue=self)
 
         # message to the browser
-        messages.success(request, "Revenue %s rejected" % self.pk)
+        messages.success(request, f"Revenue {self.pk} rejected")
 
 
 class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel):
@@ -411,7 +407,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         help_text="Economy Team notes for this expense. Only visible to the Economy team and the submitting user.",
     )
 
-    def clean(self):
+    def clean(self) -> None:
         if self.amount < 0:
             raise ValidationError("Amount of an expense can not be negative")
 
@@ -420,7 +416,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         return os.path.basename(self.invoice.file.name)
 
     @property
-    def approval_status(self):
+    def approval_status(self) -> str:
         if self.approved is None:
             return "Pending approval"
         elif self.approved:
@@ -434,9 +430,8 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
             kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
         )
 
-    def approve(self, request):
-        """
-        This method marks an expense as approved.
+    def approve(self, request: HttpRequest) -> None:
+        """This method marks an expense as approved.
         Approving an expense triggers an email to the economy system, and another email to the user who submitted the expense in the first place.
         """
         if request.user == self.user:
@@ -457,11 +452,10 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         send_expense_approved_email(expense=self)
 
         # message to the browser
-        messages.success(request, "Expense %s approved" % self.pk)
+        messages.success(request, f"Expense {self.pk} approved")
 
-    def reject(self, request):
-        """
-        This method marks an expense as not approved.
+    def reject(self, request: HttpRequest) -> None:
+        """This method marks an expense as not approved.
         Not approving an expense triggers an email to the user who submitted the expense in the first place.
         """
         # mark as not approved and save
@@ -472,7 +466,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         send_expense_rejected_email(expense=self)
 
         # message to the browser
-        messages.success(request, "Expense %s rejected" % self.pk)
+        messages.success(request, f"Expense {self.pk} rejected")
 
 
 class Reimbursement(
@@ -480,9 +474,7 @@ class Reimbursement(
     CampRelatedModel,
     UUIDModel,
 ):
-    """
-    A reimbursement covers one or more expenses.
-    """
+    """A reimbursement covers one or more expenses."""
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -527,9 +519,7 @@ class Reimbursement(
 
     @property
     def covered_expenses(self):
-        """
-        Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement.
-        """
+        """Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement."""
         return self.expenses.filter(paid_by_bornhack=False)
 
     @property
@@ -544,6 +534,7 @@ class Reimbursement(
         """Return the expense created to pay back this reimbursement."""
         if self.expenses.filter(paid_by_bornhack=True).exists():
             return self.expenses.get(paid_by_bornhack=True)
+        return None
 
     def create_payback_expense(self):
         """Create the expense to pay back this reimbursement."""
@@ -560,10 +551,7 @@ class Reimbursement(
         expense.camp = self.camp
         expense.user = self.user
         expense.amount = self.amount
-        expense.description = "Payment of reimbursement {} to {}".format(
-            self.pk,
-            self.reimbursement_user,
-        )
+        expense.description = f"Payment of reimbursement {self.pk} to {self.reimbursement_user}"
         expense.paid_by_bornhack = True
         expense.responsible_team = self.camp.economy_team
         expense.approved = True
@@ -607,10 +595,10 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
         help_text="The Team managing this POS",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} POS ({self.camp})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         """Generate slug if needed."""
         if not self.slug:
             self.slug = unique_slugify(
@@ -627,7 +615,7 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
 
     camp_filter = "team__camp"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse(
             "backoffice:pos_detail",
             kwargs={"camp_slug": self.team.camp.slug, "pos_slug": self.slug},
@@ -870,7 +858,7 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
 
     camp_filter = "pos__team__camp"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse(
             "backoffice:posreport_detail",
             kwargs={
@@ -1054,7 +1042,7 @@ class Bank(ExportModelOperationsMixin("bank"), CreatedUpdatedUUIDModel):
 
     name = models.CharField(max_length=100, help_text="The name of the bank")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -1106,7 +1094,7 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
         help_text="The date we stopped using this bank account.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Account {self.name} (reg. {self.reg_no} account {self.account_no}) in bank {self.bank.name}"
 
     def import_csv(self, csvreader):
@@ -1193,10 +1181,10 @@ class BankTransaction(
         help_text="The balance of the account after this transaction.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Transaction {self.pk} for {self.amount} DKK with the text {self.text} on {self.date} on account {self.bank_account}"
 
-    def clean(self):
+    def clean(self) -> None:
         """Make sure transactions don't fall outside the bank accounts start and end dates."""
         if self.bank_account.start_date and self.date < self.bank_account.start_date:
             raise ValidationError(
@@ -1762,5 +1750,5 @@ class AccountingExport(
         help_text="The zipfile containing the exported accounting info (html+CSV files)",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"AccountingExport from {self.date_from} to {self.date_to}"

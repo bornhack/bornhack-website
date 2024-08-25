@@ -2,7 +2,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
@@ -53,12 +52,11 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
     def email(self):
         return self.user.email
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.username
 
-    def approve_public_credit_name(self):
-        """
-        This method just sets profile.public_credit_name_approved=True and calls save()
+    def approve_public_credit_name(self) -> None:
+        """This method just sets profile.public_credit_name_approved=True and calls save()
         It is used in an admin action
         """
         self.public_credit_name_approved = True
@@ -66,8 +64,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
     @property
     def get_public_credit_name(self):
-        """
-        Convenience method to return profile.public_credit_name if it is approved,
+        """Convenience method to return profile.public_credit_name if it is approved,
         and the string "Unnamed" otherwise
         """
         if self.public_credit_name_approved:

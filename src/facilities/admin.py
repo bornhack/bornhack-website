@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 from django.utils.html import format_html
 from leaflet.admin import LeafletGeoAdmin
@@ -7,6 +11,9 @@ from .models import FacilityFeedback
 from .models import FacilityOpeningHours
 from .models import FacilityQuickFeedback
 from .models import FacilityType
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 @admin.register(FacilityQuickFeedback)
@@ -46,7 +53,7 @@ class FacilityAdmin(LeafletGeoAdmin):
     def feedback_url(self, obj):
         return obj.get_feedback_url(self.request)
 
-    def get_queryset(self, request):
+    def get_queryset(self, request: HttpRequest):
         self.request = request
         return super().get_queryset(request)
 

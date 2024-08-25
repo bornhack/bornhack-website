@@ -1,7 +1,6 @@
 from django.db import models
 from django.urls import reverse
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 
@@ -36,17 +35,11 @@ class Ride(ExportModelOperationsMixin("ride"), UUIDModel, CampRelatedModel):
         help_text="Include any details you want, like luggage space/requirements, contact info and so on.",
     )
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse(
             "rideshare:detail",
             kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
         )
 
-    def __str__(self):
-        return "{} seats from {} to {} at {} by {}".format(
-            self.seats,
-            self.from_location,
-            self.to_location,
-            self.when,
-            self.user,
-        )
+    def __str__(self) -> str:
+        return f"{self.seats} seats from {self.from_location} to {self.to_location} at {self.when} by {self.user}"

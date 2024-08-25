@@ -1,7 +1,7 @@
+from camps.mixins import CampViewMixin
 from django.views.generic import ListView
 
 from .models import ProductCategory
-from camps.mixins import CampViewMixin
 
 
 class MenuView(CampViewMixin, ListView):

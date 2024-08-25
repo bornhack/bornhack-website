@@ -2,7 +2,7 @@ import logging
 
 from django.apps import AppConfig
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ShopConfig(AppConfig):

@@ -38,7 +38,6 @@ from .views import CoinifyPayoutListView
 from .views import CredebtorDetailView
 from .views import CreditNoteDownloadView
 from .views import CreditNoteListView
-from .views import economy_search_view
 from .views import EpayCSVImportView
 from .views import EpayTransactionListView
 from .views import EventDeleteView
@@ -141,6 +140,7 @@ from .views import ZettleBalanceListView
 from .views import ZettleDashboardView
 from .views import ZettleDataImportView
 from .views import ZettleReceiptListView
+from .views import economy_search_view
 
 app_name = "backoffice"
 

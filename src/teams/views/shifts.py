@@ -1,3 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,7 +24,9 @@ from psycopg2.extras import DateTimeTZRange
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamShift
-from camps.mixins import CampViewMixin
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -31,7 +39,7 @@ class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
         queryset = super().get_queryset()
         return queryset.filter(team__slug=self.kwargs["team_slug"])
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -52,12 +60,9 @@ def date_choices(camp):
 
     def get_time_choices(date):
         time_choices = []
-        for hour in range(0, 24):
+        for hour in range(24):
             for minute in minute_choices:
-                time_label = "{hour:02d}:{minutes:02d}".format(
-                    hour=hour,
-                    minutes=minute,
-                )
+                time_label = f"{hour:02d}:{minute:02d}"
                 choice_value = f"{date} {time_label}"
                 time_choices.append((choice_value, choice_value))
         return time_choices
@@ -76,9 +81,9 @@ def date_choices(camp):
 class ShiftForm(forms.ModelForm):
     class Meta:
         model = TeamShift
-        fields = ["from_datetime", "to_datetime", "people_required"]
+        fields = ("from_datetime", "to_datetime", "people_required")
 
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, instance=None, **kwargs: dict[str, Any]) -> None:
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))
@@ -105,7 +110,7 @@ class ShiftForm(forms.ModelForm):
         current_timezone = timezone.get_current_timezone()
         return self.cleaned_data["to_datetime"].astimezone(current_timezone)
 
-    def clean(self):
+    def clean(self) -> None:
         self.lower = self._get_from_datetime()
         self.upper = self._get_to_datetime()
         if self.lower > self.upper:
@@ -133,10 +138,10 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         shift.team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("teams:shifts", kwargs=self.kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -156,11 +161,11 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
         kwargs["camp"] = self.camp
         return kwargs
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         self.kwargs.pop("pk")
         return reverse("teams:shifts", kwargs=self.kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = self.object.team
         return context
@@ -171,7 +176,7 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
     template_name = "team_shift_confirm_delete.html"
     active_menu = "shifts"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -179,13 +184,13 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
         )
         return context
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         self.kwargs.pop("pk")
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
 class MultipleShiftForm(forms.Form):
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, instance=None, **kwargs: dict[str, Any]) -> None:
         camp = kwargs.pop("camp")
         super().__init__(**kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))
@@ -239,10 +244,10 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse("teams:shifts", kwargs=self.kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -254,7 +259,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
     http_methods = ["get"]
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs: dict[str, Any]):
         shift = TeamShift.objects.get(id=kwargs["pk"])
         team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
 
@@ -290,7 +295,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
     http_methods = ["get"]
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs: dict[str, Any]):
         shift = TeamShift.objects.get(id=kwargs["pk"])
         team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
 
@@ -306,7 +311,7 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
 class UserShifts(CampViewMixin, TemplateView):
     template_name = "team_user_shifts.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["user_teams"] = self.request.user.teammember_set.filter(
             team__camp=self.camp,

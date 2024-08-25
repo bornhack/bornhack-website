@@ -1,7 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 from django.utils import timezone
 
 from camps.models import Camp
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 
 def get_current_camp():
@@ -12,15 +19,14 @@ def get_current_camp():
 
 
 class CampPropertyListFilter(admin.SimpleListFilter):
-    """
-    SimpleListFilter to filter models by camp when camp is
+    """SimpleListFilter to filter models by camp when camp is
     a property and not a real model field.
     """
 
     title = "Camp"
     parameter_name = "camp"
 
-    def lookups(self, request, model_admin):
+    def lookups(self, request: HttpRequest, model_admin):
         # get the current queryset
         qs = model_admin.get_queryset(request)
 
@@ -31,7 +37,7 @@ class CampPropertyListFilter(admin.SimpleListFilter):
         for camp in unique_camps:
             yield (camp.slug, camp.title)
 
-    def queryset(self, request, queryset):
+    def queryset(self, request: HttpRequest, queryset):
         # if self.value() is None return everything
         if not self.value():
             return queryset

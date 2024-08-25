@@ -3,10 +3,12 @@ import random
 import sys
 from datetime import datetime
 from datetime import timedelta
+from typing import Any
 
 import factory
 import pytz
 from allauth.account.models import EmailAddress
+from camps.models import Camp
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
@@ -16,9 +18,6 @@ from django.core.management.base import BaseCommand
 from django.db.models.signals import post_save
 from django.utils import timezone
 from django.utils.crypto import get_random_string
-from faker import Faker
-
-from camps.models import Camp
 from economy.factories import BankAccountFactory
 from economy.factories import BankFactory
 from economy.factories import BankTransactionFactory
@@ -42,6 +41,7 @@ from facilities.models import Facility
 from facilities.models import FacilityFeedback
 from facilities.models import FacilityQuickFeedback
 from facilities.models import FacilityType
+from faker import Faker
 from feedback.models import Feedback
 from info.models import InfoCategory
 from info.models import InfoItem
@@ -73,13 +73,14 @@ from teams.models import TeamTask
 from tickets.models import TicketType
 from tokens.models import Token
 from tokens.models import TokenFind
-from utils.slugs import unique_slugify
 from villages.models import Village
+
+from utils.slugs import unique_slugify
 
 fake = Faker()
 # Faker.seed(0)
 tz = pytz.timezone("Europe/Copenhagen")
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ChainFactory(factory.django.DjangoModelFactory):
@@ -241,7 +242,7 @@ class Command(BaseCommand):
     args = "none"
     help = "Create mock data for development instances"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "-s",
             "--skip-auto-scheduler",
@@ -356,7 +357,7 @@ class Command(BaseCommand):
 
         return camp_instances
 
-    def create_event_routing_types(self):
+    def create_event_routing_types(self) -> None:
         t, created = Type.objects.get_or_create(name="public_credit_name_changed")
         t, created = Type.objects.get_or_create(name="ticket_created")
 
@@ -365,7 +366,7 @@ class Command(BaseCommand):
 
         users = {}
 
-        for i in range(0, 16):
+        for i in range(16):
             username = f"user{i}"
             user = UserFactory.create(
                 username=username,
@@ -400,7 +401,7 @@ class Command(BaseCommand):
 
         return users
 
-    def create_news(self):
+    def create_news(self) -> None:
         NewsItem.objects.create(
             title="unpublished news item",
             content="unpublished news body here",
@@ -430,32 +431,32 @@ class Command(BaseCommand):
         )
         return options
 
-    def create_mobilepay_transactions(self):
+    def create_mobilepay_transactions(self) -> None:
         self.output("Creating MobilePay Transactions...")
         MobilePayTransactionFactory.create_batch(50)
 
-    def create_clearhaus_settlements(self):
+    def create_clearhaus_settlements(self) -> None:
         self.output("Creating Clearhaus Settlements...")
         ClearhausSettlementFactory.create_batch(50)
 
-    def create_zettle_stuff(self):
+    def create_zettle_stuff(self) -> None:
         self.output("Creating Zettle receipts and balances...")
         ZettleBalanceFactory.create_batch(100)
         ZettleReceiptFactory.create_batch(100)
 
-    def create_bank_stuff(self):
+    def create_bank_stuff(self) -> None:
         self.output("Creating Banks, BankAccounts, and BankTransactions...")
         BankFactory.create_batch(2)
         BankAccountFactory.create_batch(16)
         BankTransactionFactory.create_batch(300)
 
-    def create_coinify_stuff(self):
+    def create_coinify_stuff(self) -> None:
         self.output("Creating Coinify invoices, payouts and balances...")
         CoinifyInvoiceFactory.create_batch(50)
         CoinifyPayoutFactory.create_batch(10)
         CoinifyBalanceFactory.create_batch(10)
 
-    def create_epay_transactions(self):
+    def create_epay_transactions(self) -> None:
         self.output("Creating ePay Transactions...")
         EpayTransactionFactory.create_batch(50)
 
@@ -526,7 +527,7 @@ class Command(BaseCommand):
         )
         return facilities
 
-    def create_facility_feedbacks(self, facilities, options, users):
+    def create_facility_feedbacks(self, facilities, options, users) -> None:
         self.output("Creating facility feedbacks...")
         FacilityFeedback.objects.create(
             user=users[1],
@@ -675,7 +676,7 @@ class Command(BaseCommand):
 
         return types
 
-    def create_url_types(self):
+    def create_url_types(self) -> None:
         self.output("Creating UrlType objects...")
         t, created = UrlType.objects.get_or_create(
             name="Other",
@@ -722,7 +723,7 @@ class Command(BaseCommand):
             defaults={"icon": "fas fa-film"},
         )
 
-    def create_credebtors(self):
+    def create_credebtors(self) -> None:
         self.output("Creating Chains and Credebtors...")
         try:
             CredebtorFactory.create_batch(50)
@@ -1157,7 +1158,7 @@ class Command(BaseCommand):
 
         return locations
 
-    def create_camp_news(self, camp):
+    def create_camp_news(self, camp) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating news for {year}...")
         NewsItem.objects.create(
@@ -1171,7 +1172,7 @@ class Command(BaseCommand):
             published_at=tz.localize(datetime(year, 9, 4, 12, 0)),
         )
 
-    def create_camp_event_sessions(self, camp, event_types, event_locations):
+    def create_camp_event_sessions(self, camp, event_types, event_locations) -> None:
         self.output(f"Creating EventSessions for {camp}...")
         days = camp.get_days(camppart="camp")[1:-1]
         for day in days:
@@ -1201,8 +1202,7 @@ class Command(BaseCommand):
                 event_location=event_locations["bar_area"],
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 22, 0)),
-                    tz.localize(datetime(start.year, start.month, start.day, 22, 0))
-                    + timedelta(hours=3),
+                    tz.localize(datetime(start.year, start.month, start.day, 22, 0)) + timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
@@ -1254,7 +1254,7 @@ class Command(BaseCommand):
                 ),
             )
 
-    def create_camp_proposals(self, camp, event_types):
+    def create_camp_proposals(self, camp, event_types) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating event- and speaker_proposals for {year}...")
 
@@ -1318,7 +1318,7 @@ class Command(BaseCommand):
             track=random.choice(camp.event_tracks.all()),
         ).mark_as_approved()
 
-    def create_proposal_urls(self, camp):
+    def create_proposal_urls(self, camp) -> None:
         """Create URL objects for the proposals"""
         year = camp.camp.lower.year
         self.output(
@@ -1337,7 +1337,7 @@ class Command(BaseCommand):
             ),
         )
 
-    def generate_speaker_availability(self, camp):
+    def generate_speaker_availability(self, camp) -> None:
         """Create SpeakerAvailability objects for the SpeakerProposals"""
         year = camp.camp.lower.year
         self.output(
@@ -1356,12 +1356,12 @@ class Command(BaseCommand):
                 cleaned_data = {}
 
             form = FakeForm()
-            for _date, daychunks in matrix.items():
+            for daychunks in matrix.values():
                 # 90% chance we have info for any given day
                 if random.randint(1, 100) > 90:
                     # no availability info for this entire day, sorry
                     continue
-                for _daychunk, data in daychunks.items():
+                for data in daychunks.values():
                     if not data:
                         continue
                     # 90% chance this speaker is available for any given chunk
@@ -1369,7 +1369,7 @@ class Command(BaseCommand):
             # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
-    def approve_speaker_proposals(self, camp):
+    def approve_speaker_proposals(self, camp) -> None:
         """Approve all keynotes but reject 10% of other events"""
         for sp in camp.speaker_proposals.filter(
             event_proposals__event_type__name="Keynote",
@@ -1387,7 +1387,7 @@ class Command(BaseCommand):
             else:
                 sp.mark_as_rejected()
 
-    def approve_event_proposals(self, camp):
+    def approve_event_proposals(self, camp) -> None:
         for ep in camp.event_proposals.filter(proposal_status="pending"):
             # are all speakers for this event approved?
             for sp in ep.speakers.all():
@@ -1407,7 +1407,7 @@ class Command(BaseCommand):
             event.demand = random.randint(10, 40)
             event.save()
 
-    def create_camp_scheduling(self, camp, autoschedule):
+    def create_camp_scheduling(self, camp, autoschedule) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating scheduling for {year}...")
 
@@ -1444,7 +1444,7 @@ class Command(BaseCommand):
                 f"Done running autoscheduler for {year}... It took {scheduleduration}",
             )
 
-    def create_camp_speaker_event_conflicts(self, camp):
+    def create_camp_speaker_event_conflicts(self, camp) -> None:
         year = camp.camp.lower.year
         self.output(
             f"Generating event_conflicts for SpeakerProposals for {year}...",
@@ -1462,7 +1462,7 @@ class Command(BaseCommand):
                     ).order_by("?")[0:conflictcount],
                 )
 
-    def create_camp_rescheduling(self, camp, autoschedule):
+    def create_camp_rescheduling(self, camp, autoschedule) -> None:
         year = camp.camp.lower.year
         # reapprove all speaker_proposals so the new availability takes effect
         for prop in camp.speaker_proposals.filter(proposal_status="approved"):
@@ -1483,7 +1483,7 @@ class Command(BaseCommand):
             scheduleduration = timezone.now() - schedulestart
             self.output(f"Done rescheduling for {year}... It took {scheduleduration}.")
 
-    def create_camp_villages(self, camp, users):
+    def create_camp_villages(self, camp, users) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating villages for {year}...")
         Village.objects.create(
@@ -1579,7 +1579,7 @@ class Command(BaseCommand):
         camp.save()
         return teams
 
-    def create_camp_team_tasks(self, camp, teams):
+    def create_camp_team_tasks(self, camp, teams) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating TeamTasks for {year}...")
         TeamTask.objects.create(
@@ -1744,7 +1744,7 @@ class Command(BaseCommand):
         )
         return memberships
 
-    def create_camp_team_shifts(self, camp, teams, team_memberships):
+    def create_camp_team_shifts(self, camp, teams, team_memberships) -> None:
         shifts = {}
         year = camp.camp.lower.year
         self.output(f"Creating team shifts for {year}...")
@@ -1796,24 +1796,20 @@ class Command(BaseCommand):
 
         return categories
 
-    def create_camp_info_items(self, camp, categories):
+    def create_camp_info_items(self, camp, categories) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating infoitems for {year}...")
         InfoItem.objects.create(
             category=categories["when"],
             headline="Opening",
             anchor="opening",
-            body="BornHack {} starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)".format(
-                year,
-            ),
+            body=f"BornHack {year} starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)",
         )
         InfoItem.objects.create(
             category=categories["when"],
             headline="Closing",
             anchor="closing",
-            body="BornHack {} ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).".format(
-                year,
-            ),
+            body=f"BornHack {year} ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).",
         )
         InfoItem.objects.create(
             category=categories["travel"],
@@ -1846,7 +1842,7 @@ class Command(BaseCommand):
             body="We rent out a few cabins at the venue with 8 beds each for people who don't want to sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), but the cabins are there if you want them.",
         )
 
-    def create_camp_feedback(self, camp, users):
+    def create_camp_feedback(self, camp, users) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating feedback for {year}...")
         Feedback.objects.create(
@@ -1870,7 +1866,7 @@ class Command(BaseCommand):
             feedback="That was fun. Thanks!",
         )
 
-    def create_camp_rides(self, camp, users):
+    def create_camp_rides(self, camp, users) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating rides for {year}...")
         Ride.objects.create(
@@ -1901,22 +1897,18 @@ class Command(BaseCommand):
             description="I need a ride and have a large backpack",
         )
 
-    def create_camp_cfp(self, camp):
+    def create_camp_cfp(self, camp) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating CFP for {year}...")
         camp.call_for_participation_open = True
-        camp.call_for_participation = "Please give a talk at Bornhack {}...".format(
-            year,
-        )
+        camp.call_for_participation = f"Please give a talk at Bornhack {year}..."
         camp.save()
 
-    def create_camp_cfs(self, camp):
+    def create_camp_cfs(self, camp) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating CFS for {year}...")
         camp.call_for_sponsors_open = True
-        camp.call_for_sponsors = "Please give us ALL the money so that we can make Bornhack {} the best ever!".format(
-            year,
-        )
+        camp.call_for_sponsors = f"Please give us ALL the money so that we can make Bornhack {year} the best ever!"
         camp.save()
 
     def create_camp_sponsor_tiers(self, camp):
@@ -1954,7 +1946,7 @@ class Command(BaseCommand):
 
         return tiers
 
-    def create_camp_sponsors(self, camp, tiers):
+    def create_camp_sponsors(self, camp, tiers) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating sponsors for {year}...")
         Sponsor.objects.create(
@@ -2036,7 +2028,7 @@ class Command(BaseCommand):
 
         return tokens
 
-    def create_camp_token_finds(self, camp, tokens, users):
+    def create_camp_token_finds(self, camp, tokens, users) -> None:
         year = camp.camp.lower.year
         self.output(f"Creating token finds for {year}...")
         TokenFind.objects.create(token=tokens[3], user=users[4])
@@ -2045,14 +2037,14 @@ class Command(BaseCommand):
         TokenFind.objects.create(token=tokens[1], user=users[3])
         TokenFind.objects.create(token=tokens[4], user=users[2])
         TokenFind.objects.create(token=tokens[5], user=users[6])
-        for i in range(0, 6):
+        for i in range(6):
             TokenFind.objects.create(token=tokens[i], user=users[1])
 
-    def create_camp_expenses(self, camp):
+    def create_camp_expenses(self, camp) -> None:
         self.output(f"Creating expenses for {camp}...")
         ExpenseFactory.create_batch(200, camp=camp)
 
-    def create_camp_reimbursements(self, camp):
+    def create_camp_reimbursements(self, camp) -> None:
         self.output(f"Creating reimbursements for {camp}...")
         users = User.objects.filter(
             id__in=Expense.objects.filter(
@@ -2082,16 +2074,16 @@ class Command(BaseCommand):
             expenses.update(reimbursement=reimbursement)
             reimbursement.create_payback_expense()
 
-    def create_camp_revenues(self, camp):
+    def create_camp_revenues(self, camp) -> None:
         self.output(f"Creating revenues for {camp}...")
         RevenueFactory.create_batch(20, camp=camp)
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: list[Any], **options) -> None:
         start = timezone.now()
         self.output(
             self.style.SUCCESS("----------[ Running bootstrap_devsite ]----------"),
@@ -2255,7 +2247,7 @@ class Command(BaseCommand):
         duration = timezone.now() - start
         self.output(f"bootstrap_devsite took {duration}!")
 
-    def create_camp_pos(self, teams):
+    def create_camp_pos(self, teams) -> None:
         Pos.objects.create(
             name="Infodesk",
             team=teams["info"],

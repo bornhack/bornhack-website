@@ -1,28 +1,28 @@
 import logging
-
-from django.core.management.base import BaseCommand
+from typing import Any
 
 from camps.models import Camp
+from django.core.management.base import BaseCommand
 from program.models import EventInstance
 from program.models import EventSession
 from program.models import EventSlot
 from program.models import SpeakerAvailability
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Command(BaseCommand):
     args = "none"
     help = "Migrate eventinstances to eventsessions and eventslots"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "campslug",
             type=str,
             help="The slug of the camp to process",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args: list[Any], **options) -> None:
         camp = Camp.objects.get(slug=options["campslug"])
         for event_type_id in set(
             EventInstance.objects.filter(event__track__camp=camp).values_list(

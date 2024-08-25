@@ -1,3 +1,6 @@
+from typing import Any
+
+from camps.mixins import CampViewMixin
 from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -11,7 +14,6 @@ from .mixins import FacilityViewMixin
 from .models import Facility
 from .models import FacilityFeedback
 from .models import FacilityType
-from camps.mixins import CampViewMixin
 
 
 class FacilityTypeListView(CampViewMixin, ListView):
@@ -23,7 +25,7 @@ class FacilityListView(FacilityTypeViewMixin, ListView):
     model = Facility
     template_name = "facility_list.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(facility_type=self.facility_type)
 
@@ -33,7 +35,7 @@ class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     template_name = "facility_detail.html"
     pk_url_kwarg = "facility_uuid"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
         return qs.prefetch_related("opening_hours")
 
@@ -41,11 +43,10 @@ class FacilityDetailView(FacilityTypeViewMixin, DetailView):
 class FacilityFeedbackView(FacilityViewMixin, CreateView):
     model = FacilityFeedback
     template_name = "facility_feedback.html"
-    fields = ["quick_feedback", "comment", "urgent"]
+    fields = ("quick_feedback", "comment", "urgent")
 
     def get_form(self, form_class=None):
-        """
-        - Add quick feedback field to the form
+        """- Add quick feedback field to the form
         - Add anon option to the form
         """
         form = super().get_form(form_class)
@@ -65,7 +66,7 @@ class FacilityFeedbackView(FacilityViewMixin, CreateView):
             )
         return form
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
         context = super().get_context_data(*args, **kwargs)
         context["unhandled_feedbacks"] = FacilityFeedback.objects.filter(
             facility=self.facility,

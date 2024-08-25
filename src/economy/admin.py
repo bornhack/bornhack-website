@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.contrib import admin
 
 from .models import Bank
@@ -17,6 +21,9 @@ from .models import Revenue
 from .models import ZettleBalance
 from .models import ZettleReceipt
 
+if TYPE_CHECKING:
+    from django.http import HttpRequest
+
 ###############################
 # chains and credebtors
 
@@ -25,14 +32,14 @@ from .models import ZettleReceipt
 class ChainAdmin(admin.ModelAdmin):
     list_filter = ["name"]
     list_display = ["name", "notes"]
-    search_fields = ["name", "notes"]
+    search_fields = ("name", "notes")
 
 
 @admin.register(Credebtor)
 class CredebtorAdmin(admin.ModelAdmin):
     list_filter = ["chain", "name"]
     list_display = ["name", "chain", "address", "notes"]
-    search_fields = ["chain", "name", "address", "notes"]
+    search_fields = ("chain", "name", "address", "notes")
 
 
 ###############################
@@ -42,7 +49,7 @@ class CredebtorAdmin(admin.ModelAdmin):
 @admin.action(
     description="Approve Expenses",
 )
-def approve_expenses(modeladmin, request, queryset):
+def approve_expenses(modeladmin, request: HttpRequest, queryset) -> None:
     for expense in queryset.all():
         expense.approve(request)
 
@@ -50,7 +57,7 @@ def approve_expenses(modeladmin, request, queryset):
 @admin.action(
     description="Reject Expenses",
 )
-def reject_expenses(modeladmin, request, queryset):
+def reject_expenses(modeladmin, request: HttpRequest, queryset) -> None:
     for expense in queryset.all():
         expense.reject(request)
 
@@ -76,7 +83,7 @@ class ExpenseAdmin(admin.ModelAdmin):
         "approved",
         "reimbursement",
     ]
-    search_fields = ["description", "amount", "uuid"]
+    search_fields = ("description", "amount", "uuid")
     actions = [approve_expenses, reject_expenses]
 
 
@@ -87,7 +94,7 @@ class ExpenseAdmin(admin.ModelAdmin):
 @admin.action(
     description="Approve Revenues",
 )
-def approve_revenues(modeladmin, request, queryset):
+def approve_revenues(modeladmin, request: HttpRequest, queryset) -> None:
     for revenue in queryset.all():
         revenue.approve(request)
 
@@ -95,7 +102,7 @@ def approve_revenues(modeladmin, request, queryset):
 @admin.action(
     description="Reject Revenues",
 )
-def reject_revenues(modeladmin, request, queryset):
+def reject_revenues(modeladmin, request: HttpRequest, queryset) -> None:
     for revenue in queryset.all():
         revenue.reject(request)
 
@@ -112,7 +119,7 @@ class RevenueAdmin(admin.ModelAdmin):
         "responsible_team",
         "approved",
     ]
-    search_fields = ["description", "amount", "user"]
+    search_fields = ("description", "amount", "user")
     actions = [approve_revenues, reject_revenues]
 
 
@@ -127,7 +134,7 @@ class ReimbursementAdmin(admin.ModelAdmin):
 
     list_filter = ["camp", "user", "reimbursement_user", "paid"]
     list_display = ["camp", "user", "reimbursement_user", "paid", "notes", "get_amount"]
-    search_fields = ["user__username", "reimbursement_user__username", "notes"]
+    search_fields = ("user__username", "reimbursement_user__username", "notes")
 
 
 ################################
@@ -234,7 +241,7 @@ class EpayTransactionAdmin(admin.ModelAdmin):
         "transaction_fee",
     ]
     list_filter = ["card_type"]
-    search_fields = ["description"]
+    search_fields = ("description",)
 
 
 ################################
@@ -252,7 +259,7 @@ class ZettleBalanceAdmin(admin.ModelAdmin):
         "amount",
         "balance",
     ]
-    search_fields = ["description"]
+    search_fields = ("description",)
 
 
 @admin.register(ZettleReceipt)
@@ -271,4 +278,4 @@ class ZettleReceiptAdmin(admin.ModelAdmin):
         "description",
     ]
     list_filter = ["payment_method", "card_issuer"]
-    search_fields = ["description", "receipt_number"]
+    search_fields = ("description", "receipt_number")

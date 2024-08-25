@@ -1,17 +1,16 @@
 from allauth.account.views import LoginView
 from allauth.account.views import LogoutView
+from bar.views import MenuView
+from camps.views import CampDetailView
+from camps.views import CampListView
+from camps.views import CampRedirectView
+from contact.views import ContactView
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.urls import include
 from django.urls import path
 from django.views.generic import TemplateView
-
-from bar.views import MenuView
-from camps.views import CampDetailView
-from camps.views import CampListView
-from camps.views import CampRedirectView
-from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from people.views import PeopleView
@@ -191,4 +190,4 @@ urlpatterns = [
 if settings.DEBUG:
     import debug_toolbar
 
-    urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+    urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]

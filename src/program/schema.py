@@ -1,3 +1,5 @@
+from typing import Any
+
 import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
@@ -53,10 +55,10 @@ class EventInstanceNode(DjangoObjectType):
             "event__track__camp__slug": ["iexact"],
         }
 
-    def resolve_start(self, info, **kwargs):
+    def resolve_start(self, info, **kwargs: dict[str, Any]):
         return self.when.lower.timestamp()
 
-    def resolve_end(self, info, **kwargs):
+    def resolve_end(self, info, **kwargs: dict[str, Any]):
         return self.when.upper.timestamp()
 
 

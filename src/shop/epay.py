@@ -1,24 +1,20 @@
+from __future__ import annotations
+
 import hashlib
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 from django.conf import settings
 
 
-def calculate_epay_hash(order, request):
+def calculate_epay_hash(order, request: HttpRequest):
     hashstring = (
-        "{merchant_number}{description}11{amount}DKK"
-        "{order_id}{accept_url}{cancel_url}{callback_url}{md5_secret}"
-    ).format(
-        merchant_number=settings.EPAY_MERCHANT_NUMBER,
-        description=order.description,
-        amount=order.total * 100,
-        order_id=order.pk,
-        accept_url=order.get_epay_accept_url(request),
-        cancel_url=order.get_cancel_url(request),
-        callback_url=order.get_epay_callback_url(request),
-        md5_secret=settings.EPAY_MD5_SECRET,
+        f"{settings.EPAY_MERCHANT_NUMBER}{order.description}11{order.total * 100}DKK"
+        f"{order.pk}{order.get_epay_accept_url(request)}{order.get_cancel_url(request)}{order.get_epay_callback_url(request)}{settings.EPAY_MD5_SECRET}"
     )
-    epay_hash = hashlib.md5(hashstring.encode("utf-8")).hexdigest()
-    return epay_hash
+    return hashlib.md5(hashstring.encode("utf-8")).hexdigest()
 
 
 def validate_epay_callback(query):

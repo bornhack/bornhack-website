@@ -1,31 +1,30 @@
 import logging
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
-
-from ..forms import AddRecordingForm
-from ..mixins import ContentTeamPermissionMixin
-from camps.mixins import CampViewMixin
 from program.models import Event
 from program.models import EventFeedback
 from program.models import Url
 from program.models import UrlType
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from ..forms import AddRecordingForm
+from ..mixins import ContentTeamPermissionMixin
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of EventFeedback objects which are pending approval.
-    """
+    """This view shows a list of EventFeedback objects which are pending approval."""
 
     model = EventFeedback
     template_name = "approve_feedback.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.queryset = EventFeedback.objects.filter(
             event__track__camp=self.camp,
@@ -42,9 +41,8 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             extra=0,
         )
 
-    def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """
@@ -62,7 +60,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             )
         return redirect(self.get_success_url())
 
-    def get_success_url(self, *args, **kwargs):
+    def get_success_url(self, *args: list[Any], **kwargs: dict[str, Any]):
         return reverse(
             "backoffice:approve_event_feedback",
             kwargs={"camp_slug": self.camp.slug},
@@ -70,14 +68,12 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
 
 class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of events that is set to be recorded, but without a recording URL attached.
-    """
+    """This view shows a list of events that is set to be recorded, but without a recording URL attached."""
 
     model = Event
     template_name = "add_recording.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().setup(*args, **kwargs)
         self.queryset = Event.objects.filter(
             track__camp=self.camp,
@@ -94,9 +90,8 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             extra=0,
         )
 
-    def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+    def get_context_data(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """
@@ -122,7 +117,7 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
             messages.success(self.request, f"Updated {len(form.changed_objects)} Event")
         return redirect(self.get_success_url())
 
-    def get_success_url(self, *args, **kwargs):
+    def get_success_url(self, *args: list[Any], **kwargs: dict[str, Any]):
         return reverse(
             "backoffice:add_eventrecording",
             kwargs={"camp_slug": self.camp.slug},

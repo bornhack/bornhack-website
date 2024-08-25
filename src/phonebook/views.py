@@ -1,10 +1,11 @@
 import logging
 import secrets
 import string
+from typing import Any
 
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -13,27 +14,24 @@ from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from jsonview.views import JsonView
-
-from .mixins import DectRegistrationViewMixin
-from .models import DectRegistration
-from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.mixins import UserIsObjectOwnerMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+from .mixins import DectRegistrationViewMixin
+from .models import DectRegistration
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class DectExportJsonView(
     CampViewMixin,
     JsonView,
 ):
-    """
-    JSON export for the POC team / DECT system
-    """
+    """JSON export for the POC team / DECT system"""
 
     required_scopes = ["phonebook:read"]
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(name="POC", camp=self.camp)
         poc = self.request.user in team.responsible_members
@@ -67,8 +65,7 @@ class DectExportJsonView(
 
 
 class PhonebookListView(CampViewMixin, ListView):
-    """
-    Our phonebook view currently only shows DectRegistration entries,
+    """Our phonebook view currently only shows DectRegistration entries,
     but could later be extended to show maybe GSM or other kinds of
     phone numbers.
     """
@@ -76,7 +73,7 @@ class PhonebookListView(CampViewMixin, ListView):
     model = DectRegistration
     template_name = "phonebook.html"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(publish_in_phonebook=True)
 
@@ -85,17 +82,15 @@ class DectRegistrationListView(LoginRequiredMixin, CampViewMixin, ListView):
     model = DectRegistration
     template_name = "dectregistration_list.html"
 
-    def get_queryset(self, *args, **kwargs):
-        """
-        Show only DectRegistration entries belonging to the current user
-        """
+    def get_queryset(self, *args: list[Any], **kwargs: dict[str, Any]):
+        """Show only DectRegistration entries belonging to the current user"""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 
 
 class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     model = DectRegistration
-    fields = ["number", "letters", "description", "publish_in_phonebook"]
+    fields = ("number", "letters", "description", "publish_in_phonebook")
     template_name = "dectregistration_form.html"
 
     def form_valid(self, form):
@@ -127,9 +122,7 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
 
         # generate a 10 digit activation code for this dect registration?
         if not dect.activation_code:
-            dect.activation_code = "".join(
-                secrets.choice(string.digits) for i in range(10)
-            )
+            dect.activation_code = "".join(secrets.choice(string.digits) for i in range(10))
 
         # all good, save and return to list
         dect.save()
@@ -152,7 +145,7 @@ class DectRegistrationUpdateView(
     UpdateView,
 ):
     model = DectRegistration
-    fields = ["letters", "description", "publish_in_phonebook"]
+    fields = ("letters", "description", "publish_in_phonebook")
     template_name = "dectregistration_form.html"
 
     def form_valid(self, form):
@@ -188,7 +181,7 @@ class DectRegistrationDeleteView(
     model = DectRegistration
     template_name = "dectregistration_delete.html"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         messages.success(
             self.request,
             f"Your DECT registration for number {self.get_object().number} has been deleted successfully",

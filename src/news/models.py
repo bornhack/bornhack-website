@@ -1,8 +1,9 @@
+from typing import Any
+
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_prometheus.models import ExportModelOperationsMixin
-
 from utils.models import CreatedUpdatedModel
 from utils.slugs import unique_slugify
 
@@ -17,17 +18,13 @@ class NewsItem(ExportModelOperationsMixin("news_item"), CreatedUpdatedModel):
     slug = models.SlugField(max_length=255, blank=True)
     archived = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, Any]) -> None:
         if self.published_at:
             # if this is a new newsitem, or it doesn't have a slug, or the slug is in use on another item, create a new slug
-            if (
-                not self.pk
-                or not self.slug
-                or NewsItem.objects.filter(slug=self.slug).count() > 1
-            ):
+            if not self.pk or not self.slug or NewsItem.objects.filter(slug=self.slug).count() > 1:
                 published_at_string = self.published_at.strftime("%Y-%m-%d")
                 base_slug = slugify(self.title)
                 slug = f"{published_at_string}-{base_slug}"
@@ -40,5 +37,5 @@ class NewsItem(ExportModelOperationsMixin("news_item"), CreatedUpdatedModel):
                 )
         super().save(**kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("news:detail", kwargs={"slug": self.slug})

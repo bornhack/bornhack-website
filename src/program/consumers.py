@@ -1,3 +1,6 @@
+from typing import Any
+
+from camps.models import Camp
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from .models import Event
@@ -7,13 +10,12 @@ from .models import EventTrack
 from .models import EventType
 from .models import Favorite
 from .models import Speaker
-from camps.models import Camp
 
 
 class ScheduleConsumer(JsonWebsocketConsumer):
     groups = ["schedule_users"]
 
-    def receive(self, text_data, **kwargs):
+    def receive(self, text_data, **kwargs: dict[str, Any]) -> None:
         user = self.scope["user"]
         content = self.decode_json(text_data)
         action = content.get("action")
@@ -38,9 +40,7 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                 event_instances_query_set = EventInstance.objects.filter(
                     event__track__camp=camp,
                 )
-                event_instances = [
-                    x.serialize(user=user) for x in event_instances_query_set
-                ]
+                event_instances = [x.serialize(user=user) for x in event_instances_query_set]
 
                 event_locations_query_set = EventLocation.objects.filter(camp=camp)
                 event_locations = [x.serialize() for x in event_locations_query_set]
@@ -88,5 +88,5 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         if data:
             self.send_json(data)
 
-    def disconnect(self, message, **kwargs):
+    def disconnect(self, message, **kwargs: dict[str, Any]) -> None:
         pass

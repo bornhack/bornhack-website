@@ -1,12 +1,12 @@
 from django.test import TestCase
+from shop.factories import OrderProductRelationFactory
 
 from .factories import TicketTypeFactory
 from .models import ShopTicket
-from shop.factories import OrderProductRelationFactory
 
 
 class TicketTests(TestCase):
-    def test_correct_token_and_badge_token_are_different(self):
+    def test_correct_token_and_badge_token_are_different(self) -> None:
         ticket_type = TicketTypeFactory()
         opr = OrderProductRelationFactory()
         shop_ticket = ShopTicket.objects.create(

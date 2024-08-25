@@ -1,3 +1,5 @@
+from typing import Any
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -20,18 +22,15 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
 
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = models.Profile
-    fields = ["name", "description", "public_credit_name", "nickserv_username"]
+    fields = ("name", "description", "public_credit_name", "nickserv_username")
     success_url = reverse_lazy("profiles:detail")
     template_name = "profile_form.html"
 
     def get_object(self, queryset=None):
         return models.Profile.objects.get(user=self.request.user)
 
-    def form_valid(self, form, **kwargs):
-        if (
-            "public_credit_name" in form.changed_data
-            and form.cleaned_data["public_credit_name"]
-        ):
+    def form_valid(self, form, **kwargs: dict[str, Any]):
+        if "public_credit_name" in form.changed_data and form.cleaned_data["public_credit_name"]:
             # user changed the name (to something non blank)
             form.instance.public_credit_name_approved = False
             form.instance.save()
@@ -42,7 +41,7 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 class ProfileApiView(JsonView, ScopedProtectedResourceView):
     required_scopes = ["profile:read"]
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs: dict[str, Any]):
         context = super().get_context_data(**kwargs)
         context["user"] = {
             "username": self.request.user.username,
@@ -52,8 +51,5 @@ class ProfileApiView(JsonView, ScopedProtectedResourceView):
             "public_credit_name": self.request.user.profile.get_public_credit_name,
             "description": self.request.user.profile.description,
         }
-        context["teams"] = [
-            {"team": team.name, "camp": team.camp.title}
-            for team in self.request.user.teams.all()
-        ]
+        context["teams"] = [{"team": team.name, "camp": team.camp.title} for team in self.request.user.teams.all()]
         return context

@@ -1,6 +1,7 @@
+from typing import Any
+
 from django import forms
 from django.forms import modelformset_factory
-
 from program.models import Event
 from program.models import Speaker
 from tickets.models import ShopTicket
@@ -16,7 +17,7 @@ class AddRecordingForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = ["video_recording", "recording_url"]
+        fields = ("video_recording", "recording_url")
 
 
 class AutoScheduleValidateForm(forms.Form):
@@ -85,18 +86,16 @@ class EventScheduleForm(forms.Form):
 class SpeakerForm(forms.ModelForm):
     class Meta:
         model = Speaker
-        fields = [
+        fields = (
             "name",
             "email",
             "biography",
             "needs_oneday_ticket",
             "event_conflicts",
-        ]
+        )
 
-    def __init__(self, camp, matrix=None, *args, **kwargs):
-        """
-        initialise the form and add availability fields to form
-        """
+    def __init__(self, camp, matrix=None, *args: list[Any], **kwargs: dict[str, Any]) -> None:
+        """Initialise the form and add availability fields to form"""
         super().__init__(*args, **kwargs)
 
         matrix = matrix or {}
@@ -105,7 +104,7 @@ class SpeakerForm(forms.ModelForm):
         if not matrix:
             return
         # add speaker availability fields
-        for date in matrix.keys():
+        for date in matrix:
             # do we need a column for this day?
             if not matrix[date]:
                 # nothing on this day, skip it
@@ -130,7 +129,7 @@ class SpeakerForm(forms.ModelForm):
 
 
 class BankCSVForm(forms.Form):
-    def __init__(self, bank, *args, **kwargs):
+    def __init__(self, bank, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         for account in bank.accounts.all():
             self.fields[str(account.pk)] = forms.FileField(
@@ -191,11 +190,11 @@ class MobilePayCSVForm(forms.Form):
 class ShopTicketRefundForm(forms.ModelForm):
     class Meta:
         model = ShopTicket
-        fields = ["refund"]
+        fields = ("refund",)
 
     refund = forms.BooleanField(required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: list[Any], **kwargs: dict[str, Any]) -> None:
         super().__init__(*args, **kwargs)
         self.fields["refund"].label = self.instance.name or "Unnamed ticket"
 
@@ -210,7 +209,7 @@ ShopTicketRefundFormSet = modelformset_factory(
 class TicketGroupRefundForm(forms.ModelForm):
     class Meta:
         model = TicketGroup
-        fields = ["refund"]
+        fields = ("refund",)
 
     refund = forms.BooleanField(required=False)
 
