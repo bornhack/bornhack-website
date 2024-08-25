@@ -10,7 +10,8 @@ class TeamsConfig(AppConfig):
     name = "teams"
 
     def ready(self) -> None:
-        # connect the post_save signal, always including a dispatch_uid to prevent it being called multiple times in corner cases
+        # connect the post_save signal, always including a dispatch_uid to prevent it being
+        # called multiple times in corner cases
         post_save.connect(
             teammember_saved,
             sender="teams.TeamMember",

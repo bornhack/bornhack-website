@@ -124,7 +124,10 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         if not request.user.profile.nickserv_username:
             messages.error(
                 request,
-                "Please go to your profile and set your NickServ username first. Make sure the account is registered with NickServ first!",
+                (
+                    "Please go to your profile and set your NickServ username first. "
+                    "Make sure the account is registered with NickServ first!"
+                ),
             )
             return redirect(
                 "teams:general",
@@ -147,7 +150,10 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
             # this membership is already marked as membership.irc_channel_acl_ok=False, no need to do anything
             messages.error(
                 request,
-                "No need, this membership is already marked as irc_channel_acl_ok=False, so the bot will fix the ACL soon",
+                (
+                    "No need, this membership is already marked as irc_channel_acl_ok=False, "
+                    "so the bot will fix the ACL soon"
+                ),
             )
             return redirect(
                 "teams:general",
@@ -169,7 +175,10 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         membership.save()
         messages.success(
             self.request,
-            f"OK, hang on while we fix the permissions for your NickServ user '{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'",
+            (
+                "OK, hang on while we fix the permissions for your NickServ user "
+                f"'{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'"
+            ),
         )
         return redirect(
             "teams:general",

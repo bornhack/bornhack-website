@@ -94,7 +94,10 @@ class TokenFindView(LoginRequiredMixin, DetailView):
             # message for the user
             messages.success(
                 self.request,
-                f"Congratulations! You found a secret token: '{self.get_object().description}' - Your visit has been registered! Keep hunting, there might be more tokens out there.",
+                (
+                    f"Congratulations! You found a secret token: '{self.get_object().description}' "
+                    "- Your visit has been registered! Keep hunting, there might be more tokens out there."
+                ),
             )
         return redirect(reverse("tokens:tokenfind_list"))
 

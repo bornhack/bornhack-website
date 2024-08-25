@@ -23,7 +23,8 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class BackofficeIndexView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
-    """The Backoffice index view only requires camps.backoffice_permission so we use RaisePermissionRequiredMixin directly"""
+    # The Backoffice index view only requires camps.backoffice_permission so,
+    # we use RaisePermissionRequiredMixin directly
 
     permission_required = "camps.backoffice_permission"
     template_name = "index.html"

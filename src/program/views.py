@@ -332,7 +332,7 @@ class SpeakerProposalDeleteView(
     EnsureCFPOpenMixin,
     DeleteView,
 ):
-    """This view allows a user to delete an existing SpeakerProposal object, as long as it is not linked to any EventProposals"""
+    """Allows a user to delete an existing SpeakerProposal object, as long as it is not linked to any EventProposals"""
 
     model = models.SpeakerProposal
     template_name = "proposal_delete.html"
@@ -386,7 +386,7 @@ class EventProposalTypeSelectView(
     EnsureCFPOpenMixin,
     ListView,
 ):
-    """This view is for selecting the type of event to submit (when adding a new event_proposal to an existing speaker_proposal)"""
+    """View is to select event type to submit (when adding a new event_proposal to an existing speaker_proposal)"""
 
     model = models.EventType
     template_name = "event_type_select.html"
@@ -478,7 +478,8 @@ class EventProposalAddPersonView(
         form.instance.speakers.add(self.speaker_proposal)
         messages.success(
             self.request,
-            f"{self.speaker_proposal.name} has been added as {form.instance.event_type.host_title} for {form.instance.title}",
+            f"{self.speaker_proposal.name} has been added as "
+            f"{form.instance.event_type.host_title} for {form.instance.title}",
         )
         return redirect(self.get_success_url())
 
@@ -846,7 +847,11 @@ class CombinedProposalSubmitView(
 
         messages.success(
             self.request,
-            f"Your {self.event_type.host_title} proposal and {self.event_type.name} proposal have been submitted for review. You will receive an email when they have been accepted or rejected.",
+            (
+                f"Your {self.event_type.host_title} proposal and "
+                f"{self.event_type.name} proposal have been submitted for review. "
+                "You will receive an email when they have been accepted or rejected."
+            ),
         )
 
         # all good

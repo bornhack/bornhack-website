@@ -459,7 +459,10 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
 
         messages.success(
             self.request,
-            f"Reimbursement {reimbursement.pk} has been created. It will be paid by the economy team to the specified bank account.",
+            (
+                f"Reimbursement {reimbursement.pk} has been created. It will be paid by the economy team to the "
+                "specified bank account."
+            ),
         )
 
         # send an email to the economy team
@@ -470,7 +473,10 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             ),
             text_template="emails/reimbursement_created.txt",
             formatdict={"reimbursement": reimbursement},
-            subject=f"New {self.camp.title} reimbursement {reimbursement.pk} for user {reimbursement.reimbursement_user.username} created",
+            subject=(
+                f"New {self.camp.title} reimbursement {reimbursement.pk} for user "
+                f"{reimbursement.reimbursement_user.username} created"
+            ),
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 

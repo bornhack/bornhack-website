@@ -57,10 +57,12 @@ class CampRedirectView(View):
 
         # figure out where to redirect
         if percentpassed > settings.CAMP_REDIRECT_PERCENT or not prevcamp:
-            # either we have no previous camp, or we have both and more than settings.CAMP_REDIRECT_PERCENT has passed, so redirect to the next camp
+            # either we have no previous camp, or we have both and more than settings.CAMP_REDIRECT_PERCENT has passed,
+            # so redirect to the next camp
             camp = nextcamp
         else:
-            # either we have no next camp, or we have both and less than settings.CAMP_REDIRECT_PERCENT has passed, so redirect to the previous camp
+            # either we have no next camp, or we have both and less than settings.CAMP_REDIRECT_PERCENT has passed,
+            # so redirect to the previous camp
             camp = prevcamp
 
         # do the redirect
