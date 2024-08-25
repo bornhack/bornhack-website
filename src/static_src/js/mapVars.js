@@ -47,6 +47,13 @@ const villageOptions = {
   }
 }
 
+const genericLayerOptions = {
+  onEachFeature: function(feature, layer) {
+    const content = `<b>${feature.properties.name}</b><br><p>${feature.properties.description}</p>`;
+    layer.bindPopup(content, { maxHeight: 400});
+  }
+}
+
 const popOptions = {
   onEachFeature: function(feature, layer) {
     const content = `${feature.properties['name']}`

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.gis",
+    "colorfield",
     "channels",
     "corsheaders",
     "profiles",
@@ -191,6 +192,8 @@ LOGGING = {
 
 GRAPHENE = {"SCHEMA": "bornhack.schema.schema"}
 LEAFLET_CONFIG = {
+    'DEFAULT_CENTER': (55.38723, 9.94080),
+    'DEFAULT_ZOOM': 17,
     "PLUGINS": {"forms": {"auto-include": True}},
 }
 

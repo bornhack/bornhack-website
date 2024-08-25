@@ -8,10 +8,14 @@ class BHMap {
     this.onEachGrid = this.onEachGrid.bind(this)
     this.onEachGridClick = this.onEachGridClick.bind(this)
     this.onEachMqttFeature = this.onEachMqttFeature.bind(this)
+    this.onMqtt = this.onMqtt.bind(this)
+    this.onMqttLayer = this.onMqttLayer.bind(this)
+    this.onMqttLayerFeature = this.onMqttLayerFeature.bind(this)
     this.controls = undefined;
     this.baseLayers = {};
     this.layers = {};
     this.overlays = {};
+    this.processing = undefined;
     this.cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ'];
     if (typeof div === 'string' || div instanceof String)
       this.map = L.map(div);
@@ -61,9 +65,41 @@ class BHMap {
       [[54, 7], [54, 16], [58, 16], [58, 7]], // full map
       [[55.39019, 9.93918],[55.39007, 9.93991], [55.39001, 9.94075], [55.39002, 9.94119], [55.38997, 9.94154], [55.38983, 9.94355], [55.38983, 9.94383], [55.38973, 9.94474], [55.38953, 9.94742], [55.38946, 9.94739], [55.38955, 9.94587], [55.38956, 9.94503], [55.38952, 9.94435], [  55.38941, 9.94359], [55.38377, 9.94072], [55.38462, 9.93793], [55.3847, 9.93778], [55.38499, 9.93675]], // hylkedam hole
     ];
-    this.overlays['Venue Overlay'] = L.polygon(venuepolygons, {color: 'red'}).addTo(this.map);
-
-    this.controls = L.control.layers(this.baseLayers, this.overlays).addTo(this.map);
+    //this.overlays['Venue Overlay'] = L.polygon(venuepolygons, {color: 'red'}).addTo(this.map);
+    if (L.Control.PanelLayers) {
+      console.log("PanelLayers loaded");
+      const baseLayers = Object.entries(this.baseLayers).map(([name, layer]) => ({
+        name,
+        layer
+      }));
+      const overLayers = Object.entries(this.overlays).map(([name, layer]) => ({
+        name,
+        layer,
+      }));
+      this.controls = new L.Control.PanelLayers(baseLayers, [
+          {
+            "group": "Generic",
+            "layers": overLayers,
+            "collapsed": true,
+          },
+          {
+            "group": "External",
+            "layers": [],
+            "collapsed": true,
+          }
+        ], {
+        selectorGroup: true,
+        collapsibleGroups: true,
+        compact: true,
+        //collapsed: true,
+      });
+      this.map.addControl(this.controls);
+    } else {
+      this.controls = L.control.layers(this.baseLayers, this.overlays).addTo(this.map);
+    }
+    if (typeof MapProcessing !== 'undefined') {
+      this.processing = new MapProcessing();
+    }
   }
 
   //Set the default view of the map
@@ -72,13 +108,21 @@ class BHMap {
   }
 
   //Load a layer and add it to overlay/map
-  loadLayer(url, name, options, active=true, callback=function(){} ) {
+  loadLayer(url, name, options, active=true, callback=function(){}, group=null, icon=undefined ) {
     this.loadShapefile(url).then(json => {
       if (active)
         this.layers[name] = L.geoJson(json, options).addTo(this.map);
       else
         this.layers[name] = L.geoJson(json, options);
-      this.controls.addOverlay(this.layers[name], name);
+      if (L.Control.PanelLayers) {
+        this.controls.addOverlay({
+          name: name,
+          layer: this.layers[name],
+          icon: (icon?`<i class="${icon}"></i>`:undefined),
+        }, name, group)
+      } else {
+        this.controls.addOverlay(this.layers[name], name);
+      }
       callback(json);
     });
   }
@@ -147,5 +191,24 @@ class BHMap {
     layer.on('click', function (e) {
       console.log(e);
     });
+  }
+
+  onMqtt(topic, payload) {
+    if (this.processing !== undefined) {
+      this.map.eachLayer(layer => this.onMqttLayer(topic, payload, layer));
+    }
+  }
+  onMqttLayer(topic, payload, layer) {
+    if (layer.feature && layer.feature.properties.topic && layer.feature.properties.topic === topic) {
+      if (this.processing[layer.feature.properties.processing]) {
+        if (layer.feature.geometry.type === 'GeometryCollection') {
+          layer.eachLayer(feature => this.onMqttLayerFeature(topic, payload, layer, feature));
+        } 
+        this.processing[layer.feature.properties.processing](topic, payload, layer);
+      }
+    }
+  }
+  onMqttLayerFeature(topic, payload, layer, feature) {
+    this.processing[layer.feature.properties.processing](topic, payload, feature);
   }
 }

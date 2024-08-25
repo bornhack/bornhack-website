@@ -17,6 +17,8 @@
       <li class="{% menudropdownclass 'economy' %}"><a href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
     {% endif %}
 
+    <li class="{% menudropdownclass 'maps' %}"><a href="{% url 'maps_map' camp_slug=camp.slug %}">Map</a></li>
+
     <li class="{% menudropdownclass 'facilities' %}"><a href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
 
     {% if request.user.is_authenticated %}

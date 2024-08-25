@@ -86,6 +86,18 @@ from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView
+from .views import MapsExternalLayerCreateView
+from .views import MapsExternalLayerUpdateView
+from .views import MapsExternalLayerDeleteView
+from .views import MapsLayerView
+from .views import MapsLayerImportView
+from .views import MapsLayerUpdateView
+from .views import MapsLayerCreateView
+from .views import MapsLayerDeleteView
+from .views import MapsFeaturesView
+from .views import MapsFeatureCreateView
+from .views import MapsFeatureUpdateView
+from .views import MapsFeatureDeleteView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -188,6 +200,80 @@ urlpatterns = [
                     ),
                 ),
             ],
+        ),
+    ),
+    path(
+        "maps/",
+        include(
+            [
+                path("", MapsLayerView.as_view(), name="maps_layer_list"),
+                path("create/", MapsLayerCreateView.as_view(), name="maps_layer_create"),
+                path("external/",
+                    include (
+                        [
+                            path("create/",
+                                 MapsExternalLayerCreateView.as_view(),
+                                 name="maps_external_layer_create",
+                            ),
+                            path("<uuid:external_layer_uuid>/",
+                                 include(
+                                    [
+                                        path("delete/",
+                                             MapsExternalLayerDeleteView.as_view(),
+                                             name="maps_external_layer_delete",
+                                        ),
+                                        path("update/",
+                                             MapsExternalLayerUpdateView.as_view(),
+                                             name="maps_external_layer_update",
+                                        ),
+                                    ]
+                                 ),
+                            ),
+                        ]
+                    ),
+                ),
+                path(
+                    "<slug:layer_slug>/",
+                    include(
+                        [
+                            path("", MapsFeaturesView.as_view(), name="maps_features_list"),
+                            path("create/", MapsFeatureCreateView.as_view(), name="maps_feature_create"),
+                            path(
+                                "import/",
+                                MapsLayerImportView.as_view(),
+                                name="maps_layer_import",
+                            ),
+                            path(
+                                "update/",
+                                MapsLayerUpdateView.as_view(),
+                                name="maps_layer_update",
+                            ),
+                            path(
+                                "delete/",
+                                MapsLayerDeleteView.as_view(),
+                                name="maps_layer_delete",
+                            ),
+                            path(
+                                "<uuid:feature_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "update/",
+                                            MapsFeatureUpdateView.as_view(),
+                                            name="maps_feature_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            MapsFeatureDeleteView.as_view(),
+                                            name="maps_feature_delete",
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ]
         ),
     ),
     path(

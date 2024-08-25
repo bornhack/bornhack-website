@@ -1,15 +1,23 @@
 import logging
 import re
+import json
 
 import requests
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.views.generic import View
-from django.views.generic.base import TemplateView 
+from django.views.generic.base import TemplateView
+from jsonview.views import JsonView
+from django.core.serializers import serialize
+from django.db.models import Q
 
+from .models import Feature
+from .models import Layer 
+from .models import ExternalLayer 
 from facilities.models import FacilityType
 from camps.mixins import CampViewMixin
+from .mixins import LayerViewMixin
 
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -25,6 +33,29 @@ class MapView(CampViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['facilitytype_list'] = FacilityType.objects.filter(responsible_team__camp=self.camp) 
+        context['layers'] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context['externalLayers'] = ExternalLayer.objects.filter(Q(camp=self.camp) | Q(camp=None)) 
+        return context
+
+class LayerGeoJSONView(LayerViewMixin, JsonView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = json.loads(
+                serialize(
+                    "geojson",
+                    Feature.objects.filter(layer=self.layer.uuid),
+                    geometry_field="geom",
+                    fields=[
+                        "name",
+                        "description",
+                        "color",
+                        "url",
+                        "icon",
+                        "topic",
+                        "processing",
+                        ]
+                )
+        )
         return context
 
 class MapProxyView(View):
