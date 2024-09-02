@@ -147,7 +147,7 @@
       });
 
       var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: L.AwesomeMarkers.icon({
-          icon: "{{ facility.facility_type.icon }}".replace('fas fa-',''),
+          icon: "{{ facility.facility_type.icon }}",
           markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
         prefix: 'fa',
       })});

@@ -22,6 +22,7 @@ from leaflet.forms.widgets import LeafletWidget
 
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import RaisePermissionRequiredMixin
+from utils.widgets import IconPickerWidget
 from camps.mixins import CampViewMixin
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
@@ -111,6 +112,11 @@ class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView)
         "quickfeedback_options",
     ]
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
+
     def get_context_data(self, **kwargs):
         """
         Do not show teams that are not part of the current camp in the dropdown
@@ -139,6 +145,11 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView)
         "responsible_team",
         "quickfeedback_options",
     ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
 
     def get_context_data(self, **kwargs):
         """

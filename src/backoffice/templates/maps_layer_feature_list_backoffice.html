@@ -36,7 +36,7 @@
             <tr>
               <td>{{ ft.name }}</td>
               <td>{{ ft.description|default:"N/A" }}</td>
-              <td class="text-center"><i style="color: {{ ft.color }}" class="fas fa-{{ ft.icon }} fa-2x fa-fw"></i></td>
+              <td class="text-center"><i style="color: {{ ft.color }}" class="{{ ft.icon }} fa-2x fa-fw"></i></td>
               <td class="text-center">{{ ft.url }}</td>
               <td class="text-center">{{ ft.topic }}</td>
               <td class="text-center">{{ ft.processing }}</td>

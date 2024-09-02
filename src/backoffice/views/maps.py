@@ -16,6 +16,7 @@ from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
+from utils.widgets import IconPickerWidget
 from ..mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from maps.mixins import LayerViewMixin
@@ -121,6 +122,7 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
                 description=props['description'],
                 topic=props['topic'],
                 processing=props['processing'],
+                color=props['color'],
                 layer=layer, 
                 geom=geom
                 )
@@ -142,6 +144,11 @@ class MapsLayerCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
         "camp",
     ]
 
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
+
     def get_success_url(self):
         return reverse(
             "backoffice:maps_layer_list",
@@ -161,6 +168,11 @@ class MapsLayerUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         "group",
         "camp",
     ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
 
     def get_success_url(self):
         return reverse(
@@ -213,6 +225,7 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
         form.fields['layer'].initial = self.layer.pk
         form.fields['layer'].disabled = True
         form.fields["geom"].widget = LeafletWidget(
@@ -250,6 +263,7 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
         form.fields["geom"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",

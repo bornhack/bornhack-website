@@ -62,7 +62,8 @@
           {% url "maps:map_layer_geojson" layer_slug=layer.slug as layerUrl %}
           mapObject.loadLayer("{{layerUrl}}", "{{layer.name}}", {
             onEachFeature: function(feature, layer) {
-              let content = `<b>${feature.properties.name}</b><br><p>${feature.properties.description}</p>`;
+              let icon = `<i style="color: ${feature.properties.color}" class="${feature.properties.icon } fa-fw"></i>`; 
+              let content = `<b>${feature.properties.name}</b>${icon}<br><p>${feature.properties.description}</p>`;
               if (feature.properties.url)
                 content += `<br><p><a href='${feature.properties.url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>`
 
@@ -76,7 +77,8 @@
                 layer.eachLayer(function(l) {
                   if(l._latlng && l.setIcon){
                     l.setIcon(L.AwesomeMarkers.icon({
-                      icon: feature.properties.icon.replace('fas fa-',''),
+                      icon: feature.properties.icon,
+                      color: feature.properties.color,
                       markerColor: iconColors[feature.properties.marker],
                       prefix: 'fa',
                     }))
@@ -96,7 +98,7 @@
             style: {
               color: "{{ layer.color }}"
             }
-          }, true, function(){}, "Generic", "fas fa-{{ layer.icon }}");
+          }, true, function(){}, "{{ layer.group.name }}", "fas fa-{{ layer.icon }}");
         {% endfor %}
         {% for layer in externalLayers %}
           mapObject.loadLayer("{{layer.url}}", "{{layer.name}}", {}, false, function(){}, "External");

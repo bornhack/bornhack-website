@@ -5,6 +5,7 @@
 <a class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
 <a class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
 <a class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+<a class="btn {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Map</a>
 
 <div class="btn-group" role="group">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></button>
@@ -16,8 +17,6 @@
     {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
       <li class="{% menudropdownclass 'economy' %}"><a href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
     {% endif %}
-
-    <li class="{% menudropdownclass 'maps' %}"><a href="{% url 'maps_map' camp_slug=camp.slug %}">Map</a></li>
 
     <li class="{% menudropdownclass 'facilities' %}"><a href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
 

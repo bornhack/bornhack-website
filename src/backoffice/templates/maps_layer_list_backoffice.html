@@ -34,7 +34,7 @@
               <td><a href="{% url "backoffice:maps_features_list" camp_slug=camp.slug layer_slug=ft.slug %}">{{ ft.name }}</a></td>
               <td>{{ ft.description|default:"N/A" }}</td>
               <td>{{ ft.camp.title|default:"All" }}</td>
-              <td class="text-center"><i class="fas fa-{{ ft.icon }} fa-2x fa-fw"></i></td>
+              <td class="text-center"><i class="{{ ft.icon }} fa-2x fa-fw"></i></td>
               <td class="text-center"><span class="badge">{{ ft.features.count }}</span></td>
               <td>
                 <a href="{% url "backoffice:maps_layer_import" camp_slug=camp.slug layer_slug=ft.slug %}" class="btn btn-success"><i class="fas fa-file-import"></i> Import</a>
