@@ -19,7 +19,8 @@ from .models import ExternalLayer
 from facilities.models import FacilityType
 from camps.mixins import CampViewMixin
 from .mixins import LayerViewMixin
-
+from utils.color import adjust_color
+from utils.color import is_dark
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -29,36 +30,20 @@ class MissingCredentials(Exception):
 
 
 class MapMarkerView(TemplateView):
+    """
+    View for generating the collored marker
+    """
     template_name = "marker.svg"
 
     @property
     def color(self):
         return ImageColor.getrgb("#" + self.kwargs['color'])
 
-    def adjust_color(self, color, factor=0.4):
-        if len(color) == 3:
-            color = (*color, 1)
-        r, g, b, a = color
-        if factor > 0:
-            new_r = int(min(255, r + (255 - r) * factor))
-            new_g = int(min(255, g + (255 - g) * factor))
-            new_b = int(min(255, b + (255 - b) * factor))
-        else:
-            factor = factor * -1
-            new_r = int(max(0, r - r * factor))
-            new_g = int(max(0, g - g * factor))
-            new_b = int(max(0, b - b * factor))
-
-        return (new_r, new_g, new_b, a)
-
-    def isDark(self, color):
-        return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2] < 150
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['stroke1'] = self.color
-        context['stroke0'] = self.adjust_color(self.color, -0.4) if self.isDark(self.color) else self.adjust_color(self.color)
-        context['fill0'] = self.adjust_color(self.color, -0.4) if self.isDark(self.color) else self.adjust_color(self.color)
+        context['stroke0'] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
+        context['fill0'] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
         context['fill1'] = self.color
         return context
 
@@ -70,6 +55,9 @@ class MapMarkerView(TemplateView):
 
 
 class MapView(CampViewMixin, TemplateView):
+    """
+    Global map view
+    """
     template_name = "maps_map.html"
     context_object_name = "maps_map"
 
@@ -82,6 +70,9 @@ class MapView(CampViewMixin, TemplateView):
 
 
 class LayerGeoJSONView(LayerViewMixin, JsonView):
+    """
+    GeoJSON export view
+    """
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = json.loads(
