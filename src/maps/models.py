@@ -1,5 +1,3 @@
-import base64
-import io
 import logging
 
 from django.contrib.gis.db.models import GeometryCollectionField
@@ -7,26 +5,26 @@ from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
 
 from colorfield.fields import ColorField
-from maps.utils import LeafletMarkerChoices
 from camps.models import Camp
-from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
+
 class Group(UUIDModel):
-    name = models.CharField(    
-        max_length=100,         
+    name = models.CharField(
+        max_length=100,
         help_text="Name or description of this group",
     )
 
     def __str__(self):
         return str(self.name)
 
+
 class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
     """
-    Layers are groups of Features 
+    Layers are groups of Features
     """
 
     name = models.CharField(
@@ -75,9 +73,10 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
         )
         super().save(**kwargs)
 
+
 class Feature(UUIDModel):
     """
-    Features are elements to put on a map which can consist of polygons, lines, points, etc. 
+    Features are elements to put on a map which can consist of polygons, lines, points, etc.
     """
 
     name = models.CharField(
@@ -87,7 +86,7 @@ class Feature(UUIDModel):
 
     description = models.TextField(help_text="Description of this feature")
 
-    geom = GeometryCollectionField( 
+    geom = GeometryCollectionField(
         help_text="Geometric data",
     )
 
@@ -113,7 +112,7 @@ class Feature(UUIDModel):
         help_text="Name of javascript function call for processing data from the topic",
         blank=True,
     )
-    
+
     layer = models.ForeignKey(
         Layer,
         on_delete=models.CASCADE,
@@ -127,9 +126,10 @@ class Feature(UUIDModel):
     def camp(self):
         return self.layer.camp
 
+
 class ExternalLayer(UUIDModel):
-    name = models.CharField(                                                                             
-        max_length=100,                                                                                    
+    name = models.CharField(
+        max_length=100,
         help_text="Name or description of this layer",
     )
 
@@ -142,7 +142,7 @@ class ExternalLayer(UUIDModel):
     description = models.TextField(help_text="Description of this layer")
 
     url = models.URLField(
-        max_length = 255,
+        max_length=255,
         help_text="URL of the GEOJSON layer"
     )
 

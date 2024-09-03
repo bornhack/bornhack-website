@@ -28,6 +28,7 @@ class VillageListView(CampViewMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False, approved=True)
 
+
 class VillageMapView(CampViewMixin, ListView):
     model = Village
     template_name = "village_map.html"
@@ -51,6 +52,7 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
 
         return super().dispatch(request, *args, **kwargs)
 
+
 class VillageListGeoJSONView(CampViewMixin, JsonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,7 +63,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
     def dump_features(self) -> list[object]:
         output = []
         for village in Village.objects.filter(camp=self.camp):
-            if village.location == None:
+            if village.location is None:
                 continue
             entry = {
                 "type": "Feature",
@@ -72,7 +74,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
                     "marker": "greenIcon",
                     "icon": "campground",
                     "description": village.description,
-                    "uuid": None ,
+                    "uuid": None,
                     "type": "village",
                     "detail_url": reverse('village_detail', kwargs={'camp_slug': village.camp.slug, 'slug': village.slug}),
                 },

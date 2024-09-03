@@ -19,6 +19,7 @@ class FacilityTypeListView(CampViewMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list.html"
 
+
 class FacilityListGeoJSONView(CampViewMixin, JsonView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,10 +47,11 @@ class FacilityListGeoJSONView(CampViewMixin, JsonView):
                         "type": ft.name,
                         "detail_url": reverse('facilities:facility_detail', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
                         "feedback_url": reverse('facilities:facility_feedback', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
-                        },
+                    },
                 }
                 output.append(entry)
         return list(output)
+
 
 class FacilityListView(FacilityTypeViewMixin, ListView):
     model = Facility
@@ -58,6 +60,7 @@ class FacilityListView(FacilityTypeViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(facility_type=self.facility_type)
+
 
 class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     model = Facility

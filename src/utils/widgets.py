@@ -7,7 +7,6 @@ class IconPickerWidget(Widget):
     class Media:
         js = ("/static/modules/universal-icon-picker/assets/js/universal-icon-picker.min.js",)
 
-
     def format_value(self, value):
         if value is None:
             return ''

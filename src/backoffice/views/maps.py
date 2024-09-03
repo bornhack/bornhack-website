@@ -3,7 +3,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.geos import GeometryCollection 
+from django.contrib.gis.geos import GeometryCollection
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -20,23 +20,24 @@ from utils.widgets import IconPickerWidget
 from ..mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from maps.mixins import LayerViewMixin
-from maps.models import Layer 
-from maps.models import ExternalLayer 
-from maps.models import Feature 
+from maps.models import Layer
+from maps.models import ExternalLayer
+from maps.models import Feature
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
-    model = Layer 
+    model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['layers'] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
-        context['externalLayers'] = ExternalLayer.objects.filter(Q(camp=self.camp) | Q(camp=None)) 
+        context['externalLayers'] = ExternalLayer.objects.filter(Q(camp=self.camp) | Q(camp=None))
         return context
+
 
 class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
     model = Feature
@@ -44,8 +45,9 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
     createdCount = 0
     updateCount = 0
     errorCount = 0
+
     def get(self, request, *args, **kwargs):
-        context = dict() 
+        context = dict()
         context['layer'] = Layer.objects.get(slug=kwargs['layer_slug'])
         return render(request, self.template_name, context)
 
@@ -68,9 +70,9 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
             self.load_featureCollection(layer, geojson)
 
         if (self.createdCount > 0 or self.updateCount > 0):
-            messages.success(self.request, "%i features created, %i features updated" % (self.createdCount, self.updateCount) )
+            messages.success(self.request, "%i features created, %i features updated" % (self.createdCount, self.updateCount))
         if self.errorCount > 0:
-            messages.error(self.request, "%i features with errors not imported" % (self.errorCount) )
+            messages.error(self.request, "%i features with errors not imported" % (self.errorCount))
         return HttpResponseRedirect(reverse(
             "backoffice:maps_features_list",
             kwargs={"camp_slug": camp_slug, "layer_slug": self.layer.slug},
@@ -79,11 +81,11 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
     def load_feature(self, layer, feature, props):
         try:
             geom = GeometryCollection(GEOSGeometry(json.dumps(feature['geometry'])))
-        except:
+        except (TypeError, AttributeError):
             logger.exception(f"Failed to GEOSGeometry: {feature}")
             self.errorCount += 1
             return
-        created = self.createObject(props, layer, geom) 
+        created = self.createObject(props, layer, geom)
         if created:
             self.createdCount += 1
         else:
@@ -96,16 +98,15 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
             try:
                 f = GEOSGeometry(json.dumps(feature))
                 importFeatures.append(f)
-            except:
-              logger.exception(f"Failed to GEOSGeometry: {feature}")
-              self.errorCount += 1
-              return False
+            except (TypeError, AttributeError):
+                logger.exception(f"Failed to GEOSGeometry: {feature}")
+                self.errorCount += 1
+                return False
         return GeometryCollection(importFeatures)
-
 
     def load_featureCollection(self, layer, geojson):
         for feature in geojson['features']:
-            if feature['geometry'] == None:
+            if feature['geometry'] is None:
                 self.createObject(feature['properties'], layer, GeometryCollection([]))
                 continue
             if feature['geometry']['type'] == "GeometryCollection":
@@ -118,22 +119,23 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
 
     def createObject(self, props, layer, geom):
         obj, created = Feature.objects.update_or_create(
-                name=props['name'],
-                description=props['description'],
-                topic=props['topic'],
-                processing=props['processing'],
-                color=props['color'],
-                layer=layer, 
-                geom=geom
-                )
+            name=props['name'],
+            description=props['description'],
+            topic=props['topic'],
+            processing=props['processing'],
+            color=props['color'],
+            layer=layer,
+            geom=geom
+        )
         if created:
             self.createdCount += 1
         else:
             self.updateCount += 1
         return created
 
+
 class MapsLayerCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
-    model = Layer 
+    model = Layer
     template_name = "maps_layer_form.html"
     fields = [
         "name",
@@ -182,7 +184,7 @@ class MapsLayerUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
 
 
 class MapsLayerDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
-    model = Layer 
+    model = Layer
     template_name = "maps_layer_delete.html"
     slug_url_kwarg = "layer_slug"
 
@@ -198,8 +200,9 @@ class MapsLayerDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
             kwargs={"camp_slug": self.camp.slug},
         )
 
+
 class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
-    model = Feature 
+    model = Feature
     template_name = "maps_layer_feature_list_backoffice.html"
 
     def get_context_data(self, **kwargs):
@@ -209,7 +212,7 @@ class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
 
 
 class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView):
-    model = Feature 
+    model = Feature
     template_name = "maps_feature_form.html"
     fields = [
         "name",
@@ -241,12 +244,12 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
         messages.success(self.request, "The feature has been created")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug },
+            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
         )
 
 
 class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView):
-    model = Feature 
+    model = Feature
     slug_url_kwarg = "feature_uuid"
     slug_field = "uuid"
     template_name = "maps_feature_form.html"
@@ -277,11 +280,12 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
         messages.success(self.request, "The feature has been updated")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug },
+            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
         )
 
+
 class MapsFeatureDeleteView(LayerViewMixin, OrgaTeamPermissionMixin, DeleteView):
-    model = Feature 
+    model = Feature
     template_name = "maps_feature_delete.html"
     slug_url_kwarg = "feature_uuid"
     slug_field = "uuid"
@@ -290,11 +294,12 @@ class MapsFeatureDeleteView(LayerViewMixin, OrgaTeamPermissionMixin, DeleteView)
         messages.success(self.request, "The feature has been deleted")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug },
+            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
         )
 
+
 class MapsExternalLayerCreateView(OrgaTeamPermissionMixin, CreateView):
-    model = ExternalLayer 
+    model = ExternalLayer
     template_name = "maps_external_layer_form.html"
     fields = [
         "name",
@@ -307,12 +312,12 @@ class MapsExternalLayerCreateView(OrgaTeamPermissionMixin, CreateView):
         messages.success(self.request, "The external layer has been created")
         return reverse(
             "backoffice:maps_layer_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"] },
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )
 
 
 class MapsExternalLayerUpdateView(OrgaTeamPermissionMixin, UpdateView):
-    model = ExternalLayer 
+    model = ExternalLayer
     slug_url_kwarg = "external_layer_uuid"
     slug_field = "uuid"
     template_name = "maps_external_layer_form.html"
@@ -327,11 +332,12 @@ class MapsExternalLayerUpdateView(OrgaTeamPermissionMixin, UpdateView):
         messages.success(self.request, "The external layer has been updated")
         return reverse(
             "backoffice:maps_layer_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"] },
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )
 
+
 class MapsExternalLayerDeleteView(OrgaTeamPermissionMixin, DeleteView):
-    model = ExternalLayer 
+    model = ExternalLayer
     template_name = "maps_external_layer_delete.html"
     slug_url_kwarg = "external_layer_uuid"
     slug_field = "uuid"
@@ -341,5 +347,5 @@ class MapsExternalLayerDeleteView(OrgaTeamPermissionMixin, DeleteView):
         messages.success(self.request, "The external layer has been deleted")
         return reverse(
             "backoffice:maps_layer_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"] },
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )

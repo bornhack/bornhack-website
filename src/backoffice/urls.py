@@ -208,28 +208,29 @@ urlpatterns = [
             [
                 path("", MapsLayerView.as_view(), name="maps_layer_list"),
                 path("create/", MapsLayerCreateView.as_view(), name="maps_layer_create"),
-                path("external/",
-                    include (
+                path(
+                    "external/",
+                    include(
                         [
-                            path("create/",
-                                 MapsExternalLayerCreateView.as_view(),
-                                 name="maps_external_layer_create",
-                            ),
-                            path("<uuid:external_layer_uuid>/",
-                                 include(
+                            path("create/", MapsExternalLayerCreateView.as_view(), name="maps_external_layer_create"),
+                            path(
+                                "<uuid:external_layer_uuid>/",
+                                include(
                                     [
-                                        path("delete/",
-                                             MapsExternalLayerDeleteView.as_view(),
-                                             name="maps_external_layer_delete",
+                                        path(
+                                            "delete/",
+                                            MapsExternalLayerDeleteView.as_view(),
+                                            name="maps_external_layer_delete",
                                         ),
-                                        path("update/",
-                                             MapsExternalLayerUpdateView.as_view(),
-                                             name="maps_external_layer_update",
+                                        path(
+                                            "update/",
+                                            MapsExternalLayerUpdateView.as_view(),
+                                            name="maps_external_layer_update",
                                         ),
                                     ]
-                                 ),
+                                ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(

@@ -38,6 +38,7 @@ class FacilityTypeListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "facility_type_list_backoffice.html"
     context_object_name = "facility_type_list"
 
+
 class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
     model = FacilityType
     template_name = "facility_type_import_backoffice.html"
@@ -61,20 +62,20 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
         # Basic validation, you can add more checks
         if 'type' not in geojson or geojson['type'] != 'FeatureCollection':
             return render(request, 'facility_type_import_backoffice.html', {'error': "Invalid GeoJSON format"})
-        
+
         createdCount = 0
         updateCount = 0
         errorCount = 0
         for feature in geojson['features']:
             try:
                 geom = GEOSGeometry(json.dumps(feature['geometry']))
-            except:
+            except (TypeError, AttributeError):
                 errorCount += 1
                 continue
             props = feature['properties']
             if 'description' in props:
                 if props['description']:
-                    description=props['description']
+                    description = props['description']
                 else:
                     errorCount += 1
                     continue
@@ -82,23 +83,24 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
                 errorCount += 1
                 continue
             obj, created = Facility.objects.update_or_create(
-                    name=props['name'],
-                    description=description,
-                    facility_type=facility_type,
-                    location=geom
-                    )
+                name=props['name'],
+                description=description,
+                facility_type=facility_type,
+                location=geom
+            )
             if created:
                 createdCount += 1
             else:
                 updateCount += 1
         if (createdCount > 0 or updateCount > 0):
-            messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount) )
+            messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount))
         if errorCount > 0:
-            messages.error(self.request, "%i features with errors not imported" % (errorCount) )
+            messages.error(self.request, "%i features with errors not imported" % (errorCount))
         return HttpResponseRedirect(reverse(
             "backoffice:facility_type_list",
             kwargs={"camp_slug": camp_slug},
         ))
+
 
 class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
     model = FacilityType
@@ -191,6 +193,7 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
 class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
+
 
 class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     model = Facility

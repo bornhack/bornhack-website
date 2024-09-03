@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 
-from .models import Layer 
+from .models import Layer
+
 
 class LayerViewMixin:
     """
@@ -15,5 +16,3 @@ class LayerViewMixin:
         context = super().get_context_data(*args, **kwargs)
         context["layer"] = self.layer
         return context
-
-
