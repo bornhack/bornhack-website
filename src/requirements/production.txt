@@ -43,4 +43,4 @@ Pillow==10.4.0
 
 # numpy 1.26.0 doesn't work on freebsd
 # numpy: /usr/local/virtualenv/lib/python3.9/site-packages/numpy/core/_multiarray_tests.cpython-39.so: Undefined symbol "ccosl"
-numpy==1.26.4
+numpy==2.1.1
