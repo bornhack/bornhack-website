@@ -81,8 +81,8 @@ from .views import FacilityTypeDeleteView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
 from .views import FacilityUpdateView
-from .views import InvoiceDownloadView
 from .views import InvoiceDownloadMultipleView
+from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView

@@ -17,7 +17,7 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
-from django.views.generic import View 
+from django.views.generic import View
 
 from ..forms import ShopTicketRefundFormSet
 from ..forms import TicketGroupRefundFormSet
@@ -186,6 +186,7 @@ class InvoiceListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Invoice
     template_name = "invoice_list.html"
 
+
 class InvoiceDownloadMultipleView(CampViewMixin, InfoTeamPermissionMixin, View):
     model = Invoice
     template_name = "invoice_download.html"
@@ -196,7 +197,7 @@ class InvoiceDownloadMultipleView(CampViewMixin, InfoTeamPermissionMixin, View):
 
     def post(self, request, camp_slug):
         context = dict()
-        query = request.POST.get('q').split(" ")
+        query = request.POST.get("q").split(" ")
         context["invoices"] = Invoice.objects.filter(id__in=query)
         return render(request, self.template_name, context)
 
