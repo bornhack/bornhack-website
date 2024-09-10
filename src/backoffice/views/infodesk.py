@@ -202,7 +202,7 @@ class InvoiceDownloadMultipleView(CampViewMixin, InfoTeamPermissionMixin, View):
         return render(request, self.template_name, context)
 
     def post(self, request, camp_slug):
-        context = {} 
+        context = {}
         ordersQ = self.parseQuery(request.POST.get("orders"))
         invoicesQ = self.parseQuery(request.POST.get("invoices"))
         context["invoices"] = Invoice.objects.filter(
