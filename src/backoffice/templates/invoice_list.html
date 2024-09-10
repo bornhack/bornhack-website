@@ -12,11 +12,6 @@
     This table shows all invoices in the system.
   </div>
 
-  <form action="{% url 'backoffice:invoice_download_multiple' camp_slug=camp.slug %}" method="POST">{% csrf_token %}
-    <textarea name="invoices" type="text" placeholder="Invoices seperated by a space or return"></textarea>
-    <textarea name="orders" type="text" placeholder="Orders seperated by a space or return"></textarea>
-    <input type="submit">
-  </form>
 
   <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
   <a href="{% url 'backoffice:invoice_list_csv' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> CSV</a>
