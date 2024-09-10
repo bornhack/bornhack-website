@@ -191,14 +191,21 @@ class InvoiceDownloadMultipleView(CampViewMixin, InfoTeamPermissionMixin, View):
     model = Invoice
     template_name = "invoice_download.html"
 
+    def parseQuery(self, query):
+        if query != "":
+            return query.split()
+        else:
+            return []
+
     def get(self, request, *args, **kwargs):
         context = dict()
         return render(request, self.template_name, context)
 
     def post(self, request, camp_slug):
         context = dict()
-        query = request.POST.get("q").split(" ")
-        context["invoices"] = Invoice.objects.filter(id__in=query)
+        ordersQ = self.parseQuery(request.POST.get('orders'))
+        invoicesQ = self.parseQuery(request.POST.get('invoices'))
+        context["invoices"] = Invoice.objects.filter(Q(id__in=invoicesQ) | Q(order__id__in=ordersQ))
         return render(request, self.template_name, context)
 
 
