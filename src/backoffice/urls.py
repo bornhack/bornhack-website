@@ -82,6 +82,7 @@ from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
 from .views import FacilityUpdateView
 from .views import InvoiceDownloadView
+from .views import InvoiceDownloadMultipleView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView
@@ -339,6 +340,11 @@ urlpatterns = [
                                 "csv/",
                                 InvoiceListCSVView.as_view(),
                                 name="invoice_list_csv",
+                            ),
+                            path(
+                                "download/",
+                                InvoiceDownloadMultipleView.as_view(),
+                                name="invoice_download_multiple",
                             ),
                             path(
                                 "<int:invoice_id>/",
