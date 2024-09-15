@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='feature',
             name='icon',
-            field=models.CharField(blank=True, default='list', help_text="Name of the fontawesome icon to use, excluding the 'fab fa-' or 'fas fa-' part.", max_length=100),
+            field=models.CharField(blank=True, default='list', help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.", max_length=100),
         ),
         migrations.AddField(
             model_name='feature',
