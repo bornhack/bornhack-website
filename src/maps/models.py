@@ -96,7 +96,7 @@ class Feature(UUIDModel):
         max_length=100,
         default="list",
         blank=True,
-        help_text="Name of the fontawesome icon to use, excluding the 'fab fa-' or 'fas fa-' part.",
+        help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
     )
 
     url = models.URLField(blank=True)

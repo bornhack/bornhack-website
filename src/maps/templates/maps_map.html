@@ -111,43 +111,4 @@
         alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
       }
     </script>
-    <script type="text/javascript">
-mapObject.onMqtt("trafficlight/1", {"value":"green"})
-mapObject.onMqtt("trafficlight/2", {"value":"red"})
-mapObject.onMqtt("noisesensor/1", {"avg": 10.2})
-mapObject.onMqtt("noisesensor/2", {"avg": 30.2})
-var lightSide = 0;
-let myVar2 = setInterval(myTimer2, 1000);
-
-function getRandomLoc(min,max) {
- return Math.random() * (max - min) + min;
-}
-
-function myTimer2() {
-  const tub = Math.floor(Math.random() * (45 - 20 + 1) + 20);
-  mapObject.onMqtt("hottub", {"value":tub+""})
-  let noice = Math.floor(Math.random() * (60 - 25 + 1) + 25);
-  mapObject.onMqtt("noisesensor/1", {"avg": noice})
-  noice = Math.floor(Math.random() * (60 - 25 + 1) + 25);
-  mapObject.onMqtt("noisesensor/2", {"avg": noice})
-}
-let myVar = setInterval(myTimer, 3000);
-
-function myTimer() {
-  mapObject.onMqtt("golfcar", {
-    "lat":getRandomLoc(55.39004471637513, 55.38379389032002),
-    "lng":getRandomLoc(9.936828255477785, 9.945946155611598),
-  });
-  if (lightSide) {
-    lightSide = 0
-    mapObject.onMqtt("trafficlight/1", {"value":"green"})
-    mapObject.onMqtt("trafficlight/2", {"value":"red"})
-  } else {
-    mapObject.onMqtt("trafficlight/2", {"value":"green"})
-    mapObject.onMqtt("trafficlight/1", {"value":"red"})
-    lightSide = 1
-  }
-}
-    </script>
-
 {% endblock %}
