@@ -209,6 +209,8 @@ class IrcOverView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
 ##############
 # TICKET STATS
+
+
 class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = TicketType
     template_name = "ticket_stats.html"

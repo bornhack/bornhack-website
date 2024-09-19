@@ -2056,7 +2056,8 @@ class Command(BaseCommand):
 
     def create_camp_expenses(self, camp):
         self.output(f"Creating expenses for {camp}...")
-        ExpenseFactory.create_batch(200, camp=camp)
+        for team in Team.objects.filter(camp=camp):
+            ExpenseFactory.create_batch(10, camp=camp, responsible_team=team)
 
     def create_camp_reimbursements(self, camp):
         self.output(f"Creating reimbursements for {camp}...")
@@ -2265,8 +2266,10 @@ class Command(BaseCommand):
         Pos.objects.create(
             name="Infodesk",
             team=teams["info"],
+            external_id="HHR9izotB6HLzgT6k",
         )
         Pos.objects.create(
             name="Bar",
             team=teams["bar"],
+            external_id="bTasxE2YYXZh35wtQ",
         )

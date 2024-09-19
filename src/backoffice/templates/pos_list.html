@@ -9,14 +9,19 @@
   <div class="panel panel-default">
     <div class="panel-heading"><h3 class="panel-title">Pos List - BackOffice</h3></div>
     <div class="panel-body">
-      <p>A <i>Pos</i> is a place where we sell stuff for DKK and/or HAX.</p>
       {% if not pos_list %}
         <p class="lead">No Pos found.</p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-          {% include "includes/pos_list_table.html" %}
+          <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
+          <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos List</a>
+          <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product List</a>
+          <a href="{% url 'backoffice:posproductcost_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product Cost List</a>
+          <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Transaction List</a>
+          <a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Sales List</a>
         </p>
+        <p class="lead">A <i>Pos</i> is a place where we sell stuff for DKK and/or HAX.</p>
+        {% include "includes/pos_list_table.html" %}
       {% endif %}
       <p>
         {% if perms.camps.orgateam_permission %}

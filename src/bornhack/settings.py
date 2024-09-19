@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     "leaflet",
     "oauth2_provider",
     "taggit",
+    "django_tables2",
+    "django_filters",
 ]
 
 # MEDIA_URL = '/media/'
@@ -135,6 +137,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "utils.middleware.RedirectExceptionMiddleware",
+    "camps.middleware.RequestCampMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
@@ -217,3 +220,15 @@ OAUTH2_PROVIDER = {
 }
 
 UPCOMING_CAMP_YEAR = 2025
+
+# django-tables2 settings
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap-responsive.html"
+DJANGO_TABLES2_TABLE_ATTRS = {
+    "class": "table table-hover table-striped",
+}
+
+# fallback settings for views/pages/places where l10n is disabled
+DATE_FORMAT = "l, M jS, Y"
+DATETIME_FORMAT = "l, M jS, Y, H:i (e)"
+SHORT_DATE_FORMAT = "Ymd"
+TIME_FORMAT = "H:i"

@@ -1,21 +1,41 @@
+import json
 import logging
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
+from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
+from django_filters.views import FilterView
+from django_tables2 import SingleTableMixin
 
+from ..forms import PosSalesJSONForm
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import PosViewMixin
 from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
+from economy.filters import PosProductCostFilter
+from economy.filters import PosProductFilter
+from economy.filters import PosSaleFilter
+from economy.filters import PosTransactionFilter
+from economy.models import Expense
 from economy.models import Pos
+from economy.models import PosProduct
+from economy.models import PosProductCost
 from economy.models import PosReport
+from economy.models import PosSale
+from economy.models import PosTransaction
+from economy.tables import PosProductCostTable
+from economy.tables import PosProductTable
+from economy.tables import PosSaleTable
+from economy.tables import PosTransactionTable
+from economy.utils import import_pos_sales_json
 from teams.models import Team
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -81,6 +101,9 @@ class PosDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
         return reverse("backoffice:pos_list", kwargs={"camp_slug": self.camp.slug})
 
 
+# ################## POSREPORT VIEWS START #########################
+
+
 class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
@@ -117,6 +140,14 @@ class PosReportCreateView(PosViewMixin, CreateView):
                 },
             ),
         )
+
+
+class PosReportListView(PosViewMixin, DetailView):
+    """Show a list of PosReports for a Pos."""
+
+    model = Pos
+    template_name = "posreport_list.html"
+    slug_url_kwarg = "pos_slug"
 
 
 class PosReportUpdateView(PosViewMixin, UpdateView):
@@ -237,3 +268,199 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().pos_responsible:
             raise PermissionDenied("Only the pos responsible can do this")
+
+
+# ################## POSREPORT VIEWS END #########################
+
+
+class PosTransactionListView(
+    CampViewMixin,
+    OrgaTeamPermissionMixin,
+    SingleTableMixin,
+    FilterView,
+):
+    """A list of PosTransation objects."""
+
+    model = PosTransaction
+    template_name = "pos_transaction_list.html"
+    table_class = PosTransactionTable
+    filterset_class = PosTransactionFilter
+
+    def get_context_data(self, *args, **kwargs):
+        """Include the total (unfiltered) count."""
+        context = super().get_context_data(*args, **kwargs)
+        # transactions
+        context["total_transactions"] = PosTransaction.objects.filter(
+            pos__team__camp=self.camp,
+        ).count()
+        # total sales
+        context["total_sales_count"] = PosSale.objects.filter(
+            transaction__pos__team__camp=self.camp,
+        ).count()
+        context["total_sales_sum"] = PosSale.objects.filter(
+            transaction__pos__team__camp=self.camp,
+        ).aggregate(models.Sum("sales_price"))["sales_price__sum"]
+        # filtered sales
+        filtered_totals = context["filter"].qs.aggregate(
+            filtered_sales_count=models.Count("pos_sales"),
+            filtered_sales_sum=models.Sum("pos_sales__sales_price"),
+        )
+        context.update(filtered_totals)
+        return context
+
+
+class PosSaleListView(
+    CampViewMixin,
+    OrgaTeamPermissionMixin,
+    SingleTableMixin,
+    FilterView,
+):
+    """A list of PosSale objects."""
+
+    model = PosSale
+    template_name = "pos_sale_list.html"
+    table_class = PosSaleTable
+    filterset_class = PosSaleFilter
+
+    def get_context_data(self, *args, **kwargs):
+        """Include the total (unfiltered) count and sums."""
+        context = super().get_context_data(*args, **kwargs)
+        context["total_sales_count"] = PosSale.objects.filter(
+            transaction__pos__team__camp=self.camp,
+        ).count()
+        context["total_sales_sum"] = PosSale.objects.filter(
+            transaction__pos__team__camp=self.camp,
+        ).aggregate(models.Sum("sales_price"))["sales_price__sum"]
+        context["filtered_sales_sum"] = context["filter"].qs.aggregate(
+            models.Sum("sales_price"),
+        )["sales_price__sum"]
+        return context
+
+
+class PosSalesImportView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
+    form_class = PosSalesJSONForm
+    template_name = "pos_sales_json_upload_form.html"
+
+    def form_valid(self, form):
+        if "sales" in form.files:
+            sales_data = json.loads(form.files["sales"].read().decode())
+            products, transactions, sales = import_pos_sales_json(sales_data)
+            messages.success(
+                self.request,
+                f"PoS sales json processed OK. Created {products} new products and {transactions} new transactions containing {sales} new sales.",
+            )
+        return redirect(
+            reverse(
+                "backoffice:epaytransaction_list",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
+        )
+
+
+class PosProductListView(
+    CampViewMixin,
+    OrgaTeamPermissionMixin,
+    SingleTableMixin,
+    FilterView,
+):
+    """A list of PosProduct objects."""
+
+    model = PosProduct
+    template_name = "pos_product_list.html"
+    table_class = PosProductTable
+    filterset_class = PosProductFilter
+
+    def get_context_data(self, *args, **kwargs):
+        """Include the total (unfiltered) count."""
+        context = super().get_context_data(*args, **kwargs)
+        campfilter = models.Q(pos_sales__transaction__pos__team__camp=self.request.camp)
+        context["total_products"] = (
+            PosProduct.objects.filter(campfilter).distinct().count()
+        )
+        filtered_totals = context["filter"].qs.aggregate(
+            filtered_sales_count=models.Count("pos_sales", filter=campfilter),
+            filtered_sales_sum=models.Sum("pos_sales__sales_price", filter=campfilter),
+        )
+        context.update(filtered_totals)
+        context["total_sales_count"] = PosProduct.objects.aggregate(
+            total_sales_count=models.Count("pos_sales", filter=campfilter),
+        )["total_sales_count"]
+        context["total_sales_sum"] = PosProduct.objects.aggregate(
+            total_sales_sum=models.Sum("pos_sales__sales_price", filter=campfilter),
+        )["total_sales_sum"]
+        return context
+
+
+class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+    """Use this view to update PosProduct objects."""
+
+    model = PosProduct
+    fields = [
+        "brand_name",
+        "name",
+        "description",
+        "sales_price",
+        "unit_size",
+        "size_unit",
+        "abv",
+        "tags",
+        "expenses",
+    ]
+    template_name = "posproduct_form.html"
+    pk_url_kwarg = "posproduct_uuid"
+
+    def get_success_url(self):
+        return reverse(
+            "backoffice:posproduct_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
+
+    def get_context_data(self, **kwargs):
+        """Only show relevant expenses."""
+        context = super().get_context_data(**kwargs)
+        pos_teams = Team.objects.filter(camp=self.camp, points_of_sale__isnull=False)
+        expenses = Expense.objects.filter(
+            camp=self.request.camp,
+            responsible_team__in=pos_teams,
+        )
+        context["form"].fields["expenses"].queryset = expenses
+        return context
+
+
+class PosProductCostListView(
+    CampViewMixin,
+    OrgaTeamPermissionMixin,
+    SingleTableMixin,
+    FilterView,
+):
+    """A list of PosProductCost objects."""
+
+    model = PosProductCost
+    template_name = "pos_product_cost_list.html"
+    table_class = PosProductCostTable
+    filterset_class = PosProductCostFilter
+
+    def get_context_data(self, **kwargs):
+        """Include total number of costs."""
+        context = super().get_context_data(**kwargs)
+        context["total_costs"] = (
+            PosProductCost.objects.filter(camp=self.camp).count()
+        )
+        return context
+
+class PosProductCostUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+    """Use this view to update PosProductCost objects."""
+
+    model = PosProductCost
+    fields = [
+        "product_cost",
+        "timestamp",
+    ]
+    template_name = "posproductcost_form.html"
+    pk_url_kwarg = "posproductcost_uuid"
+
+    def get_success_url(self):
+        return reverse(
+            "backoffice:posproductcost_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )

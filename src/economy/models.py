@@ -474,6 +474,9 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         # message to the browser
         messages.success(request, "Expense %s rejected" % self.pk)
 
+    def __str__(self):
+        return f"{self.responsible_team.name} Team - { self.amount } DKK - {self.creditor.name} - {self.description}"
+
 
 class Reimbursement(
     ExportModelOperationsMixin("reimbursement"),
@@ -595,6 +598,11 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
 
     name = models.CharField(max_length=255, help_text="The point-of-sale name")
 
+    external_id = models.CharField(
+        max_length=100,
+        help_text="The external database ID of this pos location." "",
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True,
@@ -604,6 +612,7 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
     team = models.ForeignKey(
         "teams.Team",
         on_delete=models.PROTECT,
+        related_name="points_of_sale",
         help_text="The Team managing this POS",
     )
 
@@ -675,6 +684,16 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
                     ],
                 )
         return (self, filename, posreports.count())
+
+    @property
+    def total_sales(self):
+        """Return the sum of all sales in all transactions for this Pos."""
+        return self.sales.aggregate(models.Sum("sales_price"))["sales_price__sum"]
+
+    @property
+    def sales(self):
+        """Return a queryset of all sales in all transactions for this Pos."""
+        return PosSale.objects.filter(transaction__pos=self)
 
 
 class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUIDModel):
@@ -1043,6 +1062,166 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
         ):
             total += st.quantity * 100
         return total
+
+
+class PosProduct(ExportModelOperationsMixin("pos_product"), UUIDModel):
+    """A product sold in our PoS. This model does not inherit from CampRelatedModel, meaning pos products are not camp specific."""
+
+    external_id = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="The external ID of the product.",
+    )
+
+    brand_name = models.CharField(max_length=255, help_text="The name of the brand.")
+
+    name = models.CharField(max_length=255, help_text="The name of the product.")
+
+    description = models.TextField(
+        blank=True,
+        help_text="The description of the product.",
+    )
+
+    sales_price = models.IntegerField(help_text="The current price of this product.")
+
+    unit_size = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text="The size of this product.",
+    )
+
+    size_unit = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="The unit the size of this product is measured in, where applicable.",
+    )
+
+    abv = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=0,
+        help_text="The ABV level of this product, where applicable.",
+    )
+
+    tags = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="The tags for this product as a comma seperated string.",
+    )
+
+    expenses = models.ManyToManyField(
+        "economy.Expense",
+        help_text="The related expenses for this PosProduct. Only expenses related to a Pos-team are shown. For products composed of multiple ingredients all relevant expenses should be picked.",
+    )
+
+    def __str__(self):
+        return (
+            f"{self.brand_name} - {self.name} ({round(self.unit_size)}{self.size_unit})"
+        )
+
+
+class PosTransaction(
+    ExportModelOperationsMixin("pos_transaction"),
+    CampRelatedModel,
+    UUIDModel,
+):
+    """A transaction from the Pos system."""
+
+    pos = models.ForeignKey(
+        "economy.Pos",
+        on_delete=models.PROTECT,
+        related_name="pos_transactions",
+        help_text="The Pos this PosTransaction belongs to.",
+    )
+
+    external_transaction_id = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text="The external ID of this pos transaction.",
+    )
+
+    external_user_id = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="The external ID of the pos user who did this transaction.",
+    )
+
+    timestamp = models.DateTimeField(
+        help_text="The date and time of this PoS transaction.",
+    )
+
+    @property
+    def camp(self):
+        return self.pos.team.camp
+
+    camp_filter = "pos__team__camp"
+
+    def __str__(self):
+        return f"{self.pos} sale {self.timestamp}"
+
+
+class PosSale(ExportModelOperationsMixin("pos_sale"), CampRelatedModel, UUIDModel):
+    """A single product sold in a PoS transaction.
+
+    Multiples of the same product result sold in a single tx results in multilpe PosSale objects.
+    """
+
+    transaction = models.ForeignKey(
+        "economy.PosTransaction",
+        on_delete=models.PROTECT,
+        related_name="pos_sales",
+        help_text="The transaction to which this sale belongs.",
+    )
+
+    product = models.ForeignKey(
+        "economy.PosProduct",
+        on_delete=models.PROTECT,
+        related_name="pos_sales",
+        help_text="The product being sold.",
+    )
+
+    sales_price = models.IntegerField(
+        help_text="The price of this product (at the time of sale).",
+    )
+
+    @property
+    def camp(self):
+        return self.transaction.pos.team.camp
+
+    camp_filter = "transaction__pos__team__camp"
+
+
+class PosProductCost(
+    ExportModelOperationsMixin("pos_product_cost"),
+    CampRelatedModel,
+    UUIDModel,
+):
+    """Defines the cost of PosProducts."""
+
+    camp = models.ForeignKey(
+        "camps.Camp",
+        related_name="pos_product_costs",
+        on_delete=models.PROTECT,
+    )
+
+    product = models.ForeignKey(
+        "economy.PosProduct",
+        on_delete=models.PROTECT,
+        related_name="pos_product_costs",
+        help_text="The product this cost applies to.",
+    )
+
+    timestamp = models.DateTimeField(
+        help_text="The timestamp from which this product_cost is correct.",
+    )
+
+    product_cost = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="The cost/expense (in DKK, including VAT) for each product sold. For products composed of multiple ingredients this number should include the total cost per product sold.",
+    )
 
 
 ##################################

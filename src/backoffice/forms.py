@@ -220,3 +220,9 @@ TicketGroupRefundFormSet = modelformset_factory(
     form=TicketGroupRefundForm,
     extra=0,
 )
+
+
+class PosSalesJSONForm(forms.Form):
+    sales = forms.FileField(
+        help_text="POS sales.json file. Previously imported sales will be skipped and will not create duplicates.",
+    )

@@ -18,6 +18,7 @@ django-jsonview==2.0.0
 django-oauth-toolkit==2.3.0
 django-prometheus==2.3.1
 django-reversion==5.0.12
+django-tables2==2.7.0
 django-taggit==5.0.1
 django-wkhtmltopdf==3.4.0
 future==1.0.0
