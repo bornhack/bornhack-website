@@ -46,7 +46,6 @@ class PosProductFilter(FilterSet):
     sales_sum = filters.RangeFilter(label="Sales Sum")
     cost = filters.RangeFilter(label="Product Cost")
 
-
     class Meta:
         model = PosProduct
         fields = {}
