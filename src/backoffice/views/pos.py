@@ -62,7 +62,7 @@ class PosCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
 
     model = Pos
     template_name = "pos_form.html"
-    fields = ["name", "team"]
+    fields = ["name", "team", "external_id"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
