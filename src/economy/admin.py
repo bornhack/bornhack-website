@@ -139,7 +139,7 @@ class ReimbursementAdmin(admin.ModelAdmin):
 
 @admin.register(Pos)
 class PosAdmin(admin.ModelAdmin):
-    list_display = ["name", "team"]
+    list_display = ["name", "team", "external_id"]
     list_filter = ["team"]
 
 

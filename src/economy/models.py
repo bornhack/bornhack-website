@@ -600,7 +600,7 @@ class Pos(ExportModelOperationsMixin("pos"), CampRelatedModel, UUIDModel):
 
     external_id = models.CharField(
         max_length=100,
-        help_text="The external database ID of this pos location." "",
+        help_text="The external database ID of this pos location.",
     )
 
     slug = models.SlugField(
