@@ -1111,6 +1111,7 @@ class PosProduct(ExportModelOperationsMixin("pos_product"), UUIDModel):
 
     expenses = models.ManyToManyField(
         "economy.Expense",
+        blank=True,
         help_text="The related expenses for this PosProduct. Only expenses related to a Pos-team are shown. For products composed of multiple ingredients all relevant expenses should be picked.",
     )
 
