@@ -19,7 +19,6 @@ django-oauth-toolkit==2.3.0
 django-prometheus==2.3.1
 django-reversion==5.0.12
 django-taggit==5.0.1
-django-wkhtmltopdf==3.4.0
 future==1.0.0
 html5lib==1.1
 icalendar==5.0.12
@@ -31,7 +30,6 @@ pandas==2.2.2
 pipdeptree==2.21.0
 psycopg2-binary==2.9.9
 pyOpenSSL==24.1.0
-PyPDF2==3.0.1
 python-magic==0.4.27
 quickpay-api-client==2.0.1
 service-identity==24.1.0
@@ -44,3 +42,5 @@ Pillow==10.4.0
 # numpy 1.26.0 doesn't work on freebsd
 # numpy: /usr/local/virtualenv/lib/python3.9/site-packages/numpy/core/_multiarray_tests.cpython-39.so: Undefined symbol "ccosl"
 numpy==1.26.4
+
+django-weasyprint==2.3.0

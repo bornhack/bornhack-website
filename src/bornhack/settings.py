@@ -203,11 +203,6 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 # django 3.2 https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-WKHTMLTOPDF_CMD_OPTIONS = {
-    "quiet": True,
-    "enable-local-file-access": True,
-}
-
 OAUTH2_PROVIDER = {
     "SCOPES": {
         "profile:read": "Allow the remote site to read your bornhack.dk username, user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
