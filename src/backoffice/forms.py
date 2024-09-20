@@ -223,14 +223,19 @@ TicketGroupRefundFormSet = modelformset_factory(
 
 
 class InvoiceDownloadForm(forms.Form):
-    orders = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":"5"}))
-    invoices = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":"5"}))
+    orders = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": "5"}))
+    invoices = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={"rows": "5"})
+    )
 
     def clean(self):
-        cleaned_data = super(InvoiceDownloadForm, self).clean()
-        return {"invoices": cleaned_data.get('invoices', "").split(), "orders": cleaned_data.get('orders', "").split()}
+        cleaned_data = super().clean()
+        return {
+            "invoices": cleaned_data.get("invoices", "").split(),
+            "orders": cleaned_data.get("orders", "").split(),
+        }
 
-      
+
 class PosSalesJSONForm(forms.Form):
     sales = forms.FileField(
         help_text="POS sales.json file. Previously imported sales will be skipped and will not create duplicates.",

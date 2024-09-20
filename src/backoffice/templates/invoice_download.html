@@ -23,7 +23,7 @@
     <input type="submit">
   </form>
   {% if invoices|length > 0 %}
-      <p>Downloading {{ invoices | length }} invoices</p>
+    <p>Downloading {{ invoices | length }} invoices</p>
   {% endif %}
   <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
 {% endblock content %}
