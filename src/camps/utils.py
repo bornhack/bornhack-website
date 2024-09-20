@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.utils import timezone
 
 from camps.models import Camp
+from economy.models import Pos
 
 
 def get_current_camp():
@@ -48,3 +49,45 @@ class CampPropertyListFilter(admin.SimpleListFilter):
             if item.camp != camp:
                 queryset = queryset.exclude(pk=item.pk)
         return queryset
+
+
+def get_closest_camp(timestamp):
+    """Return the Camp object happening closest to the provided datetime."""
+    # is the timestamp during a camp?
+    try:
+        return Camp.objects.get(
+            buildup__startswith__lt=timestamp,
+            teardown__endswith__gt=timestamp,
+        )
+    except Camp.DoesNotExist:
+        pass
+
+    # get the upcoming/next camp after the timestamp
+    try:
+        next_camp = Camp.objects.filter(buildup__startswith__gt=timestamp).last()
+    except Pos.DoesNotExist:
+        next_camp = None
+
+    # get the previous camp before the timestamp
+    try:
+        prev_camp = Camp.objects.filter(teardown__endswith__lt=timestamp).first()
+    except Pos.DoesNotExist:
+        prev_camp = None
+
+    if not prev_camp:
+        # no bornhack happened before the first bornhack
+        return next_camp
+
+    if not next_camp:
+        # no bornhack happened after the timestamp
+        return prev_camp
+
+    # calculate timedeltas
+    time_since_prev = timestamp - prev_camp.teardown.upper
+    time_until_next = next_camp.buildup.lower - timestamp
+
+    if time_since_prev < time_until_next:
+        # timestamp is closer to the previous camp
+        return prev_camp
+    # timestamp is closer to the upcoming/next camp
+    return next_camp

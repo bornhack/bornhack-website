@@ -5,8 +5,6 @@ from uuid import UUID
 from django import template
 from django.template import Context
 from django.template import Engine
-from django.template import Template
-from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 register = template.Library()

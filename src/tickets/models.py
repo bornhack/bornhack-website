@@ -2,18 +2,16 @@ import base64
 import hashlib
 import io
 import logging
-from decimal import Decimal
 from typing import Union
 
 import qrcode
 from django.conf import settings
 from django.db import models
+from django.db.models import Avg
 from django.db.models import Case
 from django.db.models import Count
-from django.db.models import DecimalField
 from django.db.models import Exists
 from django.db.models import Expression
-from django.db.models import ExpressionWrapper
 from django.db.models import F
 from django.db.models import OuterRef
 from django.db.models import Q
@@ -39,7 +37,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
         # We have to make subqueries to be able to annotate the specific
-        # ticket type. Otherwise values would be accumulative across all types.
+        # ticket type. Otherwise, values would be accumulative across all types.
         def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
@@ -47,45 +45,48 @@ class TicketTypeQuerySet(models.QuerySet):
                 .values("annotation_value")[:1],
             )
 
-        refunded = Coalesce(Sum("product__orderproductrelation__rprs__quantity"), 0)
-        quantity = (
-            Sum(
-                "product__orderproductrelation__quantity",
-                filter=Q(product__orderproductrelation__order__paid=True),
-            )
-            - refunded
+        quantity = F("product__orderproductrelation__quantity") - Coalesce(
+            "product__orderproductrelation__rprs__quantity",
+            0,
         )
-        cost = quantity * F("product__cost")
-        income = quantity * F("product__price")
 
-        avg_ticket_price = Subquery(
-            TicketType.objects.annotate(units=quantity)
-            .annotate(income=income)
+        subquery_base = TicketType.objects.filter(pk=OuterRef("pk")).annotate(
+            total_units_sold=Sum(
+                quantity,
+                filter=Q(product__orderproductrelation__order__paid=True),
+            ),
+            total_cost=Sum(
+                F("product__cost") * quantity,
+                filter=Q(product__orderproductrelation__order__paid=True),
+            ),
+            total_income=Sum(
+                F("product__price") * quantity,
+                filter=Q(product__orderproductrelation__order__paid=True),
+            ),
+            avg_ticket_price=Avg("product__price"),
+        )
+
+        total_units_sold = subquery_base.values("total_units_sold")
+        cost_per_product = subquery_base.values("total_cost")
+        income_per_product = subquery_base.values("total_income")
+        avg_ticket_price = subquery_base.values("avg_ticket_price")
+
+        # Shop ticket count has to be its own queryset since the count messes up the other subqueries.
+        shop_ticket_count = (
+            TicketType.objects.filter(pk=OuterRef("pk"))
             .annotate(
-                avg_ticket_price=ExpressionWrapper(
-                    Case(
-                        When(
-                            condition=~Q(units=0),
-                            then=F("income") * Decimal("1.0") / F("units"),
-                        ),
-                        default=Value(0),
-                        output_field=DecimalField(),
-                    ),
-                    output_field=DecimalField(),
-                ),
+                shop_ticket_count=Count("shopticket"),
             )
-            .filter(pk=OuterRef("pk"))
-            .values("avg_ticket_price")[:1],
-            output_field=DecimalField(),
+            .values("shop_ticket_count")
         )
 
         return self.annotate(
-            shopticket_count=_make_subquery(Count("shopticket")),
-            total_units_sold=_make_subquery(quantity),
-            total_income=_make_subquery(income),
-            total_cost=_make_subquery(cost),
-            total_profit=_make_subquery(income - cost),
-            avg_ticket_price=avg_ticket_price,
+            total_units_sold=Subquery(total_units_sold),
+            total_income=Subquery(income_per_product),
+            total_cost=Subquery(cost_per_product),
+            total_profit=Subquery(income_per_product) - Subquery(cost_per_product),
+            avg_ticket_price=Subquery(avg_ticket_price),
+            shopticket_count=Subquery(shop_ticket_count),
         ).distinct()
 
 

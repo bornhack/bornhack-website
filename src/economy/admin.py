@@ -11,7 +11,10 @@ from .models import Credebtor
 from .models import EpayTransaction
 from .models import Expense
 from .models import Pos
+from .models import PosProduct
 from .models import PosReport
+from .models import PosSale
+from .models import PosTransaction
 from .models import Reimbursement
 from .models import Revenue
 from .models import ZettleBalance
@@ -136,13 +139,47 @@ class ReimbursementAdmin(admin.ModelAdmin):
 
 @admin.register(Pos)
 class PosAdmin(admin.ModelAdmin):
-    list_display = ["name", "team"]
+    list_display = ["name", "team", "external_id"]
     list_filter = ["team"]
 
 
 @admin.register(PosReport)
 class PosReportAdmin(admin.ModelAdmin):
     list_display = ["uuid", "pos"]
+
+
+@admin.register(PosProduct)
+class PosProductAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "external_id",
+        "brand_name",
+        "name",
+        "description",
+        "sales_price",
+        "unit_size",
+        "size_unit",
+        "abv",
+        "tags",
+    ]
+
+
+@admin.register(PosTransaction)
+class PosTransactionAdmin(admin.ModelAdmin):
+    list_display = [
+        "uuid",
+        "pos",
+        "external_transaction_id",
+        "external_user_id",
+        "timestamp",
+    ]
+    list_filter = ["pos", "external_user_id"]
+    date_hierarchy = "timestamp"
+
+
+@admin.register(PosSale)
+class PosSaleAdmin(admin.ModelAdmin):
+    list_display = ["uuid", "transaction", "product", "sales_price"]
 
 
 ################################

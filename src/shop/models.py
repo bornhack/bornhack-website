@@ -476,6 +476,8 @@ class ProductCategory(
 
 
 class ProductStatsManager(models.Manager):
+    """Manager used by ShopTicketStatsDetailView showing stats for a single tickettype."""
+
     def with_ticket_stats(self):
         return (
             self.filter(
@@ -492,10 +494,15 @@ class ProductStatsManager(models.Manager):
                 - F("total_units_refunded"),
             )
             .exclude(total_units_sold=0)
+            # calculate the profit for this product
             .annotate(profit=F("price") - F("cost"))
+            # calculate the total income for the units sold of this product
             .annotate(total_income=F("price") * F("total_units_sold"))
+            # calculate the total cost for the units sold of this product
             .annotate(total_cost=F("cost") * F("total_units_sold"))
+            # calculate the total profit for this product
             .annotate(total_profit=F("profit") * F("total_units_sold"))
+            # calculate the total number of orders with this product
             .annotate(paid_order_count=Count("orderproductrelation__order"))
         )
 

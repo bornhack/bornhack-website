@@ -16,10 +16,6 @@ class CampViewMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        # if this queryset is empty return it right away, because nothing for us to do
-        if not queryset:
-            return queryset
-
         # do we have a camp_filter on this model
         if not hasattr(self.model, "camp_filter"):
             return queryset

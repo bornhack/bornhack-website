@@ -18,7 +18,7 @@ class ChainViewMixin:
         self.chain = get_object_or_404(Chain, slug=self.kwargs["chain_slug"])
 
 
-class CredebtorViewMixin:
+class CredebtorViewMixin(ChainViewMixin):
     """
     The CredebtorViewMixin sets self.credebtor based on credebtor_slug from the URL
     """
@@ -27,6 +27,7 @@ class CredebtorViewMixin:
         super().setup(*args, **kwargs)
         self.credebtor = get_object_or_404(
             Credebtor,
+            chain=self.chain,
             slug=self.kwargs["credebtor_slug"],
         )
 

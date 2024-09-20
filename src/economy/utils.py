@@ -1,8 +1,10 @@
 import csv
+import datetime
 import io
+import logging
 import tempfile
-from datetime import datetime
 from decimal import Decimal
+from decimal import InvalidOperation
 from os.path import basename
 from pathlib import Path
 from zipfile import ZipFile
@@ -14,6 +16,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
+from camps.utils import get_closest_camp
 from economy.models import BankAccount
 from economy.models import ClearhausSettlement
 from economy.models import CoinifyBalance
@@ -23,6 +26,10 @@ from economy.models import EpayTransaction
 from economy.models import Expense
 from economy.models import MobilePayTransaction
 from economy.models import Pos
+from economy.models import PosProduct
+from economy.models import PosProductCost
+from economy.models import PosSale
+from economy.models import PosTransaction
 from economy.models import Reimbursement
 from economy.models import Revenue
 from economy.models import ZettleBalance
@@ -34,6 +41,7 @@ from shop.models import Order
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
+logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def import_epay_csv(csvreader):
@@ -59,14 +67,14 @@ def import_epay_csv(csvreader):
             auth_amount=Decimal(row[4]),
             currency=row[16],
             auth_date=timezone.make_aware(
-                datetime.strptime(row[6], "%d-%m-%Y %H:%M"),
+                datetime.datetime.strptime(row[6], "%d-%m-%Y %H:%M"),
                 timezone=cph,
             ),
             description=row[11],
             card_type=row[13],
             captured_amount=Decimal(row[19]),
             captured_date=timezone.make_aware(
-                datetime.strptime(row[21], "%d-%m-%Y %H:%M"),
+                datetime.datetime.strptime(row[21], "%d-%m-%Y %H:%M"),
                 timezone=cph,
             ),
             transaction_fee=row[24],
@@ -101,8 +109,8 @@ class CoinifyCSVImporter:
                 coinify_id=row[0],
                 coinify_id_alpha=row[1],
                 coinify_created=timezone.make_aware(
-                    datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S"),
-                    timezone=timezone.utc,
+                    datetime.datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S"),
+                    timezone=datetime.timezone.utc,
                 ),
                 payment_amount=Decimal(row[3]),
                 payment_currency=row[4],
@@ -140,8 +148,8 @@ class CoinifyCSVImporter:
             ci, created = CoinifyPayout.objects.get_or_create(
                 coinify_id=row[0],
                 coinify_created=timezone.make_aware(
-                    datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S"),
-                    timezone=timezone.utc,
+                    datetime.datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S"),
+                    timezone=datetime.timezone.utc,
                 ),
                 amount=Decimal(row[2]),
                 fee=Decimal(row[3]),
@@ -1179,3 +1187,138 @@ class AccountingExporter:
                 # generate an absolute path
                 fullpath = Path(settings.BASE_DIR) / "static_src" / filepath
                 zh.write(fullpath, f"{subdir}/{basename(fullpath)}")
+
+
+def import_pos_sales_json(transactions):
+    """Importer for sales details from the Pos system.
+
+    Expects a list of dicts like so:
+
+        {'_id': 'eKCFbcn6fvi5eaTJJ', 'userId': 'Y7NgNzTJRxPKupCv5', 'locationId': 'bTasxE2YYXZh35wtQ', 'currency': 'HAX', 'country': 'DK', 'amount': 55, 'timestamp': {'$date': '2021-08-23T18:11:05.379Z'}, 'products': [{'_id': '7oCSE2xt6szw5cZYQ', 'createdAt': {'$date': '2021-08-21T13:41:32.073Z'}, 'brandName': 'Gamma', 'name': 'Tap: Bando', 'description': 'IPA', 'salePrice': '35', 'unitSize': '40', 'sizeUnit': 'cl', 'abv': '6.5', 'tags': ['beer', 'tap'], 'shopPrices': [{'buyPrice': 17.5, 'timestamp': {'$date': '2021-08-21T13:41:32.073Z'}}], 'locationIds': ['bTasxE2YYXZh35wtQ'], 'updatedAt': {'$date': '2021-08-23T11:27:05.459Z'}, 'tap': '1'}, {'_id': 'Z4ZxsPPEDfDbTLHsz', 'createdAt': {'$date': '2021-08-21T13:27:25.47Z'}, 'brandName': 'Vestfyen', 'name': 'Tap: Pilsner', 'description': '', 'salePrice': '20', 'unitSize': '40', 'sizeUnit': 'cl', 'abv': '4.6', 'tags': ['tap', 'beer'], 'shopPrices': [{'buyPrice': 8.65, 'timestamp': {'$date': '2021-08-21T13:27:25.471Z'}}], 'tap': '2', 'updatedAt': {'$date': '2021-08-23T14:46:27.259Z'}, 'locationIds': ['bTasxE2YYXZh35wtQ']}]}
+
+    """
+    new_transactions = 0
+    new_products = 0
+    new_sales = 0
+    new_costs = 0
+    # loop over transactions
+    logger.info(f"Importing {len(transactions)} transactions...")
+    for tx in transactions:
+        # parse timestamp
+        try:
+            # with ms
+            timestamp = datetime.datetime.strptime(
+                tx["timestamp"]["$date"],
+                "%Y-%m-%dT%H:%M:%S.%fZ",
+            ).replace(tzinfo=datetime.timezone.utc)
+        except ValueError:
+            # without ms
+            timestamp = datetime.datetime.strptime(
+                tx["timestamp"]["$date"],
+                "%Y-%m-%dT%H:%M:%SZ",
+            ).replace(tzinfo=datetime.timezone.utc)
+        # find the Pos related to the camp during which the transaction happened
+        camp = get_closest_camp(timestamp)
+        pos = Pos.objects.get(
+            external_id=tx["locationId"],
+            team__camp=camp,
+        )
+
+        # create or get the transaction
+        transaction, created = PosTransaction.objects.get_or_create(
+            external_transaction_id=tx["_id"],
+            defaults={
+                "pos": pos,
+                "external_user_id": tx.get("userId", ""),
+                "timestamp": timestamp,
+            },
+        )
+        if not created:
+            continue
+        new_transactions += 1
+        logger.debug(
+            f"Found new transaction with txid {transaction.external_transaction_id} as PosTransaction {transaction.pk} - importing products and sales...",
+        )
+        # loop over each sale in the transaction
+        for sale in tx["products"]:
+            if sale["salePrice"] == 0:
+                # skip sales where the sales_price is 0, these are typically pre-sold special
+                # event sales like for birthdays and weddings
+                continue
+            # get abv when possible
+            try:
+                abv = Decimal(str(sale.get("abv", 0)))
+            except (ValueError, InvalidOperation):
+                # handle stuff like 'abv': {'$numberDouble': 'NaN'}
+                abv = 0
+            # get tags (sometimes a list and sometimes a comma seperated string, we want the latter)
+            tags = sale.get("tags", [])
+            if isinstance(tags, list):
+                tags = ",".join(tags)
+            # create or update the PosProduct
+            product, created = PosProduct.objects.update_or_create(
+                external_id=sale["_id"],
+                defaults={
+                    "brand_name": sale["brandName"],
+                    "name": sale["name"],
+                    "description": sale.get("description", ""),
+                    "sales_price": int(sale["salePrice"]),
+                    "unit_size": Decimal(sale["unitSize"]),
+                    "size_unit": sale["sizeUnit"],
+                    "abv": abv,
+                    "tags": tags,
+                },
+            )
+            if created:
+                logger.debug(
+                    f"Created new product {product.external_id} as PosProduct {product.pk}: {product.brand_name} - {product.name}",
+                )
+                new_products += 1
+            # create PosProductCost objects
+            if "shopPrices" in sale:
+                for cost in sale["shopPrices"]:
+                    # parse timestamp
+                    try:
+                        # with ms
+                        timestamp = datetime.datetime.strptime(
+                            cost["timestamp"]["$date"],
+                            "%Y-%m-%dT%H:%M:%S.%fZ",
+                        ).replace(tzinfo=datetime.timezone.utc)
+                    except ValueError:
+                        # without ms
+                        timestamp = datetime.datetime.strptime(
+                            cost["timestamp"]["$date"],
+                            "%Y-%m-%dT%H:%M:%SZ",
+                        ).replace(tzinfo=datetime.timezone.utc)
+                    camp = get_closest_camp(timestamp)
+                    # parse price
+                    try:
+                        price = Decimal(str(round(cost["buyPrice"], 2)))
+                    except (ValueError, InvalidOperation, TypeError):
+                        # skip stuff like 'abv': {'$numberDouble': 'NaN'}
+                        continue
+                    # create cost as needed
+                    cost, created = PosProductCost.objects.get_or_create(
+                        camp=camp,
+                        product=product,
+                        timestamp=timestamp,
+                        product_cost=price,
+                    )
+                    if created:
+                        logger.debug(
+                            f"Created new PosProductCost object {cost.pk} for product {product} at price {cost.product_cost}",
+                        )
+                        new_costs += 1
+
+            # create the PosSale object
+            possale = PosSale.objects.create(
+                transaction=transaction,
+                product=product,
+                sales_price=int(sale["salePrice"]),
+            )
+            new_sales += 1
+            logger.debug(
+                f"Created new PosSale {possale.pk} for PosProduct {product.brand_name} - {product.name} sold for {possale.sales_price} HAX",
+            )
+    # all done
+    return new_products, new_transactions, new_sales, new_costs
