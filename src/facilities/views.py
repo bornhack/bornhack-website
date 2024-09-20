@@ -1,11 +1,11 @@
 from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
-from django.templatetags.static import static
 from jsonview.views import JsonView
 
 from .mixins import FacilityTypeViewMixin
@@ -79,11 +79,17 @@ class FacilityListView(FacilityTypeViewMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
-                "loggedIn": self.request.user.is_authenticated,
-                "grid": static('json/grid.geojson'),
-                "name": context['facilitytype'].name,
-                "url": reverse("facilities:facility_list_geojson", kwargs={"camp_slug":context['facilitytype'].responsible_team.camp.slug, "facility_type_slug":context['facilitytype'].slug})
-                }
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+            "name": context["facilitytype"].name,
+            "url": reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": context["facilitytype"].responsible_team.camp.slug,
+                    "facility_type_slug": context["facilitytype"].slug,
+                },
+            ),
+        }
         return context
 
     def get_queryset(self, *args, **kwargs):
