@@ -93,7 +93,9 @@ class BrandColumn(tables.Column):
 class NameColumn(tables.Column):
     def render(self, value, record, table):
         button = filter_button(value, table.request, **{"name": value})
-        url = reverse("backoffice:posproduct_list", kwargs={"camp_slug": table.request.camp.slug})
+        url = reverse(
+            "backoffice:posproduct_list", kwargs={"camp_slug": table.request.camp.slug}
+        )
         if hasattr(record, "product"):
             product = record.product
         else:

@@ -443,10 +443,9 @@ class PosProductCostListView(
     def get_context_data(self, **kwargs):
         """Include total number of costs."""
         context = super().get_context_data(**kwargs)
-        context["total_costs"] = (
-            PosProductCost.objects.filter(camp=self.camp).count()
-        )
+        context["total_costs"] = PosProductCost.objects.filter(camp=self.camp).count()
         return context
+
 
 class PosProductCostUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     """Use this view to update PosProductCost objects."""
