@@ -36,7 +36,7 @@ class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
         context["externalLayers"] = ExternalLayer.objects.filter(
-            Q(camp=self.camp) | Q(camp=None)
+            Q(camp=self.camp) | Q(camp=None),
         )
         return context
 
@@ -87,7 +87,8 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
             )
         if self.errorCount > 0:
             messages.error(
-                self.request, "%i features with errors not imported" % (self.errorCount)
+                self.request,
+                "%i features with errors not imported" % (self.errorCount),
             )
         return HttpResponseRedirect(
             reverse(

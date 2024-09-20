@@ -75,11 +75,11 @@ class MapView(CampViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["facilitytype_list"] = FacilityType.objects.filter(
-            responsible_team__camp=self.camp
+            responsible_team__camp=self.camp,
         )
         context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
         context["externalLayers"] = ExternalLayer.objects.filter(
-            Q(camp=self.camp) | Q(camp=None)
+            Q(camp=self.camp) | Q(camp=None),
         )
         return context
 

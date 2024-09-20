@@ -108,7 +108,8 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
             )
         if errorCount > 0:
             messages.error(
-                self.request, "%i features with errors not imported" % (errorCount)
+                self.request,
+                "%i features with errors not imported" % (errorCount),
             )
         return HttpResponseRedirect(
             reverse(

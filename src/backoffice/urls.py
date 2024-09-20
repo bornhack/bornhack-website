@@ -216,7 +216,9 @@ urlpatterns = [
             [
                 path("", MapsLayerView.as_view(), name="maps_layer_list"),
                 path(
-                    "create/", MapsLayerCreateView.as_view(), name="maps_layer_create"
+                    "create/",
+                    MapsLayerCreateView.as_view(),
+                    name="maps_layer_create",
                 ),
                 path(
                     "external/",

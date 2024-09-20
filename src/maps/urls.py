@@ -17,7 +17,7 @@ urlpatterns = [
         include(
             [
                 path("geojson/", LayerGeoJSONView.as_view(), name="map_layer_geojson"),
-            ]
+            ],
         ),
     ),
     re_path("kfproxy/(?P<path>.*)", MapProxyView.as_view(), name="proxy"),
