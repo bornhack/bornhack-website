@@ -60,6 +60,18 @@ class PosProductFilter(FilterSet):
             product__uuid=models.OuterRef("uuid"),
             camp=self.request.camp,
         ).order_by("-timestamp")
+
+        # define subq for getting number of costs for this product
+        cost_count = (
+            PosProductCost.objects.filter(
+                product=models.OuterRef("pk"),
+                camp=self.request.camp,
+            )  # filter by product and camp
+            .values("product")  # group by product to return only a single row
+            .annotate(cost_count=models.Count("uuid"))  # count number of costs
+            .values("cost_count")  # select the count
+        )
+
         # annotate sales count, sales sum, and cost
         self.queryset = PosProduct.objects.filter(
             campfilter,
@@ -73,6 +85,7 @@ class PosProductFilter(FilterSet):
                 0,
                 output_field=models.DecimalField(),
             ),
+            cost_count=models.Subquery(cost_count),
         )
         return super().qs
 
