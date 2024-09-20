@@ -29,7 +29,7 @@ lxml==5.3.0
 olefile==0.47
 openpyxl==3.1.2
 pandas==2.2.2
-pipdeptree==2.21.0
+pipdeptree==2.23.4
 psycopg2-binary==2.9.9
 PyPDF2==3.0.1
 python-magic==0.4.27
