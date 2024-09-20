@@ -405,3 +405,4 @@ class PosFactory(factory.django.DjangoModelFactory):
 
     team = factory.SubFactory("teams.factories.TeamFactory")
     name = factory.Faker("name")
+    external_id = factory.Faker("word")
