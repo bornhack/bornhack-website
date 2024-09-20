@@ -21,8 +21,8 @@ from django.views.generic import View
 
 from ..forms import ShopTicketRefundFormSet
 from ..forms import TicketGroupRefundFormSet
-from ..mixins import InfoTeamPermissionMixin
 from ..mixins import EconomyTeamPermissionMixin
+from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
 from shop.forms import RefundForm
@@ -209,9 +209,12 @@ class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, Vie
         invoices = Invoice.objects.filter(
             Q(id__in=invoicesQ) | Q(order__id__in=ordersQ),
         )
-        context['invoices'] = list(invoices.values("id"))
-        for invoice in context['invoices']:
-            invoice['url'] = reverse('backoffice:invoice_download', kwargs={'camp_slug': self.camp.slug, 'invoice_id': invoice['id']})
+        context["invoices"] = list(invoices.values("id"))
+        for invoice in context["invoices"]:
+            invoice["url"] = reverse(
+                "backoffice:invoice_download",
+                kwargs={"camp_slug": self.camp.slug, "invoice_id": invoice["id"]},
+            )
         return render(request, self.template_name, context)
 
 

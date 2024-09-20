@@ -1,6 +1,6 @@
 $(function() {
   const invoices = JSON.parse(
-    document.getElementById('invoices').textContent 
+    document.getElementById('invoices').textContent
   );
   const downloadFiles = [];
 
