@@ -229,3 +229,9 @@ class InvoiceDownloadForm(forms.Form):
     def clean(self):
         cleaned_data = super(InvoiceDownloadForm, self).clean()
         return {"invoices": cleaned_data.get('invoices', "").split(), "orders": cleaned_data.get('orders', "").split()}
+
+      
+class PosSalesJSONForm(forms.Form):
+    sales = forms.FileField(
+        help_text="POS sales.json file. Previously imported sales will be skipped and will not create duplicates.",
+    )

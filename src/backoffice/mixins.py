@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 
 from camps.mixins import CampViewMixin
 from economy.models import Pos
+from economy.models import PosSale
 from utils.mixins import RaisePermissionRequiredMixin
 
 

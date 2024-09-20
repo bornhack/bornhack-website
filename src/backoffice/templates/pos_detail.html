@@ -18,24 +18,35 @@
       <table class="table">
         <tbody>
           <tr>
-            <th>Pos Name</th>
+            <th>Name</th>
             <td>{{ pos.name }}</td>
           </tr>
           <tr>
             <th>Team</th>
             <td>{{ pos.team }}</p>
           </tr>
+          <tr>
+            <th>Pos Reports</th>
+            <td><a href="{% url 'backoffice:posreport_list' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.pos_reports.count }} reports</a></p>
+          </tr>
+          <tr>
+            <th>Transactions</th>
+            <td><a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.pos_transactions.count }} transactions</a></p>
+          </tr>
+          <tr>
+            <th>Sales</th>
+            <td><a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.sales.count }} products sold</a></p>
+          </tr>
+          <tr>
+            <th>Total Sales</th>
+            <td>{{ pos.total_sales|default:0 }} HAX</p>
+          </tr>
         </tbody>
       </table>
-      <h3>Pos Reports</h3>
-      {% if pos.pos_reports.exists %}
-        {% include "includes/posreport_list_table.html" with posreport_list=pos.pos_reports.all %}
-      {% else %}
-        None found
-      {% endif %}
       <br>
       {% if perms.camps.orgateam_permission %}
         <a href="{% url 'backoffice:posreport_create' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create PosReport</a>
+        <a href="{% url 'backoffice:possale_import' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Import Pos Sales JSON</a>
       {% endif %}
     </div>
   </div>

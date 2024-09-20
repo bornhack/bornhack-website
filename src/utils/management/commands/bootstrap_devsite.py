@@ -2002,36 +2002,42 @@ class Command(BaseCommand):
             token=get_random_string(length=32),
             category="Physical",
             description="Token in the back of the speakers tent (in binary)",
+            active=True,
         )
         tokens[1] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Internet",
             description="Twitter",
+            active=True,
         )
         tokens[2] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Website",
             description="Token hidden in the X-Secret-Token HTTP header on the BornHack website",
+            active=True,
         )
         tokens[3] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Physical",
             description="Token in infodesk (QR code)",
+            active=True,
         )
         tokens[4] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Physical",
             description=f"Token on the back of the BornHack {year} badge",
+            active=True,
         )
         tokens[5] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
             category="Website",
             description="Token hidden in EXIF data in the logo posted on the website sunday",
+            active=True,
         )
 
         return tokens
@@ -2050,7 +2056,8 @@ class Command(BaseCommand):
 
     def create_camp_expenses(self, camp):
         self.output(f"Creating expenses for {camp}...")
-        ExpenseFactory.create_batch(200, camp=camp)
+        for team in Team.objects.filter(camp=camp):
+            ExpenseFactory.create_batch(10, camp=camp, responsible_team=team)
 
     def create_camp_reimbursements(self, camp):
         self.output(f"Creating reimbursements for {camp}...")
@@ -2259,8 +2266,10 @@ class Command(BaseCommand):
         Pos.objects.create(
             name="Infodesk",
             team=teams["info"],
+            external_id="HHR9izotB6HLzgT6k",
         )
         Pos.objects.create(
             name="Bar",
             team=teams["bar"],
+            external_id="bTasxE2YYXZh35wtQ",
         )
