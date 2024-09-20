@@ -44,4 +44,3 @@ Pillow==10.4.0
 numpy==1.26.4
 
 django-weasyprint==2.3.0
-
