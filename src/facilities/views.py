@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
+from django.templatetags.static import static
 from jsonview.views import JsonView
 
 from .mixins import FacilityTypeViewMixin
@@ -74,6 +75,16 @@ class FacilityListGeoJSONView(CampViewMixin, JsonView):
 class FacilityListView(FacilityTypeViewMixin, ListView):
     model = Facility
     template_name = "facility_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+                "loggedIn": self.request.user.is_authenticated,
+                "grid": static('json/grid.geojson'),
+                "name": context['facilitytype'].name,
+                "url": reverse("facilities:facility_list_geojson", kwargs={"camp_slug":context['facilitytype'].responsible_team.camp.slug, "facility_type_slug":context['facilitytype'].slug})
+                }
+        return context
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
