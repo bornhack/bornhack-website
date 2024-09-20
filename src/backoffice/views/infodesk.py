@@ -10,17 +10,18 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
-from django.views.generic import View
+from django.views.generic import FormView
 
 from ..forms import ShopTicketRefundFormSet
 from ..forms import TicketGroupRefundFormSet
+from ..forms import InvoiceDownloadForm
+from ..mixins import InfoTeamPermissionMixin
 from ..mixins import EconomyTeamPermissionMixin
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
@@ -188,34 +189,30 @@ class InvoiceListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     template_name = "invoice_list.html"
 
 
-class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, View):
+class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
     model = Invoice
     template_name = "invoice_download.html"
+    form_class = InvoiceDownloadForm
+    success_url = "."  # Redirect to the same page on successful submission
 
-    def parseQuery(self, query):
-        if query != "":
-            return query.split()
-        else:
-            return []
-
-    def get(self, request, *args, **kwargs):
-        context = {}
-        return render(request, self.template_name, context)
-
-    def post(self, request, camp_slug):
-        context = {}
-        ordersQ = self.parseQuery(request.POST.get("orders"))
-        invoicesQ = self.parseQuery(request.POST.get("invoices"))
-        invoices = Invoice.objects.filter(
-            Q(id__in=invoicesQ) | Q(order__id__in=ordersQ),
-        )
-        context["invoices"] = list(invoices.values("id"))
-        for invoice in context["invoices"]:
-            invoice["url"] = reverse(
-                "backoffice:invoice_download",
-                kwargs={"camp_slug": self.camp.slug, "invoice_id": invoice["id"]},
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = self.get_form()
+        if form.is_valid():
+            orders = form.cleaned_data['orders']
+            invoices = form.cleaned_data['invoices']
+            filtered_invoices = Invoice.objects.filter(
+                Q(id__in=invoices) | Q(order__id__in=orders)
             )
-        return render(request, self.template_name, context)
+            context['invoices'] = list(filtered_invoices.values('id'))
+            for invoice in context['invoices']:
+                invoice['url'] = reverse('backoffice:invoice_download', kwargs={'camp_slug': self.camp.slug, 'invoice_id': invoice['id']})
+        else:
+            context['invoices'] = []
+        return context
+
+    def form_valid(self, form):
+        return super().form_invalid(form)
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):

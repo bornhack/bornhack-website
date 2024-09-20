@@ -220,3 +220,12 @@ TicketGroupRefundFormSet = modelformset_factory(
     form=TicketGroupRefundForm,
     extra=0,
 )
+
+
+class InvoiceDownloadForm(forms.Form):
+    orders = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":"5"}))
+    invoices = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows":"5"}))
+
+    def clean(self):
+        cleaned_data = super(InvoiceDownloadForm, self).clean()
+        return {"invoices": cleaned_data.get('invoices', "").split(), "orders": cleaned_data.get('orders', "").split()}
