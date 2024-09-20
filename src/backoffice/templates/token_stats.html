@@ -17,6 +17,7 @@
             <tr>
               <th>Email</th>
               <th>Finds</th>
+              <th>Last token found</th>
             </tr>
           </thead>
           <tbody>
@@ -24,6 +25,7 @@
               <tr>
                 <td>{{ user.email }}</td>
                 <td>{{ user.token_find_count }}</td>
+                <td>{{ user.last_token_find }}</td>
               </tr>
             {% endfor %}
           </tbody>

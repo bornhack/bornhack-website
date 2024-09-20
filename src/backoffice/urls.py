@@ -113,13 +113,21 @@ from .views import PosCreateView
 from .views import PosDeleteView
 from .views import PosDetailView
 from .views import PosListView
+from .views import PosProductCostListView
+from .views import PosProductCostUpdateView
+from .views import PosProductListView
+from .views import PosProductUpdateView
 from .views import PosReportBankCountEndView
 from .views import PosReportBankCountStartView
 from .views import PosReportCreateView
 from .views import PosReportDetailView
+from .views import PosReportListView
 from .views import PosReportPosCountEndView
 from .views import PosReportPosCountStartView
 from .views import PosReportUpdateView
+from .views import PosSaleListView
+from .views import PosSalesImportView
+from .views import PosTransactionListView
 from .views import PosUpdateView
 from .views import RefundDetailView
 from .views import RefundListView
@@ -1179,6 +1187,55 @@ urlpatterns = [
                     name="pos_create",
                 ),
                 path(
+                    "products/",
+                    include(
+                        [
+                            path(
+                                "",
+                                PosProductListView.as_view(),
+                                name="posproduct_list",
+                            ),
+                            path(
+                                "<uuid:posproduct_uuid>/update/",
+                                PosProductUpdateView.as_view(),
+                                name="posproduct_update",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "product_costs/",
+                    include(
+                        [
+                            path(
+                                "",
+                                PosProductCostListView.as_view(),
+                                name="posproductcost_list",
+                            ),
+                            path(
+                                "<uuid:posproductcost_uuid>/update/",
+                                PosProductCostUpdateView.as_view(),
+                                name="posproductcost_update",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "transactions/",
+                    PosTransactionListView.as_view(),
+                    name="postransaction_list",
+                ),
+                path(
+                    "sales/",
+                    PosSaleListView.as_view(),
+                    name="possale_list",
+                ),
+                path(
+                    "sales/import/",
+                    PosSalesImportView.as_view(),
+                    name="possale_import",
+                ),
+                path(
                     "<slug:pos_slug>/",
                     include(
                         [
@@ -1201,6 +1258,11 @@ urlpatterns = [
                                 "reports/",
                                 include(
                                     [
+                                        path(
+                                            "",
+                                            PosReportListView.as_view(),
+                                            name="posreport_list",
+                                        ),
                                         path(
                                             "create/",
                                             PosReportCreateView.as_view(),
