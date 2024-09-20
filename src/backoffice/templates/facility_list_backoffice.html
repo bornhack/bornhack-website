@@ -76,13 +76,13 @@
         }));
 
         {% if request.user.is_authenticated %}
-        const loggedIn = true;
+          const loggedIn = true;
         {% else %}
-        const loggedIn = false;
+          const loggedIn = false;
         {% endif %}
         {% for facility in facilitytype_list %}
-        {% url "facilities:facility_list_geojson" camp_slug=facility.responsible_team.camp.slug facility_type_slug=facility.slug as layerUrl %}
-        mapObject.loadLayer("{{layerUrl}}", "{{facility.name}}", facilityOptions);
+          {% url "facilities:facility_list_geojson" camp_slug=facility.responsible_team.camp.slug facility_type_slug=facility.slug as layerUrl %}
+          mapObject.loadLayer("{{layerUrl}}", "{{facility.name}}", facilityOptions);
         {% endfor %}
         mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
           onEachFeature: mapObject.onEachGrid,
@@ -93,17 +93,17 @@
           },
         }, false);
         {% for facility in facility_list %}
-        {% url "backoffice:facility_detail" camp_slug=facility.camp.slug facility_uuid=facility.uuid as detail %}
-        L.marker([
+          {% url "backoffice:facility_detail" camp_slug=facility.camp.slug facility_uuid=facility.uuid as detail %}
+          L.marker([
             {{ facility.location.y }},
             {{ facility.location.x }}
-        ], {
+          ], {
             icon: L.AwesomeMarkers.icon({
-                icon: "{{ facility.facility_type.icon }}",
-                markerColor: iconColors['{{ facility.facility_type.marker }}'],
-                prefix: 'fa',
-            }) 
-        }).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(mapObject.map);
+              icon: "{{ facility.facility_type.icon }}",
+              markerColor: iconColors['{{ facility.facility_type.marker }}'],
+              prefix: 'fa',
+            })
+          }).bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ detail }}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>{% endif %}").addTo(mapObject.map);
         {% endfor %}
       </script>
 

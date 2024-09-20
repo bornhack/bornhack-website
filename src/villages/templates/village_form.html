@@ -28,19 +28,19 @@
     <button class="btn btn-primary pull-right" type="submit">Save</button>
   </form>
   <script>
-      var mapObject = undefined;
-      window.addEventListener("map:init", function (event) {
-          var map = event.detail.map;
-          mapObject = new BHMap(map);
-          mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
-              onEachFeature: mapObject.onEachGrid,
-              style: {
-                  color: "gray",
-                  fillOpacity: 0.0,
-                  weight: 0.5
-              },
-          });
+    var mapObject = undefined;
+    window.addEventListener("map:init", function (event) {
+      var map = event.detail.map;
+      mapObject = new BHMap(map);
+      mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
+        onEachFeature: mapObject.onEachGrid,
+        style: {
+          color: "gray",
+          fillOpacity: 0.0,
+          weight: 0.5
+        },
       });
+    });
   </script>
 
 {% endblock %}

@@ -1,10 +1,10 @@
 import logging
 
+from colorfield.fields import ColorField
 from django.contrib.gis.db.models import GeometryCollectionField
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
 
-from colorfield.fields import ColorField
 from camps.models import Camp
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
@@ -50,14 +50,14 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
     group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
-        related_name="layers"
+        related_name="layers",
     )
 
     camp = models.ForeignKey(
         Camp,
         on_delete=models.CASCADE,
         null=True,
-        blank=True
+        blank=True,
     )
 
     def __str__(self):
@@ -143,7 +143,7 @@ class ExternalLayer(UUIDModel):
 
     url = models.URLField(
         max_length=255,
-        help_text="URL of the GEOJSON layer"
+        help_text="URL of the GEOJSON layer",
     )
 
     camp = models.ForeignKey(Camp, on_delete=models.CASCADE, null=True, blank=True)

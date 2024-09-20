@@ -38,18 +38,18 @@
     const mapObject = new BHMap("map");
     mapObject.setDefaultView();
     {% if request.user.is_authenticated %}
-    const loggedIn = true;
+      const loggedIn = true;
     {% else %}
-    const loggedIn = false;
+      const loggedIn = false;
     {% endif %}
     mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
-        onEachFeature: mapObject.onEachGrid,
-        style: {
-          color: "gray",
-          fillOpacity: 0.0,
-          weight: 0.5
-        },
-      }, false);
+      onEachFeature: mapObject.onEachGrid,
+      style: {
+        color: "gray",
+        fillOpacity: 0.0,
+        weight: 0.5
+      },
+    }, false);
 
     var marker = L.marker([{{ village.location.y }}, {{ village.location.x }}], {icon: L.AwesomeMarkers.icon({
       icon: "fa fa-campground",

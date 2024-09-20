@@ -14,10 +14,10 @@
 {% block content %}
   <div class="panel panel-default">
     <div class="panel-heading">
-    <h3 class="panel-title">{% if request.resolver_match.url_name == "maps_feature_update" %}Update {{feature.name }} {% else %}Create new feature{% endif %} in {{ layer.name }}</h3>
+      <h3 class="panel-title">{% if request.resolver_match.url_name == "maps_feature_update" %}Update {{feature.name }} {% else %}Create new feature{% endif %} in {{ layer.name }}</h3>
     </div>
     <div class="panel-body">
-    <p class="lead">{% if request.resolver_match.url_name == "maps_feature_update" %}Update {{ feature.name }}{% else %}Create feature{% endif %}</p>
+      <p class="lead">{% if request.resolver_match.url_name == "maps_feature_update" %}Update {{ feature.name }}{% else %}Create feature{% endif %}</p>
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}

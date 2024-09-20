@@ -44,35 +44,35 @@
               </td>
             </tr>
           {% endfor %}
-      </table>
-      <h3>External Layers</h3>
-      <p>
-        <a href="{% url 'backoffice:maps_external_layer_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Layer</a>
-      </p>
-      <table class="table datatable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Camp</th>
-            <th>URL</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ft in externalLayers %}
-            <tr>
-              <td>{{ ft.name }}</td>
-              <td>{{ ft.description|default:"N/A" }}</td>
-              <td>{{ ft.camp.title|default:"All" }}</td>
-              <td>{{ ft.url }}</td>
-              <td>
-                <a href="{% url "backoffice:maps_external_layer_update" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-                <a href="{% url "backoffice:maps_external_layer_delete" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-              </td>
-            </tr>
-          {% endfor %}
         </table>
+        <h3>External Layers</h3>
+        <p>
+          <a href="{% url 'backoffice:maps_external_layer_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Layer</a>
+        </p>
+        <table class="table datatable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Camp</th>
+              <th>URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ft in externalLayers %}
+              <tr>
+                <td>{{ ft.name }}</td>
+                <td>{{ ft.description|default:"N/A" }}</td>
+                <td>{{ ft.camp.title|default:"All" }}</td>
+                <td>{{ ft.url }}</td>
+                <td>
+                  <a href="{% url "backoffice:maps_external_layer_update" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:maps_external_layer_delete" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
       </div>
-    </div>
 {% endblock %}

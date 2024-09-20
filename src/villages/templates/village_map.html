@@ -34,7 +34,7 @@
       const mapObject = new BHMap("map");
       mapObject.setDefaultView();
       mapObject.map.addControl(new L.Control.Fullscreen({
-        pseudoFullscreen: true, 
+        pseudoFullscreen: true,
       }));
       mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
         onEachFeature: mapObject.onEachGrid,
@@ -45,18 +45,18 @@
         },
       }, false, gridLoaded());
       mapObject.onGridClick = function (e) {
-            e.target.setStyle({fillOpacity: 1.0});
-            let center = e.target.getCenter();
-            alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
+        e.target.setStyle({fillOpacity: 1.0});
+        let center = e.target.getCenter();
+        alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
       }
       {% if request.user.is_authenticated %}
-      const loggedIn = true;
+        const loggedIn = true;
       {% else %}
-      const loggedIn = false;
+        const loggedIn = false;
       {% endif %}
       function gridLoaded() {
-      {% url "villages_geojson" camp_slug=camp.slug as villageLayerUrl %}
-      mapObject.loadLayer("{{ villageLayerUrl }}", "Villages", villageOptions, true);
+        {% url "villages_geojson" camp_slug=camp.slug as villageLayerUrl %}
+        mapObject.loadLayer("{{ villageLayerUrl }}", "Villages", villageOptions, true);
       }
     </script>
 

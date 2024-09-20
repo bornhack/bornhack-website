@@ -8,15 +8,15 @@
     </div>
     <div class="panel-body">
       {% if facility.feedbacks.count > 0 %}
-      <p class="lead">This Facility has <b>{{ facility.feedbacks.count }}</b> Feedback and can not be deleted</p>
+        <p class="lead">This Facility has <b>{{ facility.feedbacks.count }}</b> Feedback and can not be deleted</p>
       {% endif %}
       <form method="POST">
         {% csrf_token %}
         {% if facility.feedbacks.count == 0 %}
-        <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
+          <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
         {% endif %}
         <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-      </form> 
+      </form>
     </div>
   </div>
 {% endblock content %}

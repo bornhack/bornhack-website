@@ -14,17 +14,17 @@ from camps.views import CampRedirectView
 from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
+from maps.views import MapView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
 from villages.views import VillageCreateView
 from villages.views import VillageDeleteView
 from villages.views import VillageDetailView
-from villages.views import VillageListView
-from villages.views import VillageUpdateView
 from villages.views import VillageListGeoJSONView
+from villages.views import VillageListView
 from villages.views import VillageMapView
-from maps.views import MapView
+from villages.views import VillageUpdateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)

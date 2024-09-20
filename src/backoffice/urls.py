@@ -78,26 +78,26 @@ from .views import FacilityOpeningHoursDeleteView
 from .views import FacilityOpeningHoursUpdateView
 from .views import FacilityTypeCreateView
 from .views import FacilityTypeDeleteView
+from .views import FacilityTypeImportView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
-from .views import FacilityTypeImportView
 from .views import FacilityUpdateView
 from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView
 from .views import MapsExternalLayerCreateView
-from .views import MapsExternalLayerUpdateView
 from .views import MapsExternalLayerDeleteView
-from .views import MapsLayerView
-from .views import MapsLayerImportView
-from .views import MapsLayerUpdateView
+from .views import MapsExternalLayerUpdateView
+from .views import MapsFeatureCreateView
+from .views import MapsFeatureDeleteView
+from .views import MapsFeaturesView
+from .views import MapsFeatureUpdateView
 from .views import MapsLayerCreateView
 from .views import MapsLayerDeleteView
-from .views import MapsFeaturesView
-from .views import MapsFeatureCreateView
-from .views import MapsFeatureUpdateView
-from .views import MapsFeatureDeleteView
+from .views import MapsLayerImportView
+from .views import MapsLayerUpdateView
+from .views import MapsLayerView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -207,12 +207,18 @@ urlpatterns = [
         include(
             [
                 path("", MapsLayerView.as_view(), name="maps_layer_list"),
-                path("create/", MapsLayerCreateView.as_view(), name="maps_layer_create"),
+                path(
+                    "create/", MapsLayerCreateView.as_view(), name="maps_layer_create"
+                ),
                 path(
                     "external/",
                     include(
                         [
-                            path("create/", MapsExternalLayerCreateView.as_view(), name="maps_external_layer_create"),
+                            path(
+                                "create/",
+                                MapsExternalLayerCreateView.as_view(),
+                                name="maps_external_layer_create",
+                            ),
                             path(
                                 "<uuid:external_layer_uuid>/",
                                 include(
@@ -227,7 +233,7 @@ urlpatterns = [
                                             MapsExternalLayerUpdateView.as_view(),
                                             name="maps_external_layer_update",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
                         ],
@@ -237,8 +243,16 @@ urlpatterns = [
                     "<slug:layer_slug>/",
                     include(
                         [
-                            path("", MapsFeaturesView.as_view(), name="maps_features_list"),
-                            path("create/", MapsFeatureCreateView.as_view(), name="maps_feature_create"),
+                            path(
+                                "",
+                                MapsFeaturesView.as_view(),
+                                name="maps_features_list",
+                            ),
+                            path(
+                                "create/",
+                                MapsFeatureCreateView.as_view(),
+                                name="maps_feature_create",
+                            ),
                             path(
                                 "import/",
                                 MapsLayerImportView.as_view(),
@@ -274,7 +288,7 @@ urlpatterns = [
                         ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
     path(

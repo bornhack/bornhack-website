@@ -115,7 +115,7 @@
             <tr>
               <th>Location</th>
               <td>
-                  Lat {{ facility.location.y }} Long {{ facility.location.x }} Grid: <span id="gridLocator"></span><br>
+                Lat {{ facility.location.y }} Long {{ facility.location.x }} Grid: <span id="gridLocator"></span><br>
                 <div id="map" class="map"></div>
               </td>
             </tr>
@@ -129,26 +129,26 @@
     <script type="text/javascript">
       const mapObject = new BHMap("map");
       {% if request.user.is_authenticated %}
-      const loggedIn = true;
+        const loggedIn = true;
       {% else %}
-      const loggedIn = false;
+        const loggedIn = false;
       {% endif %}
       mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
-          onEachFeature: mapObject.onEachGrid,
-          style: {
-            color: "gray",
-            fillOpacity: 0.0,
-            weight: 0.5
-          },
+        onEachFeature: mapObject.onEachGrid,
+        style: {
+          color: "gray",
+          fillOpacity: 0.0,
+          weight: 0.5
+        },
       }, true, function(_json) {
-          const layer = mapObject.findGridLoc({{ facility.location.y }}, {{ facility.location.x }});
-          console.log(mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1));
-          document.getElementById('gridLocator').innerHTML = mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1);
+        const layer = mapObject.findGridLoc({{ facility.location.y }}, {{ facility.location.x }});
+        console.log(mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1));
+        document.getElementById('gridLocator').innerHTML = mapObject.cols[layer.feature.properties.col_index - 2] + (layer.feature.properties.row_index - 1);
       });
 
       var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: L.AwesomeMarkers.icon({
-          icon: "{{ facility.facility_type.icon }}",
-          markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
+        icon: "{{ facility.facility_type.icon }}",
+        markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
         prefix: 'fa',
       })});
       marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p>").addTo(mapObject.map);

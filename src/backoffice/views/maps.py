@@ -1,9 +1,9 @@
-import logging
 import json
+import logging
 
 from django.contrib import messages
-from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.geos import GeometryCollection
+from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -16,13 +16,13 @@ from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
-from utils.widgets import IconPickerWidget
 from ..mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from maps.mixins import LayerViewMixin
-from maps.models import Layer
 from maps.models import ExternalLayer
 from maps.models import Feature
+from maps.models import Layer
+from utils.widgets import IconPickerWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -34,8 +34,10 @@ class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['layers'] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
-        context['externalLayers'] = ExternalLayer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context["externalLayers"] = ExternalLayer.objects.filter(
+            Q(camp=self.camp) | Q(camp=None)
+        )
         return context
 
 
@@ -48,11 +50,11 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
 
     def get(self, request, *args, **kwargs):
         context = dict()
-        context['layer'] = Layer.objects.get(slug=kwargs['layer_slug'])
+        context["layer"] = Layer.objects.get(slug=kwargs["layer_slug"])
         return render(request, self.template_name, context)
 
     def post(self, request, camp_slug, layer_slug):
-        geojson_data = request.POST.get('geojson_data')
+        geojson_data = request.POST.get("geojson_data")
         layer = get_object_or_404(
             Layer,
             slug=layer_slug,
@@ -60,27 +62,43 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
         try:
             geojson = json.loads(geojson_data)
         except json.JSONDecodeError:
-            return render(request, 'maps_layer_import_backoffice.html', {'error': "Invalid GeoJSON data"})
+            return render(
+                request,
+                "maps_layer_import_backoffice.html",
+                {"error": "Invalid GeoJSON data"},
+            )
 
         # Basic validation, you can add more checks
-        if 'type' not in geojson or geojson['type'] != 'FeatureCollection':
-            return render(request, 'maps_type_import_backoffice.html', {'error': "Invalid GeoJSON format"})
+        if "type" not in geojson or geojson["type"] != "FeatureCollection":
+            return render(
+                request,
+                "maps_type_import_backoffice.html",
+                {"error": "Invalid GeoJSON format"},
+            )
 
-        if geojson['type'] == 'FeatureCollection':
+        if geojson["type"] == "FeatureCollection":
             self.load_featureCollection(layer, geojson)
 
-        if (self.createdCount > 0 or self.updateCount > 0):
-            messages.success(self.request, "%i features created, %i features updated" % (self.createdCount, self.updateCount))
+        if self.createdCount > 0 or self.updateCount > 0:
+            messages.success(
+                self.request,
+                "%i features created, %i features updated"
+                % (self.createdCount, self.updateCount),
+            )
         if self.errorCount > 0:
-            messages.error(self.request, "%i features with errors not imported" % (self.errorCount))
-        return HttpResponseRedirect(reverse(
-            "backoffice:maps_features_list",
-            kwargs={"camp_slug": camp_slug, "layer_slug": self.layer.slug},
-        ))
+            messages.error(
+                self.request, "%i features with errors not imported" % (self.errorCount)
+            )
+        return HttpResponseRedirect(
+            reverse(
+                "backoffice:maps_features_list",
+                kwargs={"camp_slug": camp_slug, "layer_slug": self.layer.slug},
+            ),
+        )
 
     def load_feature(self, layer, feature, props):
         try:
-            geom = GeometryCollection(GEOSGeometry(json.dumps(feature['geometry'])))
+            geom = GeometryCollection(GEOSGeometry(json.dumps(feature["geometry"])))
         except (TypeError, AttributeError):
             logger.exception(f"Failed to GEOSGeometry: {feature}")
             self.errorCount += 1
@@ -105,27 +123,27 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
         return GeometryCollection(importFeatures)
 
     def load_featureCollection(self, layer, geojson):
-        for feature in geojson['features']:
-            if feature['geometry'] is None:
-                self.createObject(feature['properties'], layer, GeometryCollection([]))
+        for feature in geojson["features"]:
+            if feature["geometry"] is None:
+                self.createObject(feature["properties"], layer, GeometryCollection([]))
                 continue
-            if feature['geometry']['type'] == "GeometryCollection":
-                geom = self.load_features(feature['geometry']['geometries'])
+            if feature["geometry"]["type"] == "GeometryCollection":
+                geom = self.load_features(feature["geometry"]["geometries"])
                 if geom:
-                    self.createObject(feature['properties'], layer, geom)
-            elif feature['type'] == "Feature":
-                self.load_feature(layer, feature, feature['properties'])
+                    self.createObject(feature["properties"], layer, geom)
+            elif feature["type"] == "Feature":
+                self.load_feature(layer, feature, feature["properties"])
                 continue
 
     def createObject(self, props, layer, geom):
         obj, created = Feature.objects.update_or_create(
-            name=props['name'],
-            description=props['description'],
-            topic=props['topic'],
-            processing=props['processing'],
-            color=props['color'],
+            name=props["name"],
+            description=props["description"],
+            topic=props["topic"],
+            processing=props["processing"],
+            color=props["color"],
             layer=layer,
-            geom=geom
+            geom=geom,
         )
         if created:
             self.createdCount += 1
@@ -207,7 +225,7 @@ class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['features'] = Feature.objects.filter(layer=self.layer)
+        context["features"] = Feature.objects.filter(layer=self.layer)
         return context
 
 
@@ -229,13 +247,13 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         form.fields["icon"].widget = IconPickerWidget()
-        form.fields['layer'].initial = self.layer.pk
-        form.fields['layer'].disabled = True
+        form.fields["layer"].initial = self.layer.pk
+        form.fields["layer"].disabled = True
         form.fields["geom"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                'map_height': '500px',
-                'geom_type': 'GeometryCollection',
+                "map_height": "500px",
+                "geom_type": "GeometryCollection",
             },
         )
         return form
@@ -244,7 +262,10 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
         messages.success(self.request, "The feature has been created")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
+            kwargs={
+                "camp_slug": self.kwargs["camp_slug"],
+                "layer_slug": self.layer.slug,
+            },
         )
 
 
@@ -270,8 +291,8 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
         form.fields["geom"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                'map_height': '500px',
-                'geom_type': 'GeometryCollection',
+                "map_height": "500px",
+                "geom_type": "GeometryCollection",
             },
         )
         return form
@@ -280,7 +301,10 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
         messages.success(self.request, "The feature has been updated")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
+            kwargs={
+                "camp_slug": self.kwargs["camp_slug"],
+                "layer_slug": self.layer.slug,
+            },
         )
 
 
@@ -294,7 +318,10 @@ class MapsFeatureDeleteView(LayerViewMixin, OrgaTeamPermissionMixin, DeleteView)
         messages.success(self.request, "The feature has been deleted")
         return reverse(
             "backoffice:maps_features_list",
-            kwargs={"camp_slug": self.kwargs["camp_slug"], "layer_slug": self.layer.slug},
+            kwargs={
+                "camp_slug": self.kwargs["camp_slug"],
+                "layer_slug": self.layer.slug,
+            },
         )
 
 

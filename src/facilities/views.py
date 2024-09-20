@@ -30,13 +30,17 @@ class FacilityListGeoJSONView(CampViewMixin, JsonView):
     def dump_features(self) -> list[object]:
         output = []
         for ft in FacilityType.objects.filter(
-                responsible_team__camp=self.camp,
-                slug=self.kwargs["facility_type_slug"]):
+            responsible_team__camp=self.camp,
+            slug=self.kwargs["facility_type_slug"],
+        ):
             for facility in Facility.objects.filter(facility_type=ft.pk):
                 entry = {
                     "type": "Feature",
                     "id": facility.pk,
-                    "geometry": {"type": "Point", "coordinates": [facility.location.x, facility.location.y]},
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [facility.location.x, facility.location.y],
+                    },
                     "properties": {
                         "name": facility.name,
                         "marker": facility.facility_type.marker,
@@ -45,8 +49,22 @@ class FacilityListGeoJSONView(CampViewMixin, JsonView):
                         "team": facility.facility_type.responsible_team.name,
                         "uuid": facility.uuid,
                         "type": ft.name,
-                        "detail_url": reverse('facilities:facility_detail', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
-                        "feedback_url": reverse('facilities:facility_feedback', kwargs={'camp_slug': facility.camp.slug, 'facility_type_slug': facility.facility_type.slug, 'facility_uuid': facility.uuid}),
+                        "detail_url": reverse(
+                            "facilities:facility_detail",
+                            kwargs={
+                                "camp_slug": facility.camp.slug,
+                                "facility_type_slug": facility.facility_type.slug,
+                                "facility_uuid": facility.uuid,
+                            },
+                        ),
+                        "feedback_url": reverse(
+                            "facilities:facility_feedback",
+                            kwargs={
+                                "camp_slug": facility.camp.slug,
+                                "facility_type_slug": facility.facility_type.slug,
+                                "facility_uuid": facility.uuid,
+                            },
+                        ),
                     },
                 }
                 output.append(entry)

@@ -1,10 +1,10 @@
 from django.contrib import admin
 from leaflet.admin import LeafletGeoAdmin
 
-from .models import Layer
-from .models import Feature
 from .models import ExternalLayer
+from .models import Feature
 from .models import Group
+from .models import Layer
 
 
 @admin.register(Feature)
@@ -27,7 +27,7 @@ class FeatureAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 @admin.register(Layer)
 class LayerAdmin(admin.ModelAdmin):
     save_as = True
-    list_display = ["name","slug"]
+    list_display = ["name", "slug"]
 
 
 @admin.register(ExternalLayer)

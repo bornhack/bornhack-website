@@ -92,23 +92,23 @@
   <script type="text/javascript">
     const mapObject = new BHMap("map");
     {% if request.user.is_authenticated %}
-    const loggedIn = true;
+      const loggedIn = true;
     {% else %}
-    const loggedIn = false;
+      const loggedIn = false;
     {% endif %}
     mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
-        onEachFeature: mapObject.onEachGrid,
-        style: {
-          color: "gray",
-          fillOpacity: 0.0,
-          weight: 0.5
-        },
-      }, false);
+      onEachFeature: mapObject.onEachGrid,
+      style: {
+        color: "gray",
+        fillOpacity: 0.0,
+        weight: 0.5
+      },
+    }, false);
 
     {% url "facilities:facility_feedback" camp_slug=facility.camp.slug facility_type_slug=facility.facility_type.slug facility_uuid=facility.uuid as feedback %}
     var marker = L.marker([{{ facility.location.y }}, {{ facility.location.x }}], {icon: L.AwesomeMarkers.icon({
-        icon: "{{ facility.facility_type.icon }}".replace('fas fa-',''),
-        markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
+      icon: "{{ facility.facility_type.icon }}".replace('fas fa-',''),
+      markerColor: "{{ facility.facility_type.marker }}".replace('Icon',''),
       prefix: 'fa',
     })});
     marker.bindPopup("<b>{{ facility.name }}</b><br><p>{{ facility.description|linebreaksbr }}</p><p>Responsible team: {{ facility.facility_type.responsible_team.name }} Team</p>{% if request.user.is_authenticated %}<p><a href='{{ feedback }}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>{% endif %}").addTo(mapObject.map);

@@ -1,24 +1,24 @@
+import json
 import logging
 import re
-import json
 
 import requests
-from PIL import ImageColor
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.serializers import serialize
+from django.db.models import Q
 from django.http import HttpResponse
 from django.views.generic import View
 from django.views.generic.base import TemplateView
 from jsonview.views import JsonView
-from django.core.serializers import serialize
-from django.db.models import Q
+from PIL import ImageColor
 
+from .mixins import LayerViewMixin
+from .models import ExternalLayer
 from .models import Feature
 from .models import Layer
-from .models import ExternalLayer
-from facilities.models import FacilityType
 from camps.mixins import CampViewMixin
-from .mixins import LayerViewMixin
+from facilities.models import FacilityType
 from utils.color import adjust_color
 from utils.color import is_dark
 
@@ -33,39 +33,54 @@ class MapMarkerView(TemplateView):
     """
     View for generating the collored marker
     """
+
     template_name = "marker.svg"
 
     @property
     def color(self):
-        return ImageColor.getrgb("#" + self.kwargs['color'])
+        return ImageColor.getrgb("#" + self.kwargs["color"])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['stroke1'] = self.color
-        context['stroke0'] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
-        context['fill0'] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
-        context['fill1'] = self.color
+        context["stroke1"] = self.color
+        context["stroke0"] = (
+            adjust_color(self.color, -0.4)
+            if is_dark(self.color)
+            else adjust_color(self.color)
+        )
+        context["fill0"] = (
+            adjust_color(self.color, -0.4)
+            if is_dark(self.color)
+            else adjust_color(self.color)
+        )
+        context["fill1"] = self.color
         return context
 
     def render_to_response(self, context, **kwargs):
-        return super(MapMarkerView, self).render_to_response(context,
-                                                             content_type='image/svg+xml',
-                                                             **kwargs
-                                                             )
+        return super().render_to_response(
+            context,
+            content_type="image/svg+xml",
+            **kwargs,
+        )
 
 
 class MapView(CampViewMixin, TemplateView):
     """
     Global map view
     """
+
     template_name = "maps_map.html"
     context_object_name = "maps_map"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['facilitytype_list'] = FacilityType.objects.filter(responsible_team__camp=self.camp)
-        context['layers'] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
-        context['externalLayers'] = ExternalLayer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context["facilitytype_list"] = FacilityType.objects.filter(
+            responsible_team__camp=self.camp
+        )
+        context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context["externalLayers"] = ExternalLayer.objects.filter(
+            Q(camp=self.camp) | Q(camp=None)
+        )
         return context
 
 
@@ -73,6 +88,7 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
     """
     GeoJSON export view
     """
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context = json.loads(
@@ -88,8 +104,8 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
                     "icon",
                     "topic",
                     "processing",
-                ]
-            )
+                ],
+            ),
         )
         return context
 

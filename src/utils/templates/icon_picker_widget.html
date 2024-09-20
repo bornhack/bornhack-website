@@ -1,18 +1,18 @@
 <div class="icon-selector-widget">
-    {% include "django/forms/widgets/input.html" %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function(event) {
-          const uip = new UniversalIconPicker('#id_{{widget.name}}', {
-            iconLibraries: [
-              'font-awesome-5.0.13.json',
-            ],
-            onSelect: function(jsonIconData) {
-              document.getElementById('id_{{widget.name}}').value = jsonIconData.iconClass;
-            },
-            onReset: function() {
-              document.getElementById('id_{{widget.name}}').value = '';
-            }
-          });
+  {% include "django/forms/widgets/input.html" %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function(event) {
+      const uip = new UniversalIconPicker('#id_{{widget.name}}', {
+        iconLibraries: [
+          'font-awesome-5.0.13.json',
+        ],
+        onSelect: function(jsonIconData) {
+          document.getElementById('id_{{widget.name}}').value = jsonIconData.iconClass;
+        },
+        onReset: function() {
+          document.getElementById('id_{{widget.name}}').value = '';
+        }
       });
-    </script>
+    });
+  </script>
 </div>

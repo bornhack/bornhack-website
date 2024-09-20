@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
 from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import DetailView
@@ -68,7 +68,10 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
             entry = {
                 "type": "Feature",
                 "id": village.pk,
-                "geometry": {"type": "Point", "coordinates": [village.location.x, village.location.y]},
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [village.location.x, village.location.y],
+                },
                 "properties": {
                     "name": village.name,
                     "marker": "greenIcon",
@@ -76,7 +79,10 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
                     "description": village.description,
                     "uuid": None,
                     "type": "village",
-                    "detail_url": reverse('village_detail', kwargs={'camp_slug': village.camp.slug, 'slug': village.slug}),
+                    "detail_url": reverse(
+                        "village_detail",
+                        kwargs={"camp_slug": village.camp.slug, "slug": village.slug},
+                    ),
                 },
             }
             output.append(entry)

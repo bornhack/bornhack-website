@@ -203,7 +203,7 @@ class BHMap {
       if (this.processing[layer.feature.properties.processing]) {
         if (layer.feature.geometry.type === 'GeometryCollection') {
           layer.eachLayer(feature => this.onMqttLayerFeature(topic, payload, layer, feature));
-        } 
+        }
         this.processing[layer.feature.properties.processing](topic, payload, layer);
       }
     }

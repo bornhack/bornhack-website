@@ -22,15 +22,15 @@ const iconColorsHex = {
   blackIcon: '#3D3D3D',
 }
 
-const facilityOptions = {     
+const facilityOptions = {
   onEachFeature: function(feature, layer) {
 
-    const gridLayer = mapObject.findGridLoc(feature.geometry.coordinates[1], feature.geometry.coordinates[0]); 
+    const gridLayer = mapObject.findGridLoc(feature.geometry.coordinates[1], feature.geometry.coordinates[0]);
     let grid = "";
     if (gridLayer !== undefined && gridLayer.feature)
       grid = `<p>Grid: ${mapObject.cols[gridLayer.feature.properties.col_index - 2]}${(gridLayer.feature.properties.row_index - 1)}</p>`;
     let icon = `<i style="color: ${feature.properties.color}" class="${feature.properties.icon } fa-fw"></i>`;
-    const content = `<b>${feature.properties.name}${icon}</b><br><p>${feature.properties.description}</p><p>Responsible team: ${feature.properties.team} Team</p>${grid}` 
+    const content = `<b>${feature.properties.name}${icon}</b><br><p>${feature.properties.description}</p><p>Responsible team: ${feature.properties.team} Team</p>${grid}`
     const authContent = `<p><a href='${feature.properties.detail_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a><a href='${feature.properties.feedback_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-comment-dots'></i> Feedback</a></p>`
     if (loggedIn)
       layer.bindPopup(content + authContent, { maxHeight: 400});

@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 
 from django.conf import settings
 from django.contrib import messages
@@ -22,13 +22,13 @@ from leaflet.forms.widgets import LeafletWidget
 
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import RaisePermissionRequiredMixin
-from utils.widgets import IconPickerWidget
 from camps.mixins import CampViewMixin
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
 from facilities.models import FacilityOpeningHours
 from facilities.models import FacilityType
 from teams.models import Team
+from utils.widgets import IconPickerWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -45,10 +45,10 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
     context_object_name = "facility_type_import"
 
     def get(self, request, *args, **kwargs):
-        return render(request, 'facility_type_import_backoffice.html')
+        return render(request, "facility_type_import_backoffice.html")
 
     def post(self, request, camp_slug, slug):
-        geojson_data = request.POST.get('geojson_data')
+        geojson_data = request.POST.get("geojson_data")
         facility_type = get_object_or_404(
             FacilityType,
             responsible_team__camp=self.camp,
@@ -57,25 +57,33 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
         try:
             geojson = json.loads(geojson_data)
         except json.JSONDecodeError:
-            return render(request, 'facility_type_import_backoffice.html', {'error': "Invalid GeoJSON data"})
+            return render(
+                request,
+                "facility_type_import_backoffice.html",
+                {"error": "Invalid GeoJSON data"},
+            )
 
         # Basic validation, you can add more checks
-        if 'type' not in geojson or geojson['type'] != 'FeatureCollection':
-            return render(request, 'facility_type_import_backoffice.html', {'error': "Invalid GeoJSON format"})
+        if "type" not in geojson or geojson["type"] != "FeatureCollection":
+            return render(
+                request,
+                "facility_type_import_backoffice.html",
+                {"error": "Invalid GeoJSON format"},
+            )
 
         createdCount = 0
         updateCount = 0
         errorCount = 0
-        for feature in geojson['features']:
+        for feature in geojson["features"]:
             try:
-                geom = GEOSGeometry(json.dumps(feature['geometry']))
+                geom = GEOSGeometry(json.dumps(feature["geometry"]))
             except (TypeError, AttributeError):
                 errorCount += 1
                 continue
-            props = feature['properties']
-            if 'description' in props:
-                if props['description']:
-                    description = props['description']
+            props = feature["properties"]
+            if "description" in props:
+                if props["description"]:
+                    description = props["description"]
                 else:
                     errorCount += 1
                     continue
@@ -83,23 +91,31 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
                 errorCount += 1
                 continue
             obj, created = Facility.objects.update_or_create(
-                name=props['name'],
+                name=props["name"],
                 description=description,
                 facility_type=facility_type,
-                location=geom
+                location=geom,
             )
             if created:
                 createdCount += 1
             else:
                 updateCount += 1
-        if (createdCount > 0 or updateCount > 0):
-            messages.success(self.request, "%i features created, %i features updated" % (createdCount, updateCount))
+        if createdCount > 0 or updateCount > 0:
+            messages.success(
+                self.request,
+                "%i features created, %i features updated"
+                % (createdCount, updateCount),
+            )
         if errorCount > 0:
-            messages.error(self.request, "%i features with errors not imported" % (errorCount))
-        return HttpResponseRedirect(reverse(
-            "backoffice:facility_type_list",
-            kwargs={"camp_slug": camp_slug},
-        ))
+            messages.error(
+                self.request, "%i features with errors not imported" % (errorCount)
+            )
+        return HttpResponseRedirect(
+            reverse(
+                "backoffice:facility_type_list",
+                kwargs={"camp_slug": camp_slug},
+            ),
+        )
 
 
 class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
