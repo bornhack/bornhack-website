@@ -87,12 +87,18 @@ class MapView(CampViewMixin, TemplateView):
             "facilitytype_list": list(context["facilitytype_list"].values()),
             "layers": list(
                 context["layers"].values(
-                    "description", "name", "slug", "uuid", "icon", "group__name"
-                )
+                    "description",
+                    "name",
+                    "slug",
+                    "uuid",
+                    "icon",
+                    "group__name",
+                ),
             ),
             "externalLayers": list(context["externalLayers"].values()),
             "villages": reverse(
-                "villages_geojson", kwargs={"camp_slug": self.camp.slug}
+                "villages_geojson",
+                kwargs={"camp_slug": self.camp.slug},
             ),
             "grid": static("json/grid.geojson"),
         }
@@ -106,7 +112,8 @@ class MapView(CampViewMixin, TemplateView):
             )
         for layer in context["mapData"]["layers"]:
             layer["url"] = reverse(
-                "maps:map_layer_geojson", kwargs={"layer_slug": layer["slug"]}
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer["slug"]},
             )
         return context
 
