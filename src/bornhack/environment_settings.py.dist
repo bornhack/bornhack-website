@@ -17,9 +17,6 @@ DATABASES = {
 
 DEBUG={{ django_debug }}
 
-# the path to the wkhtmltopdf binary
-WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
-
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
@@ -44,6 +41,7 @@ ADMINS={{ django_admins }}
 # misc settings
 TIME_ZONE='{{ django_timezone }}'
 MEDIA_ROOT='{{ django_media_root }}'
+PDF_TEST_MODE = True
 PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 
 # PSP settings
