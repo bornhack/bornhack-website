@@ -10,15 +10,19 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
+from django.views.generic import FormView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
+from ..forms import InvoiceDownloadForm
 from ..forms import ShopTicketRefundFormSet
 from ..forms import TicketGroupRefundFormSet
+from ..mixins import EconomyTeamPermissionMixin
 from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
@@ -183,6 +187,32 @@ class ShopTicketOverview(
 class InvoiceListView(CampViewMixin, InfoTeamPermissionMixin, ListView):
     model = Invoice
     template_name = "invoice_list.html"
+
+
+class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
+    model = Invoice
+    template_name = "invoice_download.html"
+    form_class = InvoiceDownloadForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["invoices"] = []
+        return context
+
+    def form_valid(self, form):
+        orders = form.cleaned_data["orders"]
+        invoices = form.cleaned_data["invoices"]
+        filtered_invoices = Invoice.objects.filter(
+            Q(id__in=invoices) | Q(order__id__in=orders),
+        )
+        context = self.get_context_data()
+        context["invoices"] = list(filtered_invoices.values("id"))
+        for invoice in context["invoices"]:
+            invoice["url"] = reverse(
+                "backoffice:invoice_download",
+                kwargs={"camp_slug": self.camp.slug, "invoice_id": invoice["id"]},
+            )
+        return render(self.request, self.template_name, context)
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):

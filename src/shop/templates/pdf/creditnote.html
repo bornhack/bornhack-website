@@ -1,6 +1,68 @@
 {% load static %}
 {% load bornhack %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css" media="all">
+  @page {
+        /*size: A4 portrait; /* can use also 'landscape' for orientation */
+    margin: 1cm;
+
+    @top-center{
+      content: element(header);
+    }
+
+    @bottom-center{
+      content: element(footer);
+    }
+
+  }
+  body {
+    font-size: 12px;
+    font-family: "Liberation Serif";
+    {% if dev %}
+      background: no-repeat center url('{% static 'images/test_letter.png' %}')
+                {% endif %}
+  }
+
+  header, footer {
+    font-size: 10px;
+    font-family: "Liberation Serif";
+    width: 100%;
+    position: relative;
+  }
+
+  header {
+    display: block;
+    height: 150px;
+    background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
+    background-size: 100% 100%;
+  }
+
+  .footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+    display: block;
+    text-align: center;
+    bottom: 0;
+    margin: auto;
+    width: 50%;
+  }
+
+  footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+        /*display: block;*/
+    text-align: center;
+  }
+</style>
+
+<header>
+  <div>
+  </div>
+</header>
 
 <table style="width:100%;">
   <tr>
@@ -18,58 +80,88 @@
 <br>
 <h2>CREDITNOTE</h2>
 <table style="width:90%; margin:1em;">
-  <tr>
-    <td>
-      <b>Product</b>
+  <thead>
+    <tr>
+      <td>
+        <b>Product</b>
+      </td>
+      <td align="right">
+        <b>Price</b>
+      </td>
       <td>
         <b>Quantity</b>
+      </td>
+      <td align="right">
+        <b>Total</b>
+      </td>
+    </tr>
+  </thead>
+  <tbody>
+    {% if creditnote.refund %}
+            {# creditnote belongs to a refund, loop over oprs #}
+      {% for rpr in creditnote.refund.rprs.all %}
+        <tr>
+          <td>
+            {{ rpr.opr.product.name }}
+          </td>
+          <td align="right">
+            {{ rpr.opr.product.price|currency }}
+          </td>
+          <td>
+            {{ rpr.quantity }}
+          </td>
+          <td align="right">
+            {{ rpr.total|currency }}
+          </td>
+        </tr>
+      {% endfor %}
+    {% else %}
+            {# creditnote does not belong to a refund, use the text #}
+      <tr>
+        <td>
+          {{ creditnote.text }}
+        </td>
         <td align="right">
-          <b>Price
-            <td align="right">
-              <b>Total</b>
+          {{ creditnote.amount|currency }}
+        </td>
+        <td>
+          1
+        </td>
+        <td align="right">
+          {{ creditnote.amount|currency }}
+        </td>
+      </tr>
+    {% endif %}
+    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-              <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+    <tr>
+      <td align="right" colspan="3">
+        {% if creditnote.danish_vat %}
+          <strong>Danish VAT (25%)</strong>
+        {% else %}
+          <strong>No VAT</strong>
+        {% endif %}
+      </td>
+      <td align="right">
+        {{ creditnote.vat|currency }}
+      </td>
+    </tr>
 
-              {% if creditnote.refund %}
-              {# creditnote belongs to a refund, loop over oprs #}
-                {% for rpr in creditnote.refund.rprs.all %}
-                  <tr>
-                    <td>
-                      {{ rpr.opr.product.name }}
-                      <td>
-                        {{ rpr.quantity }}
-                        <td align="right">
-                          {{ rpr.opr.product.price|currency }}
-                          <td align="right">
-                            {{ rpr.total|currency }}
-                {% endfor %}
-              {% else %}
-              {# creditnote does not belong to a refund, use the text #}
-                <tr>
-                  <td>
-                    {{ creditnote.text }}
-                    <td>
-                      1
-                      <td align="right">
-                        {{ creditnote.amount|currency }}
-                        <td align="right">
-                          {{ creditnote.amount|currency }}
-              {% endif %}
-              <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
-
-              <tr>
-                <td align="right" colspan="3">
-                  {% if creditnote.danish_vat %}
-                    <strong>Danish VAT (25%)</strong>
-                  {% else %}
-                    <strong>No VAT</strong>
-                  {% endif %}
-                  <td align="right">
-                    {{ creditnote.vat|currency }}
-
-                    <tr>
-                      <td align="right" colspan="3">
-                        <strong>Total</strong>
-                        <td align="right">
-                          {{ creditnote.amount|currency }}
-                        </table>
+    <tr>
+      <td align="right" colspan="3">
+        <strong>Total</strong>
+      </td>
+      <td align="right">
+        {{ creditnote.amount|currency }}
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="footer" style="opacity: 0;">
+</div>
+<div class="footer" style="position: absolute; bottom: 0; left: 0; width: 100%">
+  The legal entity behind BornHack is:<br>
+  BornHack ApS c/o Thomas Steen Rasmussen, Skelbyvej 147, Næsby,<br>
+  4171 Glumsø, Denmark. CVR# 37666521<br>
+  email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a> - web <a href="https://www.bornhack.dk">https://www.bornhack.dk</a>
+</div>

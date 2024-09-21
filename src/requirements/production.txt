@@ -20,7 +20,6 @@ django-prometheus==2.3.1
 django-reversion==5.0.12
 django-tables2==2.7.0
 django-taggit==5.0.1
-django-wkhtmltopdf==3.4.0
 django-colorfield==0.11.0
 future==1.0.0
 html5lib==1.1
@@ -31,7 +30,6 @@ olefile==0.47
 openpyxl==3.1.2
 pandas==2.2.2
 psycopg2-binary==2.9.9
-PyPDF2==3.0.1
 python-magic==0.4.27
 quickpay-api-client==2.0.1
 service-identity==24.1.0
@@ -41,6 +39,7 @@ wheel==0.44.0
 # pillow is only here to make old migrations run
 Pillow==10.4.0
 
-# numpy 1.26.0 doesn't work on freebsd
-# numpy: /usr/local/virtualenv/lib/python3.9/site-packages/numpy/core/_multiarray_tests.cpython-39.so: Undefined symbol "ccosl"
 numpy==2.1.1
+
+django-weasyprint==2.3.0
+weasyprint==62.3
