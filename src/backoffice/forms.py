@@ -225,7 +225,8 @@ TicketGroupRefundFormSet = modelformset_factory(
 class InvoiceDownloadForm(forms.Form):
     orders = forms.CharField(required=False, widget=forms.Textarea(attrs={"rows": "5"}))
     invoices = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={"rows": "5"})
+        required=False,
+        widget=forms.Textarea(attrs={"rows": "5"}),
     )
 
     def clean(self):
