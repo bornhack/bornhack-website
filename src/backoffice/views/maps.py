@@ -14,6 +14,7 @@ from django.views.generic.base import View
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
+from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget
 
 from ..mixins import OrgaTeamPermissionMixin
@@ -35,6 +36,9 @@ class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context['mapData'] = {
+                "grid": static('json/grid.geojson'),
+                }
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(camp=self.camp) | Q(camp=None),
         )
@@ -51,6 +55,9 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
     def get(self, request, *args, **kwargs):
         context = dict()
         context["layer"] = Layer.objects.get(slug=kwargs["layer_slug"])
+        context['mapData'] = {
+                "grid": static('json/grid.geojson'),
+                }
         return render(request, self.template_name, context)
 
     def post(self, request, camp_slug, layer_slug):
@@ -227,6 +234,9 @@ class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["features"] = Feature.objects.filter(layer=self.layer)
+        context['mapData'] = {
+                "grid": static('json/grid.geojson'),
+                }
         return context
 
 
@@ -285,6 +295,13 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
         "color",
         "geom",
     ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {
+                "grid": static('json/grid.geojson'),
+                }
+        return context
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
