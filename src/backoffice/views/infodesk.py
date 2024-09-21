@@ -10,6 +10,7 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
@@ -192,29 +193,21 @@ class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, For
     model = Invoice
     template_name = "invoice_download.html"
     form_class = InvoiceDownloadForm
-    success_url = "."  # Redirect to the same page on successful submission
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = self.get_form()
-        if form.is_valid():
-            orders = form.cleaned_data["orders"]
-            invoices = form.cleaned_data["invoices"]
-            filtered_invoices = Invoice.objects.filter(
-                Q(id__in=invoices) | Q(order__id__in=orders),
-            )
-            context["invoices"] = list(filtered_invoices.values("id"))
-            for invoice in context["invoices"]:
-                invoice["url"] = reverse(
-                    "backoffice:invoice_download",
-                    kwargs={"camp_slug": self.camp.slug, "invoice_id": invoice["id"]},
-                )
-        else:
-            context["invoices"] = []
-        return context
 
     def form_valid(self, form):
-        return super().form_invalid(form)
+        orders = form.cleaned_data["orders"]
+        invoices = form.cleaned_data["invoices"]
+        filtered_invoices = Invoice.objects.filter(
+            Q(id__in=invoices) | Q(order__id__in=orders),
+        )
+        context = self.get_context_data()
+        context["invoices"] = list(filtered_invoices.values("id"))
+        for invoice in context["invoices"]:
+            invoice["url"] = reverse(
+                "backoffice:invoice_download",
+                kwargs={"camp_slug": self.camp.slug, "invoice_id": invoice["id"]},
+            )
+        return render(self.request, self.template_name, context)
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load bootstrap3 %}
 
 {% block extra_head %}
   {{ invoices|json_script:"invoices" }}
@@ -17,13 +18,13 @@
     This helps download multiple invoices
   </div>
 
-  <form action="{% url 'backoffice:invoice_download_multiple' camp_slug=camp.slug %}" method="POST">{% csrf_token %}
-    <textarea name="invoices" type="text" placeholder="Invoices seperated by a space or return"></textarea>
-    <textarea name="orders" type="text" placeholder="Orders seperated by a space or return"></textarea>
-    <input type="submit">
+  <form method="POST">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+  <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
   </form>
   {% if invoices|length > 0 %}
     <p>Downloading {{ invoices | length }} invoices</p>
   {% endif %}
-  <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
 {% endblock content %}
