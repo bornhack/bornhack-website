@@ -249,6 +249,16 @@
             <h4 class="list-group-item-heading">Accounting Exports</h4>
             <p class="list-group-item-text">Use this view to see and generate Accounting Exports for bookkeeping purposes. The exports include bank accounts, PSP data, expenses, revenues, and reimbursements, invoices and creditnotes.</p>
           </a>
+          <a href="{% url 'backoffice:invoice_download_multiple' camp_slug=camp.slug %}"
+             class="list-group-item">
+            <h4 class="list-group-item-heading">
+              Download Multiple invoices or orders
+            </h4>
+            <p class="list-group-item-text">
+              Use this view to download multiple invoices and/or orders from the system
+            </p>
+          </a>
+
         {% endif %}
 
         {% if perms.camps.orgateam_permission or perms.camps.infoteam_permission or perms.camps.barteam_permission %}
