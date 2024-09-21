@@ -7,7 +7,7 @@ mapObject.setDefaultView();
 mapObject.map.addControl(new L.Control.Fullscreen({
   pseudoFullscreen: true,
 }));
-mapObject.loadLayer(mapData['grid'], "Grid squares", { 
+mapObject.loadLayer(mapData['grid'], "Grid squares", {
   onEachFeature: mapObject.onEachGrid,
   style: {
     color: "gray",
@@ -70,4 +70,3 @@ mapObject.onGridClick = function (e) {
   let center = e.target.getCenter();
   alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
 }
-
