@@ -204,8 +204,11 @@ class PosProductTable(tables.Table):
             "backoffice:posproductcost_list",
             kwargs={"camp_slug": table.request.camp.slug},
         )
-        link = f'<a href="{cost_url}?prodid={record.external_id}">(show)</a>'
-        return mark_safe(f"{value} DKK<br>{link}")
+        costs_count_label = (
+            f"{record.cost_count} {'cost' if record.cost_count == 1 else 'costs'}"
+        )
+        link = f'<a href="{cost_url}?prodid={record.external_id}">({costs_count_label})</a>'
+        return mark_safe(f"{value} DKK<br>{link}<br>")
 
     def order_expenses(self, queryset, is_descending):
         queryset = queryset.annotate(
