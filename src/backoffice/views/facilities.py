@@ -219,43 +219,52 @@ class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
             "grid": static("json/grid.geojson"),
             "facility_list": [],
         }
-        for item in context['facility_list']:
-            context["mapData"]['facility_list'].append({
-                "url": reverse("backoffice:facility_detail", kwargs={"camp_slug": item.camp.slug, "facility_uuid": item.uuid}),
-                "name": item.name,
-                "description": item.description,
-                "location": {
-                    "x": item.location.x,
-                    "y": item.location.y,
-                },
-                "facility_type": {
-                    "icon": item.facility_type.icon,
-                    "marker": item.facility_type.marker,
-                    "team": item.facility_type.responsible_team.name
+        for item in context["facility_list"]:
+            context["mapData"]["facility_list"].append(
+                {
+                    "url": reverse(
+                        "backoffice:facility_detail",
+                        kwargs={
+                            "camp_slug": item.camp.slug,
+                            "facility_uuid": item.uuid,
+                        },
+                    ),
+                    "name": item.name,
+                    "description": item.description,
+                    "location": {
+                        "x": item.location.x,
+                        "y": item.location.y,
                     },
-                })
+                    "facility_type": {
+                        "icon": item.facility_type.icon,
+                        "marker": item.facility_type.marker,
+                        "team": item.facility_type.responsible_team.name,
+                    },
+                }
+            )
         return context
+
 
 class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     model = Facility
     template_name = "facility_detail_backoffice.html"
     pk_url_kwarg = "facility_uuid"
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
             "loggedIn": self.request.user.is_authenticated,
             "facility": {
                 "location": {
-                    "x": context['facility'].location.x,
-                    "y": context['facility'].location.y,
+                    "x": context["facility"].location.x,
+                    "y": context["facility"].location.y,
                 },
-                "name": context['facility'].name,
+                "name": context["facility"].name,
                 "facility_type": {
-                    "marker": context['facility'].facility_type.marker,
-                    "icon": context['facility'].facility_type.icon,
+                    "marker": context["facility"].facility_type.marker,
+                    "icon": context["facility"].facility_type.icon,
                 },
-                "description": context['facility'].description,
+                "description": context["facility"].description,
             },
             "grid": static("json/grid.geojson"),
         }

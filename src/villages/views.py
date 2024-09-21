@@ -28,7 +28,7 @@ class VillageListView(CampViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson')}
+        context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
     def get_queryset(self):
@@ -42,11 +42,11 @@ class VillageMapView(CampViewMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {
-                "grid": static('json/grid.geojson'),
-                "url": reverse("villages_geojson", kwargs={"camp_slug": self.camp.slug}),
-                "loggedIn": self.request.user.is_authenticated,
-                }
+        context["mapData"] = {
+            "grid": static("json/grid.geojson"),
+            "url": reverse("villages_geojson", kwargs={"camp_slug": self.camp.slug}),
+            "loggedIn": self.request.user.is_authenticated,
+        }
         return context
 
     def get_queryset(self):
@@ -111,7 +111,12 @@ class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson'),"x": context['village'].location.x, "y": context['village'].location.y,"loggedIn": self.request.user.is_authenticated}
+        context["mapData"] = {
+            "grid": static("json/grid.geojson"),
+            "x": context["village"].location.x,
+            "y": context["village"].location.y,
+            "loggedIn": self.request.user.is_authenticated,
+        }
         return context
 
     def get_queryset(self):
@@ -130,7 +135,7 @@ class VillageCreateView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson')}
+        context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
     def get_form(self, *args, **kwargs):
@@ -186,7 +191,7 @@ class VillageUpdateView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson')}
+        context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
     def get_form(self, *args, **kwargs):

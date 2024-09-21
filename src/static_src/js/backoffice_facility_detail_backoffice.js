@@ -24,4 +24,3 @@ var marker = L.marker([mapData.facility.location.y, mapData.facility.location.x]
 marker.bindPopup(`<b>${mapData.facility.name}</b><br><p>${mapData.facility.description}</p>`).addTo(mapObject.map);
 // max zoom since we have only one marker
 mapObject.map.setView(marker.getLatLng(), 20);
-

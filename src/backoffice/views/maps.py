@@ -248,7 +248,7 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson')}
+        context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
     def get_form(self, *args, **kwargs):
@@ -294,7 +294,7 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['mapData'] = {"grid": static('json/grid.geojson')}
+        context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
     def get_form(self, *args, **kwargs):

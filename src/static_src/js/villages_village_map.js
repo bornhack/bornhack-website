@@ -23,4 +23,3 @@ mapObject.onGridClick = function (e) {
 function gridLoaded() {
   mapObject.loadLayer(mapData.url, "Villages", villageOptions, true);
 }
-
