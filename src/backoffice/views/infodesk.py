@@ -194,6 +194,11 @@ class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, For
     template_name = "invoice_download.html"
     form_class = InvoiceDownloadForm
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["invoices"] = []
+        return context
+
     def form_valid(self, form):
         orders = form.cleaned_data["orders"]
         invoices = form.cleaned_data["invoices"]
