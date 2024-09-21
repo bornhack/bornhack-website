@@ -7,7 +7,7 @@ mapObject.setDefaultView();
 mapObject.map.addControl(new L.Control.Fullscreen({
   pseudoFullscreen: true,
 }));
-mapObject.loadLayer("{% static 'json/grid.geojson' %}", "Grid squares", {
+mapObject.loadLayer(mapData['grid'], "Grid squares", {
   onEachFeature: mapObject.onEachGrid,
   style: {
     color: "gray",

@@ -8,8 +8,10 @@ from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpResponse
+from django.urls import reverse
 from django.views.generic import View
 from django.views.generic.base import TemplateView
+from django.templatetags.static import static
 from jsonview.views import JsonView
 from PIL import ImageColor
 
@@ -81,6 +83,17 @@ class MapView(CampViewMixin, TemplateView):
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(camp=self.camp) | Q(camp=None),
         )
+        context['mapData'] = {
+                "facilitytype_list": list(context['facilitytype_list'].values()),
+                "layers": list(context['layers'].values("description", "name", "slug", "uuid","icon", "group__name")),
+                "externalLayers": list(context['externalLayers'].values()),
+                "villages": reverse("villages_geojson", kwargs={"camp_slug": self.camp.slug}),
+                "grid": static('json/grid.geojson'),
+                }
+        for facility in context["mapData"]["facilitytype_list"]:
+            facility['url'] = reverse("facilities:facility_list_geojson", kwargs={"camp_slug": self.camp.slug, "facility_type_slug": facility['slug']})
+        for layer in context["mapData"]["layers"]:
+            layer['url'] = reverse("maps:map_layer_geojson", kwargs={"layer_slug": layer['slug']})
         return context
 
 
