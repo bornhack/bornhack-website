@@ -6,8 +6,6 @@ from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
-from django.templatetags.static import static
-
 from jsonview.views import JsonView
 
 from .mixins import FacilityTypeViewMixin
@@ -25,15 +23,18 @@ class FacilityTypeListView(CampViewMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
-                "loggedIn": self.request.user.is_authenticated,
-                "grid": static('json/grid.geojson'),
-                "facilitytypeList": list(context['facilitytype_list'].values()),
-                }
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+            "facilitytypeList": list(context["facilitytype_list"].values()),
+        }
         for facility in context["mapData"]["facilitytypeList"]:
             facility["url"] = reverse(
-                    "facilities:facility_list_geojson",
-                    kwargs={"camp_slug": self.camp.slug, "facility_type_slug": facility['slug']},
-                    )
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": self.camp.slug,
+                    "facility_type_slug": facility["slug"],
+                },
+            )
         return context
 
 
@@ -121,17 +122,24 @@ class FacilityDetailView(FacilityTypeViewMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
-                "loggedIn": self.request.user.is_authenticated,
-                "grid": static('json/grid.geojson'),
-                "name": context['facility'].name,
-                "description": context['facility'].description,
-                "team": context['facility'].facility_type.responsible_team.name,
-                "icon": context['facility'].facility_type.icon,
-                "marker": context['facility'].facility_type.marker,
-                "x": context['facility'].location.x,
-                "y": context['facility'].location.y,
-                "feedbackUrl": reverse("facilities:facility_feedback", kwargs={"camp_slug":context['facility'].camp.slug , "facility_type_slug":context['facilitytype'].slug, "facility_uuid":context['facility'].uuid})
-                }
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+            "name": context["facility"].name,
+            "description": context["facility"].description,
+            "team": context["facility"].facility_type.responsible_team.name,
+            "icon": context["facility"].facility_type.icon,
+            "marker": context["facility"].facility_type.marker,
+            "x": context["facility"].location.x,
+            "y": context["facility"].location.y,
+            "feedbackUrl": reverse(
+                "facilities:facility_feedback",
+                kwargs={
+                    "camp_slug": context["facility"].camp.slug,
+                    "facility_type_slug": context["facilitytype"].slug,
+                    "facility_uuid": context["facility"].uuid,
+                },
+            ),
+        }
         return context
 
     def get_queryset(self, *args, **kwargs):

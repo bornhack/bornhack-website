@@ -27,4 +27,3 @@ if (mapData.loggedIn) {
 marker.bindPopup(`<b>${mapData.name}</b><br><p>${mapData.description}</p><p>Responsible team: ${mapData.team} Team</p>${feedback}`).addTo(mapObject.map);
 // max zoom since we have only one marker
 mapObject.map.setView(marker.getLatLng(), 20);
-

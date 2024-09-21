@@ -20,4 +20,3 @@ function gridLoaded() {
     mapObject.loadLayer(feature.url, "feature.name", facilityOptions);
   })
 }
-
