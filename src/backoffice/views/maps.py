@@ -50,7 +50,7 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
     errorCount = 0
 
     def get(self, request, *args, **kwargs):
-        context = dict()
+        context = {}
         context["layer"] = Layer.objects.get(slug=kwargs["layer_slug"])
         return render(request, self.template_name, context)
 
