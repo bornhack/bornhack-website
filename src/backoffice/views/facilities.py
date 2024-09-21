@@ -240,7 +240,7 @@ class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
                         "marker": item.facility_type.marker,
                         "team": item.facility_type.responsible_team.name,
                     },
-                }
+                },
             )
         return context
 
