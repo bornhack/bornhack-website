@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
@@ -211,11 +212,54 @@ class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+            "facility_list": [],
+        }
+        for item in context['facility_list']:
+            context["mapData"]['facility_list'].append({
+                "url": reverse("backoffice:facility_detail", kwargs={"camp_slug": item.camp.slug, "facility_uuid": item.uuid}),
+                "name": item.name,
+                "description": item.description,
+                "location": {
+                    "x": item.location.x,
+                    "y": item.location.y,
+                },
+                "facility_type": {
+                    "icon": item.facility_type.icon,
+                    "marker": item.facility_type.marker,
+                    "team": item.facility_type.responsible_team.name
+                    },
+                })
+        return context
 
 class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
     model = Facility
     template_name = "facility_detail_backoffice.html"
     pk_url_kwarg = "facility_uuid"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "facility": {
+                "location": {
+                    "x": context['facility'].location.x,
+                    "y": context['facility'].location.y,
+                },
+                "name": context['facility'].name,
+                "facility_type": {
+                    "marker": context['facility'].facility_type.marker,
+                    "icon": context['facility'].facility_type.icon,
+                },
+                "description": context['facility'].description,
+            },
+            "grid": static("json/grid.geojson"),
+        }
+        return context
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
@@ -241,6 +285,10 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
         Do not show types that are not part of the current camp in the dropdown
         """
         context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+        }
         context["form"].fields["facility_type"].queryset = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
         )
@@ -256,6 +304,14 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
     template_name = "facility_form.html"
     pk_url_kwarg = "facility_uuid"
     fields = ["facility_type", "name", "description", "location"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+        }
+        return context
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)

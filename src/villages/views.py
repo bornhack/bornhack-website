@@ -10,6 +10,7 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
+from django.templatetags.static import static
 from jsonview.views import JsonView
 from leaflet.forms.widgets import LeafletWidget
 
@@ -25,6 +26,11 @@ class VillageListView(CampViewMixin, ListView):
     template_name = "village_list.html"
     context_object_name = "villages"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {"grid": static('json/grid.geojson')}
+        return context
+
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False, approved=True)
 
@@ -33,6 +39,15 @@ class VillageMapView(CampViewMixin, ListView):
     model = Village
     template_name = "village_map.html"
     context_object_name = "villages"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {
+                "grid": static('json/grid.geojson'),
+                "url": reverse("villages_geojson", kwargs={"camp_slug": self.camp.slug}),
+                "loggedIn": self.request.user.is_authenticated,
+                }
+        return context
 
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False, approved=True)
@@ -94,6 +109,11 @@ class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailVie
     template_name = "village_detail.html"
     context_object_name = "village"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {"grid": static('json/grid.geojson'),"x": context['village'].location.x, "y": context['village'].location.y,"loggedIn": self.request.user.is_authenticated}
+        return context
+
     def get_queryset(self):
         return super().get_queryset().filter(deleted=False)
 
@@ -107,6 +127,11 @@ class VillageCreateView(
     model = Village
     template_name = "village_form.html"
     fields = ["name", "description", "private", "location"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {"grid": static('json/grid.geojson')}
+        return context
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
@@ -158,6 +183,11 @@ class VillageUpdateView(
     model = Village
     template_name = "village_form.html"
     fields = ["name", "description", "private", "location"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['mapData'] = {"grid": static('json/grid.geojson')}
+        return context
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)

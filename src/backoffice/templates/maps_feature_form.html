@@ -10,7 +10,6 @@
   {{ mapData|json_script:"mapData" }}
   <script src="{% static 'js/mapVars.js' %}" type="text/javascript"></script>
   <script src="{% static 'js/map.js' %}" type="text/javascript"></script>
-  <script src="{% static 'js/backoffice_maps_feature_form.js' %}" type="text/javascript"></script>
 {% endblock extra_head %}
 
 {% block content %}
@@ -28,4 +27,5 @@
       </form>
     </div>
   </div>
+  <script src="{% static 'js/maps_map-init_loader.js' %}" type="text/javascript"></script>
 {% endblock content %}
