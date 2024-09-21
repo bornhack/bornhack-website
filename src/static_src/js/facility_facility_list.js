@@ -14,4 +14,4 @@ mapObject.loadLayer(frontendData['grid'], "Grid squares", {
     fillOpacity: 0.0,
     weight: 0.5
   },
-}, false, () => { mapObject.loadLayer(frontendData['url'], frontendData['name'], facilityOptions); console.log(frontendData)});
+}, false, () => { mapObject.loadLayer(frontendData['url'], frontendData['name'], facilityOptions) });
