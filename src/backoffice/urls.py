@@ -280,7 +280,7 @@ urlpatterns = [
                                 name="maps_layer_delete",
                             ),
                             path(
-                                "<uuid:feature_uuid>/",
+                                "features/<uuid:feature_uuid>/",
                                 include(
                                     [
                                         path(
