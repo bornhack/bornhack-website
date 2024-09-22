@@ -33,7 +33,7 @@ class MissingCredentials(Exception):
 
 class MapMarkerView(TemplateView):
     """
-    View for generating the collored marker
+    View for generating the coloured marker
     """
 
     template_name = "marker.svg"
