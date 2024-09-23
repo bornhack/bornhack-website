@@ -53,9 +53,10 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
         related_name="layers",
     )
 
-    camp = models.ForeignKey(
-        Camp,
-        on_delete=models.CASCADE,
+    responsible_team = models.ForeignKey(
+        "teams.Team",
+        on_delete=models.PROTECT,
+        help_text="The Team responsible for this Layer.",
         null=True,
         blank=True,
     )
@@ -146,7 +147,13 @@ class ExternalLayer(UUIDModel):
         help_text="URL of the GEOJSON layer",
     )
 
-    camp = models.ForeignKey(Camp, on_delete=models.CASCADE, null=True, blank=True)
+    responsible_team = models.ForeignKey(
+        "teams.Team",
+        on_delete=models.PROTECT,
+        help_text="The Team responsible for this Layer.",
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return str(self.name)

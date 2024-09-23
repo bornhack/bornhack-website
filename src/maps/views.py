@@ -79,9 +79,9 @@ class MapView(CampViewMixin, TemplateView):
         context["facilitytype_list"] = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
         )
-        context["layers"] = Layer.objects.filter(Q(camp=self.camp) | Q(camp=None))
+        context["layers"] = Layer.objects.filter(Q(responsible_team__camp=self.camp) | Q(camp=None))
         context["externalLayers"] = ExternalLayer.objects.filter(
-            Q(camp=self.camp) | Q(camp=None),
+            Q(responsible_team__camp=self.camp) | Q(camp=None),
         )
         context["mapData"] = {
             "facilitytype_list": list(context["facilitytype_list"].values()),
