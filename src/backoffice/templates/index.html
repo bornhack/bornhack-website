@@ -296,7 +296,7 @@
             <p class="list-group-item-text">Use this view to see token find stats</p>
           </a>
         {% endif %}
-        {% if perms.camps.mapperteam_permission %}
+        {% if perms.camps.gisteam_permission %}
           <h3>Maps</h3>
           <a href="{% url 'backoffice:maps_layer_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Layers</h4>

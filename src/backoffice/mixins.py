@@ -46,14 +46,14 @@ class ContentTeamPermissionMixin(RaisePermissionRequiredMixin):
     )
 
 
-class MapperTeamPermissionMixin(RaisePermissionRequiredMixin):
+class GisTeamPermissionMixin(RaisePermissionRequiredMixin):
     """
-    Permission mixin for views used by Mapper Team
+    Permission mixin for views used by GIS Team
     """
 
     permission_required = (
         "camps.backoffice_permission",
-        "camps.mapperteam_permission",
+        "camps.gisteam_permission",
     )
 
 
