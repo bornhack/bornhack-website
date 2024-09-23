@@ -59,7 +59,7 @@ function gridLoaded() {
       style: {
         color: "{{ layer.color }}"
       }
-    }, true, function(){}, item.group__name, item.icon);
+    }, !item.invisible, function(){}, item.group__name, item.icon);
   })
   mapData['externalLayers'].forEach(function (item) {
     mapObject.loadLayer(item.url, item.name, {}, false, function(){}, "External");

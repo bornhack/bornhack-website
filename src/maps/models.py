@@ -47,6 +47,11 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
         help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
     )
 
+    invisible = models.BooleanField(
+        default=False,
+        help_text="Is the layer invisible in the map view?",
+    )
+
     group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
@@ -60,6 +65,10 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
         null=True,
         blank=True,
     )
+
+    @property
+    def camp(self):
+        return self.responsible_team.camp
 
     def __str__(self):
         return str(self.name)
@@ -154,6 +163,10 @@ class ExternalLayer(UUIDModel):
         null=True,
         blank=True,
     )
+
+    @property
+    def camp(self):
+        return self.responsible_team.camp
 
     def __str__(self):
         return str(self.name)

@@ -35,11 +35,9 @@ class MapsLayerView(CampViewMixin, MapperTeamPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["layers"] = Layer.objects.filter(
-            Q(responsible_team__camp=self.camp) | Q(camp=None)
-        )
+        context["layers"] = Layer.objects.filter(Q(responsible_team__camp=self.camp) | Q(responsible_team=None))
         context["externalLayers"] = ExternalLayer.objects.filter(
-            Q(responsible_team__camp=self.camp) | Q(camp=None),
+            Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
         return context
 
@@ -164,8 +162,9 @@ class MapsLayerCreateView(CampViewMixin, MapperTeamPermissionMixin, CreateView):
         "slug",
         "description",
         "icon",
+        "invisible",
         "group",
-        "camp",
+        "responsible_team",
     ]
 
     def get_form(self, *args, **kwargs):
@@ -189,8 +188,9 @@ class MapsLayerUpdateView(CampViewMixin, MapperTeamPermissionMixin, UpdateView):
         "slug",
         "description",
         "icon",
+        "invisible",
         "group",
-        "camp",
+        "responsible_team",
     ]
 
     def get_form(self, *args, **kwargs):
@@ -345,7 +345,7 @@ class MapsExternalLayerCreateView(MapperTeamPermissionMixin, CreateView):
     fields = [
         "name",
         "description",
-        "camp",
+        "responsible_team",
         "url",
     ]
 
@@ -365,7 +365,7 @@ class MapsExternalLayerUpdateView(MapperTeamPermissionMixin, UpdateView):
     fields = [
         "name",
         "description",
-        "camp",
+        "responsible_team",
         "url",
     ]
 
