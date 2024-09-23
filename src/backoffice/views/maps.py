@@ -17,7 +17,7 @@ from django.views.generic.edit import UpdateView
 from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget
 
-from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import MapperTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from maps.mixins import LayerViewMixin
 from maps.models import ExternalLayer
@@ -28,7 +28,7 @@ from utils.widgets import IconPickerWidget
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+class MapsLayerView(CampViewMixin, MapperTeamPermissionMixin, ListView):
     model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
@@ -42,7 +42,7 @@ class MapsLayerView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         return context
 
 
-class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
+class MapsLayerImportView(LayerViewMixin, MapperTeamPermissionMixin, View):
     model = Feature
     template_name = "maps_layer_import_backoffice.html"
     createdCount = 0
@@ -154,7 +154,7 @@ class MapsLayerImportView(LayerViewMixin, OrgaTeamPermissionMixin, View):
         return created
 
 
-class MapsLayerCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
+class MapsLayerCreateView(CampViewMixin, MapperTeamPermissionMixin, CreateView):
     model = Layer
     template_name = "maps_layer_form.html"
     fields = [
@@ -178,7 +178,7 @@ class MapsLayerCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
         )
 
 
-class MapsLayerUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class MapsLayerUpdateView(CampViewMixin, MapperTeamPermissionMixin, UpdateView):
     model = Layer
     slug_url_kwarg = "layer_slug"
     template_name = "maps_layer_form.html"
@@ -203,7 +203,7 @@ class MapsLayerUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         )
 
 
-class MapsLayerDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
+class MapsLayerDeleteView(CampViewMixin, MapperTeamPermissionMixin, DeleteView):
     model = Layer
     template_name = "maps_layer_delete.html"
     slug_url_kwarg = "layer_slug"
@@ -221,7 +221,7 @@ class MapsLayerDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
         )
 
 
-class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
+class MapsFeaturesView(LayerViewMixin, MapperTeamPermissionMixin, ListView):
     model = Feature
     template_name = "maps_layer_feature_list_backoffice.html"
 
@@ -231,7 +231,7 @@ class MapsFeaturesView(LayerViewMixin, OrgaTeamPermissionMixin, ListView):
         return context
 
 
-class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView):
+class MapsFeatureCreateView(LayerViewMixin, MapperTeamPermissionMixin, CreateView):
     model = Feature
     template_name = "maps_feature_form.html"
     fields = [
@@ -276,7 +276,7 @@ class MapsFeatureCreateView(LayerViewMixin, OrgaTeamPermissionMixin, CreateView)
         )
 
 
-class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class MapsFeatureUpdateView(LayerViewMixin, MapperTeamPermissionMixin, UpdateView):
     model = Feature
     slug_url_kwarg = "feature_uuid"
     slug_field = "uuid"
@@ -320,7 +320,7 @@ class MapsFeatureUpdateView(LayerViewMixin, OrgaTeamPermissionMixin, UpdateView)
         )
 
 
-class MapsFeatureDeleteView(LayerViewMixin, OrgaTeamPermissionMixin, DeleteView):
+class MapsFeatureDeleteView(LayerViewMixin, MapperTeamPermissionMixin, DeleteView):
     model = Feature
     template_name = "maps_feature_delete.html"
     slug_url_kwarg = "feature_uuid"
@@ -337,7 +337,7 @@ class MapsFeatureDeleteView(LayerViewMixin, OrgaTeamPermissionMixin, DeleteView)
         )
 
 
-class MapsExternalLayerCreateView(OrgaTeamPermissionMixin, CreateView):
+class MapsExternalLayerCreateView(MapperTeamPermissionMixin, CreateView):
     model = ExternalLayer
     template_name = "maps_external_layer_form.html"
     fields = [
@@ -355,7 +355,7 @@ class MapsExternalLayerCreateView(OrgaTeamPermissionMixin, CreateView):
         )
 
 
-class MapsExternalLayerUpdateView(OrgaTeamPermissionMixin, UpdateView):
+class MapsExternalLayerUpdateView(MapperTeamPermissionMixin, UpdateView):
     model = ExternalLayer
     slug_url_kwarg = "external_layer_uuid"
     slug_field = "uuid"
@@ -375,7 +375,7 @@ class MapsExternalLayerUpdateView(OrgaTeamPermissionMixin, UpdateView):
         )
 
 
-class MapsExternalLayerDeleteView(OrgaTeamPermissionMixin, DeleteView):
+class MapsExternalLayerDeleteView(MapperTeamPermissionMixin, DeleteView):
     model = ExternalLayer
     template_name = "maps_external_layer_delete.html"
     slug_url_kwarg = "external_layer_uuid"

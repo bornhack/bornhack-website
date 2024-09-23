@@ -46,6 +46,17 @@ class ContentTeamPermissionMixin(RaisePermissionRequiredMixin):
     )
 
 
+class MapperTeamPermissionMixin(RaisePermissionRequiredMixin):
+    """
+    Permission mixin for views used by Mapper Team
+    """
+
+    permission_required = (
+        "camps.backoffice_permission",
+        "camps.mapperteam_permission",
+    )
+
+
 class PosViewMixin(CampViewMixin, UserPassesTestMixin):
     """A mixin to set self.pos based on pos_slug in url kwargs."""
 

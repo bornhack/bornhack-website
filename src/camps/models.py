@@ -54,6 +54,7 @@ class Permission(ExportModelOperationsMixin("permission"), models.Model):
             ("wellnessteam_permission", "Wellness Team permissions set"),
             ("expense_create_permission", "Expense Create permission"),
             ("revenue_create_permission", "Revenue Create permission"),
+            ("mapperteam_permission", "Mapper Team permission set"),
         )
 
 
