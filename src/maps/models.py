@@ -5,7 +5,6 @@ from django.contrib.gis.db.models import GeometryCollectionField
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
 
-from camps.models import Camp
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
