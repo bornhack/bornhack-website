@@ -35,7 +35,9 @@ class MapsLayerView(CampViewMixin, MapperTeamPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["layers"] = Layer.objects.filter(Q(responsible_team__camp=self.camp) | Q(camp=None))
+        context["layers"] = Layer.objects.filter(
+            Q(responsible_team__camp=self.camp) | Q(camp=None)
+        )
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(camp=None),
         )
