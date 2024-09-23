@@ -28,15 +28,18 @@ class BHMap {
       maxZoom: 18,
     }).addTo(this.map);
 
-    this.baseLayers['Ortophoto Map'] = L.tileLayer('/maps/kfproxy/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS?REQUEST=GetTile&VERSION=1.0.0&service=WMTS&Layer=orto_foraar_wmts&style=default&format=image/jpeg&TileMatrixSet=KortforsyningTilingDK&TileMatrix={zoom}&TileRow={y}&TileCol={x}', {
+    this.baseLayers['Ortophoto Map'] = L.tileLayer.wms('/maps/kfproxy/GeoDanmarkOrto/orto_foraar/1.0.0/WMS', {
       minZoom: 1,
-      maxZoom: 13,
+      maxZoom: 18,
       attribution: this.myAttributionText,
       crossOrigin: true,
-      zoom: function () {
-        var zoomlevel = map._animateToZoom ? map._animateToZoom : map.getZoom();
-        return zoomlevel;
-      }
+      layers: 'orto_foraar',
+      zoom: function (data) {
+        var zoomlevel = data.z;
+        if (zoomlevel > 13)
+          zoomlevel = 13;
+        return zoomlevel
+      },
     });
 
     this.baseLayers['Regular Map'] = L.tileLayer.wms('/maps/kfproxy/Dkskaermkort/topo_skaermkort/1.0.0/wms', {
@@ -198,6 +201,7 @@ class BHMap {
       this.map.eachLayer(layer => this.onMqttLayer(topic, payload, layer));
     }
   }
+
   onMqttLayer(topic, payload, layer) {
     if (layer.feature && layer.feature.properties.topic && layer.feature.properties.topic === topic) {
       if (this.processing[layer.feature.properties.processing]) {
@@ -208,6 +212,7 @@ class BHMap {
       }
     }
   }
+
   onMqttLayerFeature(topic, payload, layer, feature) {
     this.processing[layer.feature.properties.processing](topic, payload, feature);
   }

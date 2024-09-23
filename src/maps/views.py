@@ -156,6 +156,7 @@ class MapProxyView(View):
     PROXY_URL = "/maps/kfproxy"
     VALID_ENDPOINTS = [
         "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
+        "/GeoDanmarkOrto/orto_foraar/1.0.0/WMS",
         "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
         "/DHMNedboer/dhm/1.0.0/wms",
     ]
