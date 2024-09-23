@@ -80,7 +80,7 @@ class MapView(CampViewMixin, TemplateView):
             responsible_team__camp=self.camp,
         )
         context["layers"] = Layer.objects.filter(
-            Q(responsible_team__camp=self.camp) | Q(responsible_team=None)
+            Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
