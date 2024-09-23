@@ -23,6 +23,8 @@ from maps.mixins import LayerViewMixin
 from maps.models import ExternalLayer
 from maps.models import Feature
 from maps.models import Layer
+from teams.models import Team
+
 from utils.widgets import IconPickerWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -175,6 +177,16 @@ class MapsLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateView):
         form.fields["icon"].widget = IconPickerWidget()
         return form
 
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
+            camp=self.camp,
+        )
+        return context
+
     def get_success_url(self):
         return reverse(
             "backoffice:maps_layer_list",
@@ -200,6 +212,16 @@ class MapsLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateView):
         form = super().get_form(*args, **kwargs)
         form.fields["icon"].widget = IconPickerWidget()
         return form
+
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
+            camp=self.camp,
+        )
+        return context
 
     def get_success_url(self):
         return reverse(
@@ -352,6 +374,16 @@ class MapsExternalLayerCreateView(GisTeamPermissionMixin, CreateView):
         "url",
     ]
 
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
+            camp=self.camp,
+        )
+        return context
+
     def get_success_url(self):
         messages.success(self.request, "The external layer has been created")
         return reverse(
@@ -371,6 +403,16 @@ class MapsExternalLayerUpdateView(GisTeamPermissionMixin, UpdateView):
         "responsible_team",
         "url",
     ]
+
+    def get_context_data(self, **kwargs):
+        """
+        Do not show teams that are not part of the current camp in the dropdown
+        """
+        context = super().get_context_data(**kwargs)
+        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
+            camp=self.camp,
+        )
+        return context
 
     def get_success_url(self):
         messages.success(self.request, "The external layer has been updated")

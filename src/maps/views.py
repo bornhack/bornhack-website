@@ -103,6 +103,7 @@ class MapView(CampViewMixin, TemplateView):
                 "villages_geojson",
                 kwargs={"camp_slug": self.camp.slug},
             ),
+            "loggedIn": self.request.user.is_authenticated,
             "grid": static("json/grid.geojson"),
         }
         for facility in context["mapData"]["facilitytype_list"]:
