@@ -146,6 +146,7 @@ class MapsLayerImportView(LayerViewMixin, GisTeamPermissionMixin, View):
             topic=props["topic"],
             processing=props["processing"],
             color=props["color"],
+            icon=props["icon"],
             layer=layer,
             geom=geom,
         )
