@@ -78,7 +78,9 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
     def dump_features(self) -> list[object]:
         output = []
         for village in Village.objects.filter(
-            camp=self.camp, deleted=False, approved=True
+            camp=self.camp,
+            deleted=False,
+            approved=True,
         ):
             if village.location is None:
                 continue
