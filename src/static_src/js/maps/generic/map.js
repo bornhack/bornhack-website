@@ -23,10 +23,6 @@ class BHMap {
       this.map = div;
     this.myAttributionText = '&copy; <a target="_blank" href="https://download.kortforsyningen.dk/content/vilk%C3%A5r-og-betingelser">Styrelsen for Dataforsyning og Effektivisering</a>';
 
-    this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 18,
-    }).addTo(this.map);
 
     this.baseLayers['Ortophoto Map'] = L.tileLayer.wms('/maps/kfproxy/GeoDanmarkOrto/orto_foraar/1.0.0/WMS', {
       minZoom: 1,
@@ -40,7 +36,7 @@ class BHMap {
           zoomlevel = 13;
         return zoomlevel
       },
-    });
+    }).addTo(this.map);
 
     this.baseLayers['Regular Map'] = L.tileLayer.wms('/maps/kfproxy/Dkskaermkort/topo_skaermkort/1.0.0/wms', {
       version: '1.3.0',
@@ -54,6 +50,11 @@ class BHMap {
       layers: 'dhm_terraen_skyggekort',
       format: 'image/png',
       attribution: this.myAttributionText
+    });
+
+    this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18,
     });
 
     this.baseLayers['Google Sat (external)'] = L.tileLayer('https://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}', {
