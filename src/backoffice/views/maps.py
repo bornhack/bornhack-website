@@ -109,12 +109,7 @@ class MapsLayerImportView(LayerViewMixin, GisTeamPermissionMixin, View):
             logger.exception(f"Failed to GEOSGeometry: {feature}")
             self.errorCount += 1
             return
-        created = self.createObject(props, layer, geom)
-        if created:
-            self.createdCount += 1
-        else:
-            self.updateCount += 1
-        return
+        self.createObject(props, layer, geom)
 
     def load_features(self, features):
         importFeatures = []
@@ -142,20 +137,24 @@ class MapsLayerImportView(LayerViewMixin, GisTeamPermissionMixin, View):
                 continue
 
     def createObject(self, props, layer, geom):
-        obj, created = Feature.objects.update_or_create(
-            name=props["name"],
-            description=props["description"],
-            topic=props["topic"],
-            processing=props["processing"],
-            color=props["color"],
-            icon=props["icon"],
-            layer=layer,
-            geom=geom,
-        )
-        if created:
-            self.createdCount += 1
-        else:
-            self.updateCount += 1
+        try:
+            obj, created = Feature.objects.update_or_create(
+                name=props["name"],
+                description=props["description"],
+                topic=props["topic"],
+                processing=props["processing"],
+                color=props["color"],
+                icon=props["icon"],
+                layer=layer,
+                geom=geom,
+            )
+            if created:
+                self.createdCount += 1
+            else:
+                self.updateCount += 1
+        except KeyError:
+            self.errorCount += 1
+            return False
         return created
 
 
