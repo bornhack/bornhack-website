@@ -475,7 +475,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         messages.success(request, "Expense %s rejected" % self.pk)
 
     def __str__(self):
-        return f"{self.responsible_team.name} Team - { self.amount} DKK - {self.creditor.name} - {self.description}"
+        return f"{self.responsible_team.name} Team - {self.amount} DKK - {self.creditor.name} - {self.description}"
 
 
 class Reimbursement(

@@ -41,7 +41,7 @@ ADMINS={{ django_admins }}
 # misc settings
 TIME_ZONE='{{ django_timezone }}'
 MEDIA_ROOT='{{ django_media_root }}'
-PDF_TEST_MODE = True
+PDF_TEST_MODE = {{ pdf_test_mode }}
 PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 
 # PSP settings
@@ -54,7 +54,6 @@ COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
 COINIFY_CALLBACK_HOSTNAME='{{ coinify_callback_hostname | default('') }}' # leave empty or comment out to use hostname from request
 
 # shop settings
-PDF_LETTERHEAD_FILENAME='{{ pdf_letterhead_filename }}'
 BANKACCOUNT_BANK='{{ bank_name }}'
 BANKACCOUNT_IBAN='{{ iban }}'
 BANKACCOUNT_SWIFTBIC='{{ swiftbic }}'

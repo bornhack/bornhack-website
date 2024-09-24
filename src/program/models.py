@@ -737,7 +737,7 @@ class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedMod
 
     @property
     def icon_html(self):
-        return mark_safe(f'<i class="fas fa-{ self.icon} fa-fw"></i>')
+        return mark_safe(f'<i class="fas fa-{self.icon} fa-fw"></i>')
 
     @property
     def event_slots(self):
@@ -860,7 +860,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
 
     def icon_html(self):
         return mark_safe(
-            f'<i class="fas fa-{ self.icon} fa-fw" style="color: { self.color};"></i>',
+            f'<i class="fas fa-{self.icon} fa-fw" style="color: {self.color};"></i>',
         )
 
     class Meta:
@@ -1266,7 +1266,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         uuidbase = f"{start_timestamp}{location_id}{event_id}"
 
         # pad using event_uuid up to 32 hex chars and return
-        return uuid.UUID(f"{uuidbase}{event_uuid[0:32-len(uuidbase)]}")
+        return uuid.UUID(f"{uuidbase}{event_uuid[0:32 - len(uuidbase)]}")
 
 
 class Event(ExportModelOperationsMixin("event"), CampRelatedModel):

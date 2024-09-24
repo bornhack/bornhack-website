@@ -17,14 +17,6 @@ repos:
       - id: trailing-whitespace
       - id: mixed-line-ending
         args: [--fix=lf]
-  - repo: https://github.com/asottile/reorder-python-imports
-    rev: v3.13.0
-    hooks:
-      - id: reorder-python-imports
-        args:
-          - --py3-plus
-          - --application-directories=.:src
-        exclude: migrations/
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
     hooks:
