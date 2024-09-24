@@ -18,7 +18,8 @@ mapObject.loadLayer(mapData.grid, "Grid squares", {
 mapObject.onGridClick = function (e) {
   e.target.setStyle({fillOpacity: 1.0});
   let center = e.target.getCenter();
-  alert(center.lat + "," + center.lng + " " + mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1));
+  if (mapObject.cols[e.target.feature.properties.col_index - 2] && (e.target.feature.properties.row_index   - 1))
+    alert(mapObject.cols[e.target.feature.properties.col_index - 2] + (e.target.feature.properties.row_index - 1) + " " + center.lat + "," + center.lng);
 }
 function gridLoaded() {
   mapObject.loadLayer(mapData.url, "Villages", villageOptions, true);

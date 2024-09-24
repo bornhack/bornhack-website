@@ -64,8 +64,8 @@ const villageOptions = {
 
 const genericLayerOptions = {
   onEachFeature: function(feature, layer) {
-    const icon = `<i style="color: ${feature.properties.color}" class="${feature.properties.icon } fa-fw"></i>`;
-    const content = `<b>${feature.properties.name}${icon}</b><br><p>${feature.properties.description}</p>`;
+    const icon = `<i style="color: ${feature.properties.color}" class="${feature.properties.icon }"></i>`;
+    const content = `<b>${feature.properties.name} ${icon}</b><br><p>${feature.properties.description}</p>`;
     layer.bindPopup(content, { maxHeight: 400});
   }
 }

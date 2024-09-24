@@ -364,7 +364,7 @@ class MapsFeatureDeleteView(LayerViewMixin, GisTeamPermissionMixin, DeleteView):
         )
 
 
-class MapsExternalLayerCreateView(GisTeamPermissionMixin, CreateView):
+class MapsExternalLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateView):
     model = ExternalLayer
     template_name = "maps_external_layer_form.html"
     fields = [
@@ -392,7 +392,7 @@ class MapsExternalLayerCreateView(GisTeamPermissionMixin, CreateView):
         )
 
 
-class MapsExternalLayerUpdateView(GisTeamPermissionMixin, UpdateView):
+class MapsExternalLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateView):
     model = ExternalLayer
     slug_url_kwarg = "external_layer_uuid"
     slug_field = "uuid"

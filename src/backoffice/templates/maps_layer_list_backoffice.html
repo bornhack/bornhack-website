@@ -22,7 +22,7 @@
           <tr>
             <th>Name</th>
             <th>Description</th>
-            <th>Camp</th>
+            <th>Team</th>
             <th class="text-center">Icon</th>
             <th class="text-center">Features</th>
             <th>Actions</th>
@@ -33,7 +33,7 @@
             <tr>
               <td><a href="{% url "backoffice:maps_features_list" camp_slug=camp.slug layer_slug=ft.slug %}">{{ ft.name }}</a></td>
               <td>{{ ft.description|default:"N/A" }}</td>
-              <td>{{ ft.responsible_team.camp.title|default:"All" }}</td>
+              <td>{{ ft.responsible_team|default:"All" }}</td>
               <td class="text-center"><i class="{{ ft.icon }} fa-2x fa-fw"></i></td>
               <td class="text-center"><span class="badge">{{ ft.features.count }}</span></td>
               <td>
@@ -54,7 +54,7 @@
             <tr>
               <th>Name</th>
               <th>Description</th>
-              <th>Camp</th>
+              <th>Team</th>
               <th>URL</th>
               <th>Actions</th>
             </tr>
@@ -64,7 +64,7 @@
               <tr>
                 <td>{{ ft.name }}</td>
                 <td>{{ ft.description|default:"N/A" }}</td>
-                <td>{{ ft.responsible_team.camp.title|default:"All" }}</td>
+                <td>{{ ft.responsible_team|default:"All" }}</td>
                 <td>{{ ft.url }}</td>
                 <td>
                   <a href="{% url "backoffice:maps_external_layer_update" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
