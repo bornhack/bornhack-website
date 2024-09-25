@@ -134,7 +134,7 @@ class MapLayerFeaturesImportView(
                     feature_uuid = uuid.uuid4()
                 # use uuid for lookup
                 get_args = {"uuid": feature_uuid}
-            except (ValueError, TypeError):
+            except (ValueError, TypeError, AttributeError):
                 # not a valid uuid, use name for lookup
                 get_args = {"name": props.get("name", "unnamed feature")}
         else:
@@ -149,10 +149,11 @@ class MapLayerFeaturesImportView(
                     "layer": layer,
                     "name": props["name"],
                     "description": props["description"],
-                    "topic": props["topic"],
-                    "processing": props["processing"],
-                    "color": props["color"],
-                    "icon": props["icon"],
+                    "url": props.get("url", ""),
+                    "topic": props.get("topic", ""),
+                    "processing": props.get("processing", ""),
+                    "color": props.get("color", "#000000FF"),
+                    "icon": props.get("icon", "fas fa-list"),
                     "geom": geom,
                 },
             )
@@ -160,7 +161,7 @@ class MapLayerFeaturesImportView(
                 self.created_count += 1
             else:
                 self.updated_count += 1
-        except KeyError:
+        except AttributeError:
             self.error_count += 1
 
 
