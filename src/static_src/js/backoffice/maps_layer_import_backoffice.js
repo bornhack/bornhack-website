@@ -4,7 +4,7 @@ $(function() {
     fetch(url)
       .then(r => r.text())
       .then(r => {
-        document.getElementById('geojson_data').value = r;
+        document.getElementById('id_geojson_data').value = r;
       })
   };
   document.getElementById('selectFiles').onchange = function() {
@@ -21,7 +21,7 @@ $(function() {
         alert(e);
       }
       var formatted = JSON.stringify(result);
-      document.getElementById('geojson_data').value = formatted;
+      document.getElementById('id_geojson_data').value = formatted;
     }
     fr.readAsText(files.item(0));
   };

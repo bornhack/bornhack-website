@@ -87,18 +87,18 @@ from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView
-from .views import MapsExternalLayerCreateView
-from .views import MapsExternalLayerDeleteView
-from .views import MapsExternalLayerUpdateView
-from .views import MapsFeatureCreateView
-from .views import MapsFeatureDeleteView
-from .views import MapsFeaturesView
-from .views import MapsFeatureUpdateView
-from .views import MapsLayerCreateView
-from .views import MapsLayerDeleteView
-from .views import MapsLayerImportView
-from .views import MapsLayerUpdateView
-from .views import MapsLayerView
+from .views import MapExternalLayerCreateView
+from .views import MapExternalLayerDeleteView
+from .views import MapExternalLayerUpdateView
+from .views import MapFeatureCreateView
+from .views import MapFeatureDeleteView
+from .views import MapFeatureListView
+from .views import MapFeatureUpdateView
+from .views import MapLayerCreateView
+from .views import MapLayerDeleteView
+from .views import MapLayerFeaturesImportView
+from .views import MapLayerUpdateView
+from .views import MapLayerListView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -215,11 +215,11 @@ urlpatterns = [
         "maps/",
         include(
             [
-                path("", MapsLayerView.as_view(), name="maps_layer_list"),
+                path("", MapLayerListView.as_view(), name="map_layer_list"),
                 path(
                     "create/",
-                    MapsLayerCreateView.as_view(),
-                    name="maps_layer_create",
+                    MapLayerCreateView.as_view(),
+                    name="map_layer_create",
                 ),
                 path(
                     "external/",
@@ -227,8 +227,8 @@ urlpatterns = [
                         [
                             path(
                                 "create/",
-                                MapsExternalLayerCreateView.as_view(),
-                                name="maps_external_layer_create",
+                                MapExternalLayerCreateView.as_view(),
+                                name="map_external_layer_create",
                             ),
                             path(
                                 "<uuid:external_layer_uuid>/",
@@ -236,13 +236,13 @@ urlpatterns = [
                                     [
                                         path(
                                             "delete/",
-                                            MapsExternalLayerDeleteView.as_view(),
-                                            name="maps_external_layer_delete",
+                                            MapExternalLayerDeleteView.as_view(),
+                                            name="map_external_layer_delete",
                                         ),
                                         path(
                                             "update/",
-                                            MapsExternalLayerUpdateView.as_view(),
-                                            name="maps_external_layer_update",
+                                            MapExternalLayerUpdateView.as_view(),
+                                            name="map_external_layer_update",
                                         ),
                                     ],
                                 ),
@@ -256,28 +256,28 @@ urlpatterns = [
                         [
                             path(
                                 "",
-                                MapsFeaturesView.as_view(),
-                                name="maps_features_list",
+                                MapFeatureListView.as_view(),
+                                name="map_features_list",
                             ),
                             path(
                                 "create/",
-                                MapsFeatureCreateView.as_view(),
-                                name="maps_feature_create",
+                                MapFeatureCreateView.as_view(),
+                                name="map_feature_create",
                             ),
                             path(
                                 "import/",
-                                MapsLayerImportView.as_view(),
-                                name="maps_layer_import",
+                                MapLayerFeaturesImportView.as_view(),
+                                name="map_layer_features_import",
                             ),
                             path(
                                 "update/",
-                                MapsLayerUpdateView.as_view(),
-                                name="maps_layer_update",
+                                MapLayerUpdateView.as_view(),
+                                name="map_layer_update",
                             ),
                             path(
                                 "delete/",
-                                MapsLayerDeleteView.as_view(),
-                                name="maps_layer_delete",
+                                MapLayerDeleteView.as_view(),
+                                name="map_layer_delete",
                             ),
                             path(
                                 "features/<uuid:feature_uuid>/",
@@ -285,13 +285,13 @@ urlpatterns = [
                                     [
                                         path(
                                             "update/",
-                                            MapsFeatureUpdateView.as_view(),
-                                            name="maps_feature_update",
+                                            MapFeatureUpdateView.as_view(),
+                                            name="map_feature_update",
                                         ),
                                         path(
                                             "delete/",
-                                            MapsFeatureDeleteView.as_view(),
-                                            name="maps_feature_delete",
+                                            MapFeatureDeleteView.as_view(),
+                                            name="map_feature_delete",
                                         ),
                                     ],
                                 ),

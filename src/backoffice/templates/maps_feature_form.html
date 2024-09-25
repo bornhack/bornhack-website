@@ -23,7 +23,7 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
-        <a href="{% url 'backoffice:maps_features_list' camp_slug=camp.slug layer_slug=layer.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:map_features_list' camp_slug=camp.slug layer_slug=layer.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

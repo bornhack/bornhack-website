@@ -128,6 +128,14 @@ class Feature(UUIDModel):
         related_name="features",
     )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["layer", "name"],
+                name="layer_and_name_uniq",
+            ),
+        ]
+
     def __str__(self):
         return str(self.name)
 

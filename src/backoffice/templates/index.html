@@ -298,7 +298,7 @@
         {% endif %}
         {% if perms.camps.gisteam_permission %}
           <h3>Maps</h3>
-          <a href="{% url 'backoffice:maps_layer_list' camp_slug=camp.slug %}" class="list-group-item">
+          <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Layers</h4>
             <p class="list-group-item-text">Map layers</p>
           </a>
