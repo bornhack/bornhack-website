@@ -99,11 +99,11 @@ class Feature(UUIDModel):
         help_text="Geometric data",
     )
 
-    color = ColorField(format="hexa")
+    color = ColorField(format="hexa", default="#000000FF")
 
     icon = models.CharField(
         max_length=100,
-        default="list",
+        default="fab fa-list",
         blank=True,
         help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
     )
@@ -141,7 +141,7 @@ class Feature(UUIDModel):
 
     @property
     def camp(self):
-        return self.layer.camp
+        return self.layer.team.camp
 
 
 class ExternalLayer(UUIDModel):
