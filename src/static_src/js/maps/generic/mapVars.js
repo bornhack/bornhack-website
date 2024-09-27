@@ -51,7 +51,7 @@ const villageOptions = {
     let grid = "";
     if (gridLayer !== undefined && gridLayer.feature)
       grid = `<p>Grid: ${mapObject.cols[gridLayer.feature.properties.col_index - 2]}${(gridLayer.feature.properties.row_index - 1)}</p>`;
-    const content = `<b>${feature.properties.name}</b><br><p>${feature.properties.description}</p>${grid}<p><a href='${feature.properties.detail_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Details</a></p>`;
+    const content = `<b>${feature.properties.name}</b><i class="fa fa-campground"></i><br><p>${feature.properties.description}</p>${grid}<p><a href='${feature.properties.detail_url}' class='btn btn-primary' style='color: white;'><i class='fas fa-search'></i> Village Details</a></p>`;
     layer.bindPopup(content, { maxHeight: 400});
     layer.setIcon(L.AwesomeMarkers.icon({
       icon: "fa fa-campground",
