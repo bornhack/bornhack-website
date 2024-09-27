@@ -2,6 +2,11 @@ body {
   margin-top: 85px;
   margin-bottom: 105px;
   overflow: scroll;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #fff
 }
 
 * {
@@ -22,6 +27,9 @@ a, a:active, a:focus {
 .popover { z-index: 1060; }
 .tooltip { z-index: 1070; }
  */
+
+strong { font-weight: bold; }
+    
 .sticky {
   z-index: 980;
 }

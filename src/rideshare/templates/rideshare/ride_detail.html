@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {{ object.author }}{% if object.has_car %} has {% else %} needs {% endif %}{{ object.seats }} seat(s) free, going from {{ object.from_location }} to {{ object.to_location }} on {{ object.when|date:"jS \o\f F \a\t H:i T" }} | {{ block.super }}

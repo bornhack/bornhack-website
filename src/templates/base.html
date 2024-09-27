@@ -1,5 +1,5 @@
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load menubutton %}
 {% static "" as baseurl %}
 
@@ -12,8 +12,9 @@
 
     <title>{% block title %}BornHack{% endblock %}</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    {# Load Bootstrap CSS and JavaScript #}
+    <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
     <link href="{% static 'css/fontawesome-all-5.0.13.min.css' %}" rel="stylesheet">
@@ -21,10 +22,11 @@
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
 
+    <!-- jQuery -->
+    <script src="{% static 'vendor/jquery/jquery-3.7.1.min.js' %}"></script>
+
     <!-- https://datatables.net/ -->
     <link href="{% static 'css/jquery.dataTables.1.10.20.min.css' %}" rel="stylesheet">
-
-    {% bootstrap_javascript jquery=1 %}
 
     <!-- https://datatables.net/ -->
     <script src="{% static "js/jquery.dataTables.1.10.20.min.js" %}"></script>
@@ -59,85 +61,81 @@
     {% block body %}
 
       <div id="main" class="container container-fluid">
-        <nav class="navbar navbar-fixed-top">
+        <nav class="navbar navbar-light fixed-top navbar-expand-lg">
           <div class="container container-fluid">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar" aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              {% if request.resolver_match.kwargs.camp_slug and camp %}
-                <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                  <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
-                </a>
-              {% else %}
-                <a class="navbar-brand" href="/">
-                  <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
-                </a>
-              {% endif %}
-            </div>
-            <div id="top-navbar" class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="{% url 'news:index' %}">News</a></li>
-                <li><a href="{% url 'shop:index' %}">Shop</a></li>
-                <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
+            {% if request.resolver_match.kwargs.camp_slug and camp %}
+              <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
+                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
+              </a>
+            {% else %}
+              <a class="navbar-brand" href="/">
+                <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
+              </a>
+            {% endif %}
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div id="top-navbar" class="collapse navbar-collapse">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
+                <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
+                <li class="nav-item dropdown">
+                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
                   <ul class="dropdown-menu">
-                    <li><a href="{% url 'camp_detail' camp_slug='bornhack-2024' %}">BornHack 2024</a></li>
-                    <li><a href="{% url 'camp_detail' camp_slug='bornhack-2023' %}">BornHack 2023</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="{% url 'camp_list' %}">Camp List</a></li>
+                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2024' %}">BornHack 2024</a></li>
+                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2023' %}">BornHack 2023</a></li>
+                    <li><hr class="dropdown-divider"></li> 
+                    <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
                   </ul>
                 </li>
-                <li><a href="{% url 'contact' %}">Contact</a></li>
-                <li><a href="{% url 'people' %}">People</a></li>
-                <li><a href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
-                <li><a href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
 
                 {% if request.user.is_staff %}
-                  <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                  <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
                 {% endif %}
               </ul>
-              <ul class="nav navbar-nav navbar-right">
+              <div class="nav navbar-nav navbar-right ms-auto">
                 {% if user.is_authenticated %}
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
+                  <div class="dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
+                      <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
                       {% if user.orders.exists %}
                         {% url 'shop:order_list' as orders_list_url %}
-                        <li><a href="{{ orders_list_url }}">Orders</a></li>
+                        <li><a class="dropdown-item" href="{{ orders_list_url }}">Orders</a></li>
 
                         {% url 'tickets:shopticket_list' as ticket_list_url %}
-                        <li><a href="{{ ticket_list_url }}">Tickets</a></li>
+                        <li><a class="dropdown-item" href="{{ ticket_list_url }}">Tickets</a></li>
 
                         {% if user.creditnotes.exists %}
                           {% url 'shop:creditnote_list' as creditnote_list_url %}
-                          <li><a href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                          <li><a class="dropdown-item" href="{{ creditnote_list_url }}">Credit Notes</a></li>
                         {% endif %}
                       {% endif %}
-                      <li role="separator" class="divider"></li>
-                      <li><a href="{% url 'account_logout' %}">Logout</a></li>
+                      <li><hr class="dropdown-divider"></li> 
+                      <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                     </ul>
-                  </li>
+                  </div>
                 {% else %}
-                  <li><a href="{% url 'account_login' %}">Login</a></li>
+                  <a class="nav-link" href="{% url 'account_login' %}">Login</a>
                 {% endif %}
-              </ul>
+              </div>
             </div>
           </div>
         </nav>
+        <br>
         {% if camp %}
-          <div class="row">
-            <div class="btn-group btn-group-justified hidden-xs">
-              {% include 'includes/menuitems.html' %}
-            </div>
-            <div class="btn-group-vertical visible-xs">
-              {% include 'includes/menuitems.html' %}
-            </div>
-            <p>
+            <div class="row">
+              <div class="w-100 d-none d-lg-flex btn-group" role="group">
+                {% include 'includes/menuitems.html' %}
+              </div>
+              <div class="d-lg-none btn-group-vertical w-100" role="group">
+                {% include 'includes/menuitems.html' %}
+              </div>
+              <p>
             </div>
         {% endif %}
         {% bootstrap_messages %}

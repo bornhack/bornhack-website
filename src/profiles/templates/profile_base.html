@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 
+{% load django_bootstrap5 %}
+
 {% load account %}
-{% load bootstrap3 %}
 
 {% block title %}
   Profile | {{ block.super }}
@@ -14,60 +15,60 @@
   </div>
 
   <div class="row">
-    <div class="col-md-2">
-      <ul class="nav nav-pills nav-stacked">
+    <div class="col-2">
+      <ul class="nav nav-pills nav-stacked flex-column">
 
-        <li><b>Account settings</b></li>
+        <li class="nav-item"><h5>Account settings</h5></li>
 
         {% url 'profiles:detail' as profile_detail_url %}
-        <li {% if request.path == profile_detail_url %}class="active"{% endif %}>
-          <a href="{{ profile_detail_url }}">
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == profile_detail_url %} active{% endif %}" href="{{ profile_detail_url }}">
             Profile
           </a>
         </li>
 
         {% url 'account_change_password' as password_url %}
-        <li {% if request.path == password_url %}class="active"{% endif %}>
-          <a href="{{ password_url }}">
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == password_url %} active{% endif %}" href="{{ password_url }}">
             Password
           </a>
         </li>
 
         {% url 'account_email' as email_url %}
-        <li {% if request.path == email_url %}class="active"{% endif %}>
-          <a href="{{ email_url }}">
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == email_url %} active{% endif %}" href="{{ email_url }}">
             Manage emails
           </a>
         </li>
 
         {% url 'two-factor-setup' as two_factor_url %}
-        <li {% if "two_factor" in request.path %}class="active"{% endif %}>
-          <a href="{{ two_factor_url }}">
+        <li class="nav-item">
+          <a class="nav-link{% if "two_factor" in request.path %} active{% endif %}" href="{{ two_factor_url }}">
             Two-Factor settings
           </a>
         </li>
 
         {% if user.orders.exists %}
-          <li><b>Shop</b></li>
+          <li class="nav-item nav-link"><h5>Shop</h5></li>
 
           {% url 'shop:order_list' as orders_list_url %}
-          <li {% if "shop/order" in request.path %}class="active"{% endif %}>
-            <a href="{{ orders_list_url }}">
+          <li class="nav-item">
+            <a class="nav-link{% if "shop/order" in request.path %} active{% endif %}" href="{{ orders_list_url }}">
               Orders
             </a>
           </li>
 
           {% url 'tickets:shopticket_list' as ticket_list_url %}
-          <li {% if "tickets" in request.path %}class="active"{% endif %}>
-            <a href="{{ ticket_list_url }}">
+          <li class="nav-item">
+            <a class="nav-link{% if "tickets" in request.path %} active{% endif %}" href="{{ ticket_list_url }}">
               Tickets
             </a>
           </li>
 
           {% if user.creditnotes.exists %}
             {% url 'shop:creditnote_list' as creditnote_list_url %}
-            <li {% if 'creditnotes' in request.path %}class="active"{% endif %}>
-              <a href="{{ creditnote_list_url }}">
+            <li class="nav-item">
+              <a class="nav-link{% if 'creditnotes' in request.path %} active{% endif %}" href="{{ creditnote_list_url }}">
                 Credit Notes
               </a>
             </li>
@@ -75,10 +76,10 @@
 
         {% endif %}
 
-        <li><b>Misc.</b></li>
+        <li class="nav-item"><h5>Misc.</h5></li>
         {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
-        <li {% if request.path == tokenfind_list_url %}class="active"{% endif %}>
-          <a href="{{ tokenfind_list_url }}">
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == tokenfind_list_url %}active{% endif %}" href="{{ tokenfind_list_url }}">
             Secret Tokens
           </a>
         </li>

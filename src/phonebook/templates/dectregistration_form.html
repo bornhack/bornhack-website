@@ -1,5 +1,5 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {% if request.resolver_match.url_name == "dectregistration_update" %}Update{% else %}Create{% endif %} DECT Registration | {{ block.super }}
