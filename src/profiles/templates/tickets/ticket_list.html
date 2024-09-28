@@ -23,7 +23,7 @@
           <tbody>
             {% for ticket in tickets %}
               {% ifchanged ticket.ticket_type.camp %}
-                <tr class="bg-primary">
+                <tr class="table-primary">
                   <td colspan="5" class="text-center">
                     <strong>{{ ticket.ticket_type.camp }}</strong>
                   </td>
@@ -55,37 +55,38 @@
                   {% endif %}
                 </td>
                 <td>
-                  {{ ticket.product.name }}
-                  <td>
+                    {{ ticket.product.name }}
+                </td>
+                <td>
                     {% if ticket.ticket_type.single_ticket_per_product %}
-                      {{ ticket.quantity }} &times;
+                        {{ ticket.quantity }} &times;
                     {% endif %}
                     {{ ticket.product.price|currency }}
-                  </td>
-                  <td>
+                </td>
+                <td>
                     {% if ticket.used_at %}
-                      Yes
+                        Yes
                     {% else %}
-                      Not yet
+                        Not yet
                     {% endif %}
-                  </td>
-                  <td>
+                </td>
+                <td>
                     <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
-                      class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
+                                                                                   class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
                     <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary">
-                      {% if ticket.product.ticket_type.camp.read_only %}
-                        <i class="fas fa-file" aria-hidden="true"></i> View name
-                      {% elif not ticket.name %}
-                        <i class="fas fa-edit" aria-hidden="true"></i> Set name
-                      {% else %}
-                        <i class="fas fa-edit" aria-hidden="true"></i> Edit name
-                      {% endif %}
+                        {% if ticket.product.ticket_type.camp.read_only %}
+                            <i class="fas fa-file" aria-hidden="true"></i> View name
+                        {% elif not ticket.name %}
+                            <i class="fas fa-edit" aria-hidden="true"></i> Set name
+                        {% else %}
+                            <i class="fas fa-edit" aria-hidden="true"></i> Edit name
+                        {% endif %}
                     </a>
-                  </td>
-                </tr>
-              </tbody>
+                </td>
+              </tr>
             {% endfor %}
-          </table>
+          </tbody>
+        </table>
       {% endif %}
 
       {% if tickets_in_groups %}
@@ -94,14 +95,14 @@
           <tbody>
             {% for ticket in tickets_in_groups %}
               {% ifchanged ticket.ticket_type.camp %}
-                <tr class="bg-primary">
+                <tr class="table-primary">
                   <td colspan="4" class="text-center">
                     <strong>{{ ticket.ticket_type.camp }}</strong>
                   </td>
                 </tr>
               {% endifchanged %}
               {% ifchanged ticket.ticket_group %}
-                <tr class="info">
+                <tr class="table-info">
                   <td colspan="4">
                     <i>
                       <strong>{{ ticket.bundle_product.name }}</strong>
