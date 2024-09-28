@@ -47,7 +47,7 @@ strong { font-weight: bold; }
 }
 
 @media (prefers-color-scheme: dark) {
-    .navbar-brand {
+    .bornhack-logo {
        -webkit-filter: invert(1);
        filter: invert(1);
     }

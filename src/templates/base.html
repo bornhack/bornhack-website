@@ -69,7 +69,7 @@
           <div class="container container-fluid">
             {% if request.resolver_match.kwargs.camp_slug and camp %}
               <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
+                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="bornhack-logo img-responsive">
               </a>
             {% else %}
               <a class="navbar-brand" href="/">
