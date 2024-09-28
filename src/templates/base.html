@@ -20,6 +20,8 @@
     <link href="{% static 'vendor/fontawesome/css/fontawesome.css' %}" rel="stylesheet" />
     <link href="{% static 'vendor/fontawesome/css/brands.css' %}" rel="stylesheet" />
     <link href="{% static 'vendor/fontawesome/css/solid.css' %}" rel="stylesheet" />
+    <!-- Compatibility with v5 -->
+    <link href="{% static 'vendor/fontawesome/css/v5-font-face.min.css' %}" rel="stylesheet" />
 
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
@@ -131,7 +133,7 @@
         <br>
         {% if camp %}
             <div class="row">
-              <div class="w-100 d-none d-lg-flex btn-group" role="group">
+              <div class="d-none d-lg-flex btn-group w-100" role="group">
                 {% include 'includes/menuitems.html' %}
               </div>
               <div class="d-lg-none btn-group-vertical w-100" role="group">
