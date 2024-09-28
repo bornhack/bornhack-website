@@ -49,7 +49,7 @@
       <div class="col-9">
         {% for category in categories %}
           <span class="anchor" id="{{ category.anchor }}"></span>
-          <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
+          <h2>{{ category.headline }} {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
           {% for item in category.infoitems.all %}
             <div class="card">
               <div class="card-header">

@@ -14,7 +14,7 @@
 
     {# Load Bootstrap CSS and JavaScript #}
     <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-    {# <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet"> #}
+    <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
@@ -65,7 +65,7 @@
   <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% block body %}
       <header class="py-1">
-        <nav class="navbar navbar-light fixed-top navbar-expand-lg bg-light">
+        <nav class="navbar fixed-top navbar-expand-lg bg-body">
           <div class="container container-fluid">
             {% if request.resolver_match.kwargs.camp_slug and camp %}
               <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
@@ -141,15 +141,17 @@
               {% include 'includes/menuitems.html' %}
             </div>
           </div>
-          <div class="row d-none d-lg-flex w-100 {{camp.slug}}-gradient">
-            &nbsp;
+          <div class="row">
+            <div class="col d-none d-lg-flex w-100 {{camp.slug}}-gradient">
+              &nbsp;
+            </div>
           </div>
         {% endif %}
         {% bootstrap_messages %}
         {% block content %}{% endblock %}
       </div>
       <footer>
-        <div class="container-fluid">
+        <div class="container-fluid bg-body">
           {% block footer %}
             <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
             <a href="{% url 'conduct' %}">Code of Conduct</a> |
