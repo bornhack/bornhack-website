@@ -206,3 +206,4 @@ You can also specify details like:
 * Thomas Steen Rasmusssen https://github.com/tykling
 * Víðir Valberg Guðmundsson https://github.com/valberg
 * Ximin Luo https://github.com/infinity0
+* zarya https://github.com/zarya
