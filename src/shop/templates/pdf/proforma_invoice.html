@@ -93,12 +93,12 @@
       <td>
         <b>Name</b>
       </td>
-      <td align="right" class="alignRight">
-        <b>Price
-        </td>
         <td>
           <b>Quantity
           </td>
+      <td align="right" class="alignRight">
+        <b>Price
+        </td>
           <td align="right" class="alignRight">
             <b>Total
             </td>
@@ -113,11 +113,11 @@
               <td>
                 {{ order_product.product.name }}
               </td>
-              <td align="right" class="alignRight">
-                {{ order_product.product.price|currency }}
-              </td>
               <td>
                 {{ order_product.quantity }}
+              </td>
+              <td align="right" class="alignRight">
+                {{ order_product.product.price|currency }}
               </td>
               <td align="right" class="alignRight">
                 {{ order_product.total|currency }}

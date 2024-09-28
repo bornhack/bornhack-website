@@ -89,11 +89,11 @@
       <td>
         <b>Product</b>
       </td>
-      <td align="right" class="alignRight">
-        <b>Price</b>
-      </td>
       <td>
         <b>Quantity</b>
+      </td>
+      <td align="right" class="alignRight">
+        <b>Price</b>
       </td>
       <td align="right" class="alignRight">
         <b>Total</b>
@@ -108,11 +108,11 @@
           <td>
             {{ rpr.opr.product.name }}
           </td>
-          <td align="right" class="alignRight">
-            {{ rpr.opr.product.price|currency }}
-          </td>
           <td>
             {{ rpr.quantity }}
+          </td>
+          <td align="right" class="alignRight">
+            {{ rpr.opr.product.price|currency }}
           </td>
           <td align="right" class="alignRight">
             {{ rpr.total|currency }}
@@ -125,11 +125,11 @@
         <td>
           {{ creditnote.text }}
         </td>
-        <td align="right" class="alignRight">
-          {{ creditnote.amount|currency }}
-        </td>
         <td>
           1
+        </td>
+        <td align="right" class="alignRight">
+          {{ creditnote.amount|currency }}
         </td>
         <td align="right" class="alignRight">
           {{ creditnote.amount|currency }}
