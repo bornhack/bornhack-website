@@ -38,8 +38,8 @@
 
       {% for slot in event_slots %}
         {% ifchanged slot.when.lower.date %}
-          <tr>
-            <td colspan=5><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
+          <tr class="table-secondary">
+            <td colspan=6><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
           </tr>
         {% endifchanged %}
         <tr>
