@@ -16,10 +16,8 @@
 
           {% bootstrap_form form %}
 
-          {% buttons %}
-            <button class="btn btn-success ms-auto" type="submit"><i class="fas fa-check"></i> Save Team</button>
-            <a class="btn btn-primary ms-auto" href="{% url 'teams:general' team_slug=team.slug camp_slug=camp.slug %}"><i class="fas fa-times"></i> Cancel</a>&nbsp;
-          {% endbuttons %}
+          <button class="btn btn-success ms-auto" type="submit"><i class="fas fa-check"></i> Save Team</button>
+          <a class="btn btn-primary ms-auto" href="{% url 'teams:general' team_slug=team.slug camp_slug=camp.slug %}"><i class="fas fa-times"></i> Cancel</a>&nbsp;
         </form>
       </div>
     </div>
