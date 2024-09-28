@@ -10,11 +10,11 @@
 
   <p class="lead">Pick a {{ event_type.host_title }} from the list below, or press the button at the bottom to add a new {{ event_type.host_title }} for this {{ event_type.name }}.</p>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Use an Existing {{ event_type.host_title }}</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Use an Existing {{ event_type.host_title }}</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <div class="list-group">
         {% for speaker_proposal in speaker_proposal_list %}
           <a href="{% url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker_proposal.uuid %}" class="list-group-item">

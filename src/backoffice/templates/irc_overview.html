@@ -4,11 +4,11 @@
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - IRC Overview for {{ camp.title }} Teams</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">This view shows a list of all {{ camp.title }} teams with IRC channels registered in the system. Teams with neither a public IRC channel nor a private IRC channel are not listed here.</p>
       <table class="table table-hover">
         <thead>

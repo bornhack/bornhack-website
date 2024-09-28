@@ -4,9 +4,9 @@
 
 {% block content %}
   <p><a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a></p>
-  <div class="panel panel-default">
-    <div class="panel-heading"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-header"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
+    <div class="card-body">
       {{ speaker_proposal.biography|untrustedcommonmark }}
 
       <hr>
@@ -76,7 +76,7 @@
       {% endif %}
 
     </div>
-    <div class="panel-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
+    <div class="card-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
   </div>
 
   <p>

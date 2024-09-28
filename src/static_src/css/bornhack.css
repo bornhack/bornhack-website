@@ -17,6 +17,10 @@ a, a:active, a:focus {
    outline: none;
 }
 
+a, u {
+  text-decoration: none;
+}
+
 /* Z-index */
 /* Bootstrap values
 .dropdown-backdrop { z-index: 990; }

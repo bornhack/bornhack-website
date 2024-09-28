@@ -12,14 +12,14 @@
 {% endblock %}
 
 {% block team_content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>
         Delete info item {{ object.name }}
         in {{ form.instance.category.headline }}
       </h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form method="POST">
         {% csrf_token %}
         <p>Are you sure you want to delete "{{ object.headline }}" in the "{{ object.category.headline }}" category.</p>

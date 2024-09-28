@@ -4,11 +4,11 @@
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - {{ camp.title }} {{ product_list.0.ticket_type.name }} Ticket Product Stats</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">This view shows a table of each product associated with the ticket type <b>{{ product_list.0.ticket_type.name }}</b> along with the number sold, cost, price, and profit for each product.</p>
       <table class="table table-hover datatable">
         <thead>

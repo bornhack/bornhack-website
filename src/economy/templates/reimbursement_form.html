@@ -7,11 +7,11 @@
 
 {% block content %}
   <h3>{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">This reimbursement covers the following approved expenses:</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">This reimbursement covers the following approved expenses:</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <table class="table">
         <thead>
           <tr>

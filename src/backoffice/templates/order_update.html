@@ -10,19 +10,19 @@
 
   <form action="" method="post">
     {% csrf_token %}
-    <div class="panel panel-default">
+    <div class="card">
 
-      <div class="panel-heading">
+      <div class="card-header">
         Update order #{{ order.pk }} | BackOffice
       </div>
 
-      <div class="panel-body">
+      <div class="card-body">
         {% bootstrap_form form %}
       </div>
 
-      <div class="panel-footer">
+      <div class="card-footer">
         <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
-        <button type="submit" class="btn btn-primary pull-right">Save</button>
+        <button type="submit" class="btn btn-primary ms-auto">Save</button>
         <span class="clearfix"></span>
       </div>
 

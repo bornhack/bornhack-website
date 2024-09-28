@@ -1,8 +1,8 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Submit New Proposal{% if speaker %} for {{ speaker.name }}{% endif %}</h3>
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Submit New Proposal{% if speaker %} for {{ speaker.name }}{% endif %}</h3>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
     <h4>What would {% if speaker %}{{ speaker.name }}{% else %}you{% endif %} like to host?</h4>
     {% if speaker %}
       <p>You are submitting a new proposal for {{ speaker.name }}. Please begin by selecting the type of proposal below:</p>
@@ -18,7 +18,7 @@
         {% endif %}
         <h4 class="list-group-item-heading">
           <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
-          {{ event_type.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right" style="color: {{ event_type.color }};"></i></span>
+          {{ event_type.name }}<span class="ms-auto"><i class="fas fa-plus fa-2x fa-ms-auto" style="color: {{ event_type.color }};"></i></span>
         </h4>
         {% if event_type.description %}<p class="list-group-item-text">{{ event_type.description }}</p>{% endif %}
         </a>

@@ -49,7 +49,7 @@
         </li>
 
         {% if user.orders.exists %}
-          <li class="nav-item nav-link"><h5>Shop</h5></li>
+          <li class="nav-item"><h5>Shop</h5></li>
 
           {% url 'shop:order_list' as orders_list_url %}
           <li class="nav-item">

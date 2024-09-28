@@ -10,11 +10,11 @@
   <p class="lead">A Credebtor is a specific store in a Chain - Like <i>Netto Gelsted</i> or <i>XL Byg Rønne</i>. Please pick an existing Credebtor below, or create a new.</p>
 
   {% if credebtor_list %}
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">Existing Credebtors</h3>
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Existing Credebtors</h3>
       </div>
-      <div class="panel-body">
+      <div class="card-body">
         <table class="table table-hover">
           <tbody>
             {% for credebtor in chain.credebtors.all %}

@@ -15,11 +15,11 @@
 {% endblock extra_head %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Facilities - BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Facilities - BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">The following {{ facility_list.count }} facilities are defined for {{ camp.title }}</p>
       <p>
         <a href="{% url 'backoffice:facility_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Facility</a>

@@ -15,11 +15,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Facilities of type {{ facilitytype }}</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Facilities of type {{ facilitytype }}</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <div class="list-group">
         {% for facility in facility_list %}
           {% if request.user.is_authenticated %}
@@ -29,7 +29,7 @@
           {% endif %}
           <h4 class="list-group-item-heading">
             <i class="{{ facility.facility_type.icon }} fa-2x fa-pull-left fa-fw"></i> {{ facility.name }}
-            <img class="pull-right" src="{% static 'img/leaflet/marker-icon-'|add:facility.facility_type.marker|slice:"-4"|add:'.png' %}">
+            <img class="ms-auto" src="{% static 'img/leaflet/marker-icon-'|add:facility.facility_type.marker|slice:"-4"|add:'.png' %}">
           </h4>
           <p class="list-group-item-text">{{ facility.description }}</p>
           <p class="list-group-item-text"><i>Location: Lat {{ facility.location.y }} Long {{ facility.location.x }}</i></p>

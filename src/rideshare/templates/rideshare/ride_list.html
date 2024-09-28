@@ -14,7 +14,7 @@
     On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival. Press "Details" to send a message to the author of the entry.
   </p>
 
-  <a class="btn btn-success pull-right" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
+  <a class="btn btn-success ms-auto" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
     <i class="fas fa-car"></i>
     Create ride
   </a>
@@ -60,14 +60,14 @@
                                       <span class="badge">{{ ride.seats }}</span>
                                       <td>
                                         {% if request.user == ride.user %}
-                                          <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
+                                          <a class="btn btn-danger ms-auto" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
                                             <i class="fas fa-times"></i> Delete
                                           </a>
-                                          <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
+                                          <a class="btn btn-primary ms-auto" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
                                             <i class="fas fa-edit"></i> Update
                                           </a>
                                         {% endif %}
-                                        <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
+                                        <a class="btn btn-primary ms-auto" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
                                           <i class="fas fa-eye"></i> Details
                                         </a>
 

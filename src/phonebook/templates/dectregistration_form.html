@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">{% if request.resolver_match.url_name == "dectregistration_update" %}Update{% else %}Create New{% endif %} DECT Registration</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
