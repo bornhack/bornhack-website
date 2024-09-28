@@ -57,6 +57,10 @@
         /*display: block;*/
     text-align: center;
   }
+
+  .alignRight {
+    text-align: right;
+  }
 </style>
 
 <header>
@@ -97,28 +101,28 @@
           <td>
             {{ invoice.customorder.text|linebreaks }}
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
             {{ invoice.customorder.amount|currency }}
           </td>
         </tr>
         <tr>
-          <td align="right">
+          <td align="right" class="alignRight">
             {% if invoice.customorder.danish_vat %}
               <strong>Included Danish VAT (25%)</strong>
             {% else %}
               <strong>No VAT</strong>
             {% endif %}
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
             {{ invoice.customorder.vat|currency }}
           </td>
         </tr>
 
         <tr>
-          <td align="right">
+          <td align="right" class="alignRight">
             <strong>Total</strong>
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
             {{ invoice.customorder.amount|currency }}
           </td>
         </tr>

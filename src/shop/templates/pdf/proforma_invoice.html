@@ -57,6 +57,10 @@
         /*display: block;*/
     text-align: center;
   }
+
+  .alignRight {
+    text-align: right;
+  }
 </style>
 <header>
   <div>
@@ -89,13 +93,13 @@
       <td>
         <b>Name</b>
       </td>
-      <td align="right">
+      <td align="right" class="alignRight">
         <b>Price
         </td>
         <td>
           <b>Quantity
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
             <b>Total
             </td>
           </tr>
@@ -109,13 +113,13 @@
               <td>
                 {{ order_product.product.name }}
               </td>
-              <td align="right">
+              <td align="right" class="alignRight">
                 {{ order_product.product.price|currency }}
               </td>
               <td>
                 {{ order_product.quantity }}
               </td>
-              <td align="right">
+              <td align="right" class="alignRight">
                 {{ order_product.total|currency }}
               </td>
             </tr>
@@ -130,7 +134,7 @@
             <td>
               <strong>Included Danish VAT (25%)</strong>
             </td>
-            <td align="right">
+            <td align="right" class="alignRight">
               {{ order.vat|currency }}
             </td>
 
@@ -141,7 +145,7 @@
             <td>
               <strong>Invoice Total</strong>
             </td>
-            <td align="right">
+            <td align="right" class="alignRight">
               {{ order.total|currency }}
             </td>
           </tr>
