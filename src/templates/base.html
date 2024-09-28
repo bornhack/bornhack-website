@@ -63,8 +63,7 @@
 
   <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% block body %}
-
-      <div id="main" class="container container-fluid">
+      <header class="py-1 mb-1">
         <nav class="navbar navbar-light fixed-top navbar-expand-lg">
           <div class="container container-fluid">
             {% if request.resolver_match.kwargs.camp_slug and camp %}
@@ -130,7 +129,8 @@
             </div>
           </div>
         </nav>
-        <br>
+      </header>
+      <div id="main" class="container-lg">
         {% if camp %}
             <div class="row">
               <div class="d-none d-lg-flex btn-group w-100" role="group">
@@ -146,7 +146,7 @@
         {% block content %}{% endblock %}
       </div>
       <footer>
-        <div class="col-12">
+        <div class="container-fluid">
           {% block footer %}
             <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
             <a href="{% url 'conduct' %}">Code of Conduct</a> |

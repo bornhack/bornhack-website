@@ -34,12 +34,6 @@ strong { font-weight: bold; }
   z-index: 980;
 }
 
-@media (max-width: 520px) {
-  #main {
-    width: 100%;
-  }
-}
-
 /* Front page stuff */
 #front-logo {
   margin: auto;
@@ -87,34 +81,6 @@ strong { font-weight: bold; }
   padding-bottom: 15px;
 }
 
-@media (max-width: 767px) {
-  .navbar-fixed-top .navbar-collapse {
-    max-height: 450px;
-  }
-
-  .navbar .navbar-collapse {
-    border-bottom: 1px solid #ccc;
-    -webkit-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-    box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-  }
-  .navbar .navbar-nav {
-    margin: 0 -15px;
-  }
-
-  .navbar .nav > li {
-    border-top: 1px solid #ccc;
-  }
-  .navbar .nav li a {
-    padding: 20px !important;
-  }
-
-  .btn-group-vertical > .btn{
-    padding: 20px;
-  }
-}
-
-
 /* btn-group */
 .btn-group .btn:last-of-type {
   border-right: 1px solid #ccc;
@@ -154,12 +120,6 @@ footer {
     padding: 5px;
     left: 50%;
     transform: translate(-50%);
-}
-
-@media (max-width: 767px) {
-  footer {
-    max-width: 100%;
-  }
 }
 
 .breadcrumb > li.no-before::before {
@@ -327,12 +287,6 @@ body.bar-menu {
 .bar-product .price {
   font-size: 14pt;
   width: 300px;
-}
-
-@media (min-width: 600px) {
-    .event-table-tags {
-        width: 20%;
-    }
 }
 
 .team-guide-markdown

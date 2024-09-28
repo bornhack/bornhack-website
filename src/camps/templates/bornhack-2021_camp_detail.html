@@ -8,15 +8,15 @@
 {% endblock %}
 
 {% block content %}
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-12 text-center">
       <img src="{% static camp.logo_large %}" width="800" class="img-responsive" id="front-logo" />
     </div>
   </div>
 
 
-  <div class="row">
-    <div class="col-9 text-container">
+  <div class="row mt-3">
+    <div class="col-9">
       <div class="lead">
         <b>BornHack</b> is a 7 day <b>outdoor tent camp</b> where hackers, makers and people with an interest in technology or security come together to celebrate technology, socialise, learn and <b>have fun</b>.
       </div>
@@ -27,11 +27,11 @@
   </div>
 
 
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-3">
       {% thumbnail 'img/bornhack-2016/esbjerg' '1600x1000-B12A2398.jpg' 'A random hackers laptop' %}
     </div>
-    <div class="col-9 text-container">
+    <div class="col-9">
       <div class="lead">
         <strong>BornHack 2021</strong> was the sixth BornHack. It took place from <strong>Thursday the 19th of August to Thursday the 26th of August 2021</strong> at a our venue on the Danish island of Funen.
       </div>
@@ -40,8 +40,8 @@
 
   <br />
 
-  <div class="row">
-    <div class="col-9 text-container">
+  <div class="row mt-3">
+    <div class="col-9">
       <div class="lead">
         The BornHack team is very grateful for all the volunteers who helped make BornHack 2021 a success. Their names will stay visible in <a href="{% url 'people' %}">our People page</a> as a permanent token of our gratitude.
       </div>
@@ -53,19 +53,19 @@
 
   <br />
 
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-3">
       {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9970_cropped.JPG' 'Danish politicians, government officals and IT-developers debating at BornHack 2018' %}
     </div>
-    <div class="col-9 text-container">
+    <div class="col-9">
       <div class="lead">BornHack 2021 had a great lineup of <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> with something to say on the program. Most of the content was recorded and is availble on video.</div>
     </div>
   </div>
 
   <br />
 
-  <div class="row">
-    <div class="col-9 text-container">
+  <div class="row mt-3">
+    <div class="col-9">
       <div class="lead">
         BornHack aims to <strong>keep ticket prices affordable</strong> for everyone and to that end we had sponsors for BornHack 2021. Please see our <a href="{% url 'sponsors' camp_slug=camp.slug %}">sponsors page</a> to see who the BornHack 2021 sponsors were.
       </div>
@@ -77,7 +77,7 @@
 
   <br />
 
-  <div class="row">
+  <div class="row mt-3">
     <div class="col-12">
       <p class="lead">If you have questions about BornHack 2021 you can reach us on our different channels:</p>
       {% include 'includes/contact.html' %}
