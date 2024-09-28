@@ -14,6 +14,7 @@
 
     {# Load Bootstrap CSS and JavaScript #}
     <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+    {# <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet"> #}
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
@@ -64,7 +65,7 @@
   <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     {% block body %}
       <header class="py-1 mb-1">
-        <nav class="navbar navbar-light fixed-top navbar-expand-lg">
+        <nav class="navbar navbar-light fixed-top navbar-expand-lg bg-light">
           <div class="container container-fluid">
             {% if request.resolver_match.kwargs.camp_slug and camp %}
               <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">

@@ -49,14 +49,14 @@
                   {% if order.paid %}
                     {% if order.invoice.pdf %}
                       {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                      {% bootstrap_button "Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
+                      {% bootstrap_button "<i class=\"fa fa-file-arrow-down\"></i> Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
                     {% else %}
                       Not generated yet!
                     {% endif %}
                   {% else %}
                     {% if order.pdf %}
                       {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                      {% bootstrap_button "Proforma Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
+                      {% bootstrap_button "<i class=\"fa fa-file-arrow-down\"></i> Proforma Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
                     {% else %}
                       Not generated yet!
                     {% endif %}
@@ -64,7 +64,7 @@
                 </td>
                 <td>
                   {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
-                  {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
+                  {% bootstrap_button "<i class=\"fa fa-list\"></i> Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
                 </td>
               </tr>
             {% endif %}
