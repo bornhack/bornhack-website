@@ -10,7 +10,7 @@
       <h3 class="card-title">BackOffice - Pending Proposals</h3>
     </div>
     <div class="card-body">
-      <a href="{% url 'backoffice:index' camp_slug=camp.slug%}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
+      <a href="{% url 'backoffice:index' camp_slug=camp.slug%}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
       <p>
         <h3>Pending SpeakerProposals</h3>
         {% if not speaker_proposal_list %}

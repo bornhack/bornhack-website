@@ -24,7 +24,7 @@
       <p>
         <a href="{% url 'backoffice:facility_update' camp_slug=camp.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Facility</a>
         <a href="{% url 'backoffice:facility_delete' camp_slug=camp.slug facility_uuid=facility.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Facility</a>
-        <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Facility List</a>
+        <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Facility List</a>
       </p>
       <table class="table">
         <tbody>

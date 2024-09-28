@@ -14,13 +14,13 @@
         <p class="lead">No Accounting Exports found. Go <a href="{% url 'backoffice:accountingexport_create' camp_slug=camp.slug %}">create one</a>!</p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
           <a class="btn btn-success" href="{% url 'backoffice:accountingexport_create' camp_slug=camp.slug %}">Create</a>
           {% include "includes/accounting_export_list_table.html" %}
         </p>
       {% endif %}
       <p>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         <a class="btn btn-success" href="{% url 'backoffice:accountingexport_create' camp_slug=camp.slug %}">Create</a>
       </p>
     </div>

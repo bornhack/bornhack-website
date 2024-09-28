@@ -48,7 +48,7 @@
         {% endif %}
         </td>
         <td>
-          <div class="btn-group btn-group-vertical">
+          <div class="btn-group-vertical text-nowrap" role="group" aria-label="Buttons">
             <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
             <a href="{% url "backoffice:order_update" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
             <a href="{% url "backoffice:order_refund" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-undo"></i> Refund</a>

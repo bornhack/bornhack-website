@@ -15,7 +15,7 @@
       <p class="lead">The following {{ facility_type_list.count }} facility types are defined for {{ camp.title }}</p>
       <p>
         <a href="{% url 'backoffice:facility_type_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Facility Type</a>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
       <table class="table datatable">
         <thead>
@@ -41,8 +41,10 @@
               <td class="text-center"><span class="badge">{{ ft.quickfeedback_options.count }}</span></td>
               <td class="text-center"><span class="badge">{{ ft.facilities.count }}</span></td>
               <td>
-                <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-                <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                <div class="btn-group text-nowrap" role="group" aria-label="Buttons">
+                  <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </div>
               </td>
             </tr>
           {% endfor %}

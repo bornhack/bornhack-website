@@ -23,7 +23,7 @@
       <p class="lead">The following {{ facility_list.count }} facilities are defined for {{ camp.title }}</p>
       <p>
         <a href="{% url 'backoffice:facility_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Facility</a>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
       <table class="table datatable">
         <thead>
@@ -47,7 +47,7 @@
               <td>{{ facility.location }}</td>
               <td class="text-center"><span class="badge">{{ facility.feedbacks.count }}</span> / <span class="badge">{{ facility.unhandled_feedbacks.count }}</span></td>
               <td>
-                <div class="btn-group btn-group-vertical">
+                <div class="btn-group text-nowrap" role="group" aria-label="Buttons">
                   <a href="{% url "backoffice:facility_detail" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
                   <a href="{% url "backoffice:facility_update" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
                   <a href="{% url "backoffice:facility_delete" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>

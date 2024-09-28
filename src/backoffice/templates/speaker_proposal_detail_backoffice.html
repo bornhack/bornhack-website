@@ -3,7 +3,7 @@
 {% load program %}
 
 {% block content %}
-  <p><a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a></p>
+  <p><a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a></p>
   <div class="card">
     <div class="card-header"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
     <div class="card-body">
@@ -26,7 +26,7 @@
             <th>Speaker Object</th>
             <td>
               {% if speaker_proposal.speaker %}
-                <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-default"><i class="fas fa-user"></i> Show</a>
+                <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-secondary"><i class="fas fa-user"></i> Show</a>
               {% else %}
                 N/A
               {% endif %}
@@ -84,7 +84,7 @@
       <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve SpeakerProposal</a>
       <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject SpeakerProposal</a>
     {% endif %}
-    <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a>
+    <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a>
   </p>
 
 {% endblock content %}

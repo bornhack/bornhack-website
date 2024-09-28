@@ -16,7 +16,7 @@
       <a href="{% url 'economy:reimbursement_delete' camp_slug=camp.slug pk=reimbursement.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Reimbursement</a>
     {% endif %}
 
-    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Dashboard</a>
-    <a href="{% url 'economy:reimbursement_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Reimbursement list</a>
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Dashboard</a>
+    <a href="{% url 'economy:reimbursement_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Reimbursement list</a>
   </div>
 {% endblock content %}

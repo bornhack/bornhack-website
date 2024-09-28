@@ -12,7 +12,7 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save Refund</button>
-        <a href="{% url 'backoffice:refund_detail' camp_slug=camp.slug refund_id=refund.id %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:refund_detail' camp_slug=camp.slug refund_id=refund.id %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

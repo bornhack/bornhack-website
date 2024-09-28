@@ -14,11 +14,11 @@
         <p class="lead">
           No EventSlots found. Go create some EventSessions!
           <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventSession</a>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
         <table class="table table-striped datatable">
           <thead>
@@ -75,7 +75,7 @@
         </table>
       {% endif %}
       <p>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

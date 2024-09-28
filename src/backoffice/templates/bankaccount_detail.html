@@ -11,8 +11,8 @@
     </div>
     <div class="card-body">
       <p>
-        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-default"><i class="fas fa-undo"></i> Bank Details</a>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
         <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
       </p>
       <table class="table">
@@ -50,8 +50,8 @@
         No transactions found for this bank account.
       {% endif %}
       <p>
-        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-default"><i class="fas fa-undo"></i> Bank Details</a>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
         <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
       </p>
     </div>

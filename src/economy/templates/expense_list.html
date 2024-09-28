@@ -9,7 +9,7 @@
   <h3>Your {{ camp.title }} Expenses</h3>
 
   <p>
-    <a class="btn btn-default" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
+    <a class="btn btn-secondary" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
     {% if perms.camps.expense_create_permission %}
       <a class="btn btn-primary" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Expense</a>
     {% else %}
@@ -20,7 +20,7 @@
   {% include 'includes/expense_list_panel.html' %}
 
   <p>
-    <a class="btn btn-default" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
+    <a class="btn btn-secondary" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
     {% if perms.camps.expense_create_permission %}
       <a class="btn btn-primary" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Expense</a>
     {% else %}

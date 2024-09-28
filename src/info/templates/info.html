@@ -50,7 +50,6 @@
         {% for category in categories %}
           <span class="anchor" id="{{ category.anchor }}"></span>
           <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
-          <div class="card-group">
             {% for item in category.infoitems.all %}
               <div class="card">
                 <div class="card-header">
@@ -73,7 +72,6 @@
                 </div>
               </div>
             {% endfor %}
-          </div>
         {% endfor %}
       </div>
     </div>

@@ -11,7 +11,7 @@
       <form method="POST">
         {% csrf_token %}
         <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
-        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

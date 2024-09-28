@@ -3,7 +3,7 @@
 {% load bornhack %}
 
 {% block content %}
-  <p><a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to EventProposal List</a></p>
+  <p><a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to EventProposal List</a></p>
   {% if not event_proposal.can_be_approved %}
     <br>
     <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
@@ -89,7 +89,7 @@
       {% endif %}
       <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject EventProposal</a>
     {% endif %}
-    <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to EventProposal List</a>
+    <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to EventProposal List</a>
   </p>
 
 {% endblock content %}

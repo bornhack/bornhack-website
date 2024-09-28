@@ -116,7 +116,6 @@ footer {
     position: fixed;
     width: 100%;
     text-align: center;
-    background-color: white;
     bottom: 0px;
     padding: 5px;
     left: 50%;
@@ -340,4 +339,45 @@ img {
 .panel-heading-nav .nav {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+.bornhack-2016-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #004dff, #ffffff); 
+}
+.bornhack-2017-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #750787, #ffffff); 
+}
+.bornhack-2018-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #008026, #ffffff); 
+}
+.bornhack-2019-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #ffed00, #ffffff); 
+}
+.bornhack-2020-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #ff8c00, #ffffff); 
+}
+.bornhack-2021-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #e40303, #ffffff); 
+}
+.bornhack-2022-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #000000, #ffffff); 
+}
+.bornhack-2023-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #613915, #ffffff); 
+}
+.bornhack-2024-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #73d7ee, #ffffff); 
+}
+.bornhack-2025-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, #ffffff, #ffafc7, #ffffff); 
 }

@@ -25,7 +25,7 @@
 
       <p>It is fully supported to mix manual scheduling with using the AutoScheduler. The AutoScheduler can be used as needed: It can act strictly as a validator for a manually planned schedule. It could also be used for scheduling some events, while manually scheduling others. It can also be used to do the full schedule. The AutoScheduler will avoid scheduling over manually scheduled events, and will consider manually scheduled events when looking to avoid conflicts.</p>
 
-      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> AutoSchedule Management</a>
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> AutoSchedule Management</a>
     </div>
   </div>
 {% endblock content %}

@@ -13,7 +13,7 @@
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-success" name="approve"><i class='fas fa-check'></i> Approve Proposal</button>
         <button type="reject" class="btn btn-danger" name="reject"><i class='fas fa-times'></i> Reject Proposal</button>
-        <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

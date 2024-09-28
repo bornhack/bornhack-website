@@ -11,7 +11,7 @@
     <div class="card-body">
       <p class="lead">This chain has <b>{{ chain.camp_expenses_count }} expenses</b> for a total of <b>{{ chain.camp_expenses_amount }} DKK</b> and <b>{{ chain.camp_revenues_count }} revenues</b> for a total of <b>{{ chain.camp_revenues_amount }} DKK</b> for {{ camp.title }}.</p>
       <p class="lead">This chain has <b>{{ chain.all_expenses_count }} expenses</b> for a total of <b>{{ chain.all_expenses_amount }} DKK</b> and <b>{{ chain.all_revenues_count }} revenues</b> for a total of <b>{{ chain.all_revenues_amount }} DKK</b> across all camps.</p>
-      <a class="btn btn-default" href="{% url "backoffice:chain_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Chain list</a>
+      <a class="btn btn-secondary" href="{% url "backoffice:chain_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Chain list</a>
 
       <hr>
 

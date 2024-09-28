@@ -13,6 +13,6 @@
       {% csrf_token %}
       {{ form }}
       <button class="btn btn-danger" type="submit"><i class="fas fa-trash-o"></i> Remove teammember</button>
-      <a href="{% url 'teams:general' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
+      <a href="{% url 'teams:general' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-secondary" type="submit"><i class="fas fa-times"></i> Cancel</a>
     </form>
 {% endblock %}

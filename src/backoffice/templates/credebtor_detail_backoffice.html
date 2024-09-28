@@ -9,7 +9,7 @@
   <div class="card">
     <div class="card-header"><h3 class="card-title">Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) - BackOffice</h3></div>
     <div class="card-body">
-      <a class="btn btn-default" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list for {{ credebtor.chain.name }}</a>
+      <a class="btn btn-secondary" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list for {{ credebtor.chain.name }}</a>
 
       <h3>{{ expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
       {% include 'includes/expense_list_panel.html' with expense_list=expenses %}

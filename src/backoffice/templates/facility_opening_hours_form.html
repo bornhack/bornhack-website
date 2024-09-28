@@ -14,7 +14,7 @@
         {% bootstrap_form form %}
         {% buttons %}
           <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
-          <a href="{% url 'backoffice:facility_detail' camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+          <a href="{% url 'backoffice:facility_detail' camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
         {% endbuttons %}
       </form>
     </div>

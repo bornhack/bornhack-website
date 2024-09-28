@@ -9,7 +9,7 @@
     <div class="card-body">
       <p class="lead">Showing the diff between the current schedule (calculated from currently published Events), and the new schedule based on current database object.</p>
       {% include 'includes/autoschedule_diff_table.html' %}
-      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back</a>
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back</a>
     </div>
   </div>
 {% endblock content %}

@@ -15,7 +15,7 @@
       {% else %}
         <p>
           <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
         <table class="table table-hover datatable">
           <thead>
@@ -62,7 +62,7 @@
       {% endif %}
       <p>
         <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

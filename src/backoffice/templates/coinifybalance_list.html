@@ -14,14 +14,14 @@
         <p class="lead">No CoinifyBalances found. Go import a CSV!</p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
           {% include "includes/coinify_balance_list_table.html" %}
         </p>
       {% endif %}
       <p>
-        <a class="btn btn-default" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

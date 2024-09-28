@@ -12,7 +12,7 @@
     <i>Showing archived news items. <a href="{% url 'news:index' archived=False %}">Show regular news items</a></i>
   {% else %}
     <br />
-    <a href="{% url 'news:feed' %}" class="btn btn-default">
+    <a href="{% url 'news:feed' %}" class="btn btn-secondary">
       <img src="{% static 'img/feed-icon-14x14.png' %}"> Get BornHack news as a RSS feed
     </a>
     <hr />

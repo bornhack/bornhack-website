@@ -83,7 +83,7 @@
       </table>
       <a href="{% url 'backoffice:event_location_update' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Location</a>
       <a href="{% url 'backoffice:event_location_delete' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Location</a>
-      <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> EventLocation List</a>
+      <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> EventLocation List</a>
     </div>
   </div>
 {% endblock content %}

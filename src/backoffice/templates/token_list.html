@@ -14,7 +14,7 @@
         <p class="lead">No tokens found.</p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
           <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
             <thead>
               <tr>
@@ -60,7 +60,7 @@
       {% endif %}
       <p>
         <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

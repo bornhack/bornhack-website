@@ -10,7 +10,7 @@
       <div class="card-header"><h3 class="card-title">EventProposal List - BackOffice</h3></div>
       <div class="card-body">
         <p>This is a list of all EventProposal objects in the system. Search for title, type, username, speakers or status to filter the table.</p>
-        <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a></p>
+        <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a></p>
         {% if event_proposal_list %}
           {% include 'includes/event_proposal_list_table_backoffice.html' %}
         {% else %}
