@@ -80,7 +80,7 @@
               <span class="navbar-toggler-icon"></span>
             </button>
             <div id="top-navbar" class="collapse navbar-collapse">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0"> 
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
                 <li class="nav-item dropdown">
@@ -88,7 +88,7 @@
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2024' %}">BornHack 2024</a></li>
                     <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2023' %}">BornHack 2023</a></li>
-                    <li><hr class="dropdown-divider"></li> 
+                    <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
                   </ul>
                 </li>
@@ -119,7 +119,7 @@
                           <li><a class="dropdown-item" href="{{ creditnote_list_url }}">Credit Notes</a></li>
                         {% endif %}
                       {% endif %}
-                      <li><hr class="dropdown-divider"></li> 
+                      <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                     </ul>
                   </div>
@@ -133,17 +133,17 @@
       </header>
       <div id="main" class="container-lg">
         {% if camp %}
-            <div class="row">
-              <div class="d-none d-lg-flex btn-group w-100" role="group">
-                {% include 'includes/menuitems.html' %}
-              </div>
-              <div class="d-lg-none btn-group-vertical w-100" role="group">
-                {% include 'includes/menuitems.html' %}
-              </div>
+          <div class="row">
+            <div class="d-none d-lg-flex btn-group w-100" role="group">
+              {% include 'includes/menuitems.html' %}
             </div>
-            <div class="row d-none d-lg-flex w-100 {{camp.slug}}-gradient">
+            <div class="d-lg-none btn-group-vertical w-100" role="group">
+              {% include 'includes/menuitems.html' %}
+            </div>
+          </div>
+          <div class="row d-none d-lg-flex w-100 {{camp.slug}}-gradient">
             &nbsp;
-            </div>
+          </div>
         {% endif %}
         {% bootstrap_messages %}
         {% block content %}{% endblock %}

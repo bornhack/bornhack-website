@@ -44,8 +44,8 @@
                   <td>{{ task.completed }}</td>
                   <td>
                     <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-search"></i> Details</a>
-                                                                                                                                                                                                                                  {% if request.user in team.responsible_members.all %}
-                                                                                                                                                                                                                                    <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
+                                                                                                                                                                                                                                    {% if request.user in team.responsible_members.all %}
+                                                                                                                                                                                                                                      <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
                     {% endif %}
                   </td>
                 </tr>
