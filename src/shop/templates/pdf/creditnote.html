@@ -34,7 +34,7 @@
     display: block;
     height: 150px;
     background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
-    background-size: 100% 100%;
+    background-size: 571px 150px;
   }
 
   .footer {
@@ -56,6 +56,10 @@
     bottom: 0;
         /*display: block;*/
     text-align: center;
+  }
+
+  .alignRight {
+    text-align: right;
   }
 </style>
 
@@ -85,13 +89,13 @@
       <td>
         <b>Product</b>
       </td>
-      <td align="right">
-        <b>Price</b>
-      </td>
       <td>
         <b>Quantity</b>
       </td>
-      <td align="right">
+      <td align="right" class="alignRight">
+        <b>Price</b>
+      </td>
+      <td align="right" class="alignRight">
         <b>Total</b>
       </td>
     </tr>
@@ -104,13 +108,13 @@
           <td>
             {{ rpr.opr.product.name }}
           </td>
-          <td align="right">
-            {{ rpr.opr.product.price|currency }}
-          </td>
           <td>
             {{ rpr.quantity }}
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
+            {{ rpr.opr.product.price|currency }}
+          </td>
+          <td align="right" class="alignRight">
             {{ rpr.total|currency }}
           </td>
         </tr>
@@ -121,13 +125,13 @@
         <td>
           {{ creditnote.text }}
         </td>
-        <td align="right">
-          {{ creditnote.amount|currency }}
-        </td>
         <td>
           1
         </td>
-        <td align="right">
+        <td align="right" class="alignRight">
+          {{ creditnote.amount|currency }}
+        </td>
+        <td align="right" class="alignRight">
           {{ creditnote.amount|currency }}
         </td>
       </tr>
@@ -135,23 +139,23 @@
     <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
     <tr>
-      <td align="right" colspan="3">
+      <td align="right" colspan="3" class="alignRight">
         {% if creditnote.danish_vat %}
           <strong>Danish VAT (25%)</strong>
         {% else %}
           <strong>No VAT</strong>
         {% endif %}
       </td>
-      <td align="right">
+      <td align="right" class="alignRight">
         {{ creditnote.vat|currency }}
       </td>
     </tr>
 
     <tr>
-      <td align="right" colspan="3">
+      <td align="right" colspan="3" class="alignRight">
         <strong>Total</strong>
       </td>
-      <td align="right">
+      <td align="right" class="alignRight">
         {{ creditnote.amount|currency }}
       </td>
     </tr>

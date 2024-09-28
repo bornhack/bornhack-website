@@ -34,7 +34,7 @@
     display: block;
     height: 150px;
     background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
-    background-size: 100% 100%;
+    background-size: 571px 150px;
   }
 
   .footer {
@@ -56,6 +56,10 @@
     bottom: 0;
         /*display: block;*/
     text-align: center;
+  }
+
+  .alignRight {
+    text-align: right;
   }
 </style>
 <header>
@@ -89,13 +93,13 @@
       <td>
         <b>Name</b>
       </td>
-      <td align="right">
-        <b>Price
+      <td>
+        <b>Quantity
         </td>
-        <td>
-          <b>Quantity
+        <td align="right" class="alignRight">
+          <b>Price
           </td>
-          <td align="right">
+          <td align="right" class="alignRight">
             <b>Total
             </td>
           </tr>
@@ -109,13 +113,13 @@
               <td>
                 {{ order_product.product.name }}
               </td>
-              <td align="right">
-                {{ order_product.product.price|currency }}
-              </td>
               <td>
                 {{ order_product.quantity }}
               </td>
-              <td align="right">
+              <td align="right" class="alignRight">
+                {{ order_product.product.price|currency }}
+              </td>
+              <td align="right" class="alignRight">
                 {{ order_product.total|currency }}
               </td>
             </tr>
@@ -130,7 +134,7 @@
             <td>
               <strong>Included Danish VAT (25%)</strong>
             </td>
-            <td align="right">
+            <td align="right" class="alignRight">
               {{ order.vat|currency }}
             </td>
 
@@ -141,7 +145,7 @@
             <td>
               <strong>Invoice Total</strong>
             </td>
-            <td align="right">
+            <td align="right" class="alignRight">
               {{ order.total|currency }}
             </td>
           </tr>
