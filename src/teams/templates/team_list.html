@@ -10,7 +10,7 @@
   <h3>{{ camp.title }} Teams</h3>
 
   <div class="row">
-    <div class="col-md-{% if user.is_authenticated %}6{% else %}12{% endif %}">
+    <div class="col-{% if user.is_authenticated %}6{% else %}12{% endif %}">
       <h4>About teams</h4>
       <p>This is a list of the teams for {{ camp.title }}. To join a team just press the Join button, but please put some info in your <a href="{% url 'profiles:detail' %}">profile</a> first, so the team responsible has some idea who you are.</p>
       <p>You can also leave a team of course, but please let the team responsible know why :)</p>
@@ -20,7 +20,7 @@
     </div>
 
     {% if user.is_authenticated %}
-      <div class="col-md-6">
+      <div class="col-6">
         <div>
           <h4>Your teams</h4>
         </div>

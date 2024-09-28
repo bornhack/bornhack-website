@@ -17,7 +17,9 @@
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
-    <link href="{% static 'css/fontawesome-all-5.0.13.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/fontawesome/css/fontawesome.css' %}" rel="stylesheet" />
+    <link href="{% static 'vendor/fontawesome/css/brands.css' %}" rel="stylesheet" />
+    <link href="{% static 'vendor/fontawesome/css/solid.css' %}" rel="stylesheet" />
 
     <!-- Custom styles for this template -->
     <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
@@ -142,7 +144,7 @@
         {% block content %}{% endblock %}
       </div>
       <footer>
-        <div class="col-sm-12 col-md-12 col-lg-12">
+        <div class="col-12">
           {% block footer %}
             <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
             <a href="{% url 'conduct' %}">Code of Conduct</a> |

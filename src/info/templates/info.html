@@ -37,7 +37,7 @@
 
   {% if categories %}
     <div class="row">
-      <div class="col-md-3 sticky">
+      <div class="col-3 sticky">
         <h3>Table of Contents</h3>
         <p class="list-group">
           {% for category in categories %}
@@ -46,7 +46,7 @@
         </p>
       </div>
 
-      <div class="col-md-9">
+      <div class="col-9">
         {% for category in categories %}
           <span class="anchor" id="{{ category.anchor }}"></span>
           <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>

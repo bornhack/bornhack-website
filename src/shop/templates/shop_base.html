@@ -7,29 +7,31 @@
 {% block content %}
 
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
       <ol class="breadcrumb">
-        <li><a href="{% url 'shop:index' %}">Shop</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop:index' %}">Shop</a></li>
         {% if product %}
-          <li><a href="{% url 'shop:index' %}?category={{product.category.slug}}">{{ product.category }}</a></li>
-          <li class="active">{{ product.name }}</li>
+          <li class="breadcrumb-item"><a href="{% url 'shop:index' %}?category={{product.category.slug}}">{{ product.category }}</a></li>
+          <li class="breadcrumb-item active">{{ product.name }}</li>
         {% elif current_category %}
-          <li class="active">{{ current_category }}</li>
+          <li class="breadcrumb-item active">{{ current_category }}</li>
         {% endif %}
         {% if user.is_authenticated and user.orders.exists %}
           {% if user.creditnotes.exists %}
-            <li class="pull-right"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
+            <li class="breadcrumb-item pull-right"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
           {% endif %}
           {% if current_order %}
-            <li class="pull-right no-before">
+            <li class="breadcrumb-item pull-right no-before">
               <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
-                <i class="glyphicon glyphicon-shopping-cart"></i> Shopping Cart ({{ current_order.get_number_of_items|default:0 }} items)</a>
+                <i class="fa-solid fa-cart-shopping"></i> Shopping Cart ({{ current_order.get_number_of_items|default:0 }} items)</a>
             </li>
           {% else %}
-            <li class="pull-right no-before"><a href="{% url 'shop:order_list' %}">Show Orders</a></li>
+            <li class="breadcrumb-item pull-right no-before"><a href="{% url 'shop:order_list' %}">Show Orders</a></li>
           {% endif %}
         {% endif %}
       </ol>
+      </nav>
     </div>
   </div>
 

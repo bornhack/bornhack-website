@@ -13,7 +13,7 @@
 
     <div class="row">
 
-      <div class="col-md-12">
+      <div class="col-12">
         <h3>PoS: {{ pos.name }}</h3>
         <h3>Scan the ticket!</h3>
         <input type="text" class="form-control input-lg" name="ticket_token" id="ticket_token_input" autocomplete="off">
@@ -111,18 +111,18 @@
                 </form>
 
                 <div class="row">
-                  <div class="col-md-4">
+                  <div class="col-4">
                     {% qr_code "clear" %}
                   </div>
 
                   {% if not ticket.used_at %}
-                    <div class="col-md-4">
+                    <div class="col-4">
                       {% qr_code "checkin" %}
                     </div>
                   {% endif %}
 
                   {% if ticket.ticket_type.includes_badge and not ticket.badge_handed_out %}
-                    <div class="col-md-4">
+                    <div class="col-4">
                       {% qr_code "handoutbadge" %}
                     </div>
                   {% endif %}

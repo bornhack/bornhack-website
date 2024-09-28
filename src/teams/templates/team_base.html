@@ -14,16 +14,16 @@
   </div>
 
   <div class="row">
-    <div class="col-md-2">
-      <ul class="nav nav-pills nav-stacked">
-        <li {% if view.active_menu == "general" %}class="active"{% endif %}>
-          <a href="{% url "teams:general" camp_slug=team.camp.slug team_slug=team.slug %}">
+    <div class="col-2">
+      <ul class="nav nav-pills nav-stacked flex-column">
+        <li class="nav-item">
+            <a class="nav-link {% if view.active_menu == "general" %} active{% endif %}" href="{% url "teams:general" camp_slug=team.camp.slug team_slug=team.slug %}">
             General
           </a>
         </li>
 
-        <li {% if view.active_menu == "members" %}class="active"{% endif %}>
-          <a href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
+        <li class="nav-item">
+          <a class="nav-link {% if view.active_menu == "members" %} active{% endif %}"href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
             Members
             {% if request.user in team.responsible_members.all and team.unapproved_members %}
               <span class="label label-danger">Pending</span>
@@ -31,31 +31,31 @@
           </a>
         </li>
 
-        <li {% if view.active_menu == "tasks" %}class="active"{% endif %}>
-          <a href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
+        <li class="nav-item">
+          <a class="nav-link {% if view.active_menu == "tasks" %} active{% endif %}" href="{% url "teams:tasks" camp_slug=team.camp.slug team_slug=team.slug %}">
             Tasks
           </a>
         </li>
 
         {% if request.user in team.members.all %}
-          <li {% if view.active_menu == "shifts" %}class="active"{% endif %}>
-            <a href="{% url "teams:shifts" camp_slug=team.camp.slug team_slug=team.slug %}">
+          <li class="nav-item">
+            <a class="nav-link{% if view.active_menu == "shifts" %} active{% endif %}" href="{% url "teams:shifts" camp_slug=team.camp.slug team_slug=team.slug %}">
               Shifts
             </a>
           </li>
         {% endif %}
 
         {% if request.user in team.responsible_members %}
-          <li {% if view.active_menu == "info_categories" %}class="active"{% endif %}>
-            <a href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
+          <li class="nav-item">
+            <a class="nav-link{% if view.active_menu == "info_categories" %} active{% endif %}" href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
               Info categories
             </a>
           </li>
         {% endif %}
 
         {% if request.user in team.approved_members %}
-          <li {% if view.active_menu == "guide" %}class="active"{% endif %}>
-            <a href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
+          <li class="nav-item">
+            <a class="nav-link{% if view.active_menu == "guide" %} active{% endif %}" href="{% url "teams:guide" camp_slug=team.camp.slug team_slug=team.slug %}">
               Team guide
             </a>
           </li>
@@ -84,7 +84,7 @@
       {% endif %}
     </div>
 
-    <div class="col-md-10">
+    <div class="col-10">
 
       {% block team_content %}{% endblock %}
 
