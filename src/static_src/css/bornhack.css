@@ -269,7 +269,9 @@ body.bar-menu {
   color: #00ff00;
   overflow: hidden;
 }
-
+.hidden {
+    display: none;
+}
 .bar-product .name {
   width: 900px;
   font-size: 14pt;
@@ -282,7 +284,6 @@ body.bar-menu {
 
 .team-guide-markdown
 {
-    background-color: #f9f9f9;
     padding: 10px 20px;
 }
 .team-guide-markdown h1,
@@ -371,3 +372,8 @@ img {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #ffafc7, var(--bs-body-bg));
 }
+.image-white-bg {
+    background-color: white;
+    color: black;
+}
+

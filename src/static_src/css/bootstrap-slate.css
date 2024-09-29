@@ -12,9 +12,10 @@
 /*# sourceMappingURL=bootstrap.min.css.map */
 
 .bornhack-logo {
-   -webkit-filter: invert(1);
-   filter: invert(1);
+   -webkit-filter: grayscale(100%) invert(1);
+   filter: grayscale(100%) invert(1);
 }
+
 .sponsor-white {
     background-color: white;
     color: black;

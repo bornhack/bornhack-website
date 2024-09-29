@@ -15,7 +15,7 @@
   </div>
 
   <div class="row">
-    <div class="col-2">
+    <div class="col-sm-12 col-lg-2">
       <ul class="nav nav-pills nav-stacked flex-column">
 
         <li class="nav-item"><h5>Account settings</h5></li>
@@ -43,7 +43,7 @@
 
         {% url 'two-factor-setup' as two_factor_url %}
         <li class="nav-item">
-          <a class="nav-link{% if "two_factor" in request.path %} active{% endif %}" href="{{ two_factor_url }}">
+          <a class="nav-link{% if "profile/setup" in request.path %} active{% endif %}" href="{{ two_factor_url }}">
             Two-Factor settings
           </a>
         </li>
@@ -90,7 +90,7 @@
       </ul>
     </div>
 
-    <div class="col-10">
+    <div class="col-sm-12 col-lg-10">
 
       {% block profile_content %}{% endblock %}
 

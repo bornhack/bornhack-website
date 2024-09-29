@@ -8,7 +8,10 @@
 {% block team_content %}
 
   <div class="card">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4>
+        Guide / Howto for {{ team.name }}
+      </h4>
       <div class="btn-group ms-auto">
         <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
            class="btn btn-secondary"
@@ -19,9 +22,6 @@
           <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
         {% endif %}
       </div>
-      <h4>
-        Guide / Howto for {{ team.name }}
-      </h4>
     </div>
     <div class="card-body">
       <p>

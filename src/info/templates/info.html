@@ -52,20 +52,20 @@
           <h2>{{ category.headline }} {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
           {% for item in category.infoitems.all %}
             <div class="card">
-              <div class="card-header">
-                <span class="sub-anchor" id="{{ item.anchor }}"></span>
-                <h4 class="card-title">{{ item.headline }}
-                  <a href="#{{ item.anchor }}">
-                    <i class="glyphicon glyphicon-link"></i>
-                  </a>
-                  {% if request.user in category.team.responsible_members.all %}
+              <span class="sub-anchor" id="{{ item.anchor }}"></span>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="text-start">{{ item.headline }}</h4>
+                <span class="text-end">
+                <a href="#{{ item.anchor }}">
+                    <i class="fa-solid fa-link"></i> 
+                </a>
+                {% if request.user in category.team.responsible_members.all %}
                     <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=category.team.slug category_anchor=category.anchor item_anchor=item.anchor %}?next={% url 'info'  camp_slug=camp.slug %}#{{ item.anchor }}"
-                       class="btn btn-xs btn-primary ms-auto">
-                      <i class="fa fa-edit"></i> Edit
+                       class="btn btn-xs btn-primary">
+                        <i class="fa fa-edit"></i> Edit
                     </a>
-                  {% endif %}
-                </h4>
-                <small></small>
+                {% endif %}
+                </span>
               </div>
               <div class="card-body">
                 <p class="break-word">{{ item.body|trustedcommonmark }}</p>

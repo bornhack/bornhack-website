@@ -35,15 +35,17 @@
 
     {% endifchanged %}
 
-    <p class="lead sponsor-white" data-bs-theme="light">
+    <p class="lead">
       {% if sponsor.url %}
         <a href="{{ sponsor.url }}">
       {% endif %}
-      <img class="img-responsive center-block" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300" data-bs-theme="light"/>
+      <img class="img-responsive center-block sponsor-white" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300"/>
       {% if sponsor.url %}
         </a>
       {% endif %}
-      {{ sponsor.description }}
+      <p class="lead mt-3">
+        {{ sponsor.description }}
+      </p>
     </p>
 
     {% if forloop.last == True %}

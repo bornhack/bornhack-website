@@ -6,14 +6,14 @@ from django_prometheus.models import ExportModelOperationsMixin
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
-THEME_CHOICES = (
-    ("default", "Default (Auto)"),
-    ("slate", "Slate"),
-    ("solar", "Solar"),
-)
-
 
 class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
+    THEME_CHOICES = (
+        ("default", "Default (Auto)"),
+        ("slate", "Slate"),
+        ("solar", "Solar"),
+    )
+
     class Meta:
         verbose_name = _("Profile")
         verbose_name_plural = _("Profiles")
