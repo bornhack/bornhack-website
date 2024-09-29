@@ -52,16 +52,18 @@ def team_saved(sender, instance, created, **kwargs):
     # late imports
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
-    from camps.models import Camp
+    from camps.models import Permission as CampPermission
 
-    camp_content_type = ContentType.objects.get_for_model(Camp)
+    perm_content_type = ContentType.objects.get_for_model(CampPermission)
     # make sure required permissions exist in the database
     for name, desc in settings.BORNHACK_TEAM_PERMISSIONS.items():
         codename = f"{instance.slug}_team_{name}"
         perm, created = Permission.objects.get_or_create(
             codename=codename,
-            name=desc,
-            content_type=camp_content_type,
+            content_type=perm_content_type,
+            defaults={
+                "name": f"{instance.name} {desc}",
+            },
         )
         if created:
             logger.debug(f"Created new permission camps.{codename}")

@@ -89,7 +89,6 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class TeamMemberRemoveView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
     EnsureTeamMemberLeadMixin,
     UpdateView,
@@ -122,7 +121,6 @@ class TeamMemberRemoveView(
 
 class TeamMemberApproveView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
     EnsureTeamMemberLeadMixin,
     UpdateView,

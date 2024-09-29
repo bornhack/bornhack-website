@@ -237,10 +237,10 @@ WEASYPRINT_BASEURL = "/"
 # all these permissions are created for each team,
 # for example bar_team_lead, bar_team_member, etc.
 BORNHACK_TEAM_PERMISSIONS = {
-    "lead": "Manage team members and permissions",
-    "member": "A member of the team",
-    "mapper": "Manage map layers and features for the team",
-    "facilitator": "Manage facilities for the team",
-    "infopager": "Manage infopage for the team",
-    "pos": "Submit Pos Reports for the team",
+    "lead": "Team lead - members and permissions management",
+    "member": "Team member",
+    "mapper": "Team mapper - layers and feature management",
+    "facilitator": "Team facilitator - facilities management",
+    "infopager": "Team infopager - infopage management",
+    "pos": "Team Pos - Point-of-sale report submission",
 }

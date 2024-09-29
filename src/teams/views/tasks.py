@@ -30,7 +30,7 @@ class TaskCommentForm(forms.ModelForm):
         fields = ["comment"]
 
 
-class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
+class TaskDetailView(TeamViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
@@ -73,7 +73,6 @@ class TaskForm(forms.ModelForm):
 
 class TaskCreateView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
     EnsureTeamLeadMixin,
     CreateView,
@@ -103,7 +102,6 @@ class TaskCreateView(
 
 class TaskUpdateView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
     EnsureTeamLeadMixin,
     UpdateView,

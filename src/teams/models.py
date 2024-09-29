@@ -299,27 +299,27 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def member_permission_set(self):
-        return [f"camps.{self.slug}_team_member"]
+        return f"camps.{self.slug}_team_member"
 
     @property
     def mapper_permission_set(self):
-        return [f"camps.{self.slug}_team_mapper"]
+        return f"camps.{self.slug}_team_mapper"
 
     @property
     def facilitator_permission_set(self):
-        return [f"camps.{self.slug}_team_facilitator"]
+        return f"camps.{self.slug}_team_facilitator"
 
     @property
     def lead_permission_set(self):
-        return [f"camps.{self.slug}_team_lead"]
+        return f"camps.{self.slug}_team_lead"
 
     @property
     def pos_permission_set(self):
-        return [f"camps.{self.slug}_team_pos"]
+        return f"camps.{self.slug}_team_pos"
 
     @property
     def infopager_permission_set(self):
-        return [f"camps.{self.slug}_team_infopager"]
+        return f"camps.{self.slug}_team_infopager"
 
 
 class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):

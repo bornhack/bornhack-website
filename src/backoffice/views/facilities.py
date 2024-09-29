@@ -401,7 +401,7 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
         """
         This view requires the member_permission_set for the team in question.
         """
-        return self.team.member_permission_set
+        return [self.team.member_permission_set]
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)

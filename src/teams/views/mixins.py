@@ -1,3 +1,5 @@
+from utils.mixins import RaisePermissionRequiredMixin
+from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic.detail import SingleObjectMixin
@@ -42,11 +44,19 @@ class EnsureTeamMemberLeadMixin(SingleObjectMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class TeamViewMixin:
-    def get_team(self):
-        return self.get_object().team
+class TeamViewMixin(CampViewMixin):
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        self.team = Team.objects.get(slug=kwargs["team_slug"], camp=self.camp)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["team"] = self.get_team()
+        context["team"] = self.team
         return context
+
+
+class TeamInfopagerPermissionMixin(RaisePermissionRequiredMixin):
+    """Permission mixin for views restricted to users with infopager permission for self.team"""
+
+    def get_permission_required(self):
+        return [self.team.infopager_permission_set]
