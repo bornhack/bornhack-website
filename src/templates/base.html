@@ -14,10 +14,10 @@
 
     {# Load Bootstrap CSS and JavaScript #}
     {% if user.profile.theme != "default" %}
-    <link href="{% static "css/bootstrap-"|add:user.profile.theme|add:".css" %}" rel="stylesheet">
+      <link href="{% static "css/bootstrap-"|add:user.profile.theme|add:".css" %}" rel="stylesheet">
     {% else %}
-    <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
+      <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
+      <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
     {% endif %}
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
