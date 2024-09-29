@@ -132,7 +132,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         help_text="Used to indicate to the IRC bot that this teams private IRC channel is in need of a permissions and ACL fix.",
     )
 
-    #Signal
+    # Signal
     public_signal_channel_link = models.URLField(null=True, blank=True, default="")
     private_signal_channel_link = models.URLField(null=True, blank=True, default="")
 
