@@ -7,13 +7,11 @@ from teams.models import TeamMember
 
 
 class EnsureTeamLeadMixin:
-    """
-    Use to make sure request.user is a team lead for the team specified by kwargs['team_slug']
-    """
+    """Use to make sure request.user has team lead permission for the team specified by kwargs['team_slug']"""
 
     def dispatch(self, request, *args, **kwargs):
         self.team = Team.objects.get(slug=kwargs["team_slug"], camp=self.camp)
-        if request.user not in self.team.leads.all():
+        if self.team.lead_permission_set not in request.user.get_all_permissions():
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",
@@ -25,14 +23,12 @@ class EnsureTeamLeadMixin:
 
 
 class EnsureTeamMemberLeadMixin(SingleObjectMixin):
-    """
-    Use to make sure request.user is a team lead for the team which TeamMember belongs to
-    """
+    """Use to make sure request.user has team lead permission for the team which TeamMember belongs to"""
 
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user not in self.get_object().team.leads.all():
+        if self.get_object().team.lead_permission_set not in request.user.get_all_permissions():
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",
