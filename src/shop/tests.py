@@ -588,11 +588,14 @@ class TestRefund(TestCase):
 
         cls.camp = CampFactory()
         infoteam = Team.objects.create(
-            name="Info", description="Info team", camp=cls.camp
+            name="Info",
+            description="Info team",
+            camp=cls.camp,
         )
         camp_content_type = ContentType.objects.get_for_model(cls.camp)
         permission = Permission.objects.get(
-            content_type=camp_content_type, codename="info_team_member"
+            content_type=camp_content_type,
+            codename="info_team_member",
         )
         infoteam.group.permissions.add(permission)
         TeamMember.objects.create(user=cls.info_user, team=infoteam, approved=True)
