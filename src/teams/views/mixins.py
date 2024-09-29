@@ -28,7 +28,10 @@ class EnsureTeamMemberLeadMixin(SingleObjectMixin):
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_object().team.lead_permission_set not in request.user.get_all_permissions():
+        if (
+            self.get_object().team.lead_permission_set
+            not in request.user.get_all_permissions()
+        ):
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",
