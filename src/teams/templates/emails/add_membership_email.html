@@ -16,10 +16,10 @@ Thank you for helping out!
 
 <h5>Signal</h5>
 {% if team.public_signal_channel_link %}
-  <p>The {{ team.name }} Team public Signal group is <a href="{{ team.public_signal_channel_link }}">{{ team.public_signal_channel_link }}</a></p>
+    <p>The {{ team.name }} Team public Signal group is <a href="{{ team.public_signal_channel_link }}">{{ team.public_signal_channel_link|truncatechars:20 }}</a></p>
 {% endif %}
 {% if request.user in team.approved_members.all and team.private_signal_channel_link %}
-  <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link }}</a></p>
+    <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link|truncatechars:20 }}</a></p>
 {% endif %}
 <br>
 <br>
