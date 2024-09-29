@@ -46,7 +46,7 @@ strong { font-weight: bold; }
   height: 75px;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (color-scheme: dark) {
     .bornhack-logo {
        -webkit-filter: invert(1);
        filter: invert(1);
@@ -331,7 +331,6 @@ img {
   padding-left: 10px;
   padding-right: 10px;
 }
-
 .bornhack-2016-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #004dff, var(--bs-body-bg));

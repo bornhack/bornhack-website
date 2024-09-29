@@ -79,13 +79,13 @@
         <li class="nav-item"><h5>Misc.</h5></li>
         {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
         <li class="nav-item">
-          <a class="nav-link{% if request.path == tokenfind_list_url %}active{% endif %}" href="{{ tokenfind_list_url }}">
+          <a class="nav-link{% if request.path == tokenfind_list_url %} active{% endif %}" href="{{ tokenfind_list_url }}">
             Secret Tokens
           </a>
         </li>
 
         <hr />
-        <p><b>You are logged in as {{ request.user.email }}</b></p>
+        <p class="text-break"><b>You are logged in as {{ request.user.email }}</b></p>
 
       </ul>
     </div>
