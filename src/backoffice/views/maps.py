@@ -16,16 +16,16 @@ from django.views.generic.edit import UpdateView
 from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget
 
-from ..mixins import GisTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from ..forms import MapLayerFeaturesImportForm
-from maps.mixins import LayerViewMixin
 from maps.models import ExternalLayer
 from maps.models import Feature
 from maps.models import Layer
 from teams.models import Team
-
 from utils.widgets import IconPickerWidget
+from utils.mixins import TeamMapperRequiredMixin
+from maps.mixins import LayerMapperViewMixin
+from maps.mixins import ExternalLayerMapperViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -33,7 +33,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 # ################# LAYERS ########################
 
 
-class MapLayerListView(CampViewMixin, GisTeamPermissionMixin, ListView):
+class MapLayerListView(CampViewMixin, TeamMapperRequiredMixin, ListView):
     model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
@@ -50,9 +50,7 @@ class MapLayerListView(CampViewMixin, GisTeamPermissionMixin, ListView):
 
 
 class MapLayerFeaturesImportView(
-    CampViewMixin,
-    LayerViewMixin,
-    GisTeamPermissionMixin,
+    LayerMapperViewMixin,
     FormView,
 ):
     """Import features into a map layer."""
@@ -165,7 +163,7 @@ class MapLayerFeaturesImportView(
             self.error_count += 1
 
 
-class MapLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateView):
+class MapLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
     model = Layer
     template_name = "maps_layer_form.html"
     fields = [
@@ -200,7 +198,7 @@ class MapLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateView):
         )
 
 
-class MapLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateView):
+class MapLayerUpdateView(LayerMapperViewMixin, UpdateView):
     model = Layer
     slug_url_kwarg = "layer_slug"
     template_name = "maps_layer_form.html"
@@ -236,7 +234,7 @@ class MapLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateView):
         )
 
 
-class MapLayerDeleteView(CampViewMixin, GisTeamPermissionMixin, DeleteView):
+class MapLayerDeleteView(LayerMapperViewMixin, DeleteView):
     model = Layer
     template_name = "maps_layer_delete.html"
     slug_url_kwarg = "layer_slug"
@@ -257,7 +255,7 @@ class MapLayerDeleteView(CampViewMixin, GisTeamPermissionMixin, DeleteView):
 # ################# FEATURES #######################
 
 
-class MapFeatureListView(LayerViewMixin, GisTeamPermissionMixin, ListView):
+class MapFeatureListView(LayerMapperViewMixin, ListView):
     model = Feature
     template_name = "maps_layer_feature_list_backoffice.html"
 
@@ -267,7 +265,7 @@ class MapFeatureListView(LayerViewMixin, GisTeamPermissionMixin, ListView):
         return context
 
 
-class MapFeatureCreateView(LayerViewMixin, GisTeamPermissionMixin, CreateView):
+class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
     model = Feature
     template_name = "maps_feature_form.html"
     fields = [
@@ -312,7 +310,7 @@ class MapFeatureCreateView(LayerViewMixin, GisTeamPermissionMixin, CreateView):
         )
 
 
-class MapFeatureUpdateView(LayerViewMixin, GisTeamPermissionMixin, UpdateView):
+class MapFeatureUpdateView(LayerMapperViewMixin, UpdateView):
     model = Feature
     slug_url_kwarg = "feature_uuid"
     slug_field = "uuid"
@@ -356,7 +354,7 @@ class MapFeatureUpdateView(LayerViewMixin, GisTeamPermissionMixin, UpdateView):
         )
 
 
-class MapFeatureDeleteView(LayerViewMixin, GisTeamPermissionMixin, DeleteView):
+class MapFeatureDeleteView(LayerMapperViewMixin, DeleteView):
     model = Feature
     template_name = "maps_feature_delete.html"
     slug_url_kwarg = "feature_uuid"
@@ -376,7 +374,7 @@ class MapFeatureDeleteView(LayerViewMixin, GisTeamPermissionMixin, DeleteView):
 # ################# EXTERNAL LAYERS ################
 
 
-class MapExternalLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateView):
+class MapExternalLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
     model = ExternalLayer
     template_name = "maps_external_layer_form.html"
     fields = [
@@ -404,7 +402,7 @@ class MapExternalLayerCreateView(CampViewMixin, GisTeamPermissionMixin, CreateVi
         )
 
 
-class MapExternalLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateView):
+class MapExternalLayerUpdateView(ExternalLayerMapperViewMixin, UpdateView):
     model = ExternalLayer
     slug_url_kwarg = "external_layer_uuid"
     slug_field = "uuid"
@@ -434,7 +432,7 @@ class MapExternalLayerUpdateView(CampViewMixin, GisTeamPermissionMixin, UpdateVi
         )
 
 
-class MapExternalLayerDeleteView(GisTeamPermissionMixin, DeleteView):
+class MapExternalLayerDeleteView(ExternalLayerMapperViewMixin, DeleteView):
     model = ExternalLayer
     template_name = "maps_external_layer_delete.html"
     slug_url_kwarg = "external_layer_uuid"

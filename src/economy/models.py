@@ -387,7 +387,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         "teams.Team",
         on_delete=models.PROTECT,
         related_name="expenses",
-        help_text="The team to which this Expense belongs. A team responsible will need to approve the expense. When in doubt pick the Economy team.",
+        help_text="The team to which this Expense belongs. A team lead will need to approve the expense. When in doubt pick the Orga team.",
     )
 
     approved = models.BooleanField(

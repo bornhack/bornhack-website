@@ -1,4 +1,5 @@
 from typing import Optional
+from django.contrib.contenttypes.models import ContentType
 
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -24,6 +25,8 @@ from tickets.factories import TicketTypeFactory
 from tickets.models import ShopTicket
 from tickets.models import TicketGroup
 from utils.factories import UserFactory
+from teams.models import Team
+from teams.models import TeamMember
 
 
 class ProductAvailabilityTest(TestCase):
@@ -582,12 +585,18 @@ class TestRefund(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.info_user = UserFactory(username="info")
-        backoffice_permission = Permission.objects.get(codename="backoffice_permission")
-        infoteam_permission = Permission.objects.get(codename="infoteam_permission")
-        cls.info_user.user_permissions.set([backoffice_permission, infoteam_permission])
 
         cls.camp = CampFactory()
-
+        infoteam = Team.objects.create(
+            name="Info", description="Info team", camp=cls.camp
+        )
+        camp_content_type = ContentType.objects.get_for_model(cls.camp)
+        permission = Permission.objects.get(
+            content_type=camp_content_type, codename="info_team_member"
+        )
+        infoteam.group.permissions.add(permission)
+        TeamMember.objects.create(user=cls.info_user, team=infoteam, approved=True)
+        print(cls.info_user.get_all_permissions())
         cls.bundle_product = ProductFactory()
         cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
         SubProductRelationFactory(

@@ -97,6 +97,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.current_order",
                 "camps.context_processors.camp",
+                "utils.context_processors.is_volunteer",
             ],
         },
     },
@@ -232,3 +233,14 @@ SHORT_DATE_FORMAT = "Ymd"
 TIME_FORMAT = "H:i"
 
 WEASYPRINT_BASEURL = "/"
+
+# all these permissions are created for each team,
+# for example bar_team_lead, bar_team_member, etc.
+BORNHACK_TEAM_PERMISSIONS = {
+    "lead": "Manage team members and permissions",
+    "member": "A member of the team",
+    "mapper": "Manage map layers and features for the team",
+    "facilitator": "Manage facilities for the team",
+    "infopager": "Manage infopage for the team",
+    "pos": "Submit Pos Reports for the team",
+}

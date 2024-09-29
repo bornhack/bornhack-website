@@ -10,7 +10,7 @@ from ..email import add_added_membership_email
 from ..email import add_removed_membership_email
 from ..models import Team
 from ..models import TeamMember
-from .mixins import EnsureTeamMemberResponsibleMixin
+from .mixins import EnsureTeamMemberLeadMixin
 from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
@@ -91,7 +91,7 @@ class TeamMemberRemoveView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamMemberResponsibleMixin,
+    EnsureTeamMemberLeadMixin,
     UpdateView,
 ):
     template_name = "teammember_remove.html"
@@ -124,7 +124,7 @@ class TeamMemberApproveView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamMemberResponsibleMixin,
+    EnsureTeamMemberLeadMixin,
     UpdateView,
 ):
     template_name = "teammember_approve.html"

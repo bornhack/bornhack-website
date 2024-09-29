@@ -1,17 +1,22 @@
+"""Add camp as an attribute on the request object."""
+
 from django.shortcuts import get_object_or_404
 
 
 class RequestCampMiddleware:
     """Add camp as an attribute on the request object."""
 
-    def __init__(self, get_response):
+    def __init__(self, get_response) -> None:
+        """Boilerplate."""
         self.get_response = get_response
 
     def __call__(self, request):
+        """Boilerplate."""
         response = self.get_response(request)
         return response
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs) -> None:
+        """Check url kwargs for a camp_slug and add camp to request object where relevant."""
         from camps.models import Camp
 
         if (

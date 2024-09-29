@@ -11,7 +11,7 @@ from ..models import TaskComment
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamTask
-from .mixins import EnsureTeamResponsibleMixin
+from .mixins import EnsureTeamLeadMixin
 from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
 
@@ -75,7 +75,7 @@ class TaskCreateView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     CreateView,
 ):
     model = TeamTask
@@ -105,7 +105,7 @@ class TaskUpdateView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     UpdateView,
 ):
     model = TeamTask

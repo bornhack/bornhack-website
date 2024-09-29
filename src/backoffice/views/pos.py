@@ -1,4 +1,5 @@
 import json
+from utils.mixins import TeamPosRequiredMixin
 import logging
 
 from django.contrib import messages
@@ -18,7 +19,6 @@ from django_tables2 import SingleTableMixin
 from ..forms import PosSalesJSONForm
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import PosViewMixin
-from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from economy.filters import PosProductCostFilter
 from economy.filters import PosProductFilter
@@ -41,10 +41,9 @@ from teams.models import Team
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class PosListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
-    """Show a list of Pos this user has access to (through team memberships)."""
+class PosListView(CampViewMixin, TeamPosRequiredMixin, ListView):
+    """Show a list of Pos this user has access to (through team pos permissions)."""
 
-    permission_required = "camps.backoffice_permission"
     model = Pos
     template_name = "pos_list.html"
 
@@ -117,9 +116,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
             camp=self.camp,
             name="Orga",
         ).approved_members.all()
-        context["form"].fields[
-            "pos_responsible"
-        ].queryset = self.pos.team.responsible_members.all()
+        context["form"].fields["pos_responsible"].queryset = self.pos.team.leads.all()
         return context
 
     def form_valid(self, form):
@@ -171,9 +168,7 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
             camp=self.camp,
             name="Orga",
         ).approved_members.all()
-        context["form"].fields[
-            "pos_responsible"
-        ].queryset = self.pos.team.responsible_members.all()
+        context["form"].fields["pos_responsible"].queryset = self.pos.team.leads.all()
         return context
 
 
@@ -275,7 +270,7 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
 
 class PosTransactionListView(
     CampViewMixin,
-    OrgaTeamPermissionMixin,
+    TeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -311,7 +306,7 @@ class PosTransactionListView(
 
 class PosSaleListView(
     CampViewMixin,
-    OrgaTeamPermissionMixin,
+    TeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -359,7 +354,7 @@ class PosSalesImportView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
 
 class PosProductListView(
     CampViewMixin,
-    OrgaTeamPermissionMixin,
+    TeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -429,7 +424,7 @@ class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
 
 class PosProductCostListView(
     CampViewMixin,
-    OrgaTeamPermissionMixin,
+    TeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):

@@ -12,6 +12,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class Group(UUIDModel):
+    """A group of Layers."""
+
     name = models.CharField(
         max_length=100,
         help_text="Name or description of this group",

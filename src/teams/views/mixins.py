@@ -6,14 +6,14 @@ from teams.models import Team
 from teams.models import TeamMember
 
 
-class EnsureTeamResponsibleMixin:
+class EnsureTeamLeadMixin:
     """
-    Use to make sure request.user is responsible for the team specified by kwargs['team_slug']
+    Use to make sure request.user is a team lead for the team specified by kwargs['team_slug']
     """
 
     def dispatch(self, request, *args, **kwargs):
         self.team = Team.objects.get(slug=kwargs["team_slug"], camp=self.camp)
-        if request.user not in self.team.responsible_members.all():
+        if request.user not in self.team.leads.all():
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",
@@ -24,15 +24,15 @@ class EnsureTeamResponsibleMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class EnsureTeamMemberResponsibleMixin(SingleObjectMixin):
+class EnsureTeamMemberLeadMixin(SingleObjectMixin):
     """
-    Use to make sure request.user is responsible for the team which TeamMember belongs to
+    Use to make sure request.user is a team lead for the team which TeamMember belongs to
     """
 
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user not in self.get_object().team.responsible_members.all():
+        if request.user not in self.get_object().team.leads.all():
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",

@@ -38,7 +38,6 @@ from .views import CoinifyPayoutListView
 from .views import CredebtorDetailView
 from .views import CreditNoteDownloadView
 from .views import CreditNoteListView
-from .views import economy_search_view
 from .views import EpayCSVImportView
 from .views import EpayTransactionListView
 from .views import EventDeleteView
@@ -860,7 +859,6 @@ urlpatterns = [
         "economy/",
         include(
             [
-                path("search/", economy_search_view, name="economy_search"),
                 # chains & credebtors
                 path(
                     "chains/",

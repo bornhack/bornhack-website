@@ -1,10 +1,8 @@
 import json
 import logging
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.gis.geos import GEOSGeometry
-from django.core.exceptions import PermissionDenied
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -23,6 +21,7 @@ from leaflet.forms.widgets import LeafletWidget
 
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import RaisePermissionRequiredMixin
+from facilities.mixins import FacilityFacilitatorViewMixin
 from camps.mixins import CampViewMixin
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
@@ -30,8 +29,12 @@ from facilities.models import FacilityOpeningHours
 from facilities.models import FacilityType
 from teams.models import Team
 from utils.widgets import IconPickerWidget
+from utils.mixins import TeamFacilitatorRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
+
+# ########### FACILITY TYPES ######################
 
 
 class FacilityTypeListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
@@ -208,7 +211,10 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
         )
 
 
-class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+# ########### FACILITIES ######################
+
+
+class FacilityListView(TeamFacilitatorRequiredMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
 
@@ -245,7 +251,7 @@ class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         return context
 
 
-class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+class FacilityDetailView(TeamFacilitatorRequiredMixin, DetailView):
     model = Facility
     template_name = "facility_detail_backoffice.html"
     pk_url_kwarg = "facility_uuid"
@@ -275,7 +281,7 @@ class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
         return qs.prefetch_related("opening_hours")
 
 
-class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
+class FacilityCreateView(TeamFacilitatorRequiredMixin, CreateView):
     model = Facility
     template_name = "facility_form.html"
     fields = ["facility_type", "name", "description", "location"]
@@ -291,28 +297,51 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         """
-        Do not show types that are not part of the current camp in the dropdown
+        Do not show types that are not part of the current camp in the dropdown,
+        also hide types belonging to teams for which the user has no facilitator permission.
+        Also get map data.
         """
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
-            "loggedIn": self.request.user.is_authenticated,
+            "loggedIn": True,
             "grid": static("json/grid.geojson"),
         }
+        # get the teams the current user has facilitator permission for
+        perms = self.request.user.get_all_permissions()
+        team_slugs = [
+            perm.split(".")[1].split("_")[0]
+            for perm in perms
+            if perm.endswith("_facilitator")
+        ]
+        teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context["form"].fields["facility_type"].queryset = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
+            responsible_team__in=teams,
         )
         return context
+
+    def form_valid(self, form):
+        # does the user have facilitator permission for the team in charge of this facility type?
+        if (
+            form.cleaned_data["facility_type"].team.facilitator_permission_set
+            not in self.request.user.get_all_permissions()
+        ):
+            messages.error("No thanks")
+            return self.form_invalid(form)
+        super().form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, "The Facility has been created")
         return reverse("backoffice:facility_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class FacilityUpdateView(FacilityFacilitatorViewMixin, UpdateView):
+    """Update a facility. Requires facilitator permission for the team which is responsible for the facility type."""
+
     model = Facility
     template_name = "facility_form.html"
     pk_url_kwarg = "facility_uuid"
-    fields = ["facility_type", "name", "description", "location"]
+    fields = ["name", "description", "location"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -343,7 +372,9 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         )
 
 
-class FacilityDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
+class FacilityDeleteView(FacilityFacilitatorViewMixin, DeleteView):
+    """Delete a facility. Requires facilitator permission for the team which is responsible for the facility type."""
+
     model = Facility
     template_name = "facility_delete.html"
     pk_url_kwarg = "facility_uuid"
@@ -358,17 +389,19 @@ class FacilityDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
         return reverse("backoffice:facility_list", kwargs={"camp_slug": self.camp.slug})
 
 
+# ############ FACILITY FEEDBACK #####################
+
+
 class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView):
+    """View to handle facility feedback. Available for anyone with member permission for the team."""
+
     template_name = "facilityfeedback_backoffice.html"
 
     def get_permission_required(self):
         """
-        This view requires two permissions, camps.backoffice_permission and
-        the permission_set for the team in question.
+        This view requires the member_permission_set for the team in question.
         """
-        if not self.team.permission_set:
-            raise PermissionDenied("No permissions set defined for this team")
-        return ["camps.backoffice_permission", self.team.permission_set]
+        return self.team.member_permission_set
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -414,34 +447,11 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
         )
 
 
-class FacilityMixin(CampViewMixin):
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.facility = get_object_or_404(Facility, uuid=kwargs["facility_uuid"])
-
-    def get_form(self, *args, **kwargs):
-        """
-        The default range widgets are a bit shit because they eat the help_text and
-        have no indication of which field is for what. So we add a nice placeholder.
-        """
-        form = super().get_form(*args, **kwargs)
-        form.fields["when"].widget.widgets[0].attrs = {
-            "placeholder": f"Open Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
-        form.fields["when"].widget.widgets[1].attrs = {
-            "placeholder": f"Close Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["facility"] = self.facility
-        return context
+# ############ FACILITY OPENING HOURS #####################
 
 
 class FacilityOpeningHoursCreateView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     CreateView,
 ):
     model = FacilityOpeningHours
@@ -465,8 +475,7 @@ class FacilityOpeningHoursCreateView(
 
 
 class FacilityOpeningHoursUpdateView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     UpdateView,
 ):
     model = FacilityOpeningHours
@@ -482,8 +491,7 @@ class FacilityOpeningHoursUpdateView(
 
 
 class FacilityOpeningHoursDeleteView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     DeleteView,
 ):
     model = FacilityOpeningHours

@@ -7,7 +7,7 @@ from django.views.generic import UpdateView
 from reversion.views import RevisionMixin
 
 from ..models import Team
-from .mixins import EnsureTeamResponsibleMixin
+from .mixins import EnsureTeamLeadMixin
 from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
 from info.models import InfoCategory
@@ -18,7 +18,7 @@ class InfoCategoriesListView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     ListView,
 ):
     model = InfoCategory
@@ -37,7 +37,7 @@ class InfoItemCreateView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     CreateView,
 ):
     model = InfoItem
@@ -78,7 +78,7 @@ class InfoItemUpdateView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     RevisionMixin,
     UpdateView,
 ):
@@ -106,7 +106,7 @@ class InfoItemDeleteView(
     LoginRequiredMixin,
     CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     RevisionMixin,
     DeleteView,
 ):

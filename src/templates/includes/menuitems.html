@@ -10,7 +10,7 @@
 <div class="btn-group" role="group">
   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">More <span class="caret"></span></button>
   <ul class="dropdown-menu">
-    {% if perms.camps.backoffice_permission %}
+    {% if is_volunteer %}
       <li class="{% menudropdownclass 'backoffice' %}"><a href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
     {% endif %}
 

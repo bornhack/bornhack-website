@@ -16,39 +16,45 @@
     <div class="panel-body">
       <p class="lead">Welcome to the promised land! Please select your desired action below:</p>
       <div class="list-group">
-        <h3>Facilities</h3>
-        {% if perms.camps.orgateam_permission %}
-          <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item">
-            <h4 class="list-group-item-heading">
-              Facility Types
-            </h4>
-            <p class="list-group-item-text">
-              See and manage facility types
-            </p>
-          </a>
-          <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item">
-            <h4 class="list-group-item-heading">
-              Facilities
-            </h4>
-            <p class="list-group-item-text">
-              See and manage facilites
-            </p>
-          </a>
-        {% endif %}
-        {% for team in facilityfeedback_teams %}
-          {% if "camps."|add:team.permission_set in perms %}
-            <a href="{% url 'backoffice:facilityfeedback' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item">
+        {% if perms.camps.orga_team_member or facilityfeedback_teams or is_team_facilitator %}
+          <h3>Facilities</h3>
+          {% if perms.camps.orga_team_member %}
+            <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item">
               <h4 class="list-group-item-heading">
-                Feedback for {{ team.name }} Team
+                Facility Types
               </h4>
               <p class="list-group-item-text">
-                See unhandled feedback for facilities managed by {{ team.name }} Team
+                See and manage facility types
               </p>
             </a>
           {% endif %}
-        {% endfor %}
 
-        {% if perms.camps.infoteam_permission %}
+          {% if is_team_facilitator %}
+            <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item">
+              <h4 class="list-group-item-heading">
+                Facilities
+              </h4>
+              <p class="list-group-item-text">
+                See and manage facilites
+              </p>
+            </a>
+          {% endif %}
+
+          {% for team in facilityfeedback_teams %}
+            {% if team.member_permission_set in perms %}
+              <a href="{% url 'backoffice:facilityfeedback' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item">
+                <h4 class="list-group-item-heading">
+                  Feedback for {{ team.name }} Team
+                </h4>
+                <p class="list-group-item-text">
+                  See unhandled feedback for facilities managed by {{ team.name }} Team
+                </p>
+              </a>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if perms.camps.info_team_member %}
           <h3>Info Team</h3>
           <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}"
              class="list-group-item">
@@ -103,7 +109,7 @@
           </a>
         {% endif %}
 
-        {% if perms.camps.contentteam_permission %}
+        {% if perms.camps.content_team_member %}
           <h3>Content Team</h3>
           <a href="{% url 'backoffice:approve_event_feedback' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Approve Feedback</h4>
@@ -155,7 +161,7 @@
           </a>
         {% endif %}
 
-        {% if perms.camps.orgateam_permission %}
+        {% if perms.camps.orga_team_member %}
           <h3>Orga Team</h3>
           <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
@@ -199,12 +205,8 @@
           </a>
         {% endif %}
 
-        {% if perms.camps.economyteam_permission %}
+        {% if perms.camps.economy_team_member %}
           <h3>Economy Team</h3>
-          <a href="{% url 'backoffice:economy_search' camp_slug=camp.slug %}" class="list-group-item">
-            <h4 class="list-group-item-heading">Search</h4>
-            <p class="list-group-item-text"></p>
-          </a>
           <a href="{% url 'backoffice:chain_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Chains</h4>
             <p class="list-group-item-text">Use this view to see the Chains and Credebtors registered in the system.</p>
@@ -258,10 +260,9 @@
               Use this view to download multiple invoices and/or orders from the system
             </p>
           </a>
-
         {% endif %}
 
-        {% if perms.camps.orgateam_permission or perms.camps.infoteam_permission or perms.camps.barteam_permission %}
+        {% if perms.camps.orga_team_member or is_team_pos %}
           <h3>Point of Sale</h3>
           <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Point of Sale Locations</h4>
@@ -285,7 +286,7 @@
           </a>
         {% endif %}
 
-        {% if perms.camps.gameteam_permission %}
+        {% if perms.camps.game_team_member %}
           <h3>Secret Tokens</h3>
           <a href="{% url 'backoffice:token_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Tokens</h4>
@@ -296,11 +297,12 @@
             <p class="list-group-item-text">Use this view to see token find stats</p>
           </a>
         {% endif %}
-        {% if perms.camps.gisteam_permission %}
+
+        {% if perms.camps.gis_team_member or is_team_mapper %}
           <h3>Maps</h3>
           <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">Layers</h4>
-            <p class="list-group-item-text">Map layers</p>
+            <p class="list-group-item-text">Use this view to manage map layers.</p>
           </a>
         {% endif %}
       </div>

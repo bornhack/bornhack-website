@@ -83,10 +83,18 @@
           </a>
         </li>
 
-        <hr />
-        <p><b>You are logged in as {{ request.user.email }}</b></p>
-
+        {% url 'profiles:permissions_list' as profile_permissions_url %}
+        <li {% if request.path == profile_permissions_url %}class="active"{% endif %}>
+          <a href="{{ profile_permissions_url }}">
+            Permissions
+          </a>
+        </li>
       </ul>
+
+      <hr>
+
+      <p>You are logged in as username <b>{{ request.user.username }}</b> with email <b>{{ request.user.email }}</b></p>
+
     </div>
 
     <div class="col-md-10">

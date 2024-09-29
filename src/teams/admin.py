@@ -23,17 +23,17 @@ class TeamAdmin(admin.ModelAdmin):
     save_as = True
 
     @admin.display(
-        description="Responsible",
+        description="Leads",
     )
-    def get_responsible(self, obj):
+    def get_leads(self, obj):
         return ", ".join(
-            [resp.profile.public_credit_name for resp in obj.responsible_members.all()],
+            [lead.profile.public_credit_name for lead in obj.leads.all()],
         )
 
     list_display = [
         "name",
         "camp",
-        "get_responsible",
+        "get_leads",
         "needs_members",
         "public_irc_channel_name",
         "public_irc_channel_bot",

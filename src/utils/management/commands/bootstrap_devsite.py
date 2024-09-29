@@ -1517,63 +1517,53 @@ class Command(BaseCommand):
             description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
             camp=camp,
             needs_members=False,
-            permission_set="orgateam_permission",
         )
         teams["info"] = Team.objects.create(
             name="Info",
             description="Info team manage the info pages and the info desk.",
             camp=camp,
-            permission_set="infoteam_permission",
         )
         teams["poc"] = Team.objects.create(
             name="POC",
             description="The POC team is in charge of establishing and running a phone network onsite.",
             camp=camp,
-            permission_set="pocteam_permission",
         )
         teams["noc"] = Team.objects.create(
             name="NOC",
             description="The NOC team is in charge of establishing and running a network onsite.",
             camp=camp,
-            permission_set="nocteam_permission",
         )
         teams["bar"] = Team.objects.create(
             name="Bar",
             description="The Bar team plans, builds and run the IRL bar!",
             camp=camp,
-            permission_set="barteam_permission",
         )
         teams["shuttle"] = Team.objects.create(
             name="Shuttle",
             description="The shuttle team drives people to and from the trainstation or the supermarket",
             camp=camp,
-            permission_set="shuttleteam_permission",
         )
         teams["power"] = Team.objects.create(
             name="Power",
             description="The power team makes sure we have power all over the venue",
             camp=camp,
-            permission_set="powerteam_permission",
         )
         teams["shit"] = Team.objects.create(
             name="Sanitation",
             description="Team shit takes care of the toilets",
             camp=camp,
-            permission_set="sanitationteam_permission",
         )
         teams["content"] = Team.objects.create(
             name="Content",
             description="The Content Team handles stuff on the program",
             camp=camp,
             mailing_list="content@example.com",
-            permission_set="contentteam_permission",
         )
         teams["economy"] = Team.objects.create(
             name="Economy",
             description="The Economy Team handles the money and accounts.",
             camp=camp,
             mailing_list="economy@example.com",
-            permission_set="economyteam_permission",
         )
         camp.economy_team = teams["economy"]
         camp.save()
@@ -1638,7 +1628,7 @@ class Command(BaseCommand):
             team=teams["noc"],
             user=users[4],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["noc"]["user1"] = TeamMember.objects.create(
             team=teams["noc"],
@@ -1661,13 +1651,13 @@ class Command(BaseCommand):
             team=teams["bar"],
             user=users[1],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["bar"]["user3"] = TeamMember.objects.create(
             team=teams["bar"],
             user=users[3],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["bar"]["user2"] = TeamMember.objects.create(
             team=teams["bar"],
@@ -1690,31 +1680,31 @@ class Command(BaseCommand):
             team=teams["orga"],
             user=users[1],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user3"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[3],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user8"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[8],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user9"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[9],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user4"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[4],
             approved=True,
-            responsible=True,
+            lead=True,
         )
 
         # shuttle team
@@ -1723,7 +1713,7 @@ class Command(BaseCommand):
             team=teams["shuttle"],
             user=users[7],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["shuttle"]["user3"] = TeamMember.objects.create(
             team=teams["shuttle"],
@@ -1739,7 +1729,7 @@ class Command(BaseCommand):
         TeamMember.objects.create(
             team=teams["economy"],
             user=users[0],
-            responsible=True,
+            lead=True,
             approved=True,
         )
         return memberships
