@@ -19,6 +19,7 @@ from .models import Product
 from .models import RefundEnum
 from camps.factories import CampFactory
 from camps.models import Camp
+from camps.models import Permission as CampPermission
 from economy.factories import PosFactory
 from shop.forms import OrderProductRelationForm
 from tickets.factories import TicketTypeFactory
@@ -592,9 +593,9 @@ class TestRefund(TestCase):
             description="Info team",
             camp=cls.camp,
         )
-        camp_content_type = ContentType.objects.get_for_model(cls.camp)
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
         permission = Permission.objects.get(
-            content_type=camp_content_type,
+            content_type=permission_content_type,
             codename="info_team_member",
         )
         infoteam.group.permissions.add(permission)
