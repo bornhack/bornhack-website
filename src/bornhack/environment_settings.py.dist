@@ -16,6 +16,7 @@ DATABASES = {
 }
 
 DEBUG={{ django_debug }}
+DEBUG_TOOLBAR_ENABLED={{ django_debug_toolbar_enabled }}
 
 
 # start redirecting to the next camp instead of the previous camp after

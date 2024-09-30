@@ -145,7 +145,7 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/api/*$"
 
-if DEBUG:  # noqa: F405
+if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
     INSTALLED_APPS += ["debug_toolbar"]
     MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
