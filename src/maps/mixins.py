@@ -7,7 +7,7 @@ from .models import ExternalLayer
 from camps.mixins import CampViewMixin
 
 
-class LayerViewMixin(CampViewMixin):
+class LayerViewMixin:
     """A mixin to get the Layer object based on layer_slug in url kwargs."""
 
     def setup(self, *args, **kwargs):
