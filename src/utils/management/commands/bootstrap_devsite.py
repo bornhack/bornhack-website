@@ -1,4 +1,8 @@
+from camps.models import Permission as CampPermission
+from django.contrib.contenttypes.models import ContentType
+
 import logging
+from django.contrib.auth.models import Permission
 import random
 import sys
 from datetime import datetime
@@ -307,6 +311,7 @@ class Command(BaseCommand):
                 "colour": "#73d7ee",
                 "read_only": False,
                 "light_text": False,
+                "add_permissions": True,
             },
             {
                 "year": 2025,
@@ -349,6 +354,7 @@ class Command(BaseCommand):
                             tz.localize(datetime(year, 9, 5, 12, 0)),
                         ),
                         colour=camp["colour"],
+                        light_text=camp.get("light_text", True),
                     ),
                     read_only,
                 ),
@@ -2083,6 +2089,17 @@ class Command(BaseCommand):
         self.output(f"Creating revenues for {camp}...")
         RevenueFactory.create_batch(20, camp=camp)
 
+    def add_team_permissions(self, camp):
+        """Assign member permissions to the team groups for this camp."""
+        self.output(f"Assigning permissions to team groups for {camp}...")
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        for team in camp.teams.all():
+            permission = Permission.objects.get(
+                content_type=permission_content_type,
+                codename=f"{team.slug}_team_member",
+            )
+            team.group.permissions.add(permission)
+
     def output(self, message):
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
@@ -2128,6 +2145,7 @@ class Command(BaseCommand):
 
         self.create_epay_transactions()
 
+        permissions_added = False
         for camp, read_only in camps:
             year = camp.camp.lower.year
 
@@ -2153,6 +2171,10 @@ class Command(BaseCommand):
                 self.create_camp_news(camp)
 
                 teams = self.create_camp_teams(camp)
+
+                if not read_only and not permissions_added:
+                    # add permissions for the first camp that is not read_only
+                    self.add_team_permissions(camp)
 
                 self.create_camp_team_tasks(camp, teams)
 
