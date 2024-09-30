@@ -323,7 +323,9 @@ class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView
     def form_valid(self, form):
         # does the user have facilitator permission for the team in charge of this facility type?
         if (
-            form.cleaned_data["facility_type"].responsible_team.facilitator_permission_set
+            form.cleaned_data[
+                "facility_type"
+            ].responsible_team.facilitator_permission_set
             not in self.request.user.get_all_permissions()
         ):
             messages.error("No thanks")
