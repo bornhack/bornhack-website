@@ -2127,8 +2127,8 @@ class Command(BaseCommand):
                         [9.941149, 55.388035],
                         [9.94132, 55.388201],
                         [9.941073, 55.388305],
-                    ]
-                )
+                    ],
+                ),
             ),
             color="#ff00ffff",
             icon="fa fa-hand-paper",
@@ -2160,8 +2160,8 @@ class Command(BaseCommand):
                         [9.940943, 55.38754],
                         [9.940535, 55.387521],
                         [9.940803, 55.38785],
-                    ]
-                )
+                    ],
+                ),
             ),
             color="#ff00ffff",
             icon="fa fa-list",

@@ -26,8 +26,8 @@ class LayerMapperViewMixin(LayerViewMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if (
-            self.layer.responsible_team and
-            self.layer.responsible_team.mapper_permission_set
+            self.layer.responsible_team
+            and self.layer.responsible_team.mapper_permission_set
             not in request.user.get_all_permissions()
         ):
             messages.error(request, "No thanks")
