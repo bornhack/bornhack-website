@@ -305,6 +305,14 @@
             <p class="list-group-item-text">Use this view to manage map layers.</p>
           </a>
         {% endif %}
+
+        {% if perms.camps.orga_team_member or is_team_lead %}
+          <h3>Permissions</h3>
+          <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="list-group-item">
+            <h4 class="list-group-item-heading">Manage Team Permissions</h4>
+            <p class="list-group-item-text">Use this view to manage team permissions.</p>
+          </a>
+        {% endif %}
       </div>
     </div>
   </div>

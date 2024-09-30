@@ -1687,18 +1687,6 @@ class Command(BaseCommand):
 
         # orga team
         memberships["orga"] = {}
-        memberships["orga"]["user1"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[1],
-            approved=True,
-            lead=True,
-        )
-        memberships["orga"]["user3"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[3],
-            approved=True,
-            lead=True,
-        )
         memberships["orga"]["user8"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[8],

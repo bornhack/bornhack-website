@@ -34,6 +34,8 @@ from .views import CoinifyBalanceListView
 from .views import CoinifyCSVImportView
 from .views import CoinifyDashboardView
 from .views import CoinifyInvoiceListView
+from .views import TeamPermissionIndexView
+from .views import TeamPermissionManageView
 from .views import CoinifyPayoutListView
 from .views import CredebtorDetailView
 from .views import CreditNoteDownloadView
@@ -1378,6 +1380,24 @@ urlpatterns = [
                     "<uuid:pk>/",
                     ShopTicketStatsDetailView.as_view(),
                     name="shop_ticket_stats_detail",
+                ),
+            ],
+        ),
+    ),
+    # team permissions
+    path(
+        "team_permissions/",
+        include(
+            [
+                path(
+                    "",
+                    TeamPermissionIndexView.as_view(),
+                    name="team_permission_index",
+                ),
+                path(
+                    "<slug:team_slug>/",
+                    TeamPermissionManageView.as_view(),
+                    name="team_permission_manage",
                 ),
             ],
         ),

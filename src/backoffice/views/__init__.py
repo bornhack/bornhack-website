@@ -10,3 +10,4 @@ from .maps import *  # noqa: F401, F403
 from .orga import *  # noqa: F401, F403
 from .pos import *  # noqa: F401, F403
 from .program import *  # noqa: F401, F403
+from .permissions import *  # noqa: F401, F403

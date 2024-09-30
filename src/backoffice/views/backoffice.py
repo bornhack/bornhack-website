@@ -65,12 +65,13 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
         for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
             # loop over user permissions and set context
             for user_perm in perms:
-                if user_perm.endswith(f"_team_{perm}"):
+                if user_perm.startswith("camps.") and user_perm.endswith(
+                    f"_team_{perm}",
+                ):
                     context[f"is_team_{perm}"] = True
                     break
             else:
                 context[f"is_team_{perm}"] = False
-
         return context
 
 

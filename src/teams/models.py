@@ -374,8 +374,10 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     def update_group_membership(self, deleted=False):
         """Ensure group membership for this team membership is correct."""
         if self.approved and not deleted:
+            logger.debug(f"Adding user {self.user} to group {self.team.group}")
             self.team.group.user_set.add(self.user)
         else:
+            logger.debug(f"Removing user {self.user} from group {self.team.group}")
             self.team.group.user_set.remove(self.user)
 
     def update_team_lead_permissions(self, deleted=False):
@@ -385,8 +387,14 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
             content_type=ContentType.objects.get_for_model(CampPermission),
         )
         if self.approved and self.lead and not deleted:
+            logger.debug(
+                f"Adding team lead permissions to user {self.user} for {self.team}",
+            )
             self.user.user_permissions.add(lead_perm)
         else:
+            logger.debug(
+                f"Removing team lead permissions from user {self.user} for {self.team}",
+            )
             self.user.user_permissions.remove(lead_perm)
 
 

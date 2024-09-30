@@ -266,3 +266,22 @@ class MapLayerFeaturesImportForm(forms.Form):
             raise ValidationError("Invalid GeoJSON - only FeatureCollection supported!")
         # all good
         return geojson
+
+
+class ManageTeamPermissionsForm(forms.Form):
+    """The form used in backoffice to manage permissions for a team."""
+
+    def __init__(self, matrix: dict[str, list[str]], *args, **kwargs):
+        """Build a form of bool fields for the teams users permissions."""
+        super().__init__(*args, **kwargs)
+        for username in matrix.keys():
+            for perm in matrix[username]:
+                if perm in ["lead", "member"]:
+                    disabled = True
+                else:
+                    disabled = False
+                self.fields[f"{username}_{perm}"] = forms.BooleanField(
+                    label=perm,
+                    required=False,
+                    disabled=disabled,
+                )

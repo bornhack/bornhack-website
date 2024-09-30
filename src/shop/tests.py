@@ -600,7 +600,6 @@ class TestRefund(TestCase):
         )
         infoteam.group.permissions.add(permission)
         TeamMember.objects.create(user=cls.info_user, team=infoteam, approved=True)
-        print(cls.info_user.get_all_permissions())
         cls.bundle_product = ProductFactory()
         cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
         SubProductRelationFactory(

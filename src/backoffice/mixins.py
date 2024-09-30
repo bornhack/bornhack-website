@@ -70,3 +70,18 @@ class PosViewMixin(CampViewMixin, UserPassesTestMixin):
         context = super().get_context_data(*args, **kwargs)
         context["pos"] = self.pos
         return context
+
+
+class OrgaOrTeamLeadViewMixin(CampViewMixin, UserPassesTestMixin):
+    """A mixin for views that should be accessible only to orga and team leads."""
+
+    def test_func(self):
+        """
+        This view requires camps.orga_team_member or camps.<any team>_team_lead permission.
+        """
+        if self.request.user.has_perm("camps.orga_team_member"):
+            return True
+        for perm in self.request.user.get_all_permissions():
+            if perm.startswith("camps.") and perm.endswith("_team_lead"):
+                return True
+        raise PermissionDenied("No thanks")
