@@ -2175,7 +2175,7 @@ class Command(BaseCommand):
                 if not read_only and not permissions_added:
                     # add permissions for the first camp that is not read_only
                     self.add_team_permissions(camp)
-                    permissions_added=True
+                    permissions_added = True
 
                 self.create_camp_team_tasks(camp, teams)
 
