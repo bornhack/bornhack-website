@@ -14,6 +14,8 @@ from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import GeometryCollection
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -79,6 +81,9 @@ from tokens.models import Token
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
+from maps.models import Group as MapGroup
+from maps.models import Layer
+from maps.models import Feature
 
 fake = Faker()
 # Faker.seed(0)
@@ -2100,6 +2105,49 @@ class Command(BaseCommand):
             )
             team.group.permissions.add(permission)
 
+    def create_maps_layer_generic(self):
+        group = MapGroup.objects.create(name="Generic")
+        layer = Layer.objects.create(
+                    name="Areas",
+                    slug="areas",
+                    description="Venue areas",
+                    icon="fa fa-list-ul",
+                    group=group,
+                    )
+        Feature.objects.create(
+                layer=layer,
+                name="Orga",
+                description="Orga Area",
+                geom=GeometryCollection(Polygon([[9.941073,55.388305],[9.940768,55.388103], [9.941146, 55.38796], [9.941149, 55.388035], [9.94132, 55.388201], [9.941073, 55.388305]])),
+                color="#ff00ffff",
+                icon="fa fa-hand-paper",
+                url="",
+                topic="",
+                processing="",
+                )
+
+    def create_camp_map_layer(self, camp):
+        group = MapGroup.objects.get(name="Generic")
+        team = Team.objects.get(name="Orga", camp=camp)
+        layer = Layer.objects.create(
+                    name="Team Area",
+                    description="Team areas",
+                    icon="fa fa-list-ul",
+                    group=group,
+                    responsible_team=team,
+                    )
+        Feature.objects.create(
+                layer=layer,
+                name="Team Area",
+                description="Some Team Area",
+                geom=GeometryCollection(Polygon([[9.940803,55.38785],[9.941136,55.387826],[9.941297,55.387662],[9.940943,55.38754],[9.940535,55.387521],[9.940803,55.38785]])),
+                color="#ff00ffff",
+                icon="fa fa-list",
+                url="",
+                topic="",
+                processing="",
+                )
+
     def output(self, message):
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
@@ -2144,6 +2192,8 @@ class Command(BaseCommand):
         self.create_coinify_stuff()
 
         self.create_epay_transactions()
+
+        self.create_maps_layer_generic()
 
         permissions_added = False
         for camp, read_only in camps:
@@ -2251,6 +2301,8 @@ class Command(BaseCommand):
                 self.create_camp_reimbursements(camp)
 
                 self.create_camp_revenues(camp)
+
+                self.create_camp_map_layer(camp)
             else:
                 self.output("Not creating anything for this year yet")
 
