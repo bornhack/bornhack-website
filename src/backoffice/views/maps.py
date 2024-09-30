@@ -50,6 +50,7 @@ class MapLayerListView(CampViewMixin, TeamMapperRequiredMixin, ListView):
 
 
 class MapLayerFeaturesImportView(
+    CampViewMixin,
     LayerMapperViewMixin,
     FormView,
 ):
@@ -198,7 +199,7 @@ class MapLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
         )
 
 
-class MapLayerUpdateView(LayerMapperViewMixin, UpdateView):
+class MapLayerUpdateView(CampViewMixin, LayerMapperViewMixin, UpdateView):
     model = Layer
     slug_url_kwarg = "layer_slug"
     template_name = "maps_layer_form.html"
@@ -234,7 +235,7 @@ class MapLayerUpdateView(LayerMapperViewMixin, UpdateView):
         )
 
 
-class MapLayerDeleteView(LayerMapperViewMixin, DeleteView):
+class MapLayerDeleteView(CampViewMixin, LayerMapperViewMixin, DeleteView):
     model = Layer
     template_name = "maps_layer_delete.html"
     slug_url_kwarg = "layer_slug"
