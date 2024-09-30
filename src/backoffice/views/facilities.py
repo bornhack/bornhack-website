@@ -330,7 +330,7 @@ class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView
         ):
             messages.error("No thanks")
             return self.form_invalid(form)
-        super().form_valid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, "The Facility has been created")
