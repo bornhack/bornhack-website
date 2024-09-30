@@ -21,15 +21,18 @@ class LayerViewMixin:
 
 
 class LayerMapperViewMixin(LayerViewMixin):
-    """A mixin for views only available to users with mapper permission for the team responsible for the layer."""
+    """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if (
-            self.layer.responsible_team
+            (self.layer.responsible_team
             and self.layer.responsible_team.mapper_permission_set
-            not in request.user.get_all_permissions()
+            in request.user.get_all_permissions()) or
+            self.request.user.has_perm("camps.gis_team_member")
         ):
+            return
+        else:
             messages.error(request, "No thanks")
             raise PermissionDenied()
 
@@ -51,8 +54,12 @@ class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if (
-            self.layer.responsible_team.mapper_permission_set
-            not in request.user.get_all_permissions()
+            (self.layer.responsible_team
+            and self.layer.responsible_team.mapper_permission_set
+            in request.user.get_all_permissions()) or
+            self.request.user.has_perm("camps.gis_team_member")
         ):
+            return
+        else:
             messages.error(request, "No thanks")
             raise PermissionDenied()
