@@ -48,7 +48,7 @@ class ExternalLayerViewMixin(CampViewMixin):
 
 
 class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
-    """A mixin for views only available to users with mapper permission for the team responsible for the external layer."""
+    """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
