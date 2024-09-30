@@ -41,12 +41,13 @@ class FacilityViewMixin(CampViewMixin):
         have no indication of which field is for what. So we add a nice placeholder.
         """
         form = super().get_form(*args, **kwargs)
-        form.fields["when"].widget.widgets[0].attrs = {
-            "placeholder": f"Open Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
-        form.fields["when"].widget.widgets[1].attrs = {
-            "placeholder": f"Close Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
+        if "when" in form.fields:
+            form.fields["when"].widget.widgets[0].attrs = {
+                "placeholder": f"Open Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
+            }
+            form.fields["when"].widget.widgets[1].attrs = {
+                "placeholder": f"Close Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
+            }
         return form
 
     def get_context_data(self, **kwargs):

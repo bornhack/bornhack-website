@@ -186,10 +186,16 @@ class MapLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
         """
         Do not show teams that are not part of the current camp in the dropdown
         """
+        # get the teams the current user has facilitator permission for
+        perms = self.request.user.get_all_permissions()
+        team_slugs = [
+            perm.split(".")[1].split("_")[0]
+            for perm in perms
+            if perm.endswith("_mapper")
+        ]
+        teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
+        context["form"].fields["responsible_team"].queryset = teams
         return context
 
     def get_success_url(self):
@@ -222,10 +228,16 @@ class MapLayerUpdateView(CampViewMixin, LayerMapperViewMixin, UpdateView):
         """
         Do not show teams that are not part of the current camp in the dropdown
         """
+        # get the teams the current user has facilitator permission for
+        perms = self.request.user.get_all_permissions()
+        team_slugs = [
+            perm.split(".")[1].split("_")[0]
+            for perm in perms
+            if perm.endswith("_mapper")
+        ]
+        teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
+        context["form"].fields["responsible_team"].queryset = teams
         return context
 
     def get_success_url(self):

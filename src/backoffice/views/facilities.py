@@ -281,7 +281,7 @@ class FacilityDetailView(TeamFacilitatorRequiredMixin, DetailView):
         return qs.prefetch_related("opening_hours")
 
 
-class FacilityCreateView(TeamFacilitatorRequiredMixin, CreateView):
+class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView):
     model = Facility
     template_name = "facility_form.html"
     fields = ["facility_type", "name", "description", "location"]
@@ -323,7 +323,7 @@ class FacilityCreateView(TeamFacilitatorRequiredMixin, CreateView):
     def form_valid(self, form):
         # does the user have facilitator permission for the team in charge of this facility type?
         if (
-            form.cleaned_data["facility_type"].team.facilitator_permission_set
+            form.cleaned_data["facility_type"].responsible_team.facilitator_permission_set
             not in self.request.user.get_all_permissions()
         ):
             messages.error("No thanks")
