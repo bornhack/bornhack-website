@@ -9,9 +9,12 @@ from django.contrib.contenttypes.models import ContentType
 from teams.models import Team
 from django.views.generic import ListView, FormView
 from ..mixins import OrgaOrTeamLeadViewMixin
+from django.contrib.auth.models import User
 from ..forms import ManageTeamPermissionsForm
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+
+permission_content_type = ContentType.objects.get_for_model(CampPermission)
 
 
 class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
@@ -104,7 +107,6 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             if perm not in ["lead", "member"]
         ]
         # loop over perms and build a dict for use later
-        permission_content_type = ContentType.objects.get_for_model(CampPermission)
         team_permissions = {}
         for perm in perms:
             team_permissions[perm] = Permission.objects.get(
@@ -138,3 +140,34 @@ class TeamPermissionManageView(CampViewMixin, FormView):
                 kwargs={"camp_slug": self.camp.slug, "team_slug": self.team.slug},
             ),
         )
+
+
+class PermissionByUserView(OrgaOrTeamLeadViewMixin, ListView):
+    model = User
+    template_name = "permissions_by_user.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        users = qs.filter(user_permissions__isnull=False) | qs.filter(
+            groups__permissions__isnull=False
+        )
+        return users.distinct()
+
+
+class PermissionByPermissionView(OrgaOrTeamLeadViewMixin, ListView):
+    model = Permission
+    template_name = "permissions_by_permission.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        perms = []
+        for perm in qs.filter(content_type=permission_content_type):
+            perms.append(
+                (
+                    perm,
+                    User.objects.with_perm(
+                        perm, backend="django.contrib.auth.backends.ModelBackend"
+                    ).exclude(is_superuser=True),
+                )
+            )
+        return perms

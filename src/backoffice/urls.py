@@ -164,6 +164,8 @@ from .views import ZettleBalanceListView
 from .views import ZettleDashboardView
 from .views import ZettleDataImportView
 from .views import ZettleReceiptListView
+from .views import PermissionByUserView
+from .views import PermissionByPermissionView
 
 app_name = "backoffice"
 
@@ -1398,6 +1400,23 @@ urlpatterns = [
                     "<slug:team_slug>/",
                     TeamPermissionManageView.as_view(),
                     name="team_permission_manage",
+                ),
+            ],
+        ),
+    ),
+    path(
+        "permissions/",
+        include(
+            [
+                path(
+                    "by_user/",
+                    PermissionByUserView.as_view(),
+                    name="permission_list_by_user",
+                ),
+                path(
+                    "by_permission/",
+                    PermissionByPermissionView.as_view(),
+                    name="permission_list_by_permission",
                 ),
             ],
         ),
