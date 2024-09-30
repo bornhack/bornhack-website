@@ -26,11 +26,10 @@ class LayerMapperViewMixin(LayerViewMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if (
-            (self.layer.responsible_team
+            self.layer.responsible_team
             and self.layer.responsible_team.mapper_permission_set
-            in request.user.get_all_permissions()) or
-            self.request.user.has_perm("camps.gis_team_member")
-        ):
+            in request.user.get_all_permissions()
+        ) or self.request.user.has_perm("camps.gis_team_member"):
             return
         else:
             messages.error(request, "No thanks")
@@ -54,11 +53,10 @@ class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if (
-            (self.layer.responsible_team
+            self.layer.responsible_team
             and self.layer.responsible_team.mapper_permission_set
-            in request.user.get_all_permissions()) or
-            self.request.user.has_perm("camps.gis_team_member")
-        ):
+            in request.user.get_all_permissions()
+        ) or self.request.user.has_perm("camps.gis_team_member"):
             return
         else:
             messages.error(request, "No thanks")
