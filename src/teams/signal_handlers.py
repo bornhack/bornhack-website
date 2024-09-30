@@ -19,8 +19,9 @@ def teammember_saved(sender, instance, created, **kwargs):
             logger.error("Error adding email to outgoing queue")
         return
 
-    # make sure the teams group membership is uptodate
+    # make sure the teams group membership and permission is uptodate
     instance.update_group_membership()
+    instance.update_team_lead_permissions()
 
 
 def teammember_deleted(sender, instance, **kwargs):
@@ -42,7 +43,8 @@ def teammember_deleted(sender, instance, **kwargs):
         pass
 
     # make sure the teams group membership is uptodate
-    instance.update_group_membership()
+    instance.update_group_membership(deleted=True)
+    instance.update_team_lead_permissions(deleted=True)
 
 
 def team_saved(sender, instance, created, **kwargs):

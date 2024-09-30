@@ -1,4 +1,7 @@
+from django.contrib.contenttypes.models import ContentType
 import logging
+from camps.models import Permission as CampPermission
+
 
 from django.conf import settings
 from django.contrib.postgres.fields import DateTimeRangeField
@@ -6,7 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
@@ -368,12 +371,23 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     camp_filter = "team__camp"
 
-    def update_group_membership(self):
+    def update_group_membership(self, deleted=False):
         """Ensure group membership for this team membership is correct."""
-        if self.approved:
+        if self.approved and not deleted:
             self.team.group.user_set.add(self.user)
         else:
             self.team.group.user_set.remove(self.user)
+
+    def update_team_lead_permissions(self, deleted=False):
+        """Ensure team lead perms for this team membership are correct."""
+        lead_perm = Permission.objects.get(
+            codename=f"{self.team.slug}_team_lead",
+            content_type=ContentType.objects.get_for_model(CampPermission),
+        )
+        if self.approved and self.lead and not deleted:
+            self.user.user_permissions.add(lead_perm)
+        else:
+            self.user.user_permissions.remove(lead_perm)
 
 
 class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
