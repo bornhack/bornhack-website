@@ -14,8 +14,6 @@ from ..forms import ManageTeamPermissionsForm
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 
-permission_content_type = ContentType.objects.get_for_model(CampPermission)
-
 
 class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
     model = Team
@@ -108,6 +106,7 @@ class TeamPermissionManageView(CampViewMixin, FormView):
         ]
         # loop over perms and build a dict for use later
         team_permissions = {}
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
         for perm in perms:
             team_permissions[perm] = Permission.objects.get(
                 content_type=permission_content_type,
@@ -161,6 +160,7 @@ class PermissionByPermissionView(OrgaOrTeamLeadViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         perms = []
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
         for perm in qs.filter(content_type=permission_content_type):
             perms.append(
                 (
