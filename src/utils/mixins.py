@@ -36,6 +36,57 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
     raise_exception = True
 
 
+class BaseTeamPermRequiredMixin:
+    """Base class for Team<foo>RequiredMixins."""
+
+    perm = None
+
+    def dispatch(self, request, *args, **kwargs):
+        user_perms = self.request.user.get_all_permissions()
+        for perm in user_perms:
+            if perm.endswith(f"_team_{self.perm}"):
+                # user has the permissio n in some team
+                return super().dispatch(request, *args, **kwargs)
+        messages.error(request, "No thanks")
+        raise PermissionDenied()
+
+
+class TeamLeadRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_lead" permission for any team."""
+
+    perm = "lead"
+
+
+class TeamMemberRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_member" permission for any team."""
+
+    perm = "member"
+
+
+class TeamMapperRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_mapper" permission for any team."""
+
+    perm = "mapper"
+
+
+class TeamFacilitatorRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_facilitator" permission for any team."""
+
+    perm = "facilitator"
+
+
+class TeamInfopagerRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_infopager" permission for any team."""
+
+    perm = "infopager"
+
+
+class TeamPosRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_pos" permission for any team."""
+
+    perm = "pos"
+
+
 class UserIsObjectOwnerMixin(UserPassesTestMixin):
     def test_func(self):
         return self.get_object().user == self.request.user

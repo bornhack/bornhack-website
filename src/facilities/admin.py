@@ -23,6 +23,7 @@ class FacilityTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Facility)
 class FacilityAdmin(LeafletGeoAdmin):
+    display_raw = True
     save_as = True
     list_display = [
         "name",

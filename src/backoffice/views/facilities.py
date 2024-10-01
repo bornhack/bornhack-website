@@ -1,14 +1,18 @@
+import json
 import logging
 
-from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.contrib.gis.geos import GEOSGeometry
 from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.shortcuts import render
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
+from django.views.generic.base import View
 from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
@@ -17,20 +21,106 @@ from leaflet.forms.widgets import LeafletWidget
 
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import RaisePermissionRequiredMixin
+from facilities.mixins import FacilityFacilitatorViewMixin
 from camps.mixins import CampViewMixin
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
 from facilities.models import FacilityOpeningHours
 from facilities.models import FacilityType
 from teams.models import Team
+from utils.widgets import IconPickerWidget
+from utils.mixins import TeamFacilitatorRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+
+
+# ########### FACILITY TYPES ######################
 
 
 class FacilityTypeListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list_backoffice.html"
     context_object_name = "facility_type_list"
+
+
+class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
+    model = FacilityType
+    template_name = "facility_type_import_backoffice.html"
+    context_object_name = "facility_type_import"
+
+    def get(self, request, *args, **kwargs):
+        return render(request, "facility_type_import_backoffice.html")
+
+    def post(self, request, camp_slug, slug):
+        geojson_data = request.POST.get("geojson_data")
+        facility_type = get_object_or_404(
+            FacilityType,
+            responsible_team__camp=self.camp,
+            slug=slug,
+        )
+        try:
+            geojson = json.loads(geojson_data)
+        except json.JSONDecodeError:
+            return render(
+                request,
+                "facility_type_import_backoffice.html",
+                {"error": "Invalid GeoJSON data"},
+            )
+
+        # Basic validation, you can add more checks
+        if "type" not in geojson or geojson["type"] != "FeatureCollection":
+            return render(
+                request,
+                "facility_type_import_backoffice.html",
+                {"error": "Invalid GeoJSON format"},
+            )
+
+        createdCount = 0
+        updateCount = 0
+        errorCount = 0
+        for feature in geojson["features"]:
+            try:
+                geom = GEOSGeometry(json.dumps(feature["geometry"]))
+            except (TypeError, AttributeError):
+                errorCount += 1
+                continue
+            props = feature["properties"]
+            if "description" in props:
+                if props["description"]:
+                    description = props["description"]
+                else:
+                    errorCount += 1
+                    continue
+            else:
+                errorCount += 1
+                continue
+            obj, created = Facility.objects.update_or_create(
+                name=props["name"],
+                description=description,
+                facility_type=facility_type,
+                location=geom,
+            )
+            if created:
+                createdCount += 1
+            else:
+                updateCount += 1
+        if createdCount > 0 or updateCount > 0:
+            messages.success(
+                self.request,
+                "%i features created, %i features updated"
+                % (createdCount, updateCount),
+            )
+        if errorCount > 0:
+            messages.error(
+                self.request,
+                "%i features with errors not imported" % (errorCount),
+            )
+        return HttpResponseRedirect(
+            reverse(
+                "backoffice:facility_type_list",
+                kwargs={"camp_slug": camp_slug},
+            ),
+        )
 
 
 class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
@@ -44,6 +134,11 @@ class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView)
         "responsible_team",
         "quickfeedback_options",
     ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
 
     def get_context_data(self, **kwargs):
         """
@@ -73,6 +168,11 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView)
         "responsible_team",
         "quickfeedback_options",
     ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
 
     def get_context_data(self, **kwargs):
         """
@@ -111,22 +211,77 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
         )
 
 
-class FacilityListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+# ########### FACILITIES ######################
+
+
+class FacilityListView(TeamFacilitatorRequiredMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+            "facility_list": [],
+        }
+        for item in context["facility_list"]:
+            context["mapData"]["facility_list"].append(
+                {
+                    "url": reverse(
+                        "backoffice:facility_detail",
+                        kwargs={
+                            "camp_slug": item.camp.slug,
+                            "facility_uuid": item.uuid,
+                        },
+                    ),
+                    "name": item.name,
+                    "description": item.description,
+                    "location": {
+                        "x": item.location.x,
+                        "y": item.location.y,
+                    },
+                    "facility_type": {
+                        "icon": item.facility_type.icon,
+                        "marker": item.facility_type.marker,
+                        "team": item.facility_type.responsible_team.name,
+                    },
+                },
+            )
+        return context
 
-class FacilityDetailView(CampViewMixin, OrgaTeamPermissionMixin, DetailView):
+
+class FacilityDetailView(TeamFacilitatorRequiredMixin, DetailView):
     model = Facility
     template_name = "facility_detail_backoffice.html"
     pk_url_kwarg = "facility_uuid"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "facility": {
+                "location": {
+                    "x": context["facility"].location.x,
+                    "y": context["facility"].location.y,
+                },
+                "name": context["facility"].name,
+                "facility_type": {
+                    "marker": context["facility"].facility_type.marker,
+                    "icon": context["facility"].facility_type.icon,
+                },
+                "description": context["facility"].description,
+            },
+            "grid": static("json/grid.geojson"),
+        }
+        return context
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         return qs.prefetch_related("opening_hours")
 
 
-class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
+class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView):
     model = Facility
     template_name = "facility_form.html"
     fields = ["facility_type", "name", "description", "location"]
@@ -142,30 +297,68 @@ class FacilityCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         """
-        Do not show types that are not part of the current camp in the dropdown
+        Do not show types that are not part of the current camp in the dropdown,
+        also hide types belonging to teams for which the user has no facilitator permission.
+        Also get map data.
         """
         context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": True,
+            "grid": static("json/grid.geojson"),
+        }
+        # get the teams the current user has facilitator permission for
+        perms = self.request.user.get_all_permissions()
+        team_slugs = [
+            perm.split(".")[1].split("_")[0]
+            for perm in perms
+            if perm.endswith("_facilitator")
+        ]
+        teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context["form"].fields["facility_type"].queryset = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
+            responsible_team__in=teams,
         )
         return context
+
+    def form_valid(self, form):
+        # does the user have facilitator permission for the team in charge of this facility type?
+        if (
+            form.cleaned_data[
+                "facility_type"
+            ].responsible_team.facilitator_permission_set
+            not in self.request.user.get_all_permissions()
+        ):
+            messages.error("No thanks")
+            return self.form_invalid(form)
+        return super().form_valid(form)
 
     def get_success_url(self):
         messages.success(self.request, "The Facility has been created")
         return reverse("backoffice:facility_list", kwargs={"camp_slug": self.camp.slug})
 
 
-class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class FacilityUpdateView(FacilityFacilitatorViewMixin, UpdateView):
+    """Update a facility. Requires facilitator permission for the team which is responsible for the facility type."""
+
     model = Facility
     template_name = "facility_form.html"
     pk_url_kwarg = "facility_uuid"
-    fields = ["facility_type", "name", "description", "location"]
+    fields = ["name", "description", "location"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+        }
+        return context
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
+                "map_height": "500px",
             },
         )
         return form
@@ -181,7 +374,9 @@ class FacilityUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         )
 
 
-class FacilityDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
+class FacilityDeleteView(FacilityFacilitatorViewMixin, DeleteView):
+    """Delete a facility. Requires facilitator permission for the team which is responsible for the facility type."""
+
     model = Facility
     template_name = "facility_delete.html"
     pk_url_kwarg = "facility_uuid"
@@ -196,17 +391,19 @@ class FacilityDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
         return reverse("backoffice:facility_list", kwargs={"camp_slug": self.camp.slug})
 
 
+# ############ FACILITY FEEDBACK #####################
+
+
 class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView):
+    """View to handle facility feedback. Available for anyone with member permission for the team."""
+
     template_name = "facilityfeedback_backoffice.html"
 
     def get_permission_required(self):
         """
-        This view requires two permissions, camps.backoffice_permission and
-        the permission_set for the team in question.
+        This view requires the member_permission_set for the team in question.
         """
-        if not self.team.permission_set:
-            raise PermissionDenied("No permissions set defined for this team")
-        return ["camps.backoffice_permission", self.team.permission_set]
+        return [self.team.member_permission_set]
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -252,34 +449,11 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
         )
 
 
-class FacilityMixin(CampViewMixin):
-    def setup(self, *args, **kwargs):
-        super().setup(*args, **kwargs)
-        self.facility = get_object_or_404(Facility, uuid=kwargs["facility_uuid"])
-
-    def get_form(self, *args, **kwargs):
-        """
-        The default range widgets are a bit shit because they eat the help_text and
-        have no indication of which field is for what. So we add a nice placeholder.
-        """
-        form = super().get_form(*args, **kwargs)
-        form.fields["when"].widget.widgets[0].attrs = {
-            "placeholder": f"Open Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
-        form.fields["when"].widget.widgets[1].attrs = {
-            "placeholder": f"Close Date and Time (YYYY-MM-DD HH:MM). Active time zone is {settings.TIME_ZONE}.",
-        }
-        return form
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["facility"] = self.facility
-        return context
+# ############ FACILITY OPENING HOURS #####################
 
 
 class FacilityOpeningHoursCreateView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     CreateView,
 ):
     model = FacilityOpeningHours
@@ -303,8 +477,7 @@ class FacilityOpeningHoursCreateView(
 
 
 class FacilityOpeningHoursUpdateView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     UpdateView,
 ):
     model = FacilityOpeningHours
@@ -320,8 +493,7 @@ class FacilityOpeningHoursUpdateView(
 
 
 class FacilityOpeningHoursDeleteView(
-    FacilityMixin,
-    OrgaTeamPermissionMixin,
+    FacilityFacilitatorViewMixin,
     DeleteView,
 ):
     model = FacilityOpeningHours

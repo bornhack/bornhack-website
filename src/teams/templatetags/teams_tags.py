@@ -13,8 +13,8 @@ def is_team_member(user, team):
 
 @register.simple_tag
 def membershipstatus(user, team, showicon=False):
-    if user in team.responsible_members.all():
-        text = "Responsible"
+    if user in team.leads.all():
+        text = "Lead"
         icon = "fa-star"
     elif user in team.approved_members.all():
         text = "Member"

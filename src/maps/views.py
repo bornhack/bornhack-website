@@ -1,18 +1,151 @@
+import json
 import logging
 import re
 
 import requests
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.serializers import serialize
+from django.db.models import Q
 from django.http import HttpResponse
+from django.templatetags.static import static
+from django.urls import reverse
 from django.views.generic import View
+from django.views.generic.base import TemplateView
+from jsonview.views import JsonView
+from PIL import ImageColor
 
+from .mixins import LayerViewMixin
+from .models import ExternalLayer
+from .models import Feature
+from .models import Layer
+from camps.mixins import CampViewMixin
+from facilities.models import FacilityType
+from utils.color import adjust_color
+from utils.color import is_dark
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class MissingCredentials(Exception):
     pass
+
+
+class MapMarkerView(TemplateView):
+    """
+    View for generating the coloured marker
+    """
+
+    template_name = "marker.svg"
+
+    @property
+    def color(self):
+        return ImageColor.getrgb("#" + self.kwargs["color"])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["stroke1"] = self.color
+        context["stroke0"] = (
+            adjust_color(self.color, -0.4)
+            if is_dark(self.color)
+            else adjust_color(self.color)
+        )
+        context["fill0"] = (
+            adjust_color(self.color, -0.4)
+            if is_dark(self.color)
+            else adjust_color(self.color)
+        )
+        context["fill1"] = self.color
+        return context
+
+    def render_to_response(self, context, **kwargs):
+        return super().render_to_response(
+            context,
+            content_type="image/svg+xml",
+            **kwargs,
+        )
+
+
+class MapView(CampViewMixin, TemplateView):
+    """
+    Global map view
+    """
+
+    template_name = "maps_map.html"
+    context_object_name = "maps_map"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["facilitytype_list"] = FacilityType.objects.filter(
+            responsible_team__camp=self.camp,
+        )
+        context["layers"] = Layer.objects.filter(
+            Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
+        )
+        context["externalLayers"] = ExternalLayer.objects.filter(
+            Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
+        )
+        context["mapData"] = {
+            "facilitytype_list": list(context["facilitytype_list"].values()),
+            "layers": list(
+                context["layers"].values(
+                    "description",
+                    "name",
+                    "slug",
+                    "uuid",
+                    "icon",
+                    "invisible",
+                    "group__name",
+                ),
+            ),
+            "externalLayers": list(context["externalLayers"].values()),
+            "villages": reverse(
+                "villages_geojson",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
+            "loggedIn": self.request.user.is_authenticated,
+            "grid": static("json/grid.geojson"),
+        }
+        for facility in context["mapData"]["facilitytype_list"]:
+            facility["url"] = reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": self.camp.slug,
+                    "facility_type_slug": facility["slug"],
+                },
+            )
+        for layer in context["mapData"]["layers"]:
+            layer["url"] = reverse(
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer["slug"]},
+            )
+        return context
+
+
+class LayerGeoJSONView(LayerViewMixin, JsonView):
+    """
+    GeoJSON export view
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = json.loads(
+            serialize(
+                "geojson",
+                Feature.objects.filter(layer=self.layer.uuid),
+                geometry_field="geom",
+                fields=[
+                    "name",
+                    "description",
+                    "color",
+                    "url",
+                    "icon",
+                    "topic",
+                    "processing",
+                ],
+            ),
+        )
+        return context
 
 
 class MapProxyView(View):
@@ -24,6 +157,7 @@ class MapProxyView(View):
     PROXY_URL = "/maps/kfproxy"
     VALID_ENDPOINTS = [
         "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
+        "/GeoDanmarkOrto/orto_foraar/1.0.0/WMS",
         "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
         "/DHMNedboer/dhm/1.0.0/wms",
     ]

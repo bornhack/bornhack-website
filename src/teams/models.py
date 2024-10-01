@@ -1,4 +1,7 @@
+from django.contrib.contenttypes.models import ContentType
 import logging
+from camps.models import Permission as CampPermission
+
 
 from django.conf import settings
 from django.contrib.postgres.fields import DateTimeRangeField
@@ -6,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
+from django.contrib.auth.models import Group, Permission
 
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
@@ -48,6 +52,14 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     name = models.CharField(max_length=255, help_text="The team name")
 
+    group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text="The django group carrying the team permissions for this team.",
+    )
+
     slug = models.SlugField(
         max_length=255,
         blank=True,
@@ -59,13 +71,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     )
 
     description = models.TextField()
-
-    permission_set = models.CharField(
-        max_length=100,
-        blank=True,
-        default="",
-        help_text="The name of this Teams set of permissions. Must be a value from camps.models.Permission.Meta.permissions.",
-    )
 
     needs_members = models.BooleanField(
         default=True,
@@ -172,6 +177,12 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         if not self.shortslug:
             self.shortslug = self.slug
 
+        # generate group if needed
+        if not self.group:
+            self.group = Group.objects.create(
+                name=f"{self.camp.slug}-{self.slug}-team",
+            )
+
         super().save(**kwargs)
 
     def clean(self):
@@ -255,39 +266,63 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         return self.members.filter(teammember__approved=False)
 
     @property
-    def responsible_members(self):
+    def leads(self):
         """
-        Return only approved and responsible members
-        Used to handle permissions for team management
+        Return only approved team leads
+        Used to handle permissions for team leads
         """
         return self.members.filter(
             teammember__approved=True,
-            teammember__responsible=True,
+            teammember__lead=True,
         )
 
     @property
     def regular_members(self):
         """
-        Return only approved and not responsible members with
+        Return only approved and not lead members with
         an approved public_credit_name.
         Used on the people pages.
         """
         return self.members.filter(
             teammember__approved=True,
-            teammember__responsible=False,
+            teammember__lead=False,
         )
 
     @property
     def unnamed_members(self):
         """
-        Returns only approved and not responsible members,
+        Returns only approved and not team lead members,
         without an approved public_credit_name.
         """
         return self.members.filter(
             teammember__approved=True,
-            teammember__responsible=False,
+            teammember__lead=False,
             profile__public_credit_name_approved=False,
         )
+
+    @property
+    def member_permission_set(self):
+        return f"camps.{self.slug}_team_member"
+
+    @property
+    def mapper_permission_set(self):
+        return f"camps.{self.slug}_team_mapper"
+
+    @property
+    def facilitator_permission_set(self):
+        return f"camps.{self.slug}_team_facilitator"
+
+    @property
+    def lead_permission_set(self):
+        return f"camps.{self.slug}_team_lead"
+
+    @property
+    def pos_permission_set(self):
+        return f"camps.{self.slug}_team_pos"
+
+    @property
+    def infopager_permission_set(self):
+        return f"camps.{self.slug}_team_infopager"
 
 
 class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
@@ -308,7 +343,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
         help_text="True if this membership is approved. False if not.",
     )
 
-    responsible = models.BooleanField(
+    lead = models.BooleanField(
         default=False,
         help_text="True if this teammember is responsible for this Team. False if not.",
     )
@@ -319,13 +354,13 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     )
 
     class Meta:
-        ordering = ["-responsible", "-approved"]
+        ordering = ["-lead", "-approved"]
 
     def __str__(self):
         return "{} is {} {} member of team {}".format(
             self.user,
             "" if self.approved else "an unapproved",
-            "" if not self.responsible else "a responsible",
+            "" if not self.lead else "a lead",
             self.team,
         )
 
@@ -335,6 +370,32 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
         return self.team.camp
 
     camp_filter = "team__camp"
+
+    def update_group_membership(self, deleted=False):
+        """Ensure group membership for this team membership is correct."""
+        if self.approved and not deleted:
+            logger.debug(f"Adding user {self.user} to group {self.team.group}")
+            self.team.group.user_set.add(self.user)
+        else:
+            logger.debug(f"Removing user {self.user} from group {self.team.group}")
+            self.team.group.user_set.remove(self.user)
+
+    def update_team_lead_permissions(self, deleted=False):
+        """Ensure team lead perms for this team membership are correct."""
+        lead_perm = Permission.objects.get(
+            codename=f"{self.team.slug}_team_lead",
+            content_type=ContentType.objects.get_for_model(CampPermission),
+        )
+        if self.approved and self.lead and not deleted:
+            logger.debug(
+                f"Adding team lead permissions to user {self.user} for {self.team}",
+            )
+            self.user.user_permissions.add(lead_perm)
+        else:
+            logger.debug(
+                f"Removing team lead permissions from user {self.user} for {self.team}",
+            )
+            self.user.user_permissions.remove(lead_perm)
 
 
 class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):

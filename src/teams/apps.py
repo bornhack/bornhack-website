@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 
 from .signal_handlers import teammember_deleted
 from .signal_handlers import teammember_saved
+from .signal_handlers import team_saved
 
 
 class TeamsConfig(AppConfig):
@@ -19,5 +20,10 @@ class TeamsConfig(AppConfig):
         post_delete.connect(
             teammember_deleted,
             sender="teams.TeamMember",
-            dispatch_uid="teammember_save_signal",
+            dispatch_uid="teammember_delete_signal",
+        )
+        post_save.connect(
+            team_saved,
+            sender="teams.Team",
+            dispatch_uid="team_save_signal",
         )

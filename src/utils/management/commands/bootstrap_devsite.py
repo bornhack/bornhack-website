@@ -1,4 +1,8 @@
+from camps.models import Permission as CampPermission
+from django.contrib.contenttypes.models import ContentType
+
 import logging
+from django.contrib.auth.models import Permission
 import random
 import sys
 from datetime import datetime
@@ -10,6 +14,8 @@ from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Polygon
+from django.contrib.gis.geos import GeometryCollection
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -75,6 +81,9 @@ from tokens.models import Token
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
+from maps.models import Group as MapGroup
+from maps.models import Layer
+from maps.models import Feature
 
 fake = Faker()
 # Faker.seed(0)
@@ -307,6 +316,7 @@ class Command(BaseCommand):
                 "colour": "#73d7ee",
                 "read_only": False,
                 "light_text": False,
+                "add_permissions": True,
             },
             {
                 "year": 2025,
@@ -349,6 +359,7 @@ class Command(BaseCommand):
                             tz.localize(datetime(year, 9, 5, 12, 0)),
                         ),
                         colour=camp["colour"],
+                        light_text=camp.get("light_text", True),
                     ),
                     read_only,
                 ),
@@ -1517,63 +1528,53 @@ class Command(BaseCommand):
             description="The Orga team are the main organisers. All tasks are Orga responsibility until they are delegated to another team",
             camp=camp,
             needs_members=False,
-            permission_set="orgateam_permission",
         )
         teams["info"] = Team.objects.create(
             name="Info",
             description="Info team manage the info pages and the info desk.",
             camp=camp,
-            permission_set="infoteam_permission",
         )
         teams["poc"] = Team.objects.create(
             name="POC",
             description="The POC team is in charge of establishing and running a phone network onsite.",
             camp=camp,
-            permission_set="pocteam_permission",
         )
         teams["noc"] = Team.objects.create(
             name="NOC",
             description="The NOC team is in charge of establishing and running a network onsite.",
             camp=camp,
-            permission_set="nocteam_permission",
         )
         teams["bar"] = Team.objects.create(
             name="Bar",
             description="The Bar team plans, builds and run the IRL bar!",
             camp=camp,
-            permission_set="barteam_permission",
         )
         teams["shuttle"] = Team.objects.create(
             name="Shuttle",
             description="The shuttle team drives people to and from the trainstation or the supermarket",
             camp=camp,
-            permission_set="shuttleteam_permission",
         )
         teams["power"] = Team.objects.create(
             name="Power",
             description="The power team makes sure we have power all over the venue",
             camp=camp,
-            permission_set="powerteam_permission",
         )
         teams["shit"] = Team.objects.create(
             name="Sanitation",
             description="Team shit takes care of the toilets",
             camp=camp,
-            permission_set="sanitationteam_permission",
         )
         teams["content"] = Team.objects.create(
             name="Content",
             description="The Content Team handles stuff on the program",
             camp=camp,
             mailing_list="content@example.com",
-            permission_set="contentteam_permission",
         )
         teams["economy"] = Team.objects.create(
             name="Economy",
             description="The Economy Team handles the money and accounts.",
             camp=camp,
             mailing_list="economy@example.com",
-            permission_set="economyteam_permission",
         )
         camp.economy_team = teams["economy"]
         camp.save()
@@ -1638,7 +1639,7 @@ class Command(BaseCommand):
             team=teams["noc"],
             user=users[4],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["noc"]["user1"] = TeamMember.objects.create(
             team=teams["noc"],
@@ -1661,13 +1662,13 @@ class Command(BaseCommand):
             team=teams["bar"],
             user=users[1],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["bar"]["user3"] = TeamMember.objects.create(
             team=teams["bar"],
             user=users[3],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["bar"]["user2"] = TeamMember.objects.create(
             team=teams["bar"],
@@ -1686,35 +1687,23 @@ class Command(BaseCommand):
 
         # orga team
         memberships["orga"] = {}
-        memberships["orga"]["user1"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[1],
-            approved=True,
-            responsible=True,
-        )
-        memberships["orga"]["user3"] = TeamMember.objects.create(
-            team=teams["orga"],
-            user=users[3],
-            approved=True,
-            responsible=True,
-        )
         memberships["orga"]["user8"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[8],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user9"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[9],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["orga"]["user4"] = TeamMember.objects.create(
             team=teams["orga"],
             user=users[4],
             approved=True,
-            responsible=True,
+            lead=True,
         )
 
         # shuttle team
@@ -1723,7 +1712,7 @@ class Command(BaseCommand):
             team=teams["shuttle"],
             user=users[7],
             approved=True,
-            responsible=True,
+            lead=True,
         )
         memberships["shuttle"]["user3"] = TeamMember.objects.create(
             team=teams["shuttle"],
@@ -1739,7 +1728,7 @@ class Command(BaseCommand):
         TeamMember.objects.create(
             team=teams["economy"],
             user=users[0],
-            responsible=True,
+            lead=True,
             approved=True,
         )
         return memberships
@@ -2093,6 +2082,82 @@ class Command(BaseCommand):
         self.output(f"Creating revenues for {camp}...")
         RevenueFactory.create_batch(20, camp=camp)
 
+    def add_team_permissions(self, camp):
+        """Assign member permissions to the team groups for this camp."""
+        self.output(f"Assigning permissions to team groups for {camp}...")
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        for team in camp.teams.all():
+            permission = Permission.objects.get(
+                content_type=permission_content_type,
+                codename=f"{team.slug}_team_member",
+            )
+            team.group.permissions.add(permission)
+
+    def create_maps_layer_generic(self):
+        group = MapGroup.objects.create(name="Generic")
+        layer = Layer.objects.create(
+            name="Areas",
+            slug="areas",
+            description="Venue areas",
+            icon="fa fa-list-ul",
+            group=group,
+        )
+        Feature.objects.create(
+            layer=layer,
+            name="Orga",
+            description="Orga Area",
+            geom=GeometryCollection(
+                Polygon(
+                    [
+                        [9.941073, 55.388305],
+                        [9.940768, 55.388103],
+                        [9.941146, 55.38796],
+                        [9.941149, 55.388035],
+                        [9.94132, 55.388201],
+                        [9.941073, 55.388305],
+                    ],
+                ),
+            ),
+            color="#ff00ffff",
+            icon="fa fa-hand-paper",
+            url="",
+            topic="",
+            processing="",
+        )
+
+    def create_camp_map_layer(self, camp):
+        group = MapGroup.objects.get(name="Generic")
+        team = Team.objects.get(name="Orga", camp=camp)
+        layer = Layer.objects.create(
+            name="Team Area",
+            description="Team areas",
+            icon="fa fa-list-ul",
+            group=group,
+            responsible_team=team,
+        )
+        Feature.objects.create(
+            layer=layer,
+            name="Team Area",
+            description="Some Team Area",
+            geom=GeometryCollection(
+                Polygon(
+                    [
+                        [9.940803, 55.38785],
+                        [9.941136, 55.387826],
+                        [9.941297, 55.387662],
+                        [9.940943, 55.38754],
+                        [9.940535, 55.387521],
+                        [9.940803, 55.38785],
+                    ],
+                ),
+            ),
+            color="#ff00ffff",
+            icon="fa fa-list",
+            url="",
+            topic="",
+            processing="",
+        )
+
     def output(self, message):
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
@@ -2138,6 +2203,9 @@ class Command(BaseCommand):
 
         self.create_epay_transactions()
 
+        self.create_maps_layer_generic()
+
+        permissions_added = False
         for camp, read_only in camps:
             year = camp.camp.lower.year
 
@@ -2163,6 +2231,11 @@ class Command(BaseCommand):
                 self.create_camp_news(camp)
 
                 teams = self.create_camp_teams(camp)
+
+                if not read_only and not permissions_added:
+                    # add permissions for the first camp that is not read_only
+                    self.add_team_permissions(camp)
+                    permissions_added = True
 
                 self.create_camp_team_tasks(camp, teams)
 
@@ -2238,6 +2311,8 @@ class Command(BaseCommand):
                 self.create_camp_reimbursements(camp)
 
                 self.create_camp_revenues(camp)
+
+                self.create_camp_map_layer(camp)
             else:
                 self.output("Not creating anything for this year yet")
 

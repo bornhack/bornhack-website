@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.sites",
     "django.contrib.gis",
+    "colorfield",
     "channels",
     "corsheaders",
     "profiles",
@@ -96,6 +97,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.current_order",
                 "camps.context_processors.camp",
+                "utils.context_processors.is_volunteer",
             ],
         },
     },
@@ -194,6 +196,8 @@ LOGGING = {
 
 GRAPHENE = {"SCHEMA": "bornhack.schema.schema"}
 LEAFLET_CONFIG = {
+    "DEFAULT_CENTER": (55.38723, 9.94080),
+    "DEFAULT_ZOOM": 17,
     "PLUGINS": {"forms": {"auto-include": True}},
 }
 
@@ -229,3 +233,14 @@ SHORT_DATE_FORMAT = "Ymd"
 TIME_FORMAT = "H:i"
 
 WEASYPRINT_BASEURL = "/"
+
+# all these permissions are created for each team,
+# for example bar_team_lead, bar_team_member, etc.
+BORNHACK_TEAM_PERMISSIONS = {
+    "lead": "Team lead - members and permissions management",
+    "member": "Team member",
+    "mapper": "Team mapper - layers and feature management",
+    "facilitator": "Team facilitator - facilities management",
+    "infopager": "Team infopager - infopage management",
+    "pos": "Team Pos - Point-of-sale report submission",
+}

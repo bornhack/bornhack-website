@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from teams.views.mixins import TeamInfopagerPermissionMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -6,19 +6,14 @@ from django.views.generic import ListView
 from django.views.generic import UpdateView
 from reversion.views import RevisionMixin
 
-from ..models import Team
-from .mixins import EnsureTeamResponsibleMixin
 from .mixins import TeamViewMixin
-from camps.mixins import CampViewMixin
 from info.models import InfoCategory
 from info.models import InfoItem
 
 
 class InfoCategoriesListView(
-    LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    TeamInfopagerPermissionMixin,
     ListView,
 ):
     model = InfoCategory
@@ -26,18 +21,10 @@ class InfoCategoriesListView(
     slug_field = "anchor"
     active_menu = "info_categories"
 
-    def get_team(self):
-        return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"],
-            slug=self.kwargs["team_slug"],
-        )
-
 
 class InfoItemCreateView(
-    LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    TeamInfopagerPermissionMixin,
     CreateView,
 ):
     model = InfoItem
@@ -45,12 +32,6 @@ class InfoItemCreateView(
     fields = ["headline", "body", "anchor", "weight"]
     slug_field = "anchor"
     active_menu = "info_categories"
-
-    def get_team(self):
-        return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"],
-            slug=self.kwargs["team_slug"],
-        )
 
     def form_valid(self, form):
         info_item = form.save(commit=False)
@@ -75,10 +56,8 @@ class InfoItemCreateView(
 
 
 class InfoItemUpdateView(
-    LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    TeamInfopagerPermissionMixin,
     RevisionMixin,
     UpdateView,
 ):
@@ -89,12 +68,6 @@ class InfoItemUpdateView(
     slug_url_kwarg = "item_anchor"
     active_menu = "info_categories"
 
-    def get_team(self):
-        return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"],
-            slug=self.kwargs["team_slug"],
-        )
-
     def get_success_url(self):
         next = self.request.GET.get("next")
         if next:
@@ -103,10 +76,8 @@ class InfoItemUpdateView(
 
 
 class InfoItemDeleteView(
-    LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    TeamInfopagerPermissionMixin,
     RevisionMixin,
     DeleteView,
 ):
@@ -115,12 +86,6 @@ class InfoItemDeleteView(
     slug_field = "anchor"
     slug_url_kwarg = "item_anchor"
     active_menu = "info_categories"
-
-    def get_team(self):
-        return Team.objects.get(
-            camp__slug=self.kwargs["camp_slug"],
-            slug=self.kwargs["team_slug"],
-        )
 
     def get_success_url(self):
         next = self.request.GET.get("next")

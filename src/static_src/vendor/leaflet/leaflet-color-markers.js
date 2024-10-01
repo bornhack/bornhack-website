@@ -80,3 +80,8 @@ var blackIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
+
+var toiletIcon = L.AwesomeMarkers.icon({
+    icon: 'toilet',
+    markerColor: 'red'
+  });

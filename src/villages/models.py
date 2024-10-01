@@ -1,3 +1,5 @@
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
@@ -27,6 +29,12 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
 
     deleted = models.BooleanField(default=False)
     approved = models.BooleanField(default=False)
+
+    # default to near general camping
+    location = PointField(
+        default=Point(9.9401295, 55.3881695),
+        help_text="The location of this village.",
+    )
 
     def __str__(self):
         return f"{self.name} ({self.camp.title})"

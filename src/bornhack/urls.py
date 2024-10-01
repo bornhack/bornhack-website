@@ -14,13 +14,16 @@ from camps.views import CampRedirectView
 from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
+from maps.views import MapView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
 from villages.views import VillageCreateView
 from villages.views import VillageDeleteView
 from villages.views import VillageDetailView
+from villages.views import VillageListGeoJSONView
 from villages.views import VillageListView
+from villages.views import VillageMapView
 from villages.views import VillageUpdateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
@@ -145,6 +148,7 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
+                path("map/", MapView.as_view(), name="maps_map"),
                 path("bar/menu/", MenuView.as_view(), name="menu"),
                 path(
                     "villages/",
@@ -155,6 +159,16 @@ urlpatterns = [
                                 "create/",
                                 VillageCreateView.as_view(),
                                 name="village_create",
+                            ),
+                            path(
+                                "geojson/",
+                                VillageListGeoJSONView.as_view(),
+                                name="villages_geojson",
+                            ),
+                            path(
+                                "map/",
+                                VillageMapView.as_view(),
+                                name="villages_map",
                             ),
                             path(
                                 "<slug:slug>/delete/",

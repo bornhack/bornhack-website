@@ -22,6 +22,6 @@ class InfoItemInlineAdmin(admin.StackedInline):
 class InfoCategoryAdmin(admin.ModelAdmin):
     save_as = True
     list_filter = ["team__camp"]
-    list_display = ["headline"]
+    list_display = ["headline", "team"]
     search_fields = ["headline", "body"]
     inlines = [InfoItemInlineAdmin]

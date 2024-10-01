@@ -55,9 +55,7 @@ def add_new_membership_email(membership):
         responsible_team=membership.team,
         text_template="emails/new_membership_email.txt",
         html_template="emails/new_membership_email.html",
-        to_recipients=[
-            resp.email for resp in membership.team.responsible_members.all()
-        ],
+        to_recipients=[resp.email for resp in membership.team.leads.all()],
         formatdict=formatdict,
         subject="New membership request for {} at {}".format(
             membership.team.name,
