@@ -4,7 +4,7 @@ django-debug-toolbar==4.4.6
 factory_boy==3.3.1
 coverage==7.6.1
 pre-commit==3.8.0
-hypothesis==6.112.1
+hypothesis==6.112.2
 tblib==3.0.0
 unittest-xml-reporting==3.2.0
 pipdeptree==2.23.4
