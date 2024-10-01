@@ -1,3 +1,4 @@
+# TODO: docstrings because what the hell is going on here
 def adjust_color(color, factor=0.4):
     if len(color) == 3:
         color = (*color, 1)
