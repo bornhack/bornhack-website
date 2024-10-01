@@ -186,7 +186,7 @@ class MapLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
         """
         Do not show teams that are not part of the current camp in the dropdown
         """
-        # get the teams the current user has facilitator permission for
+        # get the teams the current user has mapper permission for
         perms = self.request.user.get_all_permissions()
         team_slugs = [
             perm.split(".")[1].split("_")[0]
