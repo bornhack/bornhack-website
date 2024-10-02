@@ -23,6 +23,28 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
 
     template_name = "index.html"
 
+    def get_index_tabs(self, perms, context):
+        tabs = {}
+        if "camps.orga_team_member" in perms or context["facilityfeedback_teams"] or context["is_team_facilitator"]:
+            tabs["facilities"] = "Facilities"
+        if "camps.info_team_member" in perms:
+            tabs["info"] = "Info"
+        if "camps.content_team_member" in perms:
+            tabs['content'] = "Content"
+        if "camps.orga_team_member" in perms:
+            tabs["orga"] = "Orga"
+        if "camps.economy_team_member" in perms:
+            tabs['economy'] = "Economy"
+        if "camps.orga_team_member" in perms or context["is_team_pos"]:
+            tabs["pos"] = "Pos"
+        if "camps.game_team_member" in perms:
+            tabs["game"] = "Game Team"
+        if "camps.gis_team_member" in perms or context["is_team_mapper"]:
+            tabs["map"] = "Maps"
+        if "camps.orga_team_member" in perms or context["is_team_lead"]:
+            tabs["permissions"] = "Permissions"
+        return tabs 
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -35,6 +57,8 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
             for perm in perms
             if perm.endswith("_team_member")
         ]
+        #List of menu items (to add ifs or something around later)
+        context["backoffice_items"] = ["facilities", "info", "content", "orga", "economy", "pos", "game", "map", "permissions"]
         # generate a list of teams with unhandled facility feedback
         context["facilityfeedback_teams"] = Team.objects.filter(
             slug__in=team_slugs,
@@ -72,7 +96,9 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
                     break
             else:
                 context[f"is_team_{perm}"] = False
+        context["backoffice_tabs"] = self.get_index_tabs(perms, context)
         return context
+
 
 
 class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):

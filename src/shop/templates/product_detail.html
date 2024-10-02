@@ -1,5 +1,5 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load commonmark %}
 {% load bornhack %}
 
@@ -11,12 +11,12 @@
 
   <div class="row">
 
-    <div class="col-sm-12 col-md-8">
+    <div class="col-12">
       <h2>{{ product.name }}</h2>
       {{ product.description|trustedcommonmark }}
     </div>
 
-    <div class="col-sm-12 col-md-4">
+    <div class="col-12">
 
       <h3>
         <small>Price</small><br />

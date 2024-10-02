@@ -7,11 +7,11 @@
 
 {% block team_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <div class="btn-group pull-right">
         <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
-           class="btn btn-default"
+           class="btn btn-secondary"
            target="_blank">
           Print
         </a>
@@ -23,7 +23,7 @@
         Guide / Howto for {{ team.name }}
       </h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
       </p>
 

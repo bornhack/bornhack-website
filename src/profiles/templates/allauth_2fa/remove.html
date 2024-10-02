@@ -1,7 +1,7 @@
 {% extends 'profile_base.html' %}
 
 {% load account %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   Disable Two-Factor Authentication | {{ block.super }}
@@ -10,11 +10,11 @@
 {% block profile_content %}
   <div class="row">
     <div class="col-md-12">
-      <div class="panel panel-danger">
-        <div class="panel-heading">
+      <div class="card panel-danger">
+        <div class="card-header">
           <h4>Disable Two-Factor Authentication</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           <p>Are you sure you want to disable two-factor authentication?</p>
 
           <form method="post">

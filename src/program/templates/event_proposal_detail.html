@@ -9,13 +9,13 @@
     </div>
   {% endif %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-header"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
+    <div class="card-body">
       {{ event_proposal.abstract|untrustedcommonmark }}
 
       {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
+        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
         <br>
       {% endif %}
 
@@ -62,7 +62,7 @@
       </table>
 
       {% if camp.call_for_participation_open %}
-        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Details</span></a>
+        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Details</span></a>
         <br>
       {% endif %}
 
@@ -75,7 +75,7 @@
         <i>Nothing found.</i>
       {% endif %}
       {% if camp.call_for_participation_open %}
-        <a href="{% url 'program:event_proposal_url_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
+        <a href="{% url 'program:event_proposal_url_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success btn-sm ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
         <br>
       {% endif %}
 
@@ -89,9 +89,9 @@
       {% endif %}
       {% if camp.call_for_participation_open and not camp.read_only %}
         {% if event_proposal.get_available_speaker_proposals.exists %}
-          <a href="{% url 'program:event_proposal_select_person' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
+          <a href="{% url 'program:event_proposal_select_person' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
         {% else %}
-          <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
+          <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
         {% endif %}
       {% endif %}
     </div>
@@ -100,7 +100,7 @@
   <p>
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to List</a>
     {% if camp.call_for_participation_open %}
-      <a href="{% url 'program:event_proposal_delete' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
+      <a href="{% url 'program:event_proposal_delete' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger ms-auto"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
     {% endif %}
   </p>
 

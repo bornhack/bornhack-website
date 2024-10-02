@@ -1,6 +1,6 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 {% block title %}
@@ -9,11 +9,11 @@
 
 {% block team_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Info Categories</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
 
       {% for info_category in team.info_categories.all %}
 

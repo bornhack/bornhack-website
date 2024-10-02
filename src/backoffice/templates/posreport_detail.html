@@ -6,11 +6,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
         {% if "camps.orgateam_permission" in perms %}
           <a href="{% url 'backoffice:posreport_update' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
@@ -23,7 +23,7 @@
           <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
           <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
         {% endif %}
-        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to Pos</a>
+        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Pos</a>
       </p>
       <table class="table">
         <tbody>

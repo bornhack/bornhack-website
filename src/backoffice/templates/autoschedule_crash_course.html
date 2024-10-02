@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">AutoScheduler Crash Course</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">AutoScheduler Crash Course</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>The AutoScheduler needs a list of <i>AutoScheduler Slots</i> and a list of <i>AutoScheduler Events</i> to do its thing.</p>
       <p>We create one <i>AutoScheduler Slot</i> for each <i>EventSlot</i> in all <i>EventSessions</i> for the AutoScheduler-enabled <i>EventTypes</i>.</p>
       <p>We create one <i>AutoScheduler Event</i> for each <i>EventType</i> which support autoscheduling, excluding any Events which have been scheduled manually.</p>
@@ -25,7 +25,7 @@
 
       <p>It is fully supported to mix manual scheduling with using the AutoScheduler. The AutoScheduler can be used as needed: It can act strictly as a validator for a manually planned schedule. It could also be used for scheduling some events, while manually scheduling others. It can also be used to do the full schedule. The AutoScheduler will avoid scheduling over manually scheduled events, and will consider manually scheduled events when looking to avoid conflicts.</p>
 
-      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> AutoSchedule Management</a>
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> AutoSchedule Management</a>
     </div>
   </div>
 {% endblock content %}

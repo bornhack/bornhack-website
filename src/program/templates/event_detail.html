@@ -7,14 +7,14 @@
     <p><a href="{% url 'program:noscript_schedule_index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Return to schedule</a></p>
   </noscript>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span style="font-size: x-large">
         <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
       </span>
-      <span class="pull-right"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
+      <span class="ms-auto"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
         {{ event.abstract|untrustedcommonmark }}
       </p>

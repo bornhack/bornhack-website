@@ -36,7 +36,7 @@
         <td><span class="badge text-success">{{ speaker_proposal.proposal_status }}</span></td>
         <td>
           {% if speaker_proposal.speaker %}
-            <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+            <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-secondary btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
           {% else %}
             <i class="fas fa-times"></i>
           {% endif %}

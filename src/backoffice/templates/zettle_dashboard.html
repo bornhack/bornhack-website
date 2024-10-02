@@ -4,11 +4,11 @@
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">Zettle Dashboard - BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>This view shows a quick overview of Zettle stats and links to detailed views for receipts and balances. <b>All data is imported manually using Excel files exported from Zettles webinterface. Poke someone in the Economy Team if data is looking stale!</b></p>
 
       <p>We currently have <b>{{ receipts }} receipts</b> and <b>{{ balances }} balances</b> registered in the system.</p>
@@ -33,7 +33,7 @@
           <p class="list-group-item-text">Use this view to import Excel files with new receipts and balances.</p>
         </a>
       </div>
-      <p><a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
+      <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
     </div>
   </div>
 {% endblock content %}

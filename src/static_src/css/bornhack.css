@@ -2,6 +2,9 @@ body {
   margin-top: 85px;
   margin-bottom: 105px;
   overflow: scroll;
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size: 14px;
+  line-height: 1.42857143;
 }
 
 * {
@@ -12,10 +15,13 @@ a, a:active, a:focus {
    outline: none;
 }
 
+a, u {
+  text-decoration: none;
+}
+
 /* Z-index */
 /* Bootstrap values
 .dropdown-backdrop { z-index: 990; }
-.dropdown-menu { z-index: 990; }
 .navbar-static-top, .dropdown-menu { z-index: 1000; }
 .navbar-fixed-top, .navbar-fixed-bottom { z-index: 1030; }
 .modal-backdrop { z-index: 1040; }
@@ -23,14 +29,11 @@ a, a:active, a:focus {
 .popover { z-index: 1060; }
 .tooltip { z-index: 1070; }
  */
+
+strong { font-weight: bold; }
+
 .sticky {
   z-index: 980;
-}
-
-@media (max-width: 520px) {
-  #main {
-    width: 100%;
-  }
 }
 
 /* Front page stuff */
@@ -39,14 +42,15 @@ a, a:active, a:focus {
 }
 
 /* Navbar stuff */
-.navbar {
-  max-width: 100vw;
-  background-color: rgb(255, 255, 255);
-  border-bottom: 1px solid rgb(230, 230, 230);
-}
-
 .navbar .navbar-brand {
   height: 75px;
+}
+
+@media (color-scheme: dark) {
+    .bornhack-logo {
+       -webkit-filter: invert(1);
+       filter: invert(1);
+    }
 }
 
 .navbar-fixed-top {
@@ -54,7 +58,6 @@ a, a:active, a:focus {
 }
 
 .navbar-toggle .icon-bar {
-  background: black;
   width: 45px;
   height: 8px;
 }
@@ -78,43 +81,6 @@ a, a:active, a:focus {
 .nav .dropdown-menu > li > a {
   padding-top: 15px;
   padding-bottom: 15px;
-}
-
-@media (max-width: 767px) {
-  .navbar-fixed-top .navbar-collapse {
-    max-height: 450px;
-  }
-
-  .navbar .navbar-collapse {
-    border-bottom: 1px solid #ccc;
-    -webkit-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-    -moz-box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-    box-shadow: 0 8px 6px -6px rgba(0,0,0,0.2);
-  }
-  .navbar .navbar-nav {
-    margin: 0 -15px;
-  }
-
-  .navbar .nav > li {
-    border-top: 1px solid #ccc;
-  }
-  .navbar .nav li a {
-    padding: 20px !important;
-  }
-
-  .btn-group-vertical > .btn{
-    padding: 20px;
-  }
-}
-
-
-/* btn-group */
-.btn-group .btn:last-of-type {
-  border-right: 1px solid #ccc;
-}
-
-.btn-group .btn.btn-primary:last-of-type {
-  border-color: #2e6da4;
 }
 
 /* Form stuff */
@@ -142,17 +108,10 @@ footer {
     position: fixed;
     width: 100%;
     text-align: center;
-    background-color: white;
     bottom: 0px;
     padding: 5px;
     left: 50%;
     transform: translate(-50%);
-}
-
-@media (max-width: 767px) {
-  footer {
-    max-width: 100%;
-  }
 }
 
 .breadcrumb > li.no-before::before {
@@ -254,7 +213,6 @@ footer {
 
 .sticky {
   position: sticky;
-  background-color: #fff;
 }
 
 #daypicker {
@@ -311,7 +269,9 @@ body.bar-menu {
   color: #00ff00;
   overflow: hidden;
 }
-
+.hidden {
+    display: none;
+}
 .bar-product .name {
   width: 900px;
   font-size: 14pt;
@@ -322,15 +282,8 @@ body.bar-menu {
   width: 300px;
 }
 
-@media (min-width: 600px) {
-    .event-table-tags {
-        width: 20%;
-    }
-}
-
 .team-guide-markdown
 {
-    background-color: #f9f9f9;
     padding: 10px 20px;
 }
 .team-guide-markdown h1,
@@ -347,11 +300,19 @@ body.bar-menu {
     display: none;
 }
 
-/* hide map in forms until we can show a real leaflet map */
+/* Unhide for no-js users */
+.no-js .unhide-for-no-js-users {
+    display: block !important;
+}
+.unhide-for-no-js-users {
+    display: none;
+}
+
+
+/* dont hide map in forms */
 div #id_location-map {
     display: block;
 }
-
 
 /* Stuff for responsiveness */
 
@@ -378,4 +339,48 @@ img {
 .panel-heading-nav .nav {
   padding-left: 10px;
   padding-right: 10px;
+}
+.bornhack-2016-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #004dff, var(--bs-body-bg));
+}
+.bornhack-2017-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #750787, var(--bs-body-bg));
+}
+.bornhack-2018-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #008026, var(--bs-body-bg));
+}
+.bornhack-2019-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #ffed00, var(--bs-body-bg));
+}
+.bornhack-2020-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #ff8c00, var(--bs-body-bg));
+}
+.bornhack-2021-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #e40303, var(--bs-body-bg));
+}
+.bornhack-2022-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #ffffff, var(--bs-body-bg));
+}
+.bornhack-2023-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #613915, var(--bs-body-bg));
+}
+.bornhack-2024-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #73d7ee, var(--bs-body-bg));
+}
+.bornhack-2025-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #ffafc7, var(--bs-body-bg));
+}
+.image-white-bg {
+    background-color: white;
+    color: black;
 }

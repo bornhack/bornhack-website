@@ -7,11 +7,11 @@
 
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">Your {{ camp.title }} DECT Registrations</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">This is a list of all the registered DECT numbers you have for {{ camp.title }}. To activate a handset just dial the <i>activation code</i> from the handset and follow instructions.</p>
       {% if dectregistration_list %}
         <p>

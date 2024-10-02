@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   Delete DECT Registration | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">Really delete DECT registration {{ dectregistration.number }}?</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">Are you sure you want to delete the registration of DECT number {{ dectregistration.number }}?
         <ul>
           <li>Letters: {{ dectregistration.letters|default:"N/A" }}</li>

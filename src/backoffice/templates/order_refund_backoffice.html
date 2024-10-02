@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
@@ -11,10 +11,10 @@
   <form method="POST">
     {% csrf_token %}
     {{ formset.management_form }}
-    <div class="panel panel-default">
+    <div class="card">
 
-      <div class="panel-heading">Order #{{ order.pk }} | BackOffice</div>
-      <div class="panel-body">
+      <div class="card-header">Order #{{ order.pk }} | BackOffice</div>
+      <div class="card-body">
 
         {% if ticket_groups %}
 
@@ -114,7 +114,7 @@
         {% bootstrap_form refund_form %}
 
       </div>
-      <div class="panel-footer">
+      <div class="card-footer">
         <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
         <button type="submit" class="btn btn-primary pull-right">Refund</button>
         <span class="clearfix"></span>

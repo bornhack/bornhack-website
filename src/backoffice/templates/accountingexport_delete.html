@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">Delete AccountingExport {{ accountingexport.uuid }}?</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete AccountingExport {{ accountingexport.uuid }}?</h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">Really delete this Accounting Export? It covers the period from {{ accountingexport.date_from }} to {{ accountingexport.date_to }}, with the comment: <i>{{ accountingexport.comment|default:"N/A" }}</i>. This action cannot be undone!</p>
       <form method="POST">
         {% csrf_token %}

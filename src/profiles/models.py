@@ -8,6 +8,12 @@ from utils.models import UUIDModel
 
 
 class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
+    THEME_CHOICES = (
+        ("default", "Default (Auto)"),
+        ("slate", "Slate"),
+        ("solar", "Solar"),
+    )
+
     class Meta:
         verbose_name = _("Profile")
         verbose_name_plural = _("Profiles")
@@ -48,6 +54,8 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         max_length=50,
         help_text="Your NickServ username is used to manage team IRC channel access lists. Make sure you register with NickServ _before_ you enter the username here!",
     )
+
+    theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="default")
 
     @property
     def email(self):

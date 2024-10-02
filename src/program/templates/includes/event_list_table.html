@@ -25,7 +25,7 @@
           </td>
           <td class="text-center event-table-tags">
             {% for tag in event.tags.all %}
-              <span class="badge">{{ tag }}</span>
+              <span class="badge text-bg-secondary">{{ tag }}</span>
             {% empty %}
               N/A
             {% endfor %}

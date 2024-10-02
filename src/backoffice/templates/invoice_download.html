@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block extra_head %}
   {{ invoices|json_script:"invoices" }}
@@ -22,7 +22,7 @@
     {% csrf_token %}
     {% bootstrap_form form %}
     <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
-    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
   </form>
   {% if invoices|length > 0 %}
     <p>Downloading {{ invoices | length }} invoices</p>

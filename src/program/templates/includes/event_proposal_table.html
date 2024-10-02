@@ -33,7 +33,7 @@
         <td><span class="badge">{{ event_proposal.proposal_status }}</span></td>
         <td>
           {% if event_proposal.event %}
-            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event_proposal.event.slug %}" class="btn btn-default btn-sm"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }};"></i> Show Event</a>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event_proposal.event.slug %}" class="btn btn-secondary btn-sm"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }};"></i> Show Event</a>
           {% else %}
             <i class="fas fa-times"></i>
           {% endif %}

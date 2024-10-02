@@ -1,6 +1,6 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 {% block title %}
@@ -9,11 +9,11 @@
 
 {% block team_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Tasks</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
         The {{ team.name }} Team is responsible for the following tasks.
         {% if request.user in team.leads.all %}
@@ -43,9 +43,9 @@
                   </td>
                   <td>{{ task.completed }}</td>
                   <td>
-                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-default{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-search"></i> Details</a>
+                    <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-search"></i> Details</a>
                                                                                                                                                                                                                                   {% if request.user in team.leads.all %}
-                                                                                                                                                                                                                                    <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-default{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
+                                                                                                                                                                                                                                    <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
                     {% endif %}
                   </td>
                 </tr>

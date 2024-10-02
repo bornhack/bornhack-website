@@ -1,6 +1,6 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {% if object %}
@@ -13,8 +13,8 @@
 {% endblock %}
 
 {% block team_content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>
         {% if object %}
           Editing "{{ object.headline }}"
@@ -25,7 +25,7 @@
         {% endif %}
       </h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
@@ -38,6 +38,6 @@
         {% endif %}
       </form>
     </div>
-    <div class="panel-footer"><i>This info item belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
+    <div class="card-footer"><i>This info item belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
   </div>
 {% endblock %}

@@ -3,7 +3,7 @@
 
 {% block body %}
   <p class="lead">The following conflicts have been found between events in the AutoScheduler, events with a red table cell will not be scheduled together.</p>
-  <p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
   <table class="table table-condensed table-bordered">
     <thead>
       <th><br></th>
@@ -25,5 +25,5 @@
         </tr>
       {% endfor %}
     </table>
-    <p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+    <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 {% endblock body %}

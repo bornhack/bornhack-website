@@ -1,5 +1,5 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load tickets_tags %}
 
 {% block title %}
@@ -8,11 +8,11 @@
 
 {% block profile_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Your Tickets</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
 
       <h2>{% if ticket.used_at %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
       {% if ticket.product.ticket_type.camp.read_only %}

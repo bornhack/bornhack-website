@@ -1,26 +1,26 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 
 {% block team_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Description</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       {{ team.description|untrustedcommonmark }}
     </div>
   </div>
 
   {# Team communications #}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Communication Channels</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       {{ team.camp.title }} teams primarily use mailing lists and IRC to communicate. The <b>{{ team.name }} team</b> can be contacted in the following ways:</p>
 
     <h5>Mailing List</h5>

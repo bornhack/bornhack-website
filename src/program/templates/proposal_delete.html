@@ -1,5 +1,5 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {% if object.name %}Delete "{{ object.name }}"{% else %}Delete "{{ object.title }}"{% endif %} | {{ block.super }}

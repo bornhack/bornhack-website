@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load leaflet_tags %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}
@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Import Features to map layer {{ layer.name }} - BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Import Features to map layer {{ layer.name }} - BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">
         Use this view to import/update features in the layer <b>{{ layer.name }}</b>. Only the properties <b>name,description,icon,topic,processing,url</b> will be imported!
         <br><br><b>Beware import will overwrite existing features!</b>
@@ -37,7 +37,7 @@
         {% bootstrap_form form %}
         {% buttons %}
           <button type="submit" class="btn btn-success">Import</button>
-          <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+          <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
         {% endbuttons %}
       </form>
     </div>
