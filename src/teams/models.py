@@ -373,20 +373,30 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     def update_group_membership(self, deleted=False):
         """Ensure group membership for this team membership is correct."""
-        if self.approved and not deleted:
-            logger.debug(f"Adding user {self.user} to group {self.team.group}")
-            self.team.group.user_set.add(self.user)
-        else:
-            logger.debug(f"Removing user {self.user} from group {self.team.group}")
-            self.team.group.user_set.remove(self.user)
+        if self.team.group:
+            if self.approved and not deleted:
+                logger.debug(f"Adding user {self.user} to group {self.team.group}")
+                self.team.group.user_set.add(self.user)
+            else:
+                logger.debug(f"Removing user {self.user} from group {self.team.group}")
+                self.team.group.user_set.remove(self.user)
 
     def update_team_lead_permissions(self, deleted=False):
         """Ensure team lead perms for this team membership are correct."""
-        lead_perm = Permission.objects.get(
-            codename=f"{self.team.slug}_team_lead",
-            content_type=ContentType.objects.get_for_model(CampPermission),
-        )
-        if self.approved and self.lead and not deleted:
+        try:
+            lead_perm = Permission.objects.get(
+                codename=f"{self.team.slug}_team_lead",
+                content_type=ContentType.objects.get_for_model(CampPermission),
+            )
+        except Permission.DoesNotExist:
+            logger.error(f"team lead permission not found for {self.team}")
+            return
+        if (
+            self.approved
+            and self.lead
+            and not deleted
+            and self.team.member_permission_set in self.user.get_all_permissions()
+        ):
             logger.debug(
                 f"Adding team lead permissions to user {self.user} for {self.team}",
             )

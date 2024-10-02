@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django import forms
 from django.core.exceptions import ValidationError
 import json
@@ -276,7 +277,7 @@ class ManageTeamPermissionsForm(forms.Form):
         super().__init__(*args, **kwargs)
         for username in matrix.keys():
             for perm in matrix[username]:
-                if perm in ["lead", "member"]:
+                if perm in ["lead", "member"] or User.objects.get(username=username).is_superuser:
                     disabled = True
                 else:
                     disabled = False

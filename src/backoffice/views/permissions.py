@@ -121,12 +121,16 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             if perm not in perms:
                 # no sneaking in unexpected perms
                 continue
+            user = self.team.members.get(username=username)
+            if user.is_superuser:
+                # superusers magically have all permissions, nothing to do here
+                continue
             if form.cleaned_data[field]:
-                self.team.members.get(username=username).user_permissions.add(
+                user.user_permissions.add(
                     team_permissions[perm],
                 )
             else:
-                self.team.members.get(username=username).user_permissions.remove(
+                user.user_permissions.remove(
                     team_permissions[perm],
                 )
         messages.success(
@@ -147,8 +151,17 @@ class PermissionByUserView(OrgaOrTeamLeadViewMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        users = qs.filter(user_permissions__isnull=False) | qs.filter(
-            groups__permissions__isnull=False,
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        users = (
+            qs.filter(
+                user_permissions__isnull=False,
+                user_permissions__content_type=permission_content_type,
+            )
+            | qs.filter(
+                groups__permissions__isnull=False,
+                groups__permissions__content_type=permission_content_type,
+            )
+            | qs.filter(is_superuser=True)
         )
         return users.distinct()
 
