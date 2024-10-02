@@ -373,12 +373,13 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     def update_group_membership(self, deleted=False):
         """Ensure group membership for this team membership is correct."""
-        if self.approved and not deleted:
-            logger.debug(f"Adding user {self.user} to group {self.team.group}")
-            self.team.group.user_set.add(self.user)
-        else:
-            logger.debug(f"Removing user {self.user} from group {self.team.group}")
-            self.team.group.user_set.remove(self.user)
+        if self.team.group:
+            if self.approved and not deleted:
+                logger.debug(f"Adding user {self.user} to group {self.team.group}")
+                self.team.group.user_set.add(self.user)
+            else:
+                logger.debug(f"Removing user {self.user} from group {self.team.group}")
+                self.team.group.user_set.remove(self.user)
 
     def update_team_lead_permissions(self, deleted=False):
         """Ensure team lead perms for this team membership are correct."""
