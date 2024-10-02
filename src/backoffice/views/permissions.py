@@ -147,9 +147,11 @@ class PermissionByUserView(OrgaOrTeamLeadViewMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        users = qs.filter(user_permissions__isnull=False) | qs.filter(
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        users = qs.filter(user_permissions__isnull=False, user_permissions__content_type=permission_content_type) | qs.filter(
             groups__permissions__isnull=False,
-        )
+            groups__permissions__content_type=permission_content_type,
+        ) | qs.filter(is_superuser=True)
         return users.distinct()
 
 
@@ -168,7 +170,7 @@ class PermissionByPermissionView(OrgaOrTeamLeadViewMixin, ListView):
                     User.objects.with_perm(
                         perm,
                         backend="django.contrib.auth.backends.ModelBackend",
-                    ).exclude(is_superuser=True),
+                    ),
                 ),
             )
         return perms
