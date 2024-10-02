@@ -177,7 +177,7 @@ class PermissionByPermissionView(OrgaOrTeamLeadViewMixin, ListView):
                     User.objects.with_perm(
                         perm,
                         backend="django.contrib.auth.backends.ModelBackend",
-                    ),
+                    ).exclude(is_superuser=True),
                 ),
             )
         return perms
