@@ -391,7 +391,12 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
         except Permission.DoesNotExist:
             logger.error(f"team lead permission not found for {self.team}")
             return
-        if self.approved and self.lead and not deleted:
+        if (
+            self.approved
+            and self.lead
+            and not deleted
+            and self.team.member_permission_set in self.user.get_all_permissions()
+        ):
             logger.debug(
                 f"Adding team lead permissions to user {self.user} for {self.team}",
             )
