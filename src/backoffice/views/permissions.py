@@ -121,12 +121,16 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             if perm not in perms:
                 # no sneaking in unexpected perms
                 continue
+            user = self.team.members.get(username=username)
+            if user.is_superuser:
+                # superusers magically have all permissions, nothing to do here
+                continue
             if form.cleaned_data[field]:
-                self.team.members.get(username=username).user_permissions.add(
+                user.user_permissions.add(
                     team_permissions[perm],
                 )
             else:
-                self.team.members.get(username=username).user_permissions.remove(
+                user.user_permissions.remove(
                     team_permissions[perm],
                 )
         messages.success(

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bornhack %}
 {% load bootstrap3 %}
 
 {% block content %}
@@ -7,7 +8,7 @@
       <h3 class="panel-title">Manage {{ team.name }} Team Permissions</h3>
     </div>
     <div class="panel-body">
-      <p>This view makes it possible to grant/revoke permissions for {{ team.name }} Team members. The <b>lead</b> and <b>member</b> permissions are granted through team memberships and can not be changed here.</p>
+      <p>This view makes it possible to grant/revoke permissions for {{ team.name }} Team members. The <b>lead</b> and <b>member</b> permissions are granted through team memberships and can not be changed here. Superusers have all permissions and they can not be revoked here.</p>
       {% include "includes/permissions_explainer.html" %}
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
@@ -17,6 +18,7 @@
               <th>Username</th>
               <th>Name</th>
               <th>Public Credit Name</th>
+              <th class="text-center">Superuser</th>
               {% for perm in perms %}
                 <th class="text-center">{{ perm }}</th>
               {% endfor %}
@@ -28,6 +30,7 @@
                 <td>{{ member.username }}</td>
                 <td>{{ member.profile.name }}</td>
                 <td>{{ member.profile.public_credit_name }}</td>
+                <td class="text-center">{{ member.is_superuser|truefalseicon }}</td>
                 {% for perm in perms %}
                   {% for field in form.visible_fields %}
                     {% if field.name == member.username|add:"_"|add:perm %}
