@@ -148,10 +148,17 @@ class PermissionByUserView(OrgaOrTeamLeadViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         permission_content_type = ContentType.objects.get_for_model(CampPermission)
-        users = qs.filter(user_permissions__isnull=False, user_permissions__content_type=permission_content_type) | qs.filter(
-            groups__permissions__isnull=False,
-            groups__permissions__content_type=permission_content_type,
-        ) | qs.filter(is_superuser=True)
+        users = (
+            qs.filter(
+                user_permissions__isnull=False,
+                user_permissions__content_type=permission_content_type,
+            )
+            | qs.filter(
+                groups__permissions__isnull=False,
+                groups__permissions__content_type=permission_content_type,
+            )
+            | qs.filter(is_superuser=True)
+        )
         return users.distinct()
 
 
