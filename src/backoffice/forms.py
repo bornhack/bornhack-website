@@ -277,7 +277,10 @@ class ManageTeamPermissionsForm(forms.Form):
         super().__init__(*args, **kwargs)
         for username in matrix.keys():
             for perm in matrix[username]:
-                if perm in ["lead", "member"] or User.objects.get(username=username).is_superuser:
+                if (
+                    perm in ["lead", "member"]
+                    or User.objects.get(username=username).is_superuser
+                ):
                     disabled = True
                 else:
                     disabled = False

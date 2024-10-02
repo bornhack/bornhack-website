@@ -64,7 +64,7 @@
         {% if request.user in team.leads.all %}
           <li class="nav-item">
             <a class="nav-link" href="{% url "backoffice:team_permission_manage" camp_slug=team.camp.slug team_slug=team.slug %}">
-              Permissions 
+              Permissions
             </a>
           </li>
         {% endif %}

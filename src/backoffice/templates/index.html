@@ -10,37 +10,37 @@
 {% block content %}
 
   <div class="card hide-for-no-js-users">
-      <div class="card-header panel-heading-nav">
-          <h3 class="card-title">{{ camp.title }} Backoffice</h3>
-          <p class="card-text">Welcome to the promised land! Please select your desired action below:</p>
-          <ul class="nav nav-tabs" role="tablist">
-          {% for item, value in backoffice_tabs.items %}
-              <li class="nav-item" role="presentation" class="active">
-                  <a class="nav-link{% if forloop.first %} active{% endif %}" href="#{{ item }}" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab">{{ value }}</a>
-              </li>
-          {% endfor %}
-          </ul>
-      </div>
-      <div class="card-body">
-          <div class="tab-content">
-          {% for item, value in backoffice_tabs.items %}
-              <div role="tabpanel" class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ item }}">
-                  {% include "includes/index_"|add:item|add:".html" %} 
-              </div>
-          {% endfor %}
+    <div class="card-header panel-heading-nav">
+      <h3 class="card-title">{{ camp.title }} Backoffice</h3>
+      <p class="card-text">Welcome to the promised land! Please select your desired action below:</p>
+      <ul class="nav nav-tabs" role="tablist">
+        {% for item, value in backoffice_tabs.items %}
+          <li class="nav-item" role="presentation" class="active">
+            <a class="nav-link{% if forloop.first %} active{% endif %}" href="#{{ item }}" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab">{{ value }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content">
+        {% for item, value in backoffice_tabs.items %}
+          <div role="tabpanel" class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ item }}">
+            {% include "includes/index_"|add:item|add:".html" %}
           </div>
+        {% endfor %}
       </div>
+    </div>
   </div>
   <div class="card unhide-for-no-js-users">
-      <div class="card-header panel-heading-nav">
-          <h3 class="card-title">{{ camp.title }} Backoffice</h3>
-          <p class="card-text">Welcome to the promised land! Please select your desired action below:</p>
-      </div>
-      <div class="card-body">
-          {% for item, value in backoffice_tabs.items %}
-              {% include "includes/index_"|add:item|add:".html" %}
-          {% endfor %}
-      </div>
+    <div class="card-header panel-heading-nav">
+      <h3 class="card-title">{{ camp.title }} Backoffice</h3>
+      <p class="card-text">Welcome to the promised land! Please select your desired action below:</p>
+    </div>
+    <div class="card-body">
+      {% for item, value in backoffice_tabs.items %}
+        {% include "includes/index_"|add:item|add:".html" %}
+      {% endfor %}
+    </div>
   </div>
 
 {% endblock content %}
