@@ -388,7 +388,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
                 codename=f"{self.team.slug}_team_lead",
                 content_type=ContentType.objects.get_for_model(CampPermission),
             )
-        except Permision.DoesNotExist:
+        except Permission.DoesNotExist:
             logger.error(f"team lead permission not found for {self.team}")
             return
         if self.approved and self.lead and not deleted:
