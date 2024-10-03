@@ -11,8 +11,8 @@
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
-          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
-          <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
+        <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>
