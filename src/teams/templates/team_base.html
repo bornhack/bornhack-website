@@ -25,8 +25,8 @@
         <li class="nav-item">
           <a class="nav-link {% if view.active_menu == "members" %} active{% endif %}"href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
             Members
-            {% if request.user in team.responsible_members.all and team.unapproved_members %}
-              <span class="label label-danger">Pending</span>
+            {% if request.user in team.leads.all and team.unapproved_members.count %}
+              <span class="badge text-bg-danger">Pending</span>
             {% endif %}
           </a>
         </li>

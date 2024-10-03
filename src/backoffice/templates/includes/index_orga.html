@@ -23,7 +23,7 @@
   <a href="{% url 'backoffice:outgoing_email_release' camp_slug=camp.slug %}" class="list-group-item">
     <h4 class="list-group-item-heading">Edit and Release Held Emails</h4>
     {% if held_email_count %}
-      <p class="list-group-item-text">Use this view to edit and release <span class="label label-warning">{{ held_email_count }}</span> OutgoingEmailQueue objects on hold.</p>
+      <p class="list-group-item-text">Use this view to edit and release <span class="badge rounded-pill bg-danger">{{ held_email_count }}</span> OutgoingEmailQueue objects on hold.</p>
     {% else %}
       <p class="list-group-item-text">No emails are currently held for release. Check back later!</p>
     {% endif %}

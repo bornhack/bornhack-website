@@ -9,7 +9,7 @@
 {% block content %}
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Facility Feedback for {{ team.name }} Team</h3>
+        <h3 class="card-title">Facility Feedback for {{ team.name }} Team ({{ feedback_list.count }})</h3>
     </div>
     <div class="card-body">
       {% if feedback_list %}
@@ -45,7 +45,7 @@
                   </tr>
                   <tr>
                     <th>Urgent</th>
-                    <td>{{ feedback.urgent|yesno }}</td>
+                    <td class="{% if feedback.urgent %}text-bg-danger{% endif %}">{{ feedback.urgent|yesno }}</td>
                   </tr>
                   <tr>
                     <th>Handled</th>

@@ -147,7 +147,7 @@ class FacilityDetailView(FacilityTypeViewMixin, DetailView):
         return qs.prefetch_related("opening_hours")
 
 
-class FacilityFeedbackView(FacilityViewMixin, CreateView):
+class FacilityFeedbackView(FacilityTypeViewMixin, FacilityViewMixin, CreateView):
     model = FacilityFeedback
     template_name = "facility_feedback.html"
     fields = ["quick_feedback", "comment", "urgent"]

@@ -30,23 +30,23 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
             or context["facilityfeedback_teams"]
             or context["is_team_facilitator"]
         ):
-            tabs["facilities"] = "Facilities"
+            tabs["facilities"] = {"name":"Facilities", "count": context["feedback_count"].count()}
         if "camps.info_team_member" in perms:
-            tabs["info"] = "Info"
+            tabs["info"] = {"name":"Info"}
         if "camps.content_team_member" in perms:
-            tabs["content"] = "Content"
+            tabs["content"] = {"name":"Content"}
         if "camps.orga_team_member" in perms:
-            tabs["orga"] = "Orga"
+            tabs["orga"] = {"name":"Orga", "count": context["held_email_count"]}
         if "camps.economy_team_member" in perms:
-            tabs["economy"] = "Economy"
+            tabs["economy"] = {"name":"Economy"}
         if "camps.orga_team_member" in perms or context["is_team_pos"]:
-            tabs["pos"] = "Pos"
+            tabs["pos"] = {"name":"Pos"}
         if "camps.game_team_member" in perms:
-            tabs["game"] = "Game Team"
+            tabs["game"] = {"name":"Game Team"}
         if "camps.gis_team_member" in perms or context["is_team_mapper"]:
-            tabs["map"] = "Maps"
+            tabs["map"] = {"name":"Maps"}
         if "camps.orga_team_member" in perms or context["is_team_lead"]:
-            tabs["permissions"] = "Permissions"
+            tabs["permissions"] = {"name":"Permissions"}
         return tabs
 
     def get_context_data(self, *args, **kwargs):
@@ -61,18 +61,6 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
             for perm in perms
             if perm.endswith("_team_member")
         ]
-        # List of menu items (to add ifs or something around later)
-        context["backoffice_items"] = [
-            "facilities",
-            "info",
-            "content",
-            "orga",
-            "economy",
-            "pos",
-            "game",
-            "map",
-            "permissions",
-        ]
         # generate a list of teams with unhandled facility feedback
         context["facilityfeedback_teams"] = Team.objects.filter(
             slug__in=team_slugs,
@@ -86,6 +74,12 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
                 ),
             ),
         )
+
+        context["feedback_count"] = FacilityFeedback.objects.filter(
+                facility__facility_type__responsible_team__camp=self.camp,
+                facility__facility_type__responsible_team__slug__in=team_slugs,
+                handled=False,
+                )
 
         # include the number of unread emails
         context["held_email_count"] = (
