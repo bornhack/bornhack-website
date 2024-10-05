@@ -88,7 +88,7 @@
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
-                <li class="nav-item dropdown">
+                <li class="nav-item dropdown hide-for-no-js-users">
                   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
                   <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2024' %}">BornHack 2024</a></li>
@@ -97,6 +97,7 @@
                     <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
                   </ul>
                 </li>
+                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'camp_list' %}">Camps</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
@@ -107,8 +108,10 @@
                 {% endif %}
               </ul>
               <div class="nav navbar-nav navbar-right ms-auto">
+                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
                 {% if user.is_authenticated %}
-                  <div class="dropdown">
+                  <div class="dropdown hide-for-no-js-users">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
