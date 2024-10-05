@@ -987,8 +987,8 @@ class EventDetailView(CampViewMixin, DetailView):
 # schedule views
 
 
-class NoScriptScheduleView(CampViewMixin, TemplateView):
-    template_name = "noscript_schedule_view.html"
+class ScheduleView(CampViewMixin, TemplateView):
+    template_name = "schedule_view.html"
 
     def setup(self, *args, **kwargs):
         """
