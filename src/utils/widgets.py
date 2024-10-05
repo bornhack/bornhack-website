@@ -1,4 +1,5 @@
 from django.forms import Widget
+from django.forms import Textarea
 
 
 class IconPickerWidget(Widget):
@@ -37,3 +38,13 @@ class SliderWidget(Widget):
 
 class SwitchWidget(Widget):
     template_name = "switch_widget.html"
+
+
+class MarkdownWidget(Textarea):
+    template_name = "markdown_widget.html"
+
+    class Media:
+        js = ("/static/js/markdown_widget.js","/static/vendor/marked/marked.min.js")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(attrs={'class': 'markdown-widget'}, *args, **kwargs)

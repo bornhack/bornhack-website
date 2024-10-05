@@ -385,9 +385,9 @@ img {
     color: black;
 }
 
-.form-select {
+/*.form-select {
     background-color: var(--bs-body-bg)
-}
+}*/
 
 .slider-widget {
     width: 90%;

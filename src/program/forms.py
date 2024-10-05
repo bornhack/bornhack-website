@@ -8,6 +8,8 @@ from .models import EventProposal
 from .models import EventTrack
 from .models import SpeakerProposal
 
+from utils.widgets import MarkdownWidget
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
@@ -78,6 +80,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Guest Biography"
             self.fields["biography"].help_text = "The biography of the guest (public)."
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -103,6 +106,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
             self.fields["biography"].help_text = "The biography of the speaker (public)"
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -130,6 +134,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = (
                 "The description of the artist (public)."
             )
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -157,6 +162,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].help_text = (
                 "The biography of the speaker (public)."
             )
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -179,6 +185,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
             self.fields["biography"].help_text = "The biography of the host (public)."
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -202,6 +209,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
             self.fields["biography"].help_text = "The biography of the host (public)."
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -227,6 +235,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Host Biography"
             self.fields["biography"].help_text = "The biography of the host."
+            self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -341,6 +350,7 @@ class EventProposalForm(forms.ModelForm):
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Description"
             self.fields["abstract"].help_text = "The description of this debate"
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -355,6 +365,7 @@ class EventProposalForm(forms.ModelForm):
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Description"
             self.fields["abstract"].help_text = "The description of this music act"
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -374,6 +385,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = (
                 "The description/abstract of this recreational event."
             )
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -393,6 +405,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = (
                 "The description/abstract of this talk/presentation. Explain what the audience will experience."
             )
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
             self.fields["submission_notes"].help_text = (
@@ -422,6 +435,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = (
                 "The description/abstract of this workshop. Explain what the participants will learn."
             )
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # no video recording for workshops
             del self.fields["allow_video_recording"]
@@ -441,6 +455,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = (
                 "The description/abstract of this event. Explain what the participants will experience."
             )
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # no video recording for recreational events
             del self.fields["allow_video_recording"]
@@ -460,6 +475,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].help_text = (
                 "The description/abstract of this meetup. Explain what the meetup is about and who should attend."
             )
+            self.fields["abstract"].widget = MarkdownWidget()
 
             # no video recording for meetups
             del self.fields["allow_video_recording"]

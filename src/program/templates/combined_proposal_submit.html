@@ -1,6 +1,9 @@
 {% extends 'program_base.html' %}
 {% load django_bootstrap5 %}
 {% load program %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block title %}
   Submit {{ camp.title }} {{ eventtype.name }} | {{ block.super }}

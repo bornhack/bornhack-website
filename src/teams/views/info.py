@@ -9,7 +9,7 @@ from reversion.views import RevisionMixin
 from .mixins import TeamViewMixin
 from info.models import InfoCategory
 from info.models import InfoItem
-
+from utils.widgets import MarkdownWidget
 
 class InfoCategoriesListView(
     TeamViewMixin,
@@ -32,6 +32,11 @@ class InfoItemCreateView(
     fields = ["headline", "body", "anchor", "weight"]
     slug_field = "anchor"
     active_menu = "info_categories"
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["body"].widget = MarkdownWidget()
+        return form
 
     def form_valid(self, form):
         info_item = form.save(commit=False)
@@ -67,6 +72,11 @@ class InfoItemUpdateView(
     slug_field = "anchor"
     slug_url_kwarg = "item_anchor"
     active_menu = "info_categories"
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["body"].widget = MarkdownWidget()
+        return form
 
     def get_success_url(self):
         next = self.request.GET.get("next")

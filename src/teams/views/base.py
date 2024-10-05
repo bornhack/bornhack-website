@@ -13,6 +13,7 @@ from ..models import Team
 from ..models import TeamMember
 from .mixins import EnsureTeamLeadMixin
 from camps.mixins import CampViewMixin
+from utils.widgets import MarkdownWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -70,6 +71,11 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, UpdateView):
         "guide",
     ]
     slug_url_kwarg = "team_slug"
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["guide"].widget = MarkdownWidget()
+        return form
 
     def get_success_url(self):
         return reverse_lazy(
