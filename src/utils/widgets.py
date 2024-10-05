@@ -27,9 +27,7 @@ class SliderWidget(Widget):
     input_type = "range"
 
     class Media:
-        js = (
-            "/static/js/slider_widget.js",
-        )
+        js = ("/static/js/slider_widget.js",)
 
     def __init__(self, attrs=None, smin=0, smax=0):
         self.smin = smin
@@ -38,4 +36,4 @@ class SliderWidget(Widget):
 
 
 class SwitchWidget(Widget):
-    template_name = 'switch_widget.html'
+    template_name = "switch_widget.html"

@@ -1473,7 +1473,7 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
         form.fields["expectations_fulfilled"].widget = SwitchWidget()
         form.fields["attend_speaker_again"].widget = SwitchWidget()
         form.fields["rating"].widget = SliderWidget(
-            attrs={"min":1,"max":5}
+            attrs={"min": 1, "max": 5},
         )
         return form
 
