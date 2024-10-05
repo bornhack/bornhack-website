@@ -4,6 +4,20 @@ You're now a member of the {{ team }} team at {{ camp }}.
 
 Thank you for helping out!
 
+Team Contact information:
+{% if team.public_irc_channel_name %}
+Public IRC channel is {{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}
+{% endif %}
+{% if team.private_irc_channel_name %}
+Private IRC channel is {{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}
+{% endif %}
+{% if team.public_signal_channel_link %}
+Public Signal group is {{ team.public_signal_channel_link }}
+{% endif %}
+{% if team.private_signal_channel_link %}
+Private Signal group is {{ team.private_signal_channel_link }}
+{% endif %}
+
 
 Best regards,
 

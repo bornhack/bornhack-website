@@ -68,6 +68,8 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, UpdateView):
         "private_irc_channel_name",
         "private_irc_channel_bot",
         "private_irc_channel_managed",
+        "public_signal_channel_link",
+        "private_signal_channel_link",
         "guide",
     ]
     slug_url_kwarg = "team_slug"
