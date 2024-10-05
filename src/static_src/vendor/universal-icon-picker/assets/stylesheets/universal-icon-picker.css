@@ -4,7 +4,7 @@
   width: 100%;
   bottom: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: var(--bs-body-bg);
   z-index: 9999;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -43,7 +43,7 @@
           box-shadow: 2px 8px 23px 3px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   font-family: Roboto, Arial, Helvetica, Verdana, sans-serif;
-  background-color: #f1f3f5;
+  background-color: var(--bs-body-bg);
   width: 100%;
   margin: auto;
   left: 0;
@@ -53,13 +53,13 @@
 }
 .uip-modal .uip-modal--content .uip-modal--header {
   padding: 15px 15px;
-  background-color: #fff;
+  background-color: var(--bs-card-bg);
   -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
           box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
   font-size: 15px;
-  color: #495157;
+  color: var(--bs-card-color);
   font-weight: 500;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -109,7 +109,7 @@
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--sidebar .uip-modal--sidebar-tabs .uip-modal--sidebar-tab-item {
   padding: 15px;
   font-size: 14px;
-  color: #6d7882;
+  color: var(--bs-body-color);
   text-align: left;
   cursor: pointer;
   position: relative;
@@ -124,13 +124,13 @@
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--sidebar .uip-modal--sidebar-tabs .uip-modal--sidebar-tab-item i {
   font-size: 20px;
   padding-right: 15px;
-  color: #a4afb7;
+  color: var(--bs-body-color);
 }
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--sidebar .uip-modal--sidebar-tabs .uip-modal--sidebar-tab-item img {
   padding-right: 15px;
 }
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--sidebar .uip-modal--sidebar-tabs .uip-modal--sidebar-tab-item.universal-active {
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
   -webkit-box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.1);
   box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.1);
 }
@@ -141,7 +141,7 @@
   width: 5px;
   top: 0;
   left: 0;
-  background-color: #1cc2ff;
+  background-color: var(--bs-body-bg);
 }
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--sidebar .uip-modal--sidebar-tabs .uip-modal--sidebar-tab-item.universal-active i {
   color: #1cc2ff;
@@ -171,7 +171,7 @@
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-preview-inner .uip-modal--icon-preview .uip-icon-item {
   position: relative;
   padding: 10px;
-  background-color: #fff;
+  background-color: var(--bs-secondary-bg);
   -webkit-box-shadow: 0 1px 12px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 12px rgba(0, 0, 0, 0.05);
   border-radius: 3px;
@@ -204,10 +204,10 @@
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-preview-inner .uip-modal--icon-preview .uip-icon-item .uip-icon-item-inner i,
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-preview-inner .uip-modal--icon-preview .uip-icon-item .uip-icon-item-inner .uip-icon-item__icon {
   font-size: 25px;
-  color: #6d7882;
+  color: var(--bs-body-color);
 }
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-preview-inner .uip-modal--icon-preview .uip-icon-item .uip-icon-item-inner .uip-icon-item-name {
-  color: #c2cbd2;
+  color: var(--bs-body-color);
   font-size: 11px;
   padding: 13px 0 0;
   max-width: 100%;
@@ -222,7 +222,7 @@
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-search input {
   width: calc(100% - 15px);
   padding: 8px 15px;
-  background-color: #fff;
+  color: var(--bs-primary-text-emphasis);
   border: none;
 }
 .uip-modal .uip-modal--content .uip-modal--body .uip-modal--icon-preview-wrap .uip-modal--icon-search input::-webkit-input-placeholder {
@@ -246,11 +246,12 @@
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
   right: 25px;
+  color: var(--bs-primary-text-emphasis);
 }
 .uip-modal .uip-modal--footer {
   border-top: 1px solid #e6e9ec;
   text-align: center;
-  background-color: #fff;
+  background-color: var(--bs-body-bg);
   border: none;
   display: none;
   -webkit-box-pack: end;
@@ -268,7 +269,7 @@
   padding: 10px 35px;
   color: #fff;
   font-size: 15px;
-  background-color: #42d6a0;
+  background-color: var(--bs-btn-bg);
   border: none;
   cursor: pointer;
   outline: 0;
@@ -279,12 +280,12 @@
 }
 .uip-modal .uip-modal--footer .universal-button-success {
   padding: 12px 36px;
-  color: #fff;
+  color: var(--bs-body-color);
   width: initial;
   font-size: 15px;
 }
 .uip-modal .uip-modal--footer .universal-button-success:hover {
-  background-color: #42d6a0;
+  background-color: var(--bs-body-bg);
 }
 
 /* Responsive css */
