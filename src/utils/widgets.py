@@ -48,5 +48,5 @@ class MarkdownWidget(Textarea):
         js = ("/static/js/markdown_widget.js", "/static/vendor/marked/marked.min.js")
 
     def __init__(self):
-        attrs={"class": "markdown-widget"}
+        attrs = {"class": "markdown-widget"}
         super().__init__(attrs)
