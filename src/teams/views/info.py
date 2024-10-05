@@ -11,6 +11,7 @@ from info.models import InfoCategory
 from info.models import InfoItem
 from utils.widgets import MarkdownWidget
 
+
 class InfoCategoriesListView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
