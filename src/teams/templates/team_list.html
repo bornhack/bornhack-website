@@ -82,12 +82,12 @@
             </td>
 
             <td class="text-center">
-              <span class="badge">{{ team.members.count }}</span><br>
+              <span class="badge text-bg-secondary">{{ team.members.count }}</span><br>
               {% if team.needs_members %}(more needed){% endif %}
             </td>
 
             <td class="text-center">
-              <span class="badge">{{ team.tasks.count }}</span><br>
+              <span class="badge text-bg-secondary">{{ team.tasks.count }}</span><br>
             </td>
 
             {% if request.user.is_authenticated %}
