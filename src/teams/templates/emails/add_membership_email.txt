@@ -8,13 +8,13 @@ Team Contact information:
 {% if team.public_irc_channel_name %}
 Public IRC channel is {{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}
 {% endif %}
-{% if request.user in team.approved_members.all and team.private_irc_channel_name %}
+{% if team.private_irc_channel_name %}
 Private IRC channel is {{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}
 {% endif %}
 {% if team.public_signal_channel_link %}
 Public Signal group is {{ team.public_signal_channel_link }}
 {% endif %}
-{% if request.user in team.approved_members.all and team.private_signal_channel_link %}
+{% if team.private_signal_channel_link %}
 Private Signal group is {{ team.private_signal_channel_link }}
 {% endif %}
 

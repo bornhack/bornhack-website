@@ -10,7 +10,7 @@ Thank you for helping out!
 {% if team.public_irc_channel_name %}
   <p>The {{ team.name }} Team public IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.public_irc_channel_name }}">{{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
 {% endif %}
-{% if request.user in team.approved_members.all and team.private_irc_channel_name %}
+{% if team.member_permission_set in request.user.get_all_permissions and team.private_irc_channel_name %}
   <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
 {% endif %}
 
@@ -18,7 +18,7 @@ Thank you for helping out!
 {% if team.public_signal_channel_link %}
   <p>The {{ team.name }} Team public Signal group is <a href="{{ team.public_signal_channel_link }}">{{ team.public_signal_channel_link|urlize }}</a></p>
 {% endif %}
-{% if request.user in team.approved_members.all and team.private_signal_channel_link %}
+{% if team.member_permission_set in request.user.get_all_permissions and team.private_signal_channel_link %}
   <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link|urlize }}</a></p>
 {% endif %}
 <br>
