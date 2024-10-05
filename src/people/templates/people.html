@@ -21,7 +21,7 @@
               <thead>
                 <tr>
                   <th>Team Name</th>
-                  <th>Team Responsible</th>
+                  <th>Team Leads</th>
                   <th>Team Members</th>
                 </tr>
               </thead>
@@ -32,7 +32,7 @@
                       {{ team.name }} Team
                     </td>
                     <td>
-                      {% for resp in team.responsible_members.all %}
+                      {% for resp in team.leads.all %}
                         {{ resp.profile.get_public_credit_name }}<br>
                       {% endfor %}
                     </td>

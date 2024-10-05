@@ -25,7 +25,7 @@
         <li {% if view.active_menu == "members" %}class="active"{% endif %}>
           <a href="{% url "teams:members" camp_slug=team.camp.slug team_slug=team.slug %}">
             Members
-            {% if request.user in team.responsible_members.all and team.unapproved_members %}
+            {% if request.user in team.leads.all and team.unapproved_members %}
               <span class="label label-danger">Pending</span>
             {% endif %}
           </a>
@@ -45,7 +45,7 @@
           </li>
         {% endif %}
 
-        {% if request.user in team.responsible_members %}
+        {% if request.user in team.leads %}
           <li {% if view.active_menu == "info_categories" %}class="active"{% endif %}>
             <a href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
               Info categories
@@ -71,7 +71,7 @@
         {% if request.user in team.members.all %}
           <p>Your membership status: <b>{% membershipstatus user team %}</b></p>
 
-          {% if request.user in team.responsible_members.all %}
+          {% if request.user in team.leads.all %}
             <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage Team</a>
           {% endif %}
 

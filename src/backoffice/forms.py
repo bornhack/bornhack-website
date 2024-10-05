@@ -1,4 +1,7 @@
+from django.contrib.auth.models import User
 from django import forms
+from django.core.exceptions import ValidationError
+import json
 from django.forms import modelformset_factory
 
 from program.models import Event
@@ -241,3 +244,45 @@ class PosSalesJSONForm(forms.Form):
     sales = forms.FileField(
         help_text="POS sales.json file. Previously imported sales will be skipped and will not create duplicates.",
     )
+
+
+class MapLayerFeaturesImportForm(forms.Form):
+    """Form to import features in a map layer. Only accepts geojson type FeatureCollection."""
+
+    geojson_data = forms.CharField(
+        widget=forms.Textarea(),
+        help_text="The GeoJSON geometries to import.",
+    )
+
+    def clean(self):
+        """Parse geojson and return as dict."""
+        cleaned_data = super().clean()
+        # validate json
+        try:
+            geojson = json.loads(cleaned_data["geojson_data"])
+        except json.JSONDecodeError:
+            raise ValidationError("Invalid JSON")
+        # validate geojson
+        if "type" not in geojson or geojson["type"] != "FeatureCollection":
+            raise ValidationError("Invalid GeoJSON - only FeatureCollection supported!")
+        # all good
+        return geojson
+
+
+class ManageTeamPermissionsForm(forms.Form):
+    """The form used in backoffice to manage permissions for a team."""
+
+    def __init__(self, matrix: dict[str, list[str]], *args, **kwargs):
+        """Build a form of bool fields for the teams users permissions."""
+        super().__init__(*args, **kwargs)
+        for username in matrix.keys():
+            for perm in matrix[username]:
+                if perm in ["lead", "member"] or User.objects.get(username=username).is_superuser:
+                    disabled = True
+                else:
+                    disabled = False
+                self.fields[f"{username}_{perm}"] = forms.BooleanField(
+                    label=perm,
+                    required=False,
+                    disabled=disabled,
+                )

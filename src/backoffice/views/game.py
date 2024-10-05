@@ -29,7 +29,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 class TokenListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     """Show a list of secret tokens for this camp"""
 
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_list.html"
 
@@ -37,7 +37,7 @@ class TokenListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
 class TokenDetailView(CampViewMixin, RaisePermissionRequiredMixin, DetailView):
     """Show details for a token."""
 
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_detail.html"
 
@@ -45,7 +45,7 @@ class TokenDetailView(CampViewMixin, RaisePermissionRequiredMixin, DetailView):
 class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     """Create a new Token."""
 
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_form.html"
     fields = ["token", "category", "description", "active", "valid_when"]
@@ -65,14 +65,14 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
 class TokenUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
     """Update a token."""
 
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_form.html"
     fields = ["token", "category", "description", "active", "valid_when"]
 
 
 class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_delete.html"
 
@@ -91,7 +91,7 @@ class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
 class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     """Show stats for token finds for this camp"""
 
-    permission_required = ["camps.backoffice_permission", "camps.gameteam_permission"]
+    permission_required = "camps.game_team_member"
     model = User
     template_name = "token_stats.html"
 

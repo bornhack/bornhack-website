@@ -6,7 +6,7 @@ channels-redis==4.2.0
 asyncio==3.4.3
 commonmark==0.9.1
 conference-scheduler==3.0.1
-django-allauth==65.0.0
+django-allauth==65.0.2
 django-allauth-2fa==0.11.1
 django-bootstrap3==24.3
 django-cors-headers==4.3.1
@@ -18,10 +18,11 @@ django-oauth-toolkit==3.0.1
 django-prometheus==2.3.1
 django-reversion==5.0.12
 django-tables2==2.7.0
-django-taggit==5.0.1
+django-taggit==6.1.0
+django-colorfield==0.11.0
 future==1.0.0
 html5lib==1.1
-icalendar==5.0.12
+icalendar==6.0.0
 irc3==1.1.10
 lxml==5.3.0
 nh3==0.2.18

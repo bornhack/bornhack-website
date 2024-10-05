@@ -34,11 +34,12 @@ from .views import CoinifyBalanceListView
 from .views import CoinifyCSVImportView
 from .views import CoinifyDashboardView
 from .views import CoinifyInvoiceListView
+from .views import TeamPermissionIndexView
+from .views import TeamPermissionManageView
 from .views import CoinifyPayoutListView
 from .views import CredebtorDetailView
 from .views import CreditNoteDownloadView
 from .views import CreditNoteListView
-from .views import economy_search_view
 from .views import EpayCSVImportView
 from .views import EpayTransactionListView
 from .views import EventDeleteView
@@ -78,6 +79,7 @@ from .views import FacilityOpeningHoursDeleteView
 from .views import FacilityOpeningHoursUpdateView
 from .views import FacilityTypeCreateView
 from .views import FacilityTypeDeleteView
+from .views import FacilityTypeImportView
 from .views import FacilityTypeListView
 from .views import FacilityTypeUpdateView
 from .views import FacilityUpdateView
@@ -86,6 +88,18 @@ from .views import InvoiceDownloadView
 from .views import InvoiceListCSVView
 from .views import InvoiceListView
 from .views import IrcOverView
+from .views import MapExternalLayerCreateView
+from .views import MapExternalLayerDeleteView
+from .views import MapExternalLayerUpdateView
+from .views import MapFeatureCreateView
+from .views import MapFeatureDeleteView
+from .views import MapFeatureListView
+from .views import MapFeatureUpdateView
+from .views import MapLayerCreateView
+from .views import MapLayerDeleteView
+from .views import MapLayerFeaturesImportView
+from .views import MapLayerUpdateView
+from .views import MapLayerListView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -150,6 +164,8 @@ from .views import ZettleBalanceListView
 from .views import ZettleDashboardView
 from .views import ZettleDataImportView
 from .views import ZettleReceiptListView
+from .views import PermissionByUserView
+from .views import PermissionByPermissionView
 
 app_name = "backoffice"
 
@@ -178,6 +194,11 @@ urlpatterns = [
                     include(
                         [
                             path(
+                                "import/",
+                                FacilityTypeImportView.as_view(),
+                                name="facility_type_import",
+                            ),
+                            path(
                                 "update/",
                                 FacilityTypeUpdateView.as_view(),
                                 name="facility_type_update",
@@ -186,6 +207,97 @@ urlpatterns = [
                                 "delete/",
                                 FacilityTypeDeleteView.as_view(),
                                 name="facility_type_delete",
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        ),
+    ),
+    path(
+        "maps/",
+        include(
+            [
+                path("", MapLayerListView.as_view(), name="map_layer_list"),
+                path(
+                    "create/",
+                    MapLayerCreateView.as_view(),
+                    name="map_layer_create",
+                ),
+                path(
+                    "external/",
+                    include(
+                        [
+                            path(
+                                "create/",
+                                MapExternalLayerCreateView.as_view(),
+                                name="map_external_layer_create",
+                            ),
+                            path(
+                                "<uuid:external_layer_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "delete/",
+                                            MapExternalLayerDeleteView.as_view(),
+                                            name="map_external_layer_delete",
+                                        ),
+                                        path(
+                                            "update/",
+                                            MapExternalLayerUpdateView.as_view(),
+                                            name="map_external_layer_update",
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "<slug:layer_slug>/",
+                    include(
+                        [
+                            path(
+                                "",
+                                MapFeatureListView.as_view(),
+                                name="map_features_list",
+                            ),
+                            path(
+                                "create/",
+                                MapFeatureCreateView.as_view(),
+                                name="map_feature_create",
+                            ),
+                            path(
+                                "import/",
+                                MapLayerFeaturesImportView.as_view(),
+                                name="map_layer_features_import",
+                            ),
+                            path(
+                                "update/",
+                                MapLayerUpdateView.as_view(),
+                                name="map_layer_update",
+                            ),
+                            path(
+                                "delete/",
+                                MapLayerDeleteView.as_view(),
+                                name="map_layer_delete",
+                            ),
+                            path(
+                                "features/<uuid:feature_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "update/",
+                                            MapFeatureUpdateView.as_view(),
+                                            name="map_feature_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            MapFeatureDeleteView.as_view(),
+                                            name="map_feature_delete",
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),
@@ -751,7 +863,6 @@ urlpatterns = [
         "economy/",
         include(
             [
-                path("search/", economy_search_view, name="economy_search"),
                 # chains & credebtors
                 path(
                     "chains/",
@@ -1271,6 +1382,41 @@ urlpatterns = [
                     "<uuid:pk>/",
                     ShopTicketStatsDetailView.as_view(),
                     name="shop_ticket_stats_detail",
+                ),
+            ],
+        ),
+    ),
+    # team permissions
+    path(
+        "team_permissions/",
+        include(
+            [
+                path(
+                    "",
+                    TeamPermissionIndexView.as_view(),
+                    name="team_permission_index",
+                ),
+                path(
+                    "<slug:team_slug>/",
+                    TeamPermissionManageView.as_view(),
+                    name="team_permission_manage",
+                ),
+            ],
+        ),
+    ),
+    path(
+        "permissions/",
+        include(
+            [
+                path(
+                    "by_user/",
+                    PermissionByUserView.as_view(),
+                    name="permission_list_by_user",
+                ),
+                path(
+                    "by_permission/",
+                    PermissionByPermissionView.as_view(),
+                    name="permission_list_by_permission",
                 ),
             ],
         ),

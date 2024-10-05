@@ -7,6 +7,9 @@
   {{ form.media }}
   {% leaflet_css plugins="forms" %}
   {% leaflet_js plugins="forms" %}
+  {{ mapData|json_script:"mapData" }}
+  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
 {% endblock extra_head %}
 
 {% block content %}
@@ -25,4 +28,5 @@
       </form>
     </div>
   </div>
+  <script src="{% static 'js/maps/generic/init_loader.js' %}"></script>
 {% endblock content %}

@@ -1,9 +1,21 @@
 {% extends 'base.html' %}
+{% load leaflet_tags %}
 {% load bootstrap3 %}
+{% load static %}
 
 {% block title %}
   Create {{ camp.title }} Village | {{ block.super }}
 {% endblock %}
+
+{% block extra_head %}
+  {{ form.media }}
+  {% leaflet_css plugins="forms" %}
+  {% leaflet_js plugins="forms" %}
+  {{ mapData|json_script:"mapData" }}
+  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
+{% endblock extra_head %}
+
 
 {% block content %}
   <h3>Create {{ camp.title }} Village</h3>
@@ -16,5 +28,6 @@
 
     <button class="btn btn-primary pull-right" type="submit">Save</button>
   </form>
+  <script src="{% static 'js/maps/generic/init_loader.js' %}"></script>
 
 {% endblock %}

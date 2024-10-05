@@ -23,7 +23,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         max_length=200,
         default="",
         blank=True,
-        help_text="Your name or handle (only visible to team responsible and organisers)",
+        help_text="Your name or handle (only visible to team leads and orga)",
     )
 
     description = models.TextField(

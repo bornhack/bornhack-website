@@ -24,7 +24,7 @@
             <th>
               Status
             </th>
-            {% if request.user in team.responsible_members.all %}
+            {% if request.user in team.leads.all %}
               <th>
                 Email
               </th>
@@ -39,16 +39,16 @@
         </thead>
         <tbody>
           {% for member in team.memberships.all %}
-            {% if member.approved or not member.approved and request.user in team.responsible_members.all %}
+            {% if member.approved or not member.approved and request.user in team.leads.all %}
               <tr>
                 <td>
                   {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
                 </td>
                 <td>
-                  Team {% if member.responsible %}Responsible{% else %}Member{% endif %}
+                  Team {% if member.lead %}Lead{% else %}Member{% endif %}
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
-                {% if request.user in team.responsible_members.all %}
+                {% if request.user in team.leads.all %}
                   <td>
                     {{ member.user.email }}
                   </td>

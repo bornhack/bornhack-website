@@ -11,7 +11,7 @@ from django.views.generic.edit import UpdateView
 
 from ..models import Team
 from ..models import TeamMember
-from .mixins import EnsureTeamResponsibleMixin
+from .mixins import EnsureTeamLeadMixin
 from camps.mixins import CampViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
@@ -28,7 +28,7 @@ class TeamListView(CampViewMixin, ListView):
         qs = qs.prefetch_related("members__profile")
         # FIXME: there is more to be gained here but the templatetag we use to see if
         # the logged-in user is a member of the current team does not benefit from the prefetching,
-        # also the getting of team responsible members and their profiles do not use the prefetching
+        # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
         return qs
 
@@ -55,7 +55,7 @@ class TeamGeneralView(CampViewMixin, DetailView):
         return context
 
 
-class TeamManageView(CampViewMixin, EnsureTeamResponsibleMixin, UpdateView):
+class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, UpdateView):
     model = Team
     template_name = "team_manage.html"
     fields = [

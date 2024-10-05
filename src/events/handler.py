@@ -88,7 +88,7 @@ def team_email_notification(
 ):
     """
     Sends email notifications for events to team mailinglists (if possible,
-    otherwise directly to the team responsibles)
+    otherwise directly to the team leads)
     """
     if not email_template or not email_formatdict or not eventtype.email_notification:
         # no email message found, or email notifications are not enabled for this event type
@@ -98,8 +98,8 @@ def team_email_notification(
         # send notification to the team mailing list
         recipient_list = [team.mailing_list]
     else:
-        # no team mailinglist, send to the team responsibles instead
-        recipient_list = [resp.email for resp in team.responsible_members.all()]
+        # no team mailinglist, send to the team leads instead
+        recipient_list = [resp.email for resp in team.leads.all()]
 
     # TODO: actually send the email here
     logger.debug(f"sending test email to {recipient_list}")

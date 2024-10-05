@@ -11,7 +11,7 @@ from ..models import TaskComment
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamTask
-from .mixins import EnsureTeamResponsibleMixin
+from .mixins import EnsureTeamLeadMixin
 from .mixins import TeamViewMixin
 from camps.mixins import CampViewMixin
 
@@ -30,7 +30,7 @@ class TaskCommentForm(forms.ModelForm):
         fields = ["comment"]
 
 
-class TaskDetailView(CampViewMixin, TeamViewMixin, DetailView):
+class TaskDetailView(TeamViewMixin, DetailView):
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
@@ -73,9 +73,8 @@ class TaskForm(forms.ModelForm):
 
 class TaskCreateView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     CreateView,
 ):
     model = TeamTask
@@ -103,9 +102,8 @@ class TaskCreateView(
 
 class TaskUpdateView(
     LoginRequiredMixin,
-    CampViewMixin,
     TeamViewMixin,
-    EnsureTeamResponsibleMixin,
+    EnsureTeamLeadMixin,
     UpdateView,
 ):
     model = TeamTask

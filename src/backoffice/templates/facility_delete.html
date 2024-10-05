@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h2 class="panel-title">Delete Facility {{ facility.name }}?</h2>
+    </div>
+    <div class="panel-body">
+      {% if facility.feedbacks.count > 0 %}
+        <p class="lead">This Facility has <b>{{ facility.feedbacks.count }}</b> Feedback and can not be deleted</p>
+      {% endif %}
+      <form method="POST">
+        {% csrf_token %}
+        {% if facility.feedbacks.count == 0 %}
+          <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
+        {% endif %}
+        <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

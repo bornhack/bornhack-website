@@ -4,7 +4,7 @@
 
 {% block extra_head %}
   {{ invoices|json_script:"invoices" }}
-  <script src="{% static 'js/InvoiceDownloadMultiple.js' %}"></script>
+  <script src="{% static 'js/backoffice/invoice_download.js' %}"></script>
 {% endblock %}
 
 {% block title %}

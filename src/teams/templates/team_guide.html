@@ -15,7 +15,7 @@
            target="_blank">
           Print
         </a>
-        {% if request.user in team.responsible_members.all %}
+        {% if request.user in team.leads.all %}
           <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
         {% endif %}
       </div>
