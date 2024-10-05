@@ -7,6 +7,10 @@
   Schedule | {{ block.super }}
 {% endblock %}
 
+{% block extra_head %}
+    <script src="{% static "js/schedule_view.js" %}" ></script>
+{% endblock extra_head %}
+
 {% block program_content %}
 
   <div class="row">
@@ -42,7 +46,8 @@
             <td colspan=6><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
           </tr>
         {% endifchanged %}
-        <tr>
+        <tr data-event-date-lower="{{ slot.when.lower|date:'c' }}"
+            data-event-date-upper="{{ slot.when.upper|date:'c' }}">
           <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
           <td>
             <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
