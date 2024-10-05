@@ -388,3 +388,33 @@ img {
 .form-select {
     background-color: var(--bs-body-bg)
 }
+
+.slider-widget {
+    width: 90%;
+    padding-top: 10px;
+}
+
+.slider-widget__value {
+  display: inline-block;
+  position: relative;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  color: var(--bs-info-text-emphasis);
+  background: var(--bs-info);
+  padding: 5px 10px;
+  margin-left: 8px;
+
+  &:after {
+    position: absolute;
+    top: 8px;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-right: 7px solid var(--bs-info);
+    border-bottom: 7px solid transparent;
+    content: '';
+  }
+}
+

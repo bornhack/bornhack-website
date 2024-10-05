@@ -1,6 +1,9 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
 {% load django_bootstrap5 %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block title %}
   {% if request.resolver_match.url_name == "eventfeedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }} | {{ block.super }}

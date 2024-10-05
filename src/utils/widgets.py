@@ -20,3 +20,22 @@ class IconPickerWidget(Widget):
         context["widget"]["value"] = self.format_value(value)
         context["widget"]["disabled"] = True
         return context
+
+
+class SliderWidget(Widget):
+    template_name = "slider_widget.html"
+    input_type = "range"
+
+    class Media:
+        js = (
+            "/static/js/slider_widget.js",
+        )
+
+    def __init__(self, attrs=None, smin=0, smax=0):
+        self.smin = smin
+        self.smax = smax
+        super().__init__(attrs)
+
+
+class SwitchWidget(Widget):
+    template_name = 'switch_widget.html'

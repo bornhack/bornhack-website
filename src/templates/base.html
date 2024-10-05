@@ -71,7 +71,7 @@
     {% block body %}
       <header class="py-1">
         <nav class="navbar fixed-top navbar-expand-lg bg-body">
-          <div class="container container-fluid">
+          <div class="container-xl container-fluid">
             {% if request.resolver_match.kwargs.camp_slug and camp %}
               <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
                 <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="bornhack-logo img-responsive">
@@ -136,7 +136,7 @@
           </div>
         </nav>
       </header>
-      <div id="main" class="container-lg">
+      <div id="main" class="container-xxl">
         {% if camp %}
           <div class="row">
             <div class="d-none d-lg-flex btn-group w-100" role="group">
