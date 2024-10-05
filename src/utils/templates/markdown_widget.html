@@ -4,7 +4,7 @@
       <textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
       <p class="d-inline-flex gap-1 hide-for-no-js-users">
         <a class="btn btn-primary" data-bs-toggle="collapse" href="#{{ widget.attrs.id }}-card" role="button" aria-expanded="false" aria-controls="{{ widget.attrs.id }}-card">
-          Preview
+          <i class="fa-solid fa-paint-roller"></i> Preview
         </a>
       </p>
     </div>

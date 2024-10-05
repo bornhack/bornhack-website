@@ -1,8 +1,9 @@
 from django.forms import Widget
 from django.forms import Textarea
+from django.forms import TextInput 
 
 
-class IconPickerWidget(Widget):
+class IconPickerWidget(TextInput):
     template_name = "icon_picker_widget.html"
 
     class Media:
