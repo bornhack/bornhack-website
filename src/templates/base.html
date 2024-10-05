@@ -108,9 +108,9 @@
                 {% endif %}
               </ul>
               <div class="nav navbar-nav navbar-right ms-auto">
-                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
-                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
                 {% if user.is_authenticated %}
+                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
                   <div class="dropdown hide-for-no-js-users">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
                     <ul class="dropdown-menu">
