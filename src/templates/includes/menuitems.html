@@ -7,14 +7,14 @@
 <a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
 <a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>
 {% if is_volunteer %}
-    <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
+  <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
 {% endif %}
 
 <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'facilities' %}" href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a>
 <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'phonebook' %}" href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a>
 
 {% if request.user.is_authenticated %}
-    <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
+  <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
 {% endif %}
 <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'token' %}" href="{% url 'tokens:tokenfind_list' %}">Token Game</a>
 
