@@ -1,6 +1,6 @@
 from django.forms import Widget
 from django.forms import Textarea
-from django.forms import TextInput 
+from django.forms import TextInput
 
 
 class IconPickerWidget(TextInput):
