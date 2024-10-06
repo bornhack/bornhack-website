@@ -523,7 +523,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     slug = models.SlugField(unique=True, max_length=100)
 
     price = models.IntegerField(
-        help_text=_("Price of the product (in DKK, including VAT)."),
+        help_text=_("Price of the product (in DKK, including VAT). The price can not be changed."),
     )
 
     description = models.TextField()

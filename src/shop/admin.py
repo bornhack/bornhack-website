@@ -117,6 +117,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ["category", "ticket_type"]
     search_fields = ["name"]
     save_as = True
+    readonly_fields = ("price",)
 
     list_select_related = ["ticket_type", "category", "ticket_type__camp"]
 
