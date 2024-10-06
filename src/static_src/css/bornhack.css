@@ -417,3 +417,18 @@ img {
     content: '';
   }
 }
+
+.anchor{
+    display: block;
+    height: 85px; /*same height as header*/
+    margin-top: -85px; /*same height as header*/
+    visibility: hidden;
+}
+
+.sub-anchor{
+    display: block;
+    height: 94px; /*same height as header*/
+    margin-top: -94px; /*same height as header*/
+    visibility: hidden;
+}
+

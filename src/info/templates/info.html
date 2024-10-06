@@ -11,30 +11,6 @@
 {% endblock %}
 
 {% block content %}
-  <style>
-    .anchor{
-      display: block;
-      height: 80px; /*same height as header*/
-      margin-top: -80px; /*same height as header*/
-      visibility: hidden;
-    }
-
-    .sub-anchor{
-      display: block;
-      height: 94px; /*same height as header*/
-      margin-top: -94px; /*same height as header*/
-      visibility: hidden;
-    }
-
-    @media (min-width: 992px) {
-      .sticky {
-        position: sticky;
-        top: 100px;
-      }
-    }
-
-  </style>
-
   {% if categories %}
     <div class="row">
       <div class="col-sm-12 col-lg-3 sticky">
