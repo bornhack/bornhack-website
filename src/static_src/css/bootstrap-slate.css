@@ -12081,6 +12081,7 @@ textarea.form-control-lg {
 .navbar-brand {
   padding: 0.75rem 0 calc(24px - 0.75rem);
   margin-right: 0;
+  padding-right: 2rem;
 }
 .navbar .nav-item.active .nav-link {
   background-color: rgba(0, 0, 0, 0.3);
