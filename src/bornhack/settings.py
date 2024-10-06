@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "teams",
     "people",
     "tickets",
-    "bar",
     "backoffice",
     "events",
     "rideshare",
