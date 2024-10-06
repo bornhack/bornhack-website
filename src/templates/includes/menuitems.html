@@ -5,7 +5,7 @@
 <a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
 <a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
 <a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>
+<a style="flex-grow: 1;" role="button" class="btn hide-for-no-js-users {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>
 {% if is_volunteer %}
   <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
 {% endif %}
