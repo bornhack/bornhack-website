@@ -10,6 +10,7 @@ from utils.models import UUIDModel
 class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDModel):
     THEME_CHOICES = (
         ("default", "Default (Auto)"),
+        ("light", "Light"),
         ("slate", "Slate"),
         ("solar", "Solar"),
     )
