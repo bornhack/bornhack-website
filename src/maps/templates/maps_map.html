@@ -28,11 +28,12 @@
 {% block content %}
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">Map</h3>
+      <h3 class="card-title unhide-for-no-js-users">Sorry without Javascript we can't show the map</h3>
+      <h3 class="card-title hide-for-no-js-users">Map</h3>
     </div>
     <div class="card-body" id="container">
-      <div id="map" class="map hide-for-no-js-users"></div>
-      <span class="h3 unhide-for-no-js-users">Sorry without JS we cant display the map.</span>
+      <div id="map" class="map"></div>
     </div>
     <script src="{% static 'js/maps/map.js' %}" type="text/javascript"></script>
+  </div>
 {% endblock %}

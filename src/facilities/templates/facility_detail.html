@@ -83,7 +83,7 @@
         {% endif %}
         <a href="{% url "facilities:facility_list" camp_slug=camp.slug facility_type_slug=facilitytype.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to {{ facilitytype.name }} list</a>
       </p>
-      <div id="map" class="map hide-for-no-js-users"></div>
+      <div id="map" class="map"></div>
       <hr>
       <h4>Feedback QR Code</h4>
       <img src="{% feedbackqr facility %}">
