@@ -2075,6 +2075,7 @@ progress {
   -moz-appearance: none;
   appearance: none;
   background-clip: padding-box;
+  background-color: var(--bs-gray-800);
   border: var(--bs-border-width) solid rgba(0, 0, 0, 0.6);
   border-radius: var(--bs-border-radius);
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
@@ -2092,6 +2093,7 @@ progress {
 }
 .form-control:focus {
   border-color: #9d9fa2;
+  background-color: var(--bs-gray-700);
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(58, 63, 68, 0.25);
 }
