@@ -11,8 +11,7 @@
  * Copyright 2011-2024 The Bootstrap Authors
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
-:root,
-[data-bs-theme=light] {
+:root {
   --bs-blue: #007bff;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -130,62 +129,7 @@
   --bs-form-valid-border-color: #62c462;
   --bs-form-invalid-color: #ee5f5b;
   --bs-form-invalid-border-color: #ee5f5b;
-}
-
-[data-bs-theme=dark] {
   color-scheme: dark;
-  --bs-body-color: #dee2e6;
-  --bs-body-color-rgb: 222, 226, 230;
-  --bs-body-bg: #272b30;
-  --bs-body-bg-rgb: 39, 43, 48;
-  --bs-emphasis-color: #fff;
-  --bs-emphasis-color-rgb: 255, 255, 255;
-  --bs-secondary-color: rgba(222, 226, 230, 0.75);
-  --bs-secondary-color-rgb: 222, 226, 230;
-  --bs-secondary-bg: #3a3f44;
-  --bs-secondary-bg-rgb: 58, 63, 68;
-  --bs-tertiary-color: rgba(222, 226, 230, 0.5);
-  --bs-tertiary-color-rgb: 222, 226, 230;
-  --bs-tertiary-bg: #31353a;
-  --bs-tertiary-bg-rgb: 49, 53, 58;
-  --bs-primary-text-emphasis: #898c8f;
-  --bs-secondary-text-emphasis: #afb4b8;
-  --bs-success-text-emphasis: #a1dca1;
-  --bs-info-text-emphasis: #9dd9eb;
-  --bs-warning-text-emphasis: #fbbf6a;
-  --bs-danger-text-emphasis: #f59f9d;
-  --bs-light-text-emphasis: #f8f9fa;
-  --bs-dark-text-emphasis: #dee2e6;
-  --bs-primary-bg-subtle: #0c0d0e;
-  --bs-secondary-bg-subtle: #181a1b;
-  --bs-success-bg-subtle: #142714;
-  --bs-info-bg-subtle: #12262c;
-  --bs-warning-bg-subtle: #321e01;
-  --bs-danger-bg-subtle: #301312;
-  --bs-light-bg-subtle: #3a3f44;
-  --bs-dark-bg-subtle: #1d2022;
-  --bs-primary-border-subtle: #232629;
-  --bs-secondary-border-subtle: #494e52;
-  --bs-success-border-subtle: #3b763b;
-  --bs-info-border-subtle: #377385;
-  --bs-warning-border-subtle: #955904;
-  --bs-danger-border-subtle: #8f3937;
-  --bs-light-border-subtle: #52575c;
-  --bs-dark-border-subtle: #3a3f44;
-  --bs-heading-color: inherit;
-  --bs-link-color: #898c8f;
-  --bs-link-hover-color: #a1a3a5;
-  --bs-link-color-rgb: 137, 140, 143;
-  --bs-link-hover-color-rgb: 161, 163, 165;
-  --bs-code-color: #f18bba;
-  --bs-highlight-color: #dee2e6;
-  --bs-highlight-bg: #633b02;
-  --bs-border-color: #52575c;
-  --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
-  --bs-form-valid-color: #a1dca1;
-  --bs-form-valid-border-color: #a1dca1;
-  --bs-form-invalid-color: #f59f9d;
-  --bs-form-invalid-border-color: #f59f9d;
 }
 
 *,
