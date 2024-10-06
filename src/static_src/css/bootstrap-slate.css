@@ -12061,7 +12061,7 @@ textarea.form-control-lg {
 }
 .navbar {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
-  color: var(--bs-navbar-color) 
+  color: var(--bs-navbar-color)
 }
 .navbar .container {
   padding: 0;
@@ -12513,4 +12513,3 @@ legend {
     background-color: white;
     color: black;
 }
-
