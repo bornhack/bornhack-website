@@ -7,7 +7,6 @@ from django.urls import include
 from django.urls import path
 from django.views.generic import TemplateView
 
-from bar.views import MenuView
 from camps.views import CampDetailView
 from camps.views import CampListView
 from camps.views import CampRedirectView
@@ -149,7 +148,6 @@ urlpatterns = [
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
                 path("map/", MapView.as_view(), name="maps_map"),
-                path("bar/menu/", MenuView.as_view(), name="menu"),
                 path(
                     "villages/",
                     include(
