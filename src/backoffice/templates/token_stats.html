@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load bornhack %}
+{% load obfuscate_email %}
 
 {% block title %}
   Token Stats | Backoffice | {{ block.super }}
@@ -15,7 +16,7 @@
         <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
           <thead>
             <tr>
-              <th>Email</th>
+              <th>Name</th>
               <th>Finds</th>
               <th>Last token found</th>
             </tr>
@@ -23,7 +24,7 @@
           <tbody>
             {% for user in user_list %}
               <tr>
-                <td>{{ user.email }}</td>
+                <td>{{ user.profile.public_credit_name|default:user.username }}</td>
                 <td>{{ user.token_find_count }}</td>
                 <td>{{ user.last_token_find }}</td>
               </tr>
