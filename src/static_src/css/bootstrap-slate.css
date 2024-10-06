@@ -12079,7 +12079,7 @@ textarea.form-control-lg {
   padding: 1rem;
 }
 .navbar-brand {
-  padding: 0.75rem 1rem calc(24px - 0.75rem);
+  padding: 0.75rem 0 calc(24px - 0.75rem);
   margin-right: 0;
 }
 .navbar .nav-item.active .nav-link {
@@ -12511,4 +12511,5 @@ legend {
 .sponsor-white {
     background-color: white;
     color: black;
+    border: 20px solid white;
 }

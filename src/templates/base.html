@@ -149,7 +149,7 @@
               {% include 'includes/menuitems.html' %}
             </div>
           </div>
-          <div class="row">
+          <div class="row {% if request.resolver_match.app_name != "program" %}mb-3{% endif %}">
             <div class="col d-none d-lg-flex w-100 {{camp.slug}}-gradient">
               &nbsp;
             </div>
