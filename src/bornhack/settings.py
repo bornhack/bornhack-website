@@ -12,7 +12,7 @@ WSGI_APPLICATION = "bornhack.wsgi.application"
 ASGI_APPLICATION = "bornhack.routing.application"
 ROOT_URLCONF = "bornhack.urls"
 
-ACCOUNT_ADAPTER = "allauth_2fa.adapter.OTPAdapter"
+ACCOUNT_ADAPTER = "bornhack.allauth.UsernameUUIDAdapter"
 
 SITE_ID = 1
 

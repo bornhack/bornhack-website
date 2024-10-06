@@ -68,13 +68,15 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
     context_object_name = "permissions"
 
     def get_queryset(self, *args, **kwargs):
-        perms = self.request.user.get_all_permissions()
+        """Get real Permission objects so we have the perm descriptions as well."""
         query = Q()
-        for perm in perms:
+        # loop over users permissions and build an OR query
+        for perm in self.request.user.get_all_permissions():
             app_label, codename = perm.split(".")
             query |= Q(content_type__app_label=app_label, codename=codename)
+        # get and return the objects
         perms = (
-            Permission.objects.filter(content_type__app_label="camps")
+            Permission.objects.none()
             .filter(query)
             .exclude(
                 codename__in=["add_camp", "change_camp", "delete_camp", "view_camp"],
