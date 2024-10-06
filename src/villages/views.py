@@ -150,6 +150,8 @@ class VillageCreateView(
             attrs={
                 "display_raw": "true",
                 "map_height": "500px",
+                "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form
@@ -206,6 +208,8 @@ class VillageUpdateView(
             attrs={
                 "display_raw": "true",
                 "map_height": "500px",
+                "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form
