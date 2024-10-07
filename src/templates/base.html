@@ -106,12 +106,14 @@
                 {% if request.user.is_staff %}
                   <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
                 {% endif %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
               </ul>
               <div class="nav navbar-nav navbar-right ms-auto">
                 {% if user.is_authenticated %}
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
-                  <div class="dropdown hide-for-no-js-users">
+                  <div class="dropdown hide-for-no-js-users d-none d-lg-flex">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>

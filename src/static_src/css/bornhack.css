@@ -297,7 +297,7 @@ body.bar-menu {
 
 /* the .noscript class is in <body> html and removed on load for js enabled useragents */
 .no-js .hide-for-no-js-users {
-    display: none;
+    display: none !important;
 }
 
 /* Unhide for no-js users */
@@ -366,7 +366,7 @@ img {
 }
 .bornhack-2022-gradient {
   height: 5px;
-  background: linear-gradient(0.25turn, var(--bs-body-bg), #ffffff, var(--bs-body-bg));
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #000000, var(--bs-body-bg));
 }
 .bornhack-2023-gradient {
   height: 5px;
