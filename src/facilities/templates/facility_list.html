@@ -37,7 +37,7 @@
           {% endif %}
           <h4 class="list-group-item-heading">
             <i class="{{ facility.facility_type.icon }} fa-2x fa-pull-left fa-fw"></i> {{ facility.name }}
-            <img class="pull-right" src="{% static 'img/leaflet/marker-icon-'|add:facility.facility_type.marker|slice:"-4"|add:'.png' %}">
+            <img class="float-end" src="{% static 'img/leaflet/marker-icon-'|add:facility.facility_type.marker|slice:"-4"|add:'.png' %}">
           </h4>
           <p class="list-group-item-text">{{ facility.description }}</p>
           <p class="list-group-item-text"><i>Location: Lat {{ facility.location.y }} Long {{ facility.location.x }}</i></p>

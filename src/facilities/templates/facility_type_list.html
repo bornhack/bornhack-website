@@ -24,9 +24,7 @@
 
 {% block content %}
   <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Facilities</h3>
-    </div>
+    <h3 class="card-header">Facilities</h3>
     <div class="card-body">
       <p class="lead">The {{ camp.title }} facilities are grouped in categories. Pick a category to limit the facilities shown.</p>
       <div class="list-group">
@@ -34,7 +32,7 @@
           <a href="{% url 'facilities:facility_list' camp_slug=camp.slug facility_type_slug=ft.slug %}" class="list-group-item">
             <h4 class="list-group-item-heading">
               <i class="{{ ft.icon }} fa-2x fa-pull-left fa-fw"></i> {{ ft.name }}
-              <img class="pull-right" src="{% static 'img/leaflet/marker-icon-'|add:ft.marker|slice:"-4"|add:'.png' %}">
+              <img class="float-end" src="{% static 'img/leaflet/marker-icon-'|add:ft.marker|slice:"-4"|add:'.png' %}">
             </h4>
             <p class="list-group-item-text">{{ ft.description }}</p>
           </a>

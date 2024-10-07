@@ -2921,7 +2921,7 @@ textarea.form-control-lg {
   --bs-btn-line-height: 1.5;
   --bs-btn-color: var(--bs-body-color);
   --bs-btn-bg: transparent;
-  --bs-btn-border-width: var(--bs-border-width);
+  --bs-btn-border-width: 0;
   --bs-btn-border-color: transparent;
   --bs-btn-border-radius: var(--bs-border-radius);
   --bs-btn-hover-border-color: transparent;
@@ -3693,10 +3693,6 @@ textarea.form-control-lg {
 .btn-group {
   border-radius: var(--bs-border-radius);
 }
-.btn-group > :not(.btn-check:first-child) + .btn,
-.btn-group > .btn-group:not(:first-child) {
-  margin-left: calc(var(--bs-border-width) * -1);
-}
 .btn-group > .btn:not(:last-child):not(.dropdown-toggle),
 .btn-group > .btn.dropdown-toggle-split:first-child,
 .btn-group > .btn-group:not(:last-child) > .btn {
@@ -3739,10 +3735,6 @@ textarea.form-control-lg {
 .btn-group-vertical > .btn,
 .btn-group-vertical > .btn-group {
   width: 100%;
-}
-.btn-group-vertical > .btn:not(:first-child),
-.btn-group-vertical > .btn-group:not(:first-child) {
-  margin-top: calc(var(--bs-border-width) * -1);
 }
 .btn-group-vertical > .btn:not(:last-child):not(.dropdown-toggle),
 .btn-group-vertical > .btn-group:not(:last-child) > .btn {
@@ -12096,7 +12088,7 @@ textarea.form-control-lg {
   border-color: rgba(0, 0, 0, 0.6);
 }
 .btn-primary {
-  background-image: linear-gradient(#44494d, #3a3f44 20%, #2e3236);
+  background-image: linear-gradient(#44494d, #3a3f44 100%, #2e3236);
   filter: none;
 }
 .btn-primary:not([disabled]):not(.disabled):hover {
