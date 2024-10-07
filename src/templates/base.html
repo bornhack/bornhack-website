@@ -85,7 +85,7 @@
               <span class="navbar-toggler-icon"></span>
             </button>
             <div id="top-navbar" class="collapse navbar-collapse">
-              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-nav-scroll">
                 <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
                 <li class="nav-item dropdown hide-for-no-js-users">
@@ -106,10 +106,23 @@
                 {% if request.user.is_staff %}
                   <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
                 {% endif %}
+
+                {% if user.orders.exists %}
+                  {% url 'shop:order_list' as orders_list_url %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ orders_list_url }}">Orders</a></li>
+
+                  {% url 'tickets:shopticket_list' as ticket_list_url %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ ticket_list_url }}">Tickets</a></li>
+
+                  {% if user.creditnotes.exists %}
+                    {% url 'shop:creditnote_list' as creditnote_list_url %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                  {% endif %}
+                {% endif %}
                 <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
                 <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
               </ul>
-              <div class="nav navbar-nav navbar-right ms-auto">
+              <div class="nav navbar-nav navbar-right ms-auto d-none d-lg-flex">
                 {% if user.is_authenticated %}
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
