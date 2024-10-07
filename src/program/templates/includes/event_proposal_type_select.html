@@ -18,7 +18,7 @@
         {% endif %}
         <h5 class="list-group-item-heading">
           <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
-          {{ event_type.name }}<span class="ms-auto"><i class="fas fa-plus fa-2x fa-ms-auto" style="color: {{ event_type.color }};"></i></span>
+          {{ event_type.name }}<span class="float-end"><i class="fas fa-plus fa-2x fa-ms-auto" style="color: {{ event_type.color }};"></i></span>
         </h5>
         {% if event_type.description %}<p class="list-group-item-text">{{ event_type.description }}</p>{% endif %}
         </a>
