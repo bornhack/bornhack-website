@@ -17,6 +17,7 @@ $(document).ready(function(){
         "pageLength": 100,
         "format": "dddd, MMM Do, YYYY, HH:mm",
         "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+        "responsive": true,
     } );
 } );
 
