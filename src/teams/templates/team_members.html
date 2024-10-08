@@ -57,12 +57,12 @@
                   </td>
                   <td>
                     <div class="btn-group-vertical">
-                      <a class="btn btn-danger"
+                      <a class="btn btn-danger btn-sm text-nowrap"
                          href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                         <i class="fas fa-trash"></i> Remove
                       </a>
                       {% if not member.approved %}
-                        <a class="btn btn-success"
+                        <a class="btn btn-success btn-sm text-nowrap"
                            href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve
                         </a>
