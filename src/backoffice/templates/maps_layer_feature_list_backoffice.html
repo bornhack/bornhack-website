@@ -44,8 +44,8 @@
               <td class="text-center">{{ ft.geom }}</td>
               <td>
                 <div class="btn-group" role="group">
-                <a href="{% url "backoffice:map_feature_update" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
-                <a href="{% url "backoffice:map_feature_delete" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                  <a href="{% url "backoffice:map_feature_update" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:map_feature_delete" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
                 </div>
               </td>
             </tr>

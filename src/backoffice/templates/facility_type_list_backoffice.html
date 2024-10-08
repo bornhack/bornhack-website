@@ -42,10 +42,10 @@
               <td class="text-center"><span class="badge">{{ ft.facilities.count }}</span></td>
               <td>
                 <div class="btn-group" role="group" aria-label="Controls">
-                <a href="{% url "backoffice:facility_type_import" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-success"><i class="fas fa-file-import"></i> Import</a>
-                <a href="{% url "facilities:facility_list_geojson" camp_slug=camp.slug facility_type_slug=ft.slug %}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-file-export"></i> Export</a>
-                <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
-                <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                  <a href="{% url "backoffice:facility_type_import" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-success"><i class="fas fa-file-import"></i> Import</a>
+                  <a href="{% url "facilities:facility_list_geojson" camp_slug=camp.slug facility_type_slug=ft.slug %}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-file-export"></i> Export</a>
+                  <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
                 </div>
               </td>
             </tr>
