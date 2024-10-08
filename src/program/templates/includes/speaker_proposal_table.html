@@ -20,7 +20,7 @@
         <td class="text-center">
           {% if speaker_proposal.event_proposals.all %}
             {% for ep in speaker_proposal.event_proposals.all %}
-              <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=ep.uuid %}"><i class="fas fa-{{ ep.event_type.icon }} fa-lg" style="color: {{ ep.event_type.color }};" data-toggle="tooltip" title="{{ ep.title }} ({{ ep.event_type.name }})"></i></a>
+              <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=ep.uuid %}"><i class="fas fa-{{ ep.event_type.icon }} fa-lg" style="color: {{ ep.event_type.color }};" data-bs-toggle="tooltip" data-bs-title="{{ ep.title }} ({{ ep.event_type.name }})"></i></a>
             {% endfor %}
           {% else %}
             N/A
@@ -28,7 +28,7 @@
         </td>
         <td class="text-center">
           {% for url in speaker_proposal.urls.all %}
-            <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}"><i class="{{ url.url_type.icon }}"></i></a>
+            <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}"><i class="{{ url.url_type.icon }}"></i></a>
           {% empty %}
             N/A
           {% endfor %}

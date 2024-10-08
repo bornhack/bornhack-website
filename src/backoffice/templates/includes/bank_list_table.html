@@ -2,10 +2,10 @@
   <thead>
     <tr>
       {% with bank_list.0 as b %}
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Internal BornHack UUID for this bank">ID</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ b.get_name_help_text }}">Name</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Number of accounts in this bank">Accounts</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Available actions for this bank">Actions</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Internal BornHack UUID for this bank">ID</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ b.get_name_help_text }}">Name</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Number of accounts in this bank">Accounts</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Available actions for this bank">Actions</th>
       {% endwith %}
     </tr>
   </thead>

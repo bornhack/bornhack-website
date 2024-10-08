@@ -4,7 +4,7 @@ $(document).ready(function(){
     $('body,html').removeClass("no-js");
 
     // enable all js tooltips on the page
-    $('[data-toggle="tooltip"]').tooltip();
+    $('[data-bs-toggle="tooltip"]').tooltip();
 
     // define our datetime formats from settings.py
     // Thursday, Aug 27th, 2020, 12:00 (CEST)

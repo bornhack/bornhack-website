@@ -18,7 +18,7 @@
     <div class="list-group">
       {% for speaker in speaker_list %}
         <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
-          {{ speaker.name }} {% for event in speaker.events.all %}<i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};" data-toggle="tooltip" title="{{ event.title }}"></i> {% endfor %}</a>
+          {{ speaker.name }} {% for event in speaker.events.all %}<i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};" data-bs-toggle="tooltip" data-bs-title="{{ event.title }}"></i> {% endfor %}</a>
       {% endfor %}
     </div>
   {% else %}

@@ -54,7 +54,7 @@
       <h4>URLs for <i>{{ event.title }}</i></h4>
       {% if event.urls.exists %}
         {% for url in event.urls.all %}
-          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
+          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
         {% endfor %}
       {% else %}
         <p><i>No URLs found.</i></p>
