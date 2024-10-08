@@ -12,7 +12,7 @@
       <span style="font-size: x-large">
         <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
       </span>
-      <span class="ms-auto"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
+      <span class="float-end"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
     </div>
     <div class="card-body">
       <p>

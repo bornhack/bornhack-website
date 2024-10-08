@@ -55,10 +55,10 @@
               <td>{{ facility.location }}</td>
               <td class="text-center"><span class="badge">{{ facility.feedbacks.count }}</span> / <span class="badge">{{ facility.unhandled_feedbacks.count }}</span></td>
               <td>
-                <div class="btn-group btn-group-vertical">
-                  <a href="{% url "backoffice:facility_detail" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-                  <a href="{% url "backoffice:facility_update" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-                  <a href="{% url "backoffice:facility_delete" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                <div class="btn-group">
+                  <a href="{% url "backoffice:facility_detail" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Details</a>
+                  <a href="{% url "backoffice:facility_update" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:facility_delete" camp_slug=camp.slug facility_uuid=facility.pk %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
                 </div>
               </td>
             </tr>
