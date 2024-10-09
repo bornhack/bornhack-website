@@ -20,7 +20,7 @@
         <td class="text-center"><span class="badge">{{ proposal.proposal_status }}</span></td>
         <td class="text-center">
           {% if proposal.speaker %}
-            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-secondary btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
           {% else %}
             <i class="fas fa-times"></i>
           {% endif %}
@@ -28,10 +28,10 @@
         <td>{{ proposal.user }}</td>
         <td>
           <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Details</a>
             {% if proposal.proposal_status == "pending" %}
-              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve</a>
-              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject</a>
+              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Approve</a>
+              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Reject</a>
             {% endif %}
           </div>
         </td>

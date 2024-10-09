@@ -1,5 +1,5 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
@@ -9,14 +9,12 @@
 {% block shop_content %}
 
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
       <p>
         Categories:<br />
         {% for category in categories %}
           <a href="{% url 'shop:index' %}?category={{category.slug}}"
-             class="label label-{% if category.slug == current_category.slug %}primary{% else %}default{% endif %}">
-            {{category}}
-          </a>&nbsp;
+             class="label label-{% if category.slug == current_category.slug %}primary{% else %}default{% endif %}"><span class="badge text-bg-secondary">{{category}}</span></a>&nbsp;
         {% endfor %}
       </p>
     </div>
@@ -25,14 +23,14 @@
   <hr />
 
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-12 table-responsive">
 
       <table class="table table-hover table-condensed table-striped">
         <thead>
           <tr>
             <th>Product</th>
             <th>
-              <div class="pull-right">
+              <div class="ms-auto">
                 Price
               </div>
             </th>
@@ -43,7 +41,7 @@
           {% for product in products %}
 
             {% ifchanged product.category %}
-              <tr style="background-color: #cccccc">
+              <tr class="table-secondary">
                 <td colspan="2">
                   <strong>
                     <a href="{% url 'shop:index' %}?category={{product.category.slug}}">
@@ -100,7 +98,7 @@
 
               </td>
               <td>
-                <div class="pull-right">
+                <div class="ms-auto">
                   {{ product.price|currency }}
                 </div>
               </td>

@@ -3,7 +3,7 @@
 
 {% block body %}
   <p class="lead">The following availability matrix has been generated for the Event/Slot combinations in the AutoScheduler</p>
-  <p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
   <table class="table table-condensed table-bordered">
     <thead>
       <th>fedt nok</th>
@@ -17,14 +17,14 @@
           <th class="{% if autoevent.possible_slots %}success{% else %}danger{% endif %}"><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a> (demand: {{ autoevent.demand }}, slots: {{ autoevent.possible_slots }})</th>
           {% for slot in scheduler.autoslots %}
             {% if slot in autoevent.unavailability %}
-              <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.title }}" will not be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
+              <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' data-bs-title='Event "{{ event.title }}" will not be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
             {% else %}
-              <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' title='Event "{{ event.title }}" might be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
+              <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' data-bs-title='Event "{{ event.title }}" might be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
             {% endif %}
           {% endfor %}
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 {% endblock body %}

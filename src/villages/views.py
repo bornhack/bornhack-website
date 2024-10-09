@@ -19,6 +19,7 @@ from .mixins import EnsureWritableCampMixin
 from .models import Village
 from camps.mixins import CampViewMixin
 from camps.models import Camp
+from utils.widgets import MarkdownWidget
 
 
 class VillageListView(CampViewMixin, ListView):
@@ -144,10 +145,13 @@ class VillageCreateView(
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
+        form.fields["description"].widget = MarkdownWidget()
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
                 "map_height": "500px",
+                "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form
@@ -204,6 +208,8 @@ class VillageUpdateView(
             attrs={
                 "display_raw": "true",
                 "map_height": "500px",
+                "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form

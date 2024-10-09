@@ -1,5 +1,5 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {% if object %}Update URL{% else %}Add URL to {% if speakerproposal %}{{ speakerproposal.name }}{% else %}{{ eventproposal.title }}{% endif %}{% endif %} | {{ block.super }}

@@ -1,0 +1,12 @@
+<div class="range-slider">
+  <input
+    class="form-range slider-widget"
+    min="{{ widget.attrs.min }}"
+    max="{{ widget.attrs.max }}"
+    type="range"
+    name="{{ widget.name }}"
+    {% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% else %}value="{{ widget.attrs.min }}"{% endif %}
+    {% include "django/forms/widgets/attrs.html" %}
+  >
+  <span class="hide-for-no-js-users slider-widget__value" id="{{ widget.attrs.id }}-value">{% if widget.value != None %}{{ widget.value }}{% else %}1{% endif %}</span>
+</div>

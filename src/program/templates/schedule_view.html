@@ -1,0 +1,81 @@
+{% extends 'program_base.html' %}
+
+{% load commonmark %}
+{% load static %}
+
+{% block title %}
+  Schedule | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+  <script src="{% static "js/schedule_view.js" %}" ></script>
+{% endblock extra_head %}
+
+{% block program_content %}
+
+  <div class="row">
+    <div class="col-10">
+      <h3>Schedule for {{ camp.title }}. All times are {{ event_slots.0.when.lower|date:"T" }}!</h3>
+    </div>
+
+    <div class="col-2">
+      <a class="btn btn-success btn-lg ms-auto clearfix" href="{% url "program:ics_view" camp_slug=camp.slug %}">
+        <i class="fa fa-calendar"></i>
+        ICS feed
+      </a>
+    </div>
+  </div>
+
+  <hr>
+
+  <table class="table">
+    <thead>
+      <th>When?</th>
+      <th>What?</th>
+      <th>Where?</th>
+      <th>Who?</th>
+      <th>Type</th>
+      <th>Tags</th>
+    </thead>
+    <tbody>
+
+
+      {% for slot in event_slots %}
+        {% ifchanged slot.when.lower.date %}
+          <tr class="table-secondary">
+            <td colspan=6><strong>{{ slot.when.lower.date|date:"l Y-m-d" }}</strong></td>
+          </tr>
+        {% endifchanged %}
+        <tr data-event-date-lower="{{ slot.when.lower|date:'c' }}"
+            data-event-date-upper="{{ slot.when.upper|date:'c' }}">
+          <td>{{ slot.when.lower|date:"H:i" }}-{{ slot.when.upper|date:"H:i" }}</td>
+          <td>
+            <i class="fas fa-video{% if not slot.event.video_recording %}-slash{% endif %}"></i>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=slot.event.slug %}">{{ slot.event.title }}</a>
+          </td>
+          <td>{{ slot.event_location.icon_html }} {{ slot.event_location.name }}</td>
+          <td>
+            {% for speaker in slot.event.speakers.all %}
+              <span class="speaker">
+                <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}"><i class="fas fa-user fa-fw"></i>
+                  {{ speaker.name }}
+                </a>
+              </span><br />
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
+          <td>{{ slot.event_type.icon_html }} {{ slot.event.event_type }}</td>
+          <td>
+            {% for tag in slot.event.tags.all %}
+              <span class="badge">{{ tag }}</span>
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

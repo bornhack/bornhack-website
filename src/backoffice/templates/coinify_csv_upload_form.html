@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load tz %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Coinify CSV Upload</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Coinify CSV Upload</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">Coinify CSV Upload</p>
       <p>To export Coinify CSV files with invoices, payouts and balances you need to visit the <a href="https://merchant.coinify.com/export?">export thing</a> on their webinterface.</p>
 
@@ -15,7 +15,7 @@
         {% csrf_token %}
         {% bootstrap_form form %}
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Upload</button>
-        <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

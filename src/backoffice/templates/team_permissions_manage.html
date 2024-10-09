@@ -1,13 +1,11 @@
 {% extends 'base.html' %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
-{% load bootstrap3 %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Manage {{ team.name }} Team Permissions</h3>
-    </div>
+  <div class="card">
     <div class="panel-body">
+      <h3 class="card-title">Manage {{ team.name }} Team Permissions</h3>
       <p>This view makes it possible to grant/revoke permissions for {{ team.name }} Team members. The <b>lead</b> and <b>member</b> permissions are granted through team memberships and can not be changed here. Superusers have all permissions and they can not be revoked here.</p>
       {% include "includes/permissions_explainer.html" %}
       <form method="POST" enctype="multipart/form-data">
@@ -43,8 +41,8 @@
           </tbody>
         </table>
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
-        <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
+        <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
       </form>
     </div>
   </div>

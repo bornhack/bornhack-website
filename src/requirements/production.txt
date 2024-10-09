@@ -8,7 +8,7 @@ commonmark==0.9.1
 conference-scheduler==3.0.1
 django-allauth==65.0.2
 django-allauth-2fa==0.11.1
-django-bootstrap3==24.3
+django-bootstrap5==24.3
 django-cors-headers==4.3.1
 django-extensions==3.2.3
 django-filter==24.3

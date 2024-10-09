@@ -1,5 +1,5 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
@@ -11,23 +11,23 @@
   <h2>Pay by Bank Transfer</h2>
   <p>To pay order #{{ orderid }} you need to make a bank transfer using the appropriate method below:</p>
 
-  <div class="panel panel-default">
-    <div class="panel-heading panel-heading-nav">
-      <ul class="nav nav-tabs">
-        <li role="presentation" class="active">
-          <a href="#one" aria-controls="one" role="tab" data-toggle="tab">Pay by Bank Transfer (danish bank transfer)</a>
+  <div class="card">
+    <div class="card-header panel-heading-nav">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation" class="active">
+          <a class="nav-link active" href="#one" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab">Pay by Bank Transfer (danish bank transfer)</a>
         </li>
-        <li role="presentation">
-          <a href="#two" aria-controls="two" role="tab" data-toggle="tab">Pay by Bank Transfer (SEPA region)</a>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" href="#two" aria-controls="two" aria-selected="false" role="tab" data-bs-toggle="tab">Pay by Bank Transfer (SEPA region)</a>
         </li>
-        <li role="presentation">
-          <a href="#three" aria-controls="three" role="tab" data-toggle="tab">Payment by Bank Transfer (outside SEPA region)</a>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" href="#three" aria-controls="three" aria-selected="false" role="tab" data-bs-toggle="tab">Payment by Bank Transfer (outside SEPA region)</a>
         </li>
       </ul>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <div class="tab-content">
-        <div role="tabpanel" class="tab-pane fade in active" id="one">
+        <div role="tabpanel" class="tab-pane fade show active" id="one">
           <p>If you have a danish bank account please pay in DKK with the below details. Please remember to include the reference <strong>bornhack BH{{ orderid }}</strong>.</p>
           <ul class="lead">
             <li>Amount to pay: <strong>{{ total }} DKK</strong></li>

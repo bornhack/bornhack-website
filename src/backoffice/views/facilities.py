@@ -291,6 +291,7 @@ class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
+                "class": "form-control",
             },
         )
         return form
@@ -359,6 +360,7 @@ class FacilityUpdateView(FacilityFacilitatorViewMixin, UpdateView):
             attrs={
                 "display_raw": "true",
                 "map_height": "500px",
+                "class": "form-control",
             },
         )
         return form

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   {{ object.author }}{% if object.has_car %} has {% else %} needs {% endif %}{{ object.seats }} seat(s) free, going from {{ object.from_location }} to {{ object.to_location }} on {{ object.when|date:"jS \o\f F \a\t H:i T" }} | {{ block.super }}
@@ -15,8 +15,8 @@
 
   <hr />
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>
         <strong>{{ object.author }}</strong>
         {% if object.has_car %}has {% else %}needs {% endif %}
@@ -29,14 +29,14 @@
         <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
       </h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <strong>Description:</strong>
       <p>
         {{ object.description|untrustedcommonmark }}
       </p>
     </div>
     {% if user == object.user %}
-      <div class="panel-footer">
+      <div class="card-footer">
         <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=object.pk %}">
           <i class="fas fa-trash"></i>
           Delete
@@ -48,7 +48,7 @@
         <span class="clearfix"></span>
       </div>
     {% else %}
-      <div class="panel-footer">
+      <div class="card-footer">
         <form method="POST">
           {% csrf_token %}
           {% bootstrap_form form %}

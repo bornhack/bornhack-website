@@ -524,7 +524,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
 
     price = models.IntegerField(
         help_text=_(
-            "Price of the product (in DKK, including VAT). The price can not be changed."
+            "Price of the product (in DKK, including VAT). The price can not be changed.",
         ),
     )
 

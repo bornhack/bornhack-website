@@ -1,6 +1,6 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 {% block title %}
@@ -9,11 +9,11 @@
 
 {% block team_content %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Members</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>The following <b>{{ team.approved_members.count }}</b> people {% if team.unapproved_members.count %}(and {{ team.unapproved_members.count }} pending){% endif %} are members of the <b>{{ team.name }} Team</b>:</p>
       <table class="table table-hover">
         <thead>
@@ -57,12 +57,12 @@
                   </td>
                   <td>
                     <div class="btn-group-vertical">
-                      <a class="btn btn-danger"
+                      <a class="btn btn-danger btn-sm text-nowrap"
                          href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                         <i class="fas fa-trash"></i> Remove
                       </a>
                       {% if not member.approved %}
-                        <a class="btn btn-success"
+                        <a class="btn btn-success btn-sm text-nowrap"
                            href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve
                         </a>

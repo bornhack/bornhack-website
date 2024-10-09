@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">Refund #{{ refund.pk }} for order #{{ refund.order.pk }} | BackOffice</div>
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-header">Refund #{{ refund.pk }} for order #{{ refund.order.pk }} | BackOffice</div>
+    <div class="card-body">
       <table class="table">
         <tr>
           <th>Order</th>

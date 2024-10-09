@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">EventSlot {{ event_slot.pk }} Details</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">EventSlot {{ event_slot.pk }} Details</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <table class="table">
         <tr>
           <th>EventSlot ID</th>
@@ -48,7 +48,7 @@
             </td>
           </tr>
         </table>
-        <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> List EventSlots</a>
+        <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> List EventSlots</a>
       </div>
     </div>
 {% endblock content %}

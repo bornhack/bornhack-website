@@ -17,6 +17,6 @@ mapObject.loadLayer(mapData['grid'], "Grid squares", {
 }, false, gridLoaded());
 function gridLoaded() {
   mapData['facilitytypeList'].forEach(function (feature, index) {
-    mapObject.loadLayer(feature.url, "feature.name", facilityOptions);
+    mapObject.loadLayer(feature.url, feature.name, facilityOptions);
   })
 }

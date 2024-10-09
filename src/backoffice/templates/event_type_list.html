@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - EventTypes</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p><i>EventTypes</i> define categories or types of events, like "Music Act" or "Workshop" or "Talk". They are not camp specific, so they are not editable here.</p>
       {% if not event_type_list %}
         <p class="lead">
@@ -13,7 +13,7 @@
         </p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
         <table class="table table-hover datatable">
           <thead>
@@ -43,7 +43,7 @@
         </table>
       {% endif %}
       <p>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

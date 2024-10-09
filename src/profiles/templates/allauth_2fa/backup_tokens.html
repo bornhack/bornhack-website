@@ -1,7 +1,7 @@
 {% extends 'profile_base.html' %}
 
 {% load account %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   Two-Factor Authentication Backup Tokens | {{ block.super }}
@@ -20,11 +20,11 @@
         </p>
       </div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
+      <div class="card">
+        <div class="card-header">
           <h4>Two-Factor Authentication Backup Tokens</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           {% if backup_tokens %}
             <ul>
               {% for token in backup_tokens %}
@@ -36,7 +36,7 @@
           {% endif %}
 
         </div>
-        <div class="panel-footer">
+        <div class="card-footer">
           <form method="post">
             {% csrf_token %}
             <div class="buttonHolder">
@@ -52,11 +52,11 @@
         </div>
       </div>
 
-      <div class="panel panel-danger">
-        <div class="panel-heading">
+      <div class="card panel-danger">
+        <div class="card-header">
           <h4>Disable Two-Factor Authenticatoin</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           <a class="btn btn-danger" href="{% url 'two-factor-remove' %}">Disable Two-Factor</a>
         </div>
       </div>

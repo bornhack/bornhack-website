@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load leaflet_tags %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}
@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Import Facility Types - BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Import Facility Types - BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
         Only the properties <b>name</b> and <b>description</b> will be imported!
       </p>
@@ -39,10 +39,8 @@
             <p style="color: red;">{{ error }}</p>
           </div>
         {% endif %}
-        {% buttons %}
-          <button type="submit" class="btn btn-success">Import</button>
-          <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-        {% endbuttons %}
+        <button type="submit" class="btn btn-success">Import</button>
+        <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

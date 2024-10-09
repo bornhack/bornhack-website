@@ -1,7 +1,7 @@
 {% extends 'profile_base.html' %}
 
 {% load account %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load i18n %}
 
 {% block title %}
@@ -10,7 +10,7 @@
 
 {% block profile_content %}
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-12">
       <div class="alert alert-danger">
         <h4><strong>Attention!</strong></h4>
         <p>
@@ -21,11 +21,11 @@
         </p>
       </div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
+      <div class="card">
+        <div class="card-header">
           <h4>Setup Two-Factor Authentication</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           <h4>
             {% trans 'Step 1' %}:
           </h4>
@@ -34,7 +34,7 @@
             {% trans 'Scan the QR code below with a token generator of your choice (for instance Google Authenticator).' %}
           </p>
 
-          <img src="{{ qr_code_url }}" />
+          <img src="{{ qr_code_url }}" class="image-white-bg" />
 
           <h4>
             {% trans 'Step 2' %}:

@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Select EventSlot for <i>{{ event.title }}</i></h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Select EventSlot for <i>{{ event.title }}</i></h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>The following EventSlots are available and suitable for scheduling <i>{{ event.title }}</i></p>
       <p>This event has a duration <b>{{ event.duration }}</b> hours.</p>
       <p>This event has a demand of <b>{{ event.demand }} people</b>.</p>
@@ -43,7 +43,7 @@
         {% else %}
           <p class="lead">No available slots found</p>
         {% endif %}
-        <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
   </div>

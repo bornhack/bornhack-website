@@ -23,6 +23,35 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
 
     template_name = "index.html"
 
+    def get_index_tabs(self, perms, context):
+        tabs = {}
+        if (
+            "camps.orga_team_member" in perms
+            or context["facilityfeedback_teams"]
+            or context["is_team_facilitator"]
+        ):
+            tabs["facilities"] = {
+                "name": "Facilities",
+                "count": context["feedback_count"].count(),
+            }
+        if "camps.info_team_member" in perms:
+            tabs["info"] = {"name": "Info"}
+        if "camps.content_team_member" in perms:
+            tabs["content"] = {"name": "Content"}
+        if "camps.orga_team_member" in perms:
+            tabs["orga"] = {"name": "Orga", "count": context["held_email_count"]}
+        if "camps.economy_team_member" in perms:
+            tabs["economy"] = {"name": "Economy"}
+        if "camps.orga_team_member" in perms or context["is_team_pos"]:
+            tabs["pos"] = {"name": "Pos"}
+        if "camps.game_team_member" in perms:
+            tabs["game"] = {"name": "Game Team"}
+        if "camps.gis_team_member" in perms or context["is_team_mapper"]:
+            tabs["map"] = {"name": "Maps"}
+        if "camps.orga_team_member" in perms or context["is_team_lead"]:
+            tabs["permissions"] = {"name": "Permissions"}
+        return tabs
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
@@ -49,6 +78,12 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
             ),
         )
 
+        context["feedback_count"] = FacilityFeedback.objects.filter(
+            facility__facility_type__responsible_team__camp=self.camp,
+            facility__facility_type__responsible_team__slug__in=team_slugs,
+            handled=False,
+        )
+
         # include the number of unread emails
         context["held_email_count"] = (
             OutgoingEmail.objects.filter(
@@ -72,6 +107,7 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
                     break
             else:
                 context[f"is_team_{perm}"] = False
+        context["backoffice_tabs"] = self.get_index_tabs(perms, context)
         return context
 
 

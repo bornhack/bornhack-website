@@ -82,12 +82,12 @@
             </td>
 
             <td class="text-center">
-              <span class="badge">{{ team.members.count }}</span><br>
+              <span class="badge text-bg-secondary">{{ team.members.count }}</span><br>
               {% if team.needs_members %}(more needed){% endif %}
             </td>
 
             <td class="text-center">
-              <span class="badge">{{ team.tasks.count }}</span><br>
+              <span class="badge text-bg-secondary">{{ team.tasks.count }}</span><br>
             </td>
 
             {% if request.user.is_authenticated %}
@@ -97,15 +97,15 @@
 
               <td>
                 <div class="btn-group-vertical">
-                  <a class="btn btn-primary" href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i> Details</a>
+                  <a class="btn btn-sm btn-primary text-nowrap" href="{% url 'teams:general' camp_slug=camp.slug team_slug=team.slug %}"><i class="fas fa-search"></i>&nbsp;Details</a>
                   {% if request.user in team.leads.all %}
-                    <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-cog"></i> Manage</a>
+                    <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-primary text-nowrap"><i class="fas fa-cog"></i>&nbsp;Manage</a>
                   {% endif %}
                   {% if request.user in team.members.all %}
-                    <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Leave</a>
+                    <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-danger text-nowrap"><i class="fas fa-times"></i>&nbsp;Leave</a>
                   {% else %}
                     {% if team.needs_members %}
-                      <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Join</a>
+                      <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-sm btn-success text-nowrap"><i class="fas fa-plus"></i>&nbsp;Join</a>
                     {% endif %}
                   {% endif %}
                 </div>

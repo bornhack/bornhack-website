@@ -17,7 +17,7 @@
   <hr />
 
   <div class="row">
-    <div class="col-sm-3 col-sm-push-9 schedule-filter">
+    <div class="col-3 col-push-9 schedule-filter">
       <h4>Filter</h4>
       <form id="filter" class="form-inline">
         <div class="form-group">
@@ -33,7 +33,7 @@
                          class="form-control event-type-checkbox schedule-checkbox" />
 
                   <div class="btn-group">
-                    <label for="event-type-{{ type.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
+                    <label for="event-type-{{ type.slug }}" class="btn btn-secondary" style="min-width: 200px; text-align: left;">
                       <span>
                         <i class="fas fa-minus"></i>
                         <i class="fas fa-plus"></i>
@@ -61,14 +61,14 @@
                          class="form-control location-checkbox schedule-checkbox" />
 
                   <div class="btn-group">
-                    <label for="location-{{ location.slug }}" class="btn btn-default" style="min-width: 200px; text-align: left;">
+                    <label for="location-{{ location.slug }}" class="btn btn-secondary" style="min-width: 200px; text-align: left;">
                       <span class="pull-left">
                         <i class="fas fa-minus"></i>
                         <i class="fas fa-plus"></i>
                         &nbsp;&nbsp;
                         {{ location.name }}
                       </span>
-                      <i class="pull-right fas fa-{{ location.icon }}"></i>
+                      <i class="ms-auto fas fa-{{ location.icon }}"></i>
                     </label>
                   </div>
 
@@ -77,13 +77,13 @@
             </ul>
           </div>
 
-          <a id="ics-button" class="btn btn-default form-control filter-control">
+          <a id="ics-button" class="btn btn-secondary form-control filter-control">
             <i class="fas fa-calendar"></i> ICS
           </a>
         </div>
       </form>
     </div>
-    <div class="col-sm-9 col-sm-pull-3">
+    <div class="col-9 col-pull-3">
       {% block schedule_content %}
       {% endblock schedule_content %}
     </div>

@@ -3,12 +3,12 @@
   <thead>
     <tr>
       {% with banktransaction_list.0 as t %}
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Internal BornHack UUID for this bank transaction">ID</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_date_help_text }}">Date</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_text_help_text }}">Text</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_amount_help_text }}">Amount</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="{{ t.get_balance_help_text }}">Balance</th>
-        <th data-container="body" data-placement="bottom" data-toggle="tooltip" title="Available actions for this bank">Actions</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Internal BornHack UUID for this bank transaction">ID</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_date_help_text }}">Date</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_text_help_text }}">Text</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_amount_help_text }}">Amount</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_balance_help_text }}">Balance</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Available actions for this bank">Actions</th>
       {% endwith %}
     </tr>
   </thead>

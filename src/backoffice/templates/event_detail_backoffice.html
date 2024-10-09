@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 {% load commonmark %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Event: {{ event.title }}</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Event: {{ event.title }}</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       {{ event.abstract|untrustedcommonmark }}
 
       <hr>
@@ -43,7 +43,7 @@
         </tr>
         <tr>
           <th>Proposal</th>
-          <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=event.proposal.pk %}" class="btn btn-default btn-xs"><i class="fas fa-search"></i> Show</a></td>
+          <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=event.proposal.pk %}" class="btn btn-secondary btn-xs"><i class="fas fa-search"></i> Show</a></td>
         </tr>
         <tr>
           <th>Submitted by</th>
@@ -64,14 +64,14 @@
       {% else %}
         N/A
       {% endif %}
-      <a href="{% url 'backoffice:event_schedule' camp_slug=camp.slug slug=event.slug %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i> Schedule Event</a>
+      <a href="{% url 'backoffice:event_schedule' camp_slug=camp.slug slug=event.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Schedule Event</a>
       <br>
 
       <hr>
 
       <a href="{% url 'backoffice:event_update' camp_slug=camp.slug slug=event.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Event</a>
       <a href="{% url 'backoffice:event_delete' camp_slug=camp.slug slug=event.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Event</a>
-      <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Event List</a>
+      <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Event List</a>
     </div>
   </div>
 {% endblock content %}

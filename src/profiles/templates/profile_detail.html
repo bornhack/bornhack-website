@@ -17,12 +17,12 @@
     </div>
   {% endif %}
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <a href="{% url 'profiles:update' %}" class="btn btn-primary pull-right clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
       <h4>Your information</h4>
+      <a href="{% url 'profiles:update' %}" class="btn btn-primary btn-xs clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
 
       <table class="table table-striped">
         <tr>
@@ -58,6 +58,16 @@
           </td>
           <td>
             {{ profile.nickserv_username|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Theme</b><br />
+            <small>Theme used on the website.</small>
+          </td>
+          <td>
+            {{ profile.get_theme_display|default:"Auto" }}
           </td>
         </tr>
 

@@ -1,0 +1,16 @@
+<div class="row">
+  <div class="col">
+    <div class="card card-body">
+      <textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+      <p class="d-inline-flex gap-1 hide-for-no-js-users">
+        <a class="hide-for-no-js-users btn btn-primary" data-bs-toggle="collapse" href="#{{ widget.attrs.id }}-card" role="button" aria-expanded="false" aria-controls="{{ widget.attrs.id }}-card">
+          <i class="fa-solid fa-paint-roller"></i> Preview
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="col hide-for-no-js-users collapse" id="{{ widget.attrs.id }}-card">
+    <div class="card card-body" id="{{ widget.attrs.id }}-value">
+    </div>
+  </div>
+</div>

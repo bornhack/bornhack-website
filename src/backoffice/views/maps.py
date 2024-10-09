@@ -308,6 +308,7 @@ class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
                 "display_raw": "true",
                 "map_height": "500px",
                 "geom_type": "GeometryCollection",
+                "class": "form-control",
             },
         )
         return form
@@ -352,6 +353,7 @@ class MapFeatureUpdateView(LayerMapperViewMixin, UpdateView):
                 "display_raw": "true",
                 "map_height": "500px",
                 "geom_type": "GeometryCollection",
+                "class": "form-control",
             },
         )
         return form

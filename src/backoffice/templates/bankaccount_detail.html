@@ -5,14 +5,14 @@
 {% endblock %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">{{ bankaccount.name }} | Bank Account | BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ bankaccount.name }} | Bank Account | BackOffice</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
-        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-default"><i class="fas fa-undo"></i> Bank Details</a>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
         <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
       </p>
       <table class="table">
@@ -50,8 +50,8 @@
         No transactions found for this bank account.
       {% endif %}
       <p>
-        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-default"><i class="fas fa-undo"></i> Bank Details</a>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
         <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
       </p>
     </div>

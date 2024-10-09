@@ -4,11 +4,11 @@
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - Ticket Stats for {{ camp.title }}</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">This view shows a list of all {{ camp.title }} ticket types with at least one ticket sold, along with the number of tickets and average price per type.</p>
       <table class="table table-hover datatable">
         <thead>
@@ -38,7 +38,7 @@
           {% endfor %}
         </tbody>
       </table>
-      <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
     </p>
   </div>
   </div>

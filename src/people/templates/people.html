@@ -13,10 +13,12 @@
   <p class="lead">The following is a list of the volunteers that have helped make BornHack happen. It goes without saying that an event like BornHack would not be possible to pull off without our volunteers. We are forever grateful, and we leave your names here as a recognition of the work you put in. Thank you!
     {% for camp in camp_list %}
       {% if camp.teams.exists %}
-        <div class="panel panel-default">
-          <div class="panel-heading">{{ camp.title }} Teams</div>
-          <div class="panel-body">
-            <img width=190 class="pull-right" src="{% static camp.logo_small %}">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">
+              <img width=190 class="float-end bornhack-logo" src="{% static camp.logo_small %}">
+              {{ camp.title }} Teams
+            </h4>
             <table class="table table-hover">
               <thead>
                 <tr>

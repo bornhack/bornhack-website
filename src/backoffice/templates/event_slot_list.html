@@ -4,21 +4,21 @@
 {% load bornhack %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - EventSlots</span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p><i>EventSlots</i> are what we schedule <i>Events</i> in. Search for an Event, Speaker, EventType, EventLocation, or day to filter the list.</p>
       {% if not event_slot_list %}
         <p class="lead">
           No EventSlots found. Go create some EventSessions!
           <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventSession</a>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
       {% else %}
         <p>
-          <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
         </p>
         <table class="table table-striped datatable">
           <thead>
@@ -75,7 +75,7 @@
         </table>
       {% endif %}
       <p>
-        <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

@@ -1,7 +1,9 @@
 from django.forms import Widget
+from django.forms import Textarea
+from django.forms import TextInput
 
 
-class IconPickerWidget(Widget):
+class IconPickerWidget(TextInput):
     template_name = "icon_picker_widget.html"
 
     class Media:
@@ -20,3 +22,31 @@ class IconPickerWidget(Widget):
         context["widget"]["value"] = self.format_value(value)
         context["widget"]["disabled"] = True
         return context
+
+
+class SliderWidget(Widget):
+    template_name = "slider_widget.html"
+    input_type = "range"
+
+    class Media:
+        js = ("/static/js/slider_widget.js",)
+
+    def __init__(self, attrs=None, smin=0, smax=0):
+        self.smin = smin
+        self.smax = smax
+        super().__init__(attrs)
+
+
+class SwitchWidget(Widget):
+    template_name = "switch_widget.html"
+
+
+class MarkdownWidget(Textarea):
+    template_name = "markdown_widget.html"
+
+    class Media:
+        js = ("/static/js/markdown_widget.js", "/static/vendor/marked/marked.min.js")
+
+    def __init__(self):
+        attrs = {"class": "markdown-widget"}
+        super().__init__(attrs)

@@ -23,7 +23,7 @@ from .views import FeedbackRedirectView
 from .views import FeedbackUpdateView
 from .views import FrabXmlView
 from .views import ICSView
-from .views import NoScriptScheduleView
+from .views import ScheduleView
 from .views import ProgramControlCenter
 from .views import ProposalListView
 from .views import SpeakerDetailView
@@ -39,8 +39,8 @@ from .views import UrlUpdateView
 app_name = "program"
 
 urlpatterns = [
-    path("", NoScriptScheduleView.as_view(), name="schedule_index"),
-    path("noscript/", NoScriptScheduleView.as_view(), name="noscript_schedule_index"),
+    path("", ScheduleView.as_view(), name="schedule_index"),
+    path("noscript/", ScheduleView.as_view(), name="noscript_schedule_index"),
     path("ics/", ICSView.as_view(), name="ics_view"),
     path("frab.xml", FrabXmlView.as_view(), name="frab_view"),
     path("control/", ProgramControlCenter.as_view(), name="program_control_center"),

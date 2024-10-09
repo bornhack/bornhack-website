@@ -13,6 +13,6 @@
     {% csrf_token %}
     {{ form }}
     <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Yes Please</button>
-    <a href="{% url 'teams:general' camp_slug=team.camp.slug team_slug=team.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
+    <a href="{% url 'teams:general' camp_slug=team.camp.slug team_slug=team.slug %}" class="btn btn-secondary" type="submit"><i class="fas fa-times"></i> Cancel</a>
   </form>
 {% endblock %}

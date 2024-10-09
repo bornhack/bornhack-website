@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h3 class="panel-title">Manage AutoScheduler</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Manage AutoScheduler</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p class="lead">Select your desired action below</p>
       <div class="list-group">
         <a href="{% url 'backoffice:autoschedule_validate' camp_slug=camp.slug %}" class="list-group-item">
@@ -50,7 +50,7 @@
         </a>
       </div>
       <p><i>If you are new to the AutoScheduler you might wish to consult the <a href="{% url 'backoffice:autoschedule_crash_course' camp_slug=camp.slug %}">crash course</a> for a five minute introduction to the terminology and concepts used.</i></p>
-      <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a></p>
+      <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a></p>
     </div>
   </div>
 

@@ -2,7 +2,6 @@ import logging
 from collections import OrderedDict
 
 import icalendar
-from django import forms
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -47,6 +46,8 @@ from camps.mixins import CampViewMixin
 from utils.middleware import RedirectException
 from utils.mixins import GetObjectMixin
 from utils.mixins import UserIsObjectOwnerMixin
+from utils.widgets import SliderWidget
+from utils.widgets import SwitchWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -986,8 +987,8 @@ class EventDetailView(CampViewMixin, DetailView):
 # schedule views
 
 
-class NoScriptScheduleView(CampViewMixin, TemplateView):
-    template_name = "noscript_schedule_view.html"
+class ScheduleView(CampViewMixin, TemplateView):
+    template_name = "schedule_view.html"
 
     def setup(self, *args, **kwargs):
         """
@@ -1469,14 +1470,10 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        form.fields["expectations_fulfilled"].widget = forms.RadioSelect(
-            choices=models.EventFeedback.YESNO_CHOICES,
-        )
-        form.fields["attend_speaker_again"].widget = forms.RadioSelect(
-            choices=models.EventFeedback.YESNO_CHOICES,
-        )
-        form.fields["rating"].widget = forms.RadioSelect(
-            choices=models.EventFeedback.RATING_CHOICES,
+        form.fields["expectations_fulfilled"].widget = SwitchWidget()
+        form.fields["attend_speaker_again"].widget = SwitchWidget()
+        form.fields["rating"].widget = SliderWidget(
+            attrs={"min": 1, "max": 5},
         )
         return form
 

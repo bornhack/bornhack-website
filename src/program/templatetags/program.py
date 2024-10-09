@@ -109,7 +109,7 @@ def availabilitytable(matrix, form=None):
                             output += f'<i class="fas fa-{tdicon}"></i>'
 
                         # add the info icon
-                        output += f"<i class='fas fa-info-circle pull-right text-info' data-toggle='tooltip' data-html=true data-placement='right' title='{popup}' style='margin-left: -20px;'>"
+                        output += f"<i class='fas fa-info-circle float-end text-info' data-bs-toggle='tooltip' data-bs-html='true' data-bs-placement='right' data-bs-title='{popup}' style='margin-left: -20px;margin-right: 10px;'>"
                         if form:
                             output += "</label>"
                         output += "</td>"

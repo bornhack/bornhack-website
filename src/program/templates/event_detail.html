@@ -7,14 +7,14 @@
     <p><a href="{% url 'program:noscript_schedule_index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Return to schedule</a></p>
   </noscript>
 
-  <div class="panel panel-default">
-    <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span style="font-size: x-large">
         <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
       </span>
-      <span class="pull-right"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
+      <span class="float-end"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <p>
         {{ event.abstract|untrustedcommonmark }}
       </p>
@@ -54,7 +54,7 @@
       <h4>URLs for <i>{{ event.title }}</i></h4>
       {% if event.urls.exists %}
         {% for url in event.urls.all %}
-          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
+          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
         {% endfor %}
       {% else %}
         <p><i>No URLs found.</i></p>

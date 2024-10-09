@@ -1,6 +1,6 @@
 {% extends 'profile_base.html' %}
 
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
   E-mail Addresses | {{ block.super }}
@@ -11,11 +11,11 @@
   <div class="row">
     <div class="col-md-12">
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
+      <div class="card">
+        <div class="card-header">
           <h4>E-mail Addresses</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
 
           {% if user.emailaddress_set.all %}
             <p>The following e-mail addresses are associated with your account:</p>
@@ -84,11 +84,11 @@
         </div>
       </div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading">
+      <div class="card">
+        <div class="card-header">
           <h4>Add E-mail Address</h4>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
           <form method="post" action="{% url 'account_email' %}" class="add_email">
             {% csrf_token %}
             {% bootstrap_form form %}
