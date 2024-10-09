@@ -4,8 +4,8 @@
 
 {% block content %}
   <div class="card">
-    <div class="panel-body">
-      <h3 class="card-title">Manage {{ team.name }} Team Permissions</h3>
+    <h3 class="card-header">Manage {{ team.name }} Team Permissions</h3>
+    <div class="card-body">
       <p>This view makes it possible to grant/revoke permissions for {{ team.name }} Team members. The <b>lead</b> and <b>member</b> permissions are granted through team memberships and can not be changed here. Superusers have all permissions and they can not be revoked here.</p>
       {% include "includes/permissions_explainer.html" %}
       <form method="POST" enctype="multipart/form-data">
