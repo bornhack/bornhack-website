@@ -25,12 +25,12 @@
       <div class="col-sm-12 col-lg-9">
         {% for category in categories %}
           <span class="anchor" id="{{ category.anchor }}"></span>
-          <h2>{{ category.headline }} {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
+          <h2><a href="#{{ category.anchor }}">{{ category.headline }}</a> {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
           {% for item in category.infoitems.all %}
-            <div class="card">
+            <div class="card mb-1">
               <span class="sub-anchor" id="{{ item.anchor }}"></span>
               <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="text-start m-0">{{ item.headline }}</h4>
+                <h4 class="text-start m-0"><a href="#{{ item.anchor }}">{{ item.headline }}</a></h4>
                 <span class="text-end">
                   <a href="#{{ item.anchor }}">
                     <i class="fa-solid fa-link"></i>
