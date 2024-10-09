@@ -11,9 +11,7 @@
   <p class="lead">Pick a {{ event_type.host_title }} from the list below, or press the button at the bottom to add a new {{ event_type.host_title }} for this {{ event_type.name }}.</p>
 
   <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Use an Existing {{ event_type.host_title }}</h3>
-    </div>
+    <h3 class="card-header">Use an Existing {{ event_type.host_title }}</h3>
     <div class="card-body">
       <div class="list-group">
         {% for speaker_proposal in speaker_proposal_list %}

@@ -8,9 +8,7 @@
 
 {% block content %}
   <div class="card">
-    <div class="card-header">
-      <span class="h3">Your {{ camp.title }} DECT Registrations</span>
-    </div>
+    <span class="h3 card-header">Your {{ camp.title }} DECT Registrations</span>
     <div class="card-body">
       <p class="lead">This is a list of all the registered DECT numbers you have for {{ camp.title }}. To activate a handset just dial the <i>activation code</i> from the handset and follow instructions.</p>
       {% if dectregistration_list %}

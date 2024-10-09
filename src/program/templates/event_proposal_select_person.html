@@ -11,9 +11,7 @@
   <p class="lead">Either pick an existing {{ event_proposal.event_type.host_title }} from the list below, or press the button to create a new {{ event_proposal.event_type.host_title }}. <b>Note:</b> If you need to add a {{ event_proposal.event_type.host_title }} which was not submitted by yourself you need to tell the Content Team.</p>
 
   <div class="card">
-    <div class="card-header">
-      <h3 class="card-title">Existing {{ event_proposal.event_type.host_title }}s</h3>
-    </div>
+    <h3 class="card-header">Existing {{ event_proposal.event_type.host_title }}s</h3>
     <div class="card-body">
       <div class="list-group">
         {% for speaker_proposal in speaker_proposal_list %}

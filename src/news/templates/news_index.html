@@ -27,9 +27,7 @@
     </div>
   {% empty %}
     <div class="card">
-      <div class="card-header">
-        <h3>No news yet. Stay tuned!</h3>
-      </div>
+      <h3 class="card-header">No news yet. Stay tuned!</h3>
     </div>
   {% endfor %}
   {% if not request.resolver_match.kwargs.archived %}
