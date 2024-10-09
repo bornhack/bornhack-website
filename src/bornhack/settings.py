@@ -220,7 +220,7 @@ OAUTH2_PROVIDER = {
 UPCOMING_CAMP_YEAR = 2025
 
 # django-tables2 settings
-DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap-responsive.html"
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap5-responsive.html"
 DJANGO_TABLES2_TABLE_ATTRS = {
     "class": "table table-hover table-striped",
 }
