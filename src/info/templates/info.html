@@ -25,7 +25,7 @@
       <div class="col-sm-12 col-lg-9">
         {% for category in categories %}
           <span class="anchor" id="{{ category.anchor }}"></span>
-          <h2><a href="#{{ category.anchor }}">{{ category.headline }}</a> {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
+          <h2 {% if not forloop.first %}class="mt-2"{% endif %}><a href="#{{ category.anchor }}">{{ category.headline }}</a> {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
           {% for item in category.infoitems.all %}
             <div class="card mb-1">
               <span class="sub-anchor" id="{{ item.anchor }}"></span>
