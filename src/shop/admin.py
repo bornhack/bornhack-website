@@ -128,6 +128,7 @@ class ProductAdmin(admin.ModelAdmin):
             return ("price",)
         return self.readonly_fields
 
+
 class ProductInline(admin.TabularInline):
     model = OrderProductRelation
 
