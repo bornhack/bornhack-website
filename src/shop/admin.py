@@ -117,12 +117,16 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ["category", "ticket_type"]
     search_fields = ["name"]
     save_as = True
-    readonly_fields = ("price",)
 
     list_select_related = ["ticket_type", "category", "ticket_type__camp"]
 
     inlines = [SubProductInline]
 
+    def get_readonly_fields(self, request, obj=None):
+        if obj and obj.orderproductrelation_set.exists():
+            # editing an existing product with existing OPRs, make price readonly
+            return ("price",)
+        return self.readonly_fields
 
 class ProductInline(admin.TabularInline):
     model = OrderProductRelation
