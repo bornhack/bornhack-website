@@ -15,6 +15,8 @@
     {# Load Bootstrap CSS and JavaScript #}
     {% if user.is_authenticated and user.profile.theme != "default" %}
       <link href="{% static "css/bootstrap-"|add:user.profile.theme|add:".css" %}" rel="stylesheet">
+    {% elif not user.is_authenticated and request.session.theme|default:"default" != "default" %}
+      <link href="{% static "css/bootstrap-"|add:request.session.theme|add:".css" %}" rel="stylesheet">
     {% else %}
       <link href="{% static 'css/bootstrap-light.css' %}" rel="stylesheet">
       <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
@@ -155,6 +157,7 @@
                 {% else %}
                   <a class="nav-link" href="{% url 'account_login' %}">Login</a>
                 {% endif %}
+                {% include 'includes/darkswitch.html' %}
               </div>
             </div>
           </div>

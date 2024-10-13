@@ -1,0 +1,32 @@
+<div class="dropdown hide-for-no-js-users d-none d-lg-flex">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+    {% if user.is_authenticated and user.profile.theme == "light" %}
+      <i class="fa-regular fa-sun"></i>
+    {% elif user.is_authenticated and user.profile.theme == "slate" %}
+      <i class="fa-solid fa-moon"></i>
+    {% elif not user.is_authenticated and request.session.theme|default:"default" == "slate" %}
+      <i class="fa-solid fa-moon"></i>
+    {% elif not user.is_authenticated and request.session.theme|default:"default" == "light" %}
+      <i class="fa-regular fa-sun"></i>
+    {% else %}
+      <i class="fa-solid fa-circle-half-stroke"></i>
+    {% endif %}
+  </a>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="light" %}"><i class="fa-regular fa-sun"></i> Light</a></li>
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="slate" %}"><i class="fa-solid fa-moon"></i> Dark</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="default" %}"><i class="fa-solid fa-circle-half-stroke"></i> Auto</a></li>
+  </ul>
+</div>
+{% if user.is_authenticated and user.profile.theme == "light" %}
+  <li class="nav-item unhide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:set_theme' theme="default" %}"><i class="fa-solid fa-circle-half-stroke"></i></a></li>
+{% elif user.is_authenticated and user.profile.theme == "slate" %}
+  <li class="nav-item unhide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:set_theme' theme="light" %}"><i class="fa-regular fa-sun"></i></a></li>
+{% elif not user.is_authenticated and request.session.theme|default:"default" == "light" %}
+  <li class="nav-item unhide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:set_theme' theme="default" %}"><i class="fa-solid fa-circle-half-stroke"></i></a></li>
+{% elif not user.is_authenticated and request.session.theme|default:"default" == "slate" %}
+  <li class="nav-item unhide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:set_theme' theme="light" %}"><i class="fa-regular fa-sun"></i></a></li>
+{% else %}
+  <li class="nav-item unhide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:set_theme' theme="slate" %}"><i class="fa-solid fa-moon"></i></a></li>
+{% endif %}

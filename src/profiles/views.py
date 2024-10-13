@@ -3,9 +3,12 @@ from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from django.http import HttpResponseRedirect
+
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
@@ -83,3 +86,16 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
             )
         )
         return perms
+
+
+class ProfileThemeSelectView(View):
+    def get(self, request, *args, **kwargs):
+        request.session["theme"] = self.kwargs["theme"]
+        if self.request.user.is_authenticated and self.kwargs["theme"] in [
+            "light",
+            "slate",
+            "default",
+        ]:
+            self.request.user.profile.theme = self.kwargs["theme"]
+            self.request.user.profile.save()
+        return HttpResponseRedirect(request.headers["referer"])
