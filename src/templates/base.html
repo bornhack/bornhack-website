@@ -121,8 +121,12 @@
                     <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ creditnote_list_url }}">Credit Notes</a></li>
                   {% endif %}
                 {% endif %}
-                <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
-                <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                {% if user.is_authenticated %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                {% else %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                {% endif %}
               </ul>
               <div class="nav navbar-nav navbar-right ms-auto d-none d-lg-flex">
                 {% if user.is_authenticated %}
