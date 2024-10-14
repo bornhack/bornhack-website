@@ -1,22 +1,22 @@
 <div class="dropdown hide-for-no-js-users d-none d-lg-flex">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
     {% if user.is_authenticated and user.profile.theme == "light" %}
-      <i class="fa-regular fa-sun"></i>
+      <i class="fa-regular fa-sun fa-fw"></i>
     {% elif user.is_authenticated and user.profile.theme == "slate" %}
-      <i class="fa-solid fa-moon"></i>
+      <i class="fa-solid fa-moon fa-fw"></i>
     {% elif not user.is_authenticated and request.session.theme|default:"default" == "slate" %}
-      <i class="fa-solid fa-moon"></i>
+      <i class="fa-solid fa-moon fa-fw"></i>
     {% elif not user.is_authenticated and request.session.theme|default:"default" == "light" %}
-      <i class="fa-regular fa-sun"></i>
+      <i class="fa-regular fa-sun fa-fw"></i>
     {% else %}
-      <i class="fa-solid fa-circle-half-stroke"></i>
+      <i class="fa-solid fa-circle-half-stroke fa-fw"></i>
     {% endif %}
   </a>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="light" %}"><i class="fa-regular fa-sun"></i> Light</a></li>
-    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="slate" %}"><i class="fa-solid fa-moon"></i> Dark</a></li>
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="light" %}"><i class="fa-regular fa-sun fa-fw"></i> Light</a></li>
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="slate" %}"><i class="fa-solid fa-moon fa-fw"></i> Dark</a></li>
     <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="default" %}"><i class="fa-solid fa-circle-half-stroke"></i> Auto</a></li>
+    <li><a class="dropdown-item" href="{% url 'profiles:set_theme' theme="default" %}"><i class="fa-solid fa-circle-half-stroke fa-fw"></i> Auto</a></li>
   </ul>
 </div>
 {% if user.is_authenticated and user.profile.theme == "light" %}
