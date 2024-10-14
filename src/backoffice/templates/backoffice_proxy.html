@@ -7,7 +7,7 @@
     <div class="card-body">
       <ul class="list-group">
         {% for slug, urltuple in urls.items %}
-          <a class="list-group-item" href="{% url 'backoffice:proxy' camp_slug=camp.slug proxy_slug=slug %}"><span class="h4">{{ urltuple.0 }}</span><span class="pull-right">{{ urltuple.1 }}</span></a>
+          <a class="list-group-item list-group-item-action" href="{% url 'backoffice:proxy' camp_slug=camp.slug proxy_slug=slug %}"><span class="h4">{{ urltuple.0 }}</span><span class="pull-right">{{ urltuple.1 }}</span></a>
         {% endfor %}
       </ul>
     </div>

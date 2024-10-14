@@ -16,7 +16,7 @@
       <div class="card-body">
         <div class="list-group">
           {% for chain in chain_list %}
-            <a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item">
+            <a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item list-group-item-action">
               <h4 class="list-group-item-heading">
                 <b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)
               </h4>

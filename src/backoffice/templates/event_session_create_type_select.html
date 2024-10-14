@@ -10,7 +10,7 @@
       <p class="lead">Select Event Type for the new EventSession</p>
       <div class="list-group">
         {% for event_type in event_type_list %}
-          <a href="{%url 'backoffice:event_session_create_location_select' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="list-group-item">
+          <a href="{%url 'backoffice:event_session_create_location_select' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="list-group-item list-group-item-action">
             <h4 class="list-group-item-heading">
               <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
               {{ event_type.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right" style="color: {{ event_type.color }};"></i></span>

@@ -16,7 +16,7 @@
       <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a></p>
       <div class="list-group">
         {% for team in teams %}
-          <a href="{% url 'backoffice:team_permission_manage' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item">
+          <a href="{% url 'backoffice:team_permission_manage' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item list-group-item-action">
             <h4 class="list-group-item-heading">{{ team.name }} Team</h4>
             <p class="list-group-item-text">Manage permissions for {{ team.approved_members.count }} members of the {{  team.name }} Team.</p>
           </a>

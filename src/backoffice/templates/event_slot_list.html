@@ -48,7 +48,7 @@
                     {% if slot.event.speakers.exists %}
                       <ul class="list-group">
                         {% for speaker in slot.event.speakers.all %}
-                          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}</li></a>
+                          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> {{ speaker.name }}</li></a>
                         {% endfor %}
                     {% else %}
                       N/A

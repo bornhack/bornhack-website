@@ -1,14 +1,14 @@
 {% if perms.camps.orga_team_member or is_team_lead %}
   <h3>Permissions</h3>
-  <a href="{% url 'backoffice:permission_list_by_user' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:permission_list_by_user' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Show Permissions (by User)</h4>
     <p class="list-group-item-text">Use this view to see permissions in a table with a row per user.</p>
   </a>
-  <a href="{% url 'backoffice:permission_list_by_permission' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:permission_list_by_permission' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Show Permissions (by Permission)</h4>
     <p class="list-group-item-text">Use this view to see permissions in a table with a row per permission.</p>
   </a>
-  <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Manage Team Permissions</h4>
     <p class="list-group-item-text">Use this view to manage team permissions.</p>
   </a>

@@ -28,7 +28,7 @@
           {% if proposal.speakers.exists %}
             <ul class="list-group">
               {% for speaker in proposal.speakers.all %}
-                <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}</a>
+                <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item list-group-item-action"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}</a>
               {% endfor %}
           {% else %}
             N/A

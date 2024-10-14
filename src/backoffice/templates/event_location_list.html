@@ -38,7 +38,7 @@
                   {% if location.conflicts.exists %}
                     <ul class="list-group">
                       {% for conflict in location.conflicts.all %}
-                        <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}"class="list-group-item"><i class="fas fa-{{ conflict.icon }}"></i> {{ conflict.name }}</a>
+                        <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}"class="list-group-item list-group-item-action"><i class="fas fa-{{ conflict.icon }}"></i> {{ conflict.name }}</a>
                       {% endfor %}
                   {% else %}
                     N/A
