@@ -1,50 +1,50 @@
 {% if perms.camps.content_team_member %}
   <h3>Content Team</h3>
-  <a href="{% url 'backoffice:approve_event_feedback' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:approve_event_feedback' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Approve Feedback</h4>
     <p class="list-group-item-text">Use these views to approve or reject EventFeedback</p>
   </a>
-  <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Approve/Reject Pending Proposals</h4>
     <p class="list-group-item-text">Use these views to approve/reject pending SpeakerProposals and EventProposals</p>
   </a>
-  <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">AutoScheduler</h4>
     <p class="list-group-item-text">Use these views to manage the AutoScheduler</p>
   </a>
-  <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Events</h4>
     <p class="list-group-item-text">Use these views to manage Events</p>
   </a>
-  <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">EventLocations</h4>
     <p class="list-group-item-text">Use these views to manage EventLocations</p>
   </a>
-  <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">EventProposals</h4>
     <p class="list-group-item-text">Use these views to see all EventProposals</p>
   </a>
-  <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">EventSessions</h4>
     <p class="list-group-item-text">Use these views to manage <i>EventSession</i> objects. Each <i>EventSession</i> is parent to one or more related <i>EventSlot</i> objects, which is what <i>Events</i> are scheduled in.</p>
   </a>
-  <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">EventSlots</h4>
     <p class="list-group-item-text">Use these views to see <i>EventSlot</i> objects. <i>Events</i> are scheduled in <i>EventSlots</i>. An <i>EventSlot</i> belong to an <i>EventSession</i>, which is what defines the <i>EventType</i> and <i>EventLocation</i> of the <i>EventSlot</i>.</p>
   </a>
-  <a href="{% url 'backoffice:event_type_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:event_type_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">EventTypes</h4>
     <p class="list-group-item-text">Use these views to manage EventTypes</p>
   </a>
-  <a href="{% url 'backoffice:speaker_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:speaker_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Speakers</h4>
     <p class="list-group-item-text">Use these views to manage Speakers</p>
   </a>
-  <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">SpeakerProposals</h4>
     <p class="list-group-item-text">Use these views to see all SpeakerProposals</p>
   </a>
-  <a href="{% url 'backoffice:add_eventrecording' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:add_eventrecording' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Add Recordings</h4>
     <p class="list-group-item-text">Use this view to add recordings to events</p>
   </a>
