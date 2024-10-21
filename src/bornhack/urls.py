@@ -17,6 +17,7 @@ from maps.views import MapView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
+from utils.views import csrfview
 from villages.views import VillageCreateView
 from villages.views import VillageDeleteView
 from villages.views import VillageDetailView
@@ -29,6 +30,7 @@ from villages.views import VillageUpdateView
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
+    path("api/csrf/", csrfview),
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("profile/", include("allauth.urls")),
     path("profile/", include("allauth_2fa.urls")),
