@@ -39,7 +39,7 @@ wheel==0.44.0
 # pillow is only here to make old migrations run
 Pillow==10.4.0
 
-numpy==2.1.2
+numpy==2.2.1
 
 django-weasyprint==2.3.0
 weasyprint==62.3
