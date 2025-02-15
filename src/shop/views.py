@@ -577,7 +577,7 @@ class CoinifyRedirectView(
         return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return self.get_object().coinifyapipaymentintent.paymentintentjson[
+        return self.get_object().coinify_api_payment_intent.paymentintentjson[
             "paymentWindowUrl"
         ]
 
