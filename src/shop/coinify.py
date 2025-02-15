@@ -21,7 +21,7 @@ def process_coinify_payment_intent_json(intentjson, order, request):
 
     # if the order is paid in full call the mark as paid method now
     if "state" in intentjson:
-        if intentjson["state"] == "complete" and not coinifyintent.order.paid:
+        if intentjson["state"] == "completed" and not coinifyintent.order.paid:
             coinifyintent.order.mark_as_paid(request=request)
 
     return coinifyintent
