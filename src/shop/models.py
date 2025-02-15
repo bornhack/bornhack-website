@@ -237,20 +237,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             self.save()
 
     @property
-    def coinifyapiinvoice(self):
-        if not self.coinify_api_invoices.exists():
-            return False
-
-        for tempinvoice in self.coinify_api_invoices.all():
-            # we already have a coinifyinvoice for this order, check if it expired
-            if not tempinvoice.expired:
-                # this invoice is not expired, we are good to go
-                return tempinvoice
-
-        # nope
-        return False
-
-    @property
     def coinify_api_payment_intent(self):
         if not self.coinify_api_payment_intents.exists():
             return False
