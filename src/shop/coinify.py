@@ -88,7 +88,7 @@ def handle_coinify_api_response(apireq, order, request):
             )
             return coinifyintent
         else:
-            api_error = apireq.json()
+            api_error = apireq.response
             logger.error(
                 "coinify API error: {} ({})".format(
                     api_error["errorMessage"],
