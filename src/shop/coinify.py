@@ -64,7 +64,6 @@ def coinify_api_request(api_method, order, payload):
         logger.error("requests exception during coinify api request: %s" % E)
         return False
 
-    logger.error(response.text)
     # save this API request to the database
     req = CoinifyAPIRequest.objects.create(
         order=order,
@@ -112,9 +111,9 @@ def create_coinify_payment_intent(order, request):
         "amount": float(order.total),
         "currency": "DKK",
         "pluginIdentifier": "BornHack webshop",
-        "orderId": order.id,
+        "orderId": str(order.id),
         "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b",
-        "customerEmail": "coinifycustomer@bornhack.example",
+        "customerEmail": "coinifycustomer@example.com",
         "memo": "BornHack order id #%s" % order.id,
         "successUrl": order.get_coinify_thanks_url(request),
         "failureUrl": order.get_cancel_url(request),
