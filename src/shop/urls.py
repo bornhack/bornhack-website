@@ -87,6 +87,11 @@ urlpatterns = [
             ],
         ),
     ),
+    path(
+        "blockchain/callback/",
+        CoinifyCallbackView.as_view(),
+        name="coinify_intent_callback",
+    ),
     path("creditnotes/", CreditNoteListView.as_view(), name="creditnote_list"),
     path(
         "creditnotes/<int:pk>/pdf/",

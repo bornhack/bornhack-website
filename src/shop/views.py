@@ -24,8 +24,8 @@ from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
-from .coinify import create_coinify_invoice
-from .coinify import process_coinify_invoice_json
+from .coinify import create_coinify_payment_intent
+from .coinify import process_coinify_payment_intent_json
 from .coinify import save_coinify_callback
 from .forms import OrderProductRelationForm
 from .forms import OrderProductRelationFormSet
@@ -38,7 +38,6 @@ from shop.models import ProductCategory
 from shop.models import QuickPayAPICallback
 from shop.models import QuickPayAPIObject
 from utils.mixins import GetObjectMixin
-from vendor.coinify.coinify_callback import CoinifyCallback
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 qp = QuickPay()
@@ -561,9 +560,9 @@ class CoinifyRedirectView(
         order = self.get_object()
 
         # create a new coinify invoice if needed
-        if not order.coinifyapiinvoice:
-            coinifyinvoice = create_coinify_invoice(order, request)
-            if not coinifyinvoice:
+        if not order.coinifyapipaymentintent:
+            coinifyintent = create_coinify_payment_intent(order, request)
+            if not coinifyintent:
                 messages.error(
                     request,
                     "There was a problem with the payment provider. Please try again later",
@@ -578,19 +577,39 @@ class CoinifyRedirectView(
         return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return self.get_object().coinifyapiinvoice.invoicejson["payment_url"]
+        return self.get_object().coinifyapipaymentintent.paymentintentjson[
+            "paymentWindowUrl"
+        ]
 
 
-class CoinifyCallbackView(SingleObjectMixin, View):
-    model = Order
+class CoinifyCallbackView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
+    def validate_shared_secret(self, request):
+        signature = request.headers["X-Coinify-Webhook-Signature"]
+        expected_signature = hmac.new(
+            settings.COINIFY_IPN_SECRET.encode("UTF-8"),
+            msg=request.body,
+            digestmod=hashlib.sha256,
+        ).hexdigest()
+        return signature == expected_signature
+
     def post(self, request, *args, **kwargs):
+        # Validate incoming request
+        if not self.validate_shared_secret(request):
+            logger.error("invalid coinify callback detected")
+            return HttpResponseBadRequest("unsupported")
+
         # save callback and parse json payload
-        callbackobject = save_coinify_callback(request, self.get_object())
+        payload = json.loads(request.body.decode("utf-8"))
+        order = Order.objects.get(
+            coinify_api_payment_intents__coinify_id=payload["context"]["id"],
+        )
+
+        callbackobject = save_coinify_callback(request, order)
 
         # do we have a json body?
         if not callbackobject.payload:
@@ -601,28 +620,17 @@ class CoinifyCallbackView(SingleObjectMixin, View):
             )
             return HttpResponseBadRequest("unable to parse json")
 
-        # initiate SDK
-        sdk = CoinifyCallback(settings.COINIFY_IPN_SECRET.encode("utf-8"))
-
-        # attemt to validate the callbackc
-        if sdk.validate_callback(
-            request.body,
-            request.headers["X-Coinify-Callback-Signature"],
-        ):
-            # mark callback as valid in db
-            callbackobject.valid = True
-            callbackobject.save()
-        else:
-            logger.error("invalid coinify callback detected")
-            return HttpResponseBadRequest("something is fucky")
+        # mark callback as valid in db
+        callbackobject.valid = True
+        callbackobject.save()
 
         if (
-            callbackobject.payload["event"] == "invoice_state_change"
-            or callbackobject.payload["event"] == "invoice_manual_resend"
+            callbackobject.payload["event"] == "payment-intent.completed"
+            or callbackobject.payload["event"] == "payment-intent.failed"
         ):
-            process_coinify_invoice_json(
-                invoicejson=callbackobject.payload["data"],
-                order=self.get_object(),
+            process_coinify_payment_intent_json(
+                intentjson=payload["context"],
+                order=order,
                 request=request,
             )
             return HttpResponse("OK")

@@ -49,10 +49,9 @@ PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 QUICKPAY_API_KEY="{{ quickpay_api_key }}"
 QUICKPAY_PRIVATE_KEY="{{ quickpay_private_key }}"
 
+COINIFY_API_URL='{{ coinify_api_url }}'
 COINIFY_API_KEY='{{ coinify_api_key }}'
-COINIFY_API_SECRET='{{ coinify_api_secret }}'
 COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
-COINIFY_CALLBACK_HOSTNAME='{{ coinify_callback_hostname | default('') }}' # leave empty or comment out to use hostname from request
 
 # shop settings
 BANKACCOUNT_BANK='{{ bank_name }}'

@@ -5,26 +5,26 @@ import requests
 from django.conf import settings
 
 from .models import CoinifyAPICallback
-from .models import CoinifyAPIInvoice
+from .models import CoinifyAPIPaymentIntent
 from .models import CoinifyAPIRequest
-from vendor.coinify.coinify_api import CoinifyAPI
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def process_coinify_invoice_json(invoicejson, order, request):
-    # create or update the invoice object in our database
-    coinifyinvoice, created = CoinifyAPIInvoice.objects.update_or_create(
-        coinify_id=invoicejson["id"],
+def process_coinify_payment_intent_json(intentjson, order, request):
+    # create or update the intent object in our database
+    coinifyintent, created = CoinifyAPIPaymentIntent.objects.update_or_create(
+        coinify_id=intentjson["id"],
         order=order,
-        defaults={"invoicejson": invoicejson},
+        defaults={"paymentintentjson": intentjson},
     )
 
     # if the order is paid in full call the mark as paid method now
-    if invoicejson["state"] == "complete" and not coinifyinvoice.order.paid:
-        coinifyinvoice.order.mark_as_paid(request=request)
+    if "state" in intentjson:
+        if intentjson["state"] == "complete" and not coinifyintent.order.paid:
+            coinifyintent.order.mark_as_paid(request=request)
 
-    return coinifyinvoice
+    return coinifyintent
 
 
 def save_coinify_callback(request, order):
@@ -51,32 +51,26 @@ def save_coinify_callback(request, order):
     return callbackobject
 
 
-def coinify_api_request(api_method, order, **kwargs):
-    # Initiate coinify API
-    coinifyapi = CoinifyAPI(settings.COINIFY_API_KEY, settings.COINIFY_API_SECRET)
-
-    # is this a supported method?
-    if not hasattr(coinifyapi, api_method):
-        logger.error("coinify api method not supported" % api_method)
-        return False
-
-    # get and run the API call using the SDK
-    method = getattr(coinifyapi, api_method)
-
-    # catch requests exceptions as described in https://github.com/CoinifySoftware/python-sdk#catching-errors and
-    # http://docs.python-requests.org/en/latest/user/quickstart/#errors-and-exceptions
+def coinify_api_request(api_method, order, payload):
+    url = f"{settings.COINIFY_API_URL}{api_method}"
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/json",
+        "X-API-KEY": settings.COINIFY_API_KEY,
+    }
     try:
-        response = method(**kwargs)
+        response = requests.post(url, data=json.dumps(payload), headers=headers)
     except requests.exceptions.RequestException as E:
         logger.error("requests exception during coinify api request: %s" % E)
         return False
 
+    logger.error(response.text)
     # save this API request to the database
     req = CoinifyAPIRequest.objects.create(
         order=order,
         method=api_method,
-        payload=kwargs,
-        response=response,
+        payload=payload,
+        response=response.json(),
     )
     logger.debug("saved coinify api request %s in db" % req.id)
 
@@ -84,22 +78,22 @@ def coinify_api_request(api_method, order, **kwargs):
 
 
 def handle_coinify_api_response(apireq, order, request):
-    if apireq.method == "invoice_create" or apireq.method == "invoice_get":
+    if apireq.method == "payment-intents":
         # Parse api response
-        if apireq.response["success"]:
-            # save this new coinify invoice to the DB
-            coinifyinvoice = process_coinify_invoice_json(
-                invoicejson=apireq.response["data"],
+        if "paymentWindowUrl" in apireq.response:
+            # save this new coinify intent to the DB
+            coinifyintent = process_coinify_payment_intent_json(
+                intentjson=apireq.response,
                 order=order,
                 request=request,
             )
-            return coinifyinvoice
+            return coinifyintent
         else:
-            api_error = apireq.response["error"]
+            api_error = apireq.json()
             logger.error(
                 "coinify API error: {} ({})".format(
-                    api_error["message"],
-                    api_error["code"],
+                    api_error["errorMessage"],
+                    api_error["errorCode"],
                 ),
             )
             return False
@@ -112,36 +106,26 @@ def handle_coinify_api_response(apireq, order, request):
 # API CALLS
 
 
-def get_coinify_invoice(coinify_invoiceid, order, request):
+def create_coinify_payment_intent(order, request):
     # put args for API request together
-    invoicedict = {"invoice_id": coinify_invoiceid}
-
-    # perform the api request
-    apireq = coinify_api_request(api_method="invoice_get", order=order, **invoicedict)
-
-    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
-    return coinifyinvoice
-
-
-def create_coinify_invoice(order, request):
-    # put args for API request together
-    invoicedict = {
+    intentdict = {
         "amount": float(order.total),
         "currency": "DKK",
-        "plugin_name": "BornHack webshop",
-        "plugin_version": "1.0",
-        "description": "BornHack order id #%s" % order.id,
-        "callback_url": order.get_coinify_callback_url(request),
-        "return_url": order.get_coinify_thanks_url(request),
-        "cancel_url": order.get_cancel_url(request),
+        "pluginIdentifier": "BornHack webshop",
+        "orderId": order.id,
+        "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b",
+        "customerEmail": "coinifycustomer@bornhack.example",
+        "memo": "BornHack order id #%s" % order.id,
+        "successUrl": order.get_coinify_thanks_url(request),
+        "failureUrl": order.get_cancel_url(request),
     }
 
     # perform the API request
     apireq = coinify_api_request(
-        api_method="invoice_create",
+        api_method="payment-intents",
         order=order,
-        **invoicedict,
+        payload=intentdict,
     )
 
-    coinifyinvoice = handle_coinify_api_response(apireq, order, request)
-    return coinifyinvoice
+    coinifyintent = handle_coinify_api_response(apireq, order, request)
+    return coinifyintent
