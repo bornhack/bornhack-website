@@ -560,7 +560,7 @@ class CoinifyRedirectView(
         order = self.get_object()
 
         # create a new coinify invoice if needed
-        if not order.coinifyapipaymentintent:
+        if not order.coinify_api_payment_intent:
             coinifyintent = create_coinify_payment_intent(order, request)
             if not coinifyintent:
                 messages.error(
