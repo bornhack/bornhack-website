@@ -113,7 +113,7 @@ def create_coinify_payment_intent(order, request):
         "pluginIdentifier": "BornHack webshop",
         "orderId": str(order.id),
         "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b",
-        "customerEmail": "coinifycustomer@example.com",
+        "customerEmail": order.user.email,
         "memo": "BornHack order id #%s" % order.id,
         "successUrl": order.get_coinify_thanks_url(request),
         "failureUrl": order.get_cancel_url(request),
