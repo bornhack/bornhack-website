@@ -251,7 +251,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         return False
 
     @property
-    def coinify _api_payment_intent(self):
+    def coinify_api_payment_intent(self):
         if not self.coinify_api_payment_intents.exists():
             return False
 
