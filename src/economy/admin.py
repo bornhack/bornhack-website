@@ -6,6 +6,7 @@ from .models import BankTransaction
 from .models import Chain
 from .models import CoinifyBalance
 from .models import CoinifyInvoice
+from .models import CoinifyPaymentIntent
 from .models import CoinifyPayout
 from .models import Credebtor
 from .models import EpayTransaction
@@ -231,6 +232,24 @@ class CoinifyInvoiceAdmin(admin.ModelAdmin):
         "state",
         "payment_type",
         "original_payment_id",
+    ]
+
+
+@admin.register(CoinifyPaymentIntent)
+class CoinifyPaymentIntentAdmin(admin.ModelAdmin):
+    list_display = [
+        "coinify_id",
+        "coinify_created",
+        "requested_amount",
+        "requested_currency",
+        "amount",
+        "currency",
+        "state",
+        "state_reason",
+        "reference_type",
+        "original_order_id",
+        "order",
+        "api_payment_intent",
     ]
 
 
