@@ -34,6 +34,7 @@ from .views import CoinifyBalanceListView
 from .views import CoinifyCSVImportView
 from .views import CoinifyDashboardView
 from .views import CoinifyInvoiceListView
+from .views import CoinifyPaymentIntentListView
 from .views import TeamPermissionIndexView
 from .views import TeamPermissionManageView
 from .views import CoinifyPayoutListView
@@ -1009,6 +1010,11 @@ urlpatterns = [
                                 "",
                                 CoinifyDashboardView.as_view(),
                                 name="coinify_dashboard",
+                            ),
+                            path(
+                                "payment_intents/",
+                                CoinifyPaymentIntentListView.as_view(),
+                                name="coinifypayment_intent_list",
                             ),
                             path(
                                 "invoices/",

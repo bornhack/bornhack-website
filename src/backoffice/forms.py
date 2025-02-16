@@ -143,6 +143,10 @@ class BankCSVForm(forms.Form):
 
 
 class CoinifyCSVForm(forms.Form):
+    payment_intents = forms.FileField(
+        help_text="CSV file with Coinify Payment Intents. Leave empty if no invoices need to be imported.",
+        required=False,
+    )
     invoices = forms.FileField(
         help_text="CSV file with Coinify invoices. Leave empty if no invoices need to be imported.",
         required=False,
