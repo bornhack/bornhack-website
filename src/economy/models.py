@@ -1536,6 +1536,44 @@ class CoinifyPaymentIntent(
     )
 
 
+class CoinifySettlement(
+    ExportModelOperationsMixin("coinify_settlement"),
+    CreatedUpdatedUUIDModel,
+):
+
+    settlement_id = models.CharField(
+        max_length=36,
+        help_text="The internal coinify id for the settlement",
+    )
+    account = models.CharField(
+        max_length=100,
+        help_text="The settlement account",
+    )
+    gross_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The gross amount",
+    )
+    fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payout fee",
+    )
+    net_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The net amount",
+    )
+    payout_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payout amount",
+    )
+    create_time = models.DateTimeField(
+        help_text="Created datetime in Coinifys end for this payout",
+    )
+
+
 class CoinifyPayout(
     ExportModelOperationsMixin("coinify_payout"),
     CreatedUpdatedUUIDModel,

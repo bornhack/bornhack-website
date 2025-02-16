@@ -9,6 +9,7 @@ from .models import CoinifyBalance
 from .models import CoinifyInvoice
 from .models import CoinifyPaymentIntent
 from .models import CoinifyPayout
+from .models import CoinifySettlement
 from .models import EpayTransaction
 from .models import MobilePayTransaction
 from .models import Pos
@@ -150,6 +151,38 @@ class CoinifyPayoutFactory(factory.django.DjangoModelFactory):
         max_value=10000,
     )
     currency = "EUR"
+
+
+class CoinifySettlementFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CoinifySettlement
+
+    settlement_id = factory.Faker("uuid4")
+    account = factory.Faker("word")
+    create_time = factory.Faker(
+        "date_time_between",
+        start_date="-6y",
+        tzinfo=timezone.utc,
+    )
+    gross_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
+    fee = factory.Faker("pydecimal", right_digits=2, min_value=1, max_value=10)
+    net_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
+    payout_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
 
 
 class CoinifyBalanceFactory(factory.django.DjangoModelFactory):

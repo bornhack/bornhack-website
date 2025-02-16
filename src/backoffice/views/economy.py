@@ -36,6 +36,7 @@ from economy.models import ClearhausSettlement
 from economy.models import CoinifyBalance
 from economy.models import CoinifyInvoice
 from economy.models import CoinifyPayout
+from economy.models import CoinifySettlement
 from economy.models import CoinifyPaymentIntent
 from economy.models import Credebtor
 from economy.models import EpayTransaction
@@ -460,6 +461,7 @@ class CoinifyDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateVi
             context["balance"] = None
 
         context["payment_intents"] = CoinifyPaymentIntent.objects.count()
+        context["settlements"] = CoinifySettlement.objects.count()
         context["invoices"] = CoinifyInvoice.objects.count()
         context["payouts"] = CoinifyPayout.objects.count()
         context["balances"] = CoinifyBalance.objects.count()
@@ -486,6 +488,11 @@ class CoinifyBalanceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView
     template_name = "coinifybalance_list.html"
 
 
+class CoinifySettlementListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifySettlement
+    template_name = "coinifysettlement_list.html"
+
+
 class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
     form_class = CoinifyCSVForm
     template_name = "coinify_csv_upload_form.html"
@@ -504,6 +511,21 @@ class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
                 messages.info(
                     self.request,
                     "Payment Intent CSV processed OK. No new Coinify payment intents were created.",
+                )
+
+        if "settlements" in form.files:
+            csvdata = form.files["settlements"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_settlements_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Settlements CSV processed OK. Successfully imported {created} new Coinify settlements.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Settlements CSV processed OK. No new Coinify settlements were created.",
                 )
 
         if "invoices" in form.files:

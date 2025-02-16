@@ -33,6 +33,7 @@ from economy.factories import CoinifyBalanceFactory
 from economy.factories import CoinifyInvoiceFactory
 from economy.factories import CoinifyPaymentIntentFactory
 from economy.factories import CoinifyPayoutFactory
+from economy.factories import CoinifySettlementFactory
 from economy.factories import EpayTransactionFactory
 from economy.factories import MobilePayTransactionFactory
 from economy.factories import ZettleBalanceFactory
@@ -463,12 +464,13 @@ class Command(BaseCommand):
 
     def create_coinify_stuff(self):
         self.output(
-            "Creating Coinify invoices, payment intents, payouts and balances...",
+            "Creating Coinify invoices, payment intents, payouts, settlements and balances...",
         )
         CoinifyInvoiceFactory.create_batch(50)
         CoinifyPaymentIntentFactory.create_batch(50)
         CoinifyPayoutFactory.create_batch(10)
         CoinifyBalanceFactory.create_batch(10)
+        CoinifySettlementFactory.create_batch(10)
 
     def create_epay_transactions(self):
         self.output("Creating ePay Transactions...")

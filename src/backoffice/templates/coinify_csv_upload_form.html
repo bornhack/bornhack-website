@@ -9,14 +9,16 @@
     </div>
     <div class="card-body">
       <p class="lead">Coinify CSV Upload</p>
-      <p>To export Coinify CSV files with invoices, payouts and balances you need to visit the <a href="https://merchant.coinify.com/export?">export thing</a> on their webinterface.</p>
+      <p>To export Payment Intent visit <a href="https://app.coinify.com/payment/export-data">export thing</a>
+        <p>To export Settlements visit <a href="https://app.coinify.com/payment/settlements">settlements page</a> and press export (top right)</p>
+        <p>To export Coinify CSV files from the OLD api with invoices, payouts and balances you need to visit the <a href="https://merchant.coinify.com/export?">export thing</a> on their webinterface.</p>
 
-      <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Upload</button>
-        <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
-      </form>
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Upload</button>
+          <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+        </form>
+      </div>
     </div>
-  </div>
 {% endblock content %}
