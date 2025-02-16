@@ -35,7 +35,7 @@ jobs:
           submodules: recursive
 
       - name: "Install OS deps"
-        run: "sudo apt -y install libgdal-dev libpq-dev libffi7 libmagic1 git binutils libproj-dev gdal-bin"
+        run: "sudo apt -y install libgdal-dev libpq-dev libmagic1 git binutils libproj-dev gdal-bin"
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
