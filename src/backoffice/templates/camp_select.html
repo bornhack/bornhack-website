@@ -17,7 +17,7 @@
     <p>
       <div class="list-group">
         {% for camp in camp_list %}
-          <a href="{% url 'backoffice:camp_index' camp_slug=camp.slug %}" class="list-group-item">
+          <a href="{% url 'backoffice:camp_index' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
             <h4 class="list-group-item-heading">{{ camp.title }}</h4>
             <p class="list-group-item-text">Manage {{ camp.title }}</p>
           </a>

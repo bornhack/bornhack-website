@@ -18,7 +18,7 @@
           {% if speaker.events.all %}
             <ul class="list-group">
               {% for event in speaker.events.all %}
-                <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item">
+                <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item list-group-item-action">
                   <i class="fas fa-{{ event.event_type.icon }} fa-lg fa-fw" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
                 </a>
               {% endfor %}

@@ -1,26 +1,26 @@
 {% if perms.camps.orga_team_member %}
   <h3>Orga Team</h3>
-  <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
     <p class="list-group-item-text">Use this view to check and approve users Public Credit Names</p>
   </a>
-  <a href="{% url 'backoffice:merchandise_orders' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:merchandise_orders' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Merchandise Orders</h4>
     <p class="list-group-item-text">Use this view to look at Merchandise Orders</p>
   </a>
-  <a href="{% url 'backoffice:merchandise_to_order' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:merchandise_to_order' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Merchandise To Order</h4>
     <p class="list-group-item-text">Use this view to generate a list of merchandise that needs to be ordered</p>
   </a>
-  <a href="{% url 'backoffice:village_orders' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:village_orders' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Village Orders</h4>
     <p class="list-group-item-text">Use this view to look at Village category OrderProductRelations</p>
   </a>
-  <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Village Gear To Order</h4>
     <p class="list-group-item-text">Use this view to generate a list of village gear that needs to be ordered</p>
   </a>
-  <a href="{% url 'backoffice:outgoing_email_release' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:outgoing_email_release' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Edit and Release Held Emails</h4>
     {% if held_email_count %}
       <p class="list-group-item-text">Use this view to edit and release <span class="badge rounded-pill bg-danger">{{ held_email_count }}</span> OutgoingEmailQueue objects on hold.</p>
@@ -28,15 +28,15 @@
       <p class="list-group-item-text">No emails are currently held for release. Check back later!</p>
     {% endif %}
   </a>
-  <a href="{% url 'backoffice:irc_overview' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:irc_overview' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">IRC Overview</h4>
     <p class="list-group-item-text">Use this view to see IRC channels for this years teams</p>
   </a>
-  <a href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Webshop Ticket Stats</h4>
     <p class="list-group-item-text">Use this view to see stats for tickets created from webshop sales. This includes tickets for people (adults and children, full week and oneday tickets), merchandise, village gear, parking and so on. This view does not include sponsor tickets.</p>
   </a>
-  <a href="{% url 'backoffice:proxy' camp_slug=camp.slug %}" class="list-group-item">
+  <a href="{% url 'backoffice:proxy' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Proxied Content</h4>
     <p class="list-group-item-text">Use this view to see proxied content</p>
   </a>
