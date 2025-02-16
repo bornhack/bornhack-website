@@ -114,7 +114,7 @@ class CoinifyPaymentIntentFactory(factory.django.DjangoModelFactory):
     original_order_id = factory.Faker("random_int", min=100000, max=200000)
     order = None
     api_payment_intent = None
-    customer_email = "somesucker@example.com"
+    customer_email = "coinifycustomer@example.com"
     requested_amount = factory.Faker(
         "pydecimal",
         right_digits=2,
