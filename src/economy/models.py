@@ -1542,7 +1542,7 @@ class CoinifySettlement(
 ):
 
     settlement_id = models.CharField(
-        max_length=32,
+        max_length=36,
         help_text="The internal coinify id for the settlement",
     )
     account = models.CharField(
