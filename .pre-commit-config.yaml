@@ -26,14 +26,14 @@ repos:
       - id: python-no-log-warn
       - id: rst-backticks
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.17.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
         args:
           - --py39-plus
         exclude: migrations/
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.21.0
+    rev: 1.23.1
     hooks:
       - id: django-upgrade
         args: [--target-version, "4.2"]
@@ -46,11 +46,11 @@ repos:
     hooks:
       -   id: add-trailing-comma
   - repo: https://github.com/hadialqattan/pycln
-    rev: v2.4.0
+    rev: v2.5.0
     hooks:
       -   id: pycln
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
   - repo: https://github.com/pycqa/flake8
@@ -63,7 +63,7 @@ repos:
           - flake8-tidy-imports
         args: [--max-line-length=120]
   - repo: "https://github.com/rtts/djhtml"
-    rev: '3.0.6'
+    rev: '3.0.7'
     hooks:
       - id: "djhtml"
         args: ["-t", "2"]
