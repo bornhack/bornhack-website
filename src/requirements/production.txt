@@ -29,7 +29,7 @@ nh3==0.2.20
 olefile==0.47
 openpyxl==3.1.2
 pandas==2.2.3
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.10
 python-magic==0.4.27
 quickpay-api-client==2.0.1
 service-identity==24.2.0
