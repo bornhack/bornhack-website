@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import CoinifyAPICallback
 from .models import CoinifyAPIInvoice
+from .models import CoinifyAPIPaymentIntent
 from .models import CoinifyAPIRequest
 from .models import CreditNote
 from .models import CustomOrder
@@ -21,6 +22,7 @@ from .models import SubProductRelation
 
 admin.site.register(EpayCallback)
 admin.site.register(CoinifyAPIInvoice)
+admin.site.register(CoinifyAPIPaymentIntent)
 admin.site.register(CoinifyAPICallback)
 admin.site.register(CoinifyAPIRequest)
 

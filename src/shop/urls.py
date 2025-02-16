@@ -69,11 +69,6 @@ urlpatterns = [
                     name="coinify_pay",
                 ),
                 path(
-                    "pay/blockchain/callback/",
-                    CoinifyCallbackView.as_view(),
-                    name="coinify_callback",
-                ),
-                path(
                     "pay/blockchain/thanks/",
                     CoinifyThanksView.as_view(),
                     name="coinify_thanks",
@@ -86,6 +81,11 @@ urlpatterns = [
                 path("pay/in_person/", PayInPersonView.as_view(), name="in_person"),
             ],
         ),
+    ),
+    path(
+        "blockchain/callback/",
+        CoinifyCallbackView.as_view(),
+        name="coinify_intent_callback",
     ),
     path("creditnotes/", CreditNoteListView.as_view(), name="creditnote_list"),
     path(

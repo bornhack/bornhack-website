@@ -3,7 +3,6 @@
 from django.http import HttpRequest
 from django.http import HttpResponse
 from django.middleware.csrf import get_token
-from django.shortcuts import render
 
 
 def csrfview(request: HttpRequest) -> HttpResponse:

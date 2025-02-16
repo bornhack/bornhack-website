@@ -1,0 +1,33 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "coinify_id" "ID" %}
+      {% thh "coinify_created" "Created" %}
+      {% thh "requested_amount" %}
+      {% thh "amount" %}
+      {% thh "state (state_reason)" %}
+      {% thh "reference_type" %}
+      {% thh "original_order_id" %}
+      {% thh "Shop order" %}
+      {% thh "api_payment_intent" %}
+      {% thh "created" "Imported" "The date this Coinify payment intent was imported" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ci in object_list %}
+      <tr>
+        <td>{{ ci.coinify_id }}</td>
+        <td data-order="{{ ci.coinify_created|sortable }}">{{ ci.coinify_created }}</td>
+        <td data-order="{{ ci.requested_amount }}">{{ ci.requested_amount }}&nbsp;{{ ci.requested_currency }}</td>
+        <td data-order="{{ ci.amount }}">{{ ci.amount }}&nbsp;{{ ci.currency }}</td>
+        <td>{{ ci.state }} ({{ ci.state_reason }})</td>
+        <td>{{ ci.reference_type }}</td>
+        <td>{{ ci.original_order_id }}</td>
+        <td>{{ ci.order }}</td>
+        <td>{{ ci.api_payment_intent }}</td>
+        <td data-order="{{ ci.created|sortable }}">{{ ci.created }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
