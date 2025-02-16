@@ -23,6 +23,7 @@ from economy.models import CoinifyBalance
 from economy.models import CoinifyInvoice
 from economy.models import CoinifyPaymentIntent
 from economy.models import CoinifyPayout
+from economy.models import CoinifySettlement
 from economy.models import EpayTransaction
 from economy.models import Expense
 from economy.models import MobilePayTransaction
@@ -163,6 +164,27 @@ class CoinifyCSVImporter:
                 state=row[10],
                 payment_type=row[11],
                 original_payment_id=row[12] or None,
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+    @staticmethod
+    def import_coinify_settlements_csv(csvreader):
+        """
+        Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time
+        """
+        create_count = 0
+        next(csvreader)
+        for row in csvreader:
+            cs, created = CoinifySettlement.objects.get_or_create(
+                settlement_id=row[0],
+                account=row[1],
+                gross_amount=Decimal(row[2]),
+                fee=Decimal(row[3]),
+                net_amount=Decimal(row[4]),
+                payout_amount=Decimal(row[5]),
+                create_time=row[6],
             )
             if created:
                 create_count += 1

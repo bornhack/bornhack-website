@@ -1,0 +1,29 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "settlement_id" "ID" %}
+      {% thh "create_time" "Created" %}
+      {% thh "account" %}
+      {% thh "gross_amount" %}
+      {% thh "fee" %}
+      {% thh "net_ammount" %}
+      {% thh "payout_amount" %}
+      {% thh "created" "Imported" "The date this Coinify payment intent was imported" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ci in object_list %}
+      <tr>
+        <td>{{ ci.settlement_id }}</td>
+        <td data-order="{{ ci.create_time|sortable }}">{{ ci.create_time }}</td>
+        <td data-order="{{ ci.account }}">{{ ci.account }}</td>
+        <td data-order="{{ ci.gross_amount }}">{{ ci.gross_amount }}</td>
+        <td data-order="{{ ci.fee }}">{{ ci.fee }}</td>
+        <td data-order="{{ ci.net_amount }}">{{ ci.net_amount }}</td>
+        <td data-order="{{ ci.payout_amount }}">{{ ci.payout_amount }}</td>
+        <td data-order="{{ ci.created|sortable }}">{{ ci.created }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -8,6 +8,7 @@ from .models import CoinifyBalance
 from .models import CoinifyInvoice
 from .models import CoinifyPaymentIntent
 from .models import CoinifyPayout
+from .models import CoinifySettlement
 from .models import Credebtor
 from .models import EpayTransaction
 from .models import Expense
@@ -263,6 +264,18 @@ class CoinifyPayoutAdmin(admin.ModelAdmin):
         "transferred",
         "currency",
         "btc_txid",
+    ]
+
+
+@admin.register(CoinifySettlement)
+class CoinifySettlementAdmin(admin.ModelAdmin):
+    list_display = [
+        "settlement_id",
+        "create_time",
+        "account",
+        "gross_amount",
+        "fee",
+        "net_amount",
     ]
 
 
