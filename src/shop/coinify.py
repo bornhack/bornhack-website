@@ -112,7 +112,7 @@ def create_coinify_payment_intent(order, request):
         "currency": "DKK",
         "pluginIdentifier": "BornHack webshop",
         "orderId": str(order.id),
-        "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b",
+        "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b", # random static UUID4
         "customerEmail": order.user.email,
         "memo": "BornHack order id #%s" % order.id,
         "successUrl": order.get_coinify_thanks_url(request),
