@@ -45,10 +45,6 @@ repos:
     rev: v3.1.0
     hooks:
       -   id: add-trailing-comma
-  - repo: https://github.com/hadialqattan/pycln
-    rev: v2.4.0
-    hooks:
-      -   id: pycln
   - repo: https://github.com/psf/black
     rev: 24.10.0
     hooks:
