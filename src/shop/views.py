@@ -601,7 +601,7 @@ class CoinifyCallbackView(View):
         # Validate incoming request
         if not self.validate_shared_secret(request):
             logger.error("invalid coinify callback detected")
-            return HttpResponseBadRequest("unsupported")
+            return HttpResponseBadRequest("no thanks")
 
         # save callback and parse json payload
         payload = json.loads(request.body.decode("utf-8"))
