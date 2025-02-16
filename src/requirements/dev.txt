@@ -7,4 +7,4 @@ pre-commit==4.0.1
 hypothesis==6.123.7
 tblib==3.0.0
 unittest-xml-reporting==3.2.0
-pipdeptree==2.23.4
+pipdeptree==2.24.0
