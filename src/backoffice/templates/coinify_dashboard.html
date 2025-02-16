@@ -26,7 +26,7 @@
       {% endif %}
 
       <div class="list-group">
-        <a class="list-group-item" href="{% url 'backoffice:coinifypayment_intent_list' camp_slug=camp.slug %}">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifypayment_intent_list' camp_slug=camp.slug %}">
           <h4 class="list-group-item-heading">Coinify Payment Intents</h4>
           <p class="list-group-item-text">Use this view to see {{ payment_intents }} Coinify Payment Intents.</p>
         </a>
