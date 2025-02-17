@@ -7,7 +7,9 @@ from .models import BankTransaction
 from .models import ClearhausSettlement
 from .models import CoinifyBalance
 from .models import CoinifyInvoice
+from .models import CoinifyPaymentIntent
 from .models import CoinifyPayout
+from .models import CoinifySettlement
 from .models import EpayTransaction
 from .models import MobilePayTransaction
 from .models import Pos
@@ -93,6 +95,43 @@ class CoinifyInvoiceFactory(factory.django.DjangoModelFactory):
     )
 
 
+class CoinifyPaymentIntentFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CoinifyPaymentIntent
+
+    coinify_id = factory.Faker("uuid4")
+    coinify_created = factory.Faker(
+        "date_time_between",
+        start_date="-6y",
+        tzinfo=timezone.utc,
+    )
+    reference_type = "payment_intent"
+    merchant_id = factory.Faker("uuid4")
+    merchant_name = "Sandbox Factory"
+    subaccount_id = ""
+    subaccount_name = ""
+    state = "completed"
+    state_reason = "completed_exact_amount"
+    original_order_id = factory.Faker("random_int", min=100000, max=200000)
+    order = None
+    api_payment_intent = None
+    customer_email = "coinifycustomer@example.com"
+    requested_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=100,
+        max_value=10000,
+    )
+    requested_currency = "DKK"
+    amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=100,
+        max_value=10000,
+    )
+    currency = "DKK"
+
+
 class CoinifyPayoutFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CoinifyPayout
@@ -112,6 +151,38 @@ class CoinifyPayoutFactory(factory.django.DjangoModelFactory):
         max_value=10000,
     )
     currency = "EUR"
+
+
+class CoinifySettlementFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CoinifySettlement
+
+    settlement_id = factory.Faker("uuid4")
+    account = factory.Faker("word")
+    create_time = factory.Faker(
+        "date_time_between",
+        start_date="-6y",
+        tzinfo=timezone.utc,
+    )
+    gross_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
+    fee = factory.Faker("pydecimal", right_digits=2, min_value=1, max_value=10)
+    net_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
+    payout_amount = factory.Faker(
+        "pydecimal",
+        right_digits=2,
+        min_value=1000,
+        max_value=10000,
+    )
 
 
 class CoinifyBalanceFactory(factory.django.DjangoModelFactory):

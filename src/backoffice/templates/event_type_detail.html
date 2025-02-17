@@ -65,7 +65,7 @@
                         <td>
                           <ul class="list-group">
                             {% for speaker in event.speakers.all %}
-                              <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}</a>
+                              <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> {{ speaker.name }}</a>
                             {% empty %}
                               N/A
                             {% endfor %}
@@ -74,7 +74,7 @@
                         <td>
                           <ul class="list-group">
                             {% for slot in event.event_slots.all %}
-                              <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}" class="list-group-item">From {{ slot.when.lower }} to {{ slot.when.upper }} at {{ slot.event_location.name }}</a>{% endfor %}</td>
+                              <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}" class="list-group-item list-group-item-action">From {{ slot.when.lower }} to {{ slot.when.upper }} at {{ slot.event_location.name }}</a>{% endfor %}</td>
                         </tr>
                     {% endfor %}
                   </tbody>

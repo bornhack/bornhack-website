@@ -10,7 +10,7 @@
       <p class="lead">Select Event Location for the new EventSession</p>
       <div class="list-group">
         {% for location in event_location_list %}
-          <a href="{%url 'backoffice:event_session_create' camp_slug=camp.slug event_type_slug=event_type.slug event_location_slug=location.slug %}" class="list-group-item">
+          <a href="{%url 'backoffice:event_session_create' camp_slug=camp.slug event_type_slug=event_type.slug event_location_slug=location.slug %}" class="list-group-item list-group-item-action">
             <h4 class="list-group-item-heading">
               <i class="fas fa-{{ location.icon }} fa-2x fa-pull-left fa-fw"></i>
               {{ location.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right"></i></span>

@@ -21,7 +21,9 @@ from economy.models import BankAccount
 from economy.models import ClearhausSettlement
 from economy.models import CoinifyBalance
 from economy.models import CoinifyInvoice
+from economy.models import CoinifyPaymentIntent
 from economy.models import CoinifyPayout
+from economy.models import CoinifySettlement
 from economy.models import EpayTransaction
 from economy.models import Expense
 from economy.models import MobilePayTransaction
@@ -38,6 +40,7 @@ from shop.models import CreditNote
 from shop.models import CustomOrder
 from shop.models import Invoice
 from shop.models import Order
+from shop.models import CoinifyAPIPaymentIntent
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
@@ -86,6 +89,45 @@ def import_epay_csv(csvreader):
 
 class CoinifyCSVImporter:
     @staticmethod
+    def import_coinify_payment_intent_csv(csvreader):
+        """Import a CSV file from Coinify payment intents exporeted from there webinterface
+
+        Assumes a CSV structure like this:
+        referenceId,referenceType,merchantId,merchantName,subaccountId,subaccountName,state,stateReason,orderId,customerEmail,requestedAmount,requestedCurrency,createTime,amount,currency
+        5166a422-4ac6-4077-8a82-d6b8c5948aea,payment_intent,8bb8d156-f7ad-4c52-9372-a383ae06f8c4,Sandbox Business,,,completed,completed_exact_amount,54,coinifycustomer@example.com,100,DKK,2025-02-15T17:07:50.811Z,100,DKK
+        2666cbe3-ff7d-4fa6-aa49-b86784c3ecb4,payment_intent,8bb8d156-f7ad-4c52-9372-a383ae06f8c4,Sandbox Business,,,failed,failed_overpaid,55,coinifycustomer@example.com,100,DKK,2025-02-15T17:14:30.887Z,,
+
+        """
+        create_count = 0
+        # skip header row
+        next(csvreader)
+        for row in csvreader:
+            ci, created = CoinifyPaymentIntent.objects.get_or_create(
+                coinify_id=row[0],
+                reference_type=row[1],
+                merchant_id=row[2],
+                merchant_name=row[3],
+                subaccount_id=row[4],
+                subaccount_name=row[5],
+                state=row[6],
+                state_reason=row[7],
+                original_order_id=row[8],
+                customer_email=row[9],
+                requested_amount=Decimal(row[10]),
+                requested_currency=row[11],
+                coinify_created=datetime.datetime.fromisoformat(row[12]),
+                amount=Decimal(row[13]) if row[13] else Decimal(0),
+                currency=row[14],
+                order=Order.objects.filter(pk=row[8]).first(),
+                api_payment_intent=CoinifyAPIPaymentIntent.objects.filter(
+                    coinify_id=row[0],
+                ).first(),
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+    @staticmethod
     def import_coinify_invoice_csv(csvreader):
         """Import a CSV file with Coinify invoices exported from their webinterface.
 
@@ -122,6 +164,27 @@ class CoinifyCSVImporter:
                 state=row[10],
                 payment_type=row[11],
                 original_payment_id=row[12] or None,
+            )
+            if created:
+                create_count += 1
+        return create_count
+
+    @staticmethod
+    def import_coinify_settlements_csv(csvreader):
+        """
+        Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time
+        """
+        create_count = 0
+        next(csvreader)
+        for row in csvreader:
+            cs, created = CoinifySettlement.objects.get_or_create(
+                settlement_id=row[0],
+                account=row[1],
+                gross_amount=Decimal(row[2]),
+                fee=Decimal(row[3]),
+                net_amount=Decimal(row[4]),
+                payout_amount=Decimal(row[5]),
+                create_time=row[6],
             )
             if created:
                 create_count += 1

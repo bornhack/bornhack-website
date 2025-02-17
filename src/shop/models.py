@@ -1,11 +1,11 @@
 import logging
+import uuid
 from datetime import timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import chain
 from typing import Optional
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import DateTimeRangeField
@@ -166,21 +166,6 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         else:
             return False
 
-    def get_coinify_callback_url(self, request):
-        """Check settings for an alternative COINIFY_CALLBACK_HOSTNAME otherwise use the one from the request"""
-        if (
-            hasattr(settings, "COINIFY_CALLBACK_HOSTNAME")
-            and settings.COINIFY_CALLBACK_HOSTNAME
-        ):
-            host = settings.COINIFY_CALLBACK_HOSTNAME
-        else:
-            host = request.get_host()
-        return (
-            "https://"
-            + host
-            + str(reverse_lazy("shop:coinify_callback", kwargs={"pk": self.pk}))
-        )
-
     def get_coinify_thanks_url(self, request):
         return (
             "https://"
@@ -252,14 +237,14 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             self.save()
 
     @property
-    def coinifyapiinvoice(self):
-        if not self.coinify_api_invoices.exists():
+    def coinify_api_payment_intent(self):
+        if not self.coinify_api_payment_intents.exists():
             return False
 
-        for tempinvoice in self.coinify_api_invoices.all():
-            # we already have a coinifyinvoice for this order, check if it expired
-            if not tempinvoice.expired:
-                # this invoice is not expired, we are good to go
+        for tempinvoice in self.coinify_api_payment_intents.all():
+            # we already have a coinifypaymentintent for this order
+            if "paymentWindowUrl" in tempinvoice.paymentintentjson:
+                # this invoice is still active, we are good to go
                 return tempinvoice
 
         # nope
@@ -1151,6 +1136,22 @@ class CoinifyAPIInvoice(
     @property
     def expired(self):
         return parse_datetime(self.invoicejson["expire_time"]) < timezone.now()
+
+
+class CoinifyAPIPaymentIntent(
+    ExportModelOperationsMixin("coinify_api_payment_intent"),
+    CreatedUpdatedModel,
+):
+    coinify_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    paymentintentjson = models.JSONField()
+    order = models.ForeignKey(
+        "shop.Order",
+        related_name="coinify_api_payment_intents",
+        on_delete=models.PROTECT,
+    )
+
+    def __str__(self):
+        return "coinifypaymentintent for order #%s" % self.order.id
 
 
 class CoinifyAPICallback(

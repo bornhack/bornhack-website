@@ -20,15 +20,15 @@
       {% endif %}
 
       <div class="list-group">
-        <a class="list-group-item" href="{% url 'backoffice:zettlereceipt_list' camp_slug=camp.slug %}">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettlereceipt_list' camp_slug=camp.slug %}">
           <h4 class="list-group-item-heading"><i class="fas fa-list"></i> Zettle Receipts</h4>
           <p class="list-group-item-text">Use this view to see {{ receipts }} receipts.</p>
         </a>
-        <a class="list-group-item" href="{% url 'backoffice:zettlebalance_list' camp_slug=camp.slug %}">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettlebalance_list' camp_slug=camp.slug %}">
           <h4 class="list-group-item-heading"><i class="fas fa-balance-scale"></i> Zettle Balances</h4>
           <p class="list-group-item-text">Use this view to see {{ balances }} account movements for our Zettle account. Each entry in the table represents money going into or out of our Zettle account.</p>
         </a>
-        <a class="list-group-item" href="{% url 'backoffice:zettle_import' camp_slug=camp.slug %}">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettle_import' camp_slug=camp.slug %}">
           <h4 class="list-group-item-heading"><i class="fas fa-file-excel"></i> Import Zettle Data</h4>
           <p class="list-group-item-text">Use this view to import Excel files with new receipts and balances.</p>
         </a>

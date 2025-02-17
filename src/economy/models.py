@@ -1451,6 +1451,129 @@ class CoinifyInvoice(
     )
 
 
+class CoinifyPaymentIntent(
+    ExportModelOperationsMixin("coinify_payment_intent"),
+    CreatedUpdatedUUIDModel,
+):
+    """Coinify Payment intents a intent is created for each payment."""
+
+    class Meta:
+        get_latest_by = ["coinify_created"]
+        ordering = ["-coinify_created"]
+
+    coinify_id = models.UUIDField(help_text="Coinifys internal ID for this invoice")
+    coinify_created = models.DateTimeField(help_text="Created datetime in Coinifys end")
+    reference_type = models.CharField(
+        max_length=100,
+        help_text="Coinifys reference type",
+    )
+    merchant_id = models.UUIDField(help_text="The Merchant ID in Coinify's system.")
+    merchant_name = models.TextField(
+        help_text="The Merchant name as set in Coinify's system.",
+    )
+    subaccount_id = models.CharField(
+        max_length=32,
+        help_text="Unique identifier of a created sub-account.",
+        blank=True,
+        null=True,
+    )
+    subaccount_name = models.TextField(
+        help_text="Name given when creating the sub-account.",
+        blank=True,
+        null=True,
+    )
+    state = models.CharField(
+        max_length=100,
+        help_text="Coinify intent state",
+    )
+    state_reason = models.CharField(
+        max_length=100,
+        help_text="Coinify intent state reason",
+    )
+    original_order_id = models.CharField(
+        null=True,
+        blank=True,
+        max_length=100,
+        help_text="Order id",
+    )
+    order = models.ForeignKey(
+        "shop.Order",
+        on_delete=models.PROTECT,
+        related_name="economy_coinify_payment_intents",
+        help_text="The Order this payment intent is for",
+        blank=True,
+        null=True,
+    )
+    api_payment_intent = models.ForeignKey(
+        "shop.CoinifyAPIPaymentIntent",
+        on_delete=models.PROTECT,
+        related_name="economy_coinify_payment_intents",
+        help_text="The original api payment intent",
+        blank=True,
+        null=True,
+    )
+    customer_email = models.TextField()
+    requested_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The requested amount",
+    )
+    requested_currency = models.CharField(
+        max_length=3,
+        help_text="The requested currency.",
+    )
+    amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payment amount",
+        null=True,
+    )
+    currency = models.CharField(
+        max_length=3,
+        help_text="The payment currency.",
+        null=True,
+        blank=True,
+    )
+
+
+class CoinifySettlement(
+    ExportModelOperationsMixin("coinify_settlement"),
+    CreatedUpdatedUUIDModel,
+):
+
+    settlement_id = models.CharField(
+        max_length=36,
+        help_text="The internal coinify id for the settlement",
+    )
+    account = models.CharField(
+        max_length=100,
+        help_text="The settlement account",
+    )
+    gross_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The gross amount",
+    )
+    fee = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payout fee",
+    )
+    net_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The net amount",
+    )
+    payout_amount = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        help_text="The payout amount",
+    )
+    create_time = models.DateTimeField(
+        help_text="Created datetime in Coinifys end for this payout",
+    )
+
+
 class CoinifyPayout(
     ExportModelOperationsMixin("coinify_payout"),
     CreatedUpdatedUUIDModel,

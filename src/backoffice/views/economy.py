@@ -36,6 +36,8 @@ from economy.models import ClearhausSettlement
 from economy.models import CoinifyBalance
 from economy.models import CoinifyInvoice
 from economy.models import CoinifyPayout
+from economy.models import CoinifySettlement
+from economy.models import CoinifyPaymentIntent
 from economy.models import Credebtor
 from economy.models import EpayTransaction
 from economy.models import Expense
@@ -458,6 +460,8 @@ class CoinifyDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateVi
         except CoinifyBalance.DoesNotExist:
             context["balance"] = None
 
+        context["payment_intents"] = CoinifyPaymentIntent.objects.count()
+        context["settlements"] = CoinifySettlement.objects.count()
         context["invoices"] = CoinifyInvoice.objects.count()
         context["payouts"] = CoinifyPayout.objects.count()
         context["balances"] = CoinifyBalance.objects.count()
@@ -467,6 +471,11 @@ class CoinifyDashboardView(CampViewMixin, EconomyTeamPermissionMixin, TemplateVi
 class CoinifyInvoiceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     model = CoinifyInvoice
     template_name = "coinifyinvoice_list.html"
+
+
+class CoinifyPaymentIntentListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifyPaymentIntent
+    template_name = "coinifypayment_intent_list.html"
 
 
 class CoinifyPayoutListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
@@ -479,11 +488,46 @@ class CoinifyBalanceListView(CampViewMixin, EconomyTeamPermissionMixin, ListView
     template_name = "coinifybalance_list.html"
 
 
+class CoinifySettlementListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
+    model = CoinifySettlement
+    template_name = "coinifysettlement_list.html"
+
+
 class CoinifyCSVImportView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
     form_class = CoinifyCSVForm
     template_name = "coinify_csv_upload_form.html"
 
     def form_valid(self, form):
+        if "payment_intents" in form.files:
+            csvdata = form.files["payment_intents"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_payment_intent_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Payment Intent CSV processed OK. Successfully imported {created} new Coinify payment intents.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Payment Intent CSV processed OK. No new Coinify payment intents were created.",
+                )
+
+        if "settlements" in form.files:
+            csvdata = form.files["settlements"].read().decode("utf-8-sig")
+            reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
+            created = CoinifyCSVImporter.import_coinify_settlements_csv(reader)
+            if created:
+                messages.success(
+                    self.request,
+                    f"Settlements CSV processed OK. Successfully imported {created} new Coinify settlements.",
+                )
+            else:
+                messages.info(
+                    self.request,
+                    "Settlements CSV processed OK. No new Coinify settlements were created.",
+                )
+
         if "invoices" in form.files:
             csvdata = form.files["invoices"].read().decode("utf-8-sig")
             reader = csv.reader(StringIO(csvdata), delimiter=",", quotechar='"')
