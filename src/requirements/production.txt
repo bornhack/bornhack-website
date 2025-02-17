@@ -41,5 +41,5 @@ Pillow==11.1.0
 
 numpy==2.2.3
 
-django-weasyprint==2.3.0
+django-weasyprint==2.3.1
 weasyprint==63.1
