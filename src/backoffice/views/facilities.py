@@ -214,7 +214,7 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView)
 # ########### FACILITIES ######################
 
 
-class FacilityListView(TeamFacilitatorRequiredMixin, ListView):
+class FacilityListView(CampViewMixin, TeamFacilitatorRequiredMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
 
