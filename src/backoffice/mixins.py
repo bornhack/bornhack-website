@@ -47,6 +47,20 @@ class GisTeamPermissionMixin(RaisePermissionRequiredMixin):
     permission_required = "camps.gis_team_member"
 
 
+class OrgaOrGisTeamViewMixin(UserPassesTestMixin):
+    """A mixin for views that should be accessible only to orga and gis team members."""
+
+    def test_func(self):
+        """
+        This view requires camps.orga_team_member or camps.gis_team_member permission.
+        """
+        if self.request.user.has_perm("camps.orga_team_member"):
+            return True
+        if self.request.user.has_perm("camps.gis_team_member"):
+            return True
+        raise PermissionDenied("No thanks")
+
+
 class PosViewMixin(CampViewMixin, UserPassesTestMixin):
     """A mixin to set self.pos based on pos_slug in url kwargs, and only permit access for users with pos permission for the team."""
 

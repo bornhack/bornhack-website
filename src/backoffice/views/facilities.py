@@ -19,7 +19,7 @@ from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
-from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import OrgaOrGisTeamViewMixin
 from ..mixins import RaisePermissionRequiredMixin
 from facilities.mixins import FacilityFacilitatorViewMixin
 from camps.mixins import CampViewMixin
@@ -37,13 +37,13 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 # ########### FACILITY TYPES ######################
 
 
-class FacilityTypeListView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+class FacilityTypeListView(CampViewMixin, OrgaOrGisTeamViewMixin, ListView):
     model = FacilityType
     template_name = "facility_type_list_backoffice.html"
     context_object_name = "facility_type_list"
 
 
-class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
+class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
     model = FacilityType
     template_name = "facility_type_import_backoffice.html"
     context_object_name = "facility_type_import"
@@ -123,7 +123,7 @@ class FacilityTypeImportView(CampViewMixin, OrgaTeamPermissionMixin, View):
         )
 
 
-class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView):
+class FacilityTypeCreateView(CampViewMixin, OrgaOrGisTeamViewMixin, CreateView):
     model = FacilityType
     template_name = "facility_type_form.html"
     fields = [
@@ -157,7 +157,7 @@ class FacilityTypeCreateView(CampViewMixin, OrgaTeamPermissionMixin, CreateView)
         )
 
 
-class FacilityTypeUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class FacilityTypeUpdateView(CampViewMixin, OrgaOrGisTeamViewMixin, UpdateView):
     model = FacilityType
     template_name = "facility_type_form.html"
     fields = [
@@ -191,7 +191,7 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView)
         )
 
 
-class FacilityTypeDeleteView(CampViewMixin, OrgaTeamPermissionMixin, DeleteView):
+class FacilityTypeDeleteView(CampViewMixin, OrgaOrGisTeamViewMixin, DeleteView):
     model = FacilityType
     template_name = "facility_type_delete.html"
     context_object_name = "facility_type"
