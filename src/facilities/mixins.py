@@ -62,6 +62,8 @@ class FacilityFacilitatorViewMixin(FacilityViewMixin):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if self.request.user.has_perm("camps.gis_team_member"):
+            return
         if (
             self.facility.facility_type.responsible_team.facilitator_permission_set
             not in request.user.get_all_permissions()
