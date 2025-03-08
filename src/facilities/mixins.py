@@ -58,7 +58,7 @@ class FacilityViewMixin(CampViewMixin):
 
 
 class FacilityFacilitatorViewMixin(FacilityViewMixin):
-    """Mixins for views only available to users with facilitator permission for the team responsible for the facility type."""
+    """Mixins for views only available to users with facilitator permission for the team responsible for the facility type or gis team members."""
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
