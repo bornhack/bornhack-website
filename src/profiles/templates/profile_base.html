@@ -41,9 +41,9 @@
           </a>
         </li>
 
-        {% url 'two-factor-setup' as two_factor_url %}
+        {% url 'mfa_index' as two_factor_url %}
         <li class="nav-item">
-          <a class="nav-link{% if "profile/setup" in request.path %} active{% endif %}" href="{{ two_factor_url }}">
+          <a class="nav-link{% if "profile/2fa" in request.path %} active{% endif %}" href="{{ two_factor_url }}">
             Two-Factor settings
           </a>
         </li>

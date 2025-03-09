@@ -1,7 +1,7 @@
-{% if perms.camps.orga_team_member or facilityfeedback_teams or is_team_facilitator %}
+{% if perms.camps.orga_team_member or facilityfeedback_teams or is_team_facilitator or perms.camps.gis_team_member %}
   <h3>Facilities</h3>
   <div class="list-group list-group-flush">
-    {% if perms.camps.orga_team_member %}
+    {% if perms.camps.orga_team_member or perms.camps.gis_team_member %}
       <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
         <h4 class="list-group-item-heading">
           Facility Types
@@ -12,7 +12,7 @@
       </a>
     {% endif %}
 
-    {% if is_team_facilitator %}
+    {% if is_team_facilitator or perms.camps.gis_team_member %}
       <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
         <h4 class="list-group-item-heading">
           Facilities

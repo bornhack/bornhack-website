@@ -27,6 +27,7 @@ class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
         tabs = {}
         if (
             "camps.orga_team_member" in perms
+            or "camps.gis_team_member" in perms
             or context["facilityfeedback_teams"]
             or context["is_team_facilitator"]
         ):
