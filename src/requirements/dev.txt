@@ -1,6 +1,6 @@
 -r production.txt
 
-django-debug-toolbar==5.0.1
+django-debug-toolbar==5.1.0
 factory_boy==3.3.3
 coverage==7.6.12
 pre-commit==4.2.0
