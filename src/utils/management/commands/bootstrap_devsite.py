@@ -1550,6 +1550,11 @@ class Command(BaseCommand):
             description="The NOC team is in charge of establishing and running a network onsite.",
             camp=camp,
         )
+        teams["gis"] = Team.objects.create(
+            name="GIS",
+            description="The GIS team is in charge of managing the gis data.",
+            camp=camp,
+        )
         teams["bar"] = Team.objects.create(
             name="Bar",
             description="The Bar team plans, builds and run the IRL bar!",
@@ -1733,6 +1738,14 @@ class Command(BaseCommand):
         # economy team also gets a member
         TeamMember.objects.create(
             team=teams["economy"],
+            user=users[0],
+            lead=True,
+            approved=True,
+        )
+
+        # gis team also gets a member
+        TeamMember.objects.create(
+            team=teams["gis"],
             user=users[0],
             lead=True,
             approved=True,

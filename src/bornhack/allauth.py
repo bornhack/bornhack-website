@@ -1,11 +1,11 @@
-"""Custom allauth account adapter based on allauth_2fa.adapter.OTPAdapter."""
+"""Custom allauth account adapter based on allauth.account.adapter.DefaultAccountAdapter."""
 
-from allauth_2fa.adapter import OTPAdapter
+from allauth.account.adapter import DefaultAccountAdapter
 import uuid
 
 
-class UsernameUUIDAdapter(OTPAdapter):
-    """Custom allauth account adapter based on allauth_2fa.adapter.OTPAdapter."""
+class UsernameUUIDAdapter(DefaultAccountAdapter):
+    """Custom allauth account adapter based on allauth.account.adapter.DefaultAccountAdapter."""
 
     def generate_unique_username(txts, regex=None):
         """Generate a UUID4 as username."""
