@@ -64,12 +64,5 @@ jobs:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
 
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          files: |
-            **/test_report.xml
-
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v3
