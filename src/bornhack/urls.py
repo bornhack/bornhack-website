@@ -33,7 +33,6 @@ urlpatterns = [
     path("api/csrf/", csrfview),
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("profile/", include("allauth.urls")),
-    path("profile/", include("allauth_2fa.urls")),
     path("profile/", include("profiles.urls", namespace="profiles")),
     path("tickets/", include("tickets.urls", namespace="tickets")),
     path("shop/", include("shop.urls", namespace="shop")),

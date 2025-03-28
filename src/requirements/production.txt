@@ -1,4 +1,4 @@
-Django==4.2.19
+Django==4.2.20
 channels==4.2.0
 channels-redis==4.2.1
 
@@ -6,15 +6,15 @@ channels-redis==4.2.1
 asyncio==3.4.3
 commonmark==0.9.1
 conference-scheduler==3.0.1
-django-allauth==65.4.1
-django-allauth-2fa==0.12.0
-django-bootstrap5==24.3
+django-allauth[mfa]==65.4.1
+django-bootstrap5==25.1
 django-cors-headers==4.7.0
 django-extensions==3.2.3
 django-filter==25.1
 django-leaflet==0.31.0
 django-jsonview==2.0.0
 django-oauth-toolkit==3.0.1
+django-otp==1.5.4
 django-prometheus==2.3.1
 django-reversion==5.0.12
 django-tables2==2.7.5
@@ -25,7 +25,7 @@ html5lib==1.1
 icalendar==6.1.1
 irc3==1.1.10
 lxml==5.3.1
-nh3==0.2.20
+nh3==0.2.21
 olefile==0.47
 openpyxl==3.1.2
 pandas==2.2.3
