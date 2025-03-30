@@ -174,7 +174,8 @@ if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
         "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-else:
+
+if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
