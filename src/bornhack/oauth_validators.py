@@ -19,28 +19,32 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "user": {
                 "username": request.user.username,
                 "user_id": request.user.id,
-            }
+            },
         }
         # is there a real user behind this request?
         if request.user.is_anonymous:
-            claims.update({
-                "profile": {
-                    "public_credit_name": "Anonymous User",
-                    "description": "",
-                },
-                "teams": [],
-            })
+            claims.update(
+                {
+                    "profile": {
+                        "public_credit_name": "Anonymous User",
+                        "description": "",
+                    },
+                    "teams": [],
+                }
+            )
         else:
-            claims.update({
-                "profile": {
-                    "public_credit_name": request.user.profile.get_public_credit_name,
-                    "description": request.user.profile.description,
-                },
-                "teams": [
-                    {"team": team.name, "camp": team.camp.title}
-                    for team in request.user.teams.all()
-                ],
-            })
+            claims.update(
+                {
+                    "profile": {
+                        "public_credit_name": request.user.profile.get_public_credit_name,
+                        "description": request.user.profile.description,
+                    },
+                    "teams": [
+                        {"team": team.name, "camp": team.camp.title}
+                        for team in request.user.teams.all()
+                    ],
+                }
+            )
         return claims
 
     def get_discovery_claims(self, request) -> list[str]:
