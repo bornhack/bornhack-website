@@ -134,6 +134,7 @@ BOOTSTRAP3 = {
 }
 MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
+    "django.middleware.gzip.GZipMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -155,8 +156,8 @@ CORS_URLS_REGEX = r"^/api/*$"
 
 if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-    INSTALLED_APPS += ["debug_toolbar"]
-    MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
     INTERNAL_IPS = "127.0.0.1"
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.versions.VersionsPanel",
