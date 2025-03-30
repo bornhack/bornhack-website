@@ -12,6 +12,7 @@ from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from jsonview.views import JsonView
+from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
@@ -24,6 +25,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 class DectExportJsonView(
     CampViewMixin,
+    ScopedProtectedResourceView,
     JsonView,
 ):
     """

@@ -218,13 +218,16 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": True,
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
     "SCOPES": {
-        "profile:read": "Allow the remote site to read your bornhack.dk username, user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
-        "phonebook:read": "Allow the remote site to read the entire phonebook, including service numbers and unlisted numbers.",
+        "openid": "OpenID Connect scope",
+        "phonebook:read": "Allow the remote site to read the phonebook. For POC team leads this includes service numbers and unlisted numbers.",
     },
-    "PKCE_REQUIRED": False,  # False only until https://github.com/pennersr/django-allauth/issues/2998 is resolved so BMA can use PKCE
+    "PKCE_REQUIRED": True,
 }
 
+# only used for bootstrap-devsite
 UPCOMING_CAMP_YEAR = 2025
 
 # django-tables2 settings
