@@ -30,7 +30,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
                         "description": "",
                     },
                     "teams": [],
-                }
+                },
             )
         else:
             claims.update(
@@ -43,7 +43,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
                         {"team": team.name, "camp": team.camp.title}
                         for team in request.user.teams.all()
                     ],
-                }
+                },
             )
         return claims
 
