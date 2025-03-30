@@ -38,7 +38,7 @@ class DectExportJsonView(
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(name="POC", camp=self.camp)
         poc = self.request.user in team.leads and self.request.access_token.is_valid(
-            ["phonebook:admin"]
+            ["phonebook:admin"],
         )
         context["phonebook"] = self.dump_phonebook(poc=poc)
         return context
