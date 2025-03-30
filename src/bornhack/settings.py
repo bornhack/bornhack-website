@@ -148,6 +148,7 @@ MIDDLEWARE = [
     "utils.middleware.RedirectExceptionMiddleware",
     "camps.middleware.RequestCampMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "oauth2_provider.middleware.OAuth2ExtraTokenMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
@@ -223,7 +224,8 @@ OAUTH2_PROVIDER = {
     "SCOPES": {
         "openid": "OpenID Connect scope",
         "profile:read": "Allow the remote site to read your bornhack.dk username, user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
-        "phonebook:read": "Allow the remote site to read the phonebook. For POC team leads this includes service numbers and unlisted numbers (scope: phonebook:read).",
+        "phonebook:read": "Allow the remote site to read the phonebook (scope: phonebook:read).",
+        "phonebook:admin": "Allow POC team leads to read the phonebook, this includes service numbers and unlisted numbers (scope: phonebook:admin).",
     },
     "PKCE_REQUIRED": True,
     "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
