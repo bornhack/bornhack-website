@@ -225,6 +225,7 @@ OAUTH2_PROVIDER = {
         "phonebook:read": "Allow the remote site to read the phonebook. For POC team leads this includes service numbers and unlisted numbers.",
     },
     "PKCE_REQUIRED": True,
+    "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
 }
 
 # only used for bootstrap-devsite
