@@ -1,4 +1,5 @@
 """Custom OAuth2Validator subclass."""
+
 from oauth2_provider.oauth2_validators import OAuth2Validator
 
 
@@ -7,11 +8,13 @@ class BornhackOAuth2Validator(OAuth2Validator):
 
     # scopes required for custom claims
     oidc_claim_scope = OAuth2Validator.oidc_claim_scope
-    oidc_claim_scope.update({
-        "profile": "profile:read",
-        "user": "profile:read",
-        "teams": "profile:read",
-    })
+    oidc_claim_scope.update(
+        {
+            "profile": "profile:read",
+            "user": "profile:read",
+            "teams": "profile:read",
+        }
+    )
 
     def get_claim_dict(self, request) -> dict[str, str]:
         """Return username (usually a uuid) instead of user pk in the 'sub' claim."""
@@ -20,7 +23,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             **self.get_additional_claims(request=request),
         }
 
-    def get_additional_claims(self, request) -> dict[str, str|list[dict[str, str]]]:
+    def get_additional_claims(self, request) -> dict[str, str | list[dict[str, str]]]:
         """
         Define the custom oidc claims to support, and how to get the data.
 
