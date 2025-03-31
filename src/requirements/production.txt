@@ -1,5 +1,5 @@
 Django==4.2.20
-channels==4.2.0
+channels==4.2.2
 channels-redis==4.2.1
 
 
