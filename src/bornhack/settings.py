@@ -175,7 +175,7 @@ if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
 
-if not DEBUG:
+if not DEBUG:  # noqa: F405
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
@@ -221,7 +221,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 OAUTH2_PROVIDER = {
     "OIDC_ENABLED": True,
-    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,  # noqa: F405
     "SCOPES": {
         "openid": "OpenID Connect scope",
         "profile:read": "Allow the remote site to read your bornhack.dk username (uuid), user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
