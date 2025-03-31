@@ -13,7 +13,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "profile": "profile:read",
             "user": "profile:read",
             "teams": "profile:read",
-        }
+        },
     )
 
     def get_claim_dict(self, request) -> dict[str, str]:
