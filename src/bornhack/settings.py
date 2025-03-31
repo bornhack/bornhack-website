@@ -224,9 +224,9 @@ OAUTH2_PROVIDER = {
     "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
     "SCOPES": {
         "openid": "OpenID Connect scope",
-        "profile:read": "Allow the remote site to read your bornhack.dk username, user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
+        "profile:read": "Allow the remote site to read your bornhack.dk username (uuid), user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
         "phonebook:read": "Allow the remote site to read the phonebook (scope: phonebook:read).",
-        "phonebook:admin": "Allow POC team leads to read the phonebook, this includes service numbers and unlisted numbers (scope: phonebook:admin).",
+        "phonebook:admin": "Allow the remote site to read the phonebook including service numbers and unlisted numbers. Only relevant for POC team leads (scope: phonebook:admin).",
     },
     "PKCE_REQUIRED": True,
     "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
