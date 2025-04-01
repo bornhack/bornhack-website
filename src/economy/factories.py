@@ -190,7 +190,8 @@ class CoinifyBalanceFactory(factory.django.DjangoModelFactory):
         model = CoinifyBalance
 
     date = factory.Faker(
-        "date_between", start_date="-6y"
+        "date_between",
+        start_date="-6y",
     )  # 1 in ~49 chance of collision, feeling lucky? :)
     btc = factory.Faker("pydecimal", right_digits=8, min_value=1, max_value=4)
     dkk = factory.Faker("pydecimal", right_digits=2, min_value=100, max_value=10000)
