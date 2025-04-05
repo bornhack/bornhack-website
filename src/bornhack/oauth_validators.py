@@ -13,6 +13,8 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "profile": "profile:read",
             "user": "profile:read",
             "teams": "profile:read",
+            "permissions": "permissions",
+            "groups": "permissions",
         },
     )
 
@@ -45,6 +47,8 @@ class BornhackOAuth2Validator(OAuth2Validator):
                         "description": "",
                     },
                     "teams": [],
+                    "permissions": [],
+                    "groups": [],
                 },
             )
         else:
@@ -58,6 +62,10 @@ class BornhackOAuth2Validator(OAuth2Validator):
                         {"team": team.name, "camp": team.camp.title}
                         for team in request.user.teams.all()
                     ],
+                    "permissions": list(request.user.get_all_permissions()),
+                    "groups": list(
+                        request.user.groups.all().values_list("name", flat=True),
+                    ),
                 },
             )
         return claims
