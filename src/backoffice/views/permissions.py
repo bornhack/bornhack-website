@@ -198,10 +198,8 @@ class PermissionByGroupView(OrgaOrTeamLeadViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         permission_content_type = ContentType.objects.get_for_model(CampPermission)
-        groups = (
-            qs.filter(
-                permissions__isnull=False,
-                permissions__content_type=permission_content_type,
-            )
+        groups = qs.filter(
+            permissions__isnull=False,
+            permissions__content_type=permission_content_type,
         )
         return groups.distinct()
