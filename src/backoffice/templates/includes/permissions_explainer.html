@@ -2,16 +2,19 @@
 <p>
   <dl>
     <dt>lead</dt>
-    <dd>The team lead permission enables a user to manage team memberships and permissions. This permission is granted to and removed from team leads automatically when the team membership is updated. Codename <b>camps.{{ team.slug }}_team_lead</b>.</dd>
+    <dd>The team lead permission enables a user to manage team memberships and permissions. This permission is granted to and removed from team leads automatically when the team membership is updated. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_lead</b>.</dd>
     <dt>member</dt>
-    <dd>The team member permission grants access to the team area with tasks and the team guide. It also grants access to handle facility feedback in backoffice. Some sections of backoffice and the main site are restricted to users with this permission. Codename <b>camps.{{ team.slug }}_team_member</b>.</dd>
+    <dd>The team member permission grants access to the team area with tasks and the team guide. It also grants access to handle facility feedback in backoffice. Some sections of backoffice and the main site are restricted to users with this permission. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_member</b>.</dd>
     <dt>mapper</dt>
-    <dd>The team mapper permission grants access to gis/map layer management in backoffice. Codename <b>camps.{{ team.slug }}_team_mapper</b>.</dd>
+    <dd>The team mapper permission grants access to gis/map layer management in backoffice. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_mapper</b>.</dd>
     <dt>facilitator</dt>
-    <dd>The team facilitator permission grants access to manage facilities in backoffice. Codename <b>camps.{{ team.slug }}_team_facilitator</b>.</dd>
+    <dd>The team facilitator permission grants access to manage facilities in backoffice. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_facilitator</b>.</dd>
     <dt>infopager</dt>
-    <dd>The team infopager permission grants access to manage infopage sections for the team. Codename <b>camps.{{ team.slug }}_team_infopager</b>.</dd>
+    <dd>The team infopager permission grants access to manage infopage sections for the team. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_infopager</b>.</dd>
     <dt>pos</dt>
-    <dd>The team pos permission grants access to submit point-of-sale reports on behalf of the team. Codename <b>camps.{{ team.slug }}_team_pos</b>.</dd>
+    <dd>The team pos permission grants access to submit point-of-sale reports on behalf of the team. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_pos</b>.</dd>
   </p>
-  <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a></p>
+  <p>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}#permissions" class="btn btn-secondary"><i class="fas fa-undo"></i> Permissions</a>
+  </p>

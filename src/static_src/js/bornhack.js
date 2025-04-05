@@ -19,6 +19,7 @@ $(document).ready(function(){
         "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
         "responsive": true,
     } );
+
 } );
 
 // function used in speakeravailability form tables to toggle background color
@@ -30,3 +31,24 @@ function toggle_sa_form_class(checkboxid) {
         checkbox.parent().parent().removeClass("success warning active").addClass("danger");
     };
 };
+
+document.addEventListener('DOMContentLoaded', function () {
+  //Pick tab based on url hash/fragment
+  const urlHash = window.location.hash;
+  //Test is there are tabs
+  const triggerTabOnLoad = document.querySelector(`[data-bs-target="${urlHash}"]`);
+
+  if (triggerTabOnLoad) {
+    const tab = new bootstrap.Tab(triggerTabOnLoad);
+    tab.show();
+  }
+
+  // Update URL hash on tab click
+  const tabButtons = document.querySelectorAll('a[data-bs-toggle="tab"]');
+  tabButtons.forEach(button => {
+    button.addEventListener('show.bs.tab', event => {
+      const targetId = event.target.getAttribute('data-bs-target');
+      window.location.hash = targetId;
+    });
+  });
+});

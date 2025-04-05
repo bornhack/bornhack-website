@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from teams.models import Team
 from django.views.generic import ListView, FormView
 from ..mixins import OrgaOrTeamLeadViewMixin
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from ..forms import ManageTeamPermissionsForm
 from django.shortcuts import get_object_or_404
 from django.conf import settings
@@ -41,7 +41,11 @@ class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
 
 
 class TeamPermissionManageView(CampViewMixin, FormView):
-    """This view is used to see and update team permissions."""
+    """This view is used to see and update team permissions.
+
+    This view does it's own permission checking in setup(),
+    so it does not need to inherit from OrgaOrTeamLeadViewMixin.
+    """
 
     template_name = "team_permissions_manage.html"
     form_class = ManageTeamPermissionsForm
@@ -185,3 +189,17 @@ class PermissionByPermissionView(OrgaOrTeamLeadViewMixin, ListView):
                 ),
             )
         return perms
+
+
+class PermissionByGroupView(OrgaOrTeamLeadViewMixin, ListView):
+    model = Group
+    template_name = "permissions_by_group.html"
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        groups = qs.filter(
+            permissions__isnull=False,
+            permissions__content_type=permission_content_type,
+        )
+        return groups.distinct()

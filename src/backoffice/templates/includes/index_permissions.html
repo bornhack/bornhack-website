@@ -4,6 +4,10 @@
     <h4 class="list-group-item-heading">Show Permissions (by User)</h4>
     <p class="list-group-item-text">Use this view to see permissions in a table with a row per user.</p>
   </a>
+  <a href="{% url 'backoffice:permission_list_by_group' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Show Permissions (by Group)</h4>
+    <p class="list-group-item-text">Use this view to see a list of groups and their permissions.</p>
+  </a>
   <a href="{% url 'backoffice:permission_list_by_permission' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Show Permissions (by Permission)</h4>
     <p class="list-group-item-text">Use this view to see permissions in a table with a row per permission.</p>

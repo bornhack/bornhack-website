@@ -16,7 +16,7 @@
       <ul class="nav nav-tabs" role="tablist">
         {% for item, value in backoffice_tabs.items %}
           <li class="nav-item" role="presentation" class="active">
-            <a class="nav-link{% if forloop.first %} active{% endif %}" href="#{{ item }}" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab">
+            <a class="nav-link{% if forloop.first %} active{% endif %}" href="#{{ item }}" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab" data-bs-target="#{{ item }}">
               {{ value.name }}{% if value.count %} <span class="badge rounded-pill text-bg-danger">{{ value.count }}</span>{% endif %}
             </a>
           </li>
