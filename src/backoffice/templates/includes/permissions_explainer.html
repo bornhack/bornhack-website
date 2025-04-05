@@ -14,4 +14,7 @@
     <dt>pos</dt>
     <dd>The team pos permission grants access to submit point-of-sale reports on behalf of the team. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_pos</b>.</dd>
   </p>
-  <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a></p>
+  <p>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}#permissions" class="btn btn-secondary"><i class="fas fa-undo"></i> Permissions</a>
+  </p>
