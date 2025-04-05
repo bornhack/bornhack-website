@@ -4,7 +4,7 @@
     <dt>lead</dt>
     <dd>The team lead permission enables a user to manage team memberships and permissions. This permission is granted to and removed from team leads automatically when the team membership is updated. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_lead</b>.</dd>
     <dt>member</dt>
-    <dd>The team member permission grants access to the team area with tasks and the team guide. It also grants access to handle facility feedback in backoffice. Some sections of backoffice and the main site are restricted to users with this permission. Codename <b>camps.{{ team.slug }}_team_member</b>.</dd>
+    <dd>The team member permission grants access to the team area with tasks and the team guide. It also grants access to handle facility feedback in backoffice. Some sections of backoffice and the main site are restricted to users with this permission. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_member</b>.</dd>
     <dt>mapper</dt>
     <dd>The team mapper permission grants access to gis/map layer management in backoffice. Codename <b>camps.{{ team.slug | default:"TEAM" }}_team_mapper</b>.</dd>
     <dt>facilitator</dt>
