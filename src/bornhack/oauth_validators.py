@@ -18,6 +18,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "nickname": "profile",
             "phone_number": "phone",
             "phone_number_verified": "phone",
+            "updated_at": "profile",
             # the custom user claims we support, and the (mostly cusom) scopes they require
             "bornhack:v2:description": "profile",
             "bornhack:v2:groups": "groups:read",
@@ -47,9 +48,10 @@ class BornhackOAuth2Validator(OAuth2Validator):
         claims.update(
             {
                 # standard OIDC claims
-                "nickname": request.user.profile.get_public_credit_name,
                 "email": request.user.email,
                 "email_verified": True,
+                "nickname": request.user.profile.get_public_credit_name,
+                "updated_at": int(request.user.profile.updated.timestamp()),
                 # bornhack custom claims
                 "bornhack:v2:teams": [
                     {
@@ -91,6 +93,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "phone_number",
             "phone_number_verified",
             "sub",
+            "updated_at",
             # custom user claims
             "bornhack:v2:description",
             "bornhack:v2:groups",

@@ -225,10 +225,10 @@ OAUTH2_PROVIDER = {
     "SCOPES": {
         # required
         "openid": "OpenID Connect scope",
-        # deprecated api scope
+        # deprecated api scope, remove after 2025 camp
         "profile:read": "Allow the remote site to read your bornhack.dk username (uuid), user id, profile public credit name, profile description, and a list of team memberships using the profile API endpoint (scope profile:read). NOTE: This scope is being deprecated soon! Ask the BornHack website team for more info.",
         # standard OIDC claim scopes
-        "profile": "Allow the remote site to read your BornHack profile public_credit_name and description (scope: profile)",
+        "profile": "Allow the remote site to read your profile public_credit_name, description, and update time (scope: profile)",
         "email": "Allow the remote site to read your email address (scope: email)",
         "address": "Allow the remote site to read your profile location (scope: address)",
         "phone": "Allow the remote site to read your profile phonenumber (scope: phone)",
