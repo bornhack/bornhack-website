@@ -34,6 +34,9 @@ jobs:
         with:
           submodules: recursive
 
+      - name: "Update apt"
+        run: "sudo apt update"
+
       - name: "Install OS deps"
         run: "sudo apt -y install libgdal-dev libpq-dev libmagic1 git binutils libproj-dev gdal-bin"
 
