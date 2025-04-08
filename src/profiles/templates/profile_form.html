@@ -1,6 +1,10 @@
 {% extends 'profile_base.html' %}
 {% load django_bootstrap5 %}
 
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
+
 {% block title %}
   Update profile | {{ block.super }}
 {% endblock %}
