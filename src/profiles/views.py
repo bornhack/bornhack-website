@@ -23,7 +23,15 @@ class ProfileDetail(LoginRequiredMixin, DetailView):
 
 class ProfileUpdate(LoginRequiredMixin, UpdateView):
     model = Profile
-    fields = ["name", "description", "public_credit_name", "phonenumber", "location", "nickserv_username", "theme"]
+    fields = [
+        "name",
+        "description",
+        "public_credit_name",
+        "phonenumber",
+        "location",
+        "nickserv_username",
+        "theme",
+    ]
     success_url = reverse_lazy("profiles:detail")
     template_name = "profile_form.html"
 

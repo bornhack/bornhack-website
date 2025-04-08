@@ -52,14 +52,18 @@ class BornhackOAuth2Validator(OAuth2Validator):
                 "email_verified": True,
                 # bornhack custom claims
                 "bornhack:v2:teams": [
-                    {"team": membership.team.name, "camp": membership.team.camp.title, "lead": membership.lead}
+                    {
+                        "team": membership.team.name,
+                        "camp": membership.team.camp.title,
+                        "lead": membership.lead,
+                    }
                     for membership in request.user.teammember_set.filter(approved=True)
                 ],
                 "bornhack:v2:permissions": list(request.user.get_all_permissions()),
                 "bornhack:v2:groups": list(
                     request.user.groups.all().values_list("name", flat=True),
                 ),
-            }
+            },
         )
 
         if request.user.profile.location:
