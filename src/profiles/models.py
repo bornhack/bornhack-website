@@ -69,7 +69,6 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
     # default to near general camping
     location = PointField(
-        default=Point(9.93891, 55.38562),
         blank=True,
         null=True,
         help_text="Your location at BornHack. This value is available on public maps.",
