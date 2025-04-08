@@ -53,6 +53,26 @@
 
         <tr>
           <td>
+            <b>Phone Number</b><br />
+            <small>Not visible to the public. You can choose to make this accessible to external sites using BornHack as IDP.</small>
+          </td>
+          <td>
+            {{ profile.phonenumber|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Location</b><br />
+            <small>Visible to the public (on map layers).</small>
+          </td>
+          <td>
+            {{ profile.location|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
             <b>NickServ username</b><br />
             <small>Visible to the public on IRC, used to handle team channel ACLs.</small>
           </td>

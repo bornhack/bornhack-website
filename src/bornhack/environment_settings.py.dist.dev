@@ -85,3 +85,6 @@ TEST_OUTPUT_FILE_NAME = "test_report.xml"
 
 QUICKPAY_API_KEY="secret"
 QUICKPAY_PRIVATE_KEY="alsosecret"
+
+# OIDC private key
+OIDC_RSA_PRIVATE_KEY='CIKEY'

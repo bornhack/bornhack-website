@@ -167,6 +167,7 @@ from .views import ZettleDashboardView
 from .views import ZettleDataImportView
 from .views import ZettleReceiptListView
 from .views import PermissionByUserView
+from .views import PermissionByGroupView
 from .views import PermissionByPermissionView
 
 app_name = "backoffice"
@@ -1420,6 +1421,11 @@ urlpatterns = [
         "permissions/",
         include(
             [
+                path(
+                    "by_group/",
+                    PermissionByGroupView.as_view(),
+                    name="permission_list_by_group",
+                ),
                 path(
                     "by_user/",
                     PermissionByUserView.as_view(),

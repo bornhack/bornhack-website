@@ -148,6 +148,7 @@ MIDDLEWARE = [
     "utils.middleware.RedirectExceptionMiddleware",
     "camps.middleware.RequestCampMiddleware",
     "oauth2_provider.middleware.OAuth2TokenMiddleware",
+    "oauth2_provider.middleware.OAuth2ExtraTokenMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
@@ -173,7 +174,8 @@ if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
         "debug_toolbar.panels.logging.LoggingPanel",
         "debug_toolbar.panels.redirects.RedirectsPanel",
     ]
-else:
+
+if not DEBUG:  # noqa: F405
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
@@ -218,13 +220,31 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": True,
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,  # noqa: F405
     "SCOPES": {
-        "profile:read": "Allow the remote site to read your bornhack.dk username, user id, profile public credit name, profile description, and a list of team memberships (scope profile:read)",
-        "phonebook:read": "Allow the remote site to read the entire phonebook, including service numbers and unlisted numbers.",
+        # required
+        "openid": "OpenID Connect scope",
+        # deprecated api scope, remove after 2025 camp
+        "profile:read": "Allow the remote site to read your bornhack.dk username (uuid), user id, profile public credit name, profile description, and a list of team memberships using the profile API endpoint (scope profile:read). NOTE: This scope is being deprecated soon! Ask the BornHack website team for more info.",
+        # standard OIDC claim scopes
+        "profile": "Allow the remote site to read your profile public_credit_name, description, and update time (scope: profile)",
+        "email": "Allow the remote site to read your email address (scope: email)",
+        "address": "Allow the remote site to read your profile location (scope: address)",
+        "phone": "Allow the remote site to read your profile phonenumber (scope: phone)",
+        # custom bornhack user claim scopes
+        "groups:read": "Allow the remote site to read a list of your group memberships (scope: groups:read).",
+        "permissions:read": "Allow the remote site to read a list of your assigned permissions (scope: permissions:read).",
+        "teams:read": "Allow the remote site to read a list of your team memberships and team lead status (scope: teams)",
+        # api scopes
+        "phonebook:admin": "Allow the remote site to read the camp phonebook including service numbers and unlisted numbers. Only relevant for POC team leads (scope: phonebook:admin).",
+        "phonebook:read": "Allow the remote site to read the camp phonebook (scope: phonebook:read).",
     },
-    "PKCE_REQUIRED": False,  # False only until https://github.com/pennersr/django-allauth/issues/2998 is resolved so BMA can use PKCE
+    "PKCE_REQUIRED": True,
+    "OAUTH2_VALIDATOR_CLASS": "bornhack.oauth_validators.BornhackOAuth2Validator",
 }
 
+# only used for bootstrap-devsite
 UPCOMING_CAMP_YEAR = 2025
 
 # django-tables2 settings
