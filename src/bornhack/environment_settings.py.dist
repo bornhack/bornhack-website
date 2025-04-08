@@ -40,7 +40,7 @@ ARCHIVE_EMAIL='{{ django_archive_email }}'
 ADMINS={{ django_admins }}
 
 # OIDC private key
-OIDC_RSA_PRIVATE_KEY='{{ oidc_rsa_private_key }}'
+OIDC_RSA_PRIVATE_KEY="""{{ oidc_rsa_private_key }}"""
 
 # misc settings
 TIME_ZONE='{{ django_timezone }}'
