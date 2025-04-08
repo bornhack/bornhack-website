@@ -62,6 +62,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
     theme = models.CharField(max_length=20, choices=THEME_CHOICES, default="default")
 
     phonenumber = models.PositiveSmallIntegerField(
+        blank=True,
         null=True,
         validators=[MinValueValidator(0), MaxValueValidator(9999)],
         help_text="The phonenumber you can be reached on. This field can be updated automatically when registering a DECT number in the phonebook.",
