@@ -4,17 +4,25 @@ from oauth2_provider.oauth2_validators import OAuth2Validator
 
 
 class BornhackOAuth2Validator(OAuth2Validator):
-    """Claims and scopes."""
+    """Custom OAuth2Validator subclass."""
 
-    # scopes required for custom claims
+    # supported user claims and the scopes they require
+    # https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#using-oidc-scopes-to-determine-which-claims-are-returned
     oidc_claim_scope = OAuth2Validator.oidc_claim_scope
     oidc_claim_scope.update(
         {
-            "profile": "profile:read",
-            "user": "profile:read",
-            "teams": "profile:read",
-            "permissions": "permissions",
-            "groups": "permissions",
+            # the OIDC standard user claims we support, and the OIDC stanard scopes they require
+            "address": "address",
+            "email": "email",
+            "email_verified": "email",
+            "nickname": "profile",
+            "phone_number": "phone",
+            "phone_number_verified": "phone",
+            # the custom user claims we support, and the (mostly cusom) scopes they require
+            "bornhack:v2:description": "profile",
+            "bornhack:v2:groups": "groups:read",
+            "bornhack:v2:permissions": "permissions:read",
+            "bornhack:v2:teams": "teams:read",
         },
     )
 
@@ -27,47 +35,42 @@ class BornhackOAuth2Validator(OAuth2Validator):
 
     def get_additional_claims(self, request) -> dict[str, str | list[dict[str, str]]]:
         """
-        Define the custom oidc claims to support, and how to get the data.
+        Define the oidc user claims to support and how to get the data.
 
-        https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#using-oidc-scopes-to-determine-which-claims-are-returned
+        https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#adding-claims-to-the-id-token
         """
-        claims = {
-            "user": {
-                "username": request.user.username,
-                "user_id": request.user.id,
-            },
-        }
-
+        claims = {}
         # is there a real user behind this request?
         if request.user.is_anonymous:
-            claims.update(
-                {
-                    "profile": {
-                        "public_credit_name": "Anonymous User",
-                        "description": "",
-                    },
-                    "teams": [],
-                    "permissions": [],
-                    "groups": [],
-                },
-            )
-        else:
-            claims.update(
-                {
-                    "profile": {
-                        "public_credit_name": request.user.profile.get_public_credit_name,
-                        "description": request.user.profile.description,
-                    },
-                    "teams": [
-                        {"team": team.name, "camp": team.camp.title}
-                        for team in request.user.teams.all()
-                    ],
-                    "permissions": list(request.user.get_all_permissions()),
-                    "groups": list(
-                        request.user.groups.all().values_list("name", flat=True),
-                    ),
-                },
-            )
+            return claims
+
+        claims.update(
+            {
+                # standard OIDC claims
+                "nickname": request.user.profile.get_public_credit_name,
+                "email": request.user.email,
+                "email_verified": True,
+                # bornhack custom claims
+                "bornhack:v2:teams": [
+                    {"team": membership.team.name, "camp": membership.team.camp.title, "lead": membership.lead}
+                    for membership in request.user.teammember_set.filter(approved=True)
+                ],
+                "bornhack:v2:permissions": list(request.user.get_all_permissions()),
+                "bornhack:v2:groups": list(
+                    request.user.groups.all().values_list("name", flat=True),
+                ),
+            }
+        )
+
+        if request.user.profile.location:
+            claims["address"] = {"formatted": request.user.profile.location}
+
+        if request.user.profile.phonenumber:
+            claims["phone_number"] = request.user.profile.phonenumber
+            claims["phone_number_verified"] = True
+
+        if request.user.profile.description:
+            claims["bornhack:v2:description"] = request.user.profile.description
         return claims
 
     def get_discovery_claims(self, request) -> list[str]:
@@ -75,4 +78,18 @@ class BornhackOAuth2Validator(OAuth2Validator):
 
         https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#supported-claims-discovery
         """
-        return self.get_claim_dict(request=request).keys()
+        return [
+            # OIDC standard claims
+            "address",
+            "email",
+            "email_verified",
+            "nickname",
+            "phone_number",
+            "phone_number_verified",
+            "sub",
+            # custom user claims
+            "bornhack:v2:description",
+            "bornhack:v2:groups",
+            "bornhack:v2:permissions",
+            "bornhack:v2:teams",
+        ]
