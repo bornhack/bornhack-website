@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -68,6 +69,8 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
     # default to near general camping
     location = PointField(
+        default=Point(9.93891, 55.38562),
+        blank=True,
         null=True,
         help_text="Your location at BornHack. This value is available on public maps.",
     )
