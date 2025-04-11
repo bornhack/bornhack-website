@@ -116,11 +116,11 @@ MFA_SUPPORTED_TYPES = [
 ]
 
 ACCOUNT_LOGIN_METHODS = {"email"}
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = True
 ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
-ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
+
 # include captcha field in signup form
 ACCOUNT_FORMS = {"signup": "bornhack.forms.AllAuthSignupCaptchaForm"}
 LOGIN_REDIRECT_URL = "/"
