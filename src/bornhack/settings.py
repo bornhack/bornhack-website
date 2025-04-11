@@ -149,7 +149,7 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r"^/api/*$"
+CORS_URLS_REGEX = r"^/profile/api/$|^/o/.*$|^/bornhack-20[0-9]{2}/phonebook/json/$"
 
 if DEBUG_TOOLBAR_ENABLED:  # noqa: F405
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
