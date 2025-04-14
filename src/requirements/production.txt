@@ -37,7 +37,7 @@ Unidecode==1.3.8
 wheel==0.45.1
 
 # pillow is only here to make old migrations run
-Pillow==11.1.0
+Pillow==11.2.1
 
 numpy==2.2.4
 
