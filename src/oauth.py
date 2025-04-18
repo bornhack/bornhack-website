@@ -39,10 +39,14 @@ csrf = s.post(
     headers={"Referer": host + "/login/"},
 )
 alphabet = string.ascii_uppercase + string.digits
-code_verifier = "".join(secrets.choice(alphabet) for i in range(43 + secrets.randbelow(86)))
+code_verifier = "".join(
+    secrets.choice(alphabet) for i in range(43 + secrets.randbelow(86))
+)
 code_verifier_base64 = base64.urlsafe_b64encode(code_verifier.encode("utf-8"))
 code_challenge = hashlib.sha256(code_verifier_base64).digest()
-code_challenge_base64 = base64.urlsafe_b64encode(code_challenge).decode("utf-8").replace("=", "")
+code_challenge_base64 = (
+    base64.urlsafe_b64encode(code_challenge).decode("utf-8").replace("=", "")
+)
 state = "".join(secrets.choice(alphabet) for i in range(15))
 
 data = {
@@ -58,14 +62,19 @@ data = {
     "scope": "openid profile",
     "allow": "Authorize",
 }
-auth = s.post(host + "/o/authorize/", allow_redirects=False, data=data, headers={"Referer": host + "/o/authorize/"})
-if auth.status_code != 302:  # noqa: PLR2004
-    print(f"/o/authorize/ returned status code {auth.status_code} - no token today")  # noqa: T201
+auth = s.post(
+    host + "/o/authorize/",
+    allow_redirects=False,
+    data=data,
+    headers={"Referer": host + "/o/authorize/"},
+)
+if auth.status_code != 302:
+    print(f"/o/authorize/ returned status code {auth.status_code} - no token today")
     sys.exit(1)
 url = auth.headers["Location"]
 result = urlparse(url)
 qs = parse_qs(result.query)
-assert state == qs["state"][0]  # noqa: S101
+assert state == qs["state"][0]
 authcode = qs["code"][0]
 token = s.post(
     host + "/o/token/",
@@ -77,4 +86,4 @@ token = s.post(
         "code_verifier": code_verifier_base64,
     },
 )
-print(token.json())  # noqa: T201
+print(token.json())
