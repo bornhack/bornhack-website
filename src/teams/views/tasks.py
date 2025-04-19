@@ -11,7 +11,6 @@ from ..models import TaskComment
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamTask
-from .mixins import EnsureTeamLeadMixin
 from .mixins import TeamViewMixin
 from utils.mixins import TeamTaskerRequiredMixin
 from camps.mixins import CampViewMixin
