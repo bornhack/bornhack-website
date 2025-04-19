@@ -327,7 +327,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     @property
     def infopager_permission_set(self):
         return f"camps.{self.slug}_team_infopager"
-    
+
     @property
     def tasker_permission_set(self):
         return f"camps.{self.slug}_team_tasker"
