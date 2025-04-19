@@ -87,6 +87,12 @@ class TeamPosRequiredMixin(BaseTeamPermRequiredMixin):
     perm = "pos"
 
 
+class TeamTaskerRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_tasker" permission for any team."""
+
+    perm = "tasker"
+
+
 class UserIsObjectOwnerMixin(UserPassesTestMixin):
     def test_func(self):
         return self.get_object().user == self.request.user

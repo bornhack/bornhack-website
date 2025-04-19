@@ -16,7 +16,7 @@
     <div class="card-body">
       <p>
         The {{ team.name }} Team is responsible for the following tasks.
-        {% if request.user in team.leads.all %}
+        {% if team.tasker_permission_set in perms %}
           <a href="{% url 'teams:task_create' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Task</a>
         {% endif %}
       </p>
@@ -44,7 +44,7 @@
                   <td>{{ task.completed }}</td>
                   <td>
                     <a href="{% url 'teams:task_detail' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-search"></i> Details</a>
-                                                                                                                                                                                                                                    {% if request.user in team.leads.all %}
+                                                                                                                                                                                                                                    {% if team.tasker_permission_set in perms %}
                                                                                                                                                                                                                                       <a href="{% url 'teams:task_update' camp_slug=camp.slug team_slug=team.slug slug=task.slug %}" class="btn {% if task.completed %}btn-secondary{% else %}btn-primary{% endif %}" btn-sm"><i class="fas fa-edit"></i> Edit Task</a>
                     {% endif %}
                   </td>

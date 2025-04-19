@@ -328,6 +328,10 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     def infopager_permission_set(self):
         return f"camps.{self.slug}_team_infopager"
 
+    @property
+    def tasker_permission_set(self):
+        return f"camps.{self.slug}_team_tasker"
+
 
 class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     user = models.ForeignKey(

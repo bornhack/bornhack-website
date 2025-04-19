@@ -266,4 +266,5 @@ BORNHACK_TEAM_PERMISSIONS = {
     "facilitator": "Team facilitator - facilities management",
     "infopager": "Team infopager - infopage management",
     "pos": "Team Pos - Point-of-sale report submission",
+    "tasker": "Team Tasker - task management",
 }
