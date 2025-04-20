@@ -81,7 +81,8 @@ class DectExportJsonView(
             phonebook.append(entry)
         return phonebook
 
-@method_decorator(csrf_exempt, name='dispatch')
+
+@method_decorator(csrf_exempt, name="dispatch")
 class DectUpdateIPEI(
     CampViewMixin,
     ScopedProtectedResourceView,
@@ -98,16 +99,20 @@ class DectUpdateIPEI(
         if not self.request.user in team.leads and self.request.access_token.is_valid(
             ["phonebook:admin"],
         ):
-            return JsonResponse({'error': 'Authentication failed'}, status=403)
+            return JsonResponse({"error": "Authentication failed"}, status=403)
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
 
-        instance = get_object_or_404(DectRegistration, number=dect_number, camp=self.camp)
-        instance.ipei = data['ipei']
+        instance = get_object_or_404(
+            DectRegistration, number=dect_number, camp=self.camp
+        )
+        instance.ipei = data["ipei"]
         instance.save()
-        return JsonResponse({'message': 'Record updated successfully', 'data': data}, status=200)
+        return JsonResponse(
+            {"message": "Record updated successfully", "data": data}, status=200
+        )
 
 
 class PhonebookListView(CampViewMixin, ListView):

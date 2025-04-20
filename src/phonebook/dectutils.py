@@ -60,11 +60,11 @@ class DectUtils:
             psn_hex = ipui[-5:]
             emc = int(emc_hex, 16)
             psn = int(psn_hex, 16)
-            return [emc,psn]
+            return [emc, psn]
         else:
             return []
 
     def format_ipei(self, emc, psn):
         emc_s = str(emc).zfill(5)
         psn_s = str(psn).zfill(7)
-        return f'{emc_s} {psn_s}'
+        return f"{emc_s} {psn_s}"

@@ -70,7 +70,7 @@ class DectRegistration(
         blank=True,
         null=True,
         size=2,
-        help_text="DECT phone IPEI (03562,0900847)"
+        help_text="DECT phone IPEI (03562,0900847)",
     )
 
     def save(self, *args, **kwargs):
@@ -85,14 +85,15 @@ class DectRegistration(
 
     def check_unique_ipei(self):
         if self.ipei and len(self.ipei) == 2:
-            # check for conflicts with the same IPEI 
+            # check for conflicts with the same IPEI
             if (
                 DectRegistration.objects.filter(camp=self.camp, ipei=self.ipei)
                 .exclude(pk=self.pk)
                 .exists()
             ):
-                raise ValidationError(f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use")
-
+                raise ValidationError(
+                    f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use"
+                )
 
     def clean_number(self):
         """

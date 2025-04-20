@@ -13,19 +13,22 @@ from .dectutils import DectUtils
 
 dectutil = DectUtils()
 
+
 class DectRegistrationForm(forms.ModelForm):
     ipei_help_text = """
     Optional: Enter your IPEI (03562 0900847) or IPUI (00DEADBEEF)<br>
     Entering this will enable you to register your handset directly when you arrive
     """
-    ipei = forms.CharField(max_length=13, help_text=ipei_help_text, required=False, label="IPEI/IPUI")
+    ipei = forms.CharField(
+        max_length=13, help_text=ipei_help_text, required=False, label="IPEI/IPUI"
+    )
 
     class Meta:
         model = DectRegistration
-        fields = ['number', 'letters','description','publish_in_phonebook','ipei']
+        fields = ["number", "letters", "description", "publish_in_phonebook", "ipei"]
 
     def clean_ipei(self):
-        ipei_s = self.cleaned_data['ipei']
+        ipei_s = self.cleaned_data["ipei"]
         if len(ipei_s) == 10:
             ipei = dectutil.hex_ipui_ipei(ipei_s)
         elif len(ipei_s) == 13:
@@ -38,15 +41,14 @@ class DectRegistrationForm(forms.ModelForm):
         else:
             raise ValidationError("Unable to recognize IPEI/IPUI format")
 
-
         if not ipei:
             raise ValidationError(f"unable to process {ipei}.")
         return ipei
 
     def clean(self):
         cleaned_data = super().clean()
-        ipei = cleaned_data.get('ipei')
+        ipei = cleaned_data.get("ipei")
 
         if ipei and len(ipei) != 2:
-            self.add_error('ipei', f"The ipei is incorrect. {ipei}")
+            self.add_error("ipei", f"The ipei is incorrect. {ipei}")
         return cleaned_data
