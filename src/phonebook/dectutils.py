@@ -53,3 +53,18 @@ class DectUtils:
         for letter in letters:
             result += self.REVERSE_DECT_MATRIX[letter.upper()]
         return result
+
+    def hex_ipui_ipei(self, ipui):
+        if len(ipui) == 10:
+            emc_hex = ipui[:5]
+            psn_hex = ipui[-5:]
+            emc = int(emc_hex, 16)
+            psn = int(psn_hex, 16)
+            return [emc,psn]
+        else:
+            return []
+
+    def format_ipei(self, emc, psn):
+        emc_s = str(emc).zfill(5)
+        psn_s = str(psn).zfill(7)
+        return f'{emc_s} {psn_s}'
