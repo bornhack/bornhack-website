@@ -5,6 +5,7 @@ import logging
 from django.contrib.auth.models import Permission
 import random
 import sys
+import uuid
 from datetime import datetime
 from datetime import timedelta
 
