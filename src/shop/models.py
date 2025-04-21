@@ -1177,7 +1177,6 @@ class CoinifyAPICallback(
             return f"other callback at {self.created}"
 
 
-
 class CoinifyAPIRequest(
     ExportModelOperationsMixin("coinify_api_request"),
     CreatedUpdatedModel,

@@ -636,7 +636,7 @@ class CoinifyCallbackView(View):
             callbackobject.order = order
             callbackobject.save()
             return HttpResponse("OK")
-        if (callbackobject.payload["event"] == "settlement.created"):
+        if callbackobject.payload["event"] == "settlement.created":
             return HttpResponse("OK")
         else:
             logger.error(
