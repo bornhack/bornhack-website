@@ -605,11 +605,8 @@ class CoinifyCallbackView(View):
 
         # save callback and parse json payload
         payload = json.loads(request.body.decode("utf-8"))
-        order = Order.objects.get(
-            coinify_api_payment_intents__coinify_id=payload["context"]["id"],
-        )
 
-        callbackobject = save_coinify_callback(request, order)
+        callbackobject = save_coinify_callback(request, None)
 
         # do we have a json body?
         if not callbackobject.payload:
@@ -628,11 +625,18 @@ class CoinifyCallbackView(View):
             callbackobject.payload["event"] == "payment-intent.completed"
             or callbackobject.payload["event"] == "payment-intent.failed"
         ):
+            order = Order.objects.get(
+                coinify_api_payment_intents__coinify_id=payload["context"]["id"],
+            )
             process_coinify_payment_intent_json(
                 intentjson=payload["context"],
                 order=order,
                 request=request,
             )
+            callbackobject.order = order
+            callbackobject.save()
+            return HttpResponse("OK")
+        if (callbackobject.payload["event"] == "settlement.created"):
             return HttpResponse("OK")
         else:
             logger.error(
