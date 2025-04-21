@@ -25,7 +25,6 @@ from .models import DectRegistration
 from .dectutils import DectUtils
 from .forms import DectRegistrationForm
 from camps.mixins import CampViewMixin
-from teams.models import Team
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
