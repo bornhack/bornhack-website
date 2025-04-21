@@ -1,26 +1,34 @@
 import logging
 import secrets
 import string
+import json
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from django.views.generic import View
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
+from .dectutils import DectUtils
+from .forms import DectRegistrationForm
 from camps.mixins import CampViewMixin
-from teams.models import Team
 from utils.mixins import UserIsObjectOwnerMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
+dectutil = DectUtils()
 
 
 class DectExportJsonView(
@@ -36,8 +44,9 @@ class DectExportJsonView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        team = Team.objects.get(name="POC", camp=self.camp)
-        poc = self.request.user in team.leads and self.request.access_token.is_valid(
+        poc = self.request.user.has_perm(
+            "camps.poc_team_lead",
+        ) and self.request.access_token.is_valid(
             ["phonebook:admin"],
         )
         context["phonebook"] = self.dump_phonebook(poc=poc)
@@ -59,14 +68,56 @@ class DectExportJsonView(
             }
             if poc:
                 # POC member, include extra info
+                if dect.ipei:
+                    ipei = dectutil.format_ipei(dect.ipei[0], dect.ipei[1])
+                else:
+                    ipei = None
                 entry.update(
                     {
                         "activation_code": dect.activation_code,
                         "publish_in_phonebook": dect.publish_in_phonebook,
+                        "ipei": ipei,
                     },
                 )
             phonebook.append(entry)
         return phonebook
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class ApiDectUpdateIPEI(
+    CampViewMixin,
+    ScopedProtectedResourceView,
+    View,
+):
+    """
+    API endpoint to update IPEI after user registered their phone on the network. Used by the POC system.
+    """
+
+    required_scopes = ["phonebook:admin"]
+
+    def post(self, request, dect_number, *args, **kwargs):
+        if not self.request.user.has_perm(
+            "camps.poc_team_lead",
+        ) and self.request.access_token.is_valid(
+            ["phonebook:admin"],
+        ):
+            return JsonResponse({"error": "Authentication failed"}, status=403)
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+        instance = get_object_or_404(
+            DectRegistration,
+            number=dect_number,
+            camp=self.camp,
+        )
+        instance.ipei = data["ipei"]
+        instance.save()
+        return JsonResponse(
+            {"message": "Record updated successfully", "data": data},
+            status=200,
+        )
 
 
 class PhonebookListView(CampViewMixin, ListView):
@@ -98,7 +149,7 @@ class DectRegistrationListView(LoginRequiredMixin, CampViewMixin, ListView):
 
 class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     model = DectRegistration
-    fields = ["number", "letters", "description", "publish_in_phonebook"]
+    form_class = DectRegistrationForm
     template_name = "dectregistration_form.html"
 
     def form_valid(self, form):
@@ -116,6 +167,12 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
             dect.clean_letters()
         except ValidationError as E:
             form.add_error("letters", E)
+            return super().form_invalid(form)
+
+        try:
+            dect.check_unique_ipei()
+        except ValidationError as E:
+            form.add_error("ipei", E)
             return super().form_invalid(form)
 
         # this check needs to be in this form, but not in model.save(), because then we cant save service numbers from the admin

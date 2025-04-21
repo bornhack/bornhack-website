@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 from django_prometheus.models import ExportModelOperationsMixin
 
 from .dectutils import DectUtils
@@ -63,6 +64,14 @@ class DectRegistration(
         help_text="Check to list this registration in the phonebook",
     )
 
+    ipei = ArrayField(
+        models.IntegerField(),
+        blank=True,
+        null=True,
+        size=2,
+        help_text="DECT phone IPEI (03562,0900847)",
+    )
+
     def save(self, *args, **kwargs):
         """
         This is just here so we get the validation in the admin as well.
@@ -70,7 +79,20 @@ class DectRegistration(
         # validate that the phonenumber and letters are valid and then save()
         self.clean_number()
         self.clean_letters()
+        self.check_unique_ipei()
         super().save(*args, **kwargs)
+
+    def check_unique_ipei(self):
+        if self.ipei and len(self.ipei) == 2:
+            # check for conflicts with the same IPEI
+            if (
+                DectRegistration.objects.filter(camp=self.camp, ipei=self.ipei)
+                .exclude(pk=self.pk)
+                .exists()
+            ):
+                raise ValidationError(
+                    f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use",
+                )
 
     def clean_number(self):
         """

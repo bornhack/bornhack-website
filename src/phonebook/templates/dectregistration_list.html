@@ -23,6 +23,7 @@
             <th>Description</th>
             <th>Publish in Phonebook</th>
             <th>Activation Code</th>
+            <th>IPEI</th>
             <th>Created</th>
             <th>Modified</th>
             <th>Actions</th>
@@ -34,6 +35,7 @@
               <td>{{ entry.description|default:"N/A" }}</td>
               <td>{{ entry.publish_in_phonebook|yesno }}</td>
               <td>{{ entry.activation_code }}</td>
+              <td><nobr>{{ entry.ipei.0|stringformat:"05d" }} {{ entry.ipei.1|stringformat:"07d" }}</nobr></td>
               <td>{{ entry.created }}</td>
               <td>{{ entry.updated }}</td>
               <td>
