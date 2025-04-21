@@ -55,6 +55,9 @@ class DectUtils:
         return result
 
     def hex_ipui_ipei(self, ipui):
+        """
+        Convert a hexidecimal IPUI to a IPEI notation
+        """
         if len(ipui) == 10:
             emc_hex = ipui[:5]
             psn_hex = ipui[-5:]
@@ -65,6 +68,9 @@ class DectUtils:
             return []
 
     def format_ipei(self, emc, psn):
+        """
+        Format the IPEI stored as ints to the standard notation.
+        """
         emc_s = str(emc).zfill(5)
         psn_s = str(psn).zfill(7)
         return f"{emc_s} {psn_s}"

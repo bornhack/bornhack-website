@@ -8,7 +8,7 @@ from .views import DectRegistrationDeleteView
 from .views import DectRegistrationListView
 from .views import DectRegistrationUpdateView
 from .views import PhonebookListView
-from .views import DectUpdateIPEI
+from .views import ApiDectUpdateIPEI
 
 app_name = "phonebook"
 urlpatterns = [
@@ -34,8 +34,8 @@ urlpatterns = [
                         [
                             path(
                                 "update/ipei/",
-                                DectUpdateIPEI.as_view(),
-                                name="dectregistration_update_ipei",
+                                ApiDectUpdateIPEI.as_view(),
+                                name="dectregistration_api_update_ipei",
                             ),
                             path(
                                 "update/",

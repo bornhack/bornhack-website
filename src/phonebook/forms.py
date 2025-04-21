@@ -1,10 +1,9 @@
+"""
+Forms for the phonebook
+"""
 import re
-import secrets
 
 from django import forms
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.urls import reverse
 
 from django.core.exceptions import ValidationError
 
@@ -15,9 +14,13 @@ dectutil = DectUtils()
 
 
 class DectRegistrationForm(forms.ModelForm):
+    """
+    Dect Registration Form used in the phonebook registration create view
+    """
     ipei_help_text = """
     Optional: Enter your IPEI (03562 0900847) or IPUI (00DEADBEEF)<br>
-    Entering this will enable you to register your handset directly when you arrive
+    Entering this will enable you to register your handset directly when you arrive<br>
+    You can find your IPUI on most Siemens handsets by going to menu and dailing *#06#
     """
     ipei = forms.CharField(
         max_length=13,
@@ -31,6 +34,9 @@ class DectRegistrationForm(forms.ModelForm):
         fields = ["number", "letters", "description", "publish_in_phonebook", "ipei"]
 
     def clean_ipei(self):
+        """
+        Detect IPEI type and convert both IPEI or IPUI to a array of ints
+        """
         ipei_s = self.cleaned_data["ipei"]
         if len(ipei_s) == 10:
             ipei = dectutil.hex_ipui_ipei(ipei_s)
