@@ -19,12 +19,15 @@
         <thead>
           <tr>
             <th>
-              Name
+              Public name
             </th>
             <th>
               Status
             </th>
             {% if request.user in team.leads.all %}
+              <th>
+                Name
+              </th>
               <th>
                 Email
               </th>
@@ -49,6 +52,9 @@
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
                 {% if request.user in team.leads.all %}
+                  <td>
+                    {{ member.user.profile.name }}
+                  </td>
                   <td>
                     {{ member.user.email }}
                   </td>
