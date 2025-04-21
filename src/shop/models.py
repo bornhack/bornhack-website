@@ -1165,11 +1165,16 @@ class CoinifyAPICallback(
         "shop.Order",
         related_name="coinify_api_callbacks",
         on_delete=models.PROTECT,
+        blank=True,
+        null=True,
     )
     authenticated = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"order #{self.order.id} callback at {self.created}"
+        if self.order:
+            return f"order #{self.order.id} callback at {self.created}"
+        else:
+            return f"other callback at {self.created}"
 
 
 class CoinifyAPIRequest(
