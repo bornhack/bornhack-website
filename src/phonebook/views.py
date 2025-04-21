@@ -92,7 +92,7 @@ class ApiDectUpdateIPEI(
     View,
 ):
     """
-    Function to update IPEI after user registered their phone on the network
+    API endpoint to update IPEI after user registered their phone on the network. Used by the POC system.
     """
 
     required_scopes = ["phonebook:admin"]
