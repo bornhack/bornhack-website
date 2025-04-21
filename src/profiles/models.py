@@ -4,7 +4,6 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.gis.db.models import PointField
-from django.contrib.gis.geos import Point
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
