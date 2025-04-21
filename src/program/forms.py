@@ -268,6 +268,7 @@ class EventProposalForm(forms.ModelForm):
             "title",
             "abstract",
             "allow_video_recording",
+            "allow_video_streaming",
             "duration",
             "tags",
             "slides_url",
@@ -313,8 +314,9 @@ class EventProposalForm(forms.ModelForm):
         self.fields["track"].empty_label = None
         self.fields["track"].queryset = EventTrack.objects.filter(camp=camp)
 
-        # make sure video_recording checkbox defaults to checked
+        # make sure video_recording and streaming checkbox defaults to checked
         self.fields["allow_video_recording"].initial = True
+        self.fields["allow_video_streaming"].initial = True
 
         if event_type.name not in [TALK, LIGHTNING_TALK]:
             # Only talk or lightning talk should show the slides_url field
@@ -374,6 +376,7 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for music acts
             del self.fields["allow_video_recording"]
+            del self.fields["allow_video_streaming"]
 
         elif event_type.name == RECREATIONAL_EVENT:
             # fix label and help_text for the title field
@@ -394,6 +397,7 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for music acts
             del self.fields["allow_video_recording"]
+            del self.fields["allow_video_streaming"]
 
         elif event_type.name in [TALK, LIGHTNING_TALK]:
             # fix label and help_text for the title field
@@ -439,6 +443,7 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for workshops
             del self.fields["allow_video_recording"]
+            del self.fields["allow_video_streaming"]
 
         elif event_type.name == RECREATIONAL_EVENT:
             # fix label and help_text for the title field
@@ -459,6 +464,7 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for recreational events
             del self.fields["allow_video_recording"]
+            del self.fields["allow_video_streaming"]
 
         elif event_type.name == MEETUP:
             # fix label and help_text for the title field
@@ -479,6 +485,7 @@ class EventProposalForm(forms.ModelForm):
 
             # no video recording for meetups
             del self.fields["allow_video_recording"]
+            del self.fields["allow_video_streaming"]
 
         else:
             raise ImproperlyConfigured(

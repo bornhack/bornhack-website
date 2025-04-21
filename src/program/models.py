@@ -544,6 +544,11 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         help_text="Recordings are made available under the <b>CC BY-SA 4.0</b> license. Uncheck if you do not want the event recorded, or if you cannot accept the license.",
     )
 
+    allow_video_streaming = models.BooleanField(
+        default=False,
+        help_text="Uncheck if you do not want the event streamed (only if recording is unchecked!).",
+    )
+
     duration = models.IntegerField(
         blank=True,
         help_text="How much time (in minutes) should we set aside for this event?",
@@ -575,6 +580,8 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         return self.title
 
     def save(self, **kwargs):
+        if self.allow_video_recording:
+            self.allow_video_streaming = True
         if not self.duration:
             self.duration = self.event_type.event_duration_minutes
         super().save(**kwargs)
@@ -609,6 +616,7 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         event.event_type = self.event_type
         event.proposal = self
         event.video_recording = self.allow_video_recording
+        event.video_streaming = self.allow_video_streaming
         event.save()
         # loop through the speaker_proposals linked to this event_proposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
@@ -1207,10 +1215,12 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         domain = Site.objects.get_current().domain
         speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
         recorded = "Yes" if self.event.video_recording else "No"
+        streamed = "Yes" if self.event.video_streaming else "No"
         ievent["description"] = (
             f"URL: https://{domain}{self.event.get_absolute_url()}\n\n"
             f"Speaker(s): {speakers}\n\n"
             f"Recorded: {recorded}\n\n"
+            f"Streamed: {streamed}\n\n"
             f"{self.event.abstract}"
         )
         ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
@@ -1308,6 +1318,11 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
         help_text="Do we intend to record video of this event?",
     )
 
+    video_streaming = models.BooleanField(
+        default=True,
+        help_text="Do we intend to stream video of this event?",
+    )
+
     proposal = models.OneToOneField(
         "program.EventProposal",
         null=True,
@@ -1380,6 +1395,8 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
 
         if self.video_recording:
             video_state = "to-be-recorded"
+        elif self.video_streaming:
+            video_state = "to-be-streamed-not-to-be-recorded"
         else:
             video_state = "not-to-be-recorded"
 
@@ -1515,6 +1532,8 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
 
         if self.event.video_recording:
             video_state = "to-be-recorded"
+        elif self.event.video_streaming:
+            video_state = "to-be-streamed-not-to-be-recorded"
         else:
             video_state = "not-to-be-recorded"
 

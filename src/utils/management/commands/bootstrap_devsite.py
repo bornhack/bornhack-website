@@ -229,6 +229,7 @@ class EventProposalFactory(factory.django.DjangoModelFactory):
     title = factory.Faker("sentence")
     abstract = output_fake_md_description()
     allow_video_recording = factory.Iterator([True, True, True, False])
+    allow_video_streaming = factory.Iterator([True, True, True, False])
     submission_notes = factory.Iterator(["", output_fake_description()])
     use_provided_speaker_laptop = factory.Iterator([True, False])
 
