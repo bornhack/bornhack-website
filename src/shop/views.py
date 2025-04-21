@@ -606,7 +606,7 @@ class CoinifyCallbackView(View):
         # save callback and parse json payload
         payload = json.loads(request.body.decode("utf-8"))
 
-        callbackobject = save_coinify_callback(request, None)
+        callbackobject = save_coinify_callback(request=request, order=None)
 
         # do we have a json body?
         if not callbackobject.payload:
