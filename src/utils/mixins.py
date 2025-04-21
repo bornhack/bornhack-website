@@ -45,44 +45,43 @@ class BaseTeamPermRequiredMixin:
         user_perms = self.request.user.get_all_permissions()
         for perm in user_perms:
             if perm.endswith(f"_team_{self.perm}"):
-                # user has the permissio n in some team
+                # user has the permission in some team
                 return super().dispatch(request, *args, **kwargs)
         messages.error(request, "No thanks")
         raise PermissionDenied()
 
 
-class TeamLeadRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_lead" permission for any team."""
 
-    perm = "lead"
+class AnyTeamMemberRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_member" permission for any team.
 
-
-class TeamMemberRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_member" permission for any team."""
+    Currently only used to control backoffice access.
+    """
 
     perm = "member"
 
 
-class TeamMapperRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_mapper" permission for any team."""
+class AnyTeamMapperRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_mapper" permission for any team.
+
+    Currently only used in backoffice map layer list and create views.
+    """
 
     perm = "mapper"
 
 
-class TeamFacilitatorRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_facilitator" permission for any team."""
+class AnyTeamFacilitatorRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_facilitator" permission for any team.
+
+    Currently only used in backoffice facility list, create, and detail views."""
 
     perm = "facilitator"
 
 
-class TeamInfopagerRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_infopager" permission for any team."""
+class AnyTeamPosRequiredMixin(BaseTeamPermRequiredMixin):
+    """Mixin for views available to anyone with a "camps.<team>_team_pos" permission for any team.
 
-    perm = "infopager"
-
-
-class TeamPosRequiredMixin(BaseTeamPermRequiredMixin):
-    """Mixin for views available to anyone with a "camps.<team>_team_pos" permission for any team."""
+    Currently used to control access to the backoffice POS list, POS Transaction List, POS sale list, POS product list, and POS Product Cost List views."""
 
     perm = "pos"
 

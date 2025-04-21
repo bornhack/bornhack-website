@@ -1,5 +1,5 @@
 import json
-from utils.mixins import TeamPosRequiredMixin
+from utils.mixins import AnyTeamPosRequiredMixin
 import logging
 
 from django.contrib import messages
@@ -41,7 +41,7 @@ from teams.models import Team
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class PosListView(CampViewMixin, TeamPosRequiredMixin, ListView):
+class PosListView(CampViewMixin, AnyTeamPosRequiredMixin, ListView):
     """Show a list of Pos this user has access to (through team pos permissions)."""
 
     model = Pos
@@ -270,7 +270,7 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
 
 class PosTransactionListView(
     CampViewMixin,
-    TeamPosRequiredMixin,
+    AnyTeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -306,7 +306,7 @@ class PosTransactionListView(
 
 class PosSaleListView(
     CampViewMixin,
-    TeamPosRequiredMixin,
+    AnyTeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -354,7 +354,7 @@ class PosSalesImportView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
 
 class PosProductListView(
     CampViewMixin,
-    TeamPosRequiredMixin,
+    AnyTeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
@@ -424,7 +424,7 @@ class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
 
 class PosProductCostListView(
     CampViewMixin,
-    TeamPosRequiredMixin,
+    AnyTeamPosRequiredMixin,
     SingleTableMixin,
     FilterView,
 ):
