@@ -27,6 +27,7 @@
            {% if attrs.readonly %}readonly{% endif %}
            {% if attrs.checked %}checked{% endif %}
            {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+           {% if attrs.name == "code" %}autofocus{% endif %}
            {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
            {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
            {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
