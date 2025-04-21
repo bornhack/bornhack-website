@@ -64,8 +64,7 @@ class DectUtils:
             emc = int(emc_hex, 16)
             psn = int(psn_hex, 16)
             return [emc, psn]
-        else:
-            return []
+        return []
 
     def format_ipei(self, emc, psn):
         """
