@@ -46,7 +46,9 @@ class DectExportJsonView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         team = Team.objects.get(name="POC", camp=self.camp)
-        poc = self.request.user.has_perm("camps.poc_team_lead") and self.request.access_token.is_valid(
+        poc = self.request.user.has_perm(
+            "camps.poc_team_lead"
+        ) and self.request.access_token.is_valid(
             ["phonebook:admin"],
         )
         context["phonebook"] = self.dump_phonebook(poc=poc)
@@ -96,7 +98,9 @@ class ApiDectUpdateIPEI(
 
     def post(self, request, dect_number, *args, **kwargs):
         team = Team.objects.get(name="POC", camp=self.camp)
-        if not self.request.user.has_perm("camps.poc_team_lead") and self.request.access_token.is_valid(
+        if not self.request.user.has_perm(
+            "camps.poc_team_lead"
+        ) and self.request.access_token.is_valid(
             ["phonebook:admin"],
         ):
             return JsonResponse({"error": "Authentication failed"}, status=403)

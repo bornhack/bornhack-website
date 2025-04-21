@@ -1,6 +1,7 @@
 """
 Forms for the phonebook
 """
+
 import re
 
 from django import forms
@@ -17,6 +18,7 @@ class DectRegistrationForm(forms.ModelForm):
     """
     Dect Registration Form used in the phonebook registration create view
     """
+
     ipei_help_text = """
     Optional: Enter your IPEI (03562 0900847) or IPUI (00DEADBEEF)<br>
     Entering this will enable you to register your handset directly when you arrive<br>
