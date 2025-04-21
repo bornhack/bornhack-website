@@ -233,7 +233,7 @@ OAUTH2_PROVIDER = {
         "permissions:read": "Allow the remote site to read a list of your assigned permissions (scope: permissions:read).",
         "teams:read": "Allow the remote site to read a list of your team memberships and team lead status (scope: teams)",
         # api scopes
-        "phonebook:admin": "Allow the remote site to read the camp phonebook including service numbers and unlisted numbers also allows access to the poc api. Only relevant for POC team leads (scope: phonebook:admin).",
+        "phonebook:admin": "Allow the remote site to read the camp phonebook including service numbers and unlisted numbers. Also allows access to the POC API. Only relevant for POC team leads (scope: phonebook:admin).",
         "phonebook:read": "Allow the remote site to read the camp phonebook (scope: phonebook:read).",
     },
     "PKCE_REQUIRED": True,
