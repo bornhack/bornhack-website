@@ -6,7 +6,7 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 
-from utils.mixins import TeamMemberRequiredMixin
+from utils.mixins import AnyTeamMemberRequiredMixin
 from utils.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from facilities.models import FacilityFeedback
@@ -16,7 +16,7 @@ from utils.models import OutgoingEmail
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-class BackofficeIndexView(CampViewMixin, TeamMemberRequiredMixin, TemplateView):
+class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateView):
     """
     The Backoffice index view is available to anyone who is an approved member of any team for the current camp.
     """

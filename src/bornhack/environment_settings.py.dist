@@ -4,7 +4,6 @@ SECRET_KEY = '{{ django_secret_key }}'
 ALLOWED_HOSTS = {{ django_allowed_hostnames }}
 
 # Database settings
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django_prometheus.db.backends.postgis',
@@ -12,6 +11,8 @@ DATABASES = {
         'USER': '{{ django_postgres_user }}',
         'PASSWORD': '{{ django_postgres_password }}',
         'HOST': '{{ django_postgres_host }}',
+        # comment this out for non-tls connection to postgres
+        'OPTIONS': {'sslmode': 'verify-full', 'sslrootcert': 'system'},
     },
 }
 
