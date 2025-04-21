@@ -70,9 +70,10 @@ class DectExportJsonView(
             }
             if poc:
                 # POC member, include extra info
-                ipei = None
                 if dect.ipei:
                     ipei = dectutil.format_ipei(dect.ipei[0], dect.ipei[1])
+                else:
+                    ipei = None
                 entry.update(
                     {
                         "activation_code": dect.activation_code,
