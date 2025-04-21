@@ -23,7 +23,7 @@ from maps.models import Feature
 from maps.models import Layer
 from teams.models import Team
 from utils.widgets import IconPickerWidget
-from utils.mixins import TeamMapperRequiredMixin
+from utils.mixins import AnyTeamMapperRequiredMixin
 from maps.mixins import LayerMapperViewMixin
 from maps.mixins import ExternalLayerMapperViewMixin
 
@@ -33,7 +33,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 # ################# LAYERS ########################
 
 
-class MapLayerListView(CampViewMixin, TeamMapperRequiredMixin, ListView):
+class MapLayerListView(CampViewMixin, AnyTeamMapperRequiredMixin, ListView):
     model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
@@ -164,7 +164,7 @@ class MapLayerFeaturesImportView(
             self.error_count += 1
 
 
-class MapLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
+class MapLayerCreateView(CampViewMixin, AnyTeamMapperRequiredMixin, CreateView):
     model = Layer
     template_name = "maps_layer_form.html"
     fields = [
@@ -389,7 +389,7 @@ class MapFeatureDeleteView(LayerMapperViewMixin, DeleteView):
 # ################# EXTERNAL LAYERS ################
 
 
-class MapExternalLayerCreateView(CampViewMixin, TeamMapperRequiredMixin, CreateView):
+class MapExternalLayerCreateView(CampViewMixin, AnyTeamMapperRequiredMixin, CreateView):
     model = ExternalLayer
     template_name = "maps_external_layer_form.html"
     fields = [

@@ -29,7 +29,7 @@ from facilities.models import FacilityOpeningHours
 from facilities.models import FacilityType
 from teams.models import Team
 from utils.widgets import IconPickerWidget
-from utils.mixins import TeamFacilitatorRequiredMixin
+from utils.mixins import AnyTeamFacilitatorRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -214,7 +214,7 @@ class FacilityTypeDeleteView(CampViewMixin, OrgaOrGisTeamViewMixin, DeleteView):
 # ########### FACILITIES ######################
 
 
-class FacilityListView(CampViewMixin, TeamFacilitatorRequiredMixin, ListView):
+class FacilityListView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, ListView):
     model = Facility
     template_name = "facility_list_backoffice.html"
 
@@ -251,7 +251,7 @@ class FacilityListView(CampViewMixin, TeamFacilitatorRequiredMixin, ListView):
         return context
 
 
-class FacilityDetailView(TeamFacilitatorRequiredMixin, DetailView):
+class FacilityDetailView(AnyTeamFacilitatorRequiredMixin, DetailView):
     model = Facility
     template_name = "facility_detail_backoffice.html"
     pk_url_kwarg = "facility_uuid"
@@ -281,7 +281,7 @@ class FacilityDetailView(TeamFacilitatorRequiredMixin, DetailView):
         return qs.prefetch_related("opening_hours")
 
 
-class FacilityCreateView(CampViewMixin, TeamFacilitatorRequiredMixin, CreateView):
+class FacilityCreateView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, CreateView):
     model = Facility
     template_name = "facility_form.html"
     fields = ["facility_type", "name", "description", "location"]
