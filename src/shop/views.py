@@ -621,9 +621,10 @@ class CoinifyCallbackView(View):
         callbackobject.valid = True
         callbackobject.save()
 
-        if (
-            callbackobject.payload["event"] in ["payment-intent.completed", "payment-intent.failed"]
-        ):
+        if callbackobject.payload["event"] in [
+            "payment-intent.completed",
+            "payment-intent.failed",
+        ]:
             order = Order.objects.get(
                 coinify_api_payment_intents__coinify_id=payload["context"]["id"],
             )
