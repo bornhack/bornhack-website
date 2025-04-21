@@ -20,7 +20,10 @@ class DectRegistrationForm(forms.ModelForm):
     Entering this will enable you to register your handset directly when you arrive
     """
     ipei = forms.CharField(
-        max_length=13, help_text=ipei_help_text, required=False, label="IPEI/IPUI"
+        max_length=13,
+        help_text=ipei_help_text,
+        required=False,
+        label="IPEI/IPUI",
     )
 
     class Meta:

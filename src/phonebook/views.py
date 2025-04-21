@@ -106,12 +106,15 @@ class DectUpdateIPEI(
             return JsonResponse({"error": "Invalid JSON"}, status=400)
 
         instance = get_object_or_404(
-            DectRegistration, number=dect_number, camp=self.camp
+            DectRegistration,
+            number=dect_number,
+            camp=self.camp,
         )
         instance.ipei = data["ipei"]
         instance.save()
         return JsonResponse(
-            {"message": "Record updated successfully", "data": data}, status=200
+            {"message": "Record updated successfully", "data": data},
+            status=200,
         )
 
 

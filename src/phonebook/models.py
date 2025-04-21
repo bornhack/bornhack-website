@@ -92,7 +92,7 @@ class DectRegistration(
                 .exists()
             ):
                 raise ValidationError(
-                    f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use"
+                    f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use",
                 )
 
     def clean_number(self):
