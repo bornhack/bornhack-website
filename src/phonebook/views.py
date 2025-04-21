@@ -89,7 +89,7 @@ class DectUpdateIPEI(
     View,
 ):
     """
-    Function to update IPEI after user registered there phone
+    Function to update IPEI after user registered their phone
     """
 
     required_scopes = ["phonebook:admin"]
