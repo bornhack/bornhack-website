@@ -60,3 +60,10 @@ class TeamInfopagerPermissionMixin(RaisePermissionRequiredMixin):
 
     def get_permission_required(self):
         return [self.team.infopager_permission_set]
+
+
+class TeamTaskerPermissionMixin(RaisePermissionRequiredMixin):
+    """Permission mixin for views restricted to users with tasker permission for self.team"""
+
+    def get_permission_required(self):
+        return [self.team.tasker_permission_set]

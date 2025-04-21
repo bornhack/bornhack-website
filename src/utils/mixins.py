@@ -51,7 +51,6 @@ class BaseTeamPermRequiredMixin:
         raise PermissionDenied()
 
 
-
 class AnyTeamMemberRequiredMixin(BaseTeamPermRequiredMixin):
     """Mixin for views available to anyone with a "camps.<team>_team_member" permission for any team.
 
@@ -81,7 +80,8 @@ class AnyTeamFacilitatorRequiredMixin(BaseTeamPermRequiredMixin):
 class AnyTeamPosRequiredMixin(BaseTeamPermRequiredMixin):
     """Mixin for views available to anyone with a "camps.<team>_team_pos" permission for any team.
 
-    Currently used to control access to the backoffice POS list, POS Transaction List, POS sale list, POS product list, and POS Product Cost List views."""
+    Currently used to control access to the backoffice POS list, POS Transaction List, POS sale list, POS product list, and POS Product Cost List views.
+    """
 
     perm = "pos"
 
