@@ -50,8 +50,8 @@ class BornhackOAuth2Validator(OAuth2Validator):
                 # standard OIDC claims
                 "email": request.user.email,
                 "email_verified": True,
-                "nickname": request.user.profile.get_public_credit_name,
                 "updated_at": int(request.user.profile.updated.timestamp()),
+                "username": request.user.username,
                 # bornhack custom claims
                 "bornhack:v2:teams": [
                     {
@@ -67,6 +67,13 @@ class BornhackOAuth2Validator(OAuth2Validator):
                 ),
             },
         )
+
+        if (
+            request.user.profile.public_credit_name_approved
+            and request.user.profile.public_credit_name
+        ):
+            claims["nickname"] = request.user.profile.public_credit_name
+            claims["preferred_username"] = request.user.profile.public_credit_name
 
         if request.user.profile.location:
             claims["address"] = {"formatted": request.user.profile.location}
