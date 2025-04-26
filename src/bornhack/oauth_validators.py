@@ -51,7 +51,6 @@ class BornhackOAuth2Validator(OAuth2Validator):
                 "email": request.user.email,
                 "email_verified": True,
                 "updated_at": int(request.user.profile.updated.timestamp()),
-                "username": request.user.username,
                 # bornhack custom claims
                 "bornhack:v2:teams": [
                     {
