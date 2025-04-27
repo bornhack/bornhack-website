@@ -183,29 +183,22 @@ If your database user in your dev setup is not a postgres superuser you will enc
 
 ### Add a camp
 
-Add a new camp by running:
+First do a commit with:
 
-```
-(venv) $ python src/manage.py createcamp {camp-slug}
-```
-
-Then go to the admin interface to edit the camp details, adding the same slug
-that you just used and some current dates.
-
-You can also specify details like:
-
-* A sponsors page, `{camp-slug}_sponsors.html`, to `sponsors/templates`.
 * A frontpage, `{camp-slug}_camp_detail.html`, to `camps/templates`.
-* A call for speakers page, `{camp-slug}_call_for_speakers.html`, to `program/templates`.
 * A `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
+
+Then go to the admin interface and add the camp.
+
 
 ## Contributors
 * Alexander Færøy https://github.com/ahf
 * Benjamin Bach https://github.com/benjaoming
 * coral https://github.com/coral
 * Flemming Jacobsen https://github.com/batmule
+* Florian Klink https://github.com/flokli
 * Henrik Kramshøj https://github.com/kramse
 * Janus Troelsen https://github.com/ysangkok
 * Jeppe Ernst https://github.com/Ern-st
