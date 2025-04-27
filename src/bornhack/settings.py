@@ -221,17 +221,22 @@ OAUTH2_PROVIDER = {
     "SCOPES": {
         # required
         "openid": "OpenID Connect scope",
+
         # deprecated api scope, remove after 2025 camp
         "profile:read": "Allow the remote site to read your bornhack.dk username (uuid), user id, profile public credit name, profile description, and a list of team memberships using the profile API endpoint (scope profile:read). NOTE: This scope is being deprecated soon! Ask the BornHack website team for more info.",
+
         # standard OIDC claim scopes
         "profile": "Allow the remote site to read your profile public_credit_name, description, and update time (scope: profile)",
         "email": "Allow the remote site to read your email address (scope: email)",
         "address": "Allow the remote site to read your profile location (scope: address)",
         "phone": "Allow the remote site to read your profile phonenumber (scope: phone)",
+
         # custom bornhack user claim scopes
         "groups:read": "Allow the remote site to read a list of your group memberships (scope: groups:read).",
+        "location:read": "Allow the remote site to read your profile location (scope: loocation:read)",
         "permissions:read": "Allow the remote site to read a list of your assigned permissions (scope: permissions:read).",
-        "teams:read": "Allow the remote site to read a list of your team memberships and team lead status (scope: teams)",
+        "teams:read": "Allow the remote site to read a list of your team memberships and team lead status (scope: teams:read)",
+
         # api scopes
         "phonebook:admin": "Allow the remote site to read the camp phonebook, including service numbers and unlisted numbers. Also allow the remote site to use to the POC API. This scope is only relevant for POC team leads (scope: phonebook:admin).",
         "phonebook:read": "Allow the remote site to read the camp phonebook (scope: phonebook:read).",

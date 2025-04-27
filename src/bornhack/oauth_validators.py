@@ -21,6 +21,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             # the custom user claims we support, and the (mostly custom) scopes they require
             "bornhack:v2:description": "profile",
             "bornhack:v2:groups": "groups:read",
+            "bornhack:v2:location": "location:read",
             "bornhack:v2:permissions": "permissions:read",
             "bornhack:v2:public_credit_name": "profile",
             "bornhack:v2:teams": "teams:read",
@@ -78,7 +79,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
 
         # include location?
         if request.user.profile.location:
-            claims["address"] = {"formatted": request.user.profile.location}
+            claims["bornhack:v2:location"] = request.user.profile.location
 
         # include phonenumber?
         if request.user.profile.phonenumber:
@@ -97,7 +98,6 @@ class BornhackOAuth2Validator(OAuth2Validator):
         """
         return [
             # OIDC standard claims
-            "address",
             "email",
             "email_verified",
             "nickname",
@@ -108,6 +108,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             # custom user claims
             "bornhack:v2:description",
             "bornhack:v2:groups",
+            "bornhack:v2:location",
             "bornhack:v2:permissions",
             "bornhack:v2:public_credit_name",
             "bornhack:v2:teams",
