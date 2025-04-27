@@ -72,7 +72,9 @@ class BornhackOAuth2Validator(OAuth2Validator):
             request.user.profile.public_credit_name_approved
             and request.user.profile.public_credit_name
         ):
-            claims["bornhack:v2:public_credit_name"] = request.user.profile.public_credit_name
+            claims["bornhack:v2:public_credit_name"] = (
+                request.user.profile.public_credit_name
+            )
 
         # include location?
         if request.user.profile.location:
