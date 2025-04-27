@@ -1,0 +1,11 @@
+// bornhack bootstrap scss, sets the media-query
+// build new css:
+//   $ apt install npm sass
+//   $ npm install bootstrap
+//   $ sass bornhack.scss:bootstrap-v5.3.3.bornhackcustom.css
+// also update SRI in settings.py:
+//   $ openssl dgst -sha384 -binary bootstrap-v5.3.3.bornhackcustom.css | openssl base64 -A
+
+$color-mode-type: media-query;
+
+@import "node_modules/bootstrap/scss/bootstrap";

@@ -18,7 +18,7 @@
 {% endif %}
 
 <div class="btn-group hide-for-no-js-users" role="group" style="flex-grow: 1;">
-  <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">More <span class="caret"></span></button>
+  <button type="button" class="btn btn-outline-secondary btn-menu dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">More <span class="caret"></span></button>
   <ul class="dropdown-menu">
     {% if is_volunteer %}
       <li><a class="{% menudropdownclass 'backoffice' %} dropdown-item" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>

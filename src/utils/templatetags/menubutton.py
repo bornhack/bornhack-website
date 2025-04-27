@@ -18,7 +18,7 @@ def menubuttonclass(context, appname):
     if appname == resolved_appname:
         return "btn-primary"
     else:
-        return "btn-outline-secondary"
+        return "btn-outline-secondary btn-menu"
 
 
 @register.simple_tag(takes_context=True)

@@ -13,12 +13,9 @@
     <title>{% block title %}BornHack{% endblock %}</title>
 
     {# Load Bootstrap CSS and JavaScript #}
-    {% if user.is_authenticated and user.profile.theme != "default" %}
-      <link href="{% static "css/bootstrap-"|add:user.profile.theme|add:".css" %}" rel="stylesheet">
-    {% else %}
-      <link href="{% static 'css/bootstrap-light.css' %}" rel="stylesheet">
-      <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
-    {% endif %}
+    <link href="{% static "css/bootstrap-v5.3.5.bornhackcustom.css" %}" rel="stylesheet" integrity="sha384-6j8b4NWKMY1QyKKIy08RecYTdrrKtbf8WZSqpOHCW0I8BFb4cv3GiJWkm3Kr8CCp">
+    <link href="{% static "css/theme-solar.css" %}" rel="stylesheet">
+    <link href="{% static "css/theme-slate.css" %}" rel="stylesheet">
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
@@ -69,7 +66,7 @@
     {% endblock %}
   </head>
 
-  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if user.is_authenticated and user.profile.theme != "default" %} data-bs-theme="{{user.profile.theme}}"{% endif %}>
     {% block body %}
       <header class="py-1">
         <nav class="navbar fixed-top navbar-expand-lg bg-body">

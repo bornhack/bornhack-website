@@ -35,11 +35,36 @@ strong { font-weight: bold; }
   height: 75px;
 }
 
-@media (color-scheme: dark) {
+.btn-menu {
+    --bs-btn-border-width: unset !important;
+}
+
+[data-bs-theme="light"] .bornhack-logo {
+    -webkit-filter: unset !important;
+    filter: unset !important;
+}
+
+@media (prefers-color-scheme: dark) {
     .bornhack-logo {
        -webkit-filter: invert(1);
        filter: invert(1);
     }
+    .sponsor-white {
+       background-color: white;
+       color: black;
+       border: 20px solid white;
+    }
+}
+
+[data-bs-theme="dark"] .bornhack-logo {
+    -webkit-filter: invert(1);
+    filter: invert(1);
+}
+
+[data-bs-theme="dark"] .sponsor-white {
+    background-color: white;
+    color: black;
+    border: 20px solid white;
 }
 
 .navbar-fixed-top {
