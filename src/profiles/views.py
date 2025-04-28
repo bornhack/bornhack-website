@@ -32,6 +32,7 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         "location",
         "nickserv_username",
         "theme",
+        "preferred_username",
     ]
     success_url = reverse_lazy("profiles:detail")
     template_name = "profile_form.html"

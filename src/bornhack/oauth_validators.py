@@ -17,6 +17,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "email_verified": "email",
             "phone_number": "phone",
             "phone_number_verified": "phone",
+            "preferred_username": "profile",
             "updated_at": "profile",
             # the custom user claims we support, and the (mostly custom) scopes they require
             "bornhack:v2:description": "profile",
@@ -46,6 +47,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
         if request.user.is_anonymous:
             return claims
 
+        # these claims are always available
         claims.update(
             {
                 # standard OIDC claims
@@ -84,11 +86,15 @@ class BornhackOAuth2Validator(OAuth2Validator):
         # include phonenumber?
         if request.user.profile.phonenumber:
             claims["phone_number"] = request.user.profile.phonenumber
-            claims["phone_number_verified"] = True
 
         # include profile description?
         if request.user.profile.description:
             claims["bornhack:v2:description"] = request.user.profile.description
+
+        # include preferred_username?
+        if request.user.profile.preferred_username:
+            claims["preferred_username"] = request.user.profile.preferred_username
+
         return claims
 
     def get_discovery_claims(self, request) -> list[str]:
@@ -103,6 +109,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
             "nickname",
             "phone_number",
             "phone_number_verified",
+            "preferred_username",
             "sub",
             "updated_at",
             # custom user claims

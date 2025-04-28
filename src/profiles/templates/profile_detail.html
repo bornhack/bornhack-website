@@ -91,6 +91,15 @@
           </td>
         </tr>
 
+        <tr>
+          <td>
+            <b>OIDC Preferred Username</b><br />
+            <small>When using BornHack as an IDP this value is available to remote sites with the <code>profile</code> scope. Set this to the username you prefer to use on the remote sites where you login with your BornHack account.</small>
+          </td>
+          <td>
+            {{ profile.preferred_username|default:"N/A" }}
+          </td>
+        </tr>
       </table>
     </div>
   </div>
