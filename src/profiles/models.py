@@ -67,11 +67,16 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         help_text="The phonenumber you can be reached on. This field can be updated automatically when registering a DECT number in the phonebook.",
     )
 
-    # default to near general camping
     location = PointField(
         blank=True,
         null=True,
         help_text="Your location at BornHack. This value is available on public maps.",
+    )
+
+    preferred_username = models.SlugField(
+        blank=True,
+        max_length=50,
+        help_text="When using your BornHack account to login to other sites with OIDC this value is served as the OIDC standard claim 'preferred_username'. You can set this to the username you would prefer to use on remote sites where you login with your BornHack account.",
     )
 
     @property
