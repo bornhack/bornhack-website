@@ -2,10 +2,13 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
+from django.shortcuts import redirect
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
+from django.views import View
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 from leaflet.forms.widgets import LeafletWidget
@@ -57,6 +60,8 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
             # user changed the name (to something non blank)
             form.instance.public_credit_name_approved = False
             form.instance.save()
+        if "theme" in form.changed_data and form.cleaned_data["theme"]:
+            self.request.session["theme"] = form.cleaned_data["theme"]
         messages.success(self.request, "Your profile has been updated.")
         return super().form_valid(form, **kwargs)
 
@@ -102,3 +107,18 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
             )
         )
         return perms
+
+
+class ProfileSessionThemeSwitchView(View):
+    """
+    View for setting the Session theme
+    """
+
+    def get(self, request, *args, **kwargs):
+        theme = request.GET.get("theme") or "default"
+        next_url = request.GET.get("next") or "/"
+        if theme in dict(Profile.THEME_CHOICES) and next_url[:1] == "/":
+            self.request.session["theme"] = theme
+            return redirect(next_url)
+        else:
+            return HttpResponseForbidden()

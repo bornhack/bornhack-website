@@ -1,0 +1,11 @@
+<a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary bornhack-hide-dark">
+  <i class="fa fa-moon"></i>
+</a>
+<a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary bornhack-hide-light">
+  <i class="fa fa-sun"></i>
+</a>
+{% if request.session.theme and request.session.theme != "default" %}
+  <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary">
+    <i class="fa fa-display"></i>
+  </a>
+{% endif %}

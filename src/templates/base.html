@@ -66,7 +66,7 @@
     {% endblock %}
   </head>
 
-  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if user.is_authenticated and user.profile.theme != "default" %} data-bs-theme="{{user.profile.theme}}"{% endif %}>
+  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if request.session.theme and request.session.theme != "default" %} data-bs-theme="{{request.session.theme}}"{% endif %}>
     {% block body %}
       <header class="py-1">
         <nav class="navbar fixed-top navbar-expand-lg bg-body">
@@ -80,6 +80,11 @@
                 <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="bornhack-logo img-responsive" width="200">
               </a>
             {% endif %}
+            <!-- Theme switcher for small screens -->
+            <div class="theme-switch d-lg-none col-1">
+              {% include 'includes/theme-switch.html' %}
+            </div>
+            <!-- END: Theme switcher for small screens -->
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -126,6 +131,11 @@
                 {% endif %}
               </ul>
               <div class="nav navbar-nav navbar-right ms-auto d-none d-lg-flex">
+                <!-- normal/big screen switcher -->
+                <div class="theme-switch nav-link">
+                  {% include 'includes/theme-switch.html' %}
+                </div>
+                <!-- end of switcher -->
                 {% if user.is_authenticated %}
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>

@@ -62,4 +62,8 @@
         color: black;
         border: 20px solid white;
     }
+
+    .bornhack-hide-dark {
+        display: none !important;
+    }
 }

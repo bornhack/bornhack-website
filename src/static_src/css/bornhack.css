@@ -39,33 +39,42 @@ strong { font-weight: bold; }
     --bs-btn-border-width: unset !important;
 }
 
+/* Hide elements if theme is active */
+/* Only used for data-bs-theme="light" and prefers-color-scheme: dark */
+/* For the other themes these should be defined in the theme css file */
+
+body:not([data-bs-theme]) .bornhack-hide-light {
+    display: none !important;
+}
+
 [data-bs-theme="light"] .bornhack-logo {
     -webkit-filter: unset !important;
     filter: unset !important;
 }
 
+[data-bs-theme="light"] .bornhack-hide-light {
+    display: none !important;
+}
+
 @media (prefers-color-scheme: dark) {
-    .bornhack-logo {
+    body:not([data-bs-theme]) .bornhack-logo {
        -webkit-filter: invert(1);
        filter: invert(1);
     }
-    .sponsor-white {
+    body:not([data-bs-theme]) .sponsor-white {
        background-color: white;
        color: black;
        border: 20px solid white;
     }
+    body:not([data-bs-theme]) .bornhack-hide-dark {
+        display: none !important;
+    }
+    /* Unset hide when light while being dark */
+    body:not([data-bs-theme]) .bornhack-hide-light {
+        display: unset !important;
+    }
 }
-
-[data-bs-theme="dark"] .bornhack-logo {
-    -webkit-filter: invert(1);
-    filter: invert(1);
-}
-
-[data-bs-theme="dark"] .sponsor-white {
-    background-color: white;
-    color: black;
-    border: 20px solid white;
-}
+/* end of theme based hiding */
 
 .navbar-fixed-top {
   min-height: 70px;
@@ -354,45 +363,58 @@ img {
   padding-left: 10px;
   padding-right: 10px;
 }
-.bornhack-2016-gradient {
+.bornhack-2016-gradient, .bornhack-2027-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #004dff, var(--bs-body-bg));
 }
-.bornhack-2017-gradient {
+.bornhack-2017-gradient, .bornhack-2028-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #750787, var(--bs-body-bg));
 }
-.bornhack-2018-gradient {
+.bornhack-2018-gradient, .bornhack-2029-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #008026, var(--bs-body-bg));
 }
-.bornhack-2019-gradient {
+.bornhack-2019-gradient, .bornhack-2030-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #ffed00, var(--bs-body-bg));
 }
-.bornhack-2020-gradient {
+.bornhack-2020-gradient, .bornhack-2031-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #ff8c00, var(--bs-body-bg));
 }
-.bornhack-2021-gradient {
+.bornhack-2021-gradient, .bornhack-2032-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #e40303, var(--bs-body-bg));
 }
-.bornhack-2022-gradient {
+.bornhack-2022-gradient, .bornhack-2033-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #000000, var(--bs-body-bg));
 }
-.bornhack-2023-gradient {
+.bornhack-2023-gradient, .bornhack-2034-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #613915, var(--bs-body-bg));
 }
-.bornhack-2024-gradient {
+.bornhack-2024-gradient, .bornhack-2035-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #73d7ee, var(--bs-body-bg));
 }
-.bornhack-2025-gradient {
+.bornhack-2025-gradient, .bornhack-2036-gradient {
   height: 5px;
   background: linear-gradient(0.25turn, var(--bs-body-bg), #ffafc7, var(--bs-body-bg));
+}
+.bornhack-2026-gradient, .bornhack-2037-gradient {
+  height: 5px;
+  background: linear-gradient(0.25turn, var(--bs-body-bg), #ffffff, var(--bs-body-bg));
+}
+/* Use a different starting and ending color on light theme */
+[data-bs-theme="light"] .bornhack-2026-gradient, [data-bs-theme="light"] .bornhack-2037-gradient {
+  background: linear-gradient(0.25turn, var(--bs-gray-400), #ffffff, var(--bs-gray-400)) !important;
+}
+@media (prefers-color-scheme: light) {
+    .bornhack-2026-gradient, .bornhack-2037-gradient {
+      background: linear-gradient(0.25turn, var(--bs-gray-400), #ffffff, var(--bs-gray-400)) !important;
+    }
 }
 .image-white-bg {
     background-color: white;
