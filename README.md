@@ -166,12 +166,16 @@ Enjoy!
 The BornHack website can act as an OIDC IDP. You are welcome to use it for your projects.
 
 
-### OIDC User Claims
+### OIDC Scopes and User Claims
+The website has a view to inspect which OIDC user claims are returned when using the various claim scopes. It can be accessed at https://bornhack.dk/profile/oidc/
+
+
+### OIDC User Claims Source Code
 
 The supported standard and custom OIDC user claims can be seen in `bornhack/oauth_validators.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/oauth_validators.py
 
 
-### OIDC Scopes
+### OIDC Scopes Source Code
 
 Supported oauth2 scopes are divided into standard OIDC claim scopes, custom OIDC claim scopes, and API scopes. The current list of supported scopes can be seen in the `OAUTH2_PROVIDER["SCOPES"]` dict in `bornhack/settings.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/settings.py
 
