@@ -119,7 +119,10 @@ class ProfileSessionThemeSwitchView(View):
         theme = request.GET.get("theme") or "default"
         next_url = request.GET.get("next") or "/"
         if theme in dict(Profile.THEME_CHOICES) and next_url[:1] == "/":
-            self.request.session["theme"] = theme
+            if self.request.user.is_authenticated and theme == "default":
+                self.request.session["theme"] = self.request.user.profile.theme
+            else:
+                self.request.session["theme"] = theme
             return redirect(next_url)
         else:
             return HttpResponseForbidden()

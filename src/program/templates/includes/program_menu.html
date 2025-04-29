@@ -1,13 +1,13 @@
 {% if camp.show_schedule %}
-  <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}" class="btn {% if url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">Schedule</a>
+  <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name == "schedule_index" or urlyear %}btn-primary{% else %}btn-outline-secondary{% endif %}">Schedule</a>
 {% endif %}
-<a href="{% url 'program:event_index' camp_slug=camp.slug %}" class="btn {% if url_name == "event_index" %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">Events</a>
-<a href="{% url 'program:speaker_index' camp_slug=camp.slug %}" class="btn {% if url_name == "speaker_index" %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">Speakers</a>
-<a href="{% url 'program:call_for_participation' camp_slug=camp.slug %}" class="btn {% if url_name == "call_for_participation" %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">Call for Participation</a>
+<a href="{% url 'program:event_index' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name == "event_index" %}btn-primary{% else %}btn-outline-secondary{% endif %}">Events</a>
+<a href="{% url 'program:speaker_index' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name == "speaker_index" %}btn-primary{% else %}btn-outline-secondary{% endif %}">Speakers</a>
+<a href="{% url 'program:call_for_participation' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name == "call_for_participation" %}btn-primary{% else %}btn-outline-secondary{% endif %}">Call for Participation</a>
 {% if request.user.is_authenticated %}
   {% if camp.call_for_participation_open %}
-    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">Submit Proposal</a>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-outline-secondary{% endif %}">Submit Proposal</a>
   {% else %}
-    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-outline-secondary btn-menu{% endif %}">View Proposals</a>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="bornhack-program-menu btn {% if url_name in proposal_urls %}btn-primary{% else %}btn-outline-secondary{% endif %}">View Proposals</a>
   {% endif %}
 {% endif %}

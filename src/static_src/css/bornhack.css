@@ -35,12 +35,19 @@ strong { font-weight: bold; }
   height: 75px;
 }
 
-.btn-menu {
+/* Navbar buttom customization */
+.bornhack-program-menu, .btn-menu {
     --bs-btn-border-width: unset !important;
 }
 
-/* Hide elements if theme is active */
-/* Only used for data-bs-theme="light" and prefers-color-scheme: dark */
+.btn-primary.bornhack-program-menu {
+    background-color: unset;
+    color: var(--bs-info);
+}
+
+
+/* Theme switcher css logic mainly used to set/hide icons in the theme switcher */
+/* Only used for data-bs-theme="light" */
 /* For the other themes these should be defined in the theme css file */
 
 body:not([data-bs-theme]) .bornhack-hide-light {
@@ -54,6 +61,16 @@ body:not([data-bs-theme]) .bornhack-hide-light {
 
 [data-bs-theme="light"] .bornhack-hide-light {
     display: none !important;
+}
+[data-bs-theme="light"] .bornhack-theme-light {
+    color: var(--bs-orange);
+}
+body:not([data-bs-theme]) .bornhack-theme-system {
+    color: var(--bs-primary-text-emphasis);
+}
+
+.bornhack-theme-light, .bornhack-theme-dark, .bornhack-theme-system {
+    opacity: 1;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -74,7 +91,14 @@ body:not([data-bs-theme]) .bornhack-hide-light {
         display: unset !important;
     }
 }
-/* end of theme based hiding */
+/* end of theme based css */
+
+/* Set a white background behind sponsor logos */
+.bornhack-sponsor-white {
+    background-color: white;
+    color: black;
+    border: 20px solid white;
+}
 
 .navbar-fixed-top {
   min-height: 70px;
@@ -87,10 +111,6 @@ body:not([data-bs-theme]) .bornhack-hide-light {
 
 .navbar-toggle .icon-bar+.icon-bar {
   margin-top: 6px;
-}
-
-#top-navbar > .nav > li > a {
-  padding: 30px 7px;
 }
 
 .nav .dropdown-menu  {
@@ -107,7 +127,6 @@ body:not([data-bs-theme]) .bornhack-hide-light {
 }
 
 /* Form stuff */
-
 .form-control, .form-control:focus {
   box-shadow: none;
 }
