@@ -2,6 +2,16 @@
 
 from django.db import migrations, models
 
+def update_streaming(apps, schema_editor):
+    # We can't import the models directly as it may be a newer
+    # version than this migration expects. We use the historical version.
+    Event = apps.get_model("program", "Event")
+    EventProposal = apps.get_model("program", "EventProposal")
+
+    Event.objects.filter(video_recording=True).update(video_streaming=True)
+    Event.objects.filter(video_recording=False).update(video_streaming=False)
+    EventProposal.objects.filter(allow_video_recording=False).update(allow_video_streaming=False)
+    EventProposal.objects.filter(allow_video_recording=True).update(allow_video_streaming=True)
 
 class Migration(migrations.Migration):
 
@@ -20,4 +30,5 @@ class Migration(migrations.Migration):
             name='allow_video_streaming',
             field=models.BooleanField(default=False, help_text='Uncheck if you do not want the event streamed (only if recording is unchecked!).'),
         ),
+        migrations.RunPython(update_streaming),
     ]
