@@ -11,7 +11,7 @@
       <h4>OIDC Claims</h4>
     </div>
     <div class="card-body">
-        <p class="lead">When using BornHack as an IDP (logging into other sites using your BornHack account) you can control which user claims are returned by asking for one or more of the following claim scopes:</p>
+        <p class="lead">When using BornHack as an IDP (logging into other sites using your BornHack account) you can control which <i>user claims</i> are shared with the remote site by asking for one or more of the following <i>claim scopes</i>:</p>
       <p><ul>
         {% for scope in all_scopes %}
         <li><code>{{ scope }}</code></li>
