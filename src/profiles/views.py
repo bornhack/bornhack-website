@@ -121,7 +121,8 @@ class ProfileOIDCView(LoginRequiredMixin, FormView):
     def get_form(self, form_class=None):
         if form_class is None:
             form_class = self.get_form_class()
-            self.initial['scopes'] = self.request.GET.getlist(key="scopes")
+            scopes = self.request.GET.getlist(key="scopes")
+            self.initial['scopes'] = scopes
         return form_class(**self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
@@ -132,6 +133,7 @@ class ProfileOIDCView(LoginRequiredMixin, FormView):
             if scope in self.request.GET.getlist(key="scopes"):
                 context["claims"][claim] = value
         context["scopes"] = self.scopes
-        context["active_scopes"] = ["openid"] + sorted(list(set(self.request.GET.getlist(key="scopes"))))
-        context["all_scopes"] = sorted(list(set(self.scopes.values())))
+        context["active_scopes"] = ["openid"] + sorted(set(self.request.GET.getlist(key="scopes")))
+        context["all_scopes"] = sorted(set(self.scopes.values()))
+        del(context["all_scopes"][context["all_scopes"].index("openid")])
         return context
