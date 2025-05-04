@@ -8,8 +8,9 @@
       <th data-priority="2">Event Type</th>
       <th data-priority="100" class="text-center">Tags</th>
       <th data-priority="3">Speakers</th>
-      <th data-priority="100"><i class="fas fa-video" title="Recording" alt="Streaming"></i></th>
-      <th data-priority="100"><i class="fas fa-play" title="Streaming" alt="Streaming"></i></th>
+      <th data-priority="100"><i class="fas fa-video" title="Recording" alt="Recording"></i></th>
+      <th data-priority="100"><i class="fas fa-floppy-disk" title="Recording" alt="Recording"></i></th>
+      <th data-priority="100"><i class="fas fa-broadcast-tower" title="Streaming" alt="Streaming"></i></th>
       <th data-priority="1">Scheduled</th>
     </tr>
   </thead>
@@ -38,16 +39,17 @@
               N/A
             {% endfor %}
           </td>
-          <td class="text-center" title="Recording: {{ event.video_recording|yesno }}"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
-          <td class="text-center" title="Streaming: {{ event.video_streaming|yesno }}"><span class="hidden">{{ event.video_streaming }}</span>{{ event.video_streaming|truefalseicon }}</td>
-          <td data-order="{{ event.event_slots.all.0.when.lower|date:"YmdHis" }}">
-            {% for slot in event.event_slots.all %}
-              {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
-            {% empty %}
-              <i>Not scheduled yet</i>
-            {% endfor %}
-          </td>
-        </tr>
+          <td class="text-center"><span class="hidden">{% if event.video_recording or event.video_streaming %}True</span>{{ True|truefalseicon }}{% else %}False</span>{{ False|truefalseicon }}{% endif %}</td>
+            <td class="text-center" title="Recording: {{ event.video_recording|yesno }}"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
+            <td class="text-center" title="Streaming: {{ event.video_streaming|yesno }}"><span class="hidden">{{ event.video_streaming }}</span>{{ event.video_streaming|truefalseicon }}</td>
+            <td data-order="{{ event.event_slots.all.0.when.lower|date:"YmdHis" }}">
+              {% for slot in event.event_slots.all %}
+                {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
+              {% empty %}
+                <i>Not scheduled yet</i>
+              {% endfor %}
+            </td>
+          </tr>
       {% endif %}
     {% endfor %}
   </tbody>
