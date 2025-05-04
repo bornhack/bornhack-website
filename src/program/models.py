@@ -580,8 +580,6 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         return self.title
 
     def save(self, **kwargs):
-        if self.allow_video_recording:
-            self.allow_video_streaming = True
         if not self.duration:
             self.duration = self.event_type.event_duration_minutes
         super().save(**kwargs)
@@ -1393,12 +1391,14 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
             "event_type": self.event_type.name,
         }
 
-        if self.video_recording:
-            video_state = "to-be-recorded"
+        if self.video_recording and self.video_streaming:
+            video_state = "to-be-streamed-to-be-recorded"
+        elif self.video_recording:
+            video_state = "to-be-recorded-not-to-be-streamed"
         elif self.video_streaming:
             video_state = "to-be-streamed-not-to-be-recorded"
         else:
-            video_state = "not-to-be-recorded"
+            video_state = "not-to-be-recorded-not-to-be-streamed"
 
         data["video_state"] = video_state
 
@@ -1530,12 +1530,14 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
             "timeslots": self.timeslots,
         }
 
-        if self.event.video_recording:
-            video_state = "to-be-recorded"
+        if self.event.video_recording and self.event.video_streaming:
+            video_state = "to-be-recorded-to-be-streamed"
+        elif self.event.video_recording:
+            video_state = "to-be-recorded-not-to-be-streamed"
         elif self.event.video_streaming:
             video_state = "to-be-streamed-not-to-be-recorded"
         else:
-            video_state = "not-to-be-recorded"
+            video_state = "not-to-be-recorded-not-to-be-streamed"
 
         data["video_state"] = video_state
 
