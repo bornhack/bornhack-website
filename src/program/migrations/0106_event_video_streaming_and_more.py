@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventproposal',
             name='allow_video_streaming',
-            field=models.BooleanField(default=False, help_text='Uncheck if you do not want the event streamed (only if recording is unchecked!).'),
+            field=models.BooleanField(default=False, help_text='Uncheck if you do not want the event live streamed'),
         ),
         migrations.RunPython(update_streaming),
     ]
