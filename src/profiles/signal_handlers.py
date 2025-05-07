@@ -93,3 +93,8 @@ def nickserv_username_changed(instance, original):
             # ok, mark this membership as in need of fixing
             membership.irc_acl_fix_needed = True
             membership.save()
+
+
+def set_session_on_login(sender, request, user, **kwargs):
+    """Signal handler called on_login to set session["theme"] from the user profile."""
+    request.session["theme"] = request.user.profile.theme

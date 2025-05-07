@@ -9,10 +9,7 @@
   {% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speaker_proposal_create,speaker_proposal_detail,speaker_proposal_update,speaker_proposal_submit,speaker_proposal_picture,event_proposal_create,event_proposal_detail,event_proposal_update,event_proposal_submit" %}
 
     <div class="row">
-      <div class="w-100 d-none d-lg-flex btn-group" role="group">
-        {% include 'includes/program_menu.html' %}
-      </div>
-      <div class="d-lg-none btn-group-vertical w-100" role="group">
+      <div class="d-flex flex-wrap justify-content-center mt-1">
         {% include 'includes/program_menu.html' %}
       </div>
     </div>

@@ -13,12 +13,10 @@
     <title>{% block title %}BornHack{% endblock %}</title>
 
     {# Load Bootstrap CSS and JavaScript #}
-    {% if user.is_authenticated and user.profile.theme != "default" %}
-      <link href="{% static "css/bootstrap-"|add:user.profile.theme|add:".css" %}" rel="stylesheet">
-    {% else %}
-      <link href="{% static 'css/bootstrap-light.css' %}" rel="stylesheet">
-      <link href="{% static 'css/bootstrap-slate.css' %}" rel="stylesheet" media="(prefers-color-scheme: dark)">
-    {% endif %}
+    <link href="{% static "css/bootstrap-v5.3.5.bornhackcustom.css" %}" rel="stylesheet" integrity="sha384-4PrNBKfRkYUZZt9AKlV28Xq6eIQMcESxewdNyNvdG+dF1I/VjRKfvzWXwcNLEran">
+    <link href="{% static "css/theme-system-dark.css" %}" rel="stylesheet">
+    <link href="{% static "css/theme-slate.css" %}" rel="stylesheet">
+    <link href="{% static "css/theme-solar.css" %}" rel="stylesheet">
     <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
@@ -69,7 +67,7 @@
     {% endblock %}
   </head>
 
-  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if request.session.theme and request.session.theme != "default" %} data-bs-theme="{{request.session.theme}}"{% endif %}>
     {% block body %}
       <header class="py-1">
         <nav class="navbar fixed-top navbar-expand-lg bg-body">
@@ -83,6 +81,21 @@
                 <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="bornhack-logo img-responsive" width="200">
               </a>
             {% endif %}
+            <!-- Theme switcher for small screens -->
+            <div class="theme-switch d-lg-none ms-auto me-2 col-1">
+              <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary bornhack-hide-dark">
+                <i class="fa fa-moon"></i>
+              </a>
+              <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary bornhack-hide-light">
+                <i class="fa fa-sun"></i>
+              </a>
+              {% if request.session.theme and request.session.theme != "default" and request.user.profile.theme != request.session.theme %}
+                <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary">
+                  <i class="fa fa-display"></i>
+                </a>
+              {% endif %}
+            </div>
+            <!-- END: Theme switcher for small screens -->
             <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
@@ -128,11 +141,30 @@
                   <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
                 {% endif %}
               </ul>
-              <div class="nav navbar-nav navbar-right ms-auto d-none d-lg-flex">
+              <ul class="nav navbar-nav navbar-right d-none d-lg-flex">
+                <!-- normal/big screen switcher -->
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default bornhack-theme-dark nav-link">
+                    <span class="fa fa-moon"></span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default bornhack-theme-light nav-link">
+                    <i class="fa fa-sun"></i>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default bornhack-theme-system nav-link">
+                    <i class="fa fa-display"></i>
+                  </a>
+                </li>
+                <!-- end of switcher -->
                 {% if user.is_authenticated %}
+                  <!-- User menu if no-js -->
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
                   <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
-                  <div class="dropdown hide-for-no-js-users d-none d-lg-flex">
+                  <!-- END: User menu if no-js -->
+                  <li class="nav-item dropdown hide-for-no-js-users d-none d-lg-flex">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                       <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
@@ -151,11 +183,11 @@
                       <li><hr class="dropdown-divider"></li>
                       <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
                     </ul>
-                  </div>
+                  </li>
                 {% else %}
-                  <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+                  <li><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
                 {% endif %}
-              </div>
+              </ul>
             </div>
           </div>
         </nav>
@@ -163,15 +195,12 @@
       <div id="main" class="container-xxl overflow-auto">
         {% if camp %}
           <div class="row">
-            <div class="d-none d-lg-flex btn-group w-100" role="group">
-              {% include 'includes/menuitems.html' %}
-            </div>
-            <div class="d-lg-none btn-group-vertical w-100" role="group">
+            <div class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start">
               {% include 'includes/menuitems.html' %}
             </div>
           </div>
           <div class="row {% if request.resolver_match.app_name != "program" %}mb-3{% endif %}">
-            <div class="col d-none d-lg-flex w-100 {{camp.slug}}-gradient">
+            <div class="col w-100 {{camp.slug}}-gradient">
               &nbsp;
             </div>
           </div>
