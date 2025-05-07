@@ -546,7 +546,7 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
 
     allow_video_streaming = models.BooleanField(
         default=False,
-        help_text="Uncheck if you do not want the event streamed (only if recording is unchecked!).",
+        help_text="Uncheck if you do not want the event live streamed.",
     )
 
     duration = models.IntegerField(
