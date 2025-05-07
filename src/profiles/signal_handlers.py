@@ -96,5 +96,5 @@ def nickserv_username_changed(instance, original):
 
 
 def set_session_on_login(sender, request, user, **kwargs):
-    # Set theme from profile
+    """Signal handler called on_login to set session["theme"] from the user profile."""
     request.session["theme"] = request.user.profile.theme
