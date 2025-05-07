@@ -166,14 +166,18 @@ Enjoy!
 The BornHack website can act as an OIDC IDP. You are welcome to use it for your projects.
 
 
-### OIDC User Claims
+### OIDC Scopes and User Claims
+The website has a view to inspect which OIDC user claims are returned when using the various claim scopes. It can be accessed at https://bornhack.dk/profile/oidc/
 
-The supported standard and custom OIDC user claims can be seen in `bornhack/oauth_validators.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/oauth_validators
+
+### OIDC User Claims Source Code
+
+The supported standard and custom OIDC user claims can be seen in `bornhack/oauth_validators.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/oauth_validators.py
 
 
-### OIDC Scopes
+### OIDC Scopes Source Code
 
-Supported oauth2 scopes are split between standard OIDC claim scopes, custom OIDC claim scopes, and API scopes. The current list of supported scopes can be seen in the `OAUTH2_PROVIDER["SCOPES"]` dict in `bornhack/settings.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/settings.py
+Supported oauth2 scopes are divided into standard OIDC claim scopes, custom OIDC claim scopes, and API scopes. The current list of supported scopes can be seen in the `OAUTH2_PROVIDER["SCOPES"]` dict in `bornhack/settings.py` https://github.com/bornhack/bornhack-website/blob/master/src/bornhack/settings.py
 
 
 ## Notes
@@ -183,29 +187,22 @@ If your database user in your dev setup is not a postgres superuser you will enc
 
 ### Add a camp
 
-Add a new camp by running:
+First do a commit with:
 
-```
-(venv) $ python src/manage.py createcamp {camp-slug}
-```
-
-Then go to the admin interface to edit the camp details, adding the same slug
-that you just used and some current dates.
-
-You can also specify details like:
-
-* A sponsors page, `{camp-slug}_sponsors.html`, to `sponsors/templates`.
 * A frontpage, `{camp-slug}_camp_detail.html`, to `camps/templates`.
-* A call for speakers page, `{camp-slug}_call_for_speakers.html`, to `program/templates`.
 * A `static_src/img/{camp-slug}/logo` and add two logos:
     * `{camp-slug}-logo-large.png`
     * `{camp-slug}-logo-small.png`
+
+Then go to the admin interface and add the camp.
+
 
 ## Contributors
 * Alexander Færøy https://github.com/ahf
 * Benjamin Bach https://github.com/benjaoming
 * coral https://github.com/coral
 * Flemming Jacobsen https://github.com/batmule
+* Florian Klink https://github.com/flokli
 * Henrik Kramshøj https://github.com/kramse
 * Janus Troelsen https://github.com/ysangkok
 * Jeppe Ernst https://github.com/Ern-st

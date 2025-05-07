@@ -5,12 +5,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import DetailView
 from django.views.generic import ListView
+from django.views.generic import FormView
 from django.views.generic import UpdateView
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 from leaflet.forms.widgets import LeafletWidget
 
 from .models import Profile
+from .forms import OIDCForm
+from bornhack.oauth_validators import BornhackOAuth2Validator
 
 
 class ProfileDetail(LoginRequiredMixin, DetailView):
@@ -32,6 +35,7 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         "location",
         "nickserv_username",
         "theme",
+        "preferred_username",
     ]
     success_url = reverse_lazy("profiles:detail")
     template_name = "profile_form.html"
@@ -102,3 +106,34 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
             )
         )
         return perms
+
+
+class ProfileOIDCView(LoginRequiredMixin, FormView):
+    template_name = "oidc.html"
+    form_class = OIDCForm
+
+    def setup(self, *args, **kwargs):
+        super().setup(*args, **kwargs)
+        validator = BornhackOAuth2Validator()
+        self.scopes = validator.oidc_claim_scope
+        self.claims = validator.get_additional_claims(request=self.request)
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+            scopes = self.request.GET.getlist(key="scopes")
+            self.initial['scopes'] = scopes
+        return form_class(**self.get_form_kwargs())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["claims"] = {}
+        for claim, value in self.claims.items():
+            scope = self.scopes[claim]
+            if scope in self.request.GET.getlist(key="scopes"):
+                context["claims"][claim] = value
+        context["scopes"] = self.scopes
+        context["active_scopes"] = ["openid"] + sorted(set(self.request.GET.getlist(key="scopes")))
+        context["all_scopes"] = sorted(set(self.scopes.values()))
+        del(context["all_scopes"][context["all_scopes"].index("openid")])
+        return context
