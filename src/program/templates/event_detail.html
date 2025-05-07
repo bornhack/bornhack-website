@@ -41,14 +41,25 @@
       <h4>Metadata for <i>{{ event.title }}</i></h4>
       <strong>To be recorded</strong>:
       <span class="fa-stack">
-        <i class="fas fa-video fa-stack-1x"></i>
         {% if event.video_recording %}
-          <i class="far fa-circle fa-stack-2x"></i>
+          <i class="fas fa-floppy-disk fa-stack-1x"></i>
         {% else %}
+          <i class="fas fa-floppy-disk fa-stack-1x"></i>
           <i class="fas fa-ban fa-stack-2x text-danger"></i>
         {% endif %}
       </span>
       {{ event.video_recording|yesno:"Yes,No" }}
+      <br>
+      <strong>To be streamed</strong>:
+      <span class="fa-stack">
+        {% if event.video_streaming %}
+          <i class="far fa-broadcast-tower fa-stack-1x"></i>
+        {% else %}
+          <i class="fas fa-broadcast-tower fa-stack-1x"></i>
+          <i class="fas fa-ban fa-stack-2x text-danger"></i>
+        {% endif %}
+      </span>
+      {{ event.video_streaming|yesno:"Yes,No" }}
       <hr>
 
       <h4>URLs for <i>{{ event.title }}</i></h4>
