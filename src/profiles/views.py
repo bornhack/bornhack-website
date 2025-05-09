@@ -156,7 +156,6 @@ class ProfileOIDCView(LoginRequiredMixin, FormView):
                 context["claims"][claim] = value
         context["scopes"] = self.scopes
         context["active_scopes"] = ["openid"] + sorted(
-
             set(self.request.GET.getlist(key="scopes")),
         )
         context["all_scopes"] = sorted(set(self.scopes.values()))
