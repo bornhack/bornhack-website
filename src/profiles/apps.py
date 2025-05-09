@@ -3,9 +3,11 @@ import logging
 from django.apps import AppConfig
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
+from allauth.account.signals import user_logged_in
 
 from .signal_handlers import create_profile
 from .signal_handlers import profile_pre_save
+from .signal_handlers import set_session_on_login
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -26,4 +28,9 @@ class ProfilesConfig(AppConfig):
             profile_pre_save,
             sender="profiles.Profile",
             dispatch_uid="profile_pre_save_signal",
+        )
+        user_logged_in.connect(
+            set_session_on_login,
+            sender=User,
+            dispatch_uid="profile_set_session_on_login_signal",
         )

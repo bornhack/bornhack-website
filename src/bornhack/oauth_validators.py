@@ -10,6 +10,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
     # https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#using-oidc-scopes-to-determine-which-claims-are-returned
     oidc_claim_scope = {
         # the OIDC standard user claims we support, and the OIDC standard scopes they require
+        "sub": "openid",
         "email": "email",
         "email_verified": "email",
         "phone_number": "phone",

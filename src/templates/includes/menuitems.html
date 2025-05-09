@@ -1,45 +1,43 @@
 {% load menubutton %}
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
-<a style="flex-grow: 1;" role="button" class="btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
-<a style="flex-grow: 1;" role="button" class="btn hide-for-no-js-users {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
+<a role="button" class="flex-lg-fill btn hide-for-no-js-users {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>
 {% if is_volunteer %}
-  <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
+  <a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'backoffice' %}" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a>
 {% endif %}
 
-<a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'facilities' %}" href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a>
-<a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'phonebook' %}" href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a>
+<a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'facilities' %}" href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a>
+<a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'phonebook' %}" href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a>
 
 {% if request.user.is_authenticated %}
-  <a style="flex-grow: 1;" role="button" class="btn unhide-for-no-js-users {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
+  <a role="button" class="flex-lg-fill btn unhide-for-no-js-users {% menubuttonclass 'rideshare' %}" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a>
 {% endif %}
 
-<div class="btn-group hide-for-no-js-users" role="group" style="flex-grow: 1;">
-  <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">More <span class="caret"></span></button>
-  <ul class="dropdown-menu">
-    {% if is_volunteer %}
-      <li><a class="{% menudropdownclass 'backoffice' %} dropdown-item" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
-    {% endif %}
+<button type="button" class="hide-for-no-js-users flex-lg-fill btn btn-outline-secondary btn-menu dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">More <span class="caret"></span></button>
+<ul class="hide-for-no-js-users dropdown-menu">
+  {% if is_volunteer %}
+    <li><a class="{% menudropdownclass 'backoffice' %} dropdown-item" href="{% url 'backoffice:index' camp_slug=camp.slug %}">Backoffice</a></li>
+  {% endif %}
 
-    {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
-      <li><a class="{% menudropdownclass 'economy' %} dropdown-item" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
-    {% endif %}
+  {% if perms.camps.expense_create_permission or perms.camps.revenue_create_permission %}
+    <li><a class="{% menudropdownclass 'economy' %} dropdown-item" href="{% url 'economy:dashboard' camp_slug=camp.slug %}">Economy</a></li>
+  {% endif %}
 
-    <li><a class="{% menudropdownclass 'facilities' %} dropdown-item" href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
+  <li><a class="{% menudropdownclass 'facilities' %} dropdown-item" href="{% url 'facilities:facility_type_list' camp_slug=camp.slug %}">Facilities</a></li>
 
-    {% if request.user.is_authenticated %}
-      <li><a class="{% menudropdownclass 'feedback' %} dropdown-item" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a></li>
-    {% endif %}
+  {% if request.user.is_authenticated %}
+    <li><a class="{% menudropdownclass 'feedback' %} dropdown-item" href="{% url 'feedback' camp_slug=camp.slug %}">Feedback</a></li>
+  {% endif %}
 
-    <li><a class="{% menudropdownclass 'phonebook' %} dropdown-item" href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a></li>
+  <li><a class="{% menudropdownclass 'phonebook' %} dropdown-item" href="{% url 'phonebook:list' camp_slug=camp.slug %}">Phonebook</a></li>
 
-    {% if request.user.is_authenticated %}
-      <li><a class="{% menudropdownclass 'rideshare' %} dropdown-item" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a></li>
-    {% endif %}
+  {% if request.user.is_authenticated %}
+    <li><a class="{% menudropdownclass 'rideshare' %} dropdown-item" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a></li>
+  {% endif %}
 
-    <li><a class="{% menudropdownclass 'token' %} dropdown-item" href="{% url 'tokens:tokenfind_list' %}">Token Game</a></li>
-  </ul>
-</div>
+  <li><a class="{% menudropdownclass 'token' %} dropdown-item" href="{% url 'tokens:tokenfind_list' %}">Token Game</a></li>
+</ul>
