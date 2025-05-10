@@ -1,10 +1,15 @@
+import json
+
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.gis.geos import Point
 from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import FormView
@@ -88,6 +93,18 @@ class ProfileApiView(JsonView, ScopedProtectedResourceView):
             for team in self.request.user.teams.all()
         ]
         return context
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class ProfileLocationApiView(JsonView, ScopedProtectedResourceView):
+    required_scopes = ["location:write"]
+
+    def post(self, request):
+        data = json.loads(request.body)
+        if "lat" in data and "lon" in data:
+            request.user.profile.location = Point(data["lat"], data["lon"])
+            request.user.profile.save()
+        return data
 
 
 class ProfilePermissionList(LoginRequiredMixin, ListView):

@@ -230,7 +230,8 @@ OAUTH2_PROVIDER = {
         "phone": "Allow the remote site to read your profile phonenumber (scope: phone)",
         # custom bornhack user claim scopes
         "groups:read": "Allow the remote site to read a list of your group memberships (scope: groups:read).",
-        "location:read": "Allow the remote site to read your profile location (scope: loocation:read)",
+        "location:read": "Allow the remote site to read your profile location (scope: location:read)",
+        "location:write": "Allow the remote site to write your profile location (scope: location:write)",
         "permissions:read": "Allow the remote site to read a list of your assigned permissions (scope: permissions:read).",
         "teams:read": "Allow the remote site to read a list of your team memberships and team lead status (scope: teams:read)",
         # api scopes
