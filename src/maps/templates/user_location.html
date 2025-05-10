@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  User Locations | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <h2>User Locations</h2>
+
+  <p class="lead">
+    This is a list of all your user locations for {{ camp.title }}.
+  </p>
+
+  <p>
+    <a href="{% url 'maps_user_location_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Create new User Location</a>
+  </p>
+
+  {% if userlocation_list %}
+    <table class="table table-hover table-striped datatable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in userlocation_list %}
+          <tr{% if entry.user == request.user %} class="info"{% endif %}>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.type.name }}</td>
+            <td data-order="{{ entry.created|date:"YmdHis" }}">{{ entry.created }}</td>
+            <td><a href="{% url 'maps_user_location_update' camp_slug=camp.slug user_location=entry.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'maps_user_location_delete' camp_slug=camp.slug user_location=entry.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="lead"><i>No user locations found</i></p>
+  {% endif %}
+{% endblock %}

@@ -3,23 +3,34 @@ import logging
 import re
 
 import requests
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import View
+from django.views.generic import ListView
+from django.views.generic import CreateView
+from django.views.generic import UpdateView
+from django.views.generic import DeleteView
 from django.views.generic.base import TemplateView
 from jsonview.views import JsonView
 from PIL import ImageColor
+from leaflet.forms.widgets import LeafletWidget
 
 from .mixins import LayerViewMixin
 from .models import ExternalLayer
 from .models import Feature
 from .models import Layer
+from .models import UserLocation
+from .models import UserLocationType
 from camps.mixins import CampViewMixin
+from utils.mixins import UserIsObjectOwnerMixin
 from profiles.models import Profile
 from facilities.models import FacilityType
 from utils.color import adjust_color
@@ -83,6 +94,9 @@ class MapView(CampViewMixin, TemplateView):
         context["layers"] = Layer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
+        context["user_location_types"] = UserLocationType.objects.filter(
+            user_locations__isnull=False,
+        ).distinct()
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
@@ -104,6 +118,9 @@ class MapView(CampViewMixin, TemplateView):
                 "villages_geojson",
                 kwargs={"camp_slug": self.camp.slug},
             ),
+            "user_location": list(
+                context["user_location_types"].values(),
+            ),
             "people": reverse("maps:map_layer_profile"),
             "loggedIn": self.request.user.is_authenticated,
             "grid": static("json/grid.geojson"),
@@ -120,6 +137,14 @@ class MapView(CampViewMixin, TemplateView):
             layer["url"] = reverse(
                 "maps:map_layer_geojson",
                 kwargs={"layer_slug": layer["slug"]},
+            )
+        for user_location_type in context["mapData"]["user_location"]:
+            user_location_type["url"] = reverse(
+                "maps_user_location_layer",
+                kwargs={
+                    "user_location_type_slug": user_location_type["slug"],
+                    "camp_slug": self.camp.slug,
+                },
             )
         return context
 
@@ -260,3 +285,150 @@ class MapProxyView(View):
             raise MissingCredentials()
         path += f"&username={username}&password={password}"
         return path
+
+
+# User Location views
+
+
+class LayerUserLocationView(CampViewMixin, JsonView):
+    """
+    UserLocation geojson view
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["type"] = "FeatureCollection"
+        context["features"] = self.dump_locations()
+        return context
+
+    def dump_locations(self) -> list[object]:
+        """
+        GeoJSON Formatter.
+        """
+        output = []
+        for location in UserLocation.objects.filter(
+            camp=self.camp,
+            type__slug=self.kwargs["user_location_type_slug"],
+        ):
+            output.append(
+                {
+                    "type": "Feature",
+                    "id": location.pk,
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [location.location.x, location.location.y],
+                    },
+                    "properties": {
+                        "name": location.name,
+                        "type": location.type.name,
+                        "icon": location.type.icon,
+                        "marker": location.type.marker,
+                        "user": location.user.profile.get_public_credit_name,
+                        "data": location.data,
+                    },
+                },
+            )
+        return list(output)
+
+
+class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
+    template_name = "user_location.html"
+    model = UserLocation
+
+    def get_queryset(self, *args, **kwargs):
+        """
+        Show only entries belonging to the current user
+        """
+        qs = super().get_queryset(*args, **kwargs)
+        return qs.filter(user=self.request.user)
+
+
+class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
+    model = UserLocation
+    template_name = "user_location_form.html"
+    fields = ["name", "type", "location", "data"]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+                "map_height": "500px",
+                "geom_type": "Point",
+                "class": "form-control",
+            },
+        )
+        return form
+
+    def form_valid(self, form):
+        location = form.save(commit=False)
+        location.camp = self.camp
+        location.user = self.request.user
+        location.save()
+        messages.success(
+            self.request,
+            "New User Location created successfully.",
+        )
+        return redirect(
+            reverse(
+                "maps_user_location",
+                kwargs={"camp_slug": self.camp.slug},
+            ),
+        )
+
+
+class UserLocationUpdateView(
+    LoginRequiredMixin,
+    CampViewMixin,
+    UserIsObjectOwnerMixin,
+    UpdateView,
+):
+    model = UserLocation
+    template_name = "user_location_form.html"
+    fields = ["name", "type", "location", "data"]
+
+    def get_object(self, queryset=None):
+        return UserLocation.objects.get(uuid=self.kwargs.get("user_location"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mapData"] = {"grid": static("json/grid.geojson")}
+        return context
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["location"].widget = LeafletWidget(
+            attrs={
+                "display_raw": "true",
+                "map_height": "500px",
+                "geom_type": "Point",
+                "class": "form-control",
+            },
+        )
+        return form
+
+    def get_success_url(self):
+        return reverse(
+            "maps_user_location",
+            kwargs={"camp_slug": self.camp.slug},
+        )
+
+
+class UserLocationDeleteView(
+    LoginRequiredMixin,
+    CampViewMixin,
+    UserIsObjectOwnerMixin,
+    DeleteView,
+):
+    model = UserLocation
+    template_name = "user_location_delete.html"
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"Your User Location {self.get_object().name} has been deleted successfully.",
+        )
+        return reverse(
+            "maps_user_location",
+            kwargs={"camp_slug": self.camp.slug},
+        )

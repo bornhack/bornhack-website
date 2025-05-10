@@ -79,6 +79,32 @@ const peopleOptions = {
   }
 }
 
+const userLocationOptions = {
+  onEachFeature: function(feature, layer) {
+    const gridLayer = mapObject.findGridLoc(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
+    let grid = "";
+    if (gridLayer !== undefined && gridLayer.feature)
+      grid = `<p>Grid: ${mapObject.cols[gridLayer.feature.properties.col_index - 2]}${(gridLayer.feature.properties.row_index - 1)}</p>`;
+    let propTable = '<b>Properties</b><table><tr><th>Name</th><th>Value</th></tr>';
+    for (const key in feature.properties.data) {
+      propTable = propTable + `<tr><td>${key}</td><td>${feature.properties.data[key]}</td></tr>`
+    }
+    propTable = propTable + "</table>";
+    if (feature.properties.data !== null && typeof feature.properties.data === "object") {
+      if (Object.keys(feature.properties.data).length === 0)
+        propTable = "";
+    } else propTable = "";
+    const content = `<i class="${feature.properties.icon}"></i><b>${feature.properties.name}</b><br>${grid}${propTable}`;
+    layer.bindPopup(content, { maxHeight: 400});
+    layer.setIcon(L.AwesomeMarkers.icon({
+      icon: feature.properties.icon,
+      color: iconColorsHex[feature.properties.marker],
+      markerColor: iconColors[feature.properties.marker],
+      prefix: 'fa',
+    }))
+  }
+}
+
 const genericLayerOptions = {
   onEachFeature: function(feature, layer) {
     const icon = `<i style="color: ${feature.properties.color}" class="${feature.properties.icon }"></i>`;

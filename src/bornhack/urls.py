@@ -14,6 +14,11 @@ from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from maps.views import MapView
+from maps.views import LayerUserLocationView
+from maps.views import UserLocationListView
+from maps.views import UserLocationUpdateView
+from maps.views import UserLocationCreateView
+from maps.views import UserLocationDeleteView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
@@ -148,7 +153,53 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
-                path("map/", MapView.as_view(), name="maps_map"),
+                path(
+                    "map/",
+                    include(
+                        [
+                            path("", MapView.as_view(), name="maps_map"),
+                            path(
+                                "userlocationlayer/<slug:user_location_type_slug>/",
+                                LayerUserLocationView.as_view(),
+                                name="maps_user_location_layer",
+                            ),
+                            path(
+                                "userlocation/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            UserLocationListView.as_view(),
+                                            name="maps_user_location",
+                                        ),
+                                        path(
+                                            "create/",
+                                            UserLocationCreateView.as_view(),
+                                            name="maps_user_location_create",
+                                        ),
+                                        path(
+                                            "<uuid:user_location>/",
+                                            include(
+                                                [
+                                                    path(
+                                                        "update/",
+                                                        UserLocationUpdateView.as_view(),
+                                                        name="maps_user_location_update",
+                                                    ),
+                                                    path(
+                                                        "delete/",
+                                                        UserLocationDeleteView.as_view(),
+                                                        name="maps_user_location_delete",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
                 path(
                     "villages/",
                     include(

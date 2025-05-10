@@ -28,7 +28,9 @@
 {% block content %}
   <div class="card">
     <h3 class="card-header unhide-for-no-js-users">Sorry without Javascript we can't show the map</h3>
-    <h3 class="card-header hide-for-no-js-users">Map</h3>
+    {% if request.user.is_authenticated %}
+      <h3 class="card-header hide-for-no-js-users d-flex justify-content-between align-items-center">Map <a href="{% url 'maps_user_location' camp_slug=camp.slug %}"class="btn btn-primary">User Locations</a></h3>
+    {% endif %}
     <div class="card-body" id="container">
       <div id="map" class="map"></div>
     </div>
