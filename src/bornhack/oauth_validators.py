@@ -1,6 +1,7 @@
 """Custom OAuth2Validator subclass."""
 
 from oauth2_provider.oauth2_validators import OAuth2Validator
+from django.contrib.gis.geos import GEOSGeometry
 
 
 class BornhackOAuth2Validator(OAuth2Validator):
@@ -78,7 +79,9 @@ class BornhackOAuth2Validator(OAuth2Validator):
 
         # include location?
         if request.user.profile.location:
-            claims["bornhack:v2:location"] = request.user.profile.location
+            claims["bornhack:v2:location"] = GEOSGeometry(
+                request.user.profile.location,
+            ).geojson
 
         # include phonenumber?
         if request.user.profile.phonenumber:

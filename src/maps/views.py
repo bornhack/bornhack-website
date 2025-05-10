@@ -20,6 +20,7 @@ from .models import ExternalLayer
 from .models import Feature
 from .models import Layer
 from camps.mixins import CampViewMixin
+from profiles.models import Profile
 from facilities.models import FacilityType
 from utils.color import adjust_color
 from utils.color import is_dark
@@ -103,6 +104,7 @@ class MapView(CampViewMixin, TemplateView):
                 "villages_geojson",
                 kwargs={"camp_slug": self.camp.slug},
             ),
+            "people": reverse("maps:map_layer_profile"),
             "loggedIn": self.request.user.is_authenticated,
             "grid": static("json/grid.geojson"),
         }
@@ -119,6 +121,26 @@ class MapView(CampViewMixin, TemplateView):
                 "maps:map_layer_geojson",
                 kwargs={"layer_slug": layer["slug"]},
             )
+        return context
+
+
+class LayerProfileLocationsView(JsonView):
+    """
+    Profile locations layer view.
+    """
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context = json.loads(
+            serialize(
+                "geojson",
+                Profile.objects.filter(location__isnull=False),
+                geometry_field="location",
+                fields=[
+                    "public_credit_name",
+                ],
+            ),
+        )
         return context
 
 

@@ -65,6 +65,7 @@ function gridLoaded() {
     mapObject.loadLayer(item.url, item.name, {}, false, function(){}, "External");
   })
   mapObject.loadLayer(mapData.villages, "Villages", villageOptions, true, function(){}, undefined, "fa fa-campground");
+  mapObject.loadLayer(mapData.people, "People", peopleOptions, true, function(){}, undefined, "fa fa-user");
 }
 mapObject.onGridClick = function (e) {
   let center = e.target.getCenter();
