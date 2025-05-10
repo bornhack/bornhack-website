@@ -1,5 +1,6 @@
 {% extends 'profile_base.html' %}
 {% load django_bootstrap5 %}
+{% load formatting %}
 
 {% block title %}
   OIDC Claims | {{ block.super }}
@@ -52,7 +53,7 @@
                 <tr>
                   <td><code>{{ claim }}</code></td>
                   <td><code>{{ scope }}</code></td>
-                  <td>{{ value }}</td>
+                  <td>{{ value|format_json }}</td>
                 </tr>
               {% endif %}
             {% endfor %}
