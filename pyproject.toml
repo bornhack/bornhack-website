@@ -29,7 +29,6 @@ dependencies = [
     "django-bootstrap5==25.1",
     "django-colorfield==0.14.0",
     "django-cors-headers==4.7.0",
-    "django-extensions==4.1",
     "django-filter==25.1",
     "django-leaflet==0.31.0",
     "django-jsonview==2.0.0",
@@ -54,10 +53,8 @@ dependencies = [
     "quickpay-api-client==2.0.1",
     "service-identity==24.2.0",
     "Unidecode==1.4.0",
-    "wheel==0.45.1",
     # pillow is only here to make old migrations run
     "Pillow==11.2.1",
-    "numpy==2.2.4",
     "weasyprint==65.1",
 ]
 
