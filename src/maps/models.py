@@ -260,7 +260,7 @@ class UserLocation(
 
     user = models.ForeignKey(
         User,
-        verbose_name=_("User"),
+        verbose_name="User",
         help_text="The django user this profile belongs to.",
         on_delete=models.PROTECT,
     )
