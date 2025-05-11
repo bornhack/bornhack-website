@@ -553,6 +553,5 @@ class UserLocationApiView(
             camp__slug=kwargs["camp_slug"],
             user=request.user,
         )
-        uuid = location.pk
         location.delete()
         return HttpResponse(status_code=204)
