@@ -269,7 +269,7 @@ class UserLocation(
     location = PointField(
         blank=True,
         null=True,
-        help_text="Location of this location.",
+        help_text="The location.",
     )
 
     data = models.JSONField(blank=True, null=True)
