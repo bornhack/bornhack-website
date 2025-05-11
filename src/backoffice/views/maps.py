@@ -27,7 +27,7 @@ from utils.widgets import IconPickerWidget
 from utils.mixins import AnyTeamMapperRequiredMixin
 from maps.mixins import LayerMapperViewMixin
 from maps.mixins import ExternalLayerMapperViewMixin
-from maps.mixins import MapperTeamViewMixin
+from maps.mixins import GisTeamViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -467,12 +467,12 @@ class MapExternalLayerDeleteView(ExternalLayerMapperViewMixin, DeleteView):
 # ################# User Location Types ############
 
 
-class MapUserLocationTypeListView(MapperTeamViewMixin, ListView):
+class MapUserLocationTypeListView(GisTeamViewMixin, ListView):
     model = UserLocationType
     template_name = "maps_user_location_type_list.html"
 
 
-class MapuserLocationTypeCreateView(MapperTeamViewMixin, CreateView):
+class MapuserLocationTypeCreateView(GisTeamViewMixin, CreateView):
     model = UserLocationType
     template_name = "maps_user_location_type_form.html"
     fields = [
@@ -495,7 +495,7 @@ class MapuserLocationTypeCreateView(MapperTeamViewMixin, CreateView):
         )
 
 
-class MapuserLocationTypeUpdateView(MapperTeamViewMixin, UpdateView):
+class MapuserLocationTypeUpdateView(GisTeamViewMixin, UpdateView):
     model = UserLocationType
     template_name = "maps_user_location_type_form.html"
     slug_url_kwarg = "user_location_type_uuid"
@@ -520,7 +520,7 @@ class MapuserLocationTypeUpdateView(MapperTeamViewMixin, UpdateView):
         )
 
 
-class MapuserLocationTypeDeleteView(MapperTeamViewMixin, DeleteView):
+class MapuserLocationTypeDeleteView(GisTeamViewMixin, DeleteView):
     model = UserLocationType
     template_name = "maps_user_location_type_delete.html"
     slug_url_kwarg = "user_location_type_uuid"

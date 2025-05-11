@@ -36,8 +36,8 @@ class LayerMapperViewMixin(LayerViewMixin):
             raise PermissionDenied()
 
 
-class MapperTeamViewMixin:
-    """A mixin for views only available to users with Mapper team permission."""
+class GisTeamViewMixin:
+    """A mixin for views only available to users with Gis team permission."""
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
