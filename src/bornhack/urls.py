@@ -160,7 +160,7 @@ urlpatterns = [
                         [
                             path("", MapView.as_view(), name="maps_map"),
                             path(
-                                "userlocationlayer/<slug:user_location_type_slug>/",
+                                "userlocation_geojson/<slug:user_location_type_slug>/",
                                 LayerUserLocationView.as_view(),
                                 name="maps_user_location_layer",
                             ),
@@ -177,6 +177,11 @@ urlpatterns = [
                                             "create/",
                                             UserLocationCreateView.as_view(),
                                             name="maps_user_location_create",
+                                        ),
+                                        path(
+                                            "create/api/",
+                                            UserLocationApiView.as_view(),
+                                            name="maps_user_location_create_api",
                                         ),
                                         path(
                                             "<uuid:user_location>/",

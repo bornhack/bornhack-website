@@ -1,15 +1,10 @@
-import json
-
 from django.db.models import Q
 from django.contrib import messages
-from django.contrib.gis.geos import Point
 from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import FormView
@@ -17,7 +12,6 @@ from django.views.generic import UpdateView
 from django.views import View
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
-from leaflet.forms.widgets import LeafletWidget
 
 from .models import Profile
 from .forms import OIDCForm
@@ -40,7 +34,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         "description",
         "public_credit_name",
         "phonenumber",
-        "location",
         "nickserv_username",
         "theme",
         "preferred_username",
@@ -50,16 +43,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return Profile.objects.get(user=self.request.user)
-
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        form.fields["location"].widget = LeafletWidget(
-            attrs={
-                "display_raw": "true",
-                "class": "form-control",
-            },
-        )
-        return form
 
     def form_valid(self, form, **kwargs):
         if (
@@ -93,18 +76,6 @@ class ProfileApiView(JsonView, ScopedProtectedResourceView):
             for team in self.request.user.teams.all()
         ]
         return context
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class ProfileLocationApiView(JsonView, ScopedProtectedResourceView):
-    required_scopes = ["location:write"]
-
-    def post(self, request):
-        data = json.loads(request.body)
-        if "lat" in data and "lon" in data:
-            request.user.profile.location = Point(data["lat"], data["lon"])
-            request.user.profile.save()
-        return data
 
 
 class ProfilePermissionList(LoginRequiredMixin, ListView):

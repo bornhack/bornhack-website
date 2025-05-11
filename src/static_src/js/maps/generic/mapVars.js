@@ -62,23 +62,6 @@ const villageOptions = {
   }
 }
 
-const peopleOptions = {
-  onEachFeature: function(feature, layer) {
-    const gridLayer = mapObject.findGridLoc(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);
-    let grid = "";
-    if (gridLayer !== undefined && gridLayer.feature)
-      grid = `<p>Grid: ${mapObject.cols[gridLayer.feature.properties.col_index - 2]}${(gridLayer.feature.properties.row_index - 1)}</p>`;
-    const content = `<b>${feature.properties.public_credit_name}</b><i class="fa fa-user"></i><br>${grid}`;
-    layer.bindPopup(content, { maxHeight: 400});
-    layer.setIcon(L.AwesomeMarkers.icon({
-      icon: "fa fa-user",
-      markerColor: "green",
-      color: iconColorsHex['greenIcon'],
-      prefix: 'fa',
-    }))
-  }
-}
-
 const userLocationOptions = {
   onEachFeature: function(feature, layer) {
     const gridLayer = mapObject.findGridLoc(feature.geometry.coordinates[1],feature.geometry.coordinates[0]);

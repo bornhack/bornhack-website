@@ -6,18 +6,12 @@ from .views import LayerGeoJSONView
 from .views import MapMarkerView
 from .views import MapProxyView
 from .views import MapView
-from .views import LayerProfileLocationsView
 
 app_name = "maps"
 
 urlpatterns = [
     path("map/", MapView.as_view(), name="map"),
     path("marker/<color>/", MapMarkerView.as_view(), name="marker"),
-    path(
-        "profile_layer/",
-        LayerProfileLocationsView.as_view(),
-        name="map_layer_profile",
-    ),
     path(
         "<slug:layer_slug>/",
         include(

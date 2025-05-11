@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpResponse
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
@@ -36,7 +37,6 @@ from .models import UserLocation
 from .models import UserLocationType
 from camps.mixins import CampViewMixin
 from utils.mixins import UserIsObjectOwnerMixin
-from profiles.models import Profile
 from facilities.models import FacilityType
 from utils.color import adjust_color
 from utils.color import is_dark
@@ -126,7 +126,6 @@ class MapView(CampViewMixin, TemplateView):
             "user_location": list(
                 context["user_location_types"].values(),
             ),
-            "people": reverse("maps:map_layer_profile"),
             "loggedIn": self.request.user.is_authenticated,
             "grid": static("json/grid.geojson"),
         }
@@ -151,26 +150,6 @@ class MapView(CampViewMixin, TemplateView):
                     "camp_slug": self.camp.slug,
                 },
             )
-        return context
-
-
-class LayerProfileLocationsView(JsonView):
-    """
-    Profile locations layer view.
-    """
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context = json.loads(
-            serialize(
-                "geojson",
-                Profile.objects.filter(location__isnull=False),
-                geometry_field="location",
-                fields=[
-                    "public_credit_name",
-                ],
-            ),
-        )
         return context
 
 
@@ -448,14 +427,58 @@ class UserLocationApiView(
 ):
     required_scopes = ["location:write"]
 
-    def post(self, request, camp_slug, user_location):
+    def get(self, request, **kwargs):
+        if "user_location" not in kwargs:
+            return HttpResponseNotAllowed(permitted_methods=["POST"])
         location = get_object_or_404(
             UserLocation,
-            pk=user_location,
-            camp__slug=camp_slug,
+            pk=kwargs["user_location"],
+        )
+        return {
+            "pk": location.pk,
+            "type": location.type.slug,
+            "name": location.name,
+            "lat": location.location.x,
+            "lon": location.location.y,
+            "data": location.data,
+        }
+
+    def post(self, request, **kwargs):
+        if "user_location" in kwargs:
+            return HttpResponseNotAllowed(permitted_methods=["GET", "PATCH", "DELETE"])
+        data = json.loads(request.body)
+        location = UserLocation(
+            user=request.user,
+            location=Point(data["lat"], data["lon"]),
+            name=data["name"],
+            camp=self.camp,
+            type=UserLocationType.objects.get(slug=data["type"]),
+        )
+        if "data" in data:
+            location.data = data["data"]
+        location.save()
+
+        return {
+            "pk": location.pk,
+            "type": location.type.slug,
+            "name": location.name,
+            "lat": location.location.x,
+            "lon": location.location.y,
+            "data": location.data,
+        }
+
+    def patch(self, request, **kwargs):
+        if "user_location" not in kwargs and "camp_slug" not in kwargs:
+            return HttpResponseNotAllowed(permitted_methods=["POST"])
+        location = get_object_or_404(
+            UserLocation,
+            pk=kwargs["user_location"],
+            camp__slug=kwargs["camp_slug"],
             user=request.user,
         )
         data = json.loads(request.body)
+        if "name" in data:
+            location.name = data["name"]
         if "lat" in data and "lon" in data:
             location.location = Point(data["lat"], data["lon"])
         if "data" in data:
@@ -463,6 +486,25 @@ class UserLocationApiView(
         location.save()
 
         return {
+            "name": location.name,
+            "lat": location.location.x,
+            "lon": location.location.y,
+            "data": location.data,
+        }
+
+    def delete(self, request, **kwargs):
+        if "user_location" not in kwargs and "camp_slug" not in kwargs:
+            return HttpResponseNotAllowed(permitted_methods=["POST"])
+        location = get_object_or_404(
+            UserLocation,
+            pk=kwargs["user_location"],
+            camp__slug=kwargs["camp_slug"],
+            user=request.user,
+        )
+        location.delete()
+        return {
+            "pk": location.pk,
+            "type": location.type.slug,
             "name": location.name,
             "lat": location.location.x,
             "lon": location.location.y,
