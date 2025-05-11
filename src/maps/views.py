@@ -340,7 +340,6 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     fields = ["name", "type", "location", "data"]
 
     def dispatch(self, *args, **kwargs):
-        super().dispatch(*args, **kwargs)
         if (
             UserLocation.objects.filter(user=self.request.user, camp=self.camp).count()
             > 49
@@ -355,6 +354,7 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
                     kwargs={"camp_slug": self.camp.slug},
                 ),
             )
+        return super().dispatch(*args, **kwargs)
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
