@@ -472,7 +472,7 @@ class MapUserLocationTypeListView(GisTeamViewMixin, ListView):
     template_name = "maps_user_location_type_list.html"
 
 
-class MapuserLocationTypeCreateView(GisTeamViewMixin, CreateView):
+class MapUserLocationTypeCreateView(GisTeamViewMixin, CreateView):
     model = UserLocationType
     template_name = "maps_user_location_type_form.html"
     fields = [
@@ -495,7 +495,7 @@ class MapuserLocationTypeCreateView(GisTeamViewMixin, CreateView):
         )
 
 
-class MapuserLocationTypeUpdateView(GisTeamViewMixin, UpdateView):
+class MapUserLocationTypeUpdateView(GisTeamViewMixin, UpdateView):
     model = UserLocationType
     template_name = "maps_user_location_type_form.html"
     slug_url_kwarg = "user_location_type_uuid"
@@ -520,7 +520,7 @@ class MapuserLocationTypeUpdateView(GisTeamViewMixin, UpdateView):
         )
 
 
-class MapuserLocationTypeDeleteView(GisTeamViewMixin, DeleteView):
+class MapUserLocationTypeDeleteView(GisTeamViewMixin, DeleteView):
     model = UserLocationType
     template_name = "maps_user_location_type_delete.html"
     slug_url_kwarg = "user_location_type_uuid"

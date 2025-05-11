@@ -103,9 +103,9 @@ from .views import MapLayerFeaturesImportView
 from .views import MapLayerUpdateView
 from .views import MapLayerListView
 from .views import MapUserLocationTypeListView
-from .views import MapuserLocationTypeCreateView
-from .views import MapuserLocationTypeUpdateView
-from .views import MapuserLocationTypeDeleteView
+from .views import MapUserLocationTypeCreateView
+from .views import MapUserLocationTypeUpdateView
+from .views import MapUserLocationTypeDeleteView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -242,7 +242,7 @@ urlpatterns = [
                             ),
                             path(
                                 "create/",
-                                MapuserLocationTypeCreateView.as_view(),
+                                MapUserLocationTypeCreateView.as_view(),
                                 name="map_user_location_type_create",
                             ),
                             path(
@@ -251,12 +251,12 @@ urlpatterns = [
                                     [
                                         path(
                                             "update/",
-                                            MapuserLocationTypeUpdateView.as_view(),
+                                            MapUserLocationTypeUpdateView.as_view(),
                                             name="map_user_location_type_update",
                                         ),
                                         path(
                                             "delete/",
-                                            MapuserLocationTypeDeleteView.as_view(),
+                                            MapUserLocationTypeDeleteView.as_view(),
                                             name="map_user_location_type_delete",
                                         ),
                                     ],
