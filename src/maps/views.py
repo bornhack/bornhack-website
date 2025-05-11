@@ -502,6 +502,8 @@ class UserLocationApiView(
         location.save()
 
         return {
+            "uuid": location.pk,
+            "type": location.type.slug,
             "name": location.name,
             "lat": location.location.x,
             "lon": location.location.y,
