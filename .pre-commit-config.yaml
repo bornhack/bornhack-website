@@ -1,72 +1,34 @@
+---
 default_language_version:
-  python: python3
-exclude: ^.*\b(migrations)\b.*$
+  python: "python3"
+exclude: "^.*\b(migrations)\b.*$"
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+  - repo: "https://github.com/adamchainz/django-upgrade"
+    rev: "1.24.0"
     hooks:
-      - id: check-ast
-      - id: check-merge-conflict
-      - id: check-case-conflict
-      - id: detect-private-key
-      - id: check-added-large-files
-      - id: check-json
-      - id: check-symlinks
-      - id: check-toml
-      - id: end-of-file-fixer
-      - id: trailing-whitespace
-      - id: mixed-line-ending
-        args: [--fix=lf]
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
+      - id: "django-upgrade"
+        args: ['--target-version', '5.1']
+  - repo: "https://github.com/astral-sh/ruff-pre-commit"
+    rev: "v0.11.8"
     hooks:
-      - id: python-check-blanket-noqa
-      - id: python-check-mock-methods
-      - id: python-no-eval
-      - id: python-no-log-warn
-      - id: rst-backticks
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.1
+      - id: "ruff"
+        args: ["--fix"]
+      - id: "ruff-format"
+  - repo: "https://github.com/pre-commit/mirrors-mypy"
+    rev: 'v1.15.0'
     hooks:
-      - id: pyupgrade
-        args:
-          - --py39-plus
-        exclude: migrations/
-  - repo: https://github.com/adamchainz/django-upgrade
-    rev: 1.24.0
-    hooks:
-      - id: django-upgrade
-        args: [--target-version, "4.2"]
-  - repo: https://github.com/asottile/yesqa
-    rev: v1.5.0
-    hooks:
-      -   id: yesqa
-  - repo: https://github.com/asottile/add-trailing-comma
-    rev: v3.1.0
-    hooks:
-      -   id: add-trailing-comma
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.2.0
-    hooks:
-      - id: flake8
+      - id: "mypy"
+        exclude: "src/.*/migrations/.*.py"
         additional_dependencies:
-          - flake8-bugbear
-          - flake8-comprehensions
-          - flake8-tidy-imports
-        args: [--max-line-length=120]
-  - repo: "https://github.com/rtts/djhtml"
-    rev: '3.0.7'
-    hooks:
-      - id: "djhtml"
-        args: ["-t", "2"]
-        stages: ["pre-commit"]
-     #- id: "djcss"
-     #  exclude: "static_src/css/vendor/.*"
-     #  stages: ["commit"]
-     #- id: "djjs"
-     #  exclude: "static_src/js/vendor/.*"
-     #  stages: ["commit"]
+          - "django-stubs[compatible-mypy]"
+          - "django-stubs-ext"
+          - "types-requests"
+          - "django-allauth==0.61.1"
+          - "django-bootstrap5==23.4"
+          - "django-cors-headers==4.3.1"
+          - "django-oauth-toolkit==2.3.0"
+          - "psycopg2-binary==2.9.9"
+          - "django-filter==24.2"
+          - "django-tables2==2.7.0"
+          - "django-debug-toolbar==4.1.0"
+...

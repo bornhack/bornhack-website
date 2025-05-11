@@ -1,0 +1,165 @@
+########## METADATA ##########
+[project]
+name = "bornhack-website"
+description = "Django project to power Bornhack."
+readme = "README.md"
+requires-python = "==3.11"
+dynamic = ["version"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://github.com/bornhack/bornhack-website"
+
+[project.scripts]
+"manage.py" = "src.manage:main"
+
+########## DEPENDENCIES ##########
+
+dependencies = [
+    "Django==4.2.21",
+    "channels==4.2.2",
+    "channels-redis==4.2.1",
+    "asyncio==3.4.3",
+    "commonmark==0.9.1",
+    "conference-scheduler==3.0.1",
+    "django-allauth[mfa]==65.8.0",
+    "django-bootstrap5==25.1",
+    "django-colorfield==0.14.0",
+    "django-cors-headers==4.7.0",
+    "django-extensions==4.1",
+    "django-filter==25.1",
+    "django-leaflet==0.31.0",
+    "django-jsonview==2.0.0",
+    "django-oauth-toolkit==3.0.1",
+    "django-otp==1.6.0",
+    "django-prometheus==2.3.1",
+    "django-reversion==5.0.12",
+    "django-tables2==2.7.5",
+    "django-taggit==6.1.0",
+    "django-weasyprint==2.4.0",
+    "future==1.0.0",
+    "html5lib==1.1",
+    "icalendar==6.2.0",
+    "irc3==1.1.10",
+    "lxml==5.4.0",
+    "nh3==0.2.21",
+    "olefile==0.47",
+    "openpyxl==3.1.2",
+    "pandas==2.2.3",
+    "psycopg2-binary==2.9.10",
+    "python-magic==0.4.27",
+    "quickpay-api-client==2.0.1",
+    "service-identity==24.2.0",
+    "Unidecode==1.4.0",
+    "wheel==0.45.1",
+    # pillow is only here to make old migrations run
+    "Pillow==11.2.1",
+    "numpy==2.2.4",
+    "weasyprint==65.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit==4.2.0",
+    "setuptools_scm==8.3.1",
+    "django-debug-toolbar==5.2.0",
+    "factory_boy==3.3.3",
+    "coverage==7.8.0",
+    "tblib==3.1.0",
+    "unittest-xml-reporting==3.2.0",
+    "pipdeptree==2.26.1",
+]
+
+test = [
+    "hypothesis==6.131.15",
+]
+
+
+########## SETUPTOOLS ##########
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+
+
+########## RUFF ##########
+[tool.ruff]
+target-version = "py311"
+extend-exclude = [
+    ".git",
+    "__pycache__",
+]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "G004", # Logging statement uses f-string
+    "ANN101", # Missing type annotation for `self` in method
+    "ANN102", # Missing type annotation for `cls` in classmethod
+    "EM101", # Exception must not use a string literal, assign to variable first
+    "EM102", # Exception must not use a f-string literal, assign to variable first
+    "PT", # We use django tests, not pytest
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/test*.py" = [
+    "ARG", # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT", # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    "PLR2004", # Magic value used in comparison, ...
+    "ANN001", # Missing type annotation for function argument ...
+    "ANN201", # Missing return type annotation for public function ...
+    "S113", # Probable use of requests call without timeout
+    "E501", # Line too long
+    "D104", # Missing docstring in public package
+    "D415", # First line should end with a period
+    "SLF001", # Private member accessed
+    "PLR", # Magic value used in comparison
+    "N", # PEP naming conventions
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+
+########## MYPY ##########
+[tool.mypy]
+plugins = [
+    "mypy_django_plugin.main"
+]
+mypy_path = "src"
+ignore_missing_imports = true
+disallow_subclassing_any = false
+strict = true
+
+[tool.django-stubs]
+django_settings_module = "bornhack.settings"
+
+[tool.mypy_django_plugin]
+ignore_missing_model_attributes = true
+
+
+########## COVERAGE.PY ##########
+[tool.coverage.run]
+omit = [
+    "*/tests.py",
+    "*/tests/test_*.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING",
+]
