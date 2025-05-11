@@ -275,4 +275,4 @@ class UserLocation(
     data = models.JSONField(blank=True, null=True)
 
     def __str__(self):
-        return str(self.name)
+        return self.name
