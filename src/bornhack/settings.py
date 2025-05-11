@@ -95,7 +95,11 @@ TEMPLATES = [
                 "django.template.context_processors.media",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # add camp (if relevant) and camps list to template context
+                "camps.context_processors.camp",
+                # add current open webshop order to template context if the user has one
                 "shop.context_processors.current_order",
+                # add is_volunteer=True to the template context if the user is on a team
                 "utils.context_processors.is_volunteer",
             ],
         },
