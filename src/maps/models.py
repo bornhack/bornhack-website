@@ -276,7 +276,7 @@ class UserLocation(
         blank=True,
         null=True,
         max_length=10 * 1024,
-        help_text="JSON data field (frontend will only display a object with keys on 1 level)",
+        help_text="JSON data field",
     )
 
     def __str__(self):
