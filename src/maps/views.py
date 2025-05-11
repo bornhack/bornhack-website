@@ -455,12 +455,16 @@ class UserLocationApiView(
         if "user_location" in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["GET", "PATCH", "DELETE"])
         data = json.loads(request.body)
+        try:
+            user_location_type = UserLocationType.objects.get(slug=data["type"])
+        except UserLocationType.DoesNotExist:
+            return {"error": "Type not found"}, 404
         location = UserLocation(
             user=request.user,
             location=Point(data["lat"], data["lon"]),
             name=data["name"],
             camp=self.camp,
-            type=UserLocationType.objects.get(slug=data["type"]),
+            type=user_location_type,
         )
         if "data" in data:
             location.data = data["data"]
