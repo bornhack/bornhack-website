@@ -249,7 +249,7 @@ class UserLocation(
     type = models.ForeignKey(
         UserLocationType,
         on_delete=models.PROTECT,
-        help_text="Type of this location",
+        help_text="Type of this location (extra types can be requested at the GIS team)",
         related_name="user_locations",
     )
 

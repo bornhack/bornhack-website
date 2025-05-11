@@ -5,14 +5,18 @@ import re
 import requests
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.views.generic import View
 from django.views.generic import ListView
 from django.views.generic import CreateView
@@ -22,6 +26,7 @@ from django.views.generic.base import TemplateView
 from jsonview.views import JsonView
 from PIL import ImageColor
 from leaflet.forms.widgets import LeafletWidget
+from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 from .mixins import LayerViewMixin
 from .models import ExternalLayer
@@ -386,9 +391,8 @@ class UserLocationUpdateView(
     model = UserLocation
     template_name = "user_location_form.html"
     fields = ["name", "type", "location", "data"]
-
-    def get_object(self, queryset=None):
-        return UserLocation.objects.get(uuid=self.kwargs.get("user_location"))
+    slug_url_kwarg = "user_location"
+    slug_field = "pk"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -422,6 +426,8 @@ class UserLocationDeleteView(
 ):
     model = UserLocation
     template_name = "user_location_delete.html"
+    slug_url_kwarg = "user_location"
+    slug_field = "pk"
 
     def get_success_url(self):
         messages.success(
@@ -432,3 +438,33 @@ class UserLocationDeleteView(
             "maps_user_location",
             kwargs={"camp_slug": self.camp.slug},
         )
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class UserLocationApiView(
+    ScopedProtectedResourceView,
+    CampViewMixin,
+    JsonView,
+):
+    required_scopes = ["location:write"]
+
+    def post(self, request, camp_slug, user_location):
+        location = get_object_or_404(
+            UserLocation,
+            pk=user_location,
+            camp__slug=camp_slug,
+            user=request.user,
+        )
+        data = json.loads(request.body)
+        if "lat" in data and "lon" in data:
+            location.location = Point(data["lat"], data["lon"])
+        if "data" in data:
+            location.data = data["data"]
+        location.save()
+
+        return {
+            "name": location.name,
+            "lat": location.location.x,
+            "lon": location.location.y,
+            "data": location.data,
+        }

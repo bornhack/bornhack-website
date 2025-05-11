@@ -19,6 +19,7 @@ from maps.views import UserLocationListView
 from maps.views import UserLocationUpdateView
 from maps.views import UserLocationCreateView
 from maps.views import UserLocationDeleteView
+from maps.views import UserLocationApiView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
@@ -190,6 +191,11 @@ urlpatterns = [
                                                         "delete/",
                                                         UserLocationDeleteView.as_view(),
                                                         name="maps_user_location_delete",
+                                                    ),
+                                                    path(
+                                                        "api/",
+                                                        UserLocationApiView.as_view(),
+                                                        name="maps_user_location_api",
                                                     ),
                                                 ],
                                             ),

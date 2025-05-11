@@ -9,11 +9,7 @@
   <div class="card">
     <span class="card-header h3">Really delete User Location {{ userlocation.name }}?</span>
     <div class="card-body">
-      <p class="lead">Are you sure you want to delete the registration of User Location {{ userlocation.number }}?
-        <ul>
-          <li>Letters: {{ dectregistration.letters|default:"N/A" }}</li>
-          <li>Description: {{ dectregistration.description|default:"N/A" }}</li>
-        </ul>
+      <p class="lead">Are you sure you want to delete the registration of User Location {{ userlocation.name }}?
         <form method="post">
           {% csrf_token %}
           <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete User Location</button>

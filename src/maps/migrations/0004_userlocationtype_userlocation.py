@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('location', django.contrib.gis.db.models.fields.PointField(blank=True, help_text='Location of this location.', null=True, srid=4326)),
                 ('data', models.JSONField(blank=True, null=True)),
                 ('camp', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='user_locations', to='camps.camp')),
-                ('type', models.ForeignKey(help_text='Type of this location', on_delete=django.db.models.deletion.PROTECT, related_name='user_locations', to='maps.userlocationtype')),
+                ('type', models.ForeignKey(help_text='Type of this location (extra types can be requested at the GIS team)', on_delete=django.db.models.deletion.PROTECT, related_name='user_locations', to='maps.userlocationtype')),
                 ('user', models.ForeignKey(help_text='The django user this profile belongs to.', on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
             options={
