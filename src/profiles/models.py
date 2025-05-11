@@ -1,8 +1,9 @@
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
-from django.core.validators import MinValueValidator, MaxValueValidator
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -80,8 +81,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         return self.user.username
 
     def approve_public_credit_name(self):
-        """
-        This method just sets profile.public_credit_name_approved=True and calls save()
+        """This method just sets profile.public_credit_name_approved=True and calls save()
         It is used in an admin action
         """
         self.public_credit_name_approved = True
@@ -89,11 +89,9 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
 
     @property
     def get_public_credit_name(self):
-        """
-        Convenience method to return profile.public_credit_name if it is approved,
+        """Convenience method to return profile.public_credit_name if it is approved,
         and the string "Unnamed" otherwise
         """
         if self.public_credit_name_approved:
             return self.public_credit_name
-        else:
-            return "Unnamed"
+        return "Unnamed"

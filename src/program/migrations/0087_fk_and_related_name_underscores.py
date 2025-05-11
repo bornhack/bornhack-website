@@ -3,11 +3,11 @@
 import django.contrib.postgres.constraints
 import django.db.models.deletion
 import django.db.models.expressions
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("camps", "0034_add_team_permission_sets"),
         ("program", "0086_sessions_slots_availability"),

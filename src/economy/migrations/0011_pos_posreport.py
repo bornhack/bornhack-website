@@ -4,11 +4,11 @@ import uuid
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("teams", "0052_team_permission_set"),
@@ -33,7 +33,8 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        help_text="The point-of-sale name", max_length=255
+                        help_text="The point-of-sale name",
+                        max_length=255,
                     ),
                 ),
                 (
@@ -74,7 +75,7 @@ class Migration(migrations.Migration):
                 (
                     "date",
                     models.DateField(
-                        help_text="The date this report covers (pick the starting date if opening hours cross midnight)."
+                        help_text="The date this report covers (pick the starting date if opening hours cross midnight).",
                     ),
                 ),
                 (

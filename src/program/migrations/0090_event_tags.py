@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("taggit", "0003_taggeditem_add_unique_index"),
         ("program", "0089_event_conflicts_blank"),

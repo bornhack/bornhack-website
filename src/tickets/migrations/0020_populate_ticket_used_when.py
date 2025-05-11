@@ -22,7 +22,6 @@ def populate_ticket_used_when(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tickets", "0019_auto_20210802_1756"),
     ]

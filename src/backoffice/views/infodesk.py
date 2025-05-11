@@ -1,6 +1,5 @@
 import csv
 import logging
-from typing import Optional
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,11 +18,6 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
-from ..forms import InvoiceDownloadForm
-from ..forms import ShopTicketRefundFormSet
-from ..forms import TicketGroupRefundFormSet
-from ..mixins import EconomyTeamPermissionMixin
-from ..mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
 from shop.forms import RefundForm
@@ -39,10 +33,16 @@ from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
 from utils.mixins import GetObjectMixin
 
+from ..forms import InvoiceDownloadForm
+from ..forms import ShopTicketRefundFormSet
+from ..forms import TicketGroupRefundFormSet
+from ..mixins import EconomyTeamPermissionMixin
+from ..mixins import InfoTeamPermissionMixin
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
-def _ticket_getter_by_token(token) -> Optional[TicketTypeUnion]:
+def _ticket_getter_by_token(token) -> TicketTypeUnion | None:
     for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
         try:
             return ticket_class.objects.get(Q(token=token) | Q(badge_token=token))
@@ -106,7 +106,7 @@ class ScanTicketsView(
             # Slice to get rid of the first character which is a '#'
             ticket_token = self.request.POST.get("ticket_token")[1:]
 
-            ticket: Optional[TicketTypeUnion] = _ticket_getter_by_token(ticket_token)
+            ticket: TicketTypeUnion | None = _ticket_getter_by_token(ticket_token)
 
             if ticket:
                 context["ticket"] = ticket
@@ -216,15 +216,11 @@ class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, For
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    """
-    CSV export of invoices for bookkeeping stuff
-    """
+    """CSV export of invoices for bookkeeping stuff"""
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = (
-            f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="bornhack-infoices-{timezone.now()}.csv"'
         writer = csv.writer(response)
         writer.writerow(["invoice", "invoice_date", "amount_dkk", "order", "paid"])
         for invoice in Invoice.objects.all().order_by("-id"):
@@ -232,11 +228,7 @@ class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
                 [
                     invoice.id,
                     invoice.created.date(),
-                    (
-                        invoice.order.total
-                        if invoice.order
-                        else invoice.customorder.amount
-                    ),
+                    (invoice.order.total if invoice.order else invoice.customorder.amount),
                     invoice.get_order,
                     invoice.get_order.paid,
                 ],
@@ -252,9 +244,7 @@ class InvoiceDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, DetailVie
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename={self.get_object().filename}"
-        )
+        response["Content-Disposition"] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response
 
@@ -310,9 +300,7 @@ class OrderDownloadProformaInvoiceView(
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename='{self.get_object().filename}'"
-        )
+        response["Content-Disposition"] = f"attachment; filename='{self.get_object().filename}'"
         response.write(self.get_object().pdf.read())
         return response
 
@@ -482,8 +470,6 @@ class CreditNoteDownloadView(LoginRequiredMixin, InfoTeamPermissionMixin, Detail
         if not self.get_object().pdf:
             raise Http404
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f"attachment; filename={self.get_object().filename}"
-        )
+        response["Content-Disposition"] = f"attachment; filename={self.get_object().filename}"
         response.write(self.get_object().pdf.read())
         return response

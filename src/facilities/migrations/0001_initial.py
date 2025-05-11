@@ -4,11 +4,11 @@ import uuid
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -34,7 +34,8 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        help_text="Name or description of this facility", max_length=100
+                        help_text="Name or description of this facility",
+                        max_length=100,
                     ),
                 ),
                 (
@@ -87,7 +88,8 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        help_text="The name of this facility type", max_length=100
+                        help_text="The name of this facility type",
+                        max_length=100,
                     ),
                 ),
                 (

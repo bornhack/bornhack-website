@@ -4,9 +4,8 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("tokens", "0004_auto_20180819_1743")]
 
     operations = [
-        migrations.AlterModelOptions(name="token", options={"ordering": ["camp"]})
+        migrations.AlterModelOptions(name="token", options={"ordering": ["camp"]}),
     ]

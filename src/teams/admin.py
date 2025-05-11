@@ -1,12 +1,13 @@
 from django.contrib import admin
 
+from camps.utils import CampPropertyListFilter
+
 from .email import add_added_membership_email
 from .email import add_removed_membership_email
 from .models import Team
 from .models import TeamMember
 from .models import TeamShift
 from .models import TeamTask
-from camps.utils import CampPropertyListFilter
 
 
 @admin.register(TeamTask)
@@ -72,10 +73,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
         self.message_user(
             request,
-            "Membership(s) approved: Added {} user(s) to {} team(s).".format(
-                updated,
-                teams_count,
-            ),
+            f"Membership(s) approved: Added {updated} user(s) to {teams_count} team(s).",
         )
 
     approve_membership.description = "Approve membership."

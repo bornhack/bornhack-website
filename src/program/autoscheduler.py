@@ -8,15 +8,15 @@ from conference_scheduler.validator import is_valid_schedule
 from conference_scheduler.validator import schedule_violations
 from psycopg2.extras import DateTimeTZRange
 
-from .models import EventType
 from program.email import add_event_scheduled_email
+
+from .models import EventType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class AutoScheduler:
-    """
-    The BornHack AutoScheduler. Made with love by Tykling.
+    """The BornHack AutoScheduler. Made with love by Tykling.
 
     Built around https://github.com/PyconUK/ConferenceScheduler which works with lists
     of conference_scheduler.resources.Slot and conference_scheduler.resources.Event objects.
@@ -207,11 +207,7 @@ class AutoScheduler:
                                 # the speaker is available for this slot
                                 available.append(self.autoslots.index(slot))
                     autoevent.add_unavailability(
-                        *[
-                            s
-                            for s in self.autoslots
-                            if not self.autoslots.index(s) in available
-                        ],
+                        *[s for s in self.autoslots if self.autoslots.index(s) not in available],
                     )
 
         return autoevents, autoeventindex
@@ -220,8 +216,8 @@ class AutoScheduler:
         """Build an autoschedule object based on the existing published schedule.
         Returns an autoschedule, which is a list of conference_scheduler.resources.ScheduledItem
         objects, one for each scheduled Event. This function is useful for creating an "original
-        schedule" to base a new similar schedule off of."""
-
+        schedule" to base a new similar schedule off of.
+        """
         # loop over scheduled events and create a ScheduledItem object for each
         autoschedule = []
         for slot in self.camp.event_slots.filter(
@@ -241,8 +237,7 @@ class AutoScheduler:
                 if (
                     autoslot.venue == slot.event_location.id
                     and autoslot.starts_at == slot.when.lower
-                    and autoslot.session
-                    in self.event_type_sessions[slot.event.event_type]
+                    and autoslot.session in self.event_type_sessions[slot.event.event_type]
                 ):
                     # This autoslot starts at the same time as the EventSlot, and at the same
                     # location. It also has the session ID of a session with the right EventType.
@@ -266,7 +261,8 @@ class AutoScheduler:
 
     def calculate_autoschedule(self, original_schedule=None):
         """Calculate autoschedule based on self.autoevents and self.autoslots,
-        optionally using original_schedule to minimise changes"""
+        optionally using original_schedule to minimise changes
+        """
         kwargs = {}
         kwargs["events"] = self.autoevents
         kwargs["slots"] = self.autoslots
@@ -277,17 +273,15 @@ class AutoScheduler:
             kwargs["objective_function"] = objective_functions.number_of_changes
         else:
             # otherwise use the capacity demand difference thing
-            kwargs["objective_function"] = (
-                objective_functions.efficiency_capacity_demand_difference
-            )
+            kwargs["objective_function"] = objective_functions.efficiency_capacity_demand_difference
         # calculate the new schedule
         autoschedule = scheduler.schedule(**kwargs)
         return autoschedule
 
     def calculate_similar_autoschedule(self, original_schedule=None):
         """Convenience method for creating similar schedules. If original_schedule
-        is omitted the new schedule is based on the current schedule instead"""
-
+        is omitted the new schedule is based on the current schedule instead
+        """
         if not original_schedule:
             # we do not have an original_schedule, use current EventInstances
             original_schedule = self.build_current_autoschedule()
@@ -299,7 +293,6 @@ class AutoScheduler:
 
     def apply(self, autoschedule):
         """Apply an autoschedule by creating EventInstance objects to match it"""
-
         # "The Clean Slate protocol sir?" - delete any existing autoscheduled Events
         # TODO: investigate how this affects the FRAB XML export (for which we added a UUID on
         # Slot objects). Make sure "favourite" functionality or bookmarks or w/e in
@@ -338,8 +331,7 @@ class AutoScheduler:
         return deleted, scheduled
 
     def diff(self, original_schedule, new_schedule):
-        """
-        This method returns a dict of Event differences and Slot differences between
+        """This method returns a dict of Event differences and Slot differences between
         the two schedules.
         """
         slot_diff = scheduler.slot_schedule_difference(
@@ -391,15 +383,11 @@ class AutoScheduler:
             )
             # do we have an old slot for this event?
             if item.old_slot:
-                event_output[-1]["old"]["event_location"] = (
-                    self.camp.event_locations.get(id=item.old_slot.venue)
-                )
+                event_output[-1]["old"]["event_location"] = self.camp.event_locations.get(id=item.old_slot.venue)
                 event_output[-1]["old"]["starttime"] = item.old_slot.starts_at
             # do we have a new slot for this event?
             if item.new_slot:
-                event_output[-1]["new"]["event_location"] = (
-                    self.camp.event_locations.get(id=item.new_slot.venue)
-                )
+                event_output[-1]["new"]["event_location"] = self.camp.event_locations.get(id=item.new_slot.venue)
                 event_output[-1]["new"]["starttime"] = item.new_slot.starts_at
 
         # all good

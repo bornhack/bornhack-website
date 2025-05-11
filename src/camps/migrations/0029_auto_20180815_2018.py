@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("camps", "0028_auto_20180525_1025")]
 
     operations = [
@@ -16,5 +15,5 @@ class Migration(migrations.Migration):
                 "verbose_name": "Camp",
                 "verbose_name_plural": "Camps",
             },
-        )
+        ),
     ]

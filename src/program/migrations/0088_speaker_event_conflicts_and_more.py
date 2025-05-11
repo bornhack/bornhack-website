@@ -2,13 +2,13 @@
 
 import django.contrib.postgres.constraints
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 import utils.database
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("program", "0087_fk_and_related_name_underscores"),
     ]

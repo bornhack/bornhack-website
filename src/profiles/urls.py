@@ -2,10 +2,10 @@ from django.urls import path
 
 from .views import ProfileApiView
 from .views import ProfileDetail
-from .views import ProfileUpdate
+from .views import ProfileOIDCView
 from .views import ProfilePermissionList
 from .views import ProfileSessionThemeSwitchView
-from .views import ProfileOIDCView
+from .views import ProfileUpdate
 
 app_name = "profiles"
 urlpatterns = [

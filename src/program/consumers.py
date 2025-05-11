@@ -1,5 +1,7 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 
+from camps.models import Camp
+
 from .models import Event
 from .models import EventInstance
 from .models import EventLocation
@@ -7,7 +9,6 @@ from .models import EventTrack
 from .models import EventType
 from .models import Favorite
 from .models import Speaker
-from camps.models import Camp
 
 
 class ScheduleConsumer(JsonWebsocketConsumer):
@@ -38,9 +39,7 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                 event_instances_query_set = EventInstance.objects.filter(
                     event__track__camp=camp,
                 )
-                event_instances = [
-                    x.serialize(user=user) for x in event_instances_query_set
-                ]
+                event_instances = [x.serialize(user=user) for x in event_instances_query_set]
 
                 event_locations_query_set = EventLocation.objects.filter(camp=camp)
                 event_locations = [x.serialize() for x in event_locations_query_set]

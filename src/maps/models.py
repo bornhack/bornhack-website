@@ -1,17 +1,17 @@
 import logging
 
-from django.contrib.auth.models import User
 from colorfield.fields import ColorField
+from django.contrib.auth.models import User
 from django.contrib.gis.db.models import GeometryCollectionField
+from django.contrib.gis.db.models import PointField
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
-from django.contrib.gis.db.models import PointField
-
-from .utils import LeafletMarkerChoices
 
 from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
+
+from .utils import LeafletMarkerChoices
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -29,9 +29,7 @@ class Group(UUIDModel):
 
 
 class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
-    """
-    Layers are groups of Features
-    """
+    """Layers are groups of Features"""
 
     name = models.CharField(
         max_length=100,
@@ -91,9 +89,7 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
 
 
 class Feature(UUIDModel):
-    """
-    Features are elements to put on a map which can consist of polygons, lines, points, etc.
-    """
+    """Features are elements to put on a map which can consist of polygons, lines, points, etc."""
 
     name = models.CharField(
         max_length=100,

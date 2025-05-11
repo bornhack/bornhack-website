@@ -2,11 +2,11 @@
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("camps", "0026_auto_20180506_1633"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -41,7 +41,8 @@ class Migration(migrations.Migration):
                 (
                     "managers",
                     models.ManyToManyField(
-                        related_name="managed_tracks", to=settings.AUTH_USER_MODEL
+                        related_name="managed_tracks",
+                        to=settings.AUTH_USER_MODEL,
                     ),
                 ),
             ],
@@ -153,14 +154,15 @@ class Migration(migrations.Migration):
             model_name="speakerproposal",
             name="biography",
             field=models.TextField(
-                help_text="Biography of the speaker/artist/host. Markdown is supported."
+                help_text="Biography of the speaker/artist/host. Markdown is supported.",
             ),
         ),
         migrations.AlterField(
             model_name="speakerproposal",
             name="name",
             field=models.CharField(
-                help_text="Name or alias of the speaker/artist/host", max_length=150
+                help_text="Name or alias of the speaker/artist/host",
+                max_length=150,
             ),
         ),
         migrations.AlterField(
@@ -209,6 +211,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="eventtrack", unique_together={("camp", "slug"), ("camp", "name")}
+            name="eventtrack",
+            unique_together={("camp", "slug"), ("camp", "name")},
         ),
     ]

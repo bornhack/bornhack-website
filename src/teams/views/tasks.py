@@ -7,13 +7,14 @@ from django.views.generic import CreateView
 from django.views.generic import DetailView
 from django.views.generic import UpdateView
 
+from camps.mixins import CampViewMixin
+
 from ..models import TaskComment
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamTask
-from .mixins import TeamViewMixin
 from .mixins import TeamTaskerPermissionMixin
-from camps.mixins import CampViewMixin
+from .mixins import TeamViewMixin
 
 
 class TeamTasksView(CampViewMixin, DetailView):

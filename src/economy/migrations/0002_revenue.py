@@ -4,11 +4,11 @@ import uuid
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("shop", "0057_order_notes"),
         ("teams", "0049_auto_20180815_1119"),
@@ -106,5 +106,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False},
-        )
+        ),
     ]

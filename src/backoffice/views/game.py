@@ -14,10 +14,11 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
 
-from ..mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from tokens.models import Token
 from tokens.models import TokenFind
+
+from ..mixins import RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -96,11 +97,7 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     template_name = "token_stats.html"
 
     def get_queryset(self, **kwargs):
-        tokenusers = (
-            TokenFind.objects.filter(token__camp=self.camp)
-            .distinct("user")
-            .values_list("user", flat=True)
-        )
+        tokenusers = TokenFind.objects.filter(token__camp=self.camp).distinct("user").values_list("user", flat=True)
         last_token_find_subquery = (
             TokenFind.objects.filter(
                 user=OuterRef("pk"),

@@ -1,8 +1,8 @@
 from unittest import mock
 
 from django.core.exceptions import PermissionDenied
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from django.test.client import RequestFactory
 
 from .views import MapProxyView

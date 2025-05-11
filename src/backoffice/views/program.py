@@ -18,11 +18,6 @@ from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 
-from ..forms import AutoScheduleApplyForm
-from ..forms import AutoScheduleValidateForm
-from ..forms import EventScheduleForm
-from ..forms import SpeakerForm
-from ..mixins import ContentTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from program.autoscheduler import AutoScheduler
 from program.email import add_event_scheduled_email
@@ -36,6 +31,12 @@ from program.models import EventType
 from program.models import Speaker
 from program.models import SpeakerProposal
 from program.utils import save_speaker_availability
+
+from ..forms import AutoScheduleApplyForm
+from ..forms import AutoScheduleValidateForm
+from ..forms import EventScheduleForm
+from ..forms import SpeakerForm
+from ..mixins import ContentTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -65,16 +66,12 @@ class PendingProposalsView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class ProposalApproveBaseView(CampViewMixin, ContentTeamPermissionMixin, UpdateView):
-    """
-    Shared logic between SpeakerProposalApproveView and EventProposalApproveView
-    """
+    """Shared logic between SpeakerProposalApproveView and EventProposalApproveView"""
 
     fields = ["reason"]
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         if "approve" in form.data:
             # approve button was pressed
             form.instance.mark_as_approved(self.request)
@@ -413,9 +410,7 @@ class EventLocationDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteV
 
     def delete(self, *args, **kwargs):
         slotsdeleted, slotdetails = self.get_object().event_slots.all().delete()
-        sessionsdeleted, sessiondetails = (
-            self.get_object().event_sessions.all().delete()
-        )
+        sessionsdeleted, sessiondetails = self.get_object().event_sessions.all().delete()
 
         return super().delete(*args, **kwargs)
 
@@ -501,7 +496,8 @@ class EventDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
 class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     """This view is used by the Content Team to manually schedule Events.
     It shows a table with radioselect buttons for the available slots for the
-    EventType of the Event"""
+    EventType of the Event
+    """
 
     form_class = EventScheduleForm
     template_name = "event_schedule.html"
@@ -541,18 +537,14 @@ class EventScheduleView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         return form
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Add event to context
-        """
+        """Add event to context"""
         context = super().get_context_data(*args, **kwargs)
         context["event"] = self.event
         context["event_slots"] = self.slots
         return context
 
     def form_valid(self, form):
-        """
-        Set needed values, save slot and return
-        """
+        """Set needed values, save slot and return"""
         slot = self.slots[int(form.cleaned_data["slot"])]["slot"]
         slot.event = self.event
         slot.autoscheduled = False
@@ -579,9 +571,7 @@ class EventSessionCreateTypeSelectView(
     ContentTeamPermissionMixin,
     ListView,
 ):
-    """
-    This view is shown first when creating a new EventSession
-    """
+    """This view is shown first when creating a new EventSession"""
 
     model = EventType
     template_name = "event_session_create_type_select.html"
@@ -593,9 +583,7 @@ class EventSessionCreateLocationSelectView(
     ContentTeamPermissionMixin,
     ListView,
 ):
-    """
-    This view is shown second when creating a new EventSession
-    """
+    """This view is shown second when creating a new EventSession"""
 
     model = EventLocation
     template_name = "event_session_create_location_select.html"
@@ -606,22 +594,17 @@ class EventSessionCreateLocationSelectView(
         self.event_type = get_object_or_404(EventType, slug=kwargs["event_type_slug"])
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Add event_type to context
-        """
+        """Add event_type to context"""
         context = super().get_context_data(*args, **kwargs)
         context["event_type"] = self.event_type
         return context
 
 
 class EventSessionFormViewMixin:
-    """
-    A mixin with the stuff shared between EventSession{Create|Update}View
-    """
+    """A mixin with the stuff shared between EventSession{Create|Update}View"""
 
     def get_form(self, *args, **kwargs):
-        """
-        The default range widgets are a bit shit because they eat the help_text and
+        """The default range widgets are a bit shit because they eat the help_text and
         have no indication of which field is for what. So we add a nice placeholder.
         We also limit the event_location dropdown to only the current camps locations.
         """
@@ -639,9 +622,7 @@ class EventSessionFormViewMixin:
         return form
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Add event_type and location and existing sessions to context
-        """
+        """Add event_type and location and existing sessions to context"""
         context = super().get_context_data(*args, **kwargs)
         if not hasattr(self, "event_type"):
             self.event_type = self.get_object().event_type
@@ -661,9 +642,7 @@ class EventSessionCreateView(
     EventSessionFormViewMixin,
     CreateView,
 ):
-    """
-    This view is used by the Content Team to create EventSession objects
-    """
+    """This view is used by the Content Team to create EventSession objects"""
 
     model = EventSession
     fields = ["description", "when", "event_duration_minutes"]
@@ -679,9 +658,7 @@ class EventSessionCreateView(
         )
 
     def form_valid(self, form):
-        """
-        Set camp and event_type, check for overlaps and save
-        """
+        """Set camp and event_type, check for overlaps and save"""
         session = form.save(commit=False)
         session.event_type = self.event_type
         session.event_location = self.event_location
@@ -697,9 +674,7 @@ class EventSessionCreateView(
 
 
 class EventSessionListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
-    """
-    This view is used by the Content Team to see EventSession objects.
-    """
+    """This view is used by the Content Team to see EventSession objects."""
 
     model = EventSession
     template_name = "event_session_list.html"
@@ -712,9 +687,7 @@ class EventSessionListView(CampViewMixin, ContentTeamPermissionMixin, ListView):
 
 
 class EventSessionDetailView(CampViewMixin, ContentTeamPermissionMixin, DetailView):
-    """
-    This view is used by the Content Team to see details for EventSession objects
-    """
+    """This view is used by the Content Team to see details for EventSession objects"""
 
     model = EventSession
     template_name = "event_session_detail.html"
@@ -727,18 +700,14 @@ class EventSessionUpdateView(
     EventSessionFormViewMixin,
     UpdateView,
 ):
-    """
-    This view is used by the Content Team to update EventSession objects
-    """
+    """This view is used by the Content Team to update EventSession objects"""
 
     model = EventSession
     fields = ["when", "description", "event_duration_minutes"]
     template_name = "event_session_form.html"
 
     def form_valid(self, form):
-        """
-        Just save, we have a post_save signal which takes care of fixing EventSlots
-        """
+        """Just save, we have a post_save signal which takes care of fixing EventSlots"""
         session = form.save()
         messages.success(self.request, f"{session} has been updated successfully!")
         return redirect(
@@ -750,9 +719,7 @@ class EventSessionUpdateView(
 
 
 class EventSessionDeleteView(CampViewMixin, ContentTeamPermissionMixin, DeleteView):
-    """
-    This view is used by the Content Team to delete EventSession objects
-    """
+    """This view is used by the Content Team to delete EventSession objects"""
 
     model = EventSession
     template_name = "event_session_delete.html"
@@ -859,7 +826,8 @@ class AutoScheduleCrashCourseView(
 class AutoScheduleValidateView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     """This view is used to validate schedules. It uses the AutoScheduler and can
     either validate the currently applied schedule or a new similar schedule, or a
-    brand new schedule"""
+    brand new schedule
+    """
 
     template_name = "autoschedule_validate.html"
     form_class = AutoScheduleValidateForm
@@ -989,7 +957,7 @@ class AutoScheduleDebugEventSlotUnavailabilityView(
 
     def get_context_data(self, **kwargs):
         scheduler = AutoScheduler(camp=self.camp)
-        for autoevent, _ in zip(scheduler.autoevents, scheduler.events.all()):
+        for autoevent, _ in zip(scheduler.autoevents, scheduler.events.all(), strict=False):
             autoevent.possible_slots = 0
             for slot in scheduler.autoslots:
                 if slot not in autoevent.unavailability:

@@ -3,8 +3,9 @@ import uuid
 
 from django.db import migrations
 
+
 def convert_usernames_to_uuids(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
+    User = apps.get_model("auth", "User")
     for user in User.objects.all():
         username = user.username
         user.username = uuid.uuid4()
@@ -12,10 +13,10 @@ def convert_usernames_to_uuids(apps, schema_editor):
         print(username, user.username)
     print("done")
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('utils', '0006_alter_uuidtaggeditem_content_type_and_more'),
+        ("utils", "0006_alter_uuidtaggeditem_content_type_and_more"),
     ]
 
     operations = [

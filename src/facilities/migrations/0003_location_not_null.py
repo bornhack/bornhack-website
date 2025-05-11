@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("facilities", "0002_facility_location"),
     ]
@@ -15,7 +14,8 @@ class Migration(migrations.Migration):
             model_name="facility",
             name="location",
             field=django.contrib.gis.db.models.fields.PointField(
-                help_text="The location of this facility", srid=4326
+                help_text="The location of this facility",
+                srid=4326,
             ),
         ),
     ]

@@ -24,10 +24,6 @@ from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 from taggit.managers import TaggableManager
 
-from .email import add_event_proposal_accepted_email
-from .email import add_event_proposal_rejected_email
-from .email import add_speaker_proposal_accepted_email
-from .email import add_speaker_proposal_rejected_email
 from utils.database import CastToInteger
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
@@ -35,13 +31,16 @@ from utils.models import UUIDModel
 from utils.models import UUIDTaggedItem
 from utils.slugs import unique_slugify
 
+from .email import add_event_proposal_accepted_email
+from .email import add_event_proposal_rejected_email
+from .email import add_speaker_proposal_accepted_email
+from .email import add_speaker_proposal_rejected_email
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
-    """
-    Each Url object has a type.
-    """
+    """Each Url object has a type."""
 
     name = models.CharField(
         max_length=25,
@@ -63,8 +62,7 @@ class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
 
 
 class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
-    """
-    This model contains URLs related to
+    """This model contains URLs related to
     - SpeakerProposals
     - EventProposals
     - Speakers
@@ -146,19 +144,16 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
 
     @property
     def owner(self):
-        """
-        Return the object this Url belongs to
-        """
+        """Return the object this Url belongs to"""
         if self.speaker_proposal:
             return self.speaker_proposal
-        elif self.event_proposal:
+        if self.event_proposal:
             return self.event_proposal
-        elif self.speaker:
+        if self.speaker:
             return self.speaker
-        elif self.event:
+        if self.event:
             return self.event
-        else:
-            return None
+        return None
 
     @property
     def camp(self):
@@ -176,8 +171,7 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
 
 
 class Availability(CampRelatedModel, UUIDModel):
-    """
-    This model contains all the availability info for speaker_proposals and
+    """This model contains all the availability info for speaker_proposals and
     speakers. It is inherited by SpeakerProposalAvailability and SpeakerAvailability
     models.
     """
@@ -314,8 +308,7 @@ class SpeakerAvailability(
 
 
 class UserSubmittedModel(CampRelatedModel):
-    """
-    An abstract model containing the stuff that is shared
+    """An abstract model containing the stuff that is shared
     between the SpeakerProposal and EventProposal models.
     """
 
@@ -350,11 +343,7 @@ class UserSubmittedModel(CampRelatedModel):
     )
 
     def __str__(self):
-        return "{} (submitted by: {}, status: {})".format(
-            self.headline,
-            self.user,
-            self.proposal_status,
-        )
+        return f"{self.headline} (submitted by: {self.user}, status: {self.proposal_status})"
 
     def save(self, **kwargs):
         if not self.camp.call_for_participation_open:
@@ -502,8 +491,7 @@ class SpeakerProposal(
         if self.event_proposals.values_list("event_type").distinct().count() != 1:
             # we have no events, or events of different eventtypes, use generic title
             return "Person"
-        else:
-            return self.event_proposals.first().event_type.host_title
+        return self.event_proposals.first().event_type.host_title
 
 
 class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedModel):
@@ -591,8 +579,7 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         )
 
     def get_available_speaker_proposals(self):
-        """
-        Return all SpeakerProposals submitted by the user who submitted this EventProposal,
+        """Return all SpeakerProposals submitted by the user who submitted this EventProposal,
         which are not already added to this EventProposal
         """
         return SpeakerProposal.objects.filter(
@@ -653,8 +640,7 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         """We cannot approve an EventProposal until all SpeakerProposals are approved"""
         if self.speakers.exclude(proposal_status="approved").exists():
             return False
-        else:
-            return True
+        return True
 
 
 ###############################################################################
@@ -874,8 +860,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
 
 
 class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel):
-    """
-    An EventSession define the "opening hours" for an EventType in an EventLocation.
+    """An EventSession define the "opening hours" for an EventType in an EventLocation.
 
     Creating an EventSession also creates the related EventSlots. Updating an EventSesion
     adds or removes EventSlots as needed.
@@ -968,8 +953,7 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
         )
 
     def get_available_slots(self, count_autoscheduled_as_free=False, bounds="()"):
-        """
-        Return a queryset of slots that have nothing scheduled, remember to consider
+        """Return a queryset of slots that have nothing scheduled, remember to consider
         conflicting locations too.
         """
         # do we want to count slots with autoscheduled Events as free or not?
@@ -1059,8 +1043,7 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
 
 
 class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
-    """
-    An EventSlot defines a window where we can schedule an Event.
+    """An EventSlot defines a window where we can schedule an Event.
 
     The EventType and EventLocation is defined by the EventSession this
     EventSlot belongs to. EventSlots are created and deleted by a post_save
@@ -1194,8 +1177,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         """If we have more demand than capacity return the overflow"""
         if self.event and self.event.demand > self.event_location.capacity:
             return (self.event_location.capacity - self.event.demand) * -1
-        else:
-            return 0
+        return 0
 
     @property
     def duration(self):
@@ -1235,8 +1217,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
 
     @property
     def uuid(self):
-        """
-        Returns a consistent UUID for this EventSlot with this Event (if any).
+        """Returns a consistent UUID for this EventSlot with this Event (if any).
 
         We want the UUID to be the same even if this EventSlot is deleted and replaced by
         another at the same start time and location, so it cannot be a regular UUIDField.
@@ -1247,7 +1228,6 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         the event id, and the location id, and the rest is padded with the event uuid as needed.
 
         Examples:
-
             # timestamp=1472374800 location_id=1 event_id=27 event_uuid=748316fa-78a5-4172-850b-341fc41ba2ba
             In [1]: EventSlot.objects.filter(event__isnull=False).first().uuid
             Out[1]: UUID('14723748-0012-7748-316f-a78a54172850')
@@ -1274,7 +1254,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         uuidbase = f"{start_timestamp}{location_id}{event_id}"
 
         # pad using event_uuid up to 32 hex chars and return
-        return uuid.UUID(f"{uuidbase}{event_uuid[0:32 - len(uuidbase)]}")
+        return uuid.UUID(f"{uuidbase}{event_uuid[0 : 32 - len(uuidbase)]}")
 
 
 class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
@@ -1485,16 +1465,13 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
 
     @property
     def schedule_date(self):
-        """
-        Returns the schedule date of this eventinstance. Schedule date is determined by substracting
+        """Returns the schedule date of this eventinstance. Schedule date is determined by substracting
         settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS from the eventinstance start time. This means that if
         an event is scheduled for 00:30 wednesday evening (technically thursday) then the date
         after substracting 5 hours would be wednesdays date, not thursdays
         (given settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS=5)
         """
-        return (
-            self.when.lower - timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
-        ).date()
+        return (self.when.lower - timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)).date()
 
     @property
     def timeslots(self):
@@ -1556,8 +1533,7 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
     def overflow(self):
         if self.event.demand > self.location.capacity:
             return (self.location.capacity - self.event.demand) * -1
-        else:
-            return 0
+        return 0
 
 
 class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
@@ -1642,7 +1618,8 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
     def is_available(self, when, ignore_event_slot_ids=None):
         """A speaker is available if the person has positive availability for the period and
         if the speaker is not in another event at the time, or if the person has not submitted
-        any availability at all"""
+        any availability at all
+        """
         ignore_event_slot_ids = ignore_event_slot_ids or []
         if not self.availabilities.exists():
             # we have no availability at all for this speaker, assume they are available
@@ -1676,8 +1653,7 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
         if self.events.values_list("event_type").distinct().count() > 1:
             # we have different eventtypes, use generic title
             return "Person"
-        else:
-            return self.events.first().event_type.host_title
+        return self.events.first().event_type.host_title
 
 
 class Favorite(ExportModelOperationsMixin("favorite"), models.Model):
@@ -1703,8 +1679,7 @@ class EventFeedback(
     CampRelatedModel,
     UUIDModel,
 ):
-    """
-    This model contains all feedback for Events
+    """This model contains all feedback for Events
     Each user can submit exactly one feedback per Event
     """
 
@@ -1736,7 +1711,7 @@ class EventFeedback(
         help_text="Would you attend another event with the same speaker?",
     )
 
-    RATING_CHOICES = [(n, f"{n}") for n in range(0, 6)]
+    RATING_CHOICES = [(n, f"{n}") for n in range(6)]
 
     rating = models.IntegerField(
         choices=RATING_CHOICES,
@@ -1768,28 +1743,24 @@ class EventFeedback(
 
 
 class CustomUrlStorage(FileSystemStorage):
-    """
-    Must exist because it is mentioned in old migrations.
+    """Must exist because it is mentioned in old migrations.
     Can be removed when we clean up old migrations at some point
     """
 
 
 def get_speaker_picture_upload_path():
-    """
-    Must exist because it is mentioned in old migrations.
+    """Must exist because it is mentioned in old migrations.
     Can be removed when we clean up old migrations at some point
     """
 
 
 def get_speakerproposal_picture_upload_path():
-    """
-    Must exist because it is mentioned in old migrations.
+    """Must exist because it is mentioned in old migrations.
     Can be removed when we clean up old migrations at some point
     """
 
 
 def get_speakersubmission_picture_upload_path():
-    """
-    Must exist because it is mentioned in old migrations.
+    """Must exist because it is mentioned in old migrations.
     Can be removed when we clean up old migrations at some point
     """

@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("camps", "0031_auto_20180830_0014")]
 
     operations = [
@@ -23,5 +22,5 @@ class Migration(migrations.Migration):
                     ("revenue_create_permission", "Revenue Create permission"),
                 ),
             },
-        )
+        ),
     ]

@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("tokens", "0003_token_category"),
@@ -13,6 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterUniqueTogether(
-            name="tokenfind", unique_together={("user", "token")}
-        )
+            name="tokenfind",
+            unique_together={("user", "token")},
+        ),
     ]

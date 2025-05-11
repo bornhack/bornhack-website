@@ -23,7 +23,6 @@ def fixup_opr(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("shop", "0069_refund"),
     ]

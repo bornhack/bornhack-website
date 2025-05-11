@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0023_fix_coinify_model_ordering"),
     ]
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 (
                     "merchant_id",
                     models.IntegerField(
-                        help_text="ePay merchant number for this transaction."
+                        help_text="ePay merchant number for this transaction.",
                     ),
                 ),
                 (
@@ -39,19 +39,20 @@ class Migration(migrations.Migration):
                 (
                     "order_id",
                     models.IntegerField(
-                        help_text="The BornHack order ID for this ePay transaction."
+                        help_text="The BornHack order ID for this ePay transaction.",
                     ),
                 ),
                 (
                     "currency",
                     models.CharField(
-                        help_text="The currency of this payment.", max_length=3
+                        help_text="The currency of this payment.",
+                        max_length=3,
                     ),
                 ),
                 (
                     "auth_date",
                     models.DateTimeField(
-                        help_text="The date this payment was authorised by the user."
+                        help_text="The date this payment was authorised by the user.",
                     ),
                 ),
                 (
@@ -65,7 +66,7 @@ class Migration(migrations.Migration):
                 (
                     "captured_date",
                     models.DateTimeField(
-                        help_text="The date this payment was captured."
+                        help_text="The date this payment was captured.",
                     ),
                 ),
                 (

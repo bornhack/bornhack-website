@@ -43,10 +43,4 @@ class Ride(ExportModelOperationsMixin("ride"), UUIDModel, CampRelatedModel):
         )
 
     def __str__(self):
-        return "{} seats from {} to {} at {} by {}".format(
-            self.seats,
-            self.from_location,
-            self.to_location,
-            self.when,
-            self.user,
-        )
+        return f"{self.seats} seats from {self.from_location} to {self.to_location} at {self.when} by {self.user}"

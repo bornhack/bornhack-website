@@ -15,10 +15,11 @@ from django.views.generic import UpdateView
 from django.views.generic import View
 from psycopg2.extras import DateTimeTZRange
 
+from camps.mixins import CampViewMixin
+
 from ..models import Team
 from ..models import TeamMember
 from ..models import TeamShift
-from camps.mixins import CampViewMixin
 
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -52,12 +53,9 @@ def date_choices(camp):
 
     def get_time_choices(date):
         time_choices = []
-        for hour in range(0, 24):
+        for hour in range(24):
             for minute in minute_choices:
-                time_label = "{hour:02d}:{minutes:02d}".format(
-                    hour=hour,
-                    minutes=minute,
-                )
+                time_label = f"{hour:02d}:{minute:02d}"
                 choice_value = f"{date} {time_label}"
                 time_choices.append((choice_value, choice_value))
         return time_choices

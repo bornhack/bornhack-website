@@ -4,11 +4,11 @@ import uuid
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -38,7 +38,8 @@ class Migration(migrations.Migration):
                 (
                     "camp",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT, to="camps.Camp"
+                        on_delete=django.db.models.deletion.PROTECT,
+                        to="camps.Camp",
                     ),
                 ),
                 (
@@ -50,5 +51,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False},
-        )
+        ),
     ]

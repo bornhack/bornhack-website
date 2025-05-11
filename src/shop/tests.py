@@ -1,13 +1,23 @@
-from typing import Optional
-from django.contrib.contenttypes.models import ContentType
-
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
+
+from camps.factories import CampFactory
+from camps.models import Camp
+from camps.models import Permission as CampPermission
+from economy.factories import PosFactory
+from shop.forms import OrderProductRelationForm
+from teams.models import Team
+from teams.models import TeamMember
+from tickets.factories import TicketTypeFactory
+from tickets.models import ShopTicket
+from tickets.models import TicketGroup
+from utils.factories import UserFactory
 
 from .factories import OrderFactory
 from .factories import OrderProductRelationFactory
@@ -17,17 +27,6 @@ from .models import Order
 from .models import OrderProductRelation
 from .models import Product
 from .models import RefundEnum
-from camps.factories import CampFactory
-from camps.models import Camp
-from camps.models import Permission as CampPermission
-from economy.factories import PosFactory
-from shop.forms import OrderProductRelationForm
-from tickets.factories import TicketTypeFactory
-from tickets.models import ShopTicket
-from tickets.models import TicketGroup
-from utils.factories import UserFactory
-from teams.models import Team
-from teams.models import TeamMember
 
 
 class ProductAvailabilityTest(TestCase):
@@ -700,8 +699,8 @@ class TestRefund(TestCase):
     def _get_form_data(
         self,
         *,
-        refund_tickets: Optional[list[ShopTicket]] = None,
-        refund_ticket_groups: Optional[list[TicketGroup]] = None,
+        refund_tickets: list[ShopTicket] | None = None,
+        refund_ticket_groups: list[TicketGroup] | None = None,
     ):
         """Helper method to get the form data for a refund"""
         refund_tickets = refund_tickets or []

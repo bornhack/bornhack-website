@@ -2,9 +2,9 @@ from django.apps import AppConfig
 from django.db.models.signals import post_delete
 from django.db.models.signals import post_save
 
+from .signal_handlers import team_saved
 from .signal_handlers import teammember_deleted
 from .signal_handlers import teammember_saved
-from .signal_handlers import team_saved
 
 
 class TeamsConfig(AppConfig):

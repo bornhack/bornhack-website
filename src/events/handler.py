@@ -12,8 +12,7 @@ def handle_team_event(
     email_template=None,
     email_formatdict=None,
 ):
-    """
-    This method is our basic event handler.
+    """This method is our basic event handler.
     The type of event determines which teams receive notifications.
     TODO: Add some sort of priority to messages
     """
@@ -53,9 +52,7 @@ def handle_team_event(
 
 
 def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
-    """
-    Sends IRC notifications for events to team IRC channels
-    """
+    """Sends IRC notifications for events to team IRC channels"""
     logger.debug("Inside team_irc_notification, message %s" % irc_message)
     if not irc_message:
         logger.error("No IRC message found")
@@ -86,8 +83,7 @@ def team_email_notification(
     email_template=None,
     email_formatdict=None,
 ):
-    """
-    Sends email notifications for events to team mailinglists (if possible,
+    """Sends email notifications for events to team mailinglists (if possible,
     otherwise directly to the team leads)
     """
     if not email_template or not email_formatdict or not eventtype.email_notification:

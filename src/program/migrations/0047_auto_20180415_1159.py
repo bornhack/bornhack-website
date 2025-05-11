@@ -2,11 +2,11 @@
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0046_auto_20180318_0906")]
 
     operations = [
@@ -89,14 +89,16 @@ class Migration(migrations.Migration):
             model_name="eventproposal",
             name="user",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.AlterField(
             model_name="favorite",
             name="event_instance",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT, to="program.EventInstance"
+                on_delete=django.db.models.deletion.PROTECT,
+                to="program.EventInstance",
             ),
         ),
         migrations.AlterField(
@@ -134,7 +136,8 @@ class Migration(migrations.Migration):
             model_name="speakerproposal",
             name="user",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL
+                on_delete=django.db.models.deletion.PROTECT,
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
     ]

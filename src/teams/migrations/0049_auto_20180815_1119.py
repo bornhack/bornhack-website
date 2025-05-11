@@ -4,11 +4,11 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("teams", "0048_auto_20180814_1950")]
 
     operations = [
         migrations.AlterModelOptions(
-            name="teamtask", options={"ordering": ["completed", "when", "name"]}
-        )
+            name="teamtask",
+            options={"ordering": ["completed", "when", "name"]},
+        ),
     ]

@@ -13,7 +13,6 @@ def populate_opr(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tickets", "0015_shopticket_opr"),
     ]

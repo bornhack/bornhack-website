@@ -4,11 +4,12 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("teams", "0047_taskcomment")]
 
     operations = [
         migrations.RenameField(
-            model_name="taskcomment", old_name="content", new_name="comment"
-        )
+            model_name="taskcomment",
+            old_name="content",
+            new_name="comment",
+        ),
     ]

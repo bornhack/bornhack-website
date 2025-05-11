@@ -2,11 +2,11 @@
 
 import django.contrib.postgres.fields.ranges
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("teams", "0042_auto_20180413_1933")]
 
     operations = [

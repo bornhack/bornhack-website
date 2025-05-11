@@ -1,6 +1,6 @@
 from django.db import models
-from django_filters import filters
 from django_filters import FilterSet
+from django_filters import filters
 
 from .models import Pos
 from .models import PosProduct

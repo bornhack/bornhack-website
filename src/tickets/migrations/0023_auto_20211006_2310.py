@@ -4,52 +4,51 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tickets', '0022_used_pos'),
+        ("tickets", "0022_used_pos"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='discountticket',
-            old_name='used_time',
-            new_name='used_at',
+            model_name="discountticket",
+            old_name="used_time",
+            new_name="used_at",
         ),
         migrations.RenameField(
-            model_name='discountticket',
-            old_name='used_pos_username',
-            new_name='used_pos_user',
+            model_name="discountticket",
+            old_name="used_pos_username",
+            new_name="used_pos_user",
         ),
         migrations.RenameField(
-            model_name='shopticket',
-            old_name='used_time',
-            new_name='used_at',
+            model_name="shopticket",
+            old_name="used_time",
+            new_name="used_at",
         ),
         migrations.RenameField(
-            model_name='shopticket',
-            old_name='used_pos_username',
-            new_name='used_pos_user',
+            model_name="shopticket",
+            old_name="used_pos_username",
+            new_name="used_pos_user",
         ),
         migrations.RenameField(
-            model_name='sponsorticket',
-            old_name='used_time',
-            new_name='used_at',
+            model_name="sponsorticket",
+            old_name="used_time",
+            new_name="used_at",
         ),
         migrations.RenameField(
-            model_name='sponsorticket',
-            old_name='used_pos_username',
-            new_name='used_pos_user',
+            model_name="sponsorticket",
+            old_name="used_pos_username",
+            new_name="used_pos_user",
         ),
         migrations.RemoveField(
-            model_name='discountticket',
-            name='used',
+            model_name="discountticket",
+            name="used",
         ),
         migrations.RemoveField(
-            model_name='shopticket',
-            name='used',
+            model_name="shopticket",
+            name="used",
         ),
         migrations.RemoveField(
-            model_name='sponsorticket',
-            name='used',
+            model_name="sponsorticket",
+            name="used",
         ),
     ]

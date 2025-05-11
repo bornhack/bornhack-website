@@ -42,7 +42,7 @@ class QuickPay:
             # request.response_headers = dict(e.headers)
             request.response_body = e.body
             request.save()
-            return
+            return None
         # save the response in the request object
         request.response_status_code = status
         request.response_headers = dict(headers)

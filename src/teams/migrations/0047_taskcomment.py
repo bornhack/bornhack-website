@@ -3,11 +3,11 @@
 import uuid
 
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("teams", "0046_auto_20180808_2154")]
 
     operations = [
@@ -43,5 +43,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False},
-        )
+        ),
     ]

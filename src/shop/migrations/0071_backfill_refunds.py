@@ -16,12 +16,13 @@ def backfill_refunds(apps, schema_editor):
         )
         for opr in order.oprs.all():
             RefundProductRelation.objects.create(
-                refund=refund, opr=opr, quantity=opr.quantity
+                refund=refund,
+                opr=opr,
+                quantity=opr.quantity,
             )
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("shop", "0070_fixup_opr"),
     ]

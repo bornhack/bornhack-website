@@ -24,7 +24,6 @@ def add_urltypes(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0055_auto_20180521_2354")]
 
     operations = [migrations.RunPython(add_urltypes)]

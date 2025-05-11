@@ -1,14 +1,12 @@
 import logging
-from django.conf import settings
 
+from django.conf import settings
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def teammember_saved(sender, instance, created, **kwargs):
-    """
-    This signal handler is called whenever a TeamMember instance is saved
-    """
+    """This signal handler is called whenever a TeamMember instance is saved"""
     # if this is a new unapproved teammember send a mail to team leads
     if created and not instance.approved:
         # call the mail sending function
@@ -25,20 +23,12 @@ def teammember_saved(sender, instance, created, **kwargs):
 
 
 def teammember_deleted(sender, instance, **kwargs):
-    """
-    This signal handler is called whenever a TeamMember instance is deleted
-    """
-    if (
-        instance.team.private_irc_channel_name
-        and instance.team.private_irc_channel_managed
-    ):
+    """This signal handler is called whenever a TeamMember instance is deleted"""
+    if instance.team.private_irc_channel_name and instance.team.private_irc_channel_managed:
         # TODO: remove user from private channel ACL
         pass
 
-    if (
-        instance.team.public_irc_channel_name
-        and instance.team.public_irc_channel_managed
-    ):
+    if instance.team.public_irc_channel_name and instance.team.public_irc_channel_managed:
         # TODO: remove user from public channel ACL
         pass
 
@@ -48,12 +38,11 @@ def teammember_deleted(sender, instance, **kwargs):
 
 
 def team_saved(sender, instance, created, **kwargs):
-    """
-    This signal handler is called whenever a Team instance is saved
-    """
+    """This signal handler is called whenever a Team instance is saved"""
     # late imports
     from django.contrib.auth.models import Permission
     from django.contrib.contenttypes.models import ContentType
+
     from camps.models import Permission as CampPermission
 
     perm_content_type = ContentType.objects.get_for_model(CampPermission)

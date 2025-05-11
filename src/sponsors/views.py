@@ -6,8 +6,9 @@ from django.db.models.functions import Lower
 from django.utils import timezone
 from django.views.generic import ListView
 
-from .models import Sponsor
 from camps.mixins import CampViewMixin
+
+from .models import Sponsor
 
 
 class SponsorsView(CampViewMixin, ListView):
@@ -26,11 +27,7 @@ class AllSponsorsView(ListView):
     context_object_name = "sponsors"
 
     def get_queryset(self, **kwargs):
-        sponsors = (
-            Sponsor.objects.order_by("name", "tier__camp__buildup")
-            .distinct("name")
-            .values()
-        )
+        sponsors = Sponsor.objects.order_by("name", "tier__camp__buildup").distinct("name").values()
 
         this_year = timezone.now().year
 
@@ -52,9 +49,6 @@ class AllSponsorsView(ListView):
             ).aggregate(Sum("score"))["score__sum"]
             # years is a list of all the years this sponsor has been a sponsor
             s["years"] = sorted(
-                [
-                    x["tier__camp__buildup"].lower.year
-                    for x in years.values("tier__camp__buildup")
-                ],
+                [x["tier__camp__buildup"].lower.year for x in years.values("tier__camp__buildup")],
             )
         return sorted(sponsors, key=lambda item: item["score"], reverse=True)

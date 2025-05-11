@@ -1,9 +1,9 @@
 import logging
 
+from allauth.account.signals import user_logged_in
 from django.apps import AppConfig
 from django.db.models.signals import post_save
 from django.db.models.signals import pre_save
-from allauth.account.signals import user_logged_in
 
 from .signal_handlers import create_profile
 from .signal_handlers import profile_pre_save

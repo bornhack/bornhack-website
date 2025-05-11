@@ -1,33 +1,34 @@
 import json
-import uuid
 import logging
+import uuid
 
 from django.contrib import messages
 from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
-from django.views.generic.edit import FormView
 from django.views.generic.edit import DeleteView
+from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
-from django.templatetags.static import static
 from leaflet.forms.widgets import LeafletWidget
 
 from camps.mixins import CampViewMixin
-from ..forms import MapLayerFeaturesImportForm
+from maps.mixins import ExternalLayerMapperViewMixin
+from maps.mixins import GisTeamViewMixin
+from maps.mixins import LayerMapperViewMixin
 from maps.models import ExternalLayer
 from maps.models import Feature
 from maps.models import Layer
 from maps.models import UserLocationType
 from teams.models import Team
-from utils.widgets import IconPickerWidget
 from utils.mixins import AnyTeamMapperRequiredMixin
-from maps.mixins import LayerMapperViewMixin
-from maps.mixins import ExternalLayerMapperViewMixin
-from maps.mixins import GisTeamViewMixin
+from utils.widgets import IconPickerWidget
+
+from ..forms import MapLayerFeaturesImportForm
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -71,8 +72,7 @@ class MapLayerFeaturesImportView(
         if self.created_count > 0 or self.updated_count > 0:
             messages.success(
                 self.request,
-                "%i new features created, %i existing features updated"
-                % (self.created_count, self.updated_count),
+                "%i new features created, %i existing features updated" % (self.created_count, self.updated_count),
             )
         if self.error_count > 0:
             messages.error(
@@ -96,7 +96,7 @@ class MapLayerFeaturesImportView(
             except (TypeError, AttributeError, ValueError):
                 logger.error(f"Failed to GEOSGeometry: {feature}")
                 self.error_count += 1
-                return
+                return None
         return GeometryCollection(import_features)
 
     def load_feature_collection(self, layer, geojson):
@@ -127,11 +127,7 @@ class MapLayerFeaturesImportView(
                 # is it a valid uuid?
                 feature_uuid = uuid.UUID(feature_uuid)
                 # it is a valid uuid, does it already exist in the db?
-                if (
-                    Feature.objects.exclude(layer=layer)
-                    .filter(uuid=feature_uuid)
-                    .exists()
-                ):
+                if Feature.objects.exclude(layer=layer).filter(uuid=feature_uuid).exists():
                     feature_uuid = uuid.uuid4()
                 # use uuid for lookup
                 get_args = {"uuid": feature_uuid}
@@ -185,16 +181,10 @@ class MapLayerCreateView(CampViewMixin, AnyTeamMapperRequiredMixin, CreateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         # get the teams the current user has mapper permission for
         perms = self.request.user.get_all_permissions()
-        team_slugs = [
-            perm.split(".")[1].split("_")[0]
-            for perm in perms
-            if perm.endswith("_mapper")
-        ]
+        team_slugs = [perm.split(".")[1].split("_")[0] for perm in perms if perm.endswith("_mapper")]
         teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = teams
@@ -227,16 +217,10 @@ class MapLayerUpdateView(CampViewMixin, LayerMapperViewMixin, UpdateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         # get the teams the current user has facilitator permission for
         perms = self.request.user.get_all_permissions()
-        team_slugs = [
-            perm.split(".")[1].split("_")[0]
-            for perm in perms
-            if perm.endswith("_mapper")
-        ]
+        team_slugs = [perm.split(".")[1].split("_")[0] for perm in perms if perm.endswith("_mapper")]
         teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = teams
@@ -402,9 +386,7 @@ class MapExternalLayerCreateView(CampViewMixin, AnyTeamMapperRequiredMixin, Crea
     ]
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -432,9 +414,7 @@ class MapExternalLayerUpdateView(ExternalLayerMapperViewMixin, UpdateView):
     ]
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,

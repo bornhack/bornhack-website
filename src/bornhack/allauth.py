@@ -1,7 +1,8 @@
 """Custom allauth account adapter based on allauth.account.adapter.DefaultAccountAdapter."""
 
-from allauth.account.adapter import DefaultAccountAdapter
 import uuid
+
+from allauth.account.adapter import DefaultAccountAdapter
 
 
 class UsernameUUIDAdapter(DefaultAccountAdapter):

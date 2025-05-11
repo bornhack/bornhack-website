@@ -9,7 +9,6 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
-from ..mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
@@ -17,6 +16,8 @@ from shop.models import Product
 from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
+
+from ..mixins import OrgaTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -71,13 +72,9 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
         merchandise_orders = {}
         for relation in order_relations:
             try:
-                merchandise_orders[
-                    relation.product.name
-                ] += relation.non_refunded_quantity
+                merchandise_orders[relation.product.name] += relation.non_refunded_quantity
             except KeyError:
-                merchandise_orders[relation.product.name] = (
-                    relation.non_refunded_quantity
-                )
+                merchandise_orders[relation.product.name] = relation.non_refunded_quantity
 
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
@@ -139,9 +136,7 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
 
 
 class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
-    """
-    This view shows a list with forms to edit OutgoingEmail objects with hold=True
-    """
+    """This view shows a list with forms to edit OutgoingEmail objects with hold=True"""
 
     template_name = "outgoing_email_mass_update.html"
 

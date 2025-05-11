@@ -17,9 +17,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class Permission(ExportModelOperationsMixin("permission"), models.Model):
-    """
-    An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
-    """
+    """An unmanaged field-less model which holds our non-model permissions (such as team permission sets)"""
 
     class Meta:
         managed = False
@@ -149,24 +147,22 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def logo_small(self):
-        return "img/{slug}/logo/{slug}-logo-s.png".format(slug=self.slug)
+        return f"img/{self.slug}/logo/{self.slug}-logo-s.png"
 
     @property
     def logo_small_svg(self):
-        return "img/{slug}/logo/{slug}-logo-small.svg".format(slug=self.slug)
+        return f"img/{self.slug}/logo/{self.slug}-logo-small.svg"
 
     @property
     def logo_large(self):
-        return "img/{slug}/logo/{slug}-logo-l.png".format(slug=self.slug)
+        return f"img/{self.slug}/logo/{self.slug}-logo-l.png"
 
     @property
     def logo_large_svg(self):
-        return "img/{slug}/logo/{slug}-logo-large.svg".format(slug=self.slug)
+        return f"img/{self.slug}/logo/{self.slug}-logo-large.svg"
 
     def get_days(self, camppart):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the specified part of the camp."""
         if not hasattr(self, camppart):
             logger.error("nonexistant field/attribute")
             return False
@@ -190,7 +186,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
         # loop through the required number of days, append to list as we go
         days = []
-        for i in range(0, daycount):
+        for i in range(daycount):
             if i == 0:
                 # on the first day use actual start time instead of midnight (local time)
                 days.append(
@@ -227,23 +223,17 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def buildup_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the buildup.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the buildup."""
         return self.get_days("buildup")
 
     @property
     def camp_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the camp.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the camp."""
         return self.get_days("camp")
 
     @property
     def teardown_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the buildup.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the buildup."""
         return self.get_days("teardown")
 
     # convenience properties to access Camp-related stuff easily from the Camp object

@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0027_zettlebalance_zettlereceipt"),
     ]
@@ -29,13 +29,15 @@ class Migration(migrations.Migration):
                 (
                     "event",
                     models.CharField(
-                        help_text="The type of MobilePay transaction", max_length=100
+                        help_text="The type of MobilePay transaction",
+                        max_length=100,
                     ),
                 ),
                 (
                     "currency",
                     models.CharField(
-                        help_text="The currency of this transaction.", max_length=3
+                        help_text="The currency of this transaction.",
+                        max_length=3,
                     ),
                 ),
                 (
@@ -49,7 +51,7 @@ class Migration(migrations.Migration):
                 (
                     "mobilepay_created",
                     models.DateTimeField(
-                        help_text="The MobilePay date and time for this transaction."
+                        help_text="The MobilePay date and time for this transaction.",
                     ),
                 ),
                 (
@@ -89,7 +91,7 @@ class Migration(migrations.Migration):
                 (
                     "myshop_number",
                     models.IntegerField(
-                        help_text="The MobilePay MyShop number for this payment. For now we only have one."
+                        help_text="The MobilePay MyShop number for this payment. For now we only have one.",
                     ),
                 ),
                 (

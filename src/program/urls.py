@@ -23,9 +23,9 @@ from .views import FeedbackRedirectView
 from .views import FeedbackUpdateView
 from .views import FrabXmlView
 from .views import ICSView
-from .views import ScheduleView
 from .views import ProgramControlCenter
 from .views import ProposalListView
+from .views import ScheduleView
 from .views import SpeakerDetailView
 from .views import SpeakerListView
 from .views import SpeakerProposalCreateView

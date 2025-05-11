@@ -1,11 +1,11 @@
-from utils.mixins import RaisePermissionRequiredMixin
-from camps.mixins import CampViewMixin
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.views.generic.detail import SingleObjectMixin
 
+from camps.mixins import CampViewMixin
 from teams.models import Team
 from teams.models import TeamMember
+from utils.mixins import RaisePermissionRequiredMixin
 
 
 class EnsureTeamLeadMixin:
@@ -30,10 +30,7 @@ class EnsureTeamMemberLeadMixin(SingleObjectMixin):
     model = TeamMember
 
     def dispatch(self, request, *args, **kwargs):
-        if (
-            self.get_object().team.lead_permission_set
-            not in request.user.get_all_permissions()
-        ):
+        if self.get_object().team.lead_permission_set not in request.user.get_all_permissions():
             messages.error(request, "No thanks")
             return redirect(
                 "teams:general",

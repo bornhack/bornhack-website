@@ -19,8 +19,7 @@ class CampRedirectView(View):
         try:
             camp = Camp.objects.get(camp__contains=now)
             logger.debug(
-                "Redirecting to camp '%s' for page '%s' because it is now!"
-                % (camp.slug, kwargs["page"]),
+                "Redirecting to camp '%s' for page '%s' because it is now!" % (camp.slug, kwargs["page"]),
             )
             return redirect(kwargs["page"], camp_slug=camp.slug)
         except Camp.DoesNotExist:
@@ -28,17 +27,13 @@ class CampRedirectView(View):
 
         # no ongoing camp, find the closest camp in the past
         try:
-            prevcamp = (
-                Camp.objects.filter(camp__endswith__lt=now).order_by("-camp").first()
-            )
+            prevcamp = Camp.objects.filter(camp__endswith__lt=now).order_by("-camp").first()
         except Camp.DoesNotExist:
             prevcamp = None
 
         # find the closest upcoming camp
         try:
-            nextcamp = (
-                Camp.objects.filter(camp__startswith__gt=now).order_by("camp").first()
-            )
+            nextcamp = Camp.objects.filter(camp__startswith__gt=now).order_by("camp").first()
         except Camp.DoesNotExist:
             nextcamp = None
 

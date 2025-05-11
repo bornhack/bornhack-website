@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.http import HttpResponseRedirect
+from django.templatetags.static import static
 from django.urls import reverse
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
@@ -10,14 +11,14 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
-from django.templatetags.static import static
 from jsonview.views import JsonView
 from leaflet.forms.widgets import LeafletWidget
 
-from .email import add_village_approve_email
-from .models import Village
 from camps.mixins import CampViewMixin
 from utils.widgets import MarkdownWidget
+
+from .email import add_village_approve_email
+from .models import Village
 
 
 class VillageListView(CampViewMixin, ListView):
@@ -58,10 +59,7 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # If the user is not contact for this village OR is not staff and village not approved
         if not request.user.is_staff:
-            if (
-                self.get_object().contact != request.user
-                and not self.get_object().approved
-            ):
+            if self.get_object().contact != request.user and not self.get_object().approved:
                 raise Http404("Village not found")
 
         return super().dispatch(request, *args, **kwargs)

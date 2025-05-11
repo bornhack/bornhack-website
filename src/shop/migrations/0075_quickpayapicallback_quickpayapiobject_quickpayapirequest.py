@@ -3,11 +3,11 @@
 import uuid
 
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("shop", "0074_refund_invoice_address"),
     ]

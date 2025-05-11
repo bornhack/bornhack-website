@@ -252,8 +252,7 @@ class TestRangeIntersect(TestCase):
 
 class TestRangeSubtract(TestCase):
     def test_source_within_subtract(self):
-        """
-           [ source )
+        """[ source )
         [    subtract    )
         [    subtract    ]
         (    subtract    )
@@ -286,9 +285,7 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(11, 16, "(]"), Range(0, 44, "[]")))
 
     def test_subtract_upper_bound_matches_source_lower_bound(self):
-        """
-
-                 [ source )
+        """[ source )
         [subtract]
 
         """
@@ -298,9 +295,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_lower_bound_below_bounds_only(self):
-        """
-
-                 [source)
+        """[source)
         [subtract)
         (subtract)
 
@@ -324,8 +319,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_lower_bound_below_completely(self):
-        """
-                    [source)
+        """[source)
         [subtract]
         [subtract)
         [subtract]
@@ -402,9 +396,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_upper_bound_above_bounds_only(self):
-        """
-
-        [source)
+        """[source)
                [subtract]
 
         [source]
@@ -429,13 +421,11 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_upper_bound_above_completely(self):
-        """
-
-        [source)
-                    [subtract]
-                    (subtract)
-                    [subtract)
-                    (subtract]
+        """[source)
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
 
         """
         self.assertEqual(
@@ -456,9 +446,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_intersects_lower_bounds(self):
-        """
-
-                 [source)
+        """[source)
         [subtract]
              [subtract]
              [subtract)
@@ -483,9 +471,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_lower_bounds_same(self):
-        """
-
-        [source        )
+        """[source        )
 
         [subtract]
         [subtract)
@@ -494,7 +480,6 @@ class TestRangeSubtract(TestCase):
         (   subtract   )
         (   subtract   ]
         """
-
         self.assertEqual(
             [Range(6, 8, "()")],
             safe_subtract(Range(4, 8), Range(4, 6, "[]")),
@@ -514,8 +499,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_lower_bound_inclusive_difference_only(self):
-        """
-        [source   )
+        """[source   )
         (subtract )
         (subtract ]
         """
@@ -529,11 +513,10 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_intersects_upper_bound(self):
-        """
-        [source)
+        """[source)
 
-            [subtract]
-            (subtract)
+        [subtract]
+        (subtract)
         """
         self.assertEqual(
             [Range(4, 6, "[)")],
@@ -545,9 +528,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_exact_match(self):
-        """
-
-        [  source  )
+        """[  source  )
         [ subtract )
 
 
@@ -567,13 +548,10 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(4, 8, "(]"), Range(4, 8, "(]")))
 
     def test_upper_bounds_match(self):
+        """[  source  )
+        [subtract)
+        (subtract)
         """
-
-        [  source  )
-          [subtract)
-          (subtract)
-        """
-
         self.assertEqual(
             [Range(4, 5, "[)")],
             safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[)")),
@@ -599,14 +577,12 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_subtract_within(self):
+        """[    source    )
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
         """
-        [    source    )
-           [subtract]
-           (subtract)
-           [subtract)
-           (subtract]
-        """
-
         self.assertEqual(
             [Range(4, 5, "[)"), Range(7, 8, "()")],
             safe_subtract(Range(4, 8, "[)"), Range(5, 7, "[]")),
@@ -625,8 +601,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_bounds_only_differ(self):
-        """
-        [ source ]
+        """[ source ]
         (subtract)
         [subtract)
         (subtract]

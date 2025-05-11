@@ -1,5 +1,4 @@
 import json
-from utils.mixins import AnyTeamPosRequiredMixin
 import logging
 
 from django.contrib import messages
@@ -16,9 +15,6 @@ from django.views.generic.edit import UpdateView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
-from ..forms import PosSalesJSONForm
-from ..mixins import OrgaTeamPermissionMixin
-from ..mixins import PosViewMixin
 from camps.mixins import CampViewMixin
 from economy.filters import PosProductCostFilter
 from economy.filters import PosProductFilter
@@ -37,6 +33,11 @@ from economy.tables import PosSaleTable
 from economy.tables import PosTransactionTable
 from economy.utils import import_pos_sales_json
 from teams.models import Team
+from utils.mixins import AnyTeamPosRequiredMixin
+
+from ..forms import PosSalesJSONForm
+from ..mixins import OrgaTeamPermissionMixin
+from ..mixins import PosViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -120,9 +121,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        """
-        Set Pos before saving
-        """
+        """Set Pos before saving"""
         pr = form.save(commit=False)
         pr.pos = self.pos
         pr.save()
@@ -369,9 +368,7 @@ class PosProductListView(
         """Include the total (unfiltered) count."""
         context = super().get_context_data(*args, **kwargs)
         campfilter = models.Q(pos_sales__transaction__pos__team__camp=self.camp)
-        context["total_products"] = (
-            PosProduct.objects.filter(campfilter).distinct().count()
-        )
+        context["total_products"] = PosProduct.objects.filter(campfilter).distinct().count()
         filtered_totals = context["filter"].qs.aggregate(
             filtered_sales_count=models.Count("pos_sales", filter=campfilter),
             filtered_sales_sum=models.Sum("pos_sales__sales_price", filter=campfilter),

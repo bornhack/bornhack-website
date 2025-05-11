@@ -68,7 +68,6 @@ def add_teams_to_categories(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("info", "0004_infocategory_team")]
 
     operations = [migrations.RunPython(add_teams_to_categories)]

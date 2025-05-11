@@ -4,16 +4,19 @@ Adds `self.camp` to views, and adds `camp` and `camps` to the template context.
 Filters querysets with a `camp_filter` property.
 """
 
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import PermissionDenied
-from django.views.generic import CreateView, UpdateView, DeleteView, FormView
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.views.generic import CreateView
+from django.views.generic import DeleteView
+from django.views.generic import FormView
+from django.views.generic import UpdateView
+
 from camps.models import Camp
 
 
 class CampViewMixin:
-    """
-    This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
+    """This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
     It also filters out objects that belong to other camps when the model has a camp_filter
     """
 

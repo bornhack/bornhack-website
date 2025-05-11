@@ -22,8 +22,7 @@ def render_datetimetzrange(datetimetzrange):
 
 @register.simple_tag
 def availabilitytable(matrix, form=None):
-    """
-    Build the HTML table to show speaker availability, and hold the checkboxes
+    """Build the HTML table to show speaker availability, and hold the checkboxes
     for the speaker_availability form.
     """
     if not matrix:

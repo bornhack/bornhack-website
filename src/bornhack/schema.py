@@ -1,6 +1,6 @@
 from graphene import ObjectType
-from graphene import relay
 from graphene import Schema
+from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 

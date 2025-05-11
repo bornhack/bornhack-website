@@ -14,8 +14,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def get_daychunks(day):
-    """
-    Given a DateTimeTZRange day returns a list of "daychunks" which are
+    """Given a DateTimeTZRange day returns a list of "daychunks" which are
     DateTimeTZRanges of length settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS
     starting from day.lower. If day.lower is midnight and day.upper is 10 AM and
     settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=2 then a list of 5 daychunks
@@ -33,15 +32,12 @@ def get_daychunks(day):
         # increase our counter
         i += 1
         daychunk = DateTimeTZRange(
-            day.lower
-            + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
-            day.lower
-            + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
         )
 
     # cap the final chunk to be equal to the end of the day
-    if daychunk.upper > day.upper:
-        daychunk.upper = day.upper
+    daychunk.upper = min(daychunk.upper, day.upper)
 
     # append the final chunk and return
     chunks.append(daychunk)
@@ -49,8 +45,7 @@ def get_daychunks(day):
 
 
 def get_speaker_availability_form_matrix(sessions):
-    """
-    Create a speaker availability matrix of columns, rows and checkboxes for the HTML form.
+    """Create a speaker availability matrix of columns, rows and checkboxes for the HTML form.
 
     Returns a "matrix" - a dict of dicts, where the outer dict keys are DateTimeTZRanges
     representing a full camp "day" (as returned by camp.get_days("camp")), and the
@@ -86,9 +81,9 @@ def get_speaker_availability_form_matrix(sessions):
             if event_types:
                 # build the dict for this daychunk
                 matrix[day][daychunk] = {}
-                matrix[day][daychunk][
-                    "fieldname"
-                ] = f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
+                matrix[day][daychunk]["fieldname"] = (
+                    f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
+                )
                 matrix[day][daychunk]["event_types"] = []
                 # pass a list of dicts instead of the queryset to avoid one million lookups
                 for et in event_types:
@@ -121,8 +116,7 @@ def get_speaker_availability_form_matrix(sessions):
 
 
 def save_speaker_availability(form, obj):
-    """
-    Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
+    """Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
     and CombinedProposalSubmitView to create SpeakerProposalAvailability
     objects based on the submitted form.
     Also called from SpeakerUpdateView in backoffice to update
@@ -229,8 +223,7 @@ def save_speaker_availability(form, obj):
 
 
 def add_existing_availability_to_matrix(matrix, speaker_proposal):
-    """
-    Loops over the matrix and adds an "intial" member to the daychunk dicts
+    """Loops over the matrix and adds an "intial" member to the daychunk dicts
     with the availability info for the speaker_proposal.
     This is used to populate initial form field values and to set <td> background
     colours in the html table.
@@ -254,9 +247,7 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
 
 
 def get_slots(period, duration, bounds="()"):
-    """
-    Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them
-    """
+    """Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them"""
     slots = []
     if period.upper - period.lower < timedelta(minutes=duration):
         # this period is shorter than the duration, no slots

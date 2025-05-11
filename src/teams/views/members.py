@@ -6,14 +6,15 @@ from django.shortcuts import redirect
 from django.views.generic import DetailView
 from django.views.generic import UpdateView
 
+from camps.mixins import CampViewMixin
+from profiles.models import Profile
+
 from ..email import add_added_membership_email
 from ..email import add_removed_membership_email
 from ..models import Team
 from ..models import TeamMember
 from .mixins import EnsureTeamMemberLeadMixin
 from .mixins import TeamViewMixin
-from camps.mixins import CampViewMixin
-from profiles.models import Profile
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -55,8 +56,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
         TeamMember.objects.create(team=self.get_object(), user=self.request.user)
         messages.success(
             self.request,
-            "You request to join the team %s has been registered, thank you."
-            % self.get_object().name,
+            "You request to join the team %s has been registered, thank you." % self.get_object().name,
         )
         return redirect("teams:list", camp_slug=self.get_object().camp.slug)
 
@@ -108,9 +108,7 @@ class TeamMemberRemoveView(
                 "Team member removed (unable to add email to outgoing queue).",
             )
             logger.error(
-                "Unable to add removed email to outgoing queue for teammember: {}".format(
-                    form.instance,
-                ),
+                f"Unable to add removed email to outgoing queue for teammember: {form.instance}",
             )
         return redirect(
             "teams:general",
@@ -141,9 +139,7 @@ class TeamMemberApproveView(
                 "Team member removed (unable to add email to outgoing queue).",
             )
             logger.error(
-                "Unable to add approved email to outgoing queue for teammember: {}".format(
-                    form.instance,
-                ),
+                f"Unable to add approved email to outgoing queue for teammember: {form.instance}",
             )
         return redirect(
             "teams:general",

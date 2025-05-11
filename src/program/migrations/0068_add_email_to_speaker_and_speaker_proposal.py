@@ -19,7 +19,6 @@ def add_email(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0067_auto_20180818_1634")]
 
     operations = [migrations.RunPython(add_email)]

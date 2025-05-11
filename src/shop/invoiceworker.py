@@ -18,13 +18,11 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def do_work():
-    """
-    The invoice worker creates Invoice objects for shop orders and
+    """The invoice worker creates Invoice objects for shop orders and
     for custom orders. It also generates PDF files for Invoice objects
     that have no PDF. It also emails invoices for shop orders.
     It also generates proforma invoices for all closed orders.
     """
-
     # check if we need to generate any proforma invoices for shop orders
     for order in Order.objects.filter(
         Q(pdf="") | Q(pdf__isnull=True),
@@ -96,8 +94,7 @@ def do_work():
             logger.info("Generated pdf for invoice %s" % invoice)
         except Exception as E:
             logger.exception(
-                "Unable to generate PDF file for invoice #%s. Error: %s"
-                % (invoice.pk, E),
+                "Unable to generate PDF file for invoice #%s. Error: %s" % (invoice.pk, E),
             )
             continue
 
@@ -116,16 +113,11 @@ def do_work():
             invoice.sent_to_customer = True
             invoice.save()
             logger.info(
-                "OK: Invoice email to {} added to queue.".format(
-                    invoice.order.user.email,
-                ),
+                f"OK: Invoice email to {invoice.order.user.email} added to queue.",
             )
         else:
             logger.error(
-                "Unable to add email for invoice {} to {}".format(
-                    invoice.pk,
-                    invoice.order.user.email,
-                ),
+                f"Unable to add email for invoice {invoice.pk} to {invoice.order.user.email}",
             )
 
     # check if we need to generate any pdf creditnotes?
@@ -140,8 +132,7 @@ def do_work():
             logger.info("Generated pdf for creditnote %s" % creditnote)
         except Exception as E:
             logger.exception(
-                "Unable to generate PDF file for creditnote #%s. Error: %s"
-                % (creditnote.pk, E),
+                "Unable to generate PDF file for creditnote #%s. Error: %s" % (creditnote.pk, E),
             )
             continue
 
@@ -150,11 +141,7 @@ def do_work():
         creditnote.save()
 
     # check if we need to send out any creditnotes (only where pdf has been generated and only for creditnotes linked to a user)
-    for creditnote in (
-        CreditNote.objects.filter(sent_to_customer=False)
-        .exclude(pdf="")
-        .exclude(user=None)
-    ):
+    for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf="").exclude(user=None):
         # send the email
         if add_creditnote_email(creditnote=creditnote):
             logger.info("OK: Creditnote email to %s added" % creditnote.user.email)
@@ -162,6 +149,5 @@ def do_work():
             creditnote.save()
         else:
             logger.error(
-                "Unable to add creditnote email for creditnote %s to %s"
-                % (creditnote.pk, creditnote.user.email),
+                "Unable to add creditnote email for creditnote %s to %s" % (creditnote.pk, creditnote.user.email),
             )

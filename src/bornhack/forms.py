@@ -13,9 +13,9 @@ class AllAuthSignupCaptchaForm(SignupForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].help_text = (
-            "NOTE WELL: Microsoft blocks email from BornHack. If your email ends with @hotmail.com or @outlook.com it is likely we will be unable to send email to you. Please use a different email address."
-        )
+        self.fields[
+            "email"
+        ].help_text = "NOTE WELL: Microsoft blocks email from BornHack. If your email ends with @hotmail.com or @outlook.com it is likely we will be unable to send email to you. Please use a different email address."
 
     def clean_first_bornhack_year(self):
         if self.cleaned_data["first_bornhack_year"] != "2016":

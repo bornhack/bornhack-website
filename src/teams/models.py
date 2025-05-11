@@ -1,16 +1,16 @@
-from django.contrib.contenttypes.models import ContentType
 import logging
-from camps.models import Permission as CampPermission
-
 
 from django.conf import settings
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
-from django.contrib.auth.models import Group, Permission
 
+from camps.models import Permission as CampPermission
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -248,8 +248,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def memberships(self):
-        """
-        Returns all TeamMember objects for this team.
+        """Returns all TeamMember objects for this team.
         Use self.members.all() to get User objects for all members,
         or use self.memberships.all() to get TeamMember objects for all members.
         """
@@ -257,22 +256,17 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def approved_members(self):
-        """
-        Returns only approved members (returns User objects, not TeamMember objects)
-        """
+        """Returns only approved members (returns User objects, not TeamMember objects)"""
         return self.members.filter(teammember__approved=True)
 
     @property
     def unapproved_members(self):
-        """
-        Returns only unapproved members (returns User objects, not TeamMember objects)
-        """
+        """Returns only unapproved members (returns User objects, not TeamMember objects)"""
         return self.members.filter(teammember__approved=False)
 
     @property
     def leads(self):
-        """
-        Return only approved team leads
+        """Return only approved team leads
         Used to handle permissions for team leads
         """
         return self.members.filter(
@@ -282,8 +276,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def regular_members(self):
-        """
-        Return only approved and not lead members with
+        """Return only approved and not lead members with
         an approved public_credit_name.
         Used on the people pages.
         """
@@ -294,8 +287,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def unnamed_members(self):
-        """
-        Returns only approved and not team lead members,
+        """Returns only approved and not team lead members,
         without an approved public_credit_name.
         """
         return self.members.filter(
@@ -515,11 +507,7 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     camp_filter = "team__camp"
 
     def __str__(self):
-        return "{} team shift from {} to {}".format(
-            self.team.name,
-            self.shift_range.lower,
-            self.shift_range.upper,
-        )
+        return f"{self.team.name} team shift from {self.shift_range.lower} to {self.shift_range.upper}"
 
     @property
     def users(self):

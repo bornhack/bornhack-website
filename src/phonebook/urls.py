@@ -2,13 +2,13 @@ from django.urls import include
 from django.urls import path
 from django.urls import re_path
 
+from .views import ApiDectUpdateIPEI
 from .views import DectExportJsonView
 from .views import DectRegistrationCreateView
 from .views import DectRegistrationDeleteView
 from .views import DectRegistrationListView
 from .views import DectRegistrationUpdateView
 from .views import PhonebookListView
-from .views import ApiDectUpdateIPEI
 
 app_name = "phonebook"
 urlpatterns = [

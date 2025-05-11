@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0033_alter_posreport_hax_sold_website_old"),
     ]
@@ -15,7 +14,9 @@ class Migration(migrations.Migration):
             model_name="posreport",
             name="period",
             field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
-                blank=True, help_text="The time period this report covers", null=True
+                blank=True,
+                help_text="The time period this report covers",
+                null=True,
             ),
         ),
     ]

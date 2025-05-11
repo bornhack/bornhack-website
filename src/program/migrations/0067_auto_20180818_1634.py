@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0066_speaker_email")]
 
     operations = [
         migrations.AlterModelOptions(
             name="eventproposal",
             options={
-                "permissions": (("can_approve_proposals", "Can approve proposals"),)
+                "permissions": (("can_approve_proposals", "Can approve proposals"),),
             },
-        )
+        ),
     ]

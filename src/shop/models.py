@@ -4,7 +4,6 @@ from datetime import timedelta
 from decimal import Decimal
 from enum import Enum
 from itertools import chain
-from typing import Optional
 
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -27,13 +26,14 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from unidecode import unidecode
 
-from .managers import OrderQuerySet
-from .managers import ProductQuerySet
 from tickets.models import ShopTicket
 from tickets.models import TicketGroup
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
+
+from .managers import OrderQuerySet
+from .managers import ProductQuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -64,8 +64,7 @@ class CustomOrder(ExportModelOperationsMixin("custom_order"), CreatedUpdatedMode
     def vat(self):
         if self.danish_vat:
             return Decimal(round(self.amount * Decimal(0.2), 2))
-        else:
-            return 0
+        return 0
 
 
 class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
@@ -157,49 +156,27 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
             return Decimal(
                 self.products.aggregate(
                     sum=Sum(
-                        models.F("orderproductrelation__product__price")
-                        * models.F("orderproductrelation__quantity"),
+                        models.F("orderproductrelation__product__price") * models.F("orderproductrelation__quantity"),
                         output_field=models.IntegerField(),
                     ),
                 )["sum"],
             )
-        else:
-            return False
+        return False
 
     def get_coinify_thanks_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:coinify_thanks", kwargs={"pk": self.pk}))
-        )
+        return "https://" + request.get_host() + str(reverse_lazy("shop:coinify_thanks", kwargs={"pk": self.pk}))
 
     def get_epay_accept_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:epay_thanks", kwargs={"pk": self.pk}))
-        )
+        return "https://" + request.get_host() + str(reverse_lazy("shop:epay_thanks", kwargs={"pk": self.pk}))
 
     def get_cancel_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
-        )
+        return "https://" + request.get_host() + str(reverse_lazy("shop:order_detail", kwargs={"pk": self.pk}))
 
     def get_quickpay_accept_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:quickpay_thanks", kwargs={"pk": self.pk}))
-        )
+        return "https://" + request.get_host() + str(reverse_lazy("shop:quickpay_thanks", kwargs={"pk": self.pk}))
 
     def get_quickpay_callback_url(self, request):
-        return (
-            "https://"
-            + request.get_host()
-            + str(reverse_lazy("shop:quickpay_callback", kwargs={"pk": self.pk}))
-        )
+        return "https://" + request.get_host() + str(reverse_lazy("shop:quickpay_callback", kwargs={"pk": self.pk}))
 
     @property
     def description(self):
@@ -257,8 +234,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
     def get_invoice_address(self):
         if self.invoice_address:
             return self.invoice_address
-        else:
-            return self.user.email
+        return self.user.email
 
     @property
     def used_status(self):
@@ -293,7 +269,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
         if total_refunded:
             if total_refunded == total_quantity:
                 return RefundEnum.FULLY_REFUNDED.value
-            elif total_refunded > 0:
+            if total_refunded > 0:
                 return RefundEnum.PARTIALLY_REFUNDED.value
 
         return RefundEnum.NOT_REFUNDED.value
@@ -475,8 +451,7 @@ class ProductStatsManager(models.Manager):
                 ),
             )
             .annotate(
-                total_units_sold=Sum("orderproductrelation__quantity")
-                - F("total_units_refunded"),
+                total_units_sold=Sum("orderproductrelation__quantity") - F("total_units_refunded"),
             )
             .exclude(total_units_sold=0)
             # calculate the profit for this product
@@ -538,10 +513,7 @@ class Product(ExportModelOperationsMixin("product"), CreatedUpdatedModel, UUIDMo
     )
 
     stock_amount = models.IntegerField(
-        help_text=(
-            "Initial amount available in stock if there is a limited "
-            "supply, e.g. fridge space"
-        ),
+        help_text=("Initial amount available in stock if there is a limited supply, e.g. fridge space"),
         null=True,
         blank=True,
     )
@@ -724,9 +696,9 @@ class OrderProductRelation(
         *,
         product: Product,
         number_of_tickets: int = 1,
-        bundle_product: Optional[Product] = None,
-        ticket_group: Optional[TicketGroup] = None,
-        request: Optional[HttpRequest] = None,
+        bundle_product: Product | None = None,
+        ticket_group: TicketGroup | None = None,
+        request: HttpRequest | None = None,
     ) -> list[ShopTicket]:
         if not product.ticket_type:
             return []
@@ -755,10 +727,7 @@ class OrderProductRelation(
 
             if request:
                 if created:
-                    msg = (
-                        f"Created ticket for product {self.product} on "
-                        f"order {self.order} (quantity: {self.quantity})"
-                    )
+                    msg = f"Created ticket for product {self.product} on order {self.order} (quantity: {self.quantity})"
                 else:
                     msg = (
                         f"Ticket already exists for product {self.product} on "
@@ -785,9 +754,7 @@ class OrderProductRelation(
 
             query_kwargs["opr"] = self
             # create the number of tickets required
-            new_tickets = [
-                ShopTicket(**query_kwargs) for _i in range(tickets_to_create)
-            ]
+            new_tickets = [ShopTicket(**query_kwargs) for _i in range(tickets_to_create)]
             self.shoptickets.bulk_create(new_tickets)
 
             if request:
@@ -796,7 +763,7 @@ class OrderProductRelation(
 
         return new_tickets
 
-    def create_tickets(self, request: Optional[HttpRequest] = None):
+    def create_tickets(self, request: HttpRequest | None = None):
         """This method generates the needed tickets for this OPR.
 
         We run this in a transaction so everything is undone in case something fails,
@@ -807,7 +774,6 @@ class OrderProductRelation(
         Calling this method multiple times will not result in duplicate tickets being created,
         and the number of tickets created takes the number of refunded into consideration too.
         """
-
         tickets = []
         with transaction.atomic():
             # do we even generate tickets for this type of product?
@@ -891,10 +857,7 @@ class OrderProductRelation(
 
     @property
     def possible_refund(self) -> int:
-        """
-        Returns the number of tickets that can be refunded for this OPR.
-        """
-
+        """Returns the number of tickets that can be refunded for this OPR."""
         # If the product has no ticket type, we should be able to refund everything
         if not self.product.ticket_type:
             return self.quantity - self.refunded_quantity
@@ -906,9 +869,7 @@ class OrderProductRelation(
             is_refunded = self.refunded_quantity == self.quantity
             return 0 if has_used_tickets or is_refunded else 1
 
-        quantity = (
-            1 if self.product.ticket_type.single_ticket_per_product else self.quantity
-        )
+        quantity = 1 if self.product.ticket_type.single_ticket_per_product else self.quantity
         return quantity - self.used_tickets_count - self.refunded_quantity
 
     @property
@@ -1038,24 +999,14 @@ class CreditNote(ExportModelOperationsMixin("credit_note"), CreatedUpdatedModel)
 
     def __str__(self):
         if self.user:
-            return "creditnote#{} - {} DKK (customer: user {})".format(
-                self.id,
-                self.amount,
-                self.user.email,
-            )
-        else:
-            return "creditnote#{} - {} DKK (customer: {})".format(
-                self.id,
-                self.amount,
-                self.customer,
-            )
+            return f"creditnote#{self.id} - {self.amount} DKK (customer: user {self.user.email})"
+        return f"creditnote#{self.id} - {self.amount} DKK (customer: {self.customer})"
 
     @property
     def vat(self):
         if self.danish_vat:
             return Decimal(round(self.amount * Decimal(0.2), 2))
-        else:
-            return 0
+        return 0
 
     @property
     def filename(self):
@@ -1080,24 +1031,14 @@ class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
 
     def __str__(self):
         if self.order:
-            return "invoice#{} - shop order {} - {} - total {} DKK (sent to {}: {})".format(
+            return f"invoice#{self.id} - shop order {self.order.id} - {self.order.created} - total {self.order.total} DKK (sent to {self.order.user.email}: {self.sent_to_customer})"
+        if self.customorder:
+            return "invoice#%s - custom order %s - %s - amount %s DKK (customer: %s)" % (
                 self.id,
-                self.order.id,
-                self.order.created,
-                self.order.total,
-                self.order.user.email,
-                self.sent_to_customer,
-            )
-        elif self.customorder:
-            return (
-                "invoice#%s - custom order %s - %s - amount %s DKK (customer: %s)"
-                % (
-                    self.id,
-                    self.customorder.id,
-                    self.customorder.created,
-                    self.customorder.amount,
-                    unidecode(self.customorder.customer),
-                )
+                self.customorder.id,
+                self.customorder.created,
+                self.customorder.amount,
+                unidecode(self.customorder.customer),
             )
 
     @property
@@ -1111,8 +1052,7 @@ class Invoice(ExportModelOperationsMixin("invoice"), CreatedUpdatedModel):
     def get_order(self):
         if self.order:
             return self.order
-        else:
-            return self.customorder
+        return self.customorder
 
 
 # ########## COINIFY #################################################
@@ -1173,8 +1113,7 @@ class CoinifyAPICallback(
     def __str__(self):
         if self.order:
             return f"order #{self.order.id} callback at {self.created}"
-        else:
-            return f"other callback at {self.created}"
+        return f"other callback at {self.created}"
 
 
 class CoinifyAPIRequest(
@@ -1231,17 +1170,11 @@ class QuickPayAPIRequest(CreatedUpdatedModel, UUIDModel):
     )
 
     def __str__(self):
-        return (
-            f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
-        )
+        return f"order {self.order.id} quickpay api request {self.method} {self.endpoint}"
 
     def create_or_update_object(self):
         """Create or update the QuickPayAPIObject in the response_body."""
-        if (
-            self.response_body
-            and "type" in self.response_body
-            and "id" in self.response_body
-        ):
+        if self.response_body and "type" in self.response_body and "id" in self.response_body:
             obj, created = QuickPayAPIObject.objects.get_or_create(
                 id=self.response_body["id"],
                 defaults={

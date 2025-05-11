@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from .environment_settings import *  # noqa: F403
 from utils import range_fields  # noqa: F401
+
+from .environment_settings import *  # noqa: F403
 
 # range_fields monkeypatches postgres Range object to support lookups
 

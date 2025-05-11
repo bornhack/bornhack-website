@@ -48,15 +48,11 @@ class Command(BaseCommand):
         self.output("All there is left is to create:")
         self.output(
             self.local_dir(
-                "static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png".format(
-                    camp_slug=camp_slug,
-                ),
+                f"static_src/img/{camp_slug}/logo/{camp_slug}-logo-large.png",
             ),
         )
         self.output(
             self.local_dir(
-                "static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png".format(
-                    camp_slug=camp_slug,
-                ),
+                f"static_src/img/{camp_slug}/logo/{camp_slug}-logo-small.png",
             ),
         )

@@ -8,12 +8,13 @@ from django.views.generic import ListView
 from django.views.generic.edit import CreateView
 from jsonview.views import JsonView
 
+from camps.mixins import CampViewMixin
+
 from .mixins import FacilityTypeViewMixin
 from .mixins import FacilityViewMixin
 from .models import Facility
 from .models import FacilityFeedback
 from .models import FacilityType
-from camps.mixins import CampViewMixin
 
 
 class FacilityTypeListView(CampViewMixin, ListView):
@@ -150,8 +151,7 @@ class FacilityFeedbackView(FacilityTypeViewMixin, FacilityViewMixin, CreateView)
     fields = ["quick_feedback", "comment", "urgent"]
 
     def get_form(self, form_class=None):
-        """
-        - Add quick feedback field to the form
+        """- Add quick feedback field to the form
         - Add anon option to the form
         """
         form = super().get_form(form_class)

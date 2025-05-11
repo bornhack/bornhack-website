@@ -13,9 +13,9 @@ from django.views.generic import UpdateView
 from django.views.generic import View
 from django.views.generic.detail import SingleObjectMixin
 
-from .models import ShopTicket
 from utils.models import CampReadOnlyModeError
 
+from .models import ShopTicket
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -37,9 +37,7 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
 
     context = {
         "tickets": (base_queryset.filter(ticket_group__isnull=True)),
-        "tickets_in_groups": (
-            base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")
-        ),
+        "tickets_in_groups": (base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")),
     }
 
     return render(request, "tickets/ticket_list.html", context)
@@ -57,10 +55,7 @@ class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
-            'attachment; filename="{type}_ticket_{pk}.pdf"'.format(
-                type=self.get_object().shortname,
-                pk=self.get_object().pk,
-            )
+            f'attachment; filename="{self.get_object().shortname}_ticket_{self.get_object().pk}.pdf"'
         )
         response.write(self.get_object().generate_pdf().getvalue())
         return response

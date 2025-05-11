@@ -3,19 +3,18 @@ import logging
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
+from utils.widgets import MarkdownWidget
+
 from .models import Event
 from .models import EventProposal
 from .models import EventTrack
 from .models import SpeakerProposal
 
-from utils.widgets import MarkdownWidget
-
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class SpeakerProposalForm(forms.ModelForm):
-    """
-    The SpeakerProposalForm. Takes a list of EventTypes in __init__,
+    """The SpeakerProposalForm. Takes a list of EventTypes in __init__,
     and changes fields accordingly if the list has 1 element.
     """
 
@@ -31,9 +30,7 @@ class SpeakerProposalForm(forms.ModelForm):
         ]
 
     def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
-        """
-        initialise the form and adapt based on event_type
-        """
+        """Initialise the form and adapt based on event_type"""
         super().__init__(*args, **kwargs)
 
         matrix = matrix or {}
@@ -53,9 +50,7 @@ class SpeakerProposalForm(forms.ModelForm):
                     for daychunk in matrix[date]:
                         if matrix[date][daychunk]:
                             # add the field
-                            self.fields[matrix[date][daychunk]["fieldname"]] = (
-                                forms.BooleanField(required=False)
-                            )
+                            self.fields[matrix[date][daychunk]["fieldname"]] = forms.BooleanField(required=False)
                             # add it to Meta.fields too
                             self.Meta.fields.append(matrix[date][daychunk]["fieldname"])
 
@@ -67,13 +62,13 @@ class SpeakerProposalForm(forms.ModelForm):
         if event_type.name == "Debate":
             # fix label and help_text for the name field
             self.fields["name"].label = "Guest Name"
-            self.fields["name"].help_text = (
-                "The name of a debate guest. Can be a real name or an alias (public)."
-            )
+            self.fields["name"].help_text = "The name of a debate guest. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Guest Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for this guest. Will default to the logged-in users email if left empty (not public)."
             )
 
@@ -83,9 +78,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this guest (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this guest (not public)."
 
             # no free tickets for debates
             del self.fields["needs_oneday_ticket"]
@@ -93,13 +86,13 @@ class SpeakerProposalForm(forms.ModelForm):
         elif event_type.name == "Lightning Talk":
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
-            self.fields["name"].help_text = (
-                "The name of the speaker. Can be a real name or an alias (public)."
-            )
+            self.fields["name"].help_text = "The name of the speaker. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for this speaker. Will default to the logged-in users email if left empty. (not public)"
             )
 
@@ -109,9 +102,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this speaker (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this speaker (not public)."
 
             # no free tickets for lightning talks
             del self.fields["needs_oneday_ticket"]
@@ -119,27 +110,23 @@ class SpeakerProposalForm(forms.ModelForm):
         elif event_type.name == "Music Act":
             # fix label and help_text for the name field
             self.fields["name"].label = "Artist Name"
-            self.fields["name"].help_text = (
-                "The name of the artist. Can be a real name or artist alias (public)."
-            )
+            self.fields["name"].help_text = "The name of the artist. Can be a real name or artist alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Artist Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for this artist. Will default to the logged-in users email if left empty (not public)."
             )
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Artist Description"
-            self.fields["biography"].help_text = (
-                "The description of the artist (public)."
-            )
+            self.fields["biography"].help_text = "The description of the artist (public)."
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this artist (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this artist (not public)."
 
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
@@ -147,38 +134,34 @@ class SpeakerProposalForm(forms.ModelForm):
         elif event_type.name == "Talk" or event_type.name == "Keynote":
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
-            self.fields["name"].help_text = (
-                "The name of the speaker. Can be a real name or an alias (public)."
-            )
+            self.fields["name"].help_text = "The name of the speaker. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Speaker Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for this speaker. Will default to the logged-in users email if left empty (not public)."
             )
 
             # fix label and help_text for the biograpy field
             self.fields["biography"].label = "Speaker Biography"
-            self.fields["biography"].help_text = (
-                "The biography of the speaker (public)."
-            )
+            self.fields["biography"].help_text = "The biography of the speaker (public)."
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this speaker (not public)"
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this speaker (not public)"
 
         elif event_type.name == "Workshop":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
-            self.fields["name"].help_text = (
-                "The name of the workshop host. Can be a real name or an alias (public)."
-            )
+            self.fields["name"].help_text = "The name of the workshop host. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for the host. Will default to the logged-in users email if left empty (not public)."
             )
 
@@ -188,9 +171,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this host (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for workshops
             del self.fields["needs_oneday_ticket"]
@@ -202,7 +183,9 @@ class SpeakerProposalForm(forms.ModelForm):
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for the host. Will default to the logged-in users email if left empty (not public)."
             )
 
@@ -212,9 +195,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this host (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for recreational events
             del self.fields["needs_oneday_ticket"]
@@ -222,13 +203,13 @@ class SpeakerProposalForm(forms.ModelForm):
         elif event_type.name == "Meetup":
             # fix label and help_text for the name field
             self.fields["name"].label = "Host Name"
-            self.fields["name"].help_text = (
-                "The name of the meetup host. Can be a real name or an alias (public)."
-            )
+            self.fields["name"].help_text = "The name of the meetup host. Can be a real name or an alias (public)."
 
             # fix label and help_text for the email field
             self.fields["email"].label = "Host Email"
-            self.fields["email"].help_text = (
+            self.fields[
+                "email"
+            ].help_text = (
                 "The email for the host. Will default to the logged-in users email if left empty (not public)."
             )
 
@@ -238,9 +219,7 @@ class SpeakerProposalForm(forms.ModelForm):
             self.fields["biography"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this host (not public)."
-            )
+            self.fields["submission_notes"].help_text = "Private notes regarding this host (not public)."
 
             # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
@@ -252,9 +231,7 @@ class SpeakerProposalForm(forms.ModelForm):
 
 
 class EventProposalForm(forms.ModelForm):
-    """
-    The EventProposalForm. Takes an EventType in __init__ and changes fields accordingly.
-    """
+    """The EventProposalForm. Takes an EventType in __init__ and changes fields accordingly."""
 
     slides_url = forms.URLField(
         label="Slides URL",
@@ -326,19 +303,15 @@ class EventProposalForm(forms.ModelForm):
         self.fields["duration"].label = f"{event_type.name} Duration"
         self.fields["submission_notes"].label = "Notes to the Content Team"
         if event_type.event_duration_minutes:
-            self.fields["duration"].help_text = (
-                f"Please enter the duration of this {event_type.name} (in minutes, max {event_type.event_duration_minutes})"
+            self.fields[
+                "duration"
+            ].help_text = f"Please enter the duration of this {event_type.name} (in minutes, max {event_type.event_duration_minutes})"
+            self.fields["duration"].widget.attrs["placeholder"] = (
+                f"{event_type.name} Duration (in minutes, max {event_type.event_duration_minutes})"
             )
-            self.fields["duration"].widget.attrs[
-                "placeholder"
-            ] = f"{event_type.name} Duration (in minutes, max {event_type.event_duration_minutes})"
         else:
-            self.fields["duration"].help_text = (
-                f"Please enter the duration of this {event_type.name} (in minutes)"
-            )
-            self.fields["duration"].widget.attrs[
-                "placeholder"
-            ] = f"{event_type.name} Duration (in minutes)"
+            self.fields["duration"].help_text = f"Please enter the duration of this {event_type.name} (in minutes)"
+            self.fields["duration"].widget.attrs["placeholder"] = f"{event_type.name} Duration (in minutes)"
 
         if not event_type.name == LIGHTNING_TALK:
             # Only lightning talks submissions will have to choose whether to use provided speaker laptop
@@ -355,9 +328,9 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this debate. Only visible to yourself and the BornHack organisers."
-            )
+            self.fields[
+                "submission_notes"
+            ].help_text = "Private notes regarding this debate. Only visible to yourself and the BornHack organisers."
 
         elif event_type.name == MUSIC_ACT:
             # fix label and help_text for the title field
@@ -370,7 +343,9 @@ class EventProposalForm(forms.ModelForm):
             self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
+            self.fields[
+                "submission_notes"
+            ].help_text = (
                 "Private notes regarding this music act. Only visible to yourself and the BornHack organisers."
             )
 
@@ -385,13 +360,13 @@ class EventProposalForm(forms.ModelForm):
 
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Event Abstract"
-            self.fields["abstract"].help_text = (
-                "The description/abstract of this recreational event."
-            )
+            self.fields["abstract"].help_text = "The description/abstract of this recreational event."
             self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
+            self.fields[
+                "submission_notes"
+            ].help_text = (
                 "Private notes regarding this recreational event. Only visible to yourself and the BornHack organisers."
             )
 
@@ -406,15 +381,17 @@ class EventProposalForm(forms.ModelForm):
 
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Abstract of Talk"
-            self.fields["abstract"].help_text = (
+            self.fields[
+                "abstract"
+            ].help_text = (
                 "The description/abstract of this talk/presentation. Explain what the audience will experience."
             )
             self.fields["abstract"].widget = MarkdownWidget()
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this talk. Only visible to yourself and the BornHack organisers."
-            )
+            self.fields[
+                "submission_notes"
+            ].help_text = "Private notes regarding this talk. Only visible to yourself and the BornHack organisers."
 
             if self.fields.get("slides_url") and event_type.name == LIGHTNING_TALK:
                 self.fields[
@@ -430,15 +407,15 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this workshop."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this workshop. Only visible to yourself and the BornHack organisers."
-            )
+            self.fields[
+                "submission_notes"
+            ].help_text = "Private notes regarding this workshop. Only visible to yourself and the BornHack organisers."
 
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Workshop Abstract"
-            self.fields["abstract"].help_text = (
-                "The description/abstract of this workshop. Explain what the participants will learn."
-            )
+            self.fields[
+                "abstract"
+            ].help_text = "The description/abstract of this workshop. Explain what the participants will learn."
             self.fields["abstract"].widget = MarkdownWidget()
 
             # no video recording for workshops
@@ -451,15 +428,17 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this recreational event."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
+            self.fields[
+                "submission_notes"
+            ].help_text = (
                 "Private notes regarding this recreational event. Only visible to yourself and the BornHack organisers."
             )
 
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Event Abstract"
-            self.fields["abstract"].help_text = (
-                "The description/abstract of this event. Explain what the participants will experience."
-            )
+            self.fields[
+                "abstract"
+            ].help_text = "The description/abstract of this event. Explain what the participants will experience."
             self.fields["abstract"].widget = MarkdownWidget()
 
             # no video recording for recreational events
@@ -472,13 +451,15 @@ class EventProposalForm(forms.ModelForm):
             self.fields["title"].help_text = "The title of this meetup."
 
             # fix label and help_text for the submission_notes field
-            self.fields["submission_notes"].help_text = (
-                "Private notes regarding this meetup. Only visible to yourself and the BornHack organisers."
-            )
+            self.fields[
+                "submission_notes"
+            ].help_text = "Private notes regarding this meetup. Only visible to yourself and the BornHack organisers."
 
             # fix label and help_text for the abstract field
             self.fields["abstract"].label = "Meetup Abstract"
-            self.fields["abstract"].help_text = (
+            self.fields[
+                "abstract"
+            ].help_text = (
                 "The description/abstract of this meetup. Explain what the meetup is about and who should attend."
             )
             self.fields["abstract"].widget = MarkdownWidget()

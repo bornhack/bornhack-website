@@ -165,11 +165,7 @@ class OutgoingEmail(ExportModelOperationsMixin("outgoing_email"), CreatedUpdated
         return f"OutgoingEmail Object id: {self.id} "
 
     def clean(self):
-        if (
-            not self.to_recipients
-            and not self.bcc_recipients
-            and not self.cc_recipients
-        ):
+        if not self.to_recipients and not self.bcc_recipients and not self.cc_recipients:
             raise ValidationError(
                 {
                     "recipient": "either to_recipient, bcc_recipient or cc_recipient required.",

@@ -1,17 +1,16 @@
-from django.core.exceptions import PermissionDenied
-from django.contrib import messages
-from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+
+from camps.mixins import CampViewMixin
 
 from .models import Facility
 from .models import FacilityType
-from camps.mixins import CampViewMixin
 
 
 class FacilityTypeViewMixin(CampViewMixin):
-    """
-    A mixin to get the FacilityType object based on facility_type_slug in url kwargs
-    """
+    """A mixin to get the FacilityType object based on facility_type_slug in url kwargs"""
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -36,8 +35,7 @@ class FacilityViewMixin(CampViewMixin):
         self.facility = get_object_or_404(Facility, uuid=kwargs["facility_uuid"])
 
     def get_form(self, *args, **kwargs):
-        """
-        The default range widgets are a bit shit because they eat the help_text and
+        """The default range widgets are a bit shit because they eat the help_text and
         have no indication of which field is for what. So we add a nice placeholder.
         """
         form = super().get_form(*args, **kwargs)

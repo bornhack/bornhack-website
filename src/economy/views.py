@@ -14,6 +14,13 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import TemplateView
 
+from camps.mixins import CampViewMixin
+from teams.models import Team
+from utils.email import add_outgoing_email
+from utils.mixins import RaisePermissionRequiredMixin
+from utils.mixins import VerbCreateView as CreateView
+from utils.mixins import VerbUpdateView as UpdateView
+
 from .forms import ExpenseCreateForm
 from .forms import ExpenseUpdateForm
 from .forms import RevenueCreateForm
@@ -29,21 +36,13 @@ from .models import Credebtor
 from .models import Expense
 from .models import Reimbursement
 from .models import Revenue
-from camps.mixins import CampViewMixin
-from teams.models import Team
-from utils.email import add_outgoing_email
-from utils.mixins import RaisePermissionRequiredMixin
-from utils.mixins import VerbCreateView as CreateView
-from utils.mixins import VerbUpdateView as UpdateView
 
 
 class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
-        """
-        Add expenses, reimbursements and revenues to the context
-        """
+        """Add expenses, reimbursements and revenues to the context"""
         context = super().get_context_data(**kwargs)
 
         # get reimbursement stats
@@ -138,8 +137,7 @@ class ChainCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
         # a message for the user
         messages.success(
             self.request,
-            "The new Chain %s has been saved. You can now add Creditor(s)/Debtor(s) for it."
-            % chain.name,
+            "The new Chain %s has been saved. You can now add Creditor(s)/Debtor(s) for it." % chain.name,
         )
 
         return HttpResponseRedirect(
@@ -168,9 +166,7 @@ class CredebtorCreateView(
     fields = ["name", "address", "notes"]
 
     def get_context_data(self, **kwargs):
-        """
-        Add chain to context
-        """
+        """Add chain to context"""
         context = super().get_context_data(**kwargs)
         context["chain"] = self.chain
         return context
@@ -183,8 +179,7 @@ class CredebtorCreateView(
         # a message for the user
         messages.success(
             self.request,
-            "The Creditor/Debtor %s has been saved. You can now add Expenses/Revenues for it."
-            % credebtor.name,
+            "The Creditor/Debtor %s has been saved. You can now add Expenses/Revenues for it." % credebtor.name,
         )
 
         return HttpResponseRedirect(
@@ -206,9 +201,7 @@ class CredebtorListView(
     permission_required = "camps.expense_create_permission"
 
     def get_context_data(self, **kwargs):
-        """
-        Add chain to context
-        """
+        """Add chain to context"""
         context = super().get_context_data(**kwargs)
         context["chain"] = self.chain
         return context
@@ -244,9 +237,7 @@ class ExpenseCreateView(
     form_class = ExpenseCreateForm
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -304,9 +295,7 @@ class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
         return response
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -345,8 +334,7 @@ class ExpenseDeleteView(CampViewMixin, ExpensePermissionMixin, UpdateView):
 
 
 class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
-    """
-    This view returns the invoice for an Expense with the proper mimetype
+    """This view returns the invoice for an Expense with the proper mimetype
     Uses ExpensePermissionMixin to make sure the user is allowed to see the image
     """
 
@@ -428,9 +416,7 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         return context
 
     def form_valid(self, form):
-        """
-        Set user and camp for the Reimbursement before saving
-        """
+        """Set user and camp for the Reimbursement before saving"""
         # get the expenses for this user
         expenses = Expense.objects.filter(
             user=self.request.user,
@@ -569,9 +555,7 @@ class RevenueCreateView(
     form_class = RevenueCreateForm
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -629,9 +613,7 @@ class RevenueUpdateView(CampViewMixin, RevenuePermissionMixin, UpdateView):
         return response
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -669,8 +651,7 @@ class RevenueDeleteView(CampViewMixin, RevenuePermissionMixin, UpdateView):
 
 
 class RevenueInvoiceView(CampViewMixin, RevenuePermissionMixin, DetailView):
-    """
-    This view returns a http response with the invoice for a Revenue object, with the proper mimetype
+    """This view returns a http response with the invoice for a Revenue object, with the proper mimetype
     Uses RevenuePermissionMixin to make sure the user is allowed to see the file
     """
 

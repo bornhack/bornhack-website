@@ -1,7 +1,8 @@
-from django.contrib.auth.models import User
-from django import forms
-from django.core.exceptions import ValidationError
 import json
+
+from django import forms
+from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory
 
 from program.models import Event
@@ -97,9 +98,7 @@ class SpeakerForm(forms.ModelForm):
         ]
 
     def __init__(self, camp, matrix=None, *args, **kwargs):
-        """
-        initialise the form and add availability fields to form
-        """
+        """Initialise the form and add availability fields to form"""
         super().__init__(*args, **kwargs)
 
         matrix = matrix or {}
@@ -283,12 +282,9 @@ class ManageTeamPermissionsForm(forms.Form):
     def __init__(self, matrix: dict[str, list[str]], *args, **kwargs):
         """Build a form of bool fields for the teams users permissions."""
         super().__init__(*args, **kwargs)
-        for username in matrix.keys():
+        for username in matrix:
             for perm in matrix[username]:
-                if (
-                    perm in ["lead", "member"]
-                    or User.objects.get(username=username).is_superuser
-                ):
+                if perm in ["lead", "member"] or User.objects.get(username=username).is_superuser:
                     disabled = True
                 else:
                     disabled = False

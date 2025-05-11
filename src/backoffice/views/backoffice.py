@@ -6,20 +6,18 @@ from django.http import Http404
 from django.http import HttpResponse
 from django.views.generic import TemplateView
 
-from utils.mixins import AnyTeamMemberRequiredMixin
-from utils.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from facilities.models import FacilityFeedback
 from teams.models import Team
+from utils.mixins import AnyTeamMemberRequiredMixin
+from utils.mixins import RaisePermissionRequiredMixin
 from utils.models import OutgoingEmail
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateView):
-    """
-    The Backoffice index view is available to anyone who is an approved member of any team for the current camp.
-    """
+    """The Backoffice index view is available to anyone who is an approved member of any team for the current camp."""
 
     template_name = "index.html"
 
@@ -60,11 +58,7 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
         perms = self.request.user.get_all_permissions()
 
         # get slugs for teams the user has member permission for
-        team_slugs = [
-            perm.split(".")[1].split("_")[0]
-            for perm in perms
-            if perm.endswith("_team_member")
-        ]
+        team_slugs = [perm.split(".")[1].split("_")[0] for perm in perms if perm.endswith("_team_member")]
         # generate a list of teams with unhandled facility feedback
         context["facilityfeedback_teams"] = Team.objects.filter(
             slug__in=team_slugs,
@@ -113,8 +107,7 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
 
 
 class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
-    """
-    Show proxied stuff, only for simple HTML pages with no external content
+    """Show proxied stuff, only for simple HTML pages with no external content
     Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of slug: (description, url) pairs
     """
 

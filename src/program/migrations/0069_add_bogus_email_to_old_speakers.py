@@ -13,7 +13,6 @@ def add_bogus_email(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0068_add_email_to_speaker_and_speaker_proposal")]
 
     operations = [migrations.RunPython(add_bogus_email)]

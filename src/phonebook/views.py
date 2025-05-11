@@ -1,15 +1,15 @@
+import json
 import logging
 import secrets
 import string
-import json
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
@@ -20,12 +20,13 @@ from django.views.generic import View
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
-from .mixins import DectRegistrationViewMixin
-from .models import DectRegistration
-from .dectutils import DectUtils
-from .forms import DectRegistrationForm
 from camps.mixins import CampViewMixin
 from utils.mixins import UserIsObjectOwnerMixin
+
+from .dectutils import DectUtils
+from .forms import DectRegistrationForm
+from .mixins import DectRegistrationViewMixin
+from .models import DectRegistration
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 dectutil = DectUtils()
@@ -36,9 +37,7 @@ class DectExportJsonView(
     ScopedProtectedResourceView,
     JsonView,
 ):
-    """
-    JSON export for the POC team / DECT system
-    """
+    """JSON export for the POC team / DECT system"""
 
     required_scopes = ["phonebook:read"]
 
@@ -89,9 +88,7 @@ class ApiDectUpdateIPEI(
     ScopedProtectedResourceView,
     View,
 ):
-    """
-    API endpoint to update IPEI after user registered their phone on the network. Used by the POC system.
-    """
+    """API endpoint to update IPEI after user registered their phone on the network. Used by the POC system."""
 
     required_scopes = ["phonebook:admin"]
 
@@ -121,8 +118,7 @@ class ApiDectUpdateIPEI(
 
 
 class PhonebookListView(CampViewMixin, ListView):
-    """
-    Our phonebook view currently only shows DectRegistration entries,
+    """Our phonebook view currently only shows DectRegistration entries,
     but could later be extended to show maybe GSM or other kinds of
     phone numbers.
     """
@@ -140,9 +136,7 @@ class DectRegistrationListView(LoginRequiredMixin, CampViewMixin, ListView):
     template_name = "dectregistration_list.html"
 
     def get_queryset(self, *args, **kwargs):
-        """
-        Show only DectRegistration entries belonging to the current user
-        """
+        """Show only DectRegistration entries belonging to the current user"""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 
@@ -187,9 +181,7 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
 
         # generate a 10 digit activation code for this dect registration?
         if not dect.activation_code:
-            dect.activation_code = "".join(
-                secrets.choice(string.digits) for i in range(10)
-            )
+            dect.activation_code = "".join(secrets.choice(string.digits) for i in range(10))
 
         # all good, save and return to list
         dect.save()

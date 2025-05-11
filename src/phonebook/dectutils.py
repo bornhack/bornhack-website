@@ -4,9 +4,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class DectUtils:
-    """
-    This class contains dect number <> letter related utilities
-    """
+    """This class contains dect number <> letter related utilities"""
 
     DECT_MATRIX = {
         "0": ["0"],
@@ -22,18 +20,14 @@ class DectUtils:
     }
 
     def __init__(self):
-        """
-        Build a reverse lookup matrix based on self.DECT_MATRIX
-        """
+        """Build a reverse lookup matrix based on self.DECT_MATRIX"""
         self.REVERSE_DECT_MATRIX = {}
         for digit in self.DECT_MATRIX.keys():
             for letter in self.DECT_MATRIX[digit]:
                 self.REVERSE_DECT_MATRIX[letter] = digit
 
     def get_dect_letter_combinations(self, numbers):
-        """
-        Generator to recursively get all combinations of letters for this number
-        """
+        """Generator to recursively get all combinations of letters for this number"""
         # loop over the possible letters for the first digit
         for letter in self.DECT_MATRIX[numbers[0]]:
             # if we have more digits..
@@ -46,18 +40,14 @@ class DectUtils:
                 yield letter
 
     def letters_to_number(self, letters):
-        """
-        Coverts "TYKL" to "8955"
-        """
+        """Coverts "TYKL" to "8955" """
         result = ""
         for letter in letters:
             result += self.REVERSE_DECT_MATRIX[letter.upper()]
         return result
 
     def hex_ipui_ipei(self, ipui):
-        """
-        Convert a hexidecimal IPUI to a IPEI notation
-        """
+        """Convert a hexidecimal IPUI to a IPEI notation"""
         if len(ipui) == 10:
             emc_hex = ipui[:5]
             psn_hex = ipui[-5:]
@@ -67,9 +57,7 @@ class DectUtils:
         return []
 
     def format_ipei(self, emc, psn):
-        """
-        Format the IPEI stored as ints to the standard notation.
-        """
+        """Format the IPEI stored as ints to the standard notation."""
         emc_s = str(emc).zfill(5)
         psn_s = str(psn).zfill(7)
         return f"{emc_s} {psn_s}"

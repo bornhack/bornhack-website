@@ -13,7 +13,6 @@ def fix_posreport_periods(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0034_posreport_period"),
     ]

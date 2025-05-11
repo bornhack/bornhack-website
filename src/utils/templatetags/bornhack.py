@@ -12,7 +12,7 @@ register = template.Library()
 
 @register.filter(name="zip")
 def zip_lists(a, b):
-    return zip(a, b)
+    return zip(a, b, strict=False)
 
 
 @register.filter()
@@ -20,12 +20,11 @@ def truefalseicon(value):
     """A template filter to show a green checkbox or red x depending on True/False value"""
     if value is True:
         return mark_safe("<i class='fas fa-check text-success'></i>")
-    elif value is False:
+    if value is False:
         return mark_safe("<i class='fas fa-times text-danger'></i>")
-    elif value is None:
+    if value is None:
         return mark_safe("<i class='fas fa-question text-secondary'></i>")
-    else:
-        return "the truefalseicon template filter doesn't know what to do here"
+    return "the truefalseicon template filter doesn't know what to do here"
 
 
 @register.simple_tag(takes_context=True)
@@ -39,11 +38,10 @@ def datatables_sortable(value):
     if isinstance(value, datetime.datetime):
         # return unix timestamp and microseconds
         return value.timestamp()
-    elif isinstance(value, datetime.date):
+    if isinstance(value, datetime.date):
         return value.strftime("%Y%m%d")
-    else:
-        # unsupported type
-        return value
+    # unsupported type
+    return value
 
 
 @register.simple_tag(takes_context=True)

@@ -24,12 +24,6 @@ from django.views.generic import View
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import SingleObjectMixin
 
-from .coinify import create_coinify_payment_intent
-from .coinify import process_coinify_payment_intent_json
-from .coinify import save_coinify_callback
-from .forms import OrderProductRelationForm
-from .forms import OrderProductRelationFormSet
-from .quickpay import QuickPay
 from shop.models import CreditNote
 from shop.models import Order
 from shop.models import OrderProductRelation
@@ -38,6 +32,13 @@ from shop.models import ProductCategory
 from shop.models import QuickPayAPICallback
 from shop.models import QuickPayAPIObject
 from utils.mixins import GetObjectMixin
+
+from .coinify import create_coinify_payment_intent
+from .coinify import process_coinify_payment_intent_json
+from .coinify import save_coinify_callback
+from .forms import OrderProductRelationForm
+from .forms import OrderProductRelationFormSet
+from .quickpay import QuickPay
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 qp = QuickPay()
@@ -197,11 +198,7 @@ class ProductDetailView(GetObjectMixin, FormView, DetailView):
     context_object_name = "product"
 
     def get_queryset(self):
-        return (
-            super()
-            .get_queryset()
-            .prefetch_related("sub_product_relations__sub_product")
-        )
+        return super().get_queryset().prefetch_related("sub_product_relations__sub_product")
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -252,10 +249,7 @@ class ProductDetailView(GetObjectMixin, FormView, DetailView):
 
         messages.info(
             self.request,
-            "{}x {} has been added to your order.".format(
-                opr.quantity,
-                opr.product.name,
-            ),
+            f"{opr.quantity}x {opr.product.name} has been added to your order.",
         )
 
         # done
@@ -297,10 +291,9 @@ class OrderDetailView(
     def get_template_names(self):
         if self.get_object().open is None:
             return "order_detail_closed.html"
-        elif self.get_object().open is True:
+        if self.get_object().open is True:
             return "order_detail_open.html"
-        else:
-            return False
+        return False
 
     def get(self, request, *args, **kwargs):
         order = self.get_object()
@@ -439,8 +432,7 @@ class DownloadInvoiceView(
     model = Order
 
     def get(self, request, *args, **kwargs):
-        """
-        The file we return is determined by the orders paid status.
+        """The file we return is determined by the orders paid status.
         If the order is unpaid we return a proforma invoice PDF
         If the order is paid we return a normal Invoice PDF
         """
@@ -481,9 +473,7 @@ class DownloadCreditNoteView(
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            'attachment; filename="%s"' % self.get_object().filename
-        )
+        response["Content-Disposition"] = 'attachment; filename="%s"' % self.get_object().filename
         response.write(self.get_object().pdf.read())
         return response
 
@@ -495,11 +485,10 @@ class OrderMarkAsPaidView(LoginRequiredMixin, SingleObjectMixin, View):
         if not request.user.is_staff:
             messages.error(request, "You do not have permissions to do that.")
             return HttpResponseRedirect(reverse_lazy("shop:index"))
-        else:
-            messages.success(request, "The order has been marked as paid.")
-            order = self.get_object()
-            order.mark_as_paid()
-            return HttpResponseRedirect(request.headers.get("Referer"))
+        messages.success(request, "The order has been marked as paid.")
+        order = self.get_object()
+        order.mark_as_paid()
+        return HttpResponseRedirect(request.headers.get("Referer"))
 
 
 # Bank Transfer view
@@ -577,13 +566,10 @@ class CoinifyRedirectView(
         return super().dispatch(request, *args, **kwargs)
 
     def get_redirect_url(self, *args, **kwargs):
-        return self.get_object().coinify_api_payment_intent.paymentintentjson[
-            "paymentWindowUrl"
-        ]
+        return self.get_object().coinify_api_payment_intent.paymentintentjson["paymentWindowUrl"]
 
 
 class CoinifyCallbackView(View):
-
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
@@ -612,8 +598,7 @@ class CoinifyCallbackView(View):
         if not callbackobject.payload:
             # no, return an error
             logger.error(
-                "unable to parse JSON body in callback for order %s"
-                % callbackobject.order.id,
+                "unable to parse JSON body in callback for order %s" % callbackobject.order.id,
             )
             return HttpResponseBadRequest("unable to parse json")
 
@@ -638,11 +623,10 @@ class CoinifyCallbackView(View):
             return HttpResponse("OK")
         if callbackobject.payload["event"] == "settlement.created":
             return HttpResponse("OK")
-        else:
-            logger.error(
-                "unsupported callback event %s" % callbackobject.payload["event"],
-            )
-            return HttpResponseBadRequest("unsupported event")
+        logger.error(
+            "unsupported callback event %s" % callbackobject.payload["event"],
+        )
+        return HttpResponseBadRequest("unsupported event")
 
 
 class CoinifyThanksView(

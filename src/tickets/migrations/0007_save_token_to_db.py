@@ -11,19 +11,15 @@ def save_tokens(apps, schema_editor):
     DiscountTicket = apps.get_model("tickets", "DiscountTicket")
 
     for model in (ShopTicket, SponsorTicket, DiscountTicket):
-
         for ticket in model.objects.all():
             token = create_ticket_token(
-                "{_id}{secret_key}".format(
-                    _id=ticket.uuid, secret_key=settings.SECRET_KEY
-                ).encode("utf-8")
+                f"{ticket.uuid}{settings.SECRET_KEY}".encode(),
             )
             ticket.token = token
             ticket.save()
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("tickets", "0006_auto_20190616_1746")]
 
     operations = [migrations.RunPython(save_tokens)]

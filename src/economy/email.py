@@ -9,8 +9,7 @@ from utils.email import add_outgoing_email
 
 
 def send_accountingsystem_expense_email(expense):
-    """
-    Sends an email to the accountingsystem with the invoice as an attachment,
+    """Sends an email to the accountingsystem with the invoice as an attachment,
     and with the expense uuid and description in email subject
     """
     economy_team = Team.objects.get(camp=expense.camp, name=settings.ECONOMY_TEAM_NAME)
@@ -26,9 +25,7 @@ def send_accountingsystem_expense_email(expense):
 
 
 def send_expense_approved_email(expense):
-    """
-    Sends an expense-approved email to the user who created the expense
-    """
+    """Sends an expense-approved email to the user who created the expense"""
     economy_team = Team.objects.get(camp=expense.camp, name=settings.ECONOMY_TEAM_NAME)
     add_outgoing_email(
         responsible_team=economy_team,
@@ -40,9 +37,7 @@ def send_expense_approved_email(expense):
 
 
 def send_expense_rejected_email(expense):
-    """
-    Sends an expense-rejected email to the user who created the expense
-    """
+    """Sends an expense-rejected email to the user who created the expense"""
     economy_team = Team.objects.get(camp=expense.camp, name=settings.ECONOMY_TEAM_NAME)
     add_outgoing_email(
         responsible_team=economy_team,
@@ -57,8 +52,7 @@ def send_expense_rejected_email(expense):
 
 
 def send_accountingsystem_revenue_email(revenue):
-    """
-    Sends an email to the accountingsystem with the invoice as an attachment,
+    """Sends an email to the accountingsystem with the invoice as an attachment,
     and with the revenue uuid and description in email subject
     """
     economy_team = Team.objects.get(camp=revenue.camp, name=settings.ECONOMY_TEAM_NAME)
@@ -74,9 +68,7 @@ def send_accountingsystem_revenue_email(revenue):
 
 
 def send_revenue_approved_email(revenue):
-    """
-    Sends a revenue-approved email to the user who created the revenue
-    """
+    """Sends a revenue-approved email to the user who created the revenue"""
     economy_team = Team.objects.get(camp=revenue.camp, name=settings.ECONOMY_TEAM_NAME)
     add_outgoing_email(
         responsible_team=economy_team,
@@ -88,9 +80,7 @@ def send_revenue_approved_email(revenue):
 
 
 def send_revenue_rejected_email(revenue):
-    """
-    Sends an revenue-rejected email to the user who created the revenue
-    """
+    """Sends an revenue-rejected email to the user who created the revenue"""
     economy_team = Team.objects.get(camp=revenue.camp, name=settings.ECONOMY_TEAM_NAME)
     add_outgoing_email(
         responsible_team=economy_team,

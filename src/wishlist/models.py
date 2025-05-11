@@ -7,8 +7,7 @@ from utils.slugs import unique_slugify
 
 
 class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
-    """
-    This model contains the stuff BornHack needs. This can be anything from kitchen equipment
+    """This model contains the stuff BornHack needs. This can be anything from kitchen equipment
     to network cables, or anything really.
     """
 

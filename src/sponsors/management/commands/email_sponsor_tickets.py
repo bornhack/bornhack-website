@@ -33,9 +33,7 @@ class Command(BaseCommand):
         for sponsor in sponsors:
             if sponsor.ticket_email:
                 self.output(
-                    "# Generating outgoing emails to send tickets for {}:".format(
-                        sponsor,
-                    ),
+                    f"# Generating outgoing emails to send tickets for {sponsor}:",
                 )
                 for ticket in sponsor.sponsorticket_set.all():
                     # send the email

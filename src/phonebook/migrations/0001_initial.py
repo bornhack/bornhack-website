@@ -2,11 +2,11 @@
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -32,7 +32,8 @@ class Migration(migrations.Migration):
                 (
                     "number",
                     models.CharField(
-                        help_text="The DECT number, numeric or as letters", max_length=9
+                        help_text="The DECT number, numeric or as letters",
+                        max_length=9,
                     ),
                 ),
                 (

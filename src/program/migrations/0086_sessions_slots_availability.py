@@ -6,11 +6,11 @@ import django.contrib.postgres.constraints
 import django.contrib.postgres.fields.ranges
 import django.db.models.deletion
 import django.db.models.expressions
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("camps", "0034_add_team_permission_sets"),
         ("program", "0085_btree_gist_extension"),
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                 (
                     "when",
                     django.contrib.postgres.fields.ranges.DateTimeRangeField(
-                        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>"
+                        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>",
                     ),
                 ),
                 (
@@ -47,7 +47,8 @@ class Migration(migrations.Migration):
                 (
                     "description",
                     models.TextField(
-                        blank=True, help_text="Description of this session (optional)."
+                        blank=True,
+                        help_text="Description of this session (optional).",
                     ),
                 ),
             ],
@@ -72,7 +73,7 @@ class Migration(migrations.Migration):
                 (
                     "when",
                     django.contrib.postgres.fields.ranges.DateTimeRangeField(
-                        help_text="Start and end time of this slot"
+                        help_text="Start and end time of this slot",
                     ),
                 ),
                 (
@@ -260,7 +261,8 @@ class Migration(migrations.Migration):
             model_name="eventinstance",
             name="when",
             field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
-                blank=True, null=True
+                blank=True,
+                null=True,
             ),
         ),
         migrations.AlterField(

@@ -4,9 +4,10 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import CreateView
 
-from .models import Feedback
 from camps.mixins import CampViewMixin
 from tokens.models import Token
+
+from .models import Feedback
 
 
 class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
@@ -21,9 +22,7 @@ class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         thanks_message = "Thank you! Your feedback is highly appreciated!"
         try:
             token = Token.objects.get(camp=self.camp, description="Feedback thanks")
-            thanks_message += " And for your efforts, here is a token: {}".format(
-                token.token,
-            )
+            thanks_message += f" And for your efforts, here is a token: {token.token}"
         except Token.DoesNotExist:
             pass
 

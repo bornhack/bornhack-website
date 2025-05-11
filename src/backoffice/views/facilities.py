@@ -19,17 +19,18 @@ from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
-from ..mixins import OrgaOrGisTeamViewMixin
-from ..mixins import RaisePermissionRequiredMixin
-from facilities.mixins import FacilityFacilitatorViewMixin
 from camps.mixins import CampViewMixin
+from facilities.mixins import FacilityFacilitatorViewMixin
 from facilities.models import Facility
 from facilities.models import FacilityFeedback
 from facilities.models import FacilityOpeningHours
 from facilities.models import FacilityType
 from teams.models import Team
-from utils.widgets import IconPickerWidget
 from utils.mixins import AnyTeamFacilitatorRequiredMixin
+from utils.widgets import IconPickerWidget
+
+from ..mixins import OrgaOrGisTeamViewMixin
+from ..mixins import RaisePermissionRequiredMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -107,8 +108,7 @@ class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
         if createdCount > 0 or updateCount > 0:
             messages.success(
                 self.request,
-                "%i features created, %i features updated"
-                % (createdCount, updateCount),
+                "%i features created, %i features updated" % (createdCount, updateCount),
             )
         if errorCount > 0:
             messages.error(
@@ -141,9 +141,7 @@ class FacilityTypeCreateView(CampViewMixin, OrgaOrGisTeamViewMixin, CreateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -175,9 +173,7 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaOrGisTeamViewMixin, UpdateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show teams that are not part of the current camp in the dropdown
-        """
+        """Do not show teams that are not part of the current camp in the dropdown"""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -297,8 +293,7 @@ class FacilityCreateView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, CreateV
         return form
 
     def get_context_data(self, **kwargs):
-        """
-        Do not show types that are not part of the current camp in the dropdown,
+        """Do not show types that are not part of the current camp in the dropdown,
         also hide types belonging to teams for which the user has no facilitator permission.
         Also get map data.
         """
@@ -309,11 +304,7 @@ class FacilityCreateView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, CreateV
         }
         # get the teams the current user has facilitator permission for
         perms = self.request.user.get_all_permissions()
-        team_slugs = [
-            perm.split(".")[1].split("_")[0]
-            for perm in perms
-            if perm.endswith("_facilitator")
-        ]
+        team_slugs = [perm.split(".")[1].split("_")[0] for perm in perms if perm.endswith("_facilitator")]
         teams = Team.objects.filter(camp=self.camp, slug__in=team_slugs)
         context["form"].fields["facility_type"].queryset = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
@@ -324,9 +315,7 @@ class FacilityCreateView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, CreateV
     def form_valid(self, form):
         # does the user have facilitator permission for the team in charge of this facility type?
         if (
-            form.cleaned_data[
-                "facility_type"
-            ].responsible_team.facilitator_permission_set
+            form.cleaned_data["facility_type"].responsible_team.facilitator_permission_set
             not in self.request.user.get_all_permissions()
         ):
             messages.error("No thanks")
@@ -402,9 +391,7 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
     template_name = "facilityfeedback_backoffice.html"
 
     def get_permission_required(self):
-        """
-        This view requires the member_permission_set for the team in question.
-        """
+        """This view requires the member_permission_set for the team in question."""
         return [self.team.member_permission_set]
 
     def setup(self, *args, **kwargs):
@@ -463,9 +450,7 @@ class FacilityOpeningHoursCreateView(
     fields = ["when", "notes"]
 
     def form_valid(self, form):
-        """
-        Set facility before saving
-        """
+        """Set facility before saving"""
         hours = form.save(commit=False)
         hours.facility = self.facility
         hours.save()

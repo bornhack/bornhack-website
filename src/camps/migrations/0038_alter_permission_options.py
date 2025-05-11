@@ -4,14 +4,20 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('camps', '0037_alter_permission_options'),
+        ("camps", "0037_alter_permission_options"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='permission',
-            options={'default_permissions': (), 'managed': False, 'permissions': (('expense_create_permission', 'Expense Create permission'), ('revenue_create_permission', 'Revenue Create permission'))},
+            name="permission",
+            options={
+                "default_permissions": (),
+                "managed": False,
+                "permissions": (
+                    ("expense_create_permission", "Expense Create permission"),
+                    ("revenue_create_permission", "Revenue Create permission"),
+                ),
+            },
         ),
     ]

@@ -2,9 +2,10 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from .models import TicketType
 from camps.models import Camp
 from events.handler import handle_team_event
+
+from .models import TicketType
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -32,7 +33,7 @@ class Command(BaseCommand):
         output = []
         # loop over tickettypes and generate lines of max 200 chars
         for line in [
-            f"{tt.name}: {tt.total_price} DKK/{tt.shopticket_count}={round(tt.average_price,2)} DKK"
+            f"{tt.name}: {tt.total_price} DKK/{tt.shopticket_count}={round(tt.average_price, 2)} DKK"
             for tt in tickettypes
         ]:
             if not output:

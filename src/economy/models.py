@@ -15,12 +15,6 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django_prometheus.models import ExportModelOperationsMixin
 
-from .email import send_accountingsystem_expense_email
-from .email import send_accountingsystem_revenue_email
-from .email import send_expense_approved_email
-from .email import send_expense_rejected_email
-from .email import send_revenue_approved_email
-from .email import send_revenue_rejected_email
 from shop.models import Product
 from tickets.models import ShopTicket
 from utils.models import CampRelatedModel
@@ -29,10 +23,16 @@ from utils.models import CreatedUpdatedUUIDModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
+from .email import send_accountingsystem_expense_email
+from .email import send_accountingsystem_revenue_email
+from .email import send_expense_approved_email
+from .email import send_expense_rejected_email
+from .email import send_revenue_approved_email
+from .email import send_revenue_rejected_email
+
 
 class ChainManager(models.Manager):
-    """
-    ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
+    """ChainManager adds 'expenses_total' and 'revenues_total' to the Chain qs
     Also adds 'expenses_count' and 'revenues_count' and prefetches all expenses
     and revenues for the credebtors.
     """
@@ -65,8 +65,7 @@ class ChainManager(models.Manager):
 
 
 class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel):
-    """
-    A chain of Credebtors. Used to group when several Creditors/Debtors
+    """A chain of Credebtors. Used to group when several Creditors/Debtors
     belong to the same Chain/company, like XL Byg stores or Netto stores.
     """
 
@@ -116,8 +115,7 @@ class Chain(ExportModelOperationsMixin("chain"), CreatedUpdatedModel, UUIDModel)
 
 
 class CredebtorManager(models.Manager):
-    """
-    CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs,
+    """CredebtorManager adds 'expenses_total' and 'revenues_total' to the Credebtor qs,
     and prefetches expenses and revenues for the credebtor(s).
     """
 
@@ -137,8 +135,7 @@ class Credebtor(
     CreatedUpdatedModel,
     UUIDModel,
 ):
-    """
-    The Credebtor model represents the specific "instance" of a Chain,
+    """The Credebtor model represents the specific "instance" of a Chain,
     like "XL Byg Rønne" or "Netto Gelsted".
     The model is used for both creditors and debtors, since there is a
     lot of overlap between them.
@@ -179,9 +176,7 @@ class Credebtor(
         return self.name
 
     def save(self, **kwargs):
-        """
-        Generate slug as needed
-        """
+        """Generate slug as needed"""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -193,8 +188,7 @@ class Credebtor(
 
 
 class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel):
-    """
-    The Revenue model represents any type of income for BornHack.
+    """The Revenue model represents any type of income for BornHack.
 
     Most Revenue objects will have a FK to the Invoice model,
     but only if the revenue relates directly to an Invoice in our system.
@@ -290,14 +284,12 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
     def approval_status(self):
         if self.approved is None:
             return "Pending approval"
-        elif self.approved:
+        if self.approved:
             return "Approved"
-        else:
-            return "Rejected"
+        return "Rejected"
 
     def approve(self, request):
-        """
-        This method marks a revenue as approved.
+        """This method marks a revenue as approved.
         Approving a revenue triggers an email to the economy system, and another email to the user who submitted the revenue
         """
         if request.user == self.user:
@@ -321,8 +313,7 @@ class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel
         messages.success(request, "Revenue %s approved" % self.pk)
 
     def reject(self, request):
-        """
-        This method marks a revenue as not approved.
+        """This method marks a revenue as not approved.
         Not approving a revenue triggers an email to the user who submitted the revenue in the first place.
         """
         # mark as not approved and save
@@ -423,10 +414,9 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
     def approval_status(self):
         if self.approved is None:
             return "Pending approval"
-        elif self.approved:
+        if self.approved:
             return "Approved"
-        else:
-            return "Rejected"
+        return "Rejected"
 
     def get_backoffice_url(self):
         return reverse(
@@ -435,8 +425,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         )
 
     def approve(self, request):
-        """
-        This method marks an expense as approved.
+        """This method marks an expense as approved.
         Approving an expense triggers an email to the economy system, and another email to the user who submitted the expense in the first place.
         """
         if request.user == self.user:
@@ -460,8 +449,7 @@ class Expense(ExportModelOperationsMixin("expense"), CampRelatedModel, UUIDModel
         messages.success(request, "Expense %s approved" % self.pk)
 
     def reject(self, request):
-        """
-        This method marks an expense as not approved.
+        """This method marks an expense as not approved.
         Not approving an expense triggers an email to the user who submitted the expense in the first place.
         """
         # mark as not approved and save
@@ -483,9 +471,7 @@ class Reimbursement(
     CampRelatedModel,
     UUIDModel,
 ):
-    """
-    A reimbursement covers one or more expenses.
-    """
+    """A reimbursement covers one or more expenses."""
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -530,9 +516,7 @@ class Reimbursement(
 
     @property
     def covered_expenses(self):
-        """
-        Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement.
-        """
+        """Returns a queryset of all expenses covered by this reimbursement. Excludes the expense which paid back the reimbursement."""
         return self.expenses.filter(paid_by_bornhack=False)
 
     @property
@@ -563,10 +547,7 @@ class Reimbursement(
         expense.camp = self.camp
         expense.user = self.user
         expense.amount = self.amount
-        expense.description = "Payment of reimbursement {} to {}".format(
-            self.pk,
-            self.reimbursement_user,
-        )
+        expense.description = f"Payment of reimbursement {self.pk} to {self.reimbursement_user}"
         expense.paid_by_bornhack = True
         expense.responsible_team = self.camp.economy_team
         expense.approved = True
@@ -1116,9 +1097,7 @@ class PosProduct(ExportModelOperationsMixin("pos_product"), UUIDModel):
     )
 
     def __str__(self):
-        return (
-            f"{self.brand_name} - {self.name} ({round(self.unit_size)}{self.size_unit})"
-        )
+        return f"{self.brand_name} - {self.name} ({round(self.unit_size)}{self.size_unit})"
 
 
 class PosTransaction(
@@ -1540,7 +1519,6 @@ class CoinifySettlement(
     ExportModelOperationsMixin("coinify_settlement"),
     CreatedUpdatedUUIDModel,
 ):
-
     settlement_id = models.CharField(
         max_length=36,
         help_text="The internal coinify id for the settlement",
@@ -1615,11 +1593,10 @@ class CoinifyPayout(
         """Quick currency conversion to DKK to help sorting."""
         if currency == "DKK":
             return amount
-        elif currency == "EUR":
+        if currency == "EUR":
             return amount * Decimal(7.5)
-        else:
-            # we should handle BTC payouts here if we ever start using them /tyk
-            return amount
+        # we should handle BTC payouts here if we ever start using them /tyk
+        return amount
 
     @property
     def amount_dkk(self):

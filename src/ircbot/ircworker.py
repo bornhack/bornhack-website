@@ -8,9 +8,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 def do_work():
-    """
-    Run irc3 module code, wait for events on IRC and wait for messages in OutgoingIrcMessage
-    """
+    """Run irc3 module code, wait for events on IRC and wait for messages in OutgoingIrcMessage"""
     if hasattr(settings, "IRCBOT_CHANNELS"):
         logger.error(
             "settings.IRCBOT_CHANNELS is deprecated. Please define settings.IRCBOT_PUBLIC_CHANNEL and use team channels for the rest.",

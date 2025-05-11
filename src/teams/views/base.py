@@ -9,11 +9,12 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 
+from camps.mixins import CampViewMixin
+from utils.widgets import MarkdownWidget
+
 from ..models import Team
 from ..models import TeamMember
 from .mixins import EnsureTeamLeadMixin
-from camps.mixins import CampViewMixin
-from utils.widgets import MarkdownWidget
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -111,10 +112,7 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
             )
 
         # check if we manage the channel for this team
-        if (
-            not self.get_object().irc_channel
-            or not self.get_object().irc_channel_managed
-        ):
+        if not self.get_object().irc_channel or not self.get_object().irc_channel_managed:
             messages.error(
                 request,
                 "IRC functionality is disabled for this team, or the team channel is not managed by the bot",

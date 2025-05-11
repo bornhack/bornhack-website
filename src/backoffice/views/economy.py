@@ -19,13 +19,6 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
-from ..forms import BankCSVForm
-from ..forms import ClearhausSettlementForm
-from ..forms import CoinifyCSVForm
-from ..forms import EpayCSVForm
-from ..forms import MobilePayCSVForm
-from ..forms import ZettleUploadForm
-from ..mixins import EconomyTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import AccountingExport
 from economy.models import Bank
@@ -35,9 +28,9 @@ from economy.models import Chain
 from economy.models import ClearhausSettlement
 from economy.models import CoinifyBalance
 from economy.models import CoinifyInvoice
+from economy.models import CoinifyPaymentIntent
 from economy.models import CoinifyPayout
 from economy.models import CoinifySettlement
-from economy.models import CoinifyPaymentIntent
 from economy.models import Credebtor
 from economy.models import EpayTransaction
 from economy.models import Expense
@@ -48,11 +41,19 @@ from economy.models import ZettleBalance
 from economy.models import ZettleReceipt
 from economy.utils import AccountingExporter
 from economy.utils import CoinifyCSVImporter
-from economy.utils import import_clearhaus_csv
-from economy.utils import import_epay_csv
 from economy.utils import MobilePayCSVImporter
 from economy.utils import ZettleExcelImporter
+from economy.utils import import_clearhaus_csv
+from economy.utils import import_epay_csv
 from utils.mixins import VerbUpdateView
+
+from ..forms import BankCSVForm
+from ..forms import ClearhausSettlementForm
+from ..forms import CoinifyCSVForm
+from ..forms import EpayCSVForm
+from ..forms import MobilePayCSVForm
+from ..forms import ZettleUploadForm
+from ..mixins import EconomyTeamPermissionMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -176,14 +177,10 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["expenses"] = (
-            self.get_object()
-            .expenses.filter(camp=self.camp)
-            .prefetch_related("responsible_team", "user", "creditor")
+            self.get_object().expenses.filter(camp=self.camp).prefetch_related("responsible_team", "user", "creditor")
         )
         context["revenues"] = (
-            self.get_object()
-            .revenues.filter(camp=self.camp)
-            .prefetch_related("responsible_team", "user", "debtor")
+            self.get_object().revenues.filter(camp=self.camp).prefetch_related("responsible_team", "user", "debtor")
         )
         return context
 
@@ -197,9 +194,7 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     template_name = "expense_list_backoffice.html"
 
     def get_queryset(self, **kwargs):
-        """
-        Exclude unapproved expenses, they are shown seperately
-        """
+        """Exclude unapproved expenses, they are shown seperately"""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "creditor",
@@ -208,9 +203,7 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        """
-        Include unapproved expenses seperately
-        """
+        """Include unapproved expenses seperately"""
         context = super().get_context_data(**kwargs)
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp,
@@ -229,9 +222,7 @@ class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     fields = ["notes"]
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         expense = form.save()
         if "approve" in form.data:
             # approve button was pressed
@@ -326,9 +317,7 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     template_name = "revenue_list_backoffice.html"
 
     def get_queryset(self, **kwargs):
-        """
-        Exclude unapproved revenues, they are shown seperately
-        """
+        """Exclude unapproved revenues, they are shown seperately"""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "debtor",
@@ -337,9 +326,7 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        """
-        Include unapproved revenues seperately
-        """
+        """Include unapproved revenues seperately"""
         context = super().get_context_data(**kwargs)
         context["unapproved_revenues"] = Revenue.objects.filter(
             camp=self.camp,
@@ -354,9 +341,7 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     fields = ["notes"]
 
     def form_valid(self, form):
-        """
-        We have two submit buttons in this form, Approve and Reject
-        """
+        """We have two submit buttons in this form, Approve and Reject"""
         revenue = form.save()
         if "approve" in form.data:
             # approve button was pressed

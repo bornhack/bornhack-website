@@ -33,8 +33,7 @@ class BornhackOAuth2Validator(OAuth2Validator):
         }
 
     def get_additional_claims(self, request) -> dict[str, str | list[dict[str, str]]]:
-        """
-        Define the oidc user claims to support and how to get the data.
+        """Define the oidc user claims to support and how to get the data.
 
         https://django-oauth-toolkit.readthedocs.io/en/latest/oidc.html#adding-claims-to-the-id-token
         """
@@ -67,13 +66,8 @@ class BornhackOAuth2Validator(OAuth2Validator):
         )
 
         # include bornhack:v2:public_credit_name?
-        if (
-            request.user.profile.public_credit_name_approved
-            and request.user.profile.public_credit_name
-        ):
-            claims["bornhack:v2:public_credit_name"] = (
-                request.user.profile.public_credit_name
-            )
+        if request.user.profile.public_credit_name_approved and request.user.profile.public_credit_name:
+            claims["bornhack:v2:public_credit_name"] = request.user.profile.public_credit_name
 
         # include phonenumber?
         if request.user.profile.phonenumber:

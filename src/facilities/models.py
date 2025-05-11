@@ -24,8 +24,7 @@ class FacilityQuickFeedback(
     ExportModelOperationsMixin("facility_quick_feedback"),
     models.Model,
 ):
-    """
-    This model contains the various options for giving quick feedback which we present to the user
+    """This model contains the various options for giving quick feedback which we present to the user
     when giving feedback on facilities. Think "Needs cleaning" or "Doesn't work" and such.
     This model is not Camp specific.
     """
@@ -44,8 +43,7 @@ class FacilityQuickFeedback(
 
 
 class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel):
-    """
-    Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
+    """Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
     facilities.Type has a m2m relationship with FeedbackChoice which determines which choices
     are presented for giving feedback for facilities of this type
     """
@@ -109,9 +107,7 @@ class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel
 
 
 class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDModel):
-    """
-    Facilities are toilets, thrashcans, cooking and dishwashing areas, and any other part of the event which could need attention or maintenance.
-    """
+    """Facilities are toilets, thrashcans, cooking and dishwashing areas, and any other part of the event which could need attention or maintenance."""
 
     facility_type = models.ForeignKey(
         "facilities.FacilityType",
@@ -176,8 +172,7 @@ class FacilityFeedback(
     ExportModelOperationsMixin("facility_feedback"),
     CampRelatedModel,
 ):
-    """
-    This model contains participant feedback for Facilities.
+    """This model contains participant feedback for Facilities.
     It is linked to the user and the facility, and to the
     quick_feedback choice the user picked (if any).
     """
@@ -240,8 +235,7 @@ class FacilityOpeningHours(
     ExportModelOperationsMixin("facility_opening_hours"),
     CampRelatedModel,
 ):
-    """
-    This model contains opening hours for facilities which are not always open.
+    """This model contains opening hours for facilities which are not always open.
     If a facility has zero entries in this model it means is always open.
     If a facility has one or more periods of opening hours defined in this model
     it is considered closed outside of the period(s) defined in this model.

@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0058_auto_20180523_0844")]
 
     operations = [
@@ -15,7 +15,10 @@ class Migration(migrations.Migration):
             model_name="url",
             name="uuid",
             field=models.UUIDField(
-                default=uuid.uuid4, editable=False, primary_key=True, serialize=False
+                default=uuid.uuid4,
+                editable=False,
+                primary_key=True,
+                serialize=False,
             ),
         ),
     ]

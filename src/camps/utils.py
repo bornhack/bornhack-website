@@ -13,8 +13,7 @@ def get_current_camp():
 
 
 class CampPropertyListFilter(admin.SimpleListFilter):
-    """
-    SimpleListFilter to filter models by camp when camp is
+    """SimpleListFilter to filter models by camp when camp is
     a property and not a real model field.
     """
 

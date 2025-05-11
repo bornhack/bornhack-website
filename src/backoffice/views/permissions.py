@@ -1,18 +1,22 @@
-from django.urls import reverse
-from camps.mixins import CampViewMixin
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.contrib.auth.models import Permission
-from camps.models import Permission as CampPermission
-from django.contrib.contenttypes.models import ContentType
-from teams.models import Team
-from django.views.generic import ListView, FormView
-from ..mixins import OrgaOrTeamLeadViewMixin
-from django.contrib.auth.models import User, Group
-from ..forms import ManageTeamPermissionsForm
-from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
+from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.views.generic import FormView
+from django.views.generic import ListView
+
+from camps.mixins import CampViewMixin
+from camps.models import Permission as CampPermission
+from teams.models import Team
+
+from ..forms import ManageTeamPermissionsForm
+from ..mixins import OrgaOrTeamLeadViewMixin
 
 
 class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
@@ -25,10 +29,7 @@ class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
         self.teams = []
         perms = self.request.user.get_all_permissions()
         for team in Team.objects.filter(camp=self.camp):
-            if (
-                f"camps.{team.slug}_team_lead" in perms
-                or "camps.orga_team_member" in perms
-            ):
+            if f"camps.{team.slug}_team_lead" in perms or "camps.orga_team_member" in perms:
                 # user can manage perms for this team
                 if team.approved_members.exists():
                     # there is something to manage
@@ -103,11 +104,7 @@ class TeamPermissionManageView(CampViewMixin, FormView):
         Skipping fields "lead" and "member" as they are handled through memberships.
         """
         # the perms that can be managed through this view
-        perms = [
-            perm
-            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys()
-            if perm not in ["lead", "member"]
-        ]
+        perms = [perm for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys() if perm not in ["lead", "member"]]
         # loop over perms and build a dict for use later
         team_permissions = {}
         permission_content_type = ContentType.objects.get_for_model(CampPermission)

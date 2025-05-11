@@ -39,14 +39,10 @@ csrf = s.post(
     headers={"Referer": host + "/login/"},
 )
 alphabet = string.ascii_uppercase + string.digits
-code_verifier = "".join(
-    secrets.choice(alphabet) for i in range(43 + secrets.randbelow(86))
-)
+code_verifier = "".join(secrets.choice(alphabet) for i in range(43 + secrets.randbelow(86)))
 code_verifier_base64 = base64.urlsafe_b64encode(code_verifier.encode("utf-8"))
 code_challenge = hashlib.sha256(code_verifier_base64).digest()
-code_challenge_base64 = (
-    base64.urlsafe_b64encode(code_challenge).decode("utf-8").replace("=", "")
-)
+code_challenge_base64 = base64.urlsafe_b64encode(code_challenge).decode("utf-8").replace("=", "")
 state = "".join(secrets.choice(alphabet) for i in range(15))
 
 data = {

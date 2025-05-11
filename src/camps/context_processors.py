@@ -8,8 +8,7 @@ from .models import Camp
 
 
 def camp(request):
-    """
-    If we have a camp in the request object (added by RequestCampMiddleware based on
+    """If we have a camp in the request object (added by RequestCampMiddleware based on
     the camp_slug url kwarg) add it to the context.
     Also add a "camps" queryset containing all camps (used to build the menu and such)
     """

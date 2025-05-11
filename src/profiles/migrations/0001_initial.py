@@ -1,14 +1,11 @@
-# -*- coding: utf-8 -*-
-
-
 import uuid
 
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
@@ -37,5 +34,5 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"verbose_name_plural": "Profiles", "verbose_name": "Profile"},
-        )
+        ),
     ]

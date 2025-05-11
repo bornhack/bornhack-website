@@ -7,7 +7,8 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 def check_speaker_event_camp_consistency(sender, instance, **kwargs):
     if kwargs["action"] == "pre_add":
-        from program.models import Event, Speaker
+        from program.models import Event
+        from program.models import Speaker
 
         if isinstance(instance, Event):
             # loop over speakers being added to this event

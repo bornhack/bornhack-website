@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("utils", "0004_uuidtaggeditem"),
         ("taggit", "0003_taggeditem_add_unique_index"),

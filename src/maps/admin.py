@@ -5,8 +5,8 @@ from .models import ExternalLayer
 from .models import Feature
 from .models import Group
 from .models import Layer
-from .models import UserLocationType
 from .models import UserLocation
+from .models import UserLocationType
 
 
 @admin.register(Feature)

@@ -7,10 +7,10 @@ from django.utils import timezone
 from .models import Bank
 from .models import BankAccount
 from .utils import CoinifyCSVImporter
-from .utils import import_clearhaus_csv
-from .utils import import_epay_csv
 from .utils import MobilePayCSVImporter
 from .utils import ZettleExcelImporter
+from .utils import import_clearhaus_csv
+from .utils import import_epay_csv
 
 
 class BankAccountCsvImportTest(TestCase):

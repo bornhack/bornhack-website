@@ -23,11 +23,7 @@ class NewsItem(ExportModelOperationsMixin("news_item"), CreatedUpdatedModel):
     def save(self, **kwargs):
         if self.published_at:
             # if this is a new newsitem, or it doesn't have a slug, or the slug is in use on another item, create a new slug
-            if (
-                not self.pk
-                or not self.slug
-                or NewsItem.objects.filter(slug=self.slug).count() > 1
-            ):
+            if not self.pk or not self.slug or NewsItem.objects.filter(slug=self.slug).count() > 1:
                 published_at_string = self.published_at.strftime("%Y-%m-%d")
                 base_slug = slugify(self.title)
                 slug = f"{published_at_string}-{base_slug}"

@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0026_alter_clearhaussettlement_options"),
     ]
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 (
                     "statement_time",
                     models.DateTimeField(
-                        help_text="The date and time this movement was added to the account statement."
+                        help_text="The date and time this movement was added to the account statement.",
                     ),
                 ),
                 (
@@ -51,7 +51,8 @@ class Migration(migrations.Migration):
                 (
                     "description",
                     models.CharField(
-                        help_text="The description of this transaction.", max_length=100
+                        help_text="The description of this transaction.",
+                        max_length=100,
                     ),
                 ),
                 (
@@ -93,7 +94,7 @@ class Migration(migrations.Migration):
                 (
                     "zettle_created",
                     models.DateTimeField(
-                        help_text="The date and time this receipt was created in Zettles end"
+                        help_text="The date and time this receipt was created in Zettles end",
                     ),
                 ),
                 (
@@ -155,7 +156,8 @@ class Migration(migrations.Migration):
                 (
                     "description",
                     models.CharField(
-                        help_text="The description of this transaction.", max_length=255
+                        help_text="The description of this transaction.",
+                        max_length=255,
                     ),
                 ),
                 ("sold_via", models.CharField(help_text="Always POS?", max_length=100)),

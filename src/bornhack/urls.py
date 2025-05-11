@@ -14,12 +14,12 @@ from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from maps.views import MapView
+from maps.views import UserLocationApiView
+from maps.views import UserLocationCreateView
+from maps.views import UserLocationDeleteView
 from maps.views import UserLocationLayerView
 from maps.views import UserLocationListView
 from maps.views import UserLocationUpdateView
-from maps.views import UserLocationCreateView
-from maps.views import UserLocationDeleteView
-from maps.views import UserLocationApiView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView

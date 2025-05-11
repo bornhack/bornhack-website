@@ -87,18 +87,16 @@ def handle_coinify_api_response(apireq, order, request):
                 request=request,
             )
             return coinifyintent
-        else:
-            api_error = apireq.response
-            logger.error(
-                "coinify API error: {} ({})".format(
-                    api_error["errorMessage"],
-                    api_error["errorCode"],
-                ),
-            )
-            return False
-    else:
-        logger.error("coinify api method not supported" % apireq.method)
+        api_error = apireq.response
+        logger.error(
+            "coinify API error: {} ({})".format(
+                api_error["errorMessage"],
+                api_error["errorCode"],
+            ),
+        )
         return False
+    logger.error("coinify api method not supported" % apireq.method)
+    return False
 
 
 #################################################################

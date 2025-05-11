@@ -6,21 +6,20 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
-from ..forms import AddRecordingForm
-from ..mixins import ContentTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from program.models import Event
 from program.models import EventFeedback
 from program.models import Url
 from program.models import UrlType
 
+from ..forms import AddRecordingForm
+from ..mixins import ContentTeamPermissionMixin
+
 logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of EventFeedback objects which are pending approval.
-    """
+    """This view shows a list of EventFeedback objects which are pending approval."""
 
     model = EventFeedback
     template_name = "approve_feedback.html"
@@ -43,8 +42,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """
@@ -70,9 +68,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
 
 class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of events that is set to be recorded, but without a recording URL attached.
-    """
+    """This view shows a list of events that is set to be recorded, but without a recording URL attached."""
 
     model = Event
     template_name = "add_recording.html"
@@ -95,8 +91,7 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """

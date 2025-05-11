@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0024_epaytransaction"),
     ]
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 (
                     "merchant_id",
                     models.IntegerField(
-                        help_text="The merchant ID in Clearhaus systems"
+                        help_text="The merchant ID in Clearhaus systems",
                     ),
                 ),
                 (
@@ -42,25 +42,26 @@ class Migration(migrations.Migration):
                 (
                     "clearhaus_uuid",
                     models.UUIDField(
-                        help_text="The Clearhaus UUID for this settlement."
+                        help_text="The Clearhaus UUID for this settlement.",
                     ),
                 ),
                 (
                     "settled",
                     models.BooleanField(
-                        help_text="True if the settlement has been paid out, False if not."
+                        help_text="True if the settlement has been paid out, False if not.",
                     ),
                 ),
                 (
                     "currency",
                     models.CharField(
-                        help_text="The currency of this settlement.", max_length=3
+                        help_text="The currency of this settlement.",
+                        max_length=3,
                     ),
                 ),
                 (
                     "period_start_date",
                     models.DateField(
-                        help_text="The first date of the period this settlement covers."
+                        help_text="The first date of the period this settlement covers.",
                     ),
                 ),
                 (

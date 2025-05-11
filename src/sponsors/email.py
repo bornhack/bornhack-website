@@ -15,11 +15,7 @@ def add_sponsorticket_email(ticket):
         "ticket": ticket,
     }
 
-    subject = "{} {} Sponsor Ticket {}".format(
-        ticket.sponsor.camp.title,
-        ticket.sponsor.name,
-        ticket.uuid,
-    )
+    subject = f"{ticket.sponsor.camp.title} {ticket.sponsor.name} Sponsor Ticket {ticket.uuid}"
 
     filename = f"sponsor_ticket_{ticket.pk}.pdf"
     with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:

@@ -3,30 +3,36 @@ import logging
 import re
 
 import requests
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
-from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
-from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from django.views.generic import View
-from django.views.generic import ListView
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
-from django.views.generic import UpdateView
 from django.views.generic import DeleteView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
+from django.views.generic import View
 from django.views.generic.base import TemplateView
 from jsonview.views import JsonView
 from leaflet.forms.widgets import LeafletWidget
 from oauth2_provider.views.generic import ScopedProtectedResourceView
+
+from camps.mixins import CampViewMixin
+from facilities.models import FacilityType
+from utils.color import adjust_color
+from utils.color import is_dark
+from utils.mixins import UserIsObjectOwnerMixin
 
 from .mixins import LayerViewMixin
 from .models import ExternalLayer
@@ -34,11 +40,6 @@ from .models import Feature
 from .models import Layer
 from .models import UserLocation
 from .models import UserLocationType
-from camps.mixins import CampViewMixin
-from utils.mixins import UserIsObjectOwnerMixin
-from facilities.models import FacilityType
-from utils.color import adjust_color
-from utils.color import is_dark
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -48,9 +49,7 @@ class MissingCredentials(Exception):
 
 
 class MapMarkerView(TemplateView):
-    """
-    View for generating the coloured marker
-    """
+    """View for generating the coloured marker"""
 
     template_name = "marker.svg"
 
@@ -60,29 +59,18 @@ class MapMarkerView(TemplateView):
         length = len(hex_color)
 
         if length == 6:  # RGB
-            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))  # noqa: E203
+            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
             return (r, g, b)
-        elif length == 8:  # RGBA
-            r, g, b, a = (
-                int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6)  # noqa: E203
-            )
+        if length == 8:  # RGBA
+            r, g, b, a = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6))
             return (r, g, b, a)
-        else:
-            raise ValueError("Hex color must be in format RRGGBB or RRGGBBAA")
+        raise ValueError("Hex color must be in format RRGGBB or RRGGBBAA")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["stroke1"] = self.color
-        context["stroke0"] = (
-            adjust_color(self.color, -0.4)
-            if is_dark(self.color)
-            else adjust_color(self.color)
-        )
-        context["fill0"] = (
-            adjust_color(self.color, -0.4)
-            if is_dark(self.color)
-            else adjust_color(self.color)
-        )
+        context["stroke0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
+        context["fill0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
         context["fill1"] = self.color
         return context
 
@@ -95,9 +83,7 @@ class MapMarkerView(TemplateView):
 
 
 class MapView(CampViewMixin, TemplateView):
-    """
-    Global map view
-    """
+    """Global map view"""
 
     template_name = "maps_map.html"
     context_object_name = "maps_map"
@@ -165,9 +151,7 @@ class MapView(CampViewMixin, TemplateView):
 
 
 class LayerGeoJSONView(LayerViewMixin, JsonView):
-    """
-    GeoJSON export view
-    """
+    """GeoJSON export view"""
 
     def get_context_data(self, **kwargs):
         context = json.loads(
@@ -190,8 +174,7 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
 
 
 class MapProxyView(View):
-    """
-    Proxy for Datafordeler map service. Created so we can show maps without
+    """Proxy for Datafordeler map service. Created so we can show maps without
     leaking the IP of our visitors.
     """
 
@@ -204,11 +187,9 @@ class MapProxyView(View):
     ]
 
     def get(self, *args, **kwargs):
-        """
-        Before we make the request we check that the path is in our whitelist.
+        """Before we make the request we check that the path is in our whitelist.
         Before we return the response we copy headers except for a list we dont want.
         """
-
         # Raise PermissionDenied if endpoint isn't valid
         self.is_endpoint_valid(self.request.path)
 
@@ -273,10 +254,9 @@ class MapProxyView(View):
         password = settings.DATAFORDELER_PASSWORD
         if not username or not password:
             logger.error(
-                "Missing credentials for "
-                "'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'",
+                "Missing credentials for 'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'",
             )
-            raise MissingCredentials()
+            raise MissingCredentials
         path += f"&username={username}&password={password}"
         return path
 
@@ -285,9 +265,7 @@ class MapProxyView(View):
 
 
 class UserLocationLayerView(CampViewMixin, JsonView):
-    """
-    UserLocation geojson view
-    """
+    """UserLocation geojson view"""
 
     def get_context_data(self, **kwargs):
         context = {}
@@ -296,9 +274,7 @@ class UserLocationLayerView(CampViewMixin, JsonView):
         return context
 
     def dump_locations(self) -> list[object]:
-        """
-        GeoJSON Formatter.
-        """
+        """GeoJSON Formatter."""
         output = []
         for location in UserLocation.objects.filter(
             camp=self.camp,
@@ -338,9 +314,7 @@ class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
     def get_queryset(self, *args, **kwargs):
-        """
-        Show only entries belonging to the current user
-        """
+        """Show only entries belonging to the current user"""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 
@@ -351,10 +325,7 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     fields = ["name", "type", "location", "data"]
 
     def dispatch(self, *args, **kwargs):
-        if (
-            UserLocation.objects.filter(user=self.request.user, camp=self.camp).count()
-            > 49
-        ):
+        if UserLocation.objects.filter(user=self.request.user, camp=self.camp).count() > 49:
             messages.error(
                 self.request,
                 "To many User Locations (50), please delete some.",
@@ -460,9 +431,7 @@ class UserLocationApiView(
     CampViewMixin,
     JsonView,
 ):
-    """
-    This view has 2 endpoints /create/api (POST) AND /<uuid>/api (GET, PATCH, DELETE).
-    """
+    """This view has 2 endpoints /create/api (POST) AND /<uuid>/api (GET, PATCH, DELETE)."""
 
     required_scopes = ["location:write"]
 

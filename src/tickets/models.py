@@ -38,7 +38,7 @@ class TicketTypeQuerySet(models.QuerySet):
     def with_price_stats(self):
         # We have to make subqueries to be able to annotate the specific
         # ticket type. Otherwise, values would be accumulative across all types.
-        def _make_subquery(annotation: Union[Expression, F]) -> Subquery:
+        def _make_subquery(annotation: Expression | F) -> Subquery:
             return Subquery(
                 TicketType.objects.annotate(annotation_value=annotation)
                 .filter(pk=OuterRef("pk"))
@@ -168,18 +168,12 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 
     def _get_token(self):
         return create_ticket_token(
-            "{_id}{secret_key}".format(
-                _id=self.uuid,
-                secret_key=settings.SECRET_KEY,
-            ).encode("utf-8"),
+            f"{self.uuid}{settings.SECRET_KEY}".encode(),
         )
 
     def _get_badge_token(self):
         return create_ticket_token(
-            "{_id}{secret_key}-badge".format(
-                _id=self.uuid,
-                secret_key=settings.SECRET_KEY,
-            ).encode("utf-8"),
+            f"{self.uuid}{settings.SECRET_KEY}-badge".encode(),
         )
 
     def get_qr_code_url(self):
@@ -321,10 +315,7 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
 
     name = models.CharField(
         max_length=100,
-        help_text=(
-            "Name of the person this ticket belongs to. "
-            "This can be different from the buying user."
-        ),
+        help_text=("Name of the person this ticket belongs to. This can be different from the buying user."),
         null=True,
         blank=True,
     )
@@ -334,18 +325,11 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
     # overwrite the _get_token method because old tickets use the user_id
     def _get_token(self):
         return hashlib.sha256(
-            "{_id}{user_id}{secret_key}".format(
-                _id=self.pk,
-                user_id=self.order.user.pk,
-                secret_key=settings.SECRET_KEY,
-            ).encode("utf-8"),
+            f"{self.pk}{self.order.user.pk}{settings.SECRET_KEY}".encode(),
         ).hexdigest()
 
     def __str__(self):
-        return "Ticket {user} {product}".format(
-            user=self.order.user,
-            product=self.product,
-        )
+        return f"Ticket {self.order.user} {self.product}"
 
     def get_absolute_url(self):
         return str(reverse_lazy("tickets:shopticket_edit", kwargs={"pk": self.pk}))

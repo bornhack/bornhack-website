@@ -54,13 +54,14 @@ class HaxColumn(tables.Column):
         return filter_button(
             f"{value} HAX",
             table.request,
-            **{"price_min": value, "price_max": value},
+            price_min=value,
+            price_max=value,
         )
 
 
 class PosColumn(tables.Column):
     def render(self, value, table):
-        return filter_button(value, table.request, **{"pos": value})
+        return filter_button(value, table.request, pos=value)
 
 
 class TimestampColumn(tables.Column):
@@ -68,31 +69,32 @@ class TimestampColumn(tables.Column):
         return filter_button(
             localize(timezone.localtime(value), use_l10n=True),
             table.request,
-            **{"timestamp_after": value, "timestamp_before": value},
+            timestamp_after=value,
+            timestamp_before=value,
         )
 
 
 class SizeColumn(tables.Column):
     def render(self, value, record, table):
         value = intround(value)
-        unit = (
-            record.product.size_unit if hasattr(record, "product") else record.size_unit
-        )
+        unit = record.product.size_unit if hasattr(record, "product") else record.size_unit
         return filter_button(
             f"{value} {unit}",
             table.request,
-            **{"size_min": value, "size_max": value, "unit": unit},
+            size_min=value,
+            size_max=value,
+            unit=unit,
         )
 
 
 class BrandColumn(tables.Column):
     def render(self, value, table):
-        return filter_button(value, table.request, **{"brand": value})
+        return filter_button(value, table.request, brand=value)
 
 
 class NameColumn(tables.Column):
     def render(self, value, record, table):
-        button = filter_button(value, table.request, **{"name": value})
+        button = filter_button(value, table.request, name=value)
         url = reverse(
             "backoffice:posproduct_list",
             kwargs={"camp_slug": table.request.camp.slug},
@@ -107,7 +109,7 @@ class NameColumn(tables.Column):
 
 class DescriptionColumn(tables.Column):
     def render(self, value, table):
-        return filter_button(value, table.request, **{"description": value})
+        return filter_button(value, table.request, description=value)
 
 
 class CostColumn(tables.Column):
@@ -115,7 +117,8 @@ class CostColumn(tables.Column):
         return filter_button(
             f"{value} DKK",
             table.request,
-            **{"cost_min": value, "cost_max": value},
+            cost_min=value,
+            cost_max=value,
         )
 
 
@@ -154,21 +157,24 @@ class PosProductTable(tables.Table):
         return filter_button(
             f"{value} HAX",
             self.request,
-            **{"price_min": value, "price_max": value},
+            price_min=value,
+            price_max=value,
         )
 
     def render_abv(self, value):
         return filter_button(
             f"{intround(value)}%",
             self.request,
-            **{"abv_min": value, "abv_max": value},
+            abv_min=value,
+            abv_max=value,
         )
 
     def render_sales_count(self, value, record):
         count = filter_button(
             value,
             self.request,
-            **{"sales_count_min": value, "sales_count_max": value},
+            sales_count_min=value,
+            sales_count_max=value,
         )
         qs = querystring_from_request(self.request, prodid=record.external_id)
         url = reverse(
@@ -182,7 +188,8 @@ class PosProductTable(tables.Table):
         count = filter_button(
             value,
             self.request,
-            **{"sales_sum_min": value, "sales_sum_max": value},
+            sales_sum_min=value,
+            sales_sum_max=value,
         )
         return mark_safe(f"{count}&nbsp;HAX")
 
@@ -204,9 +211,7 @@ class PosProductTable(tables.Table):
             "backoffice:posproductcost_list",
             kwargs={"camp_slug": table.request.camp.slug},
         )
-        costs_count_label = (
-            f"{record.cost_count} {'cost' if record.cost_count == 1 else 'costs'}"
-        )
+        costs_count_label = f"{record.cost_count} {'cost' if record.cost_count == 1 else 'costs'}"
         link = f'<a href="{cost_url}?prodid={record.external_id}">({costs_count_label})</a>'
         return mark_safe(f"{value} DKK<br>{link}<br>")
 
@@ -260,7 +265,7 @@ class PosSaleTable(tables.Table):
         )
 
     def render_transaction__external_transaction_id(self, value):
-        return filter_button(value, self.request, **{"txid": value})
+        return filter_button(value, self.request, txid=value)
 
     def render_profit(self, value, record):
         if record.cost == 0:
@@ -268,7 +273,8 @@ class PosSaleTable(tables.Table):
         return filter_button(
             f"{value} DKK",
             self.request,
-            **{"profit_min": value, "profit_max": value},
+            profit_min=value,
+            profit_max=value,
         )
 
     class Meta:
@@ -320,13 +326,14 @@ class PosTransactionTable(tables.Table):
         ]
 
     def render_external_user_id(self, value):
-        return filter_button(value, self.request, **{"seller": value})
+        return filter_button(value, self.request, seller=value)
 
     def render_products(self, value, record):
         count = filter_button(
             value,
             self.request,
-            **{"products_min": value, "products_max": value},
+            products_min=value,
+            products_max=value,
         )
         url = reverse(
             "backoffice:possale_list",

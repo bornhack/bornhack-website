@@ -16,7 +16,6 @@ def add_event_tracks(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("program", "0048_auto_20180512_1625")]
 
     operations = [migrations.RunPython(add_event_tracks)]

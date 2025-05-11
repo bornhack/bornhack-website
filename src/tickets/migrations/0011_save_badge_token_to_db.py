@@ -11,19 +11,15 @@ def save_badge_tokens(apps, schema_editor):
     DiscountTicket = apps.get_model("tickets", "DiscountTicket")
 
     for model in (ShopTicket, SponsorTicket, DiscountTicket):
-
         for ticket in model.objects.all():
             badge_token = create_ticket_token(
-                "{_id}{secret_key}-badge".format(
-                    _id=ticket.uuid, secret_key=settings.SECRET_KEY
-                ).encode("utf-8")
+                f"{ticket.uuid}{settings.SECRET_KEY}-badge".encode(),
             )
             ticket.badge_token = badge_token
             ticket.save()
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("tickets", "0010_auto_20190724_2037")]
 
     operations = [migrations.RunPython(save_badge_tokens)]

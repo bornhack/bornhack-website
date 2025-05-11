@@ -5,15 +5,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tokens', '0008_alter_token_active'),
+        ("tokens", "0008_alter_token_active"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='token',
-            name='valid_when',
-            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(blank=True, db_index=True, help_text='Token valid start/end time. YYYY-MM-DD HH:MM:SS. Optional.', null=True),
+            model_name="token",
+            name="valid_when",
+            field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
+                blank=True,
+                db_index=True,
+                help_text="Token valid start/end time. YYYY-MM-DD HH:MM:SS. Optional.",
+                null=True,
+            ),
         ),
     ]

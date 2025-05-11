@@ -13,9 +13,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class StaffMemberRequiredMixin:
-    """
-    A CBV mixin for when a view should only be permitted for staff users
-    """
+    """A CBV mixin for when a view should only be permitted for staff users"""
 
     def dispatch(self, request, *args, **kwargs):
         # only permit staff users
@@ -28,8 +26,7 @@ class StaffMemberRequiredMixin:
 
 
 class RaisePermissionRequiredMixin(PermissionRequiredMixin):
-    """
-    A subclass of PermissionRequiredMixin which raises an exception to return 403 rather than a redirect to the login page
+    """A subclass of PermissionRequiredMixin which raises an exception to return 403 rather than a redirect to the login page
     We use this to avoid a redirect loop since our login page redirects back to the ?next= url when a user is logged in...
     """
 
@@ -72,7 +69,8 @@ class AnyTeamMapperRequiredMixin(BaseTeamPermRequiredMixin):
 class AnyTeamFacilitatorRequiredMixin(BaseTeamPermRequiredMixin):
     """Mixin for views available to anyone with a "camps.<team>_team_facilitator" permission for any team.
 
-    Currently only used in backoffice facility list, create, and detail views."""
+    Currently only used in backoffice facility list, create, and detail views.
+    """
 
     perm = "facilitator"
 

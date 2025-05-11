@@ -3,11 +3,11 @@
 import uuid
 
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("economy", "0007_auto_20190327_0936")]
 
     operations = [
@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
                 (
                     "slug",
                     models.SlugField(
-                        help_text="The url slug for this Credebtor. Leave blank to auto generate a slug."
+                        help_text="The url slug for this Credebtor. Leave blank to auto generate a slug.",
                     ),
                 ),
                 (
@@ -105,14 +105,14 @@ class Migration(migrations.Migration):
             model_name="expense",
             name="invoice_date",
             field=models.DateField(
-                help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+                help_text="The invoice date for this Expense. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
             ),
         ),
         migrations.AlterField(
             model_name="revenue",
             name="invoice_date",
             field=models.DateField(
-                help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD."
+                help_text="The invoice date for this Revenue. This must match the invoice date on the documentation uploaded below. Format is YYYY-MM-DD.",
             ),
         ),
         migrations.AddField(
@@ -138,6 +138,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="credebtor", unique_together={("chain", "slug")}
+            name="credebtor",
+            unique_together={("chain", "slug")},
         ),
     ]

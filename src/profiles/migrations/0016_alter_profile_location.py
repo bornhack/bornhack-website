@@ -5,15 +5,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('profiles', '0015_profile_location'),
+        ("profiles", "0015_profile_location"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='profile',
-            name='location',
-            field=django.contrib.gis.db.models.fields.PointField(blank=True, help_text='Your location at BornHack. This value is available on public maps.', null=True, srid=4326),
+            model_name="profile",
+            name="location",
+            field=django.contrib.gis.db.models.fields.PointField(
+                blank=True,
+                help_text="Your location at BornHack. This value is available on public maps.",
+                null=True,
+                srid=4326,
+            ),
         ),
     ]

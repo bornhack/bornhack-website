@@ -1,21 +1,22 @@
-from django.db.models import Q
 from django.contrib import messages
-from django.contrib.auth.models import Permission
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import Permission
+from django.db.models import Q
 from django.http import HttpResponseForbidden
-from django.urls import reverse_lazy
 from django.shortcuts import redirect
-from django.views.generic import DetailView
-from django.views.generic import ListView
-from django.views.generic import FormView
-from django.views.generic import UpdateView
+from django.urls import reverse_lazy
 from django.views import View
+from django.views.generic import DetailView
+from django.views.generic import FormView
+from django.views.generic import ListView
+from django.views.generic import UpdateView
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
-from .models import Profile
-from .forms import OIDCForm
 from bornhack.oauth_validators import BornhackOAuth2Validator
+
+from .forms import OIDCForm
+from .models import Profile
 
 
 class ProfileDetail(LoginRequiredMixin, DetailView):
@@ -45,10 +46,7 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         return Profile.objects.get(user=self.request.user)
 
     def form_valid(self, form, **kwargs):
-        if (
-            "public_credit_name" in form.changed_data
-            and form.cleaned_data["public_credit_name"]
-        ):
+        if "public_credit_name" in form.changed_data and form.cleaned_data["public_credit_name"]:
             # user changed the name (to something non blank)
             form.instance.public_credit_name_approved = False
             form.instance.save()
@@ -71,10 +69,7 @@ class ProfileApiView(JsonView, ScopedProtectedResourceView):
             "public_credit_name": self.request.user.profile.get_public_credit_name,
             "description": self.request.user.profile.description,
         }
-        context["teams"] = [
-            {"team": team.name, "camp": team.camp.title}
-            for team in self.request.user.teams.all()
-        ]
+        context["teams"] = [{"team": team.name, "camp": team.camp.title} for team in self.request.user.teams.all()]
         return context
 
 
@@ -102,9 +97,7 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
 
 
 class ProfileSessionThemeSwitchView(View):
-    """
-    View for setting the Session theme
-    """
+    """View for setting the Session theme"""
 
     def get(self, request, *args, **kwargs):
         theme = request.GET.get("theme") or "default"
@@ -115,8 +108,7 @@ class ProfileSessionThemeSwitchView(View):
             else:
                 self.request.session["theme"] = theme
             return redirect(next_url)
-        else:
-            return HttpResponseForbidden()
+        return HttpResponseForbidden()
 
 
 class ProfileOIDCView(LoginRequiredMixin, FormView):

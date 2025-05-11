@@ -5,10 +5,11 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.detail import SingleObjectMixin
 
-from . import models
 from camps.mixins import CampViewMixin
 from program.utils import add_existing_availability_to_matrix
 from program.utils import get_speaker_availability_form_matrix
+
+from . import models
 
 
 class EnsureCFPOpenMixin:
@@ -27,10 +28,7 @@ class EnsureCFPOpenMixin:
 class EnsureUnapprovedProposalMixin(SingleObjectMixin):
     def dispatch(self, request, *args, **kwargs):
         # do not permit editing if the proposal is already approved
-        if (
-            self.get_object().proposal_status
-            == models.UserSubmittedModel.PROPOSAL_APPROVED
-        ):
+        if self.get_object().proposal_status == models.UserSubmittedModel.PROPOSAL_APPROVED:
             messages.error(
                 request,
                 "This proposal has already been approved. Please contact the organisers if you need to modify something.",
@@ -70,14 +68,10 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
 
 
 class UrlViewMixin:
-    """
-    Mixin with code shared between all the Url views
-    """
+    """Mixin with code shared between all the Url views"""
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user
-        """
+        """Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user"""
         # get the proposal
         if "event_uuid" in self.kwargs:
             self.event_proposal = get_object_or_404(
@@ -97,9 +91,7 @@ class UrlViewMixin:
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """
-        Include the proposal in the template context
-        """
+        """Include the proposal in the template context"""
         context = super().get_context_data(**kwargs)
         if hasattr(self, "event_proposal") and self.event_proposal:
             context["event_proposal"] = self.event_proposal
@@ -108,19 +100,14 @@ class UrlViewMixin:
         return context
 
     def get_success_url(self):
-        """
-        Return to the detail view of the proposal
-        """
+        """Return to the detail view of the proposal"""
         if hasattr(self, "event_proposal"):
             return self.event_proposal.get_absolute_url()
-        else:
-            return self.speaker_proposal.get_absolute_url()
+        return self.speaker_proposal.get_absolute_url()
 
 
 class EventViewMixin(CampViewMixin):
-    """
-    A mixin to get the Event object based on event_uuid in url kwargs
-    """
+    """A mixin to get the Event object based on event_uuid in url kwargs"""
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -137,9 +124,7 @@ class EventViewMixin(CampViewMixin):
 
 
 class EventFeedbackViewMixin(EventViewMixin):
-    """
-    A mixin to get the EventFeedback object based on self.event and self.request.user
-    """
+    """A mixin to get the EventFeedback object based on self.event and self.request.user"""
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
@@ -154,8 +139,7 @@ class EventFeedbackViewMixin(EventViewMixin):
 
 
 class AvailabilityMatrixViewMixin(CampViewMixin):
-    """
-    Mixin with shared code between all availability matrix views,
+    """Mixin with shared code between all availability matrix views,
     meaning all views that show an availability matrix (form or not)
     for a SpeakerProposal or Speaker object. Used by SpeakerProposal
     submitters and in backoffice.

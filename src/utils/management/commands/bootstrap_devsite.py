@@ -1,8 +1,4 @@
-from camps.models import Permission as CampPermission
-from django.contrib.contenttypes.models import ContentType
-
 import logging
-from django.contrib.auth.models import Permission
 import random
 import sys
 import uuid
@@ -13,10 +9,12 @@ import factory
 import pytz
 from allauth.account.models import EmailAddress
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import Point
 from django.contrib.gis.geos import Polygon
-from django.contrib.gis.geos import GeometryCollection
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
@@ -26,6 +24,7 @@ from django.utils.crypto import get_random_string
 from faker import Faker
 
 from camps.models import Camp
+from camps.models import Permission as CampPermission
 from economy.factories import BankAccountFactory
 from economy.factories import BankFactory
 from economy.factories import BankTransactionFactory
@@ -54,6 +53,9 @@ from facilities.models import FacilityType
 from feedback.models import Feedback
 from info.models import InfoCategory
 from info.models import InfoItem
+from maps.models import Feature
+from maps.models import Group as MapGroup
+from maps.models import Layer
 from news.models import NewsItem
 from profiles.models import Profile
 from program.autoscheduler import AutoScheduler
@@ -84,9 +86,6 @@ from tokens.models import Token
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
-from maps.models import Group as MapGroup
-from maps.models import Layer
-from maps.models import Feature
 
 fake = Faker()
 # Faker.seed(0)
@@ -380,7 +379,7 @@ class Command(BaseCommand):
 
         users = {}
 
-        for i in range(0, 16):
+        for i in range(16):
             username = f"user{i}"
             user = UserFactory.create(
                 username=uuid.uuid4(),
@@ -1220,8 +1219,7 @@ class Command(BaseCommand):
                 event_location=event_locations["bar_area"],
                 when=(
                     tz.localize(datetime(start.year, start.month, start.day, 22, 0)),
-                    tz.localize(datetime(start.year, start.month, start.day, 22, 0))
-                    + timedelta(hours=3),
+                    tz.localize(datetime(start.year, start.month, start.day, 22, 0)) + timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
@@ -1813,17 +1811,13 @@ class Command(BaseCommand):
             category=categories["when"],
             headline="Opening",
             anchor="opening",
-            body="BornHack {} starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)".format(
-                year,
-            ),
+            body=f"BornHack {year} starts saturday, august 27th, at noon (12:00). It will be possible to access the venue before noon if for example you arrive early in the morning with the ferry. But please dont expect everything to be ready before noon :)",
         )
         InfoItem.objects.create(
             category=categories["when"],
             headline="Closing",
             anchor="closing",
-            body="BornHack {} ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).".format(
-                year,
-            ),
+            body=f"BornHack {year} ends saturday, september 3rd, at noon (12:00). Rented village tents must be empty and cleaned at this time, ready to take down. Participants must leave the site no later than 17:00 on the closing day (or stay and help us clean up).",
         )
         InfoItem.objects.create(
             category=categories["travel"],
@@ -1915,18 +1909,14 @@ class Command(BaseCommand):
         year = camp.camp.lower.year
         self.output(f"Creating CFP for {year}...")
         camp.call_for_participation_open = True
-        camp.call_for_participation = "Please give a talk at Bornhack {}...".format(
-            year,
-        )
+        camp.call_for_participation = f"Please give a talk at Bornhack {year}..."
         camp.save()
 
     def create_camp_cfs(self, camp):
         year = camp.camp.lower.year
         self.output(f"Creating CFS for {year}...")
         camp.call_for_sponsors_open = True
-        camp.call_for_sponsors = "Please give us ALL the money so that we can make Bornhack {} the best ever!".format(
-            year,
-        )
+        camp.call_for_sponsors = f"Please give us ALL the money so that we can make Bornhack {year} the best ever!"
         camp.save()
 
     def create_camp_sponsor_tiers(self, camp):
@@ -2061,7 +2051,7 @@ class Command(BaseCommand):
         TokenFind.objects.create(token=tokens[1], user=users[3])
         TokenFind.objects.create(token=tokens[4], user=users[2])
         TokenFind.objects.create(token=tokens[5], user=users[6])
-        for i in range(0, 6):
+        for i in range(6):
             TokenFind.objects.create(token=tokens[i], user=users[1])
 
     def create_camp_expenses(self, camp):

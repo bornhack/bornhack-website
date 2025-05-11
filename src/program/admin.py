@@ -38,9 +38,7 @@ class SpeakerProposalAdmin(admin.ModelAdmin):
         for sp in queryset:
             sp.mark_as_approved(request)
 
-    mark_speaker_proposal_as_approved.description = (
-        "Approve and create Speaker object(s)"
-    )
+    mark_speaker_proposal_as_approved.description = "Approve and create Speaker object(s)"
 
     actions = ["mark_speaker_proposal_as_approved"]
     list_filter = ("camp", "proposal_status", "user")
@@ -63,12 +61,11 @@ class EventProposalAdmin(admin.ModelAdmin):
                     "Event cant be approved as it has no speaker(s).",
                 )
                 return False
-            else:
-                try:
-                    ep.mark_as_approved(request)
-                except ValidationError as e:
-                    messages.error(request, e)
-                    return False
+            try:
+                ep.mark_as_approved(request)
+            except ValidationError as e:
+                messages.error(request, e)
+                return False
 
     mark_event_proposal_as_approved.description = "Approve and create Event object(s)"
 

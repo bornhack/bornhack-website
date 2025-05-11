@@ -28,5 +28,4 @@ def membershipstatus(user, team, showicon=False):
 
     if showicon:
         return mark_safe(f"<i class='fa {icon}' title='{text}'></i>")
-    else:
-        return text
+    return text

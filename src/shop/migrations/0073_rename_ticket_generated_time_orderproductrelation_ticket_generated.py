@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("shop", "0072_remove_orderproductrelation_ticket_generated"),
     ]

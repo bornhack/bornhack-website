@@ -2,9 +2,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import DetailView
 
+from camps.mixins import CampViewMixin
+
 from ..models import Team
 from ..models import TeamMember
-from camps.mixins import CampViewMixin
 
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, DetailView):

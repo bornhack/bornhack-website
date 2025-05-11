@@ -6,15 +6,18 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('villages', '0013_village_location'),
+        ("villages", "0013_village_location"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='village',
-            name='location',
-            field=django.contrib.gis.db.models.fields.PointField(default=django.contrib.gis.geos.point.Point(9.9401295, 55.3881695), help_text='The location of this village.', srid=4326),
+            model_name="village",
+            name="location",
+            field=django.contrib.gis.db.models.fields.PointField(
+                default=django.contrib.gis.geos.point.Point(9.9401295, 55.3881695),
+                help_text="The location of this village.",
+                srid=4326,
+            ),
         ),
     ]

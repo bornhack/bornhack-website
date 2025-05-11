@@ -9,11 +9,12 @@ from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import UpdateView
 
-from .models import Ride
 from camps.mixins import CampViewMixin
 from teams.models import Team
 from utils.email import add_outgoing_email
 from utils.mixins import UserIsObjectOwnerMixin
+
+from .models import Ride
 
 
 class ContactRideForm(forms.Form):
@@ -75,15 +76,11 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     ]
 
     def get_initial(self):
-        """
-        Default 'author' to users public_credit_name where relevant
-        """
+        """Default 'author' to users public_credit_name where relevant"""
         return {"author": self.request.user.profile.get_public_credit_name}
 
     def form_valid(self, form, **kwargs):
-        """
-        Set camp and user before saving
-        """
+        """Set camp and user before saving"""
         ride = form.save(commit=False)
         ride.camp = self.camp
         ride.user = self.request.user

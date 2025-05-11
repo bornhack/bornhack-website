@@ -35,10 +35,8 @@ from .views import CoinifyCSVImportView
 from .views import CoinifyDashboardView
 from .views import CoinifyInvoiceListView
 from .views import CoinifyPaymentIntentListView
-from .views import CoinifySettlementListView
-from .views import TeamPermissionIndexView
-from .views import TeamPermissionManageView
 from .views import CoinifyPayoutListView
+from .views import CoinifySettlementListView
 from .views import CredebtorDetailView
 from .views import CreditNoteDownloadView
 from .views import CreditNoteListView
@@ -100,12 +98,12 @@ from .views import MapFeatureUpdateView
 from .views import MapLayerCreateView
 from .views import MapLayerDeleteView
 from .views import MapLayerFeaturesImportView
-from .views import MapLayerUpdateView
 from .views import MapLayerListView
-from .views import MapUserLocationTypeListView
+from .views import MapLayerUpdateView
 from .views import MapUserLocationTypeCreateView
-from .views import MapUserLocationTypeUpdateView
 from .views import MapUserLocationTypeDeleteView
+from .views import MapUserLocationTypeListView
+from .views import MapUserLocationTypeUpdateView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -117,6 +115,9 @@ from .views import OrderRefundView
 from .views import OrderUpdateView
 from .views import OutgoingEmailMassUpdateView
 from .views import PendingProposalsView
+from .views import PermissionByGroupView
+from .views import PermissionByPermissionView
+from .views import PermissionByUserView
 from .views import PosCreateView
 from .views import PosDeleteView
 from .views import PosDetailView
@@ -158,6 +159,8 @@ from .views import SpeakerProposalApproveRejectView
 from .views import SpeakerProposalDetailView
 from .views import SpeakerProposalListView
 from .views import SpeakerUpdateView
+from .views import TeamPermissionIndexView
+from .views import TeamPermissionManageView
 from .views import TokenCreateView
 from .views import TokenDeleteView
 from .views import TokenDetailView
@@ -170,9 +173,6 @@ from .views import ZettleBalanceListView
 from .views import ZettleDashboardView
 from .views import ZettleDataImportView
 from .views import ZettleReceiptListView
-from .views import PermissionByUserView
-from .views import PermissionByGroupView
-from .views import PermissionByPermissionView
 
 app_name = "backoffice"
 

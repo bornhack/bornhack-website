@@ -2,11 +2,11 @@
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("economy", "0003_auto_20180917_1933")]
 
     operations = [
@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
                 related_name="created_reimbursements",
                 to=settings.AUTH_USER_MODEL,
             ),
-        )
+        ),
     ]

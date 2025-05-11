@@ -4,11 +4,11 @@ import uuid
 
 import django.core.validators
 import django.db.models.deletion
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0020_alter_expense_reimbursement"),
     ]
@@ -54,7 +54,8 @@ class Migration(migrations.Migration):
                 (
                     "name",
                     models.CharField(
-                        help_text="The name of the bank account", max_length=100
+                        help_text="The name of the bank account",
+                        max_length=100,
                     ),
                 ),
                 (
@@ -66,7 +67,7 @@ class Migration(migrations.Migration):
                                 code="invalid_reg_no",
                                 message="Reg number must be 4 digits.",
                                 regex="^[0-9]{4}$",
-                            )
+                            ),
                         ],
                     ),
                 ),
@@ -79,7 +80,7 @@ class Migration(migrations.Migration):
                                 code="invalid_account_no",
                                 message="Account number must be 6-12 digits.",
                                 regex="^[0-9]{6,12}$",
-                            )
+                            ),
                         ],
                     ),
                 ),
@@ -131,7 +132,8 @@ class Migration(migrations.Migration):
                 (
                     "text",
                     models.CharField(
-                        help_text="The text for this transaction.", max_length=255
+                        help_text="The text for this transaction.",
+                        max_length=255,
                     ),
                 ),
                 (

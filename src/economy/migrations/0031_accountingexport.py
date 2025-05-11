@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0030_alter_coinifyinvoice_original_payment_id"),
     ]
@@ -29,13 +29,13 @@ class Migration(migrations.Migration):
                 (
                     "date_from",
                     models.DateField(
-                        help_text="The start date for this accounting export (YYYY-MM-DD)."
+                        help_text="The start date for this accounting export (YYYY-MM-DD).",
                     ),
                 ),
                 (
                     "date_to",
                     models.DateField(
-                        help_text="The end date for this accounting export (YYYY-MM-DD)."
+                        help_text="The end date for this accounting export (YYYY-MM-DD).",
                     ),
                 ),
                 (

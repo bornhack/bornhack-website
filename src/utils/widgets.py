@@ -1,15 +1,13 @@
-from django.forms import Widget
 from django.forms import Textarea
 from django.forms import TextInput
+from django.forms import Widget
 
 
 class IconPickerWidget(TextInput):
     template_name = "icon_picker_widget.html"
 
     class Media:
-        js = (
-            "/static/vendor/universal-icon-picker/assets/js/universal-icon-picker.min.js",
-        )
+        js = ("/static/vendor/universal-icon-picker/assets/js/universal-icon-picker.min.js",)
 
     def format_value(self, value):
         if value is None:

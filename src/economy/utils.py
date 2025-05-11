@@ -36,11 +36,11 @@ from economy.models import Reimbursement
 from economy.models import Revenue
 from economy.models import ZettleBalance
 from economy.models import ZettleReceipt
+from shop.models import CoinifyAPIPaymentIntent
 from shop.models import CreditNote
 from shop.models import CustomOrder
 from shop.models import Invoice
 from shop.models import Order
-from shop.models import CoinifyAPIPaymentIntent
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
@@ -152,7 +152,7 @@ class CoinifyCSVImporter:
                 coinify_id_alpha=row[1],
                 coinify_created=timezone.make_aware(
                     datetime.datetime.strptime(row[2], "%Y-%m-%d %H:%M:%S"),
-                    timezone=datetime.timezone.utc,
+                    timezone=datetime.UTC,
                 ),
                 payment_amount=Decimal(row[3]),
                 payment_currency=row[4],
@@ -171,9 +171,7 @@ class CoinifyCSVImporter:
 
     @staticmethod
     def import_coinify_settlements_csv(csvreader):
-        """
-        Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time
-        """
+        """Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time"""
         create_count = 0
         next(csvreader)
         for row in csvreader:
@@ -212,7 +210,7 @@ class CoinifyCSVImporter:
                 coinify_id=row[0],
                 coinify_created=timezone.make_aware(
                     datetime.datetime.strptime(row[1], "%Y-%m-%d %H:%M:%S"),
-                    timezone=datetime.timezone.utc,
+                    timezone=datetime.UTC,
                 ),
                 amount=Decimal(row[2]),
                 fee=Decimal(row[3]),
@@ -381,9 +379,7 @@ class ZettleExcelImporter:
                 fee=row["Afgift"],
                 net=row["Netto"],
                 payment_method=row["Betalingsmetode"],
-                card_issuer=(
-                    row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None
-                ),
+                card_issuer=(row["Kortudsteder"] if not pd.isnull(row["Kortudsteder"]) else None),
                 staff=row["Personale"],
                 description=row["Beskrivelse"],
                 sold_via=row["Solgt via"],
@@ -427,9 +423,7 @@ class ZettleExcelImporter:
                     if not pd.isnull(row["Betalingsdato"])
                     else None
                 ),
-                payment_reference=(
-                    row["Reference"] if not pd.isnull(row["Reference"]) else None
-                ),
+                payment_reference=(row["Reference"] if not pd.isnull(row["Reference"]) else None),
                 description=row["Type"],
                 amount=row["Beløb"],
                 balance=row["Saldo"],
@@ -676,9 +670,7 @@ class AccountingExporter:
     def customorder_csv_export(self, workdir, filename=None):
         """Export customorders in our system."""
         if not filename:
-            filename = (
-                f"bornhack_custom_orders_{self.period.lower}_{self.period.upper}.csv"
-            )
+            filename = f"bornhack_custom_orders_{self.period.lower}_{self.period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(["id", "amount", "vat", "paid", "customer"])
@@ -783,9 +775,7 @@ class AccountingExporter:
     def reimbursement_csv_export(self, workdir, filename=None):
         """Export reimbursements in our system."""
         if not filename:
-            filename = (
-                f"bornhack_reimbursements_{self.period.lower}_{self.period.upper}.csv"
-            )
+            filename = f"bornhack_reimbursements_{self.period.lower}_{self.period.upper}.csv"
         with open(workdir / filename, "w", newline="") as f:
             writer = csv.writer(f, dialect="excel")
             writer.writerow(
@@ -833,9 +823,7 @@ class AccountingExporter:
     def coinify_csv_export(self, workdir):
         """Export coinify data in our system. Three different CSV files is created."""
         # invoices
-        invoices_filename = (
-            f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
-        )
+        invoices_filename = f"bornhack_coinify_invoices_{self.period.lower}_{self.period.upper}.csv"
         invoices = CoinifyInvoice.objects.filter(
             coinify_created__gte=self.period.lower,
             coinify_created__lte=self.period.upper,
@@ -879,9 +867,7 @@ class AccountingExporter:
                 )
 
         # payouts
-        payouts_filename = (
-            f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
-        )
+        payouts_filename = f"bornhack_coinify_payouts_{self.period.lower}_{self.period.upper}.csv"
         payouts = CoinifyPayout.objects.filter(
             coinify_created__gte=self.period.lower,
             coinify_created__lte=self.period.upper,
@@ -919,9 +905,7 @@ class AccountingExporter:
                 )
 
         # balances
-        balances_filename = (
-            f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
-        )
+        balances_filename = f"bornhack_coinify_balances_{self.period.lower}_{self.period.upper}.csv"
         balances = CoinifyBalance.objects.filter(
             date__gte=self.period.lower,
             date__lte=self.period.upper,
@@ -949,9 +933,7 @@ class AccountingExporter:
 
     def epay_csv_export(self, workdir):
         """Export ePay/bambora transactions in our system."""
-        filename = (
-            f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
-        )
+        filename = f"bornhack_epay_transactions_{self.period.lower}_{self.period.upper}.csv"
         transactions = EpayTransaction.objects.filter(
             auth_date__gte=self.period.lower,
             auth_date__lte=self.period.upper,
@@ -1084,9 +1066,7 @@ class AccountingExporter:
     def zettle_csv_export(self, workdir):
         """Export Zettle data in our system. Two different CSV files will be created."""
         # balances
-        balances_filename = (
-            f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
-        )
+        balances_filename = f"bornhack_zettle_balances_{self.period.lower}_{self.period.upper}.csv"
         balances = ZettleBalance.objects.filter(
             statement_time__gte=self.period.lower,
             statement_time__lte=self.period.upper,
@@ -1117,9 +1097,7 @@ class AccountingExporter:
                 )
 
         # receipts
-        receipts_filename = (
-            f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
-        )
+        receipts_filename = f"bornhack_zettle_receipts_{self.period.lower}_{self.period.upper}.csv"
         receipts = ZettleReceipt.objects.filter(
             zettle_created__gte=self.period.lower,
             zettle_created__lte=self.period.upper,
@@ -1273,13 +1251,13 @@ def import_pos_sales_json(transactions):
             timestamp = datetime.datetime.strptime(
                 tx["timestamp"]["$date"],
                 "%Y-%m-%dT%H:%M:%S.%fZ",
-            ).replace(tzinfo=datetime.timezone.utc)
+            ).replace(tzinfo=datetime.UTC)
         except ValueError:
             # without ms
             timestamp = datetime.datetime.strptime(
                 tx["timestamp"]["$date"],
                 "%Y-%m-%dT%H:%M:%SZ",
-            ).replace(tzinfo=datetime.timezone.utc)
+            ).replace(tzinfo=datetime.UTC)
         # find the Pos related to the camp during which the transaction happened
         camp = get_closest_camp(timestamp)
         pos = Pos.objects.get(
@@ -1346,13 +1324,13 @@ def import_pos_sales_json(transactions):
                         timestamp = datetime.datetime.strptime(
                             cost["timestamp"]["$date"],
                             "%Y-%m-%dT%H:%M:%S.%fZ",
-                        ).replace(tzinfo=datetime.timezone.utc)
+                        ).replace(tzinfo=datetime.UTC)
                     except ValueError:
                         # without ms
                         timestamp = datetime.datetime.strptime(
                             cost["timestamp"]["$date"],
                             "%Y-%m-%dT%H:%M:%SZ",
-                        ).replace(tzinfo=datetime.timezone.utc)
+                        ).replace(tzinfo=datetime.UTC)
                     camp = get_closest_camp(timestamp)
                     # parse price
                     try:

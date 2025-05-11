@@ -2,11 +2,11 @@
 
 import uuid
 
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("economy", "0021_bank_bankaccount_banktransaction"),
     ]
@@ -36,19 +36,25 @@ class Migration(migrations.Migration):
                 (
                     "btc",
                     models.DecimalField(
-                        decimal_places=8, help_text="The BTC balance", max_digits=18
+                        decimal_places=8,
+                        help_text="The BTC balance",
+                        max_digits=18,
                     ),
                 ),
                 (
                     "dkk",
                     models.DecimalField(
-                        decimal_places=2, help_text="The DKK balance", max_digits=12
+                        decimal_places=2,
+                        help_text="The DKK balance",
+                        max_digits=12,
                     ),
                 ),
                 (
                     "eur",
                     models.DecimalField(
-                        decimal_places=2, help_text="The EUR balance", max_digits=12
+                        decimal_places=2,
+                        help_text="The EUR balance",
+                        max_digits=12,
                     ),
                 ),
             ],
@@ -73,7 +79,7 @@ class Migration(migrations.Migration):
                 (
                     "coinify_id",
                     models.IntegerField(
-                        help_text="Coinifys internal ID for this invoice"
+                        help_text="Coinifys internal ID for this invoice",
                     ),
                 ),
                 (
@@ -90,7 +96,9 @@ class Migration(migrations.Migration):
                 (
                     "payment_amount",
                     models.DecimalField(
-                        decimal_places=2, help_text="The payment amount", max_digits=12
+                        decimal_places=2,
+                        help_text="The payment amount",
+                        max_digits=12,
                     ),
                 ),
                 (
@@ -108,7 +116,7 @@ class Migration(migrations.Migration):
                 (
                     "description",
                     models.TextField(
-                        help_text="The text description of this Coinify invoice"
+                        help_text="The text description of this Coinify invoice",
                     ),
                 ),
                 (
@@ -130,13 +138,15 @@ class Migration(migrations.Migration):
                 (
                     "credited_currency",
                     models.CharField(
-                        help_text="The currency of the credited amount.", max_length=3
+                        help_text="The currency of the credited amount.",
+                        max_length=3,
                     ),
                 ),
                 (
                     "state",
                     models.CharField(
-                        help_text="The state of this Coinify invoice", max_length=100
+                        help_text="The state of this Coinify invoice",
+                        max_length=100,
                     ),
                 ),
                 (
@@ -176,13 +186,13 @@ class Migration(migrations.Migration):
                 (
                     "coinify_id",
                     models.IntegerField(
-                        help_text="Coinifys internal ID for this payout"
+                        help_text="Coinifys internal ID for this payout",
                     ),
                 ),
                 (
                     "coinify_created",
                     models.DateTimeField(
-                        help_text="Created datetime in Coinifys end for this payout"
+                        help_text="Created datetime in Coinifys end for this payout",
                     ),
                 ),
                 (
@@ -196,7 +206,9 @@ class Migration(migrations.Migration):
                 (
                     "fee",
                     models.DecimalField(
-                        decimal_places=2, help_text="The payout fee", max_digits=12
+                        decimal_places=2,
+                        help_text="The payout fee",
+                        max_digits=12,
                     ),
                 ),
                 (

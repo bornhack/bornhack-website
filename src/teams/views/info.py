@@ -1,4 +1,3 @@
-from teams.views.mixins import TeamInfopagerPermissionMixin
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -6,10 +5,12 @@ from django.views.generic import ListView
 from django.views.generic import UpdateView
 from reversion.views import RevisionMixin
 
-from .mixins import TeamViewMixin
 from info.models import InfoCategory
 from info.models import InfoItem
+from teams.views.mixins import TeamInfopagerPermissionMixin
 from utils.widgets import MarkdownWidget
+
+from .mixins import TeamViewMixin
 
 
 class InfoCategoriesListView(

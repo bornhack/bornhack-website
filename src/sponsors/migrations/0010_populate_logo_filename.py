@@ -11,7 +11,6 @@ def populate_logo_filename(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("sponsors", "0009_sponsor_logo_filename")]
 
     operations = [migrations.RunPython(populate_logo_filename)]
