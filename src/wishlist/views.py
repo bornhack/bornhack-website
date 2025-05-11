@@ -1,11 +1,10 @@
 from django.views.generic import DetailView
 from django.views.generic import ListView
-from camps.mixins import CampViewMixin
 
 from .models import Wish
 
 
-class WishListView(CampViewMixin, ListView):
+class WishListView(ListView):
     model = Wish
     template_name = "wish_list.html"
 
@@ -14,7 +13,7 @@ class WishListView(CampViewMixin, ListView):
         return super().get_queryset().filter(fulfilled=False)
 
 
-class WishDetailView(CampViewMixin, DetailView):
+class WishDetailView(DetailView):
     model = Wish
     template_name = "wish_detail.html"
     slug_url_kwarg = "wish_slug"
