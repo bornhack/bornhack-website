@@ -3,7 +3,6 @@
 This is done here and not in CampViewMixin because most views need the camp and camps
 list in tempalte context but not all views need queryset filtering by camp.
 """
-
 from .models import Camp
 
 
