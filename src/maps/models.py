@@ -272,7 +272,12 @@ class UserLocation(
         help_text="The location.",
     )
 
-    data = models.JSONField(blank=True, null=True, max_length=10 * 1024)
+    data = models.JSONField(
+        blank=True,
+        null=True,
+        max_length=10 * 1024,
+        help_text="JSON data field (frontend will only display a object with keys on 1 level)",
+    )
 
     def __str__(self):
         return self.name
