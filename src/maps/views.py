@@ -142,7 +142,7 @@ class MapView(CampViewMixin, TemplateView):
                 "maps:map_layer_geojson",
                 kwargs={"layer_slug": layer["slug"]},
             )
-        for user_location_type in context["mapData"]["user_location"]:
+        for user_location_type in context["mapData"]["user_location_types"]:
             user_location_type["url"] = reverse(
                 "maps_user_location_layer",
                 kwargs={
@@ -339,6 +339,23 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     template_name = "user_location_form.html"
     fields = ["name", "type", "location", "data"]
 
+    def dispatch(self, *args, **kwargs):
+        super().dispatch(*args, **kwargs)
+        if (
+            UserLocation.objects.filter(user=self.request.user, camp=self.camp).count()
+            > 49
+        ):
+            messages.error(
+                self.request,
+                "To many User Locations (50), please delete some.",
+            )
+            return redirect(
+                reverse(
+                    "maps_user_location_list",
+                    kwargs={"camp_slug": self.camp.slug},
+                ),
+            )
+
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
         form.fields["location"].widget = LeafletWidget(
@@ -453,6 +470,8 @@ class UserLocationApiView(
     def post(self, request, **kwargs):
         if "user_location" in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["GET", "PATCH", "DELETE"])
+        if UserLocation.objects.filter(user=request.user, camp=self.camp).count() > 49:
+            return {"error": "To many user locations created (50)"}
         data = json.loads(request.body)
         try:
             user_location_type = UserLocationType.objects.get(slug=data["type"])
