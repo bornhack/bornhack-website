@@ -37,7 +37,7 @@ class LayerMapperViewMixin(LayerViewMixin):
 
 
 class GisTeamViewMixin:
-    """A mixin for views only available to users with Gis team permission."""
+    """A mixin for views only available to users with `camps.gis_team_member` permission."""
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
