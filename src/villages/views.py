@@ -85,7 +85,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
                 continue
             entry = {
                 "type": "Feature",
-                "id": str(village.pk),
+                "id": village.pk,
                 "geometry": {
                     "type": "Point",
                     "coordinates": [village.location.x, village.location.y],
