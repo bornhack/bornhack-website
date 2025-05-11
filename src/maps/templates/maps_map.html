@@ -20,9 +20,9 @@
   <script src="{% static 'vendor/leaflet-fullscreen/Leaflet.fullscreen.min.js' %}" type="text/javascript"></script>
   <script src="{% static 'vendor/leaflet-panel-layers/leaflet-panel-layers.min.js' %}" type="text/javascript"></script>
   {{ mapData|json_script:"mapData" }}
-  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/mapVars.js' %}?v=1" type="text/javascript"></script>
   <script src="{% static 'js/maps/generic/mapProcessing.js' %}" type="text/javascript"></script>
-  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js?v=1' %}" type="text/javascript"></script>
 {% endblock extra_head %}
 
 {% block content %}
