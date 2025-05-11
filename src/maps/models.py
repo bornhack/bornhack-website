@@ -222,7 +222,7 @@ class UserLocationType(UUIDModel):
     )
 
     def __str__(self):
-        return str(self.name)
+        return self.name
 
     def save(self, **kwargs):
         if not self.slug:
