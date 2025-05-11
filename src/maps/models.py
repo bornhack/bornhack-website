@@ -248,7 +248,7 @@ class UserLocation(
 
     type = models.ForeignKey(
         UserLocationType,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         help_text="Type of this location (extra types can be requested at the GIS team)",
         related_name="user_locations",
     )

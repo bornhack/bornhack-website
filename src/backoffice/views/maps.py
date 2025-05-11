@@ -477,6 +477,7 @@ class MapuserLocationTypeCreateView(MapperTeamViewMixin, CreateView):
     template_name = "maps_user_location_type_form.html"
     fields = [
         "name",
+        "slug",
         "icon",
         "marker",
     ]
@@ -501,6 +502,7 @@ class MapuserLocationTypeUpdateView(MapperTeamViewMixin, UpdateView):
     slug_field = "pk"
     fields = [
         "name",
+        "slug",
         "icon",
         "marker",
     ]
