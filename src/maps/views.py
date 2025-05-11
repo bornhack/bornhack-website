@@ -319,6 +319,14 @@ class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
     template_name = "user_location.html"
     model = UserLocation
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_location_types"] = UserLocationType.objects.all().values_list(
+            "slug",
+            flat=True,
+        )
+        return context
+
     def get_queryset(self, *args, **kwargs):
         """
         Show only entries belonging to the current user
