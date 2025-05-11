@@ -487,7 +487,7 @@ class MapuserLocationTypeCreateView(MapperTeamViewMixin, CreateView):
         return form
 
     def get_success_url(self):
-        messages.success(self.request, "The User Location Type has been updated")
+        messages.success(self.request, "The User Location Type has been created")
         return reverse(
             "backoffice:map_user_location_type_list",
             kwargs={"camp_slug": self.kwargs["camp_slug"]},
