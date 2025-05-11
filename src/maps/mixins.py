@@ -36,6 +36,18 @@ class LayerMapperViewMixin(LayerViewMixin):
             raise PermissionDenied()
 
 
+class MapperTeamViewMixin:
+    """A mixin for views only available to users with Mapper team permission."""
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        if self.request.user.has_perm("camps.gis_team_member"):
+            return
+        else:
+            messages.error(request, "No thanks")
+            raise PermissionDenied()
+
+
 class ExternalLayerViewMixin(CampViewMixin):
     """A mixin to get the ExternalLayer object based on external_layer_uuid in url kwargs."""
 

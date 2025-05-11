@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
+
+{% block title %}
+  Maps | UserLocation Type | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Maps - User Location Types - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">The following {{ layers.count }} user location type(s) are defined.</p>
+      <p>
+        <a href="{% url 'backoffice:map_user_location_type_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add User Location Type</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+      <table class="table datatable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Icon</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in userlocationtype_list %}
+            <tr>
+              <td>{{ entry.name }}</td>
+              <td><i class="{{ entry.icon }} fa-2x fa-fw"></i> {{ entry.icon }}</td>
+              <td>
+                <a href="{% url 'backoffice:map_user_location_type_update' camp_slug=camp.slug user_location_type_uuid=entry.pk %}" class="btn btn-primary"><i class="fas fa-plus"></i> Update</a>
+                <a href="{% url 'backoffice:map_user_location_type_delete' camp_slug=camp.slug user_location_type_uuid=entry.pk %}" class="btn btn-danger"><i class="fas fa-trashcan"></i> Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
