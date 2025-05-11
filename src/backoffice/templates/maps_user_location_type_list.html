@@ -31,7 +31,7 @@
               <td>{{ entry.name }}</td>
               <td><i class="{{ entry.icon }} fa-2x fa-fw"></i> {{ entry.icon }}</td>
               <td>
-                <a href="{% url 'backoffice:map_user_location_type_update' camp_slug=camp.slug user_location_type_uuid=entry.pk %}" class="btn btn-primary"><i class="fas fa-plus"></i> Update</a>
+                <a href="{% url 'backoffice:map_user_location_type_update' camp_slug=camp.slug user_location_type_uuid=entry.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
                 <a href="{% url 'backoffice:map_user_location_type_delete' camp_slug=camp.slug user_location_type_uuid=entry.pk %}" class="btn btn-danger"><i class="fas fa-trashcan"></i> Delete</a>
               </td>
             </tr>

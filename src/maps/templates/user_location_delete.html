@@ -13,7 +13,7 @@
         <form method="post">
           {% csrf_token %}
           <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete User Location</button>
-          <a href="{% url 'maps_user_location' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+          <a href="{% url 'maps_user_location_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
         </form>
       </div>
     </div>

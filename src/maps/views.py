@@ -316,7 +316,7 @@ class LayerUserLocationView(CampViewMixin, JsonView):
 
 
 class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
-    template_name = "user_location.html"
+    template_name = "user_location_list.html"
     model = UserLocation
 
     def get_context_data(self, **kwargs):
@@ -363,7 +363,7 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         )
         return redirect(
             reverse(
-                "maps_user_location",
+                "maps_user_location_list",
                 kwargs={"camp_slug": self.camp.slug},
             ),
         )
@@ -400,7 +400,7 @@ class UserLocationUpdateView(
 
     def get_success_url(self):
         return reverse(
-            "maps_user_location",
+            "maps_user_location_list",
             kwargs={"camp_slug": self.camp.slug},
         )
 
@@ -422,7 +422,7 @@ class UserLocationDeleteView(
             f"Your User Location {self.get_object().name} has been deleted successfully.",
         )
         return reverse(
-            "maps_user_location",
+            "maps_user_location_list",
             kwargs={"camp_slug": self.camp.slug},
         )
 

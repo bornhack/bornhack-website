@@ -171,7 +171,7 @@ urlpatterns = [
                                         path(
                                             "",
                                             UserLocationListView.as_view(),
-                                            name="maps_user_location",
+                                            name="maps_user_location_list",
                                         ),
                                         path(
                                             "create/",

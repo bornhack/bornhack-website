@@ -489,7 +489,7 @@ class MapuserLocationTypeCreateView(MapperTeamViewMixin, CreateView):
     def get_success_url(self):
         messages.success(self.request, "The User Location Type has been updated")
         return reverse(
-            "backoffice:map_user_location_type",
+            "backoffice:map_user_location_type_list",
             kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )
 
@@ -513,7 +513,7 @@ class MapuserLocationTypeUpdateView(MapperTeamViewMixin, UpdateView):
     def get_success_url(self):
         messages.success(self.request, "The User Location Type has been created")
         return reverse(
-            "backoffice:map_user_location_type",
+            "backoffice:map_user_location_type_list",
             kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )
 
@@ -528,6 +528,6 @@ class MapuserLocationTypeDeleteView(MapperTeamViewMixin, DeleteView):
     def get_success_url(self):
         messages.success(self.request, "The User Location Type has been deleted")
         return reverse(
-            "backoffice:map_user_location_type",
+            "backoffice:map_user_location_type_list",
             kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )

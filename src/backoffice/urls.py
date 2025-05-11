@@ -238,7 +238,7 @@ urlpatterns = [
                             path(
                                 "",
                                 MapUserLocationTypeListView.as_view(),
-                                name="map_user_location_type",
+                                name="map_user_location_type_list",
                             ),
                             path(
                                 "create/",
