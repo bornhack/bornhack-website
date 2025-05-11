@@ -1,4 +1,7 @@
+"""The Wish model."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.urls import reverse
@@ -7,13 +10,17 @@ from django_prometheus.models import ExportModelOperationsMixin
 from utils.models import CampRelatedModel
 from utils.slugs import unique_slugify
 
+if TYPE_CHECKING:
+    from camps.models import Camp
 
 class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
-    """This model contains the stuff BornHack needs. This can be anything from kitchen equipment
-    to network cables, or anything really.
+    """This model contains the stuff BornHack needs.
+
+    This can be anything from kitchen equipment to network cables, or anything really.
     """
 
     class Meta:
+        """Model configuration."""
         verbose_name_plural = "wishes"
 
     name = models.CharField(
@@ -49,15 +56,18 @@ class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
     )
 
     @property
-    def camp(self):
+    def camp(self) -> Camp:
+        """Return the camp object."""
         return self.team.camp
 
     camp_filter = "team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Return the name."""
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs: dict[str, str]) -> None:
+        """Set slug and save."""
         self.slug = unique_slugify(
             self.name,
             slugs_in_use=self.__class__.objects.filter(team=self.team).values_list(
@@ -67,7 +77,8 @@ class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
         )
         super().save(**kwargs)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
+        """Return URL to detailview."""
         return reverse(
             "wishlist:detail",
             kwargs={

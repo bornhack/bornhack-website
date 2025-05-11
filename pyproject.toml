@@ -104,6 +104,7 @@ ignore = [
     "G004", # Logging statement uses f-string
     "ANN101", # Missing type annotation for `self` in method
     "ANN102", # Missing type annotation for `cls` in classmethod
+    "ARG002", # Unused method argument
     "EM101", # Exception must not use a string literal, assign to variable first
     "EM102", # Exception must not use a f-string literal, assign to variable first
     "PT", # We use django tests, not pytest
@@ -123,6 +124,10 @@ ignore = [
     "SLF001", # Private member accessed
     "PLR", # Magic value used in comparison
     "N", # PEP naming conventions
+]
+"**/migrations/*.py" = [
+    "D", # https://docs.astral.sh/ruff/rules/#pydocstyle-d
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
 ]
 
 [tool.ruff.lint.isort]
