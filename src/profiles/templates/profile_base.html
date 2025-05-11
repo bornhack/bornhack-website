@@ -98,6 +98,12 @@
           </a>
         </li>
 
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'maps_user_location_redirect' %}">
+            User Locations
+          </a>
+        </li>
+
         <hr />
         <p class="text-break">You are logged in as username <b>{{ request.user.username }}</b> with email <b>{{ request.user.email }}</b></p>
 

@@ -144,6 +144,12 @@ urlpatterns = [
         kwargs={"page": "phonebook:list"},
         name="phone_book_redirect",
     ),
+    path(
+        "userlocation/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "maps_user_location_list"},
+        name="maps_user_location_redirect",
+    ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
     path(
