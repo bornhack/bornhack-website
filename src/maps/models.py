@@ -262,7 +262,7 @@ class UserLocation(
         User,
         verbose_name="User",
         related_name="user_locations",
-        help_text="The django user this profile belongs to.",
+        help_text="The django user this UserLocation belongs to.",
         on_delete=models.PROTECT,
     )
 
