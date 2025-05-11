@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     "django_otp.plugins.otp_static",
     "django_bootstrap5",
-    "django_extensions",
     "reversion",
     "leaflet",
     "oauth2_provider",

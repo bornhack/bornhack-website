@@ -29,7 +29,10 @@ class Migration(migrations.Migration):
                 (
                     "subaccount_id",
                     models.CharField(
-                        blank=True, help_text="Unique identifier of a created sub-account.", max_length=32, null=True
+                        blank=True,
+                        help_text="Unique identifier of a created sub-account.",
+                        max_length=32,
+                        null=True,
                     ),
                 ),
                 (

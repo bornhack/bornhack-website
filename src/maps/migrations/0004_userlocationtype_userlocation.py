@@ -72,14 +72,19 @@ class Migration(migrations.Migration):
                 (
                     "location",
                     django.contrib.gis.db.models.fields.PointField(
-                        blank=True, help_text="The location.", null=True, srid=4326
+                        blank=True,
+                        help_text="The location.",
+                        null=True,
+                        srid=4326,
                     ),
                 ),
                 ("data", models.JSONField(blank=True, help_text="JSON data field", max_length=10240, null=True)),
                 (
                     "camp",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.PROTECT, related_name="user_locations", to="camps.camp"
+                        on_delete=django.db.models.deletion.PROTECT,
+                        related_name="user_locations",
+                        to="camps.camp",
                     ),
                 ),
                 (

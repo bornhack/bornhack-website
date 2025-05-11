@@ -55,7 +55,9 @@ class Migration(migrations.Migration):
                 (
                     "group",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="layers", to="maps.group"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="layers",
+                        to="maps.group",
                     ),
                 ),
                 (
@@ -113,7 +115,9 @@ class Migration(migrations.Migration):
                 (
                     "layer",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, related_name="features", to="maps.layer"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="features",
+                        to="maps.layer",
                     ),
                 ),
             ],

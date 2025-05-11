@@ -15,7 +15,11 @@ class Migration(migrations.Migration):
             model_name="dectregistration",
             name="ipei",
             field=django.contrib.postgres.fields.ArrayField(
-                base_field=models.IntegerField(), blank=True, help_text="DECT phone IPEI (EMC+PSN)", null=True, size=2
+                base_field=models.IntegerField(),
+                blank=True,
+                help_text="DECT phone IPEI (EMC+PSN)",
+                null=True,
+                size=2,
             ),
         ),
     ]

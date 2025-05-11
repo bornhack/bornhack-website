@@ -14,7 +14,9 @@ class Migration(migrations.Migration):
             model_name="profile",
             name="location",
             field=django.contrib.gis.db.models.fields.PointField(
-                help_text="Your location at BornHack. This value is available on public maps.", null=True, srid=4326
+                help_text="Your location at BornHack. This value is available on public maps.",
+                null=True,
+                srid=4326,
             ),
         ),
     ]

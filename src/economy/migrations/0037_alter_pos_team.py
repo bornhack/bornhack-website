@@ -16,7 +16,9 @@ class Migration(migrations.Migration):
             model_name="pos",
             name="team",
             field=models.ForeignKey(
-                help_text="The Team managing this POS", on_delete=django.db.models.deletion.PROTECT, to="teams.team"
+                help_text="The Team managing this POS",
+                on_delete=django.db.models.deletion.PROTECT,
+                to="teams.team",
             ),
         ),
     ]

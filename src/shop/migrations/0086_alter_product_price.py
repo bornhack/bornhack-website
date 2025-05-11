@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
             model_name="product",
             name="price",
             field=models.IntegerField(
-                help_text="Price of the product (in DKK, including VAT). The price can not be changed on an existing Product if the Product has been added to one or more orders/OPRs."
+                help_text="Price of the product (in DKK, including VAT). The price can not be changed on an existing Product if the Product has been added to one or more orders/OPRs.",
             ),
         ),
     ]
