@@ -494,6 +494,11 @@ class UserLocationApiView(
             location.location = Point(data["lat"], data["lon"])
         if "data" in data:
             location.data = data["data"]
+        if "type" in data:
+            try:
+                location.type = UserLocationType.objects.get(slug=data["type"])
+            except UserLocationType.DoesNotExist:
+                return {"error": "Type not found"}, 404
         location.save()
 
         return {
