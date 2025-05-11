@@ -21,7 +21,6 @@ class BornhackOAuth2Validator(OAuth2Validator):
         "bornhack:v2:public_credit_name": "profile",
         # the custom user claims we support under custom OIDC scopes
         "bornhack:v2:groups": "groups:read",
-        "bornhack:v2:location": "location:read",
         "bornhack:v2:permissions": "permissions:read",
         "bornhack:v2:teams": "teams:read",
     }
@@ -76,10 +75,6 @@ class BornhackOAuth2Validator(OAuth2Validator):
                 request.user.profile.public_credit_name
             )
 
-        # include location?
-        if request.user.profile.location:
-            claims["bornhack:v2:location"] = request.user.profile.location
-
         # include phonenumber?
         if request.user.profile.phonenumber:
             claims["phone_number"] = request.user.profile.phonenumber
@@ -112,7 +107,6 @@ class BornhackOAuth2Validator(OAuth2Validator):
             # custom user claims
             "bornhack:v2:description",
             "bornhack:v2:groups",
-            "bornhack:v2:location",
             "bornhack:v2:permissions",
             "bornhack:v2:public_credit_name",
             "bornhack:v2:teams",

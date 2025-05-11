@@ -21,11 +21,13 @@ from ..forms import MapLayerFeaturesImportForm
 from maps.models import ExternalLayer
 from maps.models import Feature
 from maps.models import Layer
+from maps.models import UserLocationType
 from teams.models import Team
 from utils.widgets import IconPickerWidget
 from utils.mixins import AnyTeamMapperRequiredMixin
 from maps.mixins import LayerMapperViewMixin
 from maps.mixins import ExternalLayerMapperViewMixin
+from maps.mixins import GisTeamViewMixin
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -458,5 +460,76 @@ class MapExternalLayerDeleteView(ExternalLayerMapperViewMixin, DeleteView):
         messages.success(self.request, "The external layer has been deleted")
         return reverse(
             "backoffice:map_layer_list",
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
+        )
+
+
+# ################# User Location Types ############
+
+
+class MapUserLocationTypeListView(GisTeamViewMixin, ListView):
+    model = UserLocationType
+    template_name = "maps_user_location_type_list.html"
+
+
+class MapUserLocationTypeCreateView(GisTeamViewMixin, CreateView):
+    model = UserLocationType
+    template_name = "maps_user_location_type_form.html"
+    fields = [
+        "name",
+        "slug",
+        "icon",
+        "marker",
+    ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
+
+    def get_success_url(self):
+        messages.success(self.request, "The User Location Type has been created")
+        return reverse(
+            "backoffice:map_user_location_type_list",
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
+        )
+
+
+class MapUserLocationTypeUpdateView(GisTeamViewMixin, UpdateView):
+    model = UserLocationType
+    template_name = "maps_user_location_type_form.html"
+    slug_url_kwarg = "user_location_type_uuid"
+    slug_field = "pk"
+    fields = [
+        "name",
+        "slug",
+        "icon",
+        "marker",
+    ]
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        form.fields["icon"].widget = IconPickerWidget()
+        return form
+
+    def get_success_url(self):
+        messages.success(self.request, "The User Location Type has been updated")
+        return reverse(
+            "backoffice:map_user_location_type_list",
+            kwargs={"camp_slug": self.kwargs["camp_slug"]},
+        )
+
+
+class MapUserLocationTypeDeleteView(GisTeamViewMixin, DeleteView):
+    model = UserLocationType
+    template_name = "maps_user_location_type_delete.html"
+    slug_url_kwarg = "user_location_type_uuid"
+    slug_field = "pk"
+    context_object_name = "user_location_type"
+
+    def get_success_url(self):
+        messages.success(self.request, "The User Location Type has been deleted")
+        return reverse(
+            "backoffice:map_user_location_type_list",
             kwargs={"camp_slug": self.kwargs["camp_slug"]},
         )

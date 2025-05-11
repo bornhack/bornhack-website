@@ -14,6 +14,12 @@ from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from maps.views import MapView
+from maps.views import UserLocationLayerView
+from maps.views import UserLocationListView
+from maps.views import UserLocationUpdateView
+from maps.views import UserLocationCreateView
+from maps.views import UserLocationDeleteView
+from maps.views import UserLocationApiView
 from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
@@ -138,6 +144,12 @@ urlpatterns = [
         kwargs={"page": "phonebook:list"},
         name="phone_book_redirect",
     ),
+    path(
+        "userlocation/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "maps_user_location_list"},
+        name="maps_user_location_redirect",
+    ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
     path(
@@ -148,7 +160,63 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
-                path("map/", MapView.as_view(), name="maps_map"),
+                path(
+                    "map/",
+                    include(
+                        [
+                            path("", MapView.as_view(), name="maps_map"),
+                            path(
+                                "userlocation_geojson/<slug:user_location_type_slug>/",
+                                UserLocationLayerView.as_view(),
+                                name="maps_user_location_layer",
+                            ),
+                            path(
+                                "userlocation/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            UserLocationListView.as_view(),
+                                            name="maps_user_location_list",
+                                        ),
+                                        path(
+                                            "create/",
+                                            UserLocationCreateView.as_view(),
+                                            name="maps_user_location_create",
+                                        ),
+                                        path(
+                                            "create/api/",
+                                            UserLocationApiView.as_view(),
+                                            name="maps_user_location_create_api",
+                                        ),
+                                        path(
+                                            "<uuid:user_location>/",
+                                            include(
+                                                [
+                                                    path(
+                                                        "update/",
+                                                        UserLocationUpdateView.as_view(),
+                                                        name="maps_user_location_update",
+                                                    ),
+                                                    path(
+                                                        "delete/",
+                                                        UserLocationDeleteView.as_view(),
+                                                        name="maps_user_location_delete",
+                                                    ),
+                                                    path(
+                                                        "api/",
+                                                        UserLocationApiView.as_view(),
+                                                        name="maps_user_location_api",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
                 path(
                     "villages/",
                     include(

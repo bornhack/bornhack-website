@@ -12,7 +12,6 @@ from django.views.generic import UpdateView
 from django.views import View
 from jsonview.views import JsonView
 from oauth2_provider.views.generic import ScopedProtectedResourceView
-from leaflet.forms.widgets import LeafletWidget
 
 from .models import Profile
 from .forms import OIDCForm
@@ -35,7 +34,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
         "description",
         "public_credit_name",
         "phonenumber",
-        "location",
         "nickserv_username",
         "theme",
         "preferred_username",
@@ -45,16 +43,6 @@ class ProfileUpdate(LoginRequiredMixin, UpdateView):
 
     def get_object(self, queryset=None):
         return Profile.objects.get(user=self.request.user)
-
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        form.fields["location"].widget = LeafletWidget(
-            attrs={
-                "display_raw": "true",
-                "class": "form-control",
-            },
-        )
-        return form
 
     def form_valid(self, form, **kwargs):
         if (

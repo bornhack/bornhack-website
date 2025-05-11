@@ -5,6 +5,8 @@ from .models import ExternalLayer
 from .models import Feature
 from .models import Group
 from .models import Layer
+from .models import UserLocationType
+from .models import UserLocation
 
 
 @admin.register(Feature)
@@ -40,3 +42,16 @@ class ExternalLayerAdmin(admin.ModelAdmin):
 class GroupAdmin(admin.ModelAdmin):
     save_as = True
     list_display = ["name"]
+
+
+@admin.register(UserLocationType)
+class UserLocationTypeAdmin(admin.ModelAdmin):
+    save_as = True
+    list_display = ["name"]
+
+
+@admin.register(UserLocation)
+class UserLocationAdmin(admin.ModelAdmin):
+    save_as = True
+    list_display = ["name", "type", "user", "camp"]
+    list_filter = ["camp", "user"]

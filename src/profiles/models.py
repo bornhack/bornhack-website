@@ -3,7 +3,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.contrib.gis.db.models import PointField
 
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -65,12 +64,6 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         null=True,
         validators=[MinValueValidator(0), MaxValueValidator(9999)],
         help_text="The phonenumber you can be reached on. This field can be updated automatically when registering a DECT number in the phonebook.",
-    )
-
-    location = PointField(
-        blank=True,
-        null=True,
-        help_text="Your location at BornHack. This value is available on public maps.",
     )
 
     preferred_username = models.SlugField(

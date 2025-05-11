@@ -1,10 +1,15 @@
 import logging
 
+from django.contrib.auth.models import User
 from colorfield.fields import ColorField
 from django.contrib.gis.db.models import GeometryCollectionField
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
+from django.contrib.gis.db.models import PointField
 
+from .utils import LeafletMarkerChoices
+
+from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
@@ -189,3 +194,90 @@ class ExternalLayer(UUIDModel):
             ),
         )
         super().save(**kwargs)
+
+
+class UserLocationType(UUIDModel):
+    name = models.CharField(
+        max_length=100,
+        help_text="Name of the user location type",
+    )
+
+    slug = models.SlugField(
+        blank=True,
+        help_text="The url slug for this user location type. Leave blank to autogenerate one.",
+    )
+
+    icon = models.CharField(
+        max_length=100,
+        default="fas fa-list",
+        blank=True,
+        help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part.",
+    )
+
+    marker = models.CharField(
+        max_length=10,
+        choices=LeafletMarkerChoices.choices,
+        default=LeafletMarkerChoices.BLUE,
+        help_text="The name/colour of the Leaflet marker to use for this User Location Type.",
+    )
+
+    def __str__(self):
+        return self.name
+
+    def save(self, **kwargs):
+        if not self.slug:
+            self.slug = unique_slugify(
+                self.name,
+                slugs_in_use=self.__class__.objects.all().values_list(
+                    "slug",
+                    flat=True,
+                ),
+            )
+        super().save(**kwargs)
+
+
+class UserLocation(
+    UUIDModel,
+    CampRelatedModel,
+):
+    name = models.CharField(
+        max_length=100,
+        help_text="Name of the location",
+    )
+
+    type = models.ForeignKey(
+        UserLocationType,
+        on_delete=models.CASCADE,
+        help_text="Type of this location (extra types can be requested at the GIS team)",
+        related_name="user_locations",
+    )
+
+    camp = models.ForeignKey(
+        "camps.Camp",
+        related_name="user_locations",
+        on_delete=models.PROTECT,
+    )
+
+    user = models.ForeignKey(
+        User,
+        verbose_name="User",
+        related_name="user_locations",
+        help_text="The django user this UserLocation belongs to.",
+        on_delete=models.PROTECT,
+    )
+
+    location = PointField(
+        blank=True,
+        null=True,
+        help_text="The location.",
+    )
+
+    data = models.JSONField(
+        blank=True,
+        null=True,
+        max_length=10 * 1024,
+        help_text="JSON data field",
+    )
+
+    def __str__(self):
+        return self.name

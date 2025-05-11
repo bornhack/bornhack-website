@@ -102,6 +102,10 @@ from .views import MapLayerDeleteView
 from .views import MapLayerFeaturesImportView
 from .views import MapLayerUpdateView
 from .views import MapLayerListView
+from .views import MapUserLocationTypeListView
+from .views import MapUserLocationTypeCreateView
+from .views import MapUserLocationTypeUpdateView
+from .views import MapUserLocationTypeDeleteView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -226,6 +230,40 @@ urlpatterns = [
                     "create/",
                     MapLayerCreateView.as_view(),
                     name="map_layer_create",
+                ),
+                path(
+                    "user_location_type/",
+                    include(
+                        [
+                            path(
+                                "",
+                                MapUserLocationTypeListView.as_view(),
+                                name="map_user_location_type_list",
+                            ),
+                            path(
+                                "create/",
+                                MapUserLocationTypeCreateView.as_view(),
+                                name="map_user_location_type_create",
+                            ),
+                            path(
+                                "<uuid:user_location_type_uuid>/",
+                                include(
+                                    [
+                                        path(
+                                            "update/",
+                                            MapUserLocationTypeUpdateView.as_view(),
+                                            name="map_user_location_type_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            MapUserLocationTypeDeleteView.as_view(),
+                                            name="map_user_location_type_delete",
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
                 ),
                 path(
                     "external/",

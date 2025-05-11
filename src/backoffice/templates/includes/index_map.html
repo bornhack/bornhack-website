@@ -5,3 +5,9 @@
     <p class="list-group-item-text">Use this view to manage map layers.</p>
   </a>
 {% endif %}
+{% if perms.camps.gis_team_member %}
+  <a href="{% url 'backoffice:map_user_location_type_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">User Location Types</h4>
+    <p class="list-group-item-text">Use this view to manage user location types.</p>
+  </a>
+{% endif %}

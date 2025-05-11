@@ -90,6 +90,11 @@ class BHMap {
             "group": "External",
             "layers": [],
             "collapsed": true,
+          },
+          {
+            "group": "User Locations",
+            "layers": [],
+            "collapsed": true,
           }
         ], {
         selectorGroup: true,
