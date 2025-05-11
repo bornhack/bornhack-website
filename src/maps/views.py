@@ -311,7 +311,7 @@ class UserLocationLayerView(CampViewMixin, JsonView):
                     },
                 },
             )
-        return list(output)
+        return output
 
 
 class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
