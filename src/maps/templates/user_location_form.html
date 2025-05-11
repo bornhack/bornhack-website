@@ -18,7 +18,7 @@
 
 {% block content %}
   <div class="card">
-    <span class="h3 card-header">{% if request.resolver_match.url_name == "maps_user_location_update" %}Update{% else %}Create New{% endif %} Location</span>
+    <span class="h3 card-header">{% if request.resolver_match.url_name == "maps_user_location_update" %}Update{% else %}Create New{% endif %} User Location</span>
     <div class="card-body">
       <form method="POST">
         {% csrf_token %}
