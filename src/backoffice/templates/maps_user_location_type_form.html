@@ -10,7 +10,7 @@
       <h3 class="card-title">{% if form.instance.pk %}Update{% else %}Create new{% endif %} User Location Type</h3>
     </div>
     <div class="card-body">
-      <p class="lead">{% if form.instance.pk %}Update{% else %}Create{% endif %} Layer</p>
+      <p class="lead">{% if form.instance.pk %}Update{% else %}Create{% endif %} User Location Type</p>
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
