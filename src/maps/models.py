@@ -2,7 +2,6 @@ import logging
 
 from django.contrib.auth.models import User
 from colorfield.fields import ColorField
-from django.utils.translation import gettext_lazy as _
 from django.contrib.gis.db.models import GeometryCollectionField
 from django.db import models
 from django_prometheus.models import ExportModelOperationsMixin
