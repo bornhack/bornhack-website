@@ -368,7 +368,7 @@ class PosProductListView(
     def get_context_data(self, *args, **kwargs):
         """Include the total (unfiltered) count."""
         context = super().get_context_data(*args, **kwargs)
-        campfilter = models.Q(pos_sales__transaction__pos__team__camp=self.request.camp)
+        campfilter = models.Q(pos_sales__transaction__pos__team__camp=self.camp)
         context["total_products"] = (
             PosProduct.objects.filter(campfilter).distinct().count()
         )
@@ -415,7 +415,7 @@ class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         pos_teams = Team.objects.filter(camp=self.camp, points_of_sale__isnull=False)
         expenses = Expense.objects.filter(
-            camp=self.request.camp,
+            camp=self.camp,
             responsible_team__in=pos_teams,
         )
         context["form"].fields["expenses"].queryset = expenses

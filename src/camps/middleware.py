@@ -1,4 +1,8 @@
-"""Add camp as an attribute on the request object."""
+"""Add camp as an attribute on the request object.
+
+CBVs which inherit from CampViewMixin can use self.camp but for everyone else
+there is request.camp.
+"""
 
 from django.shortcuts import get_object_or_404
 

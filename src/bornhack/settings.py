@@ -96,7 +96,6 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "shop.context_processors.current_order",
-                "camps.context_processors.camp",
                 "utils.context_processors.is_volunteer",
             ],
         },
