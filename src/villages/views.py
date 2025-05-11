@@ -69,10 +69,7 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
 
 class VillageListGeoJSONView(CampViewMixin, JsonView):
     def get_context_data(self, **kwargs):
-        context = {}
-        context["type"] = "FeatureCollection"
-        context["features"] = self.dump_features()
-        return context
+        return {"type": "FeatureCollection", "features" = self.dump_features()}
 
     def dump_features(self) -> list[object]:
         output = []
