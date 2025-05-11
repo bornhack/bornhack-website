@@ -128,7 +128,6 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
     """
 
     def get_context_data(self, **kwargs):
-        context = {}
         context = json.loads(
             serialize(
                 "geojson",
