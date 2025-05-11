@@ -1,5 +1,7 @@
 """Custom OAuth2Validator subclass."""
 
+from __future__ import annotations
+
 from oauth2_provider.oauth2_validators import OAuth2Validator
 
 

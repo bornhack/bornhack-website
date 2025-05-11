@@ -1,4 +1,7 @@
 # TODO: docstrings because what the hell is going on here
+from __future__ import annotations
+
+
 def adjust_color(color, factor=0.4):
     if len(color) == 3:
         color = (*color, 1)

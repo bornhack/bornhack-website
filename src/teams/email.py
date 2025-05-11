@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from utils.email import add_outgoing_email

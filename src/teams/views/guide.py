@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import DetailView

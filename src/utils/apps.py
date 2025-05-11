@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.apps import AppConfig
 
 from utils.allauth_pwreset_nospam import mock_send_unknown_account_email

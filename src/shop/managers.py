@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.models import Exists
 from django.db.models import OuterRef
 from django.db.models import QuerySet

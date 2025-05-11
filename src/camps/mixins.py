@@ -4,6 +4,8 @@ Adds `self.camp` to views, and adds `camp` and `camps` to the template context.
 Filters querysets with a `camp_filter` property.
 """
 
+from __future__ import annotations
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404

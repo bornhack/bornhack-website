@@ -1,5 +1,7 @@
 """Custom allauth account adapter based on allauth.account.adapter.DefaultAccountAdapter."""
 
+from __future__ import annotations
+
 import uuid
 
 from allauth.account.adapter import DefaultAccountAdapter

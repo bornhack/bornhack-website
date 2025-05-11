@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404

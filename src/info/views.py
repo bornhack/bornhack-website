@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.views.generic import ListView
 
 from camps.mixins import CampViewMixin

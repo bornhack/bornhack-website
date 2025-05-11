@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def is_volunteer(request):
     """Check if user has 'camps.<team>_team_member' permission for any team."""
     for perm in request.user.get_all_permissions():

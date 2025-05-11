@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404

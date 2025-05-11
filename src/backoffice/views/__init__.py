@@ -1,5 +1,7 @@
 """Backoffice views.py was split into multiple files in July 2021 /tyk."""
 
+from __future__ import annotations
+
 from .backoffice import *  # noqa: F403
 from .content import *  # noqa: F403
 from .economy import *  # noqa: F403

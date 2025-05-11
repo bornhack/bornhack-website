@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+
 def current_order(request):
     if request.user.is_authenticated:
         order = None

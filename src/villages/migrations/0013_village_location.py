@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import django.contrib.gis.db.models.fields
 from django.db import migrations
 

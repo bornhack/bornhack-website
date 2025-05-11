@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django import forms
 from django.contrib import messages
 from django.shortcuts import redirect

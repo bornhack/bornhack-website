@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from ircbot.utils import add_irc_message

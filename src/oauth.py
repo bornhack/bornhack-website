@@ -11,6 +11,8 @@ Then call this script with <hostname> <username> <password> <client_id>
 Only works with local users, not social users.
 """
 
+from __future__ import annotations
+
 import base64
 import hashlib
 import secrets

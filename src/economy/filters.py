@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db import models
 from django_filters import FilterSet
 from django_filters import filters

@@ -1,5 +1,7 @@
 """Forms for the phonebook"""
 
+from __future__ import annotations
+
 import re
 
 from django import forms

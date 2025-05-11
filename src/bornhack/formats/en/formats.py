@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 DATE_FORMAT = "l, M jS, Y"
 # DATE_INPUT_FORMATS
 DATETIME_FORMAT = "l, M jS, Y, H:i (e)"

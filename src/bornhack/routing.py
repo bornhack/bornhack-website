@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter
 from channels.routing import URLRouter

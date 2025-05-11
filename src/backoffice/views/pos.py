@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import json
 import logging
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -38,6 +41,9 @@ from utils.mixins import AnyTeamPosRequiredMixin
 from ..forms import PosSalesJSONForm
 from ..mixins import OrgaTeamPermissionMixin
 from ..mixins import PosViewMixin
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
 
 logger = logging.getLogger("bornhack.%s" % __name__)
 
@@ -383,7 +389,7 @@ class PosProductListView(
         return context
 
 
-class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView[PosProduct]):
     """Use this view to update PosProduct objects."""
 
     model = PosProduct
@@ -407,7 +413,7 @@ class PosProductUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
             kwargs={"camp_slug": self.camp.slug},
         )
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, Form]:
         """Only show relevant expenses."""
         context = super().get_context_data(**kwargs)
         pos_teams = Team.objects.filter(camp=self.camp, points_of_sale__isnull=False)
@@ -432,14 +438,14 @@ class PosProductCostListView(
     table_class = PosProductCostTable
     filterset_class = PosProductCostFilter
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, QuerySet[PosProductCost]]:
         """Include total number of costs."""
         context = super().get_context_data(**kwargs)
         context["total_costs"] = PosProductCost.objects.filter(camp=self.camp).count()
-        return context
+        return context  # type: ignore[no-any-return]
 
 
-class PosProductCostUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView):
+class PosProductCostUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateView[PosProductCost, PosProductCost]):
     """Use this view to update PosProductCost objects."""
 
     model = PosProductCost
@@ -450,7 +456,7 @@ class PosProductCostUpdateView(CampViewMixin, OrgaTeamPermissionMixin, UpdateVie
     template_name = "posproductcost_form.html"
     pk_url_kwarg = "posproductcost_uuid"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
         return reverse(
             "backoffice:posproductcost_list",
             kwargs={"camp_slug": self.camp.slug},

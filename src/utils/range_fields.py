@@ -10,6 +10,8 @@ and determines if the object is indeed empty. This is required when python-creat
 are dealt with, as these are not normalised the same way that postgres does.
 """
 
+from __future__ import annotations
+
 import datetime
 
 from psycopg2.extras import Range

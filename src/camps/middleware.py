@@ -4,6 +4,8 @@ CBVs which inherit from CampViewMixin can use self.camp but for everyone else
 there is request.camp.
 """
 
+from __future__ import annotations
+
 from django.shortcuts import get_object_or_404
 
 

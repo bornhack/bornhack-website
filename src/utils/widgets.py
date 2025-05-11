@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.forms import Textarea
 from django.forms import TextInput
 from django.forms import Widget

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from graphene import ObjectType
 from graphene import Schema
 from graphene import relay

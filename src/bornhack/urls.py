@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from allauth.account.views import LoginView
 from allauth.account.views import LogoutView
 from django.conf import settings

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.http import HttpResponseRedirect
 from django.views.generic import CreateView
 from django.views.generic import DeleteView

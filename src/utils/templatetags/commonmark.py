@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import commonmark
 import nh3
 from django import template

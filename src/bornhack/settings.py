@@ -1,10 +1,18 @@
+from __future__ import annotations
+
 from pathlib import Path
+
+import django_stubs_ext
 
 from utils import range_fields  # noqa: F401
 
 from .environment_settings import *  # noqa: F403
 
 # range_fields monkeypatches postgres Range object to support lookups
+
+# intialise django_stubs_ext
+django_stubs_ext.monkeypatch()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

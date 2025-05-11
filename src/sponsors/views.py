@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.db.models import DateTimeField
 from django.db.models import F
 from django.db.models import Sum

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib import admin
 from django.contrib import messages
 from django.core.exceptions import ValidationError

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType

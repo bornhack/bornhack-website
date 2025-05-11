@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from colorfield.fields import ColorField

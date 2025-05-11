@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.urls import reverse

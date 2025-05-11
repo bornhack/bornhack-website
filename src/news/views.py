@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib.syndication.views import Feed
 from django.utils import timezone
 from django.views.generic import DetailView

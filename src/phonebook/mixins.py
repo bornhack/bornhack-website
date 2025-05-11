@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from camps.mixins import CampViewMixin
 
 # from .models import DectRegistration

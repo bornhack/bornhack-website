@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import reversion
 from django.core.exceptions import ValidationError
 from django.db import models

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.apps import AppConfig
 from django.db.models.signals import m2m_changed
 from django.db.models.signals import post_save

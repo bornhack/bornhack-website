@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from camps.models import Camp

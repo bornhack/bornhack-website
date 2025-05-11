@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import uuid
 from datetime import timedelta
@@ -274,7 +276,7 @@ class Order(ExportModelOperationsMixin("order"), CreatedUpdatedModel):
 
         return RefundEnum.NOT_REFUNDED.value
 
-    def create_refund(self, *, created_by: User, notes: str = "") -> "Refund":
+    def create_refund(self, *, created_by: User, notes: str = "") -> Refund:
         return Refund.objects.create(order=self, notes=notes, created_by=created_by)
 
 
