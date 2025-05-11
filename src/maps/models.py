@@ -218,7 +218,7 @@ class UserLocationType(UUIDModel):
         max_length=10,
         choices=LeafletMarkerChoices.choices,
         default=LeafletMarkerChoices.BLUE,
-        help_text="The name/colour of the Leaflet marker to use for this facility type.",
+        help_text="The name/colour of the Leaflet marker to use for this User Location Type.",
     )
 
     def __str__(self):
