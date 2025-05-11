@@ -15,10 +15,8 @@ from jsonview.views import JsonView
 from leaflet.forms.widgets import LeafletWidget
 
 from .email import add_village_approve_email
-from .mixins import EnsureWritableCampMixin
 from .models import Village
 from camps.mixins import CampViewMixin
-from camps.models import Camp
 from utils.widgets import MarkdownWidget
 
 
@@ -131,7 +129,6 @@ class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailVie
 class VillageCreateView(
     CampViewMixin,
     LoginRequiredMixin,
-    EnsureWritableCampMixin,
     CreateView,
 ):
     model = Village
@@ -159,7 +156,7 @@ class VillageCreateView(
     def form_valid(self, form):
         village = form.save(commit=False)
         village.contact = self.request.user
-        village.camp = Camp.objects.get(slug=self.request.session["campslug"])
+        village.camp = self.camp
         if not village.name:
             village.name = "noname"
         village.save()
@@ -190,7 +187,6 @@ class VillageUpdateView(
     CampViewMixin,
     EnsureUserOwnsVillageMixin,
     LoginRequiredMixin,
-    EnsureWritableCampMixin,
     UpdateView,
 ):
     model = Village
@@ -237,7 +233,6 @@ class VillageDeleteView(
     CampViewMixin,
     EnsureUserOwnsVillageMixin,
     LoginRequiredMixin,
-    EnsureWritableCampMixin,
     DeleteView,
 ):
     model = Village
