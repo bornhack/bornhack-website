@@ -188,7 +188,6 @@ class VillageUpdateView(
     CampViewMixin,
     EnsureUserOwnsVillageMixin,
     LoginRequiredMixin,
-    EnsureWritableCampMixin,
     UpdateView,
 ):
     model = Village
@@ -235,7 +234,6 @@ class VillageDeleteView(
     CampViewMixin,
     EnsureUserOwnsVillageMixin,
     LoginRequiredMixin,
-    EnsureWritableCampMixin,
     DeleteView,
 ):
     model = Village
