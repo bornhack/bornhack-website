@@ -69,7 +69,7 @@ class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
 
 class VillageListGeoJSONView(CampViewMixin, JsonView):
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        context = {}
         context["type"] = "FeatureCollection"
         context["features"] = self.dump_features()
         return context
@@ -85,7 +85,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
                 continue
             entry = {
                 "type": "Feature",
-                "id": village.pk,
+                "id": str(village.pk),
                 "geometry": {
                     "type": "Point",
                     "coordinates": [village.location.x, village.location.y],
