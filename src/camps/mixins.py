@@ -22,7 +22,8 @@ class CampViewMixin:
         super().setup(*args, **kwargs)
         self.camp = get_object_or_404(Camp, slug=self.kwargs["camp_slug"])
         if self.camp.read_only and isinstance(
-            self, FormView | CreateView | UpdateView | DeleteView
+            self,
+            FormView | CreateView | UpdateView | DeleteView,
         ):
             # this camp is readonly
             messages.error(self.request, f"The camp {self.camp.title} is read-only.")
@@ -81,6 +82,6 @@ class CampViewMixin:
             {
                 "camps": Camp.objects.all().order_by("-camp"),
                 "camp": self.camp,
-            }
+            },
         )
         return context
