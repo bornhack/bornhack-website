@@ -25,7 +25,6 @@ from django.views.generic import UpdateView
 from django.views.generic import DeleteView
 from django.views.generic.base import TemplateView
 from jsonview.views import JsonView
-from PIL import ImageColor
 from leaflet.forms.widgets import LeafletWidget
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
@@ -57,7 +56,19 @@ class MapMarkerView(TemplateView):
 
     @property
     def color(self):
-        return ImageColor.getrgb("#" + self.kwargs["color"])
+        hex_color = self.kwargs["color"]
+        length = len(hex_color)
+
+        if length == 6:  # RGB
+            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))  # noqa: E203
+            return (r, g, b)
+        elif length == 8:  # RGBA
+            r, g, b, a = (
+                int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6)  # noqa: E203
+            )
+            return (r, g, b, a)
+        else:
+            raise ValueError("Hex color must be in format RRGGBB or RRGGBBAA")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -449,6 +460,10 @@ class UserLocationApiView(
     CampViewMixin,
     JsonView,
 ):
+    """
+    This view has 2 endpoints /create/api (POST) AND /<uuid>/api (GET, PATCH, DELETE).
+    """
+
     required_scopes = ["location:write"]
 
     def get(self, request, **kwargs):
