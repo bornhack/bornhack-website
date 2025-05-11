@@ -14,7 +14,7 @@ from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
 from maps.views import MapView
-from maps.views import LayerUserLocationView
+from maps.views import UserLocationLayerView
 from maps.views import UserLocationListView
 from maps.views import UserLocationUpdateView
 from maps.views import UserLocationCreateView
@@ -167,7 +167,7 @@ urlpatterns = [
                             path("", MapView.as_view(), name="maps_map"),
                             path(
                                 "userlocation_geojson/<slug:user_location_type_slug>/",
-                                LayerUserLocationView.as_view(),
+                                UserLocationLayerView.as_view(),
                                 name="maps_user_location_layer",
                             ),
                             path(

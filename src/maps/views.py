@@ -273,7 +273,7 @@ class MapProxyView(View):
 # User Location views
 
 
-class LayerUserLocationView(CampViewMixin, JsonView):
+class UserLocationLayerView(CampViewMixin, JsonView):
     """
     UserLocation geojson view
     """
