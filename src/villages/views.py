@@ -17,7 +17,6 @@ from leaflet.forms.widgets import LeafletWidget
 from .email import add_village_approve_email
 from .models import Village
 from camps.mixins import CampViewMixin
-from camps.models import Camp
 from utils.widgets import MarkdownWidget
 
 

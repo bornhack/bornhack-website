@@ -3,6 +3,7 @@
 Adds `self.camp` to views, and adds `camp` and `camps` to the template context.
 Filters querysets with a `camp_filter` property.
 """
+
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import PermissionDenied
 from django.views.generic import CreateView, UpdateView, DeleteView, FormView
@@ -20,11 +21,12 @@ class CampViewMixin:
         """Set self.camp, and raise PermissionDenied if camp is readonly and it is an edit view."""
         super().setup(*args, **kwargs)
         self.camp = get_object_or_404(Camp, slug=self.kwargs["camp_slug"])
-        if self.camp.read_only and isinstance(self, FormView | CreateView | UpdateView | DeleteView):
+        if self.camp.read_only and isinstance(
+            self, FormView | CreateView | UpdateView | DeleteView
+        ):
             # this camp is readonly
             messages.error(self.request, f"The camp {self.camp.title} is read-only.")
             raise PermissionDenied
-
 
     def get_queryset(self):
         """Filter querysets by camp.
@@ -75,8 +77,10 @@ class CampViewMixin:
     def get_context_data(self, *args, **kwargs):
         """Add `camp` and `camps` to the template context."""
         context = super().get_context_data(*args, **kwargs)
-        context.update({
-            "camps": Camp.objects.all().order_by("-camp"),
-            "camp": self.camp,
-        })
+        context.update(
+            {
+                "camps": Camp.objects.all().order_by("-camp"),
+                "camp": self.camp,
+            }
+        )
         return context
