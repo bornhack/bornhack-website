@@ -66,7 +66,7 @@ function gridLoaded() {
   })
   mapObject.loadLayer(mapData.villages, "Villages", villageOptions, true, function(){}, undefined, "fa fa-campground");
 
-  mapData['user_location'].forEach(function (item) {
+  mapData['user_location_types'].forEach(function (item) {
     mapObject.loadLayer(item.url, item.name, userLocationOptions, false, function(){}, "User Locations", item.icon);
   });
 }

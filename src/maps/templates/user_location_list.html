@@ -28,7 +28,7 @@
           <h2>Payload</h2>
           <p>The API accepts and returns JSON payloads with the following structure (for the <code>data</code> field the website map will only display values for first level keys):</p>
         <pre><code>{
-  "pk": null,
+  "uuid": "",
   "type": "sensor",
   "name": "Super fancy sensor",
   "lat": 9.940315,
@@ -50,7 +50,7 @@
             </thead>
             <tbody>
               <tr>
-                <td><code>pk</code></td>
+                <td><code>uuid</code></td>
                 <td>UUID</td>
                 <td>Primary key / UUID. Set by the server.</td>
               </tr>
@@ -90,19 +90,19 @@
           <p><strong>Request Body:</strong> See Payload</p>
           <p><strong>Response:</strong> Returns the created resource.</p>
 
-          <h3>GET <code>/{{ camp.slug }}/map/userlocation/&lt;pk&gt;/api/</code></h3>
-          <p><strong>Description:</strong> Retrieve an existing resource by pk.</p>
+          <h3>GET <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Retrieve an existing resource by uuid.</p>
           <p><strong>Required Scope:</strong> None</p>
           <p><strong>Response:</strong> Returns the full resource data.</p>
 
-          <h3>PATCH <code>/{{ camp.slug }}/map/userlocation/&lt;pk&gt;/api/</code></h3>
-          <p><strong>Description:</strong> Update an existing resource by pk.</p>
+          <h3>PATCH <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Update an existing resource by uuid.</p>
           <p><strong>Required Scope:</strong> <code>location:write</code></p>
           <p><strong>Request Body:</strong> Partial or full object (same format as POST).</p>
           <p><strong>Response:</strong> Returns the updated resource.</p>
 
-          <h3>DELETE <code>/{{ camp.slug }}/map/userlocation/&lt;pk&gt;/api/</code></h3>
-          <p><strong>Description:</strong> Delete an existing resource by pk.</p>
+          <h3>DELETE <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Delete an existing resource by uuid.</p>
           <p><strong>Required Scope:</strong> <code>location:write</code></p>
           <p><strong>Response:</strong> Returns confirmation of deletion (e.g., status 200 No Content).</p>
 

@@ -123,7 +123,7 @@ class MapView(CampViewMixin, TemplateView):
                 "villages_geojson",
                 kwargs={"camp_slug": self.camp.slug},
             ),
-            "user_location": list(
+            "user_location_types": list(
                 context["user_location_types"].values(),
             ),
             "loggedIn": self.request.user.is_authenticated,
@@ -442,7 +442,7 @@ class UserLocationApiView(
             pk=kwargs["user_location"],
         )
         return {
-            "pk": location.pk,
+            "uuid": location.pk,
             "type": location.type.slug,
             "name": location.name,
             "lat": location.location.x,
@@ -470,7 +470,7 @@ class UserLocationApiView(
         location.save()
 
         return {
-            "pk": location.pk,
+            "uuid": location.pk,
             "type": location.type.slug,
             "name": location.name,
             "lat": location.location.x,
@@ -512,9 +512,10 @@ class UserLocationApiView(
             camp__slug=kwargs["camp_slug"],
             user=request.user,
         )
+        uuid = location.pk
         location.delete()
         return {
-            "pk": location.pk,
+            "uuid": uuid,
             "type": location.type.slug,
             "name": location.name,
             "lat": location.location.x,
