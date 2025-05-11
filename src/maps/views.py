@@ -555,11 +555,4 @@ class UserLocationApiView(
         )
         uuid = location.pk
         location.delete()
-        return {
-            "uuid": uuid,
-            "type": location.type.slug,
-            "name": location.name,
-            "lat": location.location.x,
-            "lon": location.location.y,
-            "data": location.data,
-        }
+        return HttpResponse(status_code=204)
