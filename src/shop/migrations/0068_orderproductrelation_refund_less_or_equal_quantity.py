@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="orderproductrelation",
             constraint=models.CheckConstraint(
-                condition=models.Q(("refunded__lte", django.db.models.expressions.F("quantity"))),
+                check=models.Q(("refunded__lte", django.db.models.expressions.F("quantity"))),
                 name="refund_less_or_equal_quantity",
             ),
         ),
