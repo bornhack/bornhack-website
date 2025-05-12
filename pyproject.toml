@@ -129,6 +129,7 @@ ignore = [
     "N", # PEP naming conventions
 ]
 "**/migrations/*.py" = [
+    "C405", # Unnecessary list literal
     "D", # https://docs.astral.sh/ruff/rules/#pydocstyle-d
     "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
 ]

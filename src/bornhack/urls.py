@@ -26,13 +26,6 @@ from people.views import PeopleView
 from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
 from utils.views import csrfview
-from villages.views import VillageCreateView
-from villages.views import VillageDeleteView
-from villages.views import VillageDetailView
-from villages.views import VillageListGeoJSONView
-from villages.views import VillageListView
-from villages.views import VillageMapView
-from villages.views import VillageUpdateView
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
