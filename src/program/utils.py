@@ -43,8 +43,8 @@ def get_daychunks(day):
         day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
         min(
             day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
-            day.upper
-        )
+            day.upper,
+        ),
     )
 
     # append the final chunk and return

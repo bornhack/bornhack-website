@@ -1,16 +1,22 @@
+"""Email utilities for villages."""
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from django.core.exceptions import ObjectDoesNotExist
 
 from teams.models import Team
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from .models import Village
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def add_village_approve_email(village):
+def add_village_approve_email(village: Village) -> bool:
+    """Build and enqueue an email for village approval."""
     formatdict = {"village": village}
 
     try:

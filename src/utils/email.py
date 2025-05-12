@@ -86,7 +86,7 @@ def add_outgoing_email(
     attachment_filename="",
     responsible_team=None,
     hold=False,
-):
+) -> bool:
     """Adds an email to the outgoing queue
     recipients is a list of to recipients
     """

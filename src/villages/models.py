@@ -1,3 +1,4 @@
+"""The Village model."""
 from __future__ import annotations
 
 from django.contrib.gis.db.models import PointField
@@ -12,8 +13,10 @@ from utils.slugs import unique_slugify
 
 
 class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel):
+    """The Village model."""
     class Meta:
-        ordering = ["name"]
+        """Model settings."""
+        ordering = ("name",)
         unique_together = ("slug", "camp")
 
     contact = models.ForeignKey("auth.User", on_delete=models.PROTECT)
@@ -38,16 +41,19 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
         help_text="The location of this village.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Include camp in village string representation."""
         return f"{self.name} ({self.camp.title})"
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
+        """Return village detail URL."""
         return reverse_lazy(
             "village_detail",
             kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
         )
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
+        """Set slug and save."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -58,6 +64,7 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
             )
         super().save(**kwargs)
 
-    def delete(self, using=None, keep_parents=False):
+    def delete(self, *, using: str|None=None, keep_parents: bool=False) -> None:
+        """Soft-delete villages."""
         self.deleted = True
         self.save()

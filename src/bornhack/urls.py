@@ -219,45 +219,7 @@ urlpatterns = [
                         ],
                     ),
                 ),
-                path(
-                    "villages/",
-                    include(
-                        [
-                            path("", VillageListView.as_view(), name="village_list"),
-                            path(
-                                "create/",
-                                VillageCreateView.as_view(),
-                                name="village_create",
-                            ),
-                            path(
-                                "geojson/",
-                                VillageListGeoJSONView.as_view(),
-                                name="villages_geojson",
-                            ),
-                            path(
-                                "map/",
-                                VillageMapView.as_view(),
-                                name="villages_map",
-                            ),
-                            path(
-                                "<slug:slug>/delete/",
-                                VillageDeleteView.as_view(),
-                                name="village_delete",
-                            ),
-                            path(
-                                "<slug:slug>/edit/",
-                                VillageUpdateView.as_view(),
-                                name="village_update",
-                            ),
-                            # this has to be the last url in the list
-                            path(
-                                "<slug:slug>/",
-                                VillageDetailView.as_view(),
-                                name="village_detail",
-                            ),
-                        ],
-                    ),
-                ),
+                path("villages/", include("villages.urls", namespace="villages")),
                 path("teams/", include("teams.urls", namespace="teams")),
                 path("rideshare/", include("rideshare.urls", namespace="rideshare")),
                 path("backoffice/", include("backoffice.urls", namespace="backoffice")),

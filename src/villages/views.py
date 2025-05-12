@@ -1,4 +1,7 @@
+"""Village related views."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -22,27 +25,37 @@ from utils.widgets import MarkdownWidget
 from .email import add_village_approve_email
 from .models import Village
 
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.forms import ModelForm
+    from django.http import HttpRequest
+    from django.http import HttpResponse
 
 class VillageListView(CampViewMixin, ListView):
+    """List villages."""
     model = Village
     template_name = "village_list.html"
     context_object_name = "villages"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+        """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Village]:
+        """Only show approved and not deleted villages."""
         return super().get_queryset().filter(deleted=False, approved=True)
 
 
 class VillageMapView(CampViewMixin, ListView):
+    """The village map view."""
     model = Village
     template_name = "village_map.html"
     context_object_name = "villages"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, str | bool]:
+        """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
             "grid": static("json/grid.geojson"),
@@ -51,27 +64,20 @@ class VillageMapView(CampViewMixin, ListView):
         }
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Village]:
+        """Only show approved and not deleted villages."""
         return super().get_queryset().filter(deleted=False, approved=True)
 
 
-class UserOwnsVillageOrApprovedMixin(SingleObjectMixin):
-    model = Village
-
-    def dispatch(self, request, *args, **kwargs):
-        # If the user is not contact for this village OR is not staff and village not approved
-        if not request.user.is_staff:
-            if self.get_object().contact != request.user and not self.get_object().approved:
-                raise Http404("Village not found")
-
-        return super().dispatch(request, *args, **kwargs)
-
 
 class VillageListGeoJSONView(CampViewMixin, JsonView):
-    def get_context_data(self, **kwargs):
+    """GeoJSON view for the village list."""
+    def get_context_data(self, **kwargs) -> dict[str, str | dict[str, str]]:
+        """Add type and features to context."""
         return {"type": "FeatureCollection", "features": self.dump_features()}
 
     def dump_features(self) -> list[object]:
+        """Dump villages as geojson."""
         output = []
         for village in Village.objects.filter(
             camp=self.camp,
@@ -104,12 +110,20 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
         return list(output)
 
 
-class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailView):
+class VillageDetailView(CampViewMixin, DetailView):
+    """DetailView for villages."""
     model = Village
     template_name = "village_detail.html"
     context_object_name = "village"
 
-    def get_context_data(self, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """If the user is not contact for this village, is not staff, and village not approved return 404."""
+        if not request.user.is_staff and self.get_object().contact != request.user and not self.get_object().approved:
+            raise Http404("NotFound")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs) -> dict[str, str | bool]:
+        """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
             "grid": static("json/grid.geojson"),
@@ -119,7 +133,8 @@ class VillageDetailView(CampViewMixin, UserOwnsVillageOrApprovedMixin, DetailVie
         }
         return context
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Village]:
+        """Do not show deleted villages."""
         return super().get_queryset().filter(deleted=False)
 
 
@@ -128,16 +143,19 @@ class VillageCreateView(
     LoginRequiredMixin,
     CreateView,
 ):
+    """Village CreateView."""
     model = Village
     template_name = "village_form.html"
-    fields = ["name", "description", "private", "location"]
+    fields = ("name", "description", "private", "location")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+        """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args, **kwargs) -> ModelForm[Village]:
+        """Fill the form with nice widgets."""
         form = super().get_form(*args, **kwargs)
         form.fields["description"].widget = MarkdownWidget()
         form.fields["location"].widget = LeafletWidget(
@@ -150,7 +168,8 @@ class VillageCreateView(
         )
         return form
 
-    def form_valid(self, form):
+    def form_valid(self, form: ModelForm[Village]) -> HttpResponseRedirect:
+        """Set contact and camp, send email, return to village list."""
         village = form.save(commit=False)
         village.contact = self.request.user
         village.camp = self.camp
@@ -159,24 +178,24 @@ class VillageCreateView(
         village.save()
         messages.success(
             self.request,
-            "Your request to create a village has been registered - it will be published after review for CoC compliance",
+            "Your request to create a village has been registered - it will be published after CoC compliance review",
         )
         add_village_approve_email(village)
         return HttpResponseRedirect(village.get_absolute_url())
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Return to village list after create."""
         return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})
 
 
 class EnsureUserOwnsVillageMixin(SingleObjectMixin):
+    """Mixin to ensure user is contact for the village, or staff."""
     model = Village
 
-    def dispatch(self, request, *args, **kwargs):
-        # If the user is not contact for this village OR is not staff
-        if not request.user.is_staff:
-            if self.get_object().contact != request.user:
-                raise Http404("Village not found")
-
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """If the user is not contact for this village OR is not staff raise 404."""
+        if not request.user.is_staff and self.get_object().contact != request.user:
+            raise Http404("NotFound")
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -186,16 +205,19 @@ class VillageUpdateView(
     LoginRequiredMixin,
     UpdateView,
 ):
+    """Village update view."""
     model = Village
     template_name = "village_form.html"
-    fields = ["name", "description", "private", "location"]
+    fields = ("name", "description", "private", "location")
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+        """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args, **kwargs) -> ModelForm[Village]:
+        """Add leaflet to the form."""
         form = super().get_form(*args, **kwargs)
         form.fields["location"].widget = LeafletWidget(
             attrs={
@@ -207,7 +229,8 @@ class VillageUpdateView(
         )
         return form
 
-    def form_valid(self, form):
+    def form_valid(self, form: ModelForm[Village]) -> HttpResponse:
+        """Set village as not approved before saving, send email."""
         village = form.save(commit=False)
         village.approved = False
         if not village.name:
@@ -219,10 +242,12 @@ class VillageUpdateView(
         add_village_approve_email(village)
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Return to village detail page after editing."""
         return self.get_object().get_absolute_url()
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Village]:
+        """Do not allow editing deleted villages."""
         return super().get_queryset().filter(deleted=False)
 
 
@@ -232,9 +257,11 @@ class VillageDeleteView(
     LoginRequiredMixin,
     DeleteView,
 ):
+    """Village delete view."""
     model = Village
     template_name = "village_confirm_delete.html"
     context_object_name = "village"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Return to village list after deleting."""
         return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})
