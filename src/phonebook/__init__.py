@@ -1,1 +1,1 @@
-"""Phonebook module."""
+"""Phonebook app."""
