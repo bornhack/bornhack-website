@@ -126,8 +126,8 @@ class DectRegistration(
     letters = models.CharField(
         max_length=9,
         blank=True,
-        help_text="The letters or numbers chosen to represent this DECT number in the phonebook. \
-                Optional if you specify a number.",
+        help_text="The letters or numbers chosen to represent this DECT number in the phonebook. "
+                "Optional if you specify a number.",
     )
 
     description = models.TextField(
