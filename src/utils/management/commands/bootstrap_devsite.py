@@ -384,7 +384,7 @@ class Command(BaseCommand):
         for i in range(16):
             username = f"user{i}"
             user = UserFactory.create(
-                username=uuid.uuid4(),
+                username=str(uuid.uuid4()),
                 email=f"{username}@example.com",
             )
             user.set_password(username)
