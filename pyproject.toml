@@ -3,18 +3,12 @@
 name = "bornhack-website"
 description = "Django project to power Bornhack."
 readme = "README.md"
-requires-python = "==3.11"
+requires-python = ">=3.11"
 dynamic = ["version"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-
-[project.urls]
-homepage = "https://github.com/bornhack/bornhack-website"
-
-[project.scripts]
-"manage.py" = "src.manage:main"
 
 ########## DEPENDENCIES ##########
 
@@ -36,6 +30,7 @@ dependencies = [
     "django-otp==1.6.0",
     "django-prometheus==2.3.1",
     "django-reversion==5.0.12",
+    "django_stubs_ext==5.2.0",
     "django-tables2==2.7.5",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
@@ -73,6 +68,12 @@ dev = [
 test = [
     "hypothesis==6.131.15",
 ]
+
+[project.urls]
+homepage = "https://github.com/bornhack/bornhack-website"
+
+[project.scripts]
+"manage.py" = "src.manage:main"
 
 
 ########## SETUPTOOLS ##########
