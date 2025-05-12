@@ -6,20 +6,12 @@ import re
 from typing import ClassVar
 
 from django import forms
-from django.core.exceptions import ValidationError
 
 from .dectutils import DectUtils
+from .exceptions import InvalidIPEIError
 from .models import DectRegistration
 
 dectutil = DectUtils()
-
-
-class InvalidIPEIError(ValidationError):
-    """Exception raised on invalid IPEI."""
-
-    def __init__(self, ipei: list[int]) -> None:
-        """Exception raised when an invalid is used."""
-        super().__init__(f"unable to process IPEI {ipei}.")
 
 
 class DectRegistrationForm(forms.ModelForm):
