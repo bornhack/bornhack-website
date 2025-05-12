@@ -37,7 +37,7 @@ class BornhackTestBase(TestCase):
         cls.client = Client(enforce_csrf_checks=False)
 
         tz = pytz.timezone("Europe/Copenhagen")
-        year = tz.now().year
+        year = datetime.now(tz).year
         cls.camp = Camp(
             title="Test Camp",
             slug="test-camp",
