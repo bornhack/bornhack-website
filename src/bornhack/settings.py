@@ -280,3 +280,5 @@ BORNHACK_TEAM_PERMISSIONS = {
     "pos": "Team Pos - Point-of-sale report submission",
     "tasker": "Team Tasker - task management",
 }
+
+FIXTURE_DIRS = ["testdata"]

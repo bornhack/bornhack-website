@@ -14,6 +14,14 @@ from .models import DectRegistration
 dectutil = DectUtils()
 
 
+class InvalidIPEIError(ValidationError):
+    """Exception raised on invalid IPEI."""
+
+    def __init__(self, ipei: list[int]) -> None:
+        """Exception raised when an invalid is used."""
+        super().__init__(f"unable to process IPEI {ipei}.")
+
+
 class DectRegistrationForm(forms.ModelForm):
     """Dect Registration Form used in the phonebook registration create view."""
 
@@ -44,14 +52,14 @@ class DectRegistrationForm(forms.ModelForm):
             if re.match(r"^\d{5} \d{7}$", ipei_s):
                 ipei = [int(a) for a in ipei_s.split(" ")]
             else:
-                raise ValidationError("Unrecognized IPEI format")
+                raise InvalidIPEIError(ipei=[])
         elif ipei_s == "":
             return None
         else:
-            raise ValidationError("Unable to recognize IPEI/IPUI format")
+            raise InvalidIPEIError(ipei=[])
 
         if not ipei:
-            raise ValidationError(f"unable to process {ipei}.")
+            raise InvalidIPEIError(ipei=ipei)
         return ipei
 
     def clean(self) -> dict:
