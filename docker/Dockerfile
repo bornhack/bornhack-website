@@ -10,8 +10,6 @@ ENV PYTHONFAULTHANDLER=1 \
 
 WORKDIR /app
 
-ADD src/requirements/ /tmp/
-
 RUN apt-get update \
   && apt-get install -y \
     build-essential \
@@ -28,7 +26,13 @@ RUN apt-get update \
     libgdal-dev \
     wkhtmltopdf
 
-RUN uv pip install --system --no-cache-dir  -r /tmp/dev.txt
+ADD pyproject.toml /app/
+ADD README.md /app/
+ADD src /app/src/
+
+RUN uv pip install --system --no-cache-dir .[dev,test]
+
+RUN rm -rf /app/*
 
 RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
