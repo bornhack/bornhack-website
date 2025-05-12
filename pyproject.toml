@@ -103,6 +103,8 @@ line-length = 120
 select = ["ALL"]
 ignore = [
     "G004", # Logging statement uses f-string
+    "ANN002", # *args annotations
+    "ANN003", # **kwargs annotations
     "ANN101", # Missing type annotation for `self` in method
     "ANN102", # Missing type annotation for `cls` in classmethod
     "ARG002", # Unused method argument
