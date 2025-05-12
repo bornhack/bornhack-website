@@ -39,7 +39,13 @@ def get_daychunks(day):
         )
 
     # cap the final chunk to be equal to the end of the day
-    daychunk.upper = min(daychunk.upper, day.upper)
+    daychunk = DateTimeTZRange(
+        day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
+        min(
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
+            day.upper
+        )
+    )
 
     # append the final chunk and return
     chunks.append(daychunk)
