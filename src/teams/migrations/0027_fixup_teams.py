@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def add_team_camp(apps, schema_editor):
+def add_team_camp(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
 
     for team in Team.objects.all():
@@ -14,7 +14,7 @@ def add_team_camp(apps, schema_editor):
         print("set camp %s for team %s" % (team.camp.slug, team.name))
 
 
-def add_missing_team_responsibles(apps, schema_editor):
+def add_missing_team_responsibles(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
     TeamMember = apps.get_model("teams", "TeamMember")
 

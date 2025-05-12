@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from collections import OrderedDict
-from typing import Never
 
 import icalendar
 from django.contrib import messages
