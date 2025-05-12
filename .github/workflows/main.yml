@@ -47,7 +47,7 @@ jobs:
 
       - name: Install python dependencies
         run: |
-          python -m pip install -r .[dev]
+          python -m pip install .[test]
 
       - name: Copy settings
         run: cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py
