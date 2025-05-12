@@ -4,10 +4,9 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def fix_irc_channels(apps, schema_editor):
+def fix_irc_channels(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
     for team in Team.objects.filter(irc_channel=True):
-        print("fixing irc channel for team %s" % team.name)
         if team.irc_channel_private:
             team.private_irc_channel_name = team.irc_channel_name
             if team.irc_channel_managed:

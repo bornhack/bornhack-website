@@ -11,7 +11,7 @@ from django.test.client import RequestFactory
 from django_weasyprint.utils import django_url_fetcher
 from weasyprint import HTML
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def generate_pdf_letter(filename, template, formatdict):

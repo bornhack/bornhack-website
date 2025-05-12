@@ -6,10 +6,10 @@ from .email import _send_email
 from .models import OutgoingEmail
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def do_work():
+def do_work() -> None:
     """The outgoing email worker sends emails added to the OutgoingEmail
     queue.
     """

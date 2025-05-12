@@ -70,10 +70,10 @@ class EnsureUserOwnsProposalMixin(SingleObjectMixin):
 
 
 class UrlViewMixin:
-    """Mixin with code shared between all the Url views"""
+    """Mixin with code shared between all the Url views."""
 
     def dispatch(self, request, *args, **kwargs):
-        """Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user"""
+        """Check that we have a valid SpeakerProposal or EventProposal and that it belongs to the current user."""
         # get the proposal
         if "event_uuid" in self.kwargs:
             self.event_proposal = get_object_or_404(
@@ -93,7 +93,7 @@ class UrlViewMixin:
         return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        """Include the proposal in the template context"""
+        """Include the proposal in the template context."""
         context = super().get_context_data(**kwargs)
         if hasattr(self, "event_proposal") and self.event_proposal:
             context["event_proposal"] = self.event_proposal
@@ -102,16 +102,16 @@ class UrlViewMixin:
         return context
 
     def get_success_url(self):
-        """Return to the detail view of the proposal"""
+        """Return to the detail view of the proposal."""
         if hasattr(self, "event_proposal"):
             return self.event_proposal.get_absolute_url()
         return self.speaker_proposal.get_absolute_url()
 
 
 class EventViewMixin(CampViewMixin):
-    """A mixin to get the Event object based on event_uuid in url kwargs"""
+    """A mixin to get the Event object based on event_uuid in url kwargs."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.event = get_object_or_404(
             models.Event,
@@ -126,9 +126,9 @@ class EventViewMixin(CampViewMixin):
 
 
 class EventFeedbackViewMixin(EventViewMixin):
-    """A mixin to get the EventFeedback object based on self.event and self.request.user"""
+    """A mixin to get the EventFeedback object based on self.event and self.request.user."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.event_feedback = get_object_or_404(
             models.EventFeedback,
@@ -147,8 +147,8 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
     submitters and in backoffice.
     """
 
-    def setup(self, *args, **kwargs):
-        """Get the availability matrix"""
+    def setup(self, *args, **kwargs) -> None:
+        """Get the availability matrix."""
         super().setup(*args, **kwargs)
         # do we have an Event or an EventProposal?
         if hasattr(self.get_object(), "events"):
@@ -168,19 +168,19 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         add_existing_availability_to_matrix(self.matrix, self.get_object())
 
     def get_form_kwargs(self):
-        """Add the matrix to form kwargs, only used if the view has a form"""
+        """Add the matrix to form kwargs, only used if the view has a form."""
         kwargs = super().get_form_kwargs()
         kwargs["matrix"] = self.matrix
         return kwargs
 
     def get_initial(self, *args, **kwargs):
-        """Populate the speaker_availability checkboxes, only used if the view has a form"""
+        """Populate the speaker_availability checkboxes, only used if the view has a form."""
         initial = super().get_initial(*args, **kwargs)
 
         # add initial checkbox states
-        for date in self.matrix.keys():
+        for date in self.matrix:
             # loop over daychunks and check if we need a checkbox
-            for daychunk in self.matrix[date].keys():
+            for daychunk in self.matrix[date]:
                 if not self.matrix[date][daychunk]:
                     # we have no event_session here, carry on
                     continue
@@ -193,7 +193,7 @@ class AvailabilityMatrixViewMixin(CampViewMixin):
         return initial
 
     def get_context_data(self, **kwargs):
-        """Add the matrix to context"""
+        """Add the matrix to context."""
         context = super().get_context_data(**kwargs)
         context["matrix"] = self.matrix
         return context

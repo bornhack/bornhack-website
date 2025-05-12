@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def add_bogus_email(apps, schema_editor):
+def add_bogus_email(apps, schema_editor) -> None:
     Speaker = apps.get_model("program", "Speaker")
 
     for speaker in Speaker.objects.all():

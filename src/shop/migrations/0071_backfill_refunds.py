@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def backfill_refunds(apps, schema_editor):
+def backfill_refunds(apps, schema_editor) -> None:
     """Loop over Orders with refunded=True and create Refund and RefundProductRelation objects."""
     Order = apps.get_model("shop", "Order")
     Refund = apps.get_model("shop", "Refund")

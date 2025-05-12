@@ -10,11 +10,11 @@ from django.views.generic import DetailView
 from django.views.generic import UpdateView
 
 from camps.mixins import CampViewMixin
+from teams.models import TaskComment
+from teams.models import Team
+from teams.models import TeamMember
+from teams.models import TeamTask
 
-from ..models import TaskComment
-from ..models import Team
-from ..models import TeamMember
-from ..models import TeamTask
 from .mixins import TeamTaskerPermissionMixin
 from .mixins import TeamViewMixin
 
@@ -66,7 +66,7 @@ class TaskForm(forms.ModelForm):
         model = TeamTask
         fields = ["name", "description", "when", "completed"]
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         self.fields["when"].widget.widgets = [
             forms.DateTimeInput(attrs={"placeholder": "Start"}),

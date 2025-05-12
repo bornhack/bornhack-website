@@ -18,7 +18,7 @@ from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 TEAM_GUIDE_TEMPLATE = """
@@ -159,7 +159,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         default=TEAM_GUIDE_TEMPLATE,
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"
 
     def get_absolute_url(self):
@@ -168,7 +168,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
             kwargs={"camp_slug": self.camp.slug, "team_slug": self.slug},
         )
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         # generate slug if needed
         if not self.slug:
             self.slug = unique_slugify(
@@ -191,62 +191,58 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
         super().save(**kwargs)
 
-    def clean(self):
+    def clean(self) -> None:
         # make sure the public irc channel name is prefixed with a # if it is set
         if self.public_irc_channel_name and self.public_irc_channel_name[0] != "#":
-            self.public_irc_channel_name = "#%s" % self.public_irc_channel_name
+            self.public_irc_channel_name = f"#{self.public_irc_channel_name}"
 
         # make sure the private irc channel name is prefixed with a # if it is set
         if self.private_irc_channel_name and self.private_irc_channel_name[0] != "#":
-            self.private_irc_channel_name = "#%s" % self.private_irc_channel_name
+            self.private_irc_channel_name = f"#{self.private_irc_channel_name}"
 
         # make sure the channel names are not reserved
         if (
-            self.public_irc_channel_name == settings.IRCBOT_PUBLIC_CHANNEL
-            or self.public_irc_channel_name == settings.IRCBOT_VOLUNTEER_CHANNEL
+            self.public_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL)
         ):
             raise ValidationError("The public IRC channel name is reserved")
         if (
-            self.private_irc_channel_name == settings.IRCBOT_PUBLIC_CHANNEL
-            or self.private_irc_channel_name == settings.IRCBOT_VOLUNTEER_CHANNEL
+            self.private_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL)
         ):
             raise ValidationError("The private IRC channel name is reserved")
 
         # make sure public_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
-        if self.public_irc_channel_name:
-            if (
-                Team.objects.filter(
-                    private_irc_channel_name__iexact=self.public_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-                or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.public_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    "The public IRC channel name is already in use on another team!",
-                )
+        if self.public_irc_channel_name and (
+            Team.objects.filter(
+                private_irc_channel_name__iexact=self.public_irc_channel_name,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+            or Team.objects.filter(
+                public_irc_channel_name__iexact=self.public_irc_channel_name,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                "The public IRC channel name is already in use on another team!",
+            )
 
         # make sure private_irc_channel_name is not in use as public or private irc channel for another team, case insensitive
-        if self.private_irc_channel_name:
-            if (
-                Team.objects.filter(
-                    private_irc_channel_name__iexact=self.private_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-                or Team.objects.filter(
-                    public_irc_channel_name__iexact=self.private_irc_channel_name,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    "The private IRC channel name is already in use on another team!",
-                )
+        if self.private_irc_channel_name and (
+            Team.objects.filter(
+                private_irc_channel_name__iexact=self.private_irc_channel_name,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+            or Team.objects.filter(
+                public_irc_channel_name__iexact=self.private_irc_channel_name,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                "The private IRC channel name is already in use on another team!",
+            )
 
     @property
     def memberships(self):
@@ -258,18 +254,18 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     @property
     def approved_members(self):
-        """Returns only approved members (returns User objects, not TeamMember objects)"""
+        """Returns only approved members (returns User objects, not TeamMember objects)."""
         return self.members.filter(teammember__approved=True)
 
     @property
     def unapproved_members(self):
-        """Returns only unapproved members (returns User objects, not TeamMember objects)"""
+        """Returns only unapproved members (returns User objects, not TeamMember objects)."""
         return self.members.filter(teammember__approved=False)
 
     @property
     def leads(self):
         """Return only approved team leads
-        Used to handle permissions for team leads
+        Used to handle permissions for team leads.
         """
         return self.members.filter(
             teammember__approved=True,
@@ -299,31 +295,31 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         )
 
     @property
-    def member_permission_set(self):
+    def member_permission_set(self) -> str:
         return f"camps.{self.slug}_team_member"
 
     @property
-    def mapper_permission_set(self):
+    def mapper_permission_set(self) -> str:
         return f"camps.{self.slug}_team_mapper"
 
     @property
-    def facilitator_permission_set(self):
+    def facilitator_permission_set(self) -> str:
         return f"camps.{self.slug}_team_facilitator"
 
     @property
-    def lead_permission_set(self):
+    def lead_permission_set(self) -> str:
         return f"camps.{self.slug}_team_lead"
 
     @property
-    def pos_permission_set(self):
+    def pos_permission_set(self) -> str:
         return f"camps.{self.slug}_team_pos"
 
     @property
-    def infopager_permission_set(self):
+    def infopager_permission_set(self) -> str:
         return f"camps.{self.slug}_team_infopager"
 
     @property
-    def tasker_permission_set(self):
+    def tasker_permission_set(self) -> str:
         return f"camps.{self.slug}_team_tasker"
 
 
@@ -358,7 +354,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     class Meta:
         ordering = ["-lead", "-approved"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{} is {} {} member of team {}".format(
             self.user,
             "" if self.approved else "an unapproved",
@@ -368,12 +364,12 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     @property
     def camp(self):
-        """All CampRelatedModels must have a camp FK or a camp property"""
+        """All CampRelatedModels must have a camp FK or a camp property."""
         return self.team.camp
 
     camp_filter = "team__camp"
 
-    def update_group_membership(self, deleted=False):
+    def update_group_membership(self, deleted=False) -> None:
         """Ensure group membership for this team membership is correct."""
         if self.team.group:
             if self.approved and not deleted:
@@ -383,7 +379,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
                 logger.debug(f"Removing user {self.user} from group {self.team.group}")
                 self.team.group.user_set.remove(self.user)
 
-    def update_team_lead_permissions(self, deleted=False):
+    def update_team_lead_permissions(self, deleted=False) -> None:
         """Ensure team lead perms for this team membership are correct."""
         try:
             lead_perm = Permission.objects.get(
@@ -391,7 +387,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
                 content_type=ContentType.objects.get_for_model(CampPermission),
             )
         except Permission.DoesNotExist:
-            logger.error(f"team lead permission not found for {self.team}")
+            logger.exception(f"team lead permission not found for {self.team}")
             return
         if (
             self.approved
@@ -452,12 +448,12 @@ class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
 
     @property
     def camp(self):
-        """All CampRelatedModels must have a camp FK or a camp property"""
+        """All CampRelatedModels must have a camp FK or a camp property."""
         return self.team.camp
 
     camp_filter = "team__camp"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         # generate slug if needed
         if not self.slug:
             self.slug = unique_slugify(
@@ -503,12 +499,12 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
 
     @property
     def camp(self):
-        """All CampRelatedModels must have a camp FK or a camp property"""
+        """All CampRelatedModels must have a camp FK or a camp property."""
         return self.team.camp
 
     camp_filter = "team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.team.name} team shift from {self.shift_range.lower} to {self.shift_range.upper}"
 
     @property

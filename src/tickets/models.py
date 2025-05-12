@@ -33,7 +33,7 @@ from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.pdf import generate_pdf_letter
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TicketTypeQuerySet(models.QuerySet):
@@ -110,7 +110,7 @@ class TicketType(
         ),
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"
 
 
@@ -126,8 +126,7 @@ def qr_code_base64(token):
     ).resize((250, 250))
     file_like = io.BytesIO()
     qr.save(file_like, format="png")
-    qrcode_base64 = base64.b64encode(file_like.getvalue())
-    return qrcode_base64
+    return base64.b64encode(file_like.getvalue())
 
 
 class BaseTicket(CampRelatedModel, UUIDModel):
@@ -163,7 +162,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
     def camp(self):
         return self.ticket_type.camp
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         self.token = self._get_token()
         self.badge_token = self._get_badge_token()
         super().save(**kwargs)
@@ -198,7 +197,7 @@ class BaseTicket(CampRelatedModel, UUIDModel):
             template="pdf/ticket.html",
         )
 
-    def mark_as_used(self, *, pos, user):
+    def mark_as_used(self, *, pos, user) -> None:
         self.used_at = timezone.now()
         self.used_pos = pos
         self.used_pos_user = user
@@ -208,11 +207,11 @@ class BaseTicket(CampRelatedModel, UUIDModel):
 class SponsorTicket(ExportModelOperationsMixin("sponsor_ticket"), BaseTicket):
     sponsor = models.ForeignKey("sponsors.Sponsor", on_delete=models.PROTECT)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"SponsorTicket: {self.pk}"
 
     @property
-    def shortname(self):
+    def shortname(self) -> str:
         return "sponsor"
 
 
@@ -221,11 +220,11 @@ class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
         help_text=_("Price of the discounted ticket (in DKK, including VAT)."),
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"DiscountTicket: {self.pk}"
 
     @property
-    def shortname(self):
+    def shortname(self) -> str:
         return "discount"
 
 
@@ -330,14 +329,14 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
             f"{self.pk}{self.order.user.pk}{settings.SECRET_KEY}".encode(),
         ).hexdigest()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Ticket {self.order.user} {self.product}"
 
     def get_absolute_url(self):
         return str(reverse_lazy("tickets:shopticket_edit", kwargs={"pk": self.pk}))
 
     @property
-    def shortname(self):
+    def shortname(self) -> str:
         return "shop"
 
     @property

@@ -1,4 +1,4 @@
-"""Forms for the phonebook"""
+"""Forms for the phonebook."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ dectutil = DectUtils()
 
 
 class DectRegistrationForm(forms.ModelForm):
-    """Dect Registration Form used in the phonebook registration create view"""
+    """Dect Registration Form used in the phonebook registration create view."""
 
     ipei_help_text = """
     Optional: Enter your IPEI (03562 0900847) or IPUI (00DEADBEEF)<br>
@@ -33,7 +33,7 @@ class DectRegistrationForm(forms.ModelForm):
         fields = ["number", "letters", "description", "publish_in_phonebook", "ipei"]
 
     def clean_ipei(self):
-        """Detect IPEI type and convert both IPEI or IPUI to a array of ints"""
+        """Detect IPEI type and convert both IPEI or IPUI to a array of ints."""
         ipei_s = self.cleaned_data["ipei"]
         if len(ipei_s) == 10:
             ipei = dectutil.hex_ipui_ipei(ipei_s)

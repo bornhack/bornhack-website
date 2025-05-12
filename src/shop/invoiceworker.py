@@ -16,10 +16,10 @@ from shop.models import Refund
 from utils.pdf import generate_pdf_letter
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def do_work():
+def do_work() -> None:
     """The invoice worker creates Invoice objects for shop orders and
     for custom orders. It also generates PDF files for Invoice objects
     that have no PDF. It also emails invoices for shop orders.
@@ -77,10 +77,7 @@ def do_work():
     for invoice in Invoice.objects.filter(Q(pdf="") | Q(pdf__isnull=True)):
         # generate the pdf
         try:
-            if invoice.customorder:
-                template = "pdf/custominvoice.html"
-            else:
-                template = "pdf/invoice.html"
+            template = "pdf/custominvoice.html" if invoice.customorder else "pdf/invoice.html"
             pdffile = generate_pdf_letter(
                 filename=invoice.filename,
                 template=template,
@@ -93,10 +90,10 @@ def do_work():
                     "bank_dk_accno": settings.BANKACCOUNT_ACCOUNT,
                 },
             )
-            logger.info("Generated pdf for invoice %s" % invoice)
+            logger.info(f"Generated pdf for invoice {invoice}")
         except Exception as E:
             logger.exception(
-                "Unable to generate PDF file for invoice #%s. Error: %s" % (invoice.pk, E),
+                f"Unable to generate PDF file for invoice #{invoice.pk}. Error: {E}",
             )
             continue
 
@@ -109,7 +106,7 @@ def do_work():
         order__isnull=False,
         sent_to_customer=False,
     ).exclude(pdf=""):
-        logger.info("found unmailed Invoice object: %s" % invoice)
+        logger.info(f"found unmailed Invoice object: {invoice}")
         # add email to the outgoing email queue
         if add_invoice_email(invoice=invoice):
             invoice.sent_to_customer = True
@@ -131,10 +128,10 @@ def do_work():
                 template="pdf/creditnote.html",
                 formatdict={"creditnote": creditnote},
             )
-            logger.info("Generated pdf for creditnote %s" % creditnote)
+            logger.info(f"Generated pdf for creditnote {creditnote}")
         except Exception as E:
             logger.exception(
-                "Unable to generate PDF file for creditnote #%s. Error: %s" % (creditnote.pk, E),
+                f"Unable to generate PDF file for creditnote #{creditnote.pk}. Error: {E}",
             )
             continue
 
@@ -146,10 +143,10 @@ def do_work():
     for creditnote in CreditNote.objects.filter(sent_to_customer=False).exclude(pdf="").exclude(user=None):
         # send the email
         if add_creditnote_email(creditnote=creditnote):
-            logger.info("OK: Creditnote email to %s added" % creditnote.user.email)
+            logger.info(f"OK: Creditnote email to {creditnote.user.email} added")
             creditnote.sent_to_customer = True
             creditnote.save()
         else:
             logger.error(
-                "Unable to add creditnote email for creditnote %s to %s" % (creditnote.pk, creditnote.user.email),
+                f"Unable to add creditnote email for creditnote {creditnote.pk} to {creditnote.user.email}",
             )

@@ -15,7 +15,7 @@ from utils.mixins import AnyTeamMemberRequiredMixin
 from utils.mixins import RaisePermissionRequiredMixin
 from utils.models import OutgoingEmail
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateView):
@@ -94,7 +94,7 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
         )
 
         # add bools for each of settings.BORNHACK_TEAM_PERMISSIONS
-        for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+        for perm in settings.BORNHACK_TEAM_PERMISSIONS:
             # loop over user permissions and set context
             for user_perm in perms:
                 if user_perm.startswith("camps.") and user_perm.endswith(
@@ -110,20 +110,20 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
 
 class BackofficeProxyView(CampViewMixin, RaisePermissionRequiredMixin, TemplateView):
     """Show proxied stuff, only for simple HTML pages with no external content
-    Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of slug: (description, url) pairs
+    Define URLs in settings.BACKOFFICE_PROXY_URLS as a dict of slug: (description, url) pairs.
     """
 
     permission_required = "camps.orga_team_member"
     template_name = "backoffice_proxy.html"
 
     def dispatch(self, request, *args, **kwargs):
-        """Perform the request and return the response if we have a slug"""
+        """Perform the request and return the response if we have a slug."""
         # list available stuff if we have no slug
         if "proxy_slug" not in kwargs:
             return super().dispatch(request, *args, **kwargs)
 
         # is the slug valid?
-        if kwargs["proxy_slug"] not in settings.BACKOFFICE_PROXY_URLS.keys():
+        if kwargs["proxy_slug"] not in settings.BACKOFFICE_PROXY_URLS:
             raise Http404
 
         # perform the request

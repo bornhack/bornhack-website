@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations
 
 
-def add_teams_to_categories(apps, schema_editor):
+def add_teams_to_categories(apps, schema_editor) -> None:
     InfoCategory = apps.get_model("info", "InfoCategory")
     Team = apps.get_model("teams", "Team")
     Camp = apps.get_model("camps", "Camp")

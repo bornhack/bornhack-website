@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def create_eventtypes(apps, schema_editor):
+def create_eventtypes(apps, schema_editor) -> None:
     Type = apps.get_model("events", "Type")
     Type.objects.create(name="public_credit_name_changed")
 

@@ -79,12 +79,12 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
     def email(self):
         return self.user.email
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.user.username
 
-    def approve_public_credit_name(self):
+    def approve_public_credit_name(self) -> None:
         """This method just sets profile.public_credit_name_approved=True and calls save()
-        It is used in an admin action
+        It is used in an admin action.
         """
         self.public_credit_name_approved = True
         self.save()
@@ -92,7 +92,7 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
     @property
     def get_public_credit_name(self):
         """Convenience method to return profile.public_credit_name if it is approved,
-        and the string "Unnamed" otherwise
+        and the string "Unnamed" otherwise.
         """
         if self.public_credit_name_approved:
             return self.public_credit_name

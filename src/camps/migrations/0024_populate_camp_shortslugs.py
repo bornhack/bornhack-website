@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def populate_camp_shortslugs(apps, schema_editor):
+def populate_camp_shortslugs(apps, schema_editor) -> None:
     Camp = apps.get_model("camps", "Camp")
     for camp in Camp.objects.all():
         if not camp.shortslug:

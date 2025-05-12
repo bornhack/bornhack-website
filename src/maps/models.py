@@ -15,7 +15,7 @@ from utils.slugs import unique_slugify
 
 from .utils import LeafletMarkerChoices
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Group(UUIDModel):
@@ -26,12 +26,12 @@ class Group(UUIDModel):
         help_text="Name or description of this group",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
 
 class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
-    """Layers are groups of Features"""
+    """Layers are groups of Features."""
 
     name = models.CharField(
         max_length=100,
@@ -76,10 +76,10 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
     def camp(self):
         return self.responsible_team.camp
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         self.slug = unique_slugify(
             str(self.name),
             slugs_in_use=self.__class__.objects.all().values_list(
@@ -141,7 +141,7 @@ class Feature(UUIDModel):
             ),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
     @property
@@ -180,10 +180,10 @@ class ExternalLayer(UUIDModel):
     def camp(self):
         return self.responsible_team.camp
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.name)
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         self.slug = unique_slugify(
             str(self.name),
             slugs_in_use=self.__class__.objects.all().values_list(
@@ -219,10 +219,10 @@ class UserLocationType(UUIDModel):
         help_text="The name/colour of the Leaflet marker to use for this User Location Type.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -277,5 +277,5 @@ class UserLocation(
         help_text="JSON data field",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

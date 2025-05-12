@@ -1,27 +1,30 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Model
 from django.views.generic import CreateView
 from django.views.generic import UpdateView
 from django.views.generic.detail import SingleObjectMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+if TYPE_CHECKING:
+    from django.db.models import Model
+
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class StaffMemberRequiredMixin:
-    """A CBV mixin for when a view should only be permitted for staff users"""
+    """A CBV mixin for when a view should only be permitted for staff users."""
 
     def dispatch(self, request, *args, **kwargs):
         # only permit staff users
         if not request.user.is_staff:
             messages.error(request, "No thanks")
-            raise PermissionDenied()
+            raise PermissionDenied
 
         # continue with the request
         return super().dispatch(request, *args, **kwargs)
@@ -47,7 +50,7 @@ class BaseTeamPermRequiredMixin:
                 # user has the permission in some team
                 return super().dispatch(request, *args, **kwargs)
         messages.error(request, "No thanks")
-        raise PermissionDenied()
+        raise PermissionDenied
 
 
 class AnyTeamMemberRequiredMixin(BaseTeamPermRequiredMixin):
@@ -99,7 +102,7 @@ class GetObjectMixin(SingleObjectMixin):
             return self.object
         return super().get_object(**kwargs)
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         self.object = self.get_object()
 

@@ -38,7 +38,7 @@ from .email import add_event_proposal_rejected_email
 from .email import add_speaker_proposal_accepted_email
 from .email import add_speaker_proposal_rejected_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
@@ -59,7 +59,7 @@ class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
     class Meta:
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -120,11 +120,11 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
         related_name="urls",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.url
 
-    def clean_fk(self):
-        """Make sure we have exactly one FK"""
+    def clean_fk(self) -> None:
+        """Make sure we have exactly one FK."""
         fks = 0
         if self.speaker_proposal:
             fks += 1
@@ -139,14 +139,14 @@ class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
                 f"Url objects must have exactly one FK, this has {fks}",
             )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """Just clean_fk() and super save()."""
         self.clean_fk()
         super().save(*args, **kwargs)
 
     @property
     def owner(self):
-        """Return the object this Url belongs to"""
+        """Return the object this Url belongs to."""
         if self.speaker_proposal:
             return self.speaker_proposal
         if self.event_proposal:
@@ -196,10 +196,10 @@ class SpeakerProposalAvailability(
     ExportModelOperationsMixin("speaker_proposal_availability"),
     Availability,
 ):
-    """Availability info for SpeakerProposal objects"""
+    """Availability info for SpeakerProposal objects."""
 
     class Meta:
-        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability"""
+        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability."""
 
         constraints = [
             # we do not want overlapping ranges
@@ -236,7 +236,7 @@ class SpeakerProposalAvailability(
 
     camp_filter = "speaker_proposal__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         if SpeakerProposalAvailability.objects.filter(
             speaker_proposal=self.speaker_proposal,
             when__adjacent_to=self.when,
@@ -246,7 +246,7 @@ class SpeakerProposalAvailability(
                 f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}",
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"SpeakerProposalAvailability: {self.speaker_proposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
 
 
@@ -254,10 +254,10 @@ class SpeakerAvailability(
     ExportModelOperationsMixin("speaker_availability"),
     Availability,
 ):
-    """Availability info for Speaker objects"""
+    """Availability info for Speaker objects."""
 
     class Meta:
-        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability"""
+        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability."""
 
         constraints = [
             # we do not want overlapping ranges
@@ -294,7 +294,7 @@ class SpeakerAvailability(
 
     camp_filter = "speaker__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         # this should be an ExclusionConstraint but the boolean condition isn't conditioning :/
         if SpeakerAvailability.objects.filter(
             speaker=self.speaker,
@@ -344,10 +344,10 @@ class UserSubmittedModel(CampRelatedModel):
         help_text="The reason this proposal was accepted or rejected. This text will be included in the email to the submitter. Leave blank to send a standard email.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.headline} (submitted by: {self.user}, status: {self.proposal_status})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.camp.call_for_participation_open:
             message = "Call for participation is not open"
             if hasattr(self, "request"):
@@ -355,7 +355,7 @@ class UserSubmittedModel(CampRelatedModel):
             raise ValidationError(message)
         super().save(**kwargs)
 
-    def delete(self, **kwargs):
+    def delete(self, **kwargs) -> None:
         if not self.camp.call_for_participation_open:
             message = "Call for participation is not open"
             if hasattr(self, "request"):
@@ -368,7 +368,7 @@ class SpeakerProposal(
     ExportModelOperationsMixin("speaker_proposal"),
     UserSubmittedModel,
 ):
-    """A speaker proposal"""
+    """A speaker proposal."""
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -419,8 +419,8 @@ class SpeakerProposal(
             kwargs={"camp_slug": self.camp.slug, "pk": self.uuid},
         )
 
-    def mark_as_approved(self, request=None):
-        """Marks a SpeakerProposal as approved, including creating/updating the related Speaker object"""
+    def mark_as_approved(self, request=None) -> None:
+        """Marks a SpeakerProposal as approved, including creating/updating the related Speaker object."""
         speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
         # create a Speaker if we don't have one
         if not hasattr(self, "speaker"):
@@ -465,31 +465,31 @@ class SpeakerProposal(
         if request:
             messages.success(
                 request,
-                "Speaker object %s has been created/updated" % speaker,
+                f"Speaker object {speaker} has been created/updated",
             )
         add_speaker_proposal_accepted_email(self)
 
-    def mark_as_rejected(self, request=None):
+    def mark_as_rejected(self, request=None) -> None:
         speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
         self.proposal_status = speaker_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
             messages.success(
                 request,
-                "SpeakerProposal %s has been rejected" % self.name,
+                f"SpeakerProposal {self.name} has been rejected",
             )
         add_speaker_proposal_rejected_email(self)
 
     @property
     def event_types(self):
-        """Return a queryset of the EventType objects for the EventProposals"""
+        """Return a queryset of the EventType objects for the EventProposals."""
         return EventType.objects.filter(
             id__in=self.event_proposals.all().values_list("event_type", flat=True),
         )
 
     @property
     def title(self):
-        """Convenience method to return the proper host_title"""
+        """Convenience method to return the proper host_title."""
         if self.event_proposals.values_list("event_type").distinct().count() != 1:
             # we have no events, or events of different eventtypes, use generic title
             return "Person"
@@ -497,7 +497,7 @@ class SpeakerProposal(
 
 
 class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedModel):
-    """An event proposal"""
+    """An event proposal."""
 
     track = models.ForeignKey(
         "program.EventTrack",
@@ -569,7 +569,7 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
     def headline(self):
         return self.title
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.duration:
             self.duration = self.event_type.event_duration_minutes
         super().save(**kwargs)
@@ -582,21 +582,18 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
 
     def get_available_speaker_proposals(self):
         """Return all SpeakerProposals submitted by the user who submitted this EventProposal,
-        which are not already added to this EventProposal
+        which are not already added to this EventProposal.
         """
         return SpeakerProposal.objects.filter(
             camp=self.track.camp,
             user=self.user,
         ).exclude(uuid__in=self.speakers.all().values_list("uuid"))
 
-    def mark_as_approved(self, request=None):
+    def mark_as_approved(self, request=None) -> None:
         eventmodel = apps.get_model("program", "Event")
         event_proposalmodel = apps.get_model("program", "EventProposal")
         # use existing event if we have one
-        if not hasattr(self, "event"):
-            event = eventmodel()
-        else:
-            event = self.event
+        event = eventmodel() if not hasattr(self, "event") else self.event
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
@@ -625,24 +622,22 @@ class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedM
         if request:
             messages.success(
                 request,
-                "Event object %s has been created/updated" % event,
+                f"Event object {event} has been created/updated",
             )
         add_event_proposal_accepted_email(self)
 
-    def mark_as_rejected(self, request=None):
+    def mark_as_rejected(self, request=None) -> None:
         event_proposalmodel = apps.get_model("program", "EventProposal")
         self.proposal_status = event_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
-            messages.success(request, "EventProposal %s has been rejected" % self.title)
+            messages.success(request, f"EventProposal {self.title} has been rejected")
         add_event_proposal_rejected_email(self)
 
     @property
-    def can_be_approved(self):
-        """We cannot approve an EventProposal until all SpeakerProposals are approved"""
-        if self.speakers.exclude(proposal_status="approved").exists():
-            return False
-        return True
+    def can_be_approved(self) -> bool:
+        """We cannot approve an EventProposal until all SpeakerProposals are approved."""
+        return not self.speakers.exclude(proposal_status="approved").exists()
 
 
 ###############################################################################
@@ -669,7 +664,7 @@ class EventTrack(ExportModelOperationsMixin("event_track"), CampRelatedModel):
         help_text="If this track is managed by someone other than the Content team pick the users here.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"
 
     class Meta:
@@ -680,7 +675,7 @@ class EventTrack(ExportModelOperationsMixin("event_track"), CampRelatedModel):
 
 
 class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedModel):
-    """The places where stuff happens"""
+    """The places where stuff happens."""
 
     name = models.CharField(max_length=100)
 
@@ -708,14 +703,14 @@ class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedMod
         help_text="Select the locations which this location conflicts with. Nothing can be scheduled in a location if a conflicting location has a scheduled Event at the same time. Example: If one room can be split into two, then the big room would conflict with each of the two small rooms (but the small rooms would not conflict with eachother).",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"
 
     class Meta:
         unique_together = (("camp", "slug"), ("camp", "name"))
 
-    def save(self, **kwargs):
-        """Create a slug"""
+    def save(self, **kwargs) -> None:
+        """Create a slug."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -738,11 +733,11 @@ class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedMod
         return self.camp.event_slots.filter(event_session__event_location=self)
 
     def scheduled_event_slots(self):
-        """Returns a QuerySet of all EventSlots scheduled in this EventLocation"""
+        """Returns a QuerySet of all EventSlots scheduled in this EventLocation."""
         return self.event_slots.filter(event__isnull=False)
 
-    def is_available(self, when, ignore_event_slot_ids=None):
-        """A location is available if nothing is scheduled in it at that time"""
+    def is_available(self, when, ignore_event_slot_ids=None) -> bool:
+        """A location is available if nothing is scheduled in it at that time."""
         ignore_event_slot_ids = ignore_event_slot_ids or []
         if (
             self.event_slots.filter(event__isnull=False, when__overlap=when)
@@ -830,7 +825,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
         help_text="Order for showing the event type in a list",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def serialize(self):
@@ -841,7 +836,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
             "light_text": self.light_text,
         }
 
-    def clean(self):
+    def clean(self) -> None:
         if self.support_autoscheduling and not self.event_duration_minutes:
             raise ValidationError(
                 "You must specify event_duration_minutes to support autoscheduling",
@@ -849,7 +844,7 @@ class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
 
     @property
     def duration(self):
-        """Just return a timedelta of the lenght of this Session"""
+        """Just return a timedelta of the lenght of this Session."""
         return timedelta(minutes=self.event_duration_minutes)
 
     def icon_html(self):
@@ -934,17 +929,17 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
         help_text="Description of this session (optional).",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"EventSession for {self.event_type} in {self.event_location.name}: {self.when}"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.event_duration_minutes:
             self.event_duration_minutes = self.event_type.event_duration_minutes
         super().save(**kwargs)
 
     @property
     def duration(self):
-        """Just return a timedelta of the lenght of this Session"""
+        """Just return a timedelta of the lenght of this Session."""
         return self.when.upper - self.when.lower
 
     @property
@@ -993,7 +988,7 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
         return self.event_slots.filter(availablefilter).exclude(excludefilter)
 
     def get_unavailable_slots(self, count_autoscheduled_as_free=False, bounds="[)"):
-        """Return a list of slots that are not available for some reason"""
+        """Return a list of slots that are not available for some reason."""
         return self.event_slots.exclude(
             id__in=self.get_available_slots(
                 count_autoscheduled_as_free=count_autoscheduled_as_free,
@@ -1002,7 +997,7 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
         )
 
     def get_slot_times(self, bounds="[)"):
-        """Return a list of the DateTimeTZRanges we want EventSlots to exists for"""
+        """Return a list of the DateTimeTZRanges we want EventSlots to exists for."""
         slots = []
         period = self.when
         duration = timedelta(minutes=self.event_duration_minutes)
@@ -1024,8 +1019,8 @@ class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel
             slots.append(slot)
         return slots
 
-    def fixup_event_slots(self):
-        """This method takes care of creating and deleting EventSlots when the EventSession is created, updated or deleted"""
+    def fixup_event_slots(self) -> None:
+        """This method takes care of creating and deleting EventSlots when the EventSession is created, updated or deleted."""
         # get a set of DateTimeTZRange objects representing the EventSlots we need
         needed_slot_times = set(self.get_slot_times(bounds="[)"))
 
@@ -1101,11 +1096,11 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
 
     camp_filter = "event_session__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.when} ({self.event_session.event_location.name}, {self.event_session.event_type})"
 
-    def clean(self):
-        """Validate EventSlot length, time, and autoscheduled status"""
+    def clean(self) -> None:
+        """Validate EventSlot length, time, and autoscheduled status."""
         if self.when.upper - self.when.lower != timedelta(
             minutes=self.event_session.event_duration_minutes,
         ):
@@ -1128,7 +1123,7 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
         self.clean_location()
 
     def get_autoscheduler_slot(self):
-        """Return a conference_scheduler.resources.Slot object matching this EventSlot"""
+        """Return a conference_scheduler.resources.Slot object matching this EventSlot."""
         return resources.Slot(
             venue=self.event_session.event_location.id,
             starts_at=self.when.lower,
@@ -1145,8 +1140,8 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
     def event_location(self):
         return self.event_session.event_location
 
-    def clean_speakers(self):
-        """Check if all speakers are available"""
+    def clean_speakers(self) -> None:
+        """Check if all speakers are available."""
         if self.event:
             for speaker in self.event.speakers.all():
                 if not speaker.is_available(
@@ -1157,26 +1152,25 @@ class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
                         f"The speaker {speaker} is not available at this time",
                     )
 
-    def clean_location(self):
-        """Make sure the location is available"""
-        if self.event:
-            if not self.event_location.is_available(
-                when=self.when,
-                ignore_event_slot_ids=[self.pk],
-            ):
-                raise ValidationError(
-                    f"The location {self.event_location} is not available at this time",
-                )
+    def clean_location(self) -> None:
+        """Make sure the location is available."""
+        if self.event and not self.event_location.is_available(
+            when=self.when,
+            ignore_event_slot_ids=[self.pk],
+        ):
+            raise ValidationError(
+                f"The location {self.event_location} is not available at this time",
+            )
 
-    def unschedule(self):
-        """Clear the Event FK and autoscheduled status, removing the Event from the schedule"""
+    def unschedule(self) -> None:
+        """Clear the Event FK and autoscheduled status, removing the Event from the schedule."""
         self.event = None
         self.autoscheduled = None
         self.save()
 
     @property
     def overflow(self):
-        """If we have more demand than capacity return the overflow"""
+        """If we have more demand than capacity return the overflow."""
         if self.event and self.event.demand > self.event_location.capacity:
             return (self.event_location.capacity - self.event.demand) * -1
         return 0
@@ -1329,11 +1323,11 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
         ordering = ["title"]
         unique_together = (("track", "slug"), ("track", "title"))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
-    def save(self, **kwargs):
-        """Create a slug and get duration"""
+    def save(self, **kwargs) -> None:
+        """Create a slug and get duration."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.title,
@@ -1392,7 +1386,7 @@ class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
 
 
 class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedModel):
-    """The old way of scheduling events. Model to be deleted after prod data migration"""
+    """The old way of scheduling events. Model to be deleted after prod data migration."""
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -1437,11 +1431,11 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
             ),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.event} ({self.when})"
 
-    def clean_speakers(self):
-        """Check if all speakers are available"""
+    def clean_speakers(self) -> None:
+        """Check if all speakers are available."""
         for speaker in self.event.speakers.all():
             if not speaker.is_available(
                 when=self.event_slot.when,
@@ -1451,8 +1445,8 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
                     f"The speaker {speaker} is not available at this time",
                 )
 
-    def save(self, *args, clean_speakers=True, **kwargs):
-        """Validate speakers (unless we are asked not to)"""
+    def save(self, *args, clean_speakers=True, **kwargs) -> None:
+        """Validate speakers (unless we are asked not to)."""
         if "commit" not in kwargs or kwargs["commit"]:
             # we are saving for real
             if clean_speakers:
@@ -1471,13 +1465,13 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
         settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS from the eventinstance start time. This means that if
         an event is scheduled for 00:30 wednesday evening (technically thursday) then the date
         after substracting 5 hours would be wednesdays date, not thursdays
-        (given settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS=5)
+        (given settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS=5).
         """
         return (self.when.lower - timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)).date()
 
     @property
     def timeslots(self):
-        """Find the number of timeslots this eventinstance takes up"""
+        """Find the number of timeslots this eventinstance takes up."""
         seconds = (self.when.upper - self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
@@ -1528,7 +1522,7 @@ class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedMod
 
     @property
     def duration(self):
-        """Return a timedelta of the lenght of this EventInstance"""
+        """Return a timedelta of the lenght of this EventInstance."""
         return self.when.upper - self.when.lower
 
     @property
@@ -1593,10 +1587,10 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
         ordering = ["name"]
         unique_together = ("camp", "slug")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -1614,13 +1608,12 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
         )
 
     def serialize(self):
-        data = {"name": self.name, "slug": self.slug, "biography": self.biography}
-        return data
+        return {"name": self.name, "slug": self.slug, "biography": self.biography}
 
-    def is_available(self, when, ignore_event_slot_ids=None):
+    def is_available(self, when, ignore_event_slot_ids=None) -> bool:
         """A speaker is available if the person has positive availability for the period and
         if the speaker is not in another event at the time, or if the person has not submitted
-        any availability at all
+        any availability at all.
         """
         ignore_event_slot_ids = ignore_event_slot_ids or []
         if not self.availabilities.exists():
@@ -1646,12 +1639,12 @@ class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
         return True
 
     def scheduled_event_slots(self):
-        """Returns a QuerySet of all EventSlots scheduled for this speaker"""
+        """Returns a QuerySet of all EventSlots scheduled for this speaker."""
         return self.camp.event_slots.filter(event__speakers=self)
 
     @property
     def title(self):
-        """Convenience method to return the proper host_title"""
+        """Convenience method to return the proper host_title."""
         if self.events.values_list("event_type").distinct().count() > 1:
             # we have different eventtypes, use generic title
             return "Person"
@@ -1682,7 +1675,7 @@ class EventFeedback(
     UUIDModel,
 ):
     """This model contains all feedback for Events
-    Each user can submit exactly one feedback per Event
+    Each user can submit exactly one feedback per Event.
     """
 
     class Meta:
@@ -1746,23 +1739,23 @@ class EventFeedback(
 
 class CustomUrlStorage(FileSystemStorage):
     """Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+    Can be removed when we clean up old migrations at some point.
     """
 
 
-def get_speaker_picture_upload_path():
+def get_speaker_picture_upload_path() -> None:
     """Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+    Can be removed when we clean up old migrations at some point.
     """
 
 
-def get_speakerproposal_picture_upload_path():
+def get_speakerproposal_picture_upload_path() -> None:
     """Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+    Can be removed when we clean up old migrations at some point.
     """
 
 
-def get_speakersubmission_picture_upload_path():
+def get_speakersubmission_picture_upload_path() -> None:
     """Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+    Can be removed when we clean up old migrations at some point.
     """

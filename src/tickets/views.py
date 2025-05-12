@@ -19,7 +19,7 @@ from utils.models import CampReadOnlyModeError
 
 from .models import ShopTicket
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 @login_required

@@ -13,7 +13,7 @@ class BaseTicketAdmin(admin.ModelAdmin):
     exclude = ["qrcode_base64"]
     readonly_fields = ["token", "badge_token"]
 
-    def generate_pdf(self, request, queryset):
+    def generate_pdf(self, request, queryset) -> None:
         for ticket in queryset.all():
             ticket.generate_pdf()
 
@@ -102,7 +102,7 @@ class ShopTicketAdmin(BaseTicketAdmin):
     def product_quantity(self, ticket):
         return str(ticket.quantity)
 
-    def generate_pdf(self, request, queryset):
+    def generate_pdf(self, request, queryset) -> None:
         for ticket in queryset.all():
             ticket.generate_pdf()
 

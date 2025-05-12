@@ -6,7 +6,7 @@ from django.conf import settings
 
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_creditnote_email(creditnote):
@@ -19,7 +19,7 @@ def add_creditnote_email(creditnote):
     # put formatdict together
     formatdict = {"creditnote": creditnote}
 
-    subject = "BornHack creditnote %s" % creditnote.pk
+    subject = f"BornHack creditnote {creditnote.pk}"
 
     # add email to outgoing email queue
     return add_outgoing_email(
@@ -48,7 +48,7 @@ def add_invoice_email(invoice):
         "filename": invoice.filename,
     }
 
-    subject = "BornHack invoice %s" % invoice.pk
+    subject = f"BornHack invoice {invoice.pk}"
 
     # add email to outgoing email queue
     return add_outgoing_email(

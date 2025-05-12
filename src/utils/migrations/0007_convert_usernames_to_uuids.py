@@ -6,14 +6,11 @@ import uuid
 from django.db import migrations
 
 
-def convert_usernames_to_uuids(apps, schema_editor):
+def convert_usernames_to_uuids(apps, schema_editor) -> None:
     User = apps.get_model("auth", "User")
     for user in User.objects.all():
-        username = user.username
         user.username = uuid.uuid4()
         user.save()
-        print(username, user.username)
-    print("done")
 
 
 class Migration(migrations.Migration):

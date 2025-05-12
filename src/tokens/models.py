@@ -34,7 +34,7 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     camp_filter = "camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.description} ({self.camp})"
 
     class Meta:
@@ -47,7 +47,7 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         )
 
     @property
-    def valid_now(self):
+    def valid_now(self) -> bool:
         if not self.valid_when:
             # no time limit
             return True
@@ -74,7 +74,7 @@ class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
 
     camp_filter = "token__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.token} found by {self.user}"
 
     @property

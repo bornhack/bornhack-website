@@ -12,7 +12,7 @@ from utils.models import CampRelatedModel
 
 from .dectutils import DectUtils
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 dectutil = DectUtils()
 
 
@@ -20,7 +20,7 @@ class DectRegistration(
     ExportModelOperationsMixin("dect_registration"),
     CampRelatedModel,
 ):
-    """This model contains DECT registrations for users and services"""
+    """This model contains DECT registrations for users and services."""
 
     class Meta:
         unique_together = [("camp", "number")]
@@ -73,7 +73,7 @@ class DectRegistration(
         help_text="DECT phone IPEI (03562,0900847)",
     )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """This is just here so we get the validation in the admin as well."""
         # validate that the phonenumber and letters are valid and then save()
         self.clean_number()
@@ -81,7 +81,7 @@ class DectRegistration(
         self.check_unique_ipei()
         super().save(*args, **kwargs)
 
-    def check_unique_ipei(self):
+    def check_unique_ipei(self) -> None:
         if self.ipei and len(self.ipei) == 2:
             # check for conflicts with the same IPEI
             if DectRegistration.objects.filter(camp=self.camp, ipei=self.ipei).exclude(pk=self.pk).exists():
@@ -89,7 +89,7 @@ class DectRegistration(
                     f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use",
                 )
 
-    def clean_number(self):
+    def clean_number(self) -> None:
         """We call this from the views form_valid() so we have a Camp object available for the validation.
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
@@ -136,7 +136,7 @@ class DectRegistration(
                 )
             i -= 1
 
-    def clean_letters(self):
+    def clean_letters(self) -> None:
         """We call this from the views form_valid() so we have a Camp object available for the validation.
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.

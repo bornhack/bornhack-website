@@ -19,7 +19,7 @@ from utils.models import CampRelatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class FacilityQuickFeedback(
@@ -40,14 +40,14 @@ class FacilityQuickFeedback(
         help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part. Defaults to an exclamation mark icon.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.feedback
 
 
 class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel):
     """Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
     facilities.Type has a m2m relationship with FeedbackChoice which determines which choices
-    are presented for giving feedback for facilities of this type
+    are presented for giving feedback for facilities of this type.
     """
 
     class Meta:
@@ -94,10 +94,10 @@ class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel
 
     camp_filter = "responsible_team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -140,7 +140,7 @@ class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDMod
 
     camp_filter = "facility_type__responsible_team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def get_feedback_url(self, request):
@@ -155,7 +155,7 @@ class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDMod
             ),
         )
 
-    def get_feedback_qr(self, request):
+    def get_feedback_qr(self, request) -> str:
         qr = qrcode.make(
             self.get_feedback_url(request),
             version=1,

@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def populate_opr(apps, schema_editor):
+def populate_opr(apps, schema_editor) -> None:
     OrderProductRelation = apps.get_model("shop", "OrderProductRelation")
     ShopTicket = apps.get_model("tickets", "ShopTicket")
 

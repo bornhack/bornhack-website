@@ -15,11 +15,11 @@ from psycopg2.extras import DateTimeTZRange
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Permission(ExportModelOperationsMixin("permission"), models.Model):
-    """An unmanaged field-less model which holds our non-model permissions (such as team permission sets)"""
+    """An unmanaged field-less model which holds our non-model permissions (such as team permission sets)."""
 
     class Meta:
         managed = False
@@ -126,8 +126,8 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     def get_absolute_url(self):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 
-    def clean(self):
-        """Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown"""
+    def clean(self) -> None:
+        """Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown."""
         errors = []
         # check for overlaps buildup vs. camp
         if self.buildup.upper > self.camp.lower:
@@ -144,23 +144,23 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         if errors:
             raise ValidationError(errors)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.title} - {self.tagline}"
 
     @property
-    def logo_small(self):
+    def logo_small(self) -> str:
         return f"img/{self.slug}/logo/{self.slug}-logo-s.png"
 
     @property
-    def logo_small_svg(self):
+    def logo_small_svg(self) -> str:
         return f"img/{self.slug}/logo/{self.slug}-logo-small.svg"
 
     @property
-    def logo_large(self):
+    def logo_large(self) -> str:
         return f"img/{self.slug}/logo/{self.slug}-logo-l.png"
 
     @property
-    def logo_large_svg(self):
+    def logo_large_svg(self) -> str:
         return f"img/{self.slug}/logo/{self.slug}-logo-large.svg"
 
     def get_days(self, camppart):
@@ -174,9 +174,9 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         if (
             not hasattr(field, "__class__")
             or not hasattr(field.__class__, "__name__")
-            or not field.__class__.__name__ == "DateTimeTZRange"
+            or field.__class__.__name__ != "DateTimeTZRange"
         ):
-            logger.error("this attribute is not a datetimetzrange field: %s" % field)
+            logger.error(f"this attribute is not a datetimetzrange field: {field}")
             return False
 
         # count how many unique dates we have in this range
@@ -242,7 +242,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def event_types(self):
-        """Return all event types with at least one event in this camp"""
+        """Return all event types with at least one event in this camp."""
         EventType = apps.get_model("program", "EventType")
         return EventType.objects.filter(
             events__isnull=False,

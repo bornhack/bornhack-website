@@ -12,7 +12,7 @@ from .models import EventProposal
 from .models import EventTrack
 from .models import SpeakerProposal
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class SpeakerProposalForm(forms.ModelForm):
@@ -31,8 +31,8 @@ class SpeakerProposalForm(forms.ModelForm):
             "event_conflicts",
         ]
 
-    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
-        """Initialise the form and adapt based on event_type"""
+    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs) -> None:
+        """Initialise the form and adapt based on event_type."""
         super().__init__(*args, **kwargs)
 
         matrix = matrix or {}
@@ -45,7 +45,7 @@ class SpeakerProposalForm(forms.ModelForm):
 
         if matrix:
             # add speaker availability fields
-            for date in matrix.keys():
+            for date in matrix:
                 # do we need a column for this day?
                 if matrix[date]:
                     # loop over the daychunks for this day
@@ -133,7 +133,7 @@ class SpeakerProposalForm(forms.ModelForm):
             # no oneday tickets for music acts
             del self.fields["needs_oneday_ticket"]
 
-        elif event_type.name == "Talk" or event_type.name == "Keynote":
+        elif event_type.name in {"Talk", "Keynote"}:
             # fix label and help_text for the name field
             self.fields["name"].label = "Speaker Name"
             self.fields["name"].help_text = "The name of the speaker. Can be a real name or an alias (public)."
@@ -257,7 +257,7 @@ class EventProposalForm(forms.ModelForm):
         ]
 
     def clean_duration(self):
-        """Make sure duration has been specified, and make sure it is not too long"""
+        """Make sure duration has been specified, and make sure it is not too long."""
         if not self.cleaned_data["duration"]:
             raise forms.ValidationError("Please specify a duration.")
         if (
@@ -270,11 +270,10 @@ class EventProposalForm(forms.ModelForm):
         return self.cleaned_data["duration"]
 
     def clean_track(self):
-        track = self.cleaned_data["track"]
+        return self.cleaned_data["track"]
         # TODO: make sure the track is part of the current camp, needs camp as form kwarg to verify
-        return track
 
-    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs):
+    def __init__(self, camp, event_type=None, matrix=None, *args, **kwargs) -> None:
         # initialise form
         super().__init__(*args, **kwargs)
 
@@ -315,7 +314,7 @@ class EventProposalForm(forms.ModelForm):
             self.fields["duration"].help_text = f"Please enter the duration of this {event_type.name} (in minutes)"
             self.fields["duration"].widget.attrs["placeholder"] = f"{event_type.name} Duration (in minutes)"
 
-        if not event_type.name == LIGHTNING_TALK:
+        if event_type.name != LIGHTNING_TALK:
             # Only lightning talks submissions will have to choose whether to use provided speaker laptop
             del self.fields["use_provided_speaker_laptop"]
 

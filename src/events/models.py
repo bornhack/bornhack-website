@@ -12,7 +12,7 @@ class Type(ExportModelOperationsMixin("type"), CreatedUpdatedModel):
     New event types should be added in data migrations.
     The following types are currently used in the codebase:
     - ticket_created: Whenever a new ShopTicket is created
-    - public_credit_name_changed: Whenever a user changes public_credit_name in the profile
+    - public_credit_name_changed: Whenever a user changes public_credit_name in the profile.
     """
 
     name = models.TextField(unique=True, help_text="The type of event")
@@ -27,12 +27,12 @@ class Type(ExportModelOperationsMixin("type"), CreatedUpdatedModel):
         help_text="Check to send email notifications for this type of event.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     @property
     def teams(self):
-        """This property returns a queryset with all the teams that should receive this type of events"""
+        """This property returns a queryset with all the teams that should receive this type of events."""
         team_ids = Routing.objects.filter(eventtype=self).values_list("team", flat=True)
         return Team.objects.filter(pk__in=team_ids)
 
@@ -57,5 +57,5 @@ class Routing(ExportModelOperationsMixin("routing"), CreatedUpdatedModel):
         help_text="The team which should receive events of this type.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.eventtype} -> {self.team}"

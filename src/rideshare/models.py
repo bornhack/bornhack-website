@@ -44,5 +44,5 @@ class Ride(ExportModelOperationsMixin("ride"), UUIDModel, CampRelatedModel):
             kwargs={"pk": self.pk, "camp_slug": self.camp.slug},
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.seats} seats from {self.from_location} to {self.to_location} at {self.when} by {self.user}"

@@ -8,7 +8,7 @@ register = template.Library()
 
 
 @register.filter
-def currency(value):
+def currency(value) -> str | bool | None:
     try:
         return f"{Decimal(value):.2f} DKK"
     except ValueError:

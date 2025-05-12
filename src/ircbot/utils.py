@@ -5,12 +5,12 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def add_irc_message(target, message, timeout=10):
+def add_irc_message(target, message, timeout=10) -> None:
     """Convenience function for adding OutgoingIrcMessage objects.
-    Defaults to a message timeout of 10 minutes
+    Defaults to a message timeout of 10 minutes.
     """
     from .models import OutgoingIrcMessage
 

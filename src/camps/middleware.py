@@ -18,8 +18,7 @@ class RequestCampMiddleware:
 
     def __call__(self, request):
         """Boilerplate."""
-        response = self.get_response(request)
-        return response
+        return self.get_response(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs) -> None:
         """Check url kwargs for a camp_slug and add camp to request object where relevant."""

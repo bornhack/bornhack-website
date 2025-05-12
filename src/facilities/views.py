@@ -154,7 +154,7 @@ class FacilityFeedbackView(FacilityTypeViewMixin, FacilityViewMixin, CreateView)
 
     def get_form(self, form_class=None):
         """- Add quick feedback field to the form
-        - Add anon option to the form
+        - Add anon option to the form.
         """
         form = super().get_form(form_class)
 

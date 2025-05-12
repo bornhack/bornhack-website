@@ -20,6 +20,11 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
+from backoffice.forms import InvoiceDownloadForm
+from backoffice.forms import ShopTicketRefundFormSet
+from backoffice.forms import TicketGroupRefundFormSet
+from backoffice.mixins import EconomyTeamPermissionMixin
+from backoffice.mixins import InfoTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import Pos
 from shop.forms import RefundForm
@@ -35,13 +40,7 @@ from tickets.models import TicketType
 from tickets.models import TicketTypeUnion
 from utils.mixins import GetObjectMixin
 
-from ..forms import InvoiceDownloadForm
-from ..forms import ShopTicketRefundFormSet
-from ..forms import TicketGroupRefundFormSet
-from ..mixins import EconomyTeamPermissionMixin
-from ..mixins import InfoTeamPermissionMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def _ticket_getter_by_token(token) -> TicketTypeUnion | None:
@@ -50,6 +49,7 @@ def _ticket_getter_by_token(token) -> TicketTypeUnion | None:
             return ticket_class.objects.get(Q(token=token) | Q(badge_token=token))
         except ticket_class.DoesNotExist:
             continue
+    return None
 
 
 def _ticket_getter_by_pk(pk):
@@ -58,6 +58,7 @@ def _ticket_getter_by_pk(pk):
             return ticket_class.objects.get(pk=pk)
         except ticket_class.DoesNotExist:
             pass
+    return None
 
 
 class ScanTicketsPosSelectView(
@@ -92,7 +93,7 @@ class ScanTicketsView(
             return HttpResponseForbidden("Camp is read-only")
         return super().dispatch(*args, **kwargs)
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.pos = Pos.objects.get(team__camp=self.camp, slug=kwargs["pos_slug"])
 
@@ -123,7 +124,7 @@ class ScanTicketsView(
 
         return context
 
-    def _set_order(self):
+    def _set_order(self) -> None:
         self.order_search = True
         try:
             order_id = self.request.POST.get("find_order_id")
@@ -161,7 +162,7 @@ class ScanTicketsView(
         messages.info(request, "Badge marked as handed out!")
         return ticket_to_handout_badge_for
 
-    def mark_order_as_paid(self, request):
+    def mark_order_as_paid(self, request) -> None:
         order = Order.objects.get(id=request.POST.get("mark_as_paid"))
         order.mark_as_paid()
         messages.success(request, f"Order #{order.id} has been marked as paid!")
@@ -218,7 +219,7 @@ class InvoiceDownloadMultipleView(CampViewMixin, EconomyTeamPermissionMixin, For
 
 
 class InvoiceListCSVView(CampViewMixin, InfoTeamPermissionMixin, ListView):
-    """CSV export of invoices for bookkeeping stuff"""
+    """CSV export of invoices for bookkeeping stuff."""
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="text/csv")

@@ -42,7 +42,7 @@ from .forms import OrderProductRelationForm
 from .forms import OrderProductRelationFormSet
 from .quickpay import QuickPay
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 qp = QuickPay()
 
 
@@ -63,9 +63,8 @@ class EnsureUserOwnsCreditNoteMixin(SingleObjectMixin):
 
     def dispatch(self, request, *args, **kwargs):
         # If the user does not own this creditnote OR is not staff
-        if not request.user.is_staff:
-            if self.get_object().user != request.user:
-                raise Http404("CreditNote not found")
+        if not request.user.is_staff and self.get_object().user != request.user:
+            raise Http404("CreditNote not found")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -75,9 +74,8 @@ class EnsureUserOwnsOrderMixin(SingleObjectMixin):
 
     def dispatch(self, request, *args, **kwargs):
         # If the user does not own this order OR is not staff
-        if not request.user.is_staff:
-            if self.get_object().user != request.user:
-                raise Http404("Order not found")
+        if not request.user.is_staff and self.get_object().user != request.user:
+            raise Http404("Order not found")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -290,7 +288,7 @@ class OrderDetailView(
 
         return super().get_context_data(**kwargs)
 
-    def get_template_names(self):
+    def get_template_names(self) -> str | bool:
         if self.get_object().open is None:
             return "order_detail_closed.html"
         if self.get_object().open is True:
@@ -357,7 +355,7 @@ class OrderDetailView(
                 )
 
             # No stock issues, proceed to save OPRs and Order
-            if "update_order" or "review_and_pay" in request.POST:
+            if True:
                 # We have already made sure the formset is valid, so just save it to update quantities.
                 formset.save()
 
@@ -423,6 +421,7 @@ class OrderReviewAndPayView(
             }
 
             return HttpResponseRedirect(reverses[payment_method])
+        return None
 
 
 class DownloadInvoiceView(
@@ -436,12 +435,9 @@ class DownloadInvoiceView(
     def get(self, request, *args, **kwargs):
         """The file we return is determined by the orders paid status.
         If the order is unpaid we return a proforma invoice PDF
-        If the order is paid we return a normal Invoice PDF
+        If the order is paid we return a normal Invoice PDF.
         """
-        if self.get_object().paid:
-            pdfobj = self.get_object().invoice
-        else:
-            pdfobj = self.get_object()
+        pdfobj = self.get_object().invoice if self.get_object().paid else self.get_object()
 
         if not pdfobj.pdf:
             messages.error(request, "No PDF has been generated yet!")
@@ -449,7 +445,7 @@ class DownloadInvoiceView(
                 reverse_lazy("shop:order_detail", kwargs={"pk": self.get_object().pk}),
             )
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="%s"' % pdfobj.filename
+        response["Content-Disposition"] = f'attachment; filename="{pdfobj.filename}"'
         response.write(pdfobj.pdf.read())
         return response
 
@@ -475,7 +471,7 @@ class DownloadCreditNoteView(
 
     def get(self, request, *args, **kwargs):
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = 'attachment; filename="%s"' % self.get_object().filename
+        response["Content-Disposition"] = f'attachment; filename="{self.get_object().filename}"'
         response.write(self.get_object().pdf.read())
         return response
 
@@ -515,7 +511,7 @@ class BankTransferView(
         context["regno"] = settings.BANKACCOUNT_REG
         context["accountno"] = settings.BANKACCOUNT_ACCOUNT
         context["total"] = self.get_object().total
-        context["eur"] = round(self.get_object().total / Decimal(7.42), 2)  # EUR rate
+        context["eur"] = round(self.get_object().total / Decimal("7.42"), 2)  # EUR rate
         return context
 
 
@@ -600,7 +596,7 @@ class CoinifyCallbackView(View):
         if not callbackobject.payload:
             # no, return an error
             logger.error(
-                "unable to parse JSON body in callback for order %s" % callbackobject.order.id,
+                f"unable to parse JSON body in callback for order {callbackobject.order.id}",
             )
             return HttpResponseBadRequest("unable to parse json")
 
@@ -626,7 +622,7 @@ class CoinifyCallbackView(View):
         if callbackobject.payload["event"] == "settlement.created":
             return HttpResponse("OK")
         logger.error(
-            "unsupported callback event %s" % callbackobject.payload["event"],
+            "unsupported callback event {}".format(callbackobject.payload["event"]),
         )
         return HttpResponseBadRequest("unsupported event")
 
@@ -726,10 +722,7 @@ class QuickPayCallbackView(View):
 
         # find the related Order object (where possible)
         body = json.loads(request.body.decode("utf-8"))
-        if body["type"] == "Payment":
-            order = Order.objects.get(id=int(body["order_id"]))
-        else:
-            order = None
+        order = Order.objects.get(id=int(body["order_id"])) if body["type"] == "Payment" else None
 
         # save the new or updated QuickPayAPIObject and the callback
         qpobj, created = QuickPayAPIObject.objects.get_or_create(

@@ -10,7 +10,7 @@ from .models import CoinifyAPICallback
 from .models import CoinifyAPIPaymentIntent
 from .models import CoinifyAPIRequest
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def process_coinify_payment_intent_json(intentjson, order, request):
@@ -22,9 +22,8 @@ def process_coinify_payment_intent_json(intentjson, order, request):
     )
 
     # if the order is paid in full call the mark as paid method now
-    if "state" in intentjson:
-        if intentjson["state"] == "completed" and not coinifyintent.order.paid:
-            coinifyintent.order.mark_as_paid(request=request)
+    if "state" in intentjson and intentjson["state"] == "completed" and not coinifyintent.order.paid:
+        coinifyintent.order.mark_as_paid(request=request)
 
     return coinifyintent
 
@@ -43,14 +42,13 @@ def save_coinify_callback(request, order):
         parsed = ""
 
     # save this callback to db
-    callbackobject = CoinifyAPICallback.objects.create(
+    return CoinifyAPICallback.objects.create(
         headers=headerdict,
         body=request.body,
         payload=parsed,
         order=order,
     )
 
-    return callbackobject
 
 
 def coinify_api_request(api_method, order, payload):
@@ -63,7 +61,7 @@ def coinify_api_request(api_method, order, payload):
     try:
         response = requests.post(url, data=json.dumps(payload), headers=headers)
     except requests.exceptions.RequestException as E:
-        logger.error("requests exception during coinify api request: %s" % E)
+        logger.exception(f"requests exception during coinify api request: {E}")
         return False
 
     # save this API request to the database
@@ -73,7 +71,7 @@ def coinify_api_request(api_method, order, payload):
         payload=payload,
         response=response.json(),
     )
-    logger.debug("saved coinify api request %s in db" % req.id)
+    logger.debug(f"saved coinify api request {req.id} in db")
 
     return req
 
@@ -83,12 +81,11 @@ def handle_coinify_api_response(apireq, order, request):
         # Parse api response
         if "paymentWindowUrl" in apireq.response:
             # save this new coinify intent to the DB
-            coinifyintent = process_coinify_payment_intent_json(
+            return process_coinify_payment_intent_json(
                 intentjson=apireq.response,
                 order=order,
                 request=request,
             )
-            return coinifyintent
         api_error = apireq.response
         logger.error(
             "coinify API error: {} ({})".format(
@@ -97,7 +94,7 @@ def handle_coinify_api_response(apireq, order, request):
             ),
         )
         return False
-    logger.error("coinify api method not supported" % apireq.method)
+    logger.error("coinify api method not supported")
     return False
 
 
@@ -114,7 +111,7 @@ def create_coinify_payment_intent(order, request):
         "orderId": str(order.id),
         "customerId": "bbca76fa-1337-439a-ae29-a3c2c2c84c4b",  # random static UUID4
         "customerEmail": order.user.email,
-        "memo": "BornHack order id #%s" % order.id,
+        "memo": f"BornHack order id #{order.id}",
         "successUrl": order.get_coinify_thanks_url(request),
         "failureUrl": order.get_cancel_url(request),
     }
@@ -126,5 +123,4 @@ def create_coinify_payment_intent(order, request):
         payload=intentdict,
     )
 
-    coinifyintent = handle_coinify_api_response(apireq, order, request)
-    return coinifyintent
+    return handle_coinify_api_response(apireq, order, request)

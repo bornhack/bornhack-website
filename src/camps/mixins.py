@@ -19,10 +19,10 @@ from camps.models import Camp
 
 class CampViewMixin:
     """This mixin makes sure self.camp is available (taken from url kwarg camp_slug)
-    It also filters out objects that belong to other camps when the model has a camp_filter
+    It also filters out objects that belong to other camps when the model has a camp_filter.
     """
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         """Set self.camp, and raise PermissionDenied if camp is readonly and it is an edit view."""
         super().setup(*args, **kwargs)
         self.camp = get_object_or_404(Camp, slug=self.kwargs["camp_slug"])

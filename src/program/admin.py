@@ -36,7 +36,7 @@ class SpeakerAvailabilityAdmin(admin.ModelAdmin):
 
 @admin.register(SpeakerProposal)
 class SpeakerProposalAdmin(admin.ModelAdmin):
-    def mark_speaker_proposal_as_approved(self, request, queryset):
+    def mark_speaker_proposal_as_approved(self, request, queryset) -> None:
         for sp in queryset:
             sp.mark_as_approved(request)
 
@@ -55,7 +55,7 @@ def get_speakers_string(event_proposal):
 
 @admin.register(EventProposal)
 class EventProposalAdmin(admin.ModelAdmin):
-    def mark_event_proposal_as_approved(self, request, queryset):
+    def mark_event_proposal_as_approved(self, request, queryset) -> bool | None:
         for ep in queryset:
             if not ep.speakers.all():
                 messages.error(
@@ -68,10 +68,11 @@ class EventProposalAdmin(admin.ModelAdmin):
             except ValidationError as e:
                 messages.error(request, e)
                 return False
+        return None
 
     mark_event_proposal_as_approved.description = "Approve and create Event object(s)"
 
-    def get_speakers(self):
+    def get_speakers(self) -> None:
         return
 
     actions = ["mark_event_proposal_as_approved"]

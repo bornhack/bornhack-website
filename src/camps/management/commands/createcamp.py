@@ -10,10 +10,10 @@ from django.utils import timezone
 class Command(BaseCommand):
     help = "Creates html files needed for a camp"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("camp_slug", type=str)
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
@@ -21,7 +21,7 @@ class Command(BaseCommand):
     def local_dir(self, entry):
         return os.path.join(settings.BASE_DIR, entry)
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         # files to create, relative to BASE_DIR
         files = ["camps/templates/{camp_slug}_camp_detail.html"]
 

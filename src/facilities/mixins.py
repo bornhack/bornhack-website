@@ -12,9 +12,9 @@ from .models import FacilityType
 
 
 class FacilityTypeViewMixin(CampViewMixin):
-    """A mixin to get the FacilityType object based on facility_type_slug in url kwargs"""
+    """A mixin to get the FacilityType object based on facility_type_slug in url kwargs."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.facility_type = get_object_or_404(
             FacilityType,
@@ -31,7 +31,7 @@ class FacilityTypeViewMixin(CampViewMixin):
 class FacilityViewMixin(CampViewMixin):
     """Mixin shared between views dealing with a facility."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         """Get facility from kwargs."""
         super().setup(*args, **kwargs)
         self.facility = get_object_or_404(Facility, uuid=kwargs["facility_uuid"])
@@ -60,7 +60,7 @@ class FacilityViewMixin(CampViewMixin):
 class FacilityFacilitatorViewMixin(FacilityViewMixin):
     """Mixins for views only available to users with facilitator permission for the team responsible for the facility type or gis team members."""
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         if self.request.user.has_perm("camps.gis_team_member"):
             return
@@ -69,4 +69,4 @@ class FacilityFacilitatorViewMixin(FacilityViewMixin):
             not in request.user.get_all_permissions()
         ):
             messages.error(request, "No thanks")
-            raise PermissionDenied()
+            raise PermissionDenied

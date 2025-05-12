@@ -21,6 +21,8 @@ from django.views.generic.edit import FormView
 from django.views.generic.edit import UpdateView
 from leaflet.forms.widgets import LeafletWidget
 
+from backoffice.mixins import OrgaOrGisTeamViewMixin
+from backoffice.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from facilities.mixins import FacilityFacilitatorViewMixin
 from facilities.models import Facility
@@ -31,10 +33,7 @@ from teams.models import Team
 from utils.mixins import AnyTeamFacilitatorRequiredMixin
 from utils.widgets import IconPickerWidget
 
-from ..mixins import OrgaOrGisTeamViewMixin
-from ..mixins import RaisePermissionRequiredMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 # ########### FACILITY TYPES ######################
@@ -143,7 +142,7 @@ class FacilityTypeCreateView(CampViewMixin, OrgaOrGisTeamViewMixin, CreateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -175,7 +174,7 @@ class FacilityTypeUpdateView(CampViewMixin, OrgaOrGisTeamViewMixin, UpdateView):
         return form
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -396,7 +395,7 @@ class FacilityFeedbackView(CampViewMixin, RaisePermissionRequiredMixin, FormView
         """This view requires the member_permission_set for the team in question."""
         return [self.team.member_permission_set]
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.team = get_object_or_404(
             Team,
@@ -452,7 +451,7 @@ class FacilityOpeningHoursCreateView(
     fields = ["when", "notes"]
 
     def form_valid(self, form):
-        """Set facility before saving"""
+        """Set facility before saving."""
         hours = form.save(commit=False)
         hours.facility = self.facility
         hours.save()

@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def create_eventtype(apps, schema_editor):
+def create_eventtype(apps, schema_editor) -> None:
     Type = apps.get_model("events", "Type")
     Type.objects.create(name="ticket_stats")
 

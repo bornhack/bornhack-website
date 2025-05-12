@@ -31,7 +31,7 @@ class SliderWidget(Widget):
     class Media:
         js = ("/static/js/slider_widget.js",)
 
-    def __init__(self, attrs=None, smin=0, smax=0):
+    def __init__(self, attrs=None, smin=0, smax=0) -> None:
         self.smin = smin
         self.smax = smax
         super().__init__(attrs)
@@ -47,6 +47,6 @@ class MarkdownWidget(Textarea):
     class Media:
         js = ("/static/js/markdown_widget.js", "/static/vendor/marked/marked.min.js")
 
-    def __init__(self):
+    def __init__(self) -> None:
         attrs = {"class": "markdown-widget"}
         super().__init__(attrs)

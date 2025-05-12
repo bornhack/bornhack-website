@@ -18,6 +18,9 @@ from django.views.generic.edit import UpdateView
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
+from backoffice.forms import PosSalesJSONForm
+from backoffice.mixins import OrgaTeamPermissionMixin
+from backoffice.mixins import PosViewMixin
 from camps.mixins import CampViewMixin
 from economy.filters import PosProductCostFilter
 from economy.filters import PosProductFilter
@@ -38,14 +41,10 @@ from economy.utils import import_pos_sales_json
 from teams.models import Team
 from utils.mixins import AnyTeamPosRequiredMixin
 
-from ..forms import PosSalesJSONForm
-from ..mixins import OrgaTeamPermissionMixin
-from ..mixins import PosViewMixin
-
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class PosListView(CampViewMixin, AnyTeamPosRequiredMixin, ListView):
@@ -127,7 +126,7 @@ class PosReportCreateView(PosViewMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        """Set Pos before saving"""
+        """Set Pos before saving."""
         pr = form.save(commit=False)
         pr.pos = self.pos
         pr.save()
@@ -200,7 +199,7 @@ class PosReportBankCountStartView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().bank_responsible:
             raise PermissionDenied("Only the bank responsible can do this")
@@ -221,7 +220,7 @@ class PosReportBankCountEndView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().bank_responsible:
             raise PermissionDenied("Only the bank responsible can do this")
@@ -242,7 +241,7 @@ class PosReportPosCountStartView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().pos_responsible:
             raise PermissionDenied("Only the Pos responsible can do this")
@@ -264,7 +263,7 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         if self.request.user != self.get_object().pos_responsible:
             raise PermissionDenied("Only the pos responsible can do this")

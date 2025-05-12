@@ -78,11 +78,11 @@ class RideCreate(LoginRequiredMixin, CampViewMixin, CreateView):
     ]
 
     def get_initial(self):
-        """Default 'author' to users public_credit_name where relevant"""
+        """Default 'author' to users public_credit_name where relevant."""
         return {"author": self.request.user.profile.get_public_credit_name}
 
     def form_valid(self, form, **kwargs):
-        """Set camp and user before saving"""
+        """Set camp and user before saving."""
         ride = form.save(commit=False)
         ride.camp = self.camp
         ride.user = self.request.user

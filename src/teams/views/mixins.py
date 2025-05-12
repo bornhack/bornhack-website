@@ -11,7 +11,7 @@ from utils.mixins import RaisePermissionRequiredMixin
 
 
 class EnsureTeamLeadMixin:
-    """Use to make sure request.user has team lead permission for the team specified by kwargs['team_slug']"""
+    """Use to make sure request.user has team lead permission for the team specified by kwargs['team_slug']."""
 
     def dispatch(self, request, *args, **kwargs):
         self.team = Team.objects.get(slug=kwargs["team_slug"], camp=self.camp)
@@ -27,7 +27,7 @@ class EnsureTeamLeadMixin:
 
 
 class EnsureTeamMemberLeadMixin(SingleObjectMixin):
-    """Use to make sure request.user has team lead permission for the team which TeamMember belongs to"""
+    """Use to make sure request.user has team lead permission for the team which TeamMember belongs to."""
 
     model = TeamMember
 
@@ -44,7 +44,7 @@ class EnsureTeamMemberLeadMixin(SingleObjectMixin):
 
 
 class TeamViewMixin(CampViewMixin):
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.team = Team.objects.get(slug=kwargs["team_slug"], camp=self.camp)
 
@@ -55,14 +55,14 @@ class TeamViewMixin(CampViewMixin):
 
 
 class TeamInfopagerPermissionMixin(RaisePermissionRequiredMixin):
-    """Permission mixin for views restricted to users with infopager permission for self.team"""
+    """Permission mixin for views restricted to users with infopager permission for self.team."""
 
     def get_permission_required(self):
         return [self.team.infopager_permission_set]
 
 
 class TeamTaskerPermissionMixin(RaisePermissionRequiredMixin):
-    """Permission mixin for views restricted to users with tasker permission for self.team"""
+    """Permission mixin for views restricted to users with tasker permission for self.team."""
 
     def get_permission_required(self):
         return [self.team.tasker_permission_set]

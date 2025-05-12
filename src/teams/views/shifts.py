@@ -18,10 +18,9 @@ from django.views.generic import View
 from psycopg2.extras import DateTimeTZRange
 
 from camps.mixins import CampViewMixin
-
-from ..models import Team
-from ..models import TeamMember
-from ..models import TeamShift
+from teams.models import Team
+from teams.models import TeamMember
+from teams.models import TeamShift
 
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
@@ -78,7 +77,7 @@ class ShiftForm(forms.ModelForm):
         model = TeamShift
         fields = ["from_datetime", "to_datetime", "people_required"]
 
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, instance=None, **kwargs) -> None:
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))
@@ -105,7 +104,7 @@ class ShiftForm(forms.ModelForm):
         current_timezone = timezone.get_current_timezone()
         return self.cleaned_data["to_datetime"].astimezone(current_timezone)
 
-    def clean(self):
+    def clean(self) -> None:
         self.lower = self._get_from_datetime()
         self.upper = self._get_to_datetime()
         if self.lower > self.upper:
@@ -185,7 +184,7 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
 
 
 class MultipleShiftForm(forms.Form):
-    def __init__(self, instance=None, **kwargs):
+    def __init__(self, instance=None, **kwargs) -> None:
         camp = kwargs.pop("camp")
         super().__init__(**kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))

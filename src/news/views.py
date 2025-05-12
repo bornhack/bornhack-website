@@ -9,10 +9,7 @@ from .models import NewsItem
 
 
 def news_items_queryset(kwargs=None):
-    if not kwargs:
-        archived = False
-    else:
-        archived = kwargs["archived"]
+    archived = False if not kwargs else kwargs["archived"]
 
     return NewsItem.objects.filter(
         published_at__isnull=False,

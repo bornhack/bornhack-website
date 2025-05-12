@@ -14,7 +14,7 @@ def _resolve_app_name(func):
 
 
 @register.simple_tag(takes_context=True)
-def menubuttonclass(context, appname):
+def menubuttonclass(context, appname) -> str:
     resolved_appname = _resolve_app_name(context["request"].resolver_match.func)
 
     if appname == resolved_appname:
@@ -23,8 +23,9 @@ def menubuttonclass(context, appname):
 
 
 @register.simple_tag(takes_context=True)
-def menudropdownclass(context, appname):
+def menudropdownclass(context, appname) -> str | None:
     resolved_appname = _resolve_app_name(context["request"].resolver_match.func)
 
     if appname == resolved_appname:
         return "active"
+    return None

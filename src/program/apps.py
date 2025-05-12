@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 class ProgramConfig(AppConfig):
     name = "program"
 
-    def ready(self):
+    def ready(self) -> None:
         from .models import EventSession
         from .models import Speaker
         from .signal_handlers import check_speaker_event_camp_consistency

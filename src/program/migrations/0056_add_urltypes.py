@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def add_urltypes(apps, schema_editor):
+def add_urltypes(apps, schema_editor) -> None:
     UrlType = apps.get_model("program", "UrlType")
 
     UrlType.objects.create(name="Other", icon="link")

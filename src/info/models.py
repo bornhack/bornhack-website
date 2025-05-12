@@ -34,7 +34,7 @@ class InfoCategory(ExportModelOperationsMixin("info_category"), CampRelatedModel
         related_name="info_categories",
     )
 
-    def clean(self):
+    def clean(self) -> None:
         if InfoItem.objects.filter(
             category__team__camp=self.camp,
             anchor=self.anchor,
@@ -50,7 +50,7 @@ class InfoCategory(ExportModelOperationsMixin("info_category"), CampRelatedModel
 
     camp_filter = "team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.headline} ({self.camp})"
 
 
@@ -84,7 +84,7 @@ class InfoItem(ExportModelOperationsMixin("info_item"), CampRelatedModel):
 
     camp_filter = "category__team__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         if (
             hasattr(self, "category")
             and InfoCategory.objects.filter(
@@ -99,5 +99,5 @@ class InfoItem(ExportModelOperationsMixin("info_item"), CampRelatedModel):
                 },
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.headline} ({self.category})"

@@ -13,19 +13,18 @@ from django.urls import reverse
 from django.views.generic import FormView
 from django.views.generic import ListView
 
+from backoffice.forms import ManageTeamPermissionsForm
+from backoffice.mixins import OrgaOrTeamLeadViewMixin
 from camps.mixins import CampViewMixin
 from camps.models import Permission as CampPermission
 from teams.models import Team
-
-from ..forms import ManageTeamPermissionsForm
-from ..mixins import OrgaOrTeamLeadViewMixin
 
 
 class TeamPermissionIndexView(OrgaOrTeamLeadViewMixin, ListView):
     model = Team
     template_name = "team_permissions_index.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         # get the teams for which this user can manage permissions
         self.teams = []
@@ -53,7 +52,7 @@ class TeamPermissionManageView(CampViewMixin, FormView):
     template_name = "team_permissions_manage.html"
     form_class = ManageTeamPermissionsForm
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         """Get the team object."""
         super().setup(*args, **kwargs)
         self.team = get_object_or_404(
@@ -66,24 +65,24 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             f"camps.{self.team.slug}_team_lead",
         ) and not self.request.user.has_perm("camps.orga_team_member"):
             messages.error(self.request, "No thanks")
-            raise PermissionDenied()
+            raise PermissionDenied
         self.matrix = {}
         for member in self.team.approved_members.all():
             self.matrix[member.username] = []
-            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS:
                 self.matrix[member.username].append(perm)
 
     def get_form_kwargs(self):
-        """Set teams and permissions for the form"""
+        """Set teams and permissions for the form."""
         kwargs = super().get_form_kwargs()
         kwargs["matrix"] = self.matrix
         return kwargs
 
     def get_initial(self, *args, **kwargs):
-        """Populate the form with current permissions"""
+        """Populate the form with current permissions."""
         initial = super().get_initial(*args, **kwargs)
         # loop over users in the matrix
-        for username in self.matrix.keys():
+        for username in self.matrix:
             user_perms = self.team.approved_members.get(
                 username=username,
             ).get_all_permissions()
@@ -106,7 +105,7 @@ class TeamPermissionManageView(CampViewMixin, FormView):
         Skipping fields "lead" and "member" as they are handled through memberships.
         """
         # the perms that can be managed through this view
-        perms = [perm for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys() if perm not in ["lead", "member"]]
+        perms = [perm for perm in settings.BORNHACK_TEAM_PERMISSIONS if perm not in ["lead", "member"]]
         # loop over perms and build a dict for use later
         team_permissions = {}
         permission_content_type = ContentType.objects.get_for_model(CampPermission)
@@ -116,9 +115,9 @@ class TeamPermissionManageView(CampViewMixin, FormView):
                 codename=f"{self.team.slug}_team_{perm}",
             )
         # loop over form fields
-        for field in form.cleaned_data.keys():
+        for field in form.cleaned_data:
             username, perm = field.split("_")
-            if username not in self.matrix.keys():
+            if username not in self.matrix:
                 # no sneaking in new usernames
                 continue
             if perm not in perms:

@@ -404,7 +404,7 @@ class TestOrderListView(TestCase):
 
 class TestTicketCreation(TestCase):
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         cls.user = UserFactory()
 
     def test_multiple_tickets_created(self):
@@ -584,7 +584,7 @@ class TestRefund(TestCase):
     opr4: OrderProductRelation
 
     @classmethod
-    def setUpTestData(cls):
+    def setUpTestData(cls) -> None:
         cls.user = UserFactory()
         cls.info_user = UserFactory(username="info")
 
@@ -717,9 +717,6 @@ class TestRefund(TestCase):
             for index, ticket in enumerate(opr.shoptickets.all()):
                 form_data[f"ticket-{opr.id}-{index}-uuid"] = str(ticket.uuid)
                 if ticket in refund_tickets:
-                    print(
-                        f"Refunding ticket {ticket}, index {index}, uuid {ticket.uuid}",
-                    )
                     form_data[f"ticket-{opr.id}-{index}-refund"] = "on"
 
         for opr in [self.opr4]:

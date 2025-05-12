@@ -13,7 +13,7 @@ from .models import Layer
 class LayerViewMixin:
     """A mixin to get the Layer object based on layer_slug in url kwargs."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(Layer, slug=self.kwargs["layer_slug"])
 
@@ -26,7 +26,7 @@ class LayerViewMixin:
 class LayerMapperViewMixin(LayerViewMixin):
     """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         if (
             self.layer.responsible_team
@@ -34,24 +34,24 @@ class LayerMapperViewMixin(LayerViewMixin):
         ) or self.request.user.has_perm("camps.gis_team_member"):
             return
         messages.error(request, "No thanks")
-        raise PermissionDenied()
+        raise PermissionDenied
 
 
 class GisTeamViewMixin:
     """A mixin for views only available to users with `camps.gis_team_member` permission."""
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         if self.request.user.has_perm("camps.gis_team_member"):
             return
         messages.error(request, "No thanks")
-        raise PermissionDenied()
+        raise PermissionDenied
 
 
 class ExternalLayerViewMixin(CampViewMixin):
     """A mixin to get the ExternalLayer object based on external_layer_uuid in url kwargs."""
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(
             ExternalLayer,
@@ -62,7 +62,7 @@ class ExternalLayerViewMixin(CampViewMixin):
 class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
     """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
 
-    def setup(self, request, *args, **kwargs):
+    def setup(self, request, *args, **kwargs) -> None:
         super().setup(request, *args, **kwargs)
         if (
             self.layer.responsible_team
@@ -70,4 +70,4 @@ class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
         ) or self.request.user.has_perm("camps.gis_team_member"):
             return
         messages.error(request, "No thanks")
-        raise PermissionDenied()
+        raise PermissionDenied

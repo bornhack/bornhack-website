@@ -6,7 +6,7 @@ import datetime
 from django.db import migrations
 
 
-def fix_posreport_periods(apps, schema_editor):
+def fix_posreport_periods(apps, schema_editor) -> None:
     PosReport = apps.get_model("economy", "PosReport")
     for pr in PosReport.objects.all():
         start = datetime.datetime.combine(pr.date, datetime.time(8, 0))

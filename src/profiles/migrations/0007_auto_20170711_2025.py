@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def populate_team_responsible_public_credit_names(apps, schema_editor):
+def populate_team_responsible_public_credit_names(apps, schema_editor) -> None:
     pass
 
 

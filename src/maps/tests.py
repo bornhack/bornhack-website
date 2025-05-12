@@ -70,6 +70,5 @@ class MapProxyViewTest(TestCase):
         with self.settings(
             DATAFORDELER_USER="",
             DATAFORDELER_PASSWORD="",
-        ):
-            with self.assertRaises(MissingCredentials):
-                MapProxyView().append_credentials("path")
+        ), self.assertRaises(MissingCredentials):
+            MapProxyView().append_credentials("path")

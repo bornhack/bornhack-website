@@ -11,13 +11,13 @@ from .signal_handlers import create_profile
 from .signal_handlers import profile_pre_save
 from .signal_handlers import set_session_on_login
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ProfilesConfig(AppConfig):
     name = "profiles"
 
-    def ready(self):
+    def ready(self) -> None:
         # remember to include a dispatch_uid to prevent signals being called multiple times in certain corner cases
         from django.contrib.auth.models import User
 

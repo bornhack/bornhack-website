@@ -4,7 +4,7 @@ import logging
 
 from ircbot.utils import add_irc_message
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def handle_team_event(
@@ -13,10 +13,10 @@ def handle_team_event(
     irc_timeout=60,
     email_template=None,
     email_formatdict=None,
-):
+) -> None:
     """This method is our basic event handler.
     The type of event determines which teams receive notifications.
-    TODO: Add some sort of priority to messages
+    TODO: Add some sort of priority to messages.
     """
     # logger.info("Inside handle_team_event, eventtype %s" % eventtype)
 
@@ -27,7 +27,7 @@ def handle_team_event(
         eventtype = Type.objects.get(name=eventtype)
     except Type.DoesNotExist:
         # unknown event type, do nothing
-        logger.error("Unknown eventtype %s" % eventtype)
+        logger.exception(f"Unknown eventtype {eventtype}")
         return
 
     if not eventtype.teams:
@@ -53,15 +53,15 @@ def handle_team_event(
         # handle any future notification types here..
 
 
-def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60):
-    """Sends IRC notifications for events to team IRC channels"""
-    logger.debug("Inside team_irc_notification, message %s" % irc_message)
+def team_irc_notification(team, eventtype, irc_message=None, irc_timeout=60) -> None:
+    """Sends IRC notifications for events to team IRC channels."""
+    logger.debug(f"Inside team_irc_notification, message {irc_message}")
     if not irc_message:
         logger.error("No IRC message found")
         return
 
     if not eventtype.irc_notification:
-        logger.error("IRC notifications not enabled for eventtype %s" % eventtype)
+        logger.error(f"IRC notifications not enabled for eventtype {eventtype}")
         return
 
     if not team.private_irc_channel_name or not team.private_irc_channel_bot:
@@ -84,9 +84,9 @@ def team_email_notification(
     eventtype,
     email_template=None,
     email_formatdict=None,
-):
+) -> None:
     """Sends email notifications for events to team mailinglists (if possible,
-    otherwise directly to the team leads)
+    otherwise directly to the team leads).
     """
     if not email_template or not email_formatdict or not eventtype.email_notification:
         # no email message found, or email notifications are not enabled for this event type

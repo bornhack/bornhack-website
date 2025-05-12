@@ -63,7 +63,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     actions = ["approve_membership", "remove_member"]
 
-    def approve_membership(self, request, queryset):
+    def approve_membership(self, request, queryset) -> None:
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 
@@ -80,7 +80,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     approve_membership.description = "Approve membership."
 
-    def remove_member(self, request, queryset):
+    def remove_member(self, request, queryset) -> None:
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 

@@ -12,17 +12,17 @@ from tickets.models import TicketType
 class Command(BaseCommand):
     help = "Creates sponsor tickets"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument("camp_slug", type=str)
         parser.add_argument("week_ticket_type_pk", type=str)
         parser.add_argument("day_ticket_type_pk", type=str)
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         week_ticket_type = TicketType.objects.get(pk=options["week_ticket_type_pk"])
         day_ticket_type = TicketType.objects.get(pk=options["day_ticket_type_pk"])
         camp = Camp.objects.get(slug=options["camp_slug"])

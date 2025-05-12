@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def fixup_opr(apps, schema_editor):
+def fixup_opr(apps, schema_editor) -> None:
     """Loop over OrderProductRelations and fix a few things.
 
     - Set price (so we can do a Refund with the correct amount even if the price in the shop changed later)

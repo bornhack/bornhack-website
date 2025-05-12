@@ -10,7 +10,7 @@ from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class Command(BaseCommand):
-    def handle(self, **options):
+    def handle(self, **options) -> None:
         adapter = get_adapter()
         authenticators = []
         for totp in TOTPDevice.objects.filter(confirmed=True).iterator():

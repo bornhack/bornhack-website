@@ -7,7 +7,7 @@ from django.db import migrations
 from tickets.models import create_ticket_token
 
 
-def save_tokens(apps, schema_editor):
+def save_tokens(apps, schema_editor) -> None:
     ShopTicket = apps.get_model("tickets", "ShopTicket")
     SponsorTicket = apps.get_model("tickets", "SponsorTicket")
     DiscountTicket = apps.get_model("tickets", "DiscountTicket")

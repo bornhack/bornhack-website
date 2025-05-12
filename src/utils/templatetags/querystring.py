@@ -6,9 +6,13 @@ Remove when django 5.1 is out
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django import template
-from django.template.context import RequestContext
 from django.utils.itercompat import is_iterable
+
+if TYPE_CHECKING:
+    from django.template.context import RequestContext
 
 register = template.Library()
 

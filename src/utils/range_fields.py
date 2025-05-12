@@ -1,4 +1,4 @@
-"""Borrowed from https://gist.github.com/schinckel/aeea9c0f807dd009bf47566df7ac5054
+"""Borrowed from https://gist.github.com/schinckel/aeea9c0f807dd009bf47566df7ac5054.
 
 This module overrides the Range.__and__ function, so that it returns a boolean value
 based on if the two objects overlap.
@@ -25,7 +25,7 @@ OFFSET = {
 def normalise(instance):
     """In the case of discrete ranges (integer, date), then we normalise the values
     so it is in the form [start,finish), the same way that postgres does.
-    If the lower value is None, we normalise this to (None,finish)
+    If the lower value is None, we normalise this to (None,finish).
     """
     if instance.isempty:
         return instance
@@ -104,7 +104,7 @@ def __eq__(self, other):
 
 
 def range_merge(self, other):
-    """Union"""
+    """Union."""
     self = normalise(self)
     other = normalise(other)
     bounds = [None, None]

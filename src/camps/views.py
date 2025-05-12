@@ -11,7 +11,7 @@ from django.views.generic import ListView
 
 from .models import Camp
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class CampRedirectView(View):
@@ -21,7 +21,7 @@ class CampRedirectView(View):
         try:
             camp = Camp.objects.get(camp__contains=now)
             logger.debug(
-                "Redirecting to camp '%s' for page '%s' because it is now!" % (camp.slug, kwargs["page"]),
+                "Redirecting to camp '{}' for page '{}' because it is now!".format(camp.slug, kwargs["page"]),
             )
             return redirect(kwargs["page"], camp_slug=camp.slug)
         except Camp.DoesNotExist:
@@ -66,8 +66,8 @@ class CampDetailView(DetailView):
     model = Camp
     slug_url_kwarg = "camp_slug"
 
-    def get_template_names(self):
-        return "%s_camp_detail.html" % self.get_object().slug
+    def get_template_names(self) -> str:
+        return f"{self.get_object().slug}_camp_detail.html"
 
 
 class CampListView(ListView):

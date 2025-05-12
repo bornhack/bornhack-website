@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def populate_logo_filename(apps, schema_editor):
+def populate_logo_filename(apps, schema_editor) -> None:
     Sponsor = apps.get_model("sponsors", "Sponsor")
     for sponsor in Sponsor.objects.all():
         sponsor.logo_filename = sponsor.logo.split("/")[-1]

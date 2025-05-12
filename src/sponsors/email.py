@@ -8,7 +8,7 @@ from django.conf import settings
 from teams.models import Team
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_sponsorticket_email(ticket):

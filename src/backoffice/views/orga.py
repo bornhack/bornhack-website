@@ -11,6 +11,7 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic.edit import FormView
 
+from backoffice.mixins import OrgaTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
 from shop.models import OrderProductRelation
@@ -19,9 +20,7 @@ from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
 
-from ..mixins import OrgaTeamPermissionMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
@@ -138,11 +137,11 @@ class VillageToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
 
 
 class OutgoingEmailMassUpdateView(CampViewMixin, OrgaTeamPermissionMixin, FormView):
-    """This view shows a list with forms to edit OutgoingEmail objects with hold=True"""
+    """This view shows a list with forms to edit OutgoingEmail objects with hold=True."""
 
     template_name = "outgoing_email_mass_update.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         """Get emails with no team and emails with a team for the current camp."""
         super().setup(*args, **kwargs)
         self.queryset = OutgoingEmail.objects.filter(
@@ -213,11 +212,10 @@ class ShopTicketStatsView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "ticket_stats.html"
 
     def get_queryset(self):
-        query = TicketType.objects.filter(
+        return TicketType.objects.filter(
             camp=self.camp,
             shopticket__isnull=False,
         ).with_price_stats()
-        return query
 
 
 class ShopTicketStatsDetailView(CampViewMixin, OrgaTeamPermissionMixin, ListView):

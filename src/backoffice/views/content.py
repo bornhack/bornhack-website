@@ -8,16 +8,15 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
+from backoffice.forms import AddRecordingForm
+from backoffice.mixins import ContentTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from program.models import Event
 from program.models import EventFeedback
 from program.models import Url
 from program.models import UrlType
 
-from ..forms import AddRecordingForm
-from ..mixins import ContentTeamPermissionMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
@@ -26,7 +25,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     model = EventFeedback
     template_name = "approve_feedback.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.queryset = EventFeedback.objects.filter(
             event__track__camp=self.camp,
@@ -75,7 +74,7 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
     model = Event
     template_name = "add_recording.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.queryset = Event.objects.filter(
             track__camp=self.camp,

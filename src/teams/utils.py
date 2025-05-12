@@ -4,7 +4,7 @@ from .models import Team
 
 
 def get_team_from_irc_channel(channel):
-    """Returns a Team object given an IRC channel name, if possible"""
+    """Returns a Team object given an IRC channel name, if possible."""
     if not channel:
         return False
     # check if this channel is a private_irc_channel for a team

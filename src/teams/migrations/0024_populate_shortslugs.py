@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def populate_team_shortslugs(apps, schema_editor):
+def populate_team_shortslugs(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
     for team in Team.objects.all():
         if not team.shortslug:

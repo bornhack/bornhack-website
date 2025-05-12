@@ -10,15 +10,15 @@ from django.views.generic import UpdateView
 
 from camps.mixins import CampViewMixin
 from profiles.models import Profile
+from teams.email import add_added_membership_email
+from teams.email import add_removed_membership_email
+from teams.models import Team
+from teams.models import TeamMember
 
-from ..email import add_added_membership_email
-from ..email import add_removed_membership_email
-from ..models import Team
-from ..models import TeamMember
 from .mixins import EnsureTeamMemberLeadMixin
 from .mixins import TeamViewMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamMembersView(CampViewMixin, DetailView):
@@ -58,7 +58,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
         TeamMember.objects.create(team=self.get_object(), user=self.request.user)
         messages.success(
             self.request,
-            "You request to join the team %s has been registered, thank you." % self.get_object().name,
+            f"You request to join the team {self.get_object().name} has been registered, thank you.",
         )
         return redirect("teams:list", camp_slug=self.get_object().camp.slug)
 
@@ -84,7 +84,7 @@ class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
         ).delete()
         messages.success(
             self.request,
-            "You are no longer a member of the team %s" % self.get_object().name,
+            f"You are no longer a member of the team {self.get_object().name}",
         )
         return redirect("teams:list", camp_slug=self.get_object().camp.slug)
 

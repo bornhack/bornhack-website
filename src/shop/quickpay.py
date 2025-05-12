@@ -11,13 +11,13 @@ from .models import QuickPayAPIRequest
 
 # from .models import QuickPayPayment
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class QuickPay:
     """A small wrapper around the QuickPay client to log API requests and responses."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise the QuickPay client."""
         self.client = QPClient(f":{settings.QUICKPAY_API_KEY}")
 
@@ -38,7 +38,7 @@ class QuickPay:
                 raw=True,
             )
         except ApiError as e:
-            logger.error(f"QuickPay API error: {e}")
+            logger.exception(f"QuickPay API error: {e}")
             request.response_status_code = e.status_code
             # no headers returned in the ApiError object
             # request.response_headers = dict(e.headers)
@@ -53,6 +53,7 @@ class QuickPay:
         # create or update related QuickPayAPIObject
         if request.response_status_code in [200, 201]:
             return request.create_or_update_object()
+        return None
 
     def create_payment(self, order):
         """Create and return a QuickPayAPIPayment object."""
@@ -66,8 +67,7 @@ class QuickPay:
             },
         )
         qpr.save()
-        payment = self.do_request(qpr)
-        return payment
+        return self.do_request(qpr)
 
     def get_payment_link(self, payment, request):
         """Get a payment link for this payment."""

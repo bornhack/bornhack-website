@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def add_event_tracks(apps, schema_editor):
+def add_event_tracks(apps, schema_editor) -> None:
     Camp = apps.get_model("camps", "Camp")
     EventTrack = apps.get_model("program", "EventTrack")
     EventProposal = apps.get_model("program", "EventProposal")

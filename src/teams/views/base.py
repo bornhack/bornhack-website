@@ -12,13 +12,13 @@ from django.views.generic import ListView
 from django.views.generic.edit import UpdateView
 
 from camps.mixins import CampViewMixin
+from teams.models import Team
+from teams.models import TeamMember
 from utils.widgets import MarkdownWidget
 
-from ..models import Team
-from ..models import TeamMember
 from .mixins import EnsureTeamLeadMixin
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamListView(CampViewMixin, ListView):
@@ -29,12 +29,11 @@ class TeamListView(CampViewMixin, ListView):
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related("members")
-        qs = qs.prefetch_related("members__profile")
+        return qs.prefetch_related("members__profile")
         # FIXME: there is more to be gained here but the templatetag we use to see if
         # the logged-in user is a member of the current team does not benefit from the prefetching,
         # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
-        return qs
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
@@ -174,11 +173,7 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         membership.save()
         messages.success(
             self.request,
-            "OK, hang on while we fix the permissions for your NickServ user '%s' for IRC channel '%s'"
-            % (
-                self.request.user.profile.nickserv_username,
-                form.instance.irc_channel_name,
-            ),
+            f"OK, hang on while we fix the permissions for your NickServ user '{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'",
         )
         return redirect(
             "teams:general",

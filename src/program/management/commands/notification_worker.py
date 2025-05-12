@@ -12,19 +12,19 @@ from camps.utils import get_current_camp
 from ircbot.models import OutgoingIrcMessage
 from program.models import EventInstance
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Command(BaseCommand):
     args = "none"
     help = "Queue notifications for channels and users for upcoming event instances."
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
             "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         self.output("Schedule notification worker running...")
         while True:
             camp = get_current_camp()
@@ -43,7 +43,7 @@ class Command(BaseCommand):
                     # this event is less than settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES minutes from starting, queue an IRC notificatio
                     oim = OutgoingIrcMessage.objects.create(
                         target=settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL,
-                        message="starting soon: %s" % ei,
+                        message=f"starting soon: {ei}",
                         timeout=ei.when.lower,
                     )
                     logger.info(

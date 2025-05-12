@@ -12,7 +12,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def get_daychunks(day):
@@ -111,8 +111,8 @@ def get_speaker_availability_form_matrix(sessions):
     # where none of the chunks need a checkbox. Loop over and remove any days with
     # 0 checkboxes before returning
     new_matrix = matrix.copy()
-    for date in matrix.keys():
-        for chunk in matrix[date].keys():
+    for date in matrix:
+        for chunk in matrix[date]:
             if matrix[date][chunk]:
                 # we have at least one checkbox on this date, keep it
                 break
@@ -123,7 +123,7 @@ def get_speaker_availability_form_matrix(sessions):
     return new_matrix
 
 
-def save_speaker_availability(form, obj):
+def save_speaker_availability(form, obj) -> None:
     """Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
     and CombinedProposalSubmitView to create SpeakerProposalAvailability
     objects based on the submitted form.
@@ -148,7 +148,7 @@ def save_speaker_availability(form, obj):
 
     # count availability form fields
     fieldcounter = 0
-    for field in form.cleaned_data.keys():
+    for field in form.cleaned_data:
         if field[:13] == "availability_":
             fieldcounter += 1
 
@@ -230,7 +230,7 @@ def save_speaker_availability(form, obj):
         )
 
 
-def add_existing_availability_to_matrix(matrix, speaker_proposal):
+def add_existing_availability_to_matrix(matrix, speaker_proposal) -> None:
     """Loops over the matrix and adds an "intial" member to the daychunk dicts
     with the availability info for the speaker_proposal.
     This is used to populate initial form field values and to set <td> background
@@ -238,9 +238,9 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
     speaker_proposal can be either a SpeakerProposal object or a Speaker object.
     """
     # loop over dates in the matrix
-    for date in matrix.keys():
+    for date in matrix:
         # loop over daychunks and check if we need a checkbox
-        for daychunk in matrix[date].keys():
+        for daychunk in matrix[date]:
             if not matrix[date][daychunk]:
                 # we have no event_session here, carry on
                 continue
@@ -255,7 +255,7 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
 
 
 def get_slots(period, duration, bounds="()"):
-    """Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them"""
+    """Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them."""
     slots = []
     if period.upper - period.lower < timedelta(minutes=duration):
         # this period is shorter than the duration, no slots

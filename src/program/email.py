@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from teams.models import Team
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_new_speaker_proposal_email(speaker_proposal):
@@ -25,7 +25,7 @@ def add_new_speaker_proposal_email(speaker_proposal):
         html_template="emails/new_speaker_proposal.html",
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
-        subject="New speaker proposal '%s' was just submitted" % speaker_proposal.name,
+        subject=f"New speaker proposal '{speaker_proposal.name}' was just submitted",
         hold=False,
     )
 
@@ -45,7 +45,7 @@ def add_new_event_proposal_email(event_proposal):
         html_template="emails/new_event_proposal.html",
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
-        subject="New event proposal '%s' was just submitted" % event_proposal.title,
+        subject=f"New event proposal '{event_proposal.title}' was just submitted",
         hold=False,
     )
 
@@ -65,7 +65,7 @@ def add_speaker_proposal_updated_email(speaker_proposal):
         html_template="emails/update_speaker_proposal.html",
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
-        subject="Speaker proposal '%s' was just updated" % speaker_proposal.name,
+        subject=f"Speaker proposal '{speaker_proposal.name}' was just updated",
         hold=False,
     )
 
@@ -85,7 +85,7 @@ def add_event_proposal_updated_email(event_proposal):
         html_template="emails/update_event_proposal.html",
         to_recipients=content_team.mailing_list,
         formatdict=formatdict,
-        subject="Event proposal '%s' was just updated" % event_proposal.title,
+        subject=f"Event proposal '{event_proposal.title}' was just updated",
         hold=False,
     )
 
@@ -170,7 +170,7 @@ def add_event_proposal_accepted_email(event_proposal):
     )
 
 
-def add_event_scheduled_email(slot):
+def add_event_scheduled_email(slot) -> bool | None:
     formatdict = {"slot": slot}
     # add all speaker emails
     recipients = [speaker.email for speaker in slot.event.speakers.all()]
@@ -194,3 +194,4 @@ def add_event_scheduled_email(slot):
             subject=f"Your {slot.camp.title} event '{slot.event.title}' has been scheduled!",
             hold=True,
         )
+    return None

@@ -19,7 +19,7 @@ def zip_lists(a, b):
 
 @register.filter()
 def truefalseicon(value):
-    """A template filter to show a green checkbox or red x depending on True/False value"""
+    """A template filter to show a green checkbox or red x depending on True/False value."""
     if value is True:
         return mark_safe("<i class='fas fa-check text-success'></i>")
     if value is False:

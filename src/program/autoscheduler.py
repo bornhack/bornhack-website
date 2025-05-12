@@ -14,7 +14,7 @@ from program.email import add_event_scheduled_email
 
 from .models import EventType
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class AutoScheduler:
@@ -29,8 +29,8 @@ class AutoScheduler:
     Initialising this class takes a while because all the objects have to be created.
     """
 
-    def __init__(self, camp, **kwargs):
-        """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects"""
+    def __init__(self, camp, **kwargs) -> None:
+        """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects."""
         self.camp = camp
 
         # Get all EventTypes which support autoscheduling
@@ -70,17 +70,17 @@ class AutoScheduler:
         )
 
     def get_event_types(self):
-        """Return all EventTypes which support autoscheduling"""
+        """Return all EventTypes which support autoscheduling."""
         return EventType.objects.filter(support_autoscheduling=True)
 
     def get_event_sessions(self, event_types):
-        """Return all EventSessions for these EventTypes"""
+        """Return all EventSessions for these EventTypes."""
         return self.camp.event_sessions.filter(
             event_type__in=event_types,
         ).prefetch_related("event_type", "event_location")
 
     def get_events(self, event_types):
-        """Return all Events that need scheduling"""
+        """Return all Events that need scheduling."""
         # return all events for these event_types, but..
         return self.camp.events.filter(event_type__in=event_types).exclude(
             # exclude Events that have been sceduled already...
@@ -90,7 +90,7 @@ class AutoScheduler:
         )
 
     def get_autoslots(self, event_sessions):
-        """Return a list of autoslots for all slots in all EventSessions"""
+        """Return a list of autoslots for all slots in all EventSessions."""
         autoslots = []
         # loop over the sessions
         for session in event_sessions:
@@ -107,7 +107,7 @@ class AutoScheduler:
         speaker_event_conflicts_constraint=True,
         speaker_availability_constraint=True,
     ):
-        """Return a list of resources.Event objects, one for each Event"""
+        """Return a list of resources.Event objects, one for each Event."""
         autoevents = []
         autoeventindex = {}
         eventindex = {}
@@ -254,7 +254,7 @@ class AutoScheduler:
 
             # did we find a slot matching this EventInstance?
             if not scheduled:
-                print(f"Could not find an autoslot for slot {slot} - skipping")
+                pass
 
         # The returned schedule might not be valid! For example if a speaker is no
         # longer available when their talk is scheduled. This is fine though, an invalid
@@ -263,7 +263,7 @@ class AutoScheduler:
 
     def calculate_autoschedule(self, original_schedule=None):
         """Calculate autoschedule based on self.autoevents and self.autoslots,
-        optionally using original_schedule to minimise changes
+        optionally using original_schedule to minimise changes.
         """
         kwargs = {}
         kwargs["events"] = self.autoevents
@@ -277,12 +277,11 @@ class AutoScheduler:
             # otherwise use the capacity demand difference thing
             kwargs["objective_function"] = objective_functions.efficiency_capacity_demand_difference
         # calculate the new schedule
-        autoschedule = scheduler.schedule(**kwargs)
-        return autoschedule
+        return scheduler.schedule(**kwargs)
 
     def calculate_similar_autoschedule(self, original_schedule=None):
         """Convenience method for creating similar schedules. If original_schedule
-        is omitted the new schedule is based on the current schedule instead
+        is omitted the new schedule is based on the current schedule instead.
         """
         if not original_schedule:
             # we do not have an original_schedule, use current EventInstances
@@ -294,7 +293,7 @@ class AutoScheduler:
         return autoschedule, diff
 
     def apply(self, autoschedule):
-        """Apply an autoschedule by creating EventInstance objects to match it"""
+        """Apply an autoschedule by creating EventInstance objects to match it."""
         # "The Clean Slate protocol sir?" - delete any existing autoscheduled Events
         # TODO: investigate how this affects the FRAB XML export (for which we added a UUID on
         # Slot objects). Make sure "favourite" functionality or bookmarks or w/e in
@@ -396,7 +395,7 @@ class AutoScheduler:
         return {"event_diffs": event_output, "slot_diffs": slot_output}
 
     def is_valid(self, autoschedule, return_violations=False):
-        """Check if a schedule is valid, optionally returning a list of violations if invalid"""
+        """Check if a schedule is valid, optionally returning a list of violations if invalid."""
         valid = is_valid_schedule(
             autoschedule,
             slots=self.autoslots,

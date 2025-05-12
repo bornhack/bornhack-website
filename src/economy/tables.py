@@ -101,10 +101,7 @@ class NameColumn(tables.Column):
             "backoffice:posproduct_list",
             kwargs={"camp_slug": table.request.camp.slug},
         )
-        if hasattr(record, "product"):
-            product = record.product
-        else:
-            product = record
+        product = record.product if hasattr(record, "product") else record
         link = f'<a href="{url}?prodid={product.external_id}">(show)</a>'
         return mark_safe(f"{button} {link}")
 
@@ -144,7 +141,7 @@ class PosProductTable(tables.Table):
         orderable=False,
     )
 
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, *args, **kwargs) -> None:
         """Do select/prefetch_related here so it happens after django-tables2s pagination."""
         super().__init__(
             data.prefetch_related(
@@ -254,7 +251,7 @@ class PosSaleTable(tables.Table):
     product__tags = TagsColumn(verbose_name="Tags")
     cost = CostColumn(verbose_name="Cost")
 
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, *args, **kwargs) -> None:
         """Do select/prefetch_related and annotations here so it happens after django-tables2s pagination."""
         super().__init__(
             data
@@ -305,7 +302,7 @@ class PosTransactionTable(tables.Table):
     products = tables.Column(verbose_name="Items Sold")
     timestamp = TimestampColumn(verbose_name="Transaction Timestamp")
 
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, *args, **kwargs) -> None:
         """Do select/prefetch_related here so it happens after django-tables2s pagination."""
         super().__init__(
             data
@@ -359,7 +356,7 @@ class PosProductCostTable(tables.Table):
         orderable=False,
     )
 
-    def __init__(self, data, *args, **kwargs):
+    def __init__(self, data, *args, **kwargs) -> None:
         """Do select/prefetch_related here so it happens after django-tables2s pagination."""
         super().__init__(
             data.prefetch_related("product"),

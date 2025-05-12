@@ -46,7 +46,7 @@ from shop.models import Order
 
 # we need the Danish timezone here and there
 cph = pytz.timezone("Europe/Copenhagen")
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def import_epay_csv(csvreader):
@@ -92,7 +92,7 @@ def import_epay_csv(csvreader):
 class CoinifyCSVImporter:
     @staticmethod
     def import_coinify_payment_intent_csv(csvreader):
-        """Import a CSV file from Coinify payment intents exporeted from there webinterface
+        """Import a CSV file from Coinify payment intents exporeted from there webinterface.
 
         Assumes a CSV structure like this:
         referenceId,referenceType,merchantId,merchantName,subaccountId,subaccountName,state,stateReason,orderId,customerEmail,requestedAmount,requestedCurrency,createTime,amount,currency
@@ -173,7 +173,7 @@ class CoinifyCSVImporter:
 
     @staticmethod
     def import_coinify_settlements_csv(csvreader):
-        """Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time"""
+        """Settlement ID,Account,Gross amount,Fee,Net amount,Payout amount,Create Time."""
         create_count = 0
         next(csvreader)
         for row in csvreader:
@@ -285,7 +285,7 @@ def import_clearhaus_csv(csvreader):
             defaults={
                 "merchant_id": row[0],
                 "merchant_name": row[1],
-                "settled": True if row[3] == "true" else False,
+                "settled": row[3] == "true",
                 "currency": row[4],
                 "period_start_date": row[5],
                 "period_end_date": row[6] if row[6] else None,
@@ -325,6 +325,7 @@ def import_clearhaus_csv(csvreader):
 def optional_int(value):
     if not pd.isnull(value):
         return value
+    return None
 
 
 def to_decimal(value):
@@ -345,7 +346,7 @@ class ZettleExcelImporter:
         The receipts sheet has 16 rows header and 3 rows footer to skip.
         Also skip columns B (redundant) and J (part of cardnumber).
         """
-        df = pd.read_excel(
+        return pd.read_excel(
             fh,
             skiprows=16,
             skipfooter=3,
@@ -366,7 +367,6 @@ class ZettleExcelImporter:
                 "Netto": to_decimal,  # G
             },
         )
-        return df
 
     @staticmethod
     def import_zettle_receipts_df(df):
@@ -398,7 +398,7 @@ class ZettleExcelImporter:
 
         The receipts sheet has no header or footer rows, and no columns to skip.
         """
-        df = pd.read_excel(
+        return pd.read_excel(
             fh,
             parse_dates=True,
             dtype={
@@ -410,7 +410,6 @@ class ZettleExcelImporter:
                 "Saldo": to_decimal,  # F
             },
         )
-        return df
 
     @staticmethod
     def import_zettle_balances_df(df):
@@ -514,11 +513,11 @@ class MobilePayCSVImporter:
 class AccountingExporter:
     """A class with methods for exporting all the financial data for the bookkeeper."""
 
-    def __init__(self, startdate, enddate):
+    def __init__(self, startdate, enddate) -> None:
         """Requires startdate and enddate."""
         self.period = DateTimeTZRange(startdate, enddate)
 
-    def doit(self):
+    def doit(self) -> None:
         """Do all the things."""
         with tempfile.TemporaryDirectory(prefix="django-accounting-") as tmpdir:
             workdir = Path(tmpdir)
@@ -651,10 +650,7 @@ class AccountingExporter:
                 created__lte=self.period.upper,
             )
             for order in orders:
-                if order.invoice:
-                    invoiceid = order.invoice.id
-                else:
-                    invoiceid = "N/A"
+                invoiceid = order.invoice.id if order.invoice else "N/A"
                 writer.writerow(
                     [
                         order.id,
@@ -1187,8 +1183,8 @@ class AccountingExporter:
                 )
         return (filename, transactions.count())
 
-    def create_index_html(self, workdir):
-        """Create a HTML file with links for everything"""
+    def create_index_html(self, workdir) -> None:
+        """Create a HTML file with links for everything."""
         context = {
             "period": self.period,
             "bankaccounts": self.bankaccounts,
@@ -1211,8 +1207,8 @@ class AccountingExporter:
         with open(workdir / "index.html", "w") as f:
             f.write(rendered)
 
-    def create_archive(self, workdir):
-        """Create an in-memory zip-file with all the CSV data and the HTML file"""
+    def create_archive(self, workdir) -> None:
+        """Create an in-memory zip-file with all the CSV data and the HTML file."""
         self.archivedata = io.BytesIO()
         subdir = "bornhack_accounting_export"
         with ZipFile(self.archivedata, "w") as zh:

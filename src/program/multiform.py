@@ -46,7 +46,7 @@ class MultiForm:
 
     form_classes = {}
 
-    def __init__(self, data=None, files=None, *args, **kwargs):
+    def __init__(self, data=None, files=None, *args, **kwargs) -> None:
         # Some things, such as the WizardView expect these to exist.
         self.data, self.files = data, files
         kwargs.update(
@@ -68,17 +68,14 @@ class MultiForm:
         """Returns the args and kwargs for initializing one of our form children."""
         fkwargs = kwargs.copy()
         prefix = kwargs.get("prefix")
-        if prefix is None:
-            prefix = key
-        else:
-            prefix = f"{key}__{prefix}"
+        prefix = key if prefix is None else f"{key}__{prefix}"
         fkwargs.update(
             initial=self.initials.get(key),
             prefix=prefix,
         )
         return args, fkwargs
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.as_table()
 
     def __getitem__(self, key):
@@ -119,7 +116,7 @@ class MultiForm:
         """
         return self.cleaned_data
 
-    def add_crossform_error(self, e):
+    def add_crossform_error(self, e) -> None:
         self.crossform_errors.append(e)
 
     def is_valid(self):
@@ -163,7 +160,7 @@ class MultiForm:
         return OrderedDict((key, form.cleaned_data) for key, form in self.forms.items() if form.is_valid())
 
     @cleaned_data.setter
-    def cleaned_data(self, data):
+    def cleaned_data(self, data) -> None:
         for key, value in data.items():
             child_form = self[key]
             if hasattr(child_form, "forms"):
@@ -179,7 +176,7 @@ class MultiModelForm(MultiForm):
     and adds a save method.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.instances = kwargs.pop("instance", None)
         if self.instances is None:
             self.instances = {}
@@ -204,7 +201,7 @@ class MultiModelForm(MultiForm):
 
         if any(hasattr(form, "save_m2m") for form in self.forms.values()):
 
-            def save_m2m():
+            def save_m2m() -> None:
                 for form in self.forms.values():
                     if hasattr(form, "save_m2m"):
                         form.save_m2m()

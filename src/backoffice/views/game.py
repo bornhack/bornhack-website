@@ -16,13 +16,12 @@ from django.views.generic.edit import CreateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import UpdateView
 
+from backoffice.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from tokens.models import Token
 from tokens.models import TokenFind
 
-from ..mixins import RaisePermissionRequiredMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 ################################
@@ -30,7 +29,7 @@ logger = logging.getLogger("bornhack.%s" % __name__)
 
 
 class TokenListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
-    """Show a list of secret tokens for this camp"""
+    """Show a list of secret tokens for this camp."""
 
     permission_required = "camps.game_team_member"
     model = Token
@@ -92,7 +91,7 @@ class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
 
 
 class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
-    """Show stats for token finds for this camp"""
+    """Show stats for token finds for this camp."""
 
     permission_required = "camps.game_team_member"
     model = User

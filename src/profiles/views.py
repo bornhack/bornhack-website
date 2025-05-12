@@ -88,18 +88,17 @@ class ProfilePermissionList(LoginRequiredMixin, ListView):
             app_label, codename = perm.split(".")
             query |= Q(content_type__app_label=app_label, codename=codename)
         # get and return the objects
-        perms = (
+        return (
             Permission.objects.none()
             .filter(query)
             .exclude(
                 codename__in=["add_camp", "change_camp", "delete_camp", "view_camp"],
             )
         )
-        return perms
 
 
 class ProfileSessionThemeSwitchView(View):
-    """View for setting the Session theme"""
+    """View for setting the Session theme."""
 
     def get(self, request, *args, **kwargs):
         theme = request.GET.get("theme") or "default"
@@ -117,7 +116,7 @@ class ProfileOIDCView(LoginRequiredMixin, FormView):
     template_name = "oidc.html"
     form_class = OIDCForm
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         validator = BornhackOAuth2Validator()
         self.scopes = validator.oidc_claim_scope
@@ -137,9 +136,7 @@ class ProfileOIDCView(LoginRequiredMixin, FormView):
             if scope in self.request.GET.getlist(key="scopes"):
                 context["claims"][claim] = value
         context["scopes"] = self.scopes
-        context["active_scopes"] = ["openid"] + sorted(
-            set(self.request.GET.getlist(key="scopes")),
-        )
+        context["active_scopes"] = ["openid", *sorted(set(self.request.GET.getlist(key="scopes")))]
         context["all_scopes"] = sorted(set(self.scopes.values()))
         del context["all_scopes"][context["all_scopes"].index("openid")]
         return context

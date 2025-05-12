@@ -15,7 +15,7 @@ class FeedbackAdmin(admin.ModelAdmin):
     actions = ["mark_as_processed"]
 
     @admin.action(description="Mark this feedback as processed")
-    def mark_as_processed(self, request, queryset):
+    def mark_as_processed(self, request, queryset) -> None:
         queryset.update(
             processed_at=timezone.now(),
             processed_by=request.user,

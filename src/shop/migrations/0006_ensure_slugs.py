@@ -4,7 +4,7 @@ from __future__ import annotations
 from django.db import migrations
 
 
-def ensure_slugs(apps, schema_editor):
+def ensure_slugs(apps, schema_editor) -> None:
     ProductCategory = apps.get_model("shop", "ProductCategory")
     Product = apps.get_model("shop", "Product")
 

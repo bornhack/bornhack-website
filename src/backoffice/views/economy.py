@@ -21,6 +21,13 @@ from django.views.generic import ListView
 from django.views.generic import TemplateView
 from django.views.generic import UpdateView
 
+from backoffice.forms import BankCSVForm
+from backoffice.forms import ClearhausSettlementForm
+from backoffice.forms import CoinifyCSVForm
+from backoffice.forms import EpayCSVForm
+from backoffice.forms import MobilePayCSVForm
+from backoffice.forms import ZettleUploadForm
+from backoffice.mixins import EconomyTeamPermissionMixin
 from camps.mixins import CampViewMixin
 from economy.models import AccountingExport
 from economy.models import Bank
@@ -49,15 +56,7 @@ from economy.utils import import_clearhaus_csv
 from economy.utils import import_epay_csv
 from utils.mixins import VerbUpdateView
 
-from ..forms import BankCSVForm
-from ..forms import ClearhausSettlementForm
-from ..forms import CoinifyCSVForm
-from ..forms import EpayCSVForm
-from ..forms import MobilePayCSVForm
-from ..forms import ZettleUploadForm
-from ..mixins import EconomyTeamPermissionMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 ################################
@@ -70,7 +69,7 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
 
     def get_queryset(self, *args, **kwargs):
         """Annotate the total count and amount for expenses and revenues for all credebtors in each chain."""
-        qs = Chain.objects.annotate(
+        return Chain.objects.annotate(
             camp_expenses_amount=Sum(
                 "credebtors__expenses__amount",
                 filter=Q(credebtors__expenses__camp=self.camp),
@@ -92,7 +91,6 @@ class ChainListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
                 distinct=True,
             ),
         )
-        return qs
 
 
 class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
@@ -103,7 +101,7 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
     def get_queryset(self, *args, **kwargs):
         """Annotate the Chain object with the camp filtered expense and revenue info."""
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.annotate(
+        return qs.annotate(
             camp_expenses_amount=Sum(
                 "credebtors__expenses__amount",
                 filter=Q(credebtors__expenses__camp=self.camp),
@@ -125,7 +123,6 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
                 distinct=True,
             ),
         )
-        return qs
 
     def get_context_data(self, *args, **kwargs):
         """Add credebtors, expenses and revenues to the context in camp-filtered versions."""
@@ -196,7 +193,7 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     template_name = "expense_list_backoffice.html"
 
     def get_queryset(self, **kwargs):
-        """Exclude unapproved expenses, they are shown seperately"""
+        """Exclude unapproved expenses, they are shown seperately."""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "creditor",
@@ -205,7 +202,7 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        """Include unapproved expenses seperately"""
+        """Include unapproved expenses seperately."""
         context = super().get_context_data(**kwargs)
         context["unapproved_expenses"] = Expense.objects.filter(
             camp=self.camp,
@@ -224,7 +221,7 @@ class ExpenseDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     fields = ["notes"]
 
     def form_valid(self, form):
-        """We have two submit buttons in this form, Approve and Reject"""
+        """We have two submit buttons in this form, Approve and Reject."""
         expense = form.save()
         if "approve" in form.data:
             # approve button was pressed
@@ -319,7 +316,7 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
     template_name = "revenue_list_backoffice.html"
 
     def get_queryset(self, **kwargs):
-        """Exclude unapproved revenues, they are shown seperately"""
+        """Exclude unapproved revenues, they are shown seperately."""
         queryset = super().get_queryset(**kwargs)
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "debtor",
@@ -328,7 +325,7 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         )
 
     def get_context_data(self, **kwargs):
-        """Include unapproved revenues seperately"""
+        """Include unapproved revenues seperately."""
         context = super().get_context_data(**kwargs)
         context["unapproved_revenues"] = Revenue.objects.filter(
             camp=self.camp,
@@ -343,7 +340,7 @@ class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
     fields = ["notes"]
 
     def form_valid(self, form):
-        """We have two submit buttons in this form, Approve and Reject"""
+        """We have two submit buttons in this form, Approve and Reject."""
         revenue = form.save()
         if "approve" in form.data:
             # approve button was pressed
@@ -377,7 +374,7 @@ class BankCSVUploadView(CampViewMixin, EconomyTeamPermissionMixin, FormView):
     form_class = BankCSVForm
     template_name = "bank_csv_upload_form.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.bank = Bank.objects.get(pk=kwargs["bank_uuid"])
 
@@ -900,9 +897,8 @@ class AccountingExportDownloadFileView(
     def get(self, request, *args, **kwargs):
         ae = self.get_object()
         filename = kwargs["filename"]
-        with zipfile.ZipFile(ae.archive.path) as z:
-            with z.open("bornhack_accounting_export/" + filename) as f:
-                data = f.read()
+        with zipfile.ZipFile(ae.archive.path) as z, z.open("bornhack_accounting_export/" + filename) as f:
+            data = f.read()
         mimetype = magic.from_buffer(data, mime=True)
         response = HttpResponse(content_type=mimetype)
         response["Content-Disposition"] = f"attachment; filename={filename}"

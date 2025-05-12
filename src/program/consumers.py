@@ -16,7 +16,7 @@ from .models import Speaker
 class ScheduleConsumer(JsonWebsocketConsumer):
     groups = ["schedule_users"]
 
-    def receive(self, text_data, **kwargs):
+    def receive(self, text_data, **kwargs) -> None:
         user = self.scope["user"]
         content = self.decode_json(text_data)
         action = content.get("action")
@@ -89,5 +89,5 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         if data:
             self.send_json(data)
 
-    def disconnect(self, message, **kwargs):
+    def disconnect(self, message, **kwargs) -> None:
         pass

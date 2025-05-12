@@ -44,7 +44,7 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
     template_name = "dashboard.html"
 
     def get_context_data(self, **kwargs):
-        """Add expenses, reimbursements and revenues to the context"""
+        """Add expenses, reimbursements and revenues to the context."""
         context = super().get_context_data(**kwargs)
 
         # get reimbursement stats
@@ -139,7 +139,7 @@ class ChainCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
         # a message for the user
         messages.success(
             self.request,
-            "The new Chain %s has been saved. You can now add Creditor(s)/Debtor(s) for it." % chain.name,
+            f"The new Chain {chain.name} has been saved. You can now add Creditor(s)/Debtor(s) for it.",
         )
 
         return HttpResponseRedirect(
@@ -168,7 +168,7 @@ class CredebtorCreateView(
     fields = ["name", "address", "notes"]
 
     def get_context_data(self, **kwargs):
-        """Add chain to context"""
+        """Add chain to context."""
         context = super().get_context_data(**kwargs)
         context["chain"] = self.chain
         return context
@@ -181,7 +181,7 @@ class CredebtorCreateView(
         # a message for the user
         messages.success(
             self.request,
-            "The Creditor/Debtor %s has been saved. You can now add Expenses/Revenues for it." % credebtor.name,
+            f"The Creditor/Debtor {credebtor.name} has been saved. You can now add Expenses/Revenues for it.",
         )
 
         return HttpResponseRedirect(
@@ -203,7 +203,7 @@ class CredebtorListView(
     permission_required = "camps.expense_create_permission"
 
     def get_context_data(self, **kwargs):
-        """Add chain to context"""
+        """Add chain to context."""
         context = super().get_context_data(**kwargs)
         context["chain"] = self.chain
         return context
@@ -239,7 +239,7 @@ class ExpenseCreateView(
     form_class = ExpenseCreateForm
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -268,8 +268,7 @@ class ExpenseCreateView(
             ),
             text_template="emails/expense_awaiting_approval_email.txt",
             formatdict={"expense": expense},
-            subject="New %s expense for %s Team is awaiting approval"
-            % (expense.camp.title, expense.responsible_team.name),
+            subject=f"New {expense.camp.title} expense for {expense.responsible_team.name} Team is awaiting approval",
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 
@@ -297,7 +296,7 @@ class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
         return response
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -308,7 +307,7 @@ class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
     def get_success_url(self):
         messages.success(
             self.request,
-            "Expense %s has been updated" % self.get_object().pk,
+            f"Expense {self.get_object().pk} has been updated",
         )
         return reverse("economy:expense_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -326,7 +325,7 @@ class ExpenseDeleteView(CampViewMixin, ExpensePermissionMixin, UpdateView):
                 "This expense has already been approved, it cannot be deleted",
             )
         else:
-            message = "Expense %s has been deleted" % expense.pk
+            message = f"Expense {expense.pk} has been deleted"
             expense.delete()
             messages.success(self.request, message)
         return redirect(self.get_success_url())
@@ -337,7 +336,7 @@ class ExpenseDeleteView(CampViewMixin, ExpensePermissionMixin, UpdateView):
 
 class ExpenseInvoiceView(CampViewMixin, ExpensePermissionMixin, DetailView):
     """This view returns the invoice for an Expense with the proper mimetype
-    Uses ExpensePermissionMixin to make sure the user is allowed to see the image
+    Uses ExpensePermissionMixin to make sure the user is allowed to see the image.
     """
 
     model = Expense
@@ -418,7 +417,7 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
         return context
 
     def form_valid(self, form):
-        """Set user and camp for the Reimbursement before saving"""
+        """Set user and camp for the Reimbursement before saving."""
         # get the expenses for this user
         expenses = Expense.objects.filter(
             user=self.request.user,
@@ -557,7 +556,7 @@ class RevenueCreateView(
     form_class = RevenueCreateForm
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -586,8 +585,7 @@ class RevenueCreateView(
             ),
             text_template="emails/revenue_awaiting_approval_email.txt",
             formatdict={"revenue": revenue},
-            subject="New %s revenue for %s Team is awaiting approval"
-            % (revenue.camp.title, revenue.responsible_team.name),
+            subject=f"New {revenue.camp.title} revenue for {revenue.responsible_team.name} Team is awaiting approval",
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 
@@ -615,7 +613,7 @@ class RevenueUpdateView(CampViewMixin, RevenuePermissionMixin, UpdateView):
         return response
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown"""
+        """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
         context["form"].fields["responsible_team"].queryset = Team.objects.filter(
             camp=self.camp,
@@ -625,7 +623,7 @@ class RevenueUpdateView(CampViewMixin, RevenuePermissionMixin, UpdateView):
     def get_success_url(self):
         messages.success(
             self.request,
-            "Revenue %s has been updated" % self.get_object().pk,
+            f"Revenue {self.get_object().pk} has been updated",
         )
         return reverse("economy:revenue_list", kwargs={"camp_slug": self.camp.slug})
 
@@ -643,7 +641,7 @@ class RevenueDeleteView(CampViewMixin, RevenuePermissionMixin, UpdateView):
                 "This revenue has already been approved, it cannot be deleted",
             )
         else:
-            message = "Revenue %s has been deleted" % revenue.pk
+            message = f"Revenue {revenue.pk} has been deleted"
             revenue.delete()
             messages.success(self.request, message)
         return redirect(self.get_success_url())
@@ -654,7 +652,7 @@ class RevenueDeleteView(CampViewMixin, RevenuePermissionMixin, UpdateView):
 
 class RevenueInvoiceView(CampViewMixin, RevenuePermissionMixin, DetailView):
     """This view returns a http response with the invoice for a Revenue object, with the proper mimetype
-    Uses RevenuePermissionMixin to make sure the user is allowed to see the file
+    Uses RevenuePermissionMixin to make sure the user is allowed to see the file.
     """
 
     model = Revenue

@@ -6,7 +6,7 @@ import uuid
 from django.db import migrations
 
 
-def gen_uuid(apps, schema_editor):
+def gen_uuid(apps, schema_editor) -> None:
     MyModel = apps.get_model("program", "EventInstance")
     for row in MyModel.objects.all():
         row.uuid = uuid.uuid4()

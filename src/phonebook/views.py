@@ -30,7 +30,7 @@ from .forms import DectRegistrationForm
 from .mixins import DectRegistrationViewMixin
 from .models import DectRegistration
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 dectutil = DectUtils()
 
 
@@ -39,7 +39,7 @@ class DectExportJsonView(
     ScopedProtectedResourceView,
     JsonView,
 ):
-    """JSON export for the POC team / DECT system"""
+    """JSON export for the POC team / DECT system."""
 
     required_scopes = ["phonebook:read"]
 
@@ -69,10 +69,7 @@ class DectExportJsonView(
             }
             if poc:
                 # POC member, include extra info
-                if dect.ipei:
-                    ipei = dectutil.format_ipei(dect.ipei[0], dect.ipei[1])
-                else:
-                    ipei = None
+                ipei = dectutil.format_ipei(dect.ipei[0], dect.ipei[1]) if dect.ipei else None
                 entry.update(
                     {
                         "activation_code": dect.activation_code,
@@ -138,7 +135,7 @@ class DectRegistrationListView(LoginRequiredMixin, CampViewMixin, ListView):
     template_name = "dectregistration_list.html"
 
     def get_queryset(self, *args, **kwargs):
-        """Show only DectRegistration entries belonging to the current user"""
+        """Show only DectRegistration entries belonging to the current user."""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 

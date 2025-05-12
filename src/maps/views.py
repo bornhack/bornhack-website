@@ -43,7 +43,7 @@ from .models import Layer
 from .models import UserLocation
 from .models import UserLocationType
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class MissingCredentials(Exception):
@@ -51,7 +51,7 @@ class MissingCredentials(Exception):
 
 
 class MapMarkerView(TemplateView):
-    """View for generating the coloured marker"""
+    """View for generating the coloured marker."""
 
     template_name = "marker.svg"
 
@@ -85,7 +85,7 @@ class MapMarkerView(TemplateView):
 
 
 class MapView(CampViewMixin, TemplateView):
-    """Global map view"""
+    """Global map view."""
 
     template_name = "maps_map.html"
     context_object_name = "maps_map"
@@ -153,10 +153,10 @@ class MapView(CampViewMixin, TemplateView):
 
 
 class LayerGeoJSONView(LayerViewMixin, JsonView):
-    """GeoJSON export view"""
+    """GeoJSON export view."""
 
     def get_context_data(self, **kwargs):
-        context = json.loads(
+        return json.loads(
             serialize(
                 "geojson",
                 Feature.objects.filter(layer=self.layer.uuid),
@@ -172,7 +172,6 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
                 ],
             ),
         )
-        return context
 
 
 class MapProxyView(View):
@@ -230,7 +229,7 @@ class MapProxyView(View):
         return response
 
     def is_endpoint_valid(self, path: str) -> None:
-        """Validate request path against whitelisted endpoints or raise PermDenied"""
+        """Validate request path against whitelisted endpoints or raise PermDenied."""
         endpoint = path.replace(self.PROXY_URL, "", 1)
         if endpoint not in self.VALID_ENDPOINTS:
             logger.warning(
@@ -241,17 +240,16 @@ class MapProxyView(View):
             raise PermissionDenied("No thanks")
 
     def sanitize_path(self, path: str) -> str:
-        """Sanitize path by removing PROXY_URL and set 'transparent' value to upper"""
+        """Sanitize path by removing PROXY_URL and set 'transparent' value to upper."""
         new_path = path.replace(self.PROXY_URL, "", 1)
-        sanitized_path = re.sub(
+        return re.sub(
             r"(transparent=)(true|false)",
             lambda match: rf"{match.group(1)}{match.group(2).upper()}",
             new_path,
         )
-        return sanitized_path
 
     def append_credentials(self, path: str) -> str:
-        """Verify credentials are defined in settings & append or raise exception"""
+        """Verify credentials are defined in settings & append or raise exception."""
         username = settings.DATAFORDELER_USER
         password = settings.DATAFORDELER_PASSWORD
         if not username or not password:
@@ -267,7 +265,7 @@ class MapProxyView(View):
 
 
 class UserLocationLayerView(CampViewMixin, JsonView):
-    """UserLocation geojson view"""
+    """UserLocation geojson view."""
 
     def get_context_data(self, **kwargs):
         context = {}
@@ -316,7 +314,7 @@ class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
     def get_queryset(self, *args, **kwargs):
-        """Show only entries belonging to the current user"""
+        """Show only entries belonging to the current user."""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 

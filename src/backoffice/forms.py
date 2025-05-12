@@ -83,7 +83,7 @@ class AutoScheduleApplyForm(forms.Form):
 
 
 class EventScheduleForm(forms.Form):
-    """The EventSlots are added in the view and help_text is not visible, just define the field"""
+    """The EventSlots are added in the view and help_text is not visible, just define the field."""
 
     slot = forms.ChoiceField()
 
@@ -99,8 +99,8 @@ class SpeakerForm(forms.ModelForm):
             "event_conflicts",
         ]
 
-    def __init__(self, camp, matrix=None, *args, **kwargs):
-        """Initialise the form and add availability fields to form"""
+    def __init__(self, camp, matrix=None, *args, **kwargs) -> None:
+        """Initialise the form and add availability fields to form."""
         super().__init__(*args, **kwargs)
 
         matrix = matrix or {}
@@ -109,7 +109,7 @@ class SpeakerForm(forms.ModelForm):
         if not matrix:
             return
         # add speaker availability fields
-        for date in matrix.keys():
+        for date in matrix:
             # do we need a column for this day?
             if not matrix[date]:
                 # nothing on this day, skip it
@@ -134,7 +134,7 @@ class SpeakerForm(forms.ModelForm):
 
 
 class BankCSVForm(forms.Form):
-    def __init__(self, bank, *args, **kwargs):
+    def __init__(self, bank, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         for account in bank.accounts.all():
             self.fields[str(account.pk)] = forms.FileField(
@@ -207,7 +207,7 @@ class ShopTicketRefundForm(forms.ModelForm):
 
     refund = forms.BooleanField(required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.fields["refund"].label = self.instance.name or "Unnamed ticket"
 
@@ -281,7 +281,7 @@ class MapLayerFeaturesImportForm(forms.Form):
 class ManageTeamPermissionsForm(forms.Form):
     """The form used in backoffice to manage permissions for a team."""
 
-    def __init__(self, matrix: dict[str, list[str]], *args, **kwargs):
+    def __init__(self, matrix: dict[str, list[str]], *args, **kwargs) -> None:
         """Build a form of bool fields for the teams users permissions."""
         super().__init__(*args, **kwargs)
         for username in matrix:

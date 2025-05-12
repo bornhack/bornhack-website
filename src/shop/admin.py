@@ -95,7 +95,7 @@ def available_to(product):
     return "None"
 
 
-def stock_info(product):
+def stock_info(product) -> str:
     if product.stock_amount:
         return f"{product.left_in_stock} / {product.stock_amount}"
     return "N/A"
@@ -175,19 +175,19 @@ class OrderAdmin(admin.ModelAdmin):
         "create_tickets",
     ]
 
-    def mark_order_as_paid(self, request, queryset):
+    def mark_order_as_paid(self, request, queryset) -> None:
         for order in queryset.filter(paid=False):
             order.mark_as_paid(request)
 
     mark_order_as_paid.description = "Mark order(s) as paid"
 
-    def mark_order_as_cancelled(self, request, queryset):
+    def mark_order_as_cancelled(self, request, queryset) -> None:
         for order in queryset.filter(cancelled=False):
             order.mark_as_cancelled(request)
 
     mark_order_as_cancelled.description = "Mark order(s) as cancelled"
 
-    def create_tickets(self, request, queryset):
+    def create_tickets(self, request, queryset) -> None:
         for order in queryset.filter(paid=True):
             order.create_tickets(request)
 

@@ -19,10 +19,10 @@ class NewsItem(ExportModelOperationsMixin("news_item"), CreatedUpdatedModel):
     slug = models.SlugField(max_length=255, blank=True)
     archived = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if self.published_at:
             # if this is a new newsitem, or it doesn't have a slug, or the slug is in use on another item, create a new slug
             if not self.pk or not self.slug or NewsItem.objects.filter(slug=self.slug).count() > 1:

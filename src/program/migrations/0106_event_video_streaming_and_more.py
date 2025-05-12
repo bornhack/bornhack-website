@@ -5,7 +5,7 @@ from django.db import migrations
 from django.db import models
 
 
-def update_streaming(apps, schema_editor):
+def update_streaming(apps, schema_editor) -> None:
     # We can't import the models directly as it may be a newer
     # version than this migration expects. We use the historical version.
     Event = apps.get_model("program", "Event")

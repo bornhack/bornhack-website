@@ -5,7 +5,7 @@ from django.contrib.auth.models import Group
 from django.db import migrations
 
 
-def create_team_groups(apps, schema_editor):
+def create_team_groups(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
 
     for team in Team.objects.all():
