@@ -32,8 +32,8 @@
 
   {% if user == village.contact %}
     <hr />
-    <a href="{% url 'village_update' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-primary">Edit</a>
-    <a href="{% url 'village_delete' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'villages:village_update' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'villages:village_delete' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-danger">Delete</a>
   {% endif %}
   <script type="text/javascript" src="{% static 'js/villages/village_detail.js' %}"></script>
 

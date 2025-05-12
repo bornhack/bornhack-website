@@ -59,7 +59,7 @@ class VillageMapView(CampViewMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["mapData"] = {
             "grid": static("json/grid.geojson"),
-            "url": reverse("villages_geojson", kwargs={"camp_slug": self.camp.slug}),
+            "url": reverse("villages:villages_geojson", kwargs={"camp_slug": self.camp.slug}),
             "loggedIn": self.request.user.is_authenticated,
         }
         return context
@@ -67,7 +67,6 @@ class VillageMapView(CampViewMixin, ListView):
     def get_queryset(self) -> QuerySet[Village]:
         """Only show approved and not deleted villages."""
         return super().get_queryset().filter(deleted=False, approved=True)
-
 
 
 class VillageListGeoJSONView(CampViewMixin, JsonView):
@@ -101,7 +100,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
                     "uuid": None,
                     "type": "village",
                     "detail_url": reverse(
-                        "village_detail",
+                        "villages:village_detail",
                         kwargs={"camp_slug": village.camp.slug, "slug": village.slug},
                     ),
                 },
@@ -185,7 +184,7 @@ class VillageCreateView(
 
     def get_success_url(self) -> str:
         """Return to village list after create."""
-        return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})
+        return reverse_lazy("villages:village_list", kwargs={"camp_slug": self.object.camp.slug})
 
 
 class EnsureUserOwnsVillageMixin(SingleObjectMixin):
@@ -264,4 +263,4 @@ class VillageDeleteView(
 
     def get_success_url(self) -> str:
         """Return to village list after deleting."""
-        return reverse_lazy("village_list", kwargs={"camp_slug": self.object.camp.slug})
+        return reverse_lazy("villages:village_list", kwargs={"camp_slug": self.object.camp.slug})

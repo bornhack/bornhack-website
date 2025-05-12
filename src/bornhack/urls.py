@@ -88,7 +88,7 @@ urlpatterns = [
     path(
         "villages/",
         CampRedirectView.as_view(),
-        kwargs={"page": "village_list"},
+        kwargs={"page": "villages:village_list"},
         name="village_list_redirect",
     ),
     path(

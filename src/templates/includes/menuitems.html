@@ -2,7 +2,7 @@
 <a role="button" class="flex-lg-fill btn {% menubuttonclass 'camps' %}" href="{% url 'camp_detail' camp_slug=camp.slug %}">{{ camp.title }}</a>
 <a role="button" class="flex-lg-fill btn {% menubuttonclass 'info' %}" href="{% url 'info' camp_slug=camp.slug %}">Info</a>
 <a role="button" class="flex-lg-fill btn {% menubuttonclass 'program' %}" href="{% url 'program:schedule_index' camp_slug=camp.slug %}">Program</a>
-<a role="button" class="flex-lg-fill btn {% menubuttonclass 'villages' %}" href="{% url 'village_list' camp_slug=camp.slug %}">Villages</a>
+<a role="button" class="flex-lg-fill btn {% menubuttonclass 'villages' %}" href="{% url 'villages:village_list' camp_slug=camp.slug %}">Villages</a>
 <a role="button" class="flex-lg-fill btn {% menubuttonclass 'sponsors' %}" href="{% url 'sponsors' camp_slug=camp.slug %}">Sponsors</a>
 <a role="button" class="flex-lg-fill btn {% menubuttonclass 'teams' %}" href="{% url 'teams:list' camp_slug=camp.slug %}">Teams</a>
 <a role="button" class="flex-lg-fill btn hide-for-no-js-users {% menubuttonclass 'maps' %}" href="{% url 'maps_map' camp_slug=camp.slug %}">Maps</a>

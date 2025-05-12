@@ -16,8 +16,8 @@
     tent, chairs and tables in the shop!
   </p>
   <p>
-    <a class="btn btn-success" href="{% url 'village_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create village</a>
-    <a class="btn btn-primary" href="{% url 'villages_map' camp_slug=camp.slug %}"><i class="fas fa-map"></i> Villages map</a>
+    <a class="btn btn-success" href="{% url 'villages:village_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create village</a>
+    <a class="btn btn-primary" href="{% url 'villages:village_map' camp_slug=camp.slug %}"><i class="fas fa-map"></i> Villages map</a>
     <br>
     <br>
     Our <a href="{% url 'conduct'%}">Code of Conduct</a> applies to village names and descriptions!
@@ -37,7 +37,7 @@
         {% for village in villages %}
           <tr>
             <td>
-              <a href="{% url 'village_detail' camp_slug=camp.slug slug=village.slug %}">
+              <a href="{% url 'villages:village_detail' camp_slug=camp.slug slug=village.slug %}">
                 {{ village.name }}
               </a>
             </td>
