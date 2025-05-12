@@ -167,7 +167,7 @@ class DectRegistrationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     form_class = DectRegistrationForm
     template_name = "dectregistration_form.html"
 
-    def form_valid(self, form: DectRegistrationForm) -> HttpResponsePermanentRedirect | HttpResponseRedirect:
+    def form_valid(self, form: DectRegistrationForm) -> HttpResponseRedirect:
         """Check if form is valid."""
         dect = form.save(commit=False)
         dect.camp = self.camp
