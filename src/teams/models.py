@@ -395,14 +395,10 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
             and not deleted
             and self.team.member_permission_set in self.user.get_all_permissions()
         ):
-            logger.debug(
-                f"Adding team lead permissions to user {self.user} for {self.team}",
-            )
+            # this is a no-op if the perm is already there
             self.user.user_permissions.add(lead_perm)
         else:
-            logger.debug(
-                f"Removing team lead permissions from user {self.user} for {self.team}",
-            )
+            # or if the perm is already removed
             self.user.user_permissions.remove(lead_perm)
 
 
