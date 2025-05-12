@@ -1,3 +1,5 @@
+"""URLs for app phonebook."""
+
 from __future__ import annotations
 
 from django.urls import include

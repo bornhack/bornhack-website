@@ -1,6 +1,9 @@
+"""Model for phonebook."""
+
 from __future__ import annotations
 
 import logging
+from typing import ClassVar
 
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
@@ -23,7 +26,9 @@ class DectRegistration(
     """This model contains DECT registrations for users and services."""
 
     class Meta:
-        unique_together = [("camp", "number")]
+        """Meta."""
+
+        unique_together: ClassVar[list[tuple[str]]] = [("camp", "number")]
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -82,15 +87,19 @@ class DectRegistration(
         super().save(*args, **kwargs)
 
     def check_unique_ipei(self) -> None:
-        if self.ipei and len(self.ipei) == 2:
-            # check for conflicts with the same IPEI
-            if DectRegistration.objects.filter(camp=self.camp, ipei=self.ipei).exclude(pk=self.pk).exists():
-                raise ValidationError(
-                    f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use",
-                )
+        """Check IPEI is unique."""
+        if (
+            self.ipei
+            and len(self.ipei) == 2  # noqa: PLR2004
+            and DectRegistration.objects.filter(camp=self.camp, ipei=self.ipei).exclude(pk=self.pk).exists()
+        ):
+            raise ValidationError(
+                f"The IPEI {dectutil.format_ipei(self.ipei[0], self.ipei[1])} is in use",
+            )
 
     def clean_number(self) -> None:
         """We call this from the views form_valid() so we have a Camp object available for the validation.
+
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """
@@ -108,7 +117,7 @@ class DectRegistration(
         try:
             int(self.number)
         except ValueError:
-            raise ValidationError("Phonenumber must be numeric!")
+            raise ValidationError("Phonenumber must be numeric!") from None
 
         # check for conflicts with the same number
         if DectRegistration.objects.filter(camp=self.camp, number=self.number).exclude(pk=self.pk).exists():
@@ -138,6 +147,7 @@ class DectRegistration(
 
     def clean_letters(self) -> None:
         """We call this from the views form_valid() so we have a Camp object available for the validation.
+
         This code really belongs in model.clean(), but that gets called before form_valid()
         which is where we set the Camp object for the model instance.
         """
@@ -157,10 +167,8 @@ class DectRegistration(
 
             if self.letters.upper() not in list(combinations):
                 # something is fucky, loop over letters to give a better error message
-                i = 0
-                for digit in self.number:
+                for i, digit in enumerate(self.number):
                     if self.letters[i].upper() not in dectutil.DECT_MATRIX[digit]:
                         raise ValidationError(
                             f"The digit '{digit}' does not match the letter '{self.letters[i]}'. Valid letters for the digit '{digit}' are: {dectutil.DECT_MATRIX[digit]}",
                         )
-                    i += 1

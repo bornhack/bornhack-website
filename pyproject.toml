@@ -67,6 +67,7 @@ dev = [
 
 test = [
     "hypothesis==6.131.15",
+    "beautifulsoup4==4.13.4",
 ]
 
 [project.urls]
