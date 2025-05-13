@@ -35,7 +35,7 @@ class LayerViewMixin:
 class LayerMapperViewMixin(LayerViewMixin):
     """A mixin for LayerMapper.
 
-    only available to users with mapper permission for the team responsible
+    For views only available to users with mapper permission for the team responsible
     for the layer and/or Mapper team permission.
     """
 
