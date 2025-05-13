@@ -67,7 +67,7 @@ class ExternalLayerViewMixin(CampViewMixin):
     """A mixin to get the ExternalLayer object based on external_layer_uuid in url kwargs."""
 
     def setup(self, *args, **kwargs) -> None:
-        """Setup the mixin."""
+        """Set self.layer."""
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(
             ExternalLayer,
