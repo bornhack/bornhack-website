@@ -1,4 +1,5 @@
 """All models for the token application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -16,8 +17,10 @@ if TYPE_CHECKING:
 
     from camps.models import Camp
 
+
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     """Token model."""
+
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
@@ -50,6 +53,7 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["camp"]
 
     def get_absolute_url(self) -> str:
@@ -77,8 +81,10 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
 class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
     """Model for submitting the found token."""
+
     class Meta:
         """Meta."""
+
         unique_together = ("user", "token")
 
     token = models.ForeignKey("tokens.Token", on_delete=models.PROTECT)

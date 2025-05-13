@@ -1,4 +1,5 @@
 """All views for the Token application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -37,6 +38,7 @@ FIRST_TOKEN_FINDS = Gauge(
 
 class TokenFindView(LoginRequiredMixin, DetailView):
     """View for submitting the token found."""
+
     model = Token
     slug_field = "token"
     slug_url_kwarg = "token"
@@ -107,6 +109,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
 
 class TokenFindListView(LoginRequiredMixin, ListView):
     """A View with a list of active tokens one can find."""
+
     model = Token
     template_name = "tokenfind_list.html"
 

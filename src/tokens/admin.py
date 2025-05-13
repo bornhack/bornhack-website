@@ -1,4 +1,5 @@
 """All Django admin views for application token."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -15,6 +16,7 @@ from .models import TokenFind
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
     """Django admin for tokens."""
+
     list_filter: ClassVar[list[str]] = ["camp", "category", "active"]
     list_display: ClassVar[list[str]] = ["token", "description", "camp", "category", "active", "valid_when"]
     search_fields: ClassVar[list[str]] = ["token", "description", "category"]
@@ -23,6 +25,7 @@ class TokenAdmin(admin.ModelAdmin):
 @admin.register(TokenFind)
 class TokenFindAdmin(admin.ModelAdmin):
     """Django admin for token finds."""
+
     list_filter: ClassVar[list[str]] = ["token__camp", "user"]
     list_display: ClassVar[list[str]] = ["token", "user", "created"]
     search_fields: ClassVar[list[str]] = ["user", "token"]
