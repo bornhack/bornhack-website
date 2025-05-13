@@ -26,7 +26,7 @@ class LayerViewMixin:
         self.layer = get_object_or_404(Layer, slug=self.kwargs["layer_slug"])
 
     def get_context_data(self, *args, **kwargs) -> dict:
-        """Get context data."""
+        """Add self.layer to context."""
         context = super().get_context_data(*args, **kwargs)
         context["layer"] = self.layer
         return context
