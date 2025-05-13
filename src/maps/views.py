@@ -12,6 +12,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
+from django.core.exceptions import BadRequest
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
@@ -64,11 +65,13 @@ class MissingCredentialsError(Exception):
 
 
 class MarkerColorError(ValueError):
-    """Exception raised on a invalid marker color."""
+    """Exception raised on invalid color."""
 
     def __init__(self) -> None:
-        """Exception raised on a invalid marker color."""
-        super().__init__("Hex color must be in format RRGGBB or RRGGBBAA")
+        """Exception raised on invalid color."""
+        error = "Hex color must be in format RRGGBB or RRGGBBAA"
+        logger.exception(error)
+        super().__init__(error)
 
 
 class MapMarkerView(TemplateView):
@@ -83,20 +86,29 @@ class MapMarkerView(TemplateView):
         length = len(hex_color)
 
         if length == 6:  # RGB # noqa: PLR2004
-            r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+            try:
+                r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
+            except ValueError as e:
+                raise MarkerColorError from e
             return (r, g, b)
         if length == 8:  # RGBA # noqa: PLR2004
-            r, g, b, a = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6))
+            try:
+                r, g, b, a = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6))
+            except ValueError as e:
+                raise MarkerColorError from e
             return (r, g, b, a)
         raise MarkerColorError
 
     def get_context_data(self, **kwargs) -> dict:
         """Get the context data."""
         context = super().get_context_data(**kwargs)
-        context["stroke1"] = self.color
-        context["stroke0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
-        context["fill0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
-        context["fill1"] = self.color
+        try:
+            context["stroke0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
+            context["stroke1"] = self.color
+            context["fill0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
+            context["fill1"] = self.color
+        except MarkerColorError as e:
+            raise BadRequest from e
         return context
 
     def render_to_response(self, context: dict, **kwargs) -> TemplateResponse:
@@ -180,7 +192,7 @@ class MapView(CampViewMixin, TemplateView):
 class LayerGeoJSONView(LayerViewMixin, JsonView):
     """GeoJSON export view."""
 
-    def get_context_data(self, **kwargs) -> list:
+    def get_context_data(self, **kwargs) -> dict:
         """Return the GeoJSON Data to the client."""
         return json.loads(
             serialize(

@@ -7,12 +7,13 @@ from unittest import skip
 
 import pytz
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.test import Client
 from django.test import TestCase
 
 from camps.models import Camp
-
+from teams.models import Team
 
 class TestBootstrapScript(TestCase):
     """Test bootstrap_devsite script (touching many codepaths)"""
@@ -27,6 +28,7 @@ class BornhackTestBase(TestCase):
     """Bornhack base TestCase."""
     users: list[User]
     camp: Camp
+    team: Team
 
     @classmethod
     def setUpTestData(cls) -> None:
@@ -68,3 +70,17 @@ class BornhackTestBase(TestCase):
         user.set_password("user0")
         user.save()
         cls.users.append(user)
+
+        #Create a team
+        team_group = Group(name="Test Team Group")
+        team_group.save()
+        cls.team = Team(
+            camp=cls.camp,
+            name="Test Team",
+            group=team_group,
+            slug="test",
+            shortslug="test",
+            description="Many test Such Team",
+            needs_members=True,
+        )
+        cls.team.save()
