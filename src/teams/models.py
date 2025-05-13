@@ -201,13 +201,9 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
             self.private_irc_channel_name = f"#{self.private_irc_channel_name}"
 
         # make sure the channel names are not reserved
-        if (
-            self.public_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL)
-        ):
+        if self.public_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL):
             raise ValidationError("The public IRC channel name is reserved")
-        if (
-            self.private_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL)
-        ):
+        if self.private_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL):
             raise ValidationError("The private IRC channel name is reserved")
 
         # make sure public_irc_channel_name is not in use as public or private irc channel for another team, case insensitive

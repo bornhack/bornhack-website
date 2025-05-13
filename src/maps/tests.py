@@ -67,8 +67,11 @@ class MapProxyViewTest(TestCase):
         self.assertEqual(result, fix_result)
 
     def test_append_credentials_raises_perm_denied_if_no_creds_is_set(self):
-        with self.settings(
-            DATAFORDELER_USER="",
-            DATAFORDELER_PASSWORD="",
-        ), self.assertRaises(MissingCredentials):
+        with (
+            self.settings(
+                DATAFORDELER_USER="",
+                DATAFORDELER_PASSWORD="",
+            ),
+            self.assertRaises(MissingCredentials),
+        ):
             MapProxyView().append_credentials("path")

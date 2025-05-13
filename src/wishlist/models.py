@@ -1,4 +1,5 @@
 """The Wish model."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -13,6 +14,7 @@ from utils.slugs import unique_slugify
 if TYPE_CHECKING:
     from camps.models import Camp
 
+
 class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
     """This model contains the stuff BornHack needs.
 
@@ -21,6 +23,7 @@ class Wish(ExportModelOperationsMixin("wish"), CampRelatedModel):
 
     class Meta:
         """Model configuration."""
+
         verbose_name_plural = "wishes"
 
     name = models.CharField(

@@ -1,4 +1,5 @@
 """URLs for villages."""
+
 from __future__ import annotations
 
 from django.urls import include
@@ -19,9 +20,14 @@ urlpatterns = [
     path("create/", VillageCreateView.as_view(), name="village_create"),
     path("geojson/", VillageListGeoJSONView.as_view(), name="villages_geojson"),
     path("map/", VillageMapView.as_view(), name="village_map"),
-    path("<slug:slug>/", include([
-        path("", VillageDetailView.as_view(), name="village_detail"),
-        path("update/", VillageUpdateView.as_view(), name="village_update"),
-        path("delete/", VillageDeleteView.as_view(), name="village_delete"),
-    ])),
+    path(
+        "<slug:slug>/",
+        include(
+            [
+                path("", VillageDetailView.as_view(), name="village_detail"),
+                path("update/", VillageUpdateView.as_view(), name="village_update"),
+                path("delete/", VillageDeleteView.as_view(), name="village_delete"),
+            ]
+        ),
+    ),
 ]
