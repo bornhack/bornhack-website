@@ -35,10 +35,6 @@ class FeatureAdmin(LeafletGeoAdmin, admin.ModelAdmin):
         "layer",
     ]
 
-    def get_queryset(self, request: HttpRequest) -> QuerySet:
-        """Get the QuerySet."""
-        self.request = request
-        return super().get_queryset(request)
 
 
 @admin.register(Layer)
