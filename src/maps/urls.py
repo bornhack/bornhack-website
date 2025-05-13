@@ -1,4 +1,5 @@
 """Maps URLS File."""
+
 from __future__ import annotations
 
 from django.urls import include

@@ -1,4 +1,5 @@
 """Maps models."""
+
 from __future__ import annotations
 
 import logging
@@ -146,6 +147,7 @@ class Feature(UUIDModel):
 
     class Meta:
         """Meta data."""
+
         constraints: ClassVar[list] = [
             models.UniqueConstraint(
                 fields=["layer", "name"],
@@ -165,6 +167,7 @@ class Feature(UUIDModel):
 
 class ExternalLayer(UUIDModel):
     """External layer model."""
+
     name = models.CharField(
         max_length=100,
         help_text="Name or description of this layer",
@@ -214,6 +217,7 @@ class ExternalLayer(UUIDModel):
 
 class UserLocationType(UUIDModel):
     """User Location Type model."""
+
     name = models.CharField(
         max_length=100,
         help_text="Name of the user location type",
@@ -260,6 +264,7 @@ class UserLocation(
     CampRelatedModel,
 ):
     """UserLocation model."""
+
     name = models.CharField(
         max_length=100,
         help_text="Name of the location",

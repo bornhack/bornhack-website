@@ -1,4 +1,5 @@
 """Maps view."""
+
 from __future__ import annotations
 
 import json
@@ -61,12 +62,14 @@ ERROR_COLOR_FORMAT = "Hex color must be in format RRGGBB or RRGGBBAA"
 class MissingCredentialsError(Exception):
     """Missing Credentials Exception."""
 
+
 class MarkerColorError(ValueError):
     """Exception raised on a invalid marker color."""
 
     def __init__(self) -> None:
         """Exception raised on a invalid marker color."""
         super().__init__("Hex color must be in format RRGGBB or RRGGBBAA")
+
 
 class MapMarkerView(TemplateView):
     """View for generating the coloured marker."""
@@ -324,8 +327,10 @@ class UserLocationLayerView(CampViewMixin, JsonView):
             )
         ]
 
+
 class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
     """UserLocation view."""
+
     template_name = "user_location_list.html"
     model = UserLocation
 
@@ -346,15 +351,17 @@ class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
 
 class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
     """Create view for UserLocation."""
+
     model = UserLocation
     template_name = "user_location_form.html"
     fields: ClassVar[list[str]] = ["name", "type", "location", "data"]
 
     def dispatch(self, *args, **kwargs) -> str:
         """Check user limits."""
-        if (UserLocation.objects.filter(
-                user=self.request.user,
-                camp=self.camp).count() >= settings.MAPS_USER_LOCATION_MAX):
+        if (
+            UserLocation.objects.filter(user=self.request.user, camp=self.camp).count()
+            >= settings.MAPS_USER_LOCATION_MAX
+        ):
             messages.error(
                 self.request,
                 "To many User Locations (50), please delete some.",
@@ -405,6 +412,7 @@ class UserLocationUpdateView(
     UpdateView,
 ):
     """Update view for UserLocation."""
+
     model = UserLocation
     template_name = "user_location_form.html"
     fields: ClassVar[list[str]] = ["name", "type", "location", "data"]
@@ -445,6 +453,7 @@ class UserLocationDeleteView(
     DeleteView,
 ):
     """Delete view for UserLocation."""
+
     model = UserLocation
     template_name = "user_location_delete.html"
     slug_url_kwarg = "user_location"

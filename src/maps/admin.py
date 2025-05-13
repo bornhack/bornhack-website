@@ -1,4 +1,5 @@
 """Maps Django Admin."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -23,6 +24,7 @@ from .models import UserLocationType
 @admin.register(Feature)
 class FeatureAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     """Feature Admin."""
+
     display_raw = True
     save_as = True
     list_display: ClassVar[list[str]] = [
@@ -42,6 +44,7 @@ class FeatureAdmin(LeafletGeoAdmin, admin.ModelAdmin):
 @admin.register(Layer)
 class LayerAdmin(admin.ModelAdmin):
     """Layer admin."""
+
     save_as = True
     list_display: ClassVar[list[str]] = ["name", "slug"]
 
@@ -49,6 +52,7 @@ class LayerAdmin(admin.ModelAdmin):
 @admin.register(ExternalLayer)
 class ExternalLayerAdmin(admin.ModelAdmin):
     """Layer admin."""
+
     save_as = True
     list_display: ClassVar[list[str]] = ["name"]
 
@@ -56,6 +60,7 @@ class ExternalLayerAdmin(admin.ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     """Group admin."""
+
     save_as = True
     list_display: ClassVar[list[str]] = ["name"]
 
@@ -63,6 +68,7 @@ class GroupAdmin(admin.ModelAdmin):
 @admin.register(UserLocationType)
 class UserLocationTypeAdmin(admin.ModelAdmin):
     """User Location Type admin."""
+
     save_as = True
     list_display: ClassVar[list[str]] = ["name"]
 
@@ -70,6 +76,7 @@ class UserLocationTypeAdmin(admin.ModelAdmin):
 @admin.register(UserLocation)
 class UserLocationAdmin(admin.ModelAdmin):
     """User Location admin."""
+
     save_as = True
     list_display: ClassVar[list[str]] = ["name", "type", "user", "camp"]
     list_filter: ClassVar[list[str]] = ["camp", "user"]
