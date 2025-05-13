@@ -57,9 +57,6 @@ from .models import UserLocationType
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
-ERROR_COLOR_FORMAT = "Hex color must be in format RRGGBB or RRGGBBAA"
-
-
 class MissingCredentialsError(Exception):
     """Missing Credentials Exception."""
 
