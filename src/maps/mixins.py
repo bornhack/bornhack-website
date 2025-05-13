@@ -21,7 +21,7 @@ class LayerViewMixin:
     """A mixin to get the Layer object based on layer_slug in url kwargs."""
 
     def setup(self, *args, **kwargs) -> None:
-        """Setup the mixin."""
+        """Set self.layer based on layer_slug in url kwargs."""
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(Layer, slug=self.kwargs["layer_slug"])
 
