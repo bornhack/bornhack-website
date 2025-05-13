@@ -8,8 +8,8 @@ from django.test import TestCase
 from django.test import override_settings
 from django.test.client import RequestFactory
 
-from .views import MapProxyView
-from .views import MissingCredentials
+from maps.views import MapProxyView
+from maps.views import MissingCredentialsError
 
 USER = "user"
 PASSWORD = "password"
@@ -79,5 +79,5 @@ class MapProxyViewTest(TestCase):
         with self.settings(
             DATAFORDELER_USER="",
             DATAFORDELER_PASSWORD="",
-        ), self.assertRaises(MissingCredentials):
+        ), self.assertRaises(MissingCredentialsError):
             MapProxyView().append_credentials("path")
