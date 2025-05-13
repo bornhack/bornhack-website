@@ -57,3 +57,8 @@ class TestTokenViews(BornhackTestBase):
         matches = [s for s in rows if "You found a secret token:" in str(s)]
         self.assertEqual(len(matches), 1, "token_find failed")
 
+        # Test finding a false token
+        url = reverse("tokens:details", kwargs={"token": "F00000001234"})
+        response = self.client.get(path=url, follow=True)
+        self.assertEqual(response.status_code, 404, "Did not find a non-excisting token")
+

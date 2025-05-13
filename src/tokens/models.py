@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
-    """Secret Token model."""
+    """Token model."""
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
@@ -76,7 +76,7 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
 
 class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
-    """Model with all found Secret Tokens."""
+    """Model for submitting the found token."""
     class Meta:
         """Meta."""
         unique_together = ("user", "token")
