@@ -1,10 +1,14 @@
+"""Utils for the Maps APP."""
+
 from __future__ import annotations
 
 from django.db import models
 
 
 class LeafletMarkerChoices(models.TextChoices):
-    """Leaflet icon color choices, a models.TextChoices class to use when we want to set
+    """Leaflet icon color choices.
+
+    a models.TextChoices class to use when we want to set
     choices for a model field to pick a marker colour for a Leaflet map.
     These map directly to the L.Icon() objects in static_src/js/leaflet-color-markers.js.
     """
