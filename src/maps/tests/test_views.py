@@ -1,9 +1,9 @@
 """Test cases for the Maps application."""
 from __future__ import annotations
 
-from bs4 import BeautifulSoup
 from unittest import mock
 
+from bs4 import BeautifulSoup
 from django.contrib.gis.geos import Point
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
