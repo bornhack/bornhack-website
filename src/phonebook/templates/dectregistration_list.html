@@ -17,6 +17,7 @@
           <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
         </p>
         <table class="table table-hover table-striped">
+          <thead>
           <tr>
             <th>Number</th>
             <th>Letters</th>
@@ -28,6 +29,8 @@
             <th>Modified</th>
             <th>Actions</th>
           </tr>
+          </thead>
+          <tbody>
           {% for entry in dectregistration_list %}
             <tr>
               <td>{{ entry.number }}</td>
@@ -44,6 +47,7 @@
               </td>
             </tr>
           {% endfor %}
+          </tbody>
         </table>
       {% else %}
         <p class="lead"><i>No DECT registrations found. Go create one!</i></p>

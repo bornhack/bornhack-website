@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import re
+from typing import ClassVar
 
 from django import forms
-from django.core.exceptions import ValidationError
 
 from .dectutils import DectUtils
+from .exceptions import InvalidIPEIError
 from .models import DectRegistration
 
 dectutil = DectUtils()
@@ -29,32 +30,35 @@ class DectRegistrationForm(forms.ModelForm):
     )
 
     class Meta:
-        model = DectRegistration
-        fields = ["number", "letters", "description", "publish_in_phonebook", "ipei"]
+        """Meta info of class."""
 
-    def clean_ipei(self):
+        model = DectRegistration
+        fields: ClassVar[list[str]] = ["number", "letters", "description", "publish_in_phonebook", "ipei"]
+
+    def clean_ipei(self) -> None | list[int]:
         """Detect IPEI type and convert both IPEI or IPUI to a array of ints."""
         ipei_s = self.cleaned_data["ipei"]
-        if len(ipei_s) == 10:
+        if len(ipei_s) == 10:  # noqa: PLR2004
             ipei = dectutil.hex_ipui_ipei(ipei_s)
-        elif len(ipei_s) == 13:
+        elif len(ipei_s) == 13:  # noqa: PLR2004
             if re.match(r"^\d{5} \d{7}$", ipei_s):
                 ipei = [int(a) for a in ipei_s.split(" ")]
             else:
-                raise ValidationError("Unrecognized IPEI format")
+                raise InvalidIPEIError(ipei=[])
         elif ipei_s == "":
             return None
         else:
-            raise ValidationError("Unable to recognize IPEI/IPUI format")
+            raise InvalidIPEIError(ipei=[])
 
         if not ipei:
-            raise ValidationError(f"unable to process {ipei}.")
+            raise InvalidIPEIError(ipei=ipei)
         return ipei
 
-    def clean(self):
+    def clean(self) -> dict:
+        """Clean data."""
         cleaned_data = super().clean()
         ipei = cleaned_data.get("ipei")
 
-        if ipei and len(ipei) != 2:
+        if ipei and len(ipei) != 2:  # noqa: PLR2004
             self.add_error("ipei", f"The ipei is incorrect. {ipei}")
         return cleaned_data
