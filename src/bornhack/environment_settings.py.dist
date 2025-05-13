@@ -76,6 +76,9 @@ SCHEDULE_TIMESLOT_LENGTH_MINUTES=30
 SCHEDULE_EVENT_NOTIFICATION_MINUTES=10
 SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3 # how many hours per speaker_availability form checkbox
 
+# Map settings
+MAPS_USER_LOCATION_MAX = 50 # Maximum number of UserLocations a user can create
+
 # irc bot settings
 IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS=10
 IRCBOT_NICK='{{ django_ircbot_nickname }}'

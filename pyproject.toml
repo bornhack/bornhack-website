@@ -68,6 +68,7 @@ test = [
     "coverage==7.8.0",
     "factory_boy==3.3.3",
     "hypothesis==6.131.15",
+    "beautifulsoup4==4.13.4",
     "unittest-xml-reporting==3.2.0",
 ]
 
@@ -123,7 +124,8 @@ ignore = [
     "ANN001", # Missing type annotation for function argument ...
     "ANN201", # Missing return type annotation for public function ...
     "S101", # Allow use of assert
-    "S106", # Allow passwords in tests 
+    "S105", # Allow PASSWORD as password in tests 
+    "S106", # Allow passwords in tests
     "S113", # Probable use of requests call without timeout
     "E501", # Line too long
     "D104", # Missing docstring in public package

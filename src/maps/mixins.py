@@ -1,4 +1,11 @@
+"""Mixins for Maps app."""
+
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.http import HttpRequest
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -14,19 +21,26 @@ class LayerViewMixin:
     """A mixin to get the Layer object based on layer_slug in url kwargs."""
 
     def setup(self, *args, **kwargs) -> None:
+        """Set self.layer based on layer_slug in url kwargs."""
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(Layer, slug=self.kwargs["layer_slug"])
 
-    def get_context_data(self, *args, **kwargs):
+    def get_context_data(self, *args, **kwargs) -> dict:
+        """Add self.layer to context."""
         context = super().get_context_data(*args, **kwargs)
         context["layer"] = self.layer
         return context
 
 
 class LayerMapperViewMixin(LayerViewMixin):
-    """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
+    """A mixin for LayerMapper.
 
-    def setup(self, request, *args, **kwargs) -> None:
+    For views only available to users with mapper permission for the team responsible
+    for the layer and/or Mapper team permission.
+    """
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        """Check permissions."""
         super().setup(request, *args, **kwargs)
         if (
             self.layer.responsible_team
@@ -40,7 +54,8 @@ class LayerMapperViewMixin(LayerViewMixin):
 class GisTeamViewMixin:
     """A mixin for views only available to users with `camps.gis_team_member` permission."""
 
-    def setup(self, request, *args, **kwargs) -> None:
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        """Check permissions."""
         super().setup(request, *args, **kwargs)
         if self.request.user.has_perm("camps.gis_team_member"):
             return
@@ -52,6 +67,7 @@ class ExternalLayerViewMixin(CampViewMixin):
     """A mixin to get the ExternalLayer object based on external_layer_uuid in url kwargs."""
 
     def setup(self, *args, **kwargs) -> None:
+        """Set self.layer."""
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(
             ExternalLayer,
@@ -60,9 +76,14 @@ class ExternalLayerViewMixin(CampViewMixin):
 
 
 class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
-    """A mixin for views only available to users with mapper permission for the team responsible for the layer and/or Mapper team permission."""
+    """A mixin for views.
 
-    def setup(self, request, *args, **kwargs) -> None:
+    only available to users with mapper permission for the team responsible
+    for the layer and/or Mapper team permission.
+    """
+
+    def setup(self, request: HttpRequest, *args, **kwargs) -> None:
+        """Check permissions."""
         super().setup(request, *args, **kwargs)
         if (
             self.layer.responsible_team
