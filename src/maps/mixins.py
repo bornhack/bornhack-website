@@ -83,7 +83,7 @@ class ExternalLayerMapperViewMixin(ExternalLayerViewMixin):
     """
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        """Setup the mixin."""
+        """Check permissions."""
         super().setup(request, *args, **kwargs)
         if (
             self.layer.responsible_team
