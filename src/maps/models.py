@@ -204,7 +204,7 @@ class ExternalLayer(UUIDModel):
         return str(self.name)
 
     def save(self, **kwargs) -> None:
-        """Model save function."""
+        """Set slug and save."""
         self.slug = unique_slugify(
             str(self.name),
             slugs_in_use=self.__class__.objects.all().values_list(
