@@ -1,4 +1,7 @@
+"""All views for the Token application."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,6 +12,11 @@ from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import ListView
 from prometheus_client import Gauge
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.http import HttpRequest
+    from django.http import HttpResponsePermanentRedirect
 
 from utils.models import CampReadOnlyModeError
 
@@ -28,11 +36,13 @@ FIRST_TOKEN_FINDS = Gauge(
 
 
 class TokenFindView(LoginRequiredMixin, DetailView):
+    """View for submitting the token found."""
     model = Token
     slug_field = "token"
     slug_url_kwarg = "token"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponsePermanentRedirect:
+        """Method for submitting the token found."""
         if not self.get_object().active:
             messages.warning(
                 self.request,
@@ -61,8 +71,8 @@ class TokenFindView(LoginRequiredMixin, DetailView):
                 token=self.get_object(),
                 user=request.user,
             )
-        except CampReadOnlyModeError:
-            raise Http404
+        except CampReadOnlyModeError as e:
+            raise Http404 from e
 
         if created:
             # user found a new token
@@ -89,15 +99,18 @@ class TokenFindView(LoginRequiredMixin, DetailView):
             # message for the user
             messages.success(
                 self.request,
-                f"Congratulations! You found a secret token: '{self.get_object().description}' - Your visit has been registered! Keep hunting, there might be more tokens out there.",
+                f"Congratulations! You found a secret token: '{self.get_object().description}' "
+                "- Your visit has been registered! Keep hunting, there might be more tokens out there.",
             )
         return redirect(reverse("tokens:tokenfind_list"))
 
 
 class TokenFindListView(LoginRequiredMixin, ListView):
+    """A View with a list of active tokens one can find."""
     model = Token
     template_name = "tokenfind_list.html"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """Get QuerySet of active tokens."""
         qs = super().get_queryset()
         return qs.filter(active=True)

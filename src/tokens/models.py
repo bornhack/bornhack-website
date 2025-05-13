@@ -1,4 +1,7 @@
+"""All models for the token application."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
@@ -8,8 +11,13 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
+if TYPE_CHECKING:
+    from typing import ClassVar
+
+    from camps.models import Camp
 
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
+    """Secret Token model."""
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
@@ -22,7 +30,9 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     active = models.BooleanField(
         default=False,
-        help_text="An active token is listed and can be found by players, an inactive token is unlisted and returns an error saying 'valid but inactive token found' to players who find it.",
+        help_text="An active token is listed and can be found by players, "
+        "an inactive token is unlisted and returns an error saying 'valid "
+        "but inactive token found' to players who find it.",
     )
 
     valid_when = DateTimeRangeField(
@@ -35,12 +45,15 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     camp_filter = "camp"
 
     def __str__(self) -> str:
+        """String formatter."""
         return f"{self.description} ({self.camp})"
 
     class Meta:
-        ordering = ["camp"]
+        """Meta."""
+        ordering: ClassVar[list[str]] = ["camp"]
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
+        """Get absolute url."""
         return reverse(
             "backoffice:token_detail",
             kwargs={"camp_slug": self.camp.slug, "pk": self.pk},
@@ -48,20 +61,24 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     @property
     def valid_now(self) -> bool:
+        """Returns if the token is valid 'now'."""
+        valid = False
         if not self.valid_when:
             # no time limit
-            return True
-        if self.valid_when.lower and self.valid_when.lower > timezone.now():
+            valid = True
+        elif self.valid_when.lower and self.valid_when.lower > timezone.now():
             # not valid yet
-            return False
-        if self.valid_when.upper and self.valid_when.upper < timezone.now():
+            valid = False
+        elif self.valid_when.upper and self.valid_when.upper < timezone.now():
             # not valid anymore
-            return False
-        return True
+            valid = False
+        return valid
 
 
 class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
+    """Model with all found Secret Tokens."""
     class Meta:
+        """Meta."""
         unique_together = ("user", "token")
 
     token = models.ForeignKey("tokens.Token", on_delete=models.PROTECT)
@@ -75,8 +92,10 @@ class TokenFind(ExportModelOperationsMixin("token_find"), CampRelatedModel):
     camp_filter = "token__camp"
 
     def __str__(self) -> str:
+        """String formatter."""
         return f"{self.token} found by {self.user}"
 
     @property
-    def camp(self):
+    def camp(self) -> Camp:
+        """Property camp linked to this token find via Token."""
         return self.token.camp
