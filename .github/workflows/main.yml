@@ -66,4 +66,7 @@ jobs:
           POSTGRES_PORT: 5432
 
       - name: Upload coverage to codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: bornhack/bornhack-website
