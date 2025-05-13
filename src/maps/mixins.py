@@ -55,7 +55,7 @@ class GisTeamViewMixin:
     """A mixin for views only available to users with `camps.gis_team_member` permission."""
 
     def setup(self, request: HttpRequest, *args, **kwargs) -> None:
-        """Setup the mixin."""
+        """Check permissions."""
         super().setup(request, *args, **kwargs)
         if self.request.user.has_perm("camps.gis_team_member"):
             return
