@@ -144,7 +144,7 @@ class MapView(CampViewMixin, TemplateView):
             ),
             "externalLayers": list(context["externalLayers"].values()),
             "villages": reverse(
-                "villages_geojson",
+                "villages:villages_geojson",
                 kwargs={"camp_slug": self.camp.slug},
             ),
             "user_location_types": list(
