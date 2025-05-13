@@ -247,7 +247,7 @@ class UserLocationType(UUIDModel):
         return self.name
 
     def save(self, **kwargs) -> None:
-        """Model save function."""
+        """Set slug and save."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
