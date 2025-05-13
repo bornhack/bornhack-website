@@ -1,6 +1,13 @@
+"""Maps models."""
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from camps.models import Camp
+
+from typing import ClassVar
 
 from colorfield.fields import ColorField
 from django.contrib.auth.models import User
@@ -27,6 +34,7 @@ class Group(UUIDModel):
     )
 
     def __str__(self) -> str:
+        """String formatter."""
         return str(self.name)
 
 
@@ -73,13 +81,16 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
     )
 
     @property
-    def camp(self):
+    def camp(self) -> Camp:
+        """Camp object reference."""
         return self.responsible_team.camp
 
     def __str__(self) -> str:
+        """String formatter."""
         return str(self.name)
 
     def save(self, **kwargs) -> None:
+        """Model save function."""
         self.slug = unique_slugify(
             str(self.name),
             slugs_in_use=self.__class__.objects.all().values_list(
@@ -134,7 +145,8 @@ class Feature(UUIDModel):
     )
 
     class Meta:
-        constraints = [
+        """Meta data."""
+        constraints: ClassVar[list] = [
             models.UniqueConstraint(
                 fields=["layer", "name"],
                 name="layer_and_name_uniq",
@@ -142,14 +154,17 @@ class Feature(UUIDModel):
         ]
 
     def __str__(self) -> str:
+        """String formatter."""
         return str(self.name)
 
     @property
-    def camp(self):
+    def camp(self) -> Camp:
+        """Camp object reference."""
         return self.layer.team.camp
 
 
 class ExternalLayer(UUIDModel):
+    """External layer model."""
     name = models.CharField(
         max_length=100,
         help_text="Name or description of this layer",
@@ -177,13 +192,16 @@ class ExternalLayer(UUIDModel):
     )
 
     @property
-    def camp(self):
+    def camp(self) -> Camp:
+        """Camp object reference."""
         return self.responsible_team.camp
 
     def __str__(self) -> str:
+        """String formatter."""
         return str(self.name)
 
     def save(self, **kwargs) -> None:
+        """Model save function."""
         self.slug = unique_slugify(
             str(self.name),
             slugs_in_use=self.__class__.objects.all().values_list(
@@ -195,6 +213,7 @@ class ExternalLayer(UUIDModel):
 
 
 class UserLocationType(UUIDModel):
+    """User Location Type model."""
     name = models.CharField(
         max_length=100,
         help_text="Name of the user location type",
@@ -220,9 +239,11 @@ class UserLocationType(UUIDModel):
     )
 
     def __str__(self) -> str:
+        """String formatter."""
         return self.name
 
     def save(self, **kwargs) -> None:
+        """Model save function."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
@@ -238,6 +259,7 @@ class UserLocation(
     UUIDModel,
     CampRelatedModel,
 ):
+    """UserLocation model."""
     name = models.CharField(
         max_length=100,
         help_text="Name of the location",
@@ -278,4 +300,5 @@ class UserLocation(
     )
 
     def __str__(self) -> str:
+        """String formatter."""
         return self.name

@@ -1,8 +1,10 @@
+"""Maps view."""
 from __future__ import annotations
 
 import json
 import logging
 import re
+from typing import TYPE_CHECKING
 
 import requests
 from django.conf import settings
@@ -12,6 +14,7 @@ from django.contrib.gis.geos import Point
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
 from django.db.models import Q
+from django.http import HttpRequest
 from django.http import HttpResponse
 from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
@@ -30,6 +33,13 @@ from jsonview.views import JsonView
 from leaflet.forms.widgets import LeafletWidget
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.forms import BaseForm
+    from django.http import TemplateResponse
+
+from typing import ClassVar
+
 from camps.mixins import CampViewMixin
 from facilities.models import FacilityType
 from utils.color import adjust_color
@@ -45,10 +55,18 @@ from .models import UserLocationType
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+ERROR_COLOR_FORMAT = "Hex color must be in format RRGGBB or RRGGBBAA"
 
-class MissingCredentials(Exception):
-    pass
 
+class MissingCredentialsError(Exception):
+    """Missing Credentials Exception."""
+
+class MarkerColorError(ValueError):
+    """Exception raised on a invalid marker color."""
+
+    def __init__(self) -> None:
+        """Exception raised on a invalid marker color."""
+        super().__init__("Hex color must be in format RRGGBB or RRGGBBAA")
 
 class MapMarkerView(TemplateView):
     """View for generating the coloured marker."""
@@ -56,19 +74,21 @@ class MapMarkerView(TemplateView):
     template_name = "marker.svg"
 
     @property
-    def color(self):
+    def color(self) -> tuple:
+        """Return the color values as ints."""
         hex_color = self.kwargs["color"]
         length = len(hex_color)
 
-        if length == 6:  # RGB
+        if length == 6:  # RGB # noqa: PLR2004
             r, g, b = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
             return (r, g, b)
-        if length == 8:  # RGBA
+        if length == 8:  # RGBA # noqa: PLR2004
             r, g, b, a = (int(hex_color[i : i + 2], 16) for i in (0, 2, 4, 6))
             return (r, g, b, a)
-        raise ValueError("Hex color must be in format RRGGBB or RRGGBBAA")
+        raise MarkerColorError
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get the context data."""
         context = super().get_context_data(**kwargs)
         context["stroke1"] = self.color
         context["stroke0"] = adjust_color(self.color, -0.4) if is_dark(self.color) else adjust_color(self.color)
@@ -76,7 +96,8 @@ class MapMarkerView(TemplateView):
         context["fill1"] = self.color
         return context
 
-    def render_to_response(self, context, **kwargs):
+    def render_to_response(self, context: dict, **kwargs) -> TemplateResponse:
+        """Render the SVG output."""
         return super().render_to_response(
             context,
             content_type="image/svg+xml",
@@ -90,7 +111,8 @@ class MapView(CampViewMixin, TemplateView):
     template_name = "maps_map.html"
     context_object_name = "maps_map"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get the context data."""
         context = super().get_context_data(**kwargs)
         context["facilitytype_list"] = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
@@ -155,7 +177,8 @@ class MapView(CampViewMixin, TemplateView):
 class LayerGeoJSONView(LayerViewMixin, JsonView):
     """GeoJSON export view."""
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> list:
+        """Return the GeoJSON Data to the client."""
         return json.loads(
             serialize(
                 "geojson",
@@ -175,20 +198,22 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
 
 
 class MapProxyView(View):
-    """Proxy for Datafordeler map service. Created so we can show maps without
-    leaking the IP of our visitors.
+    """Proxy for Datafordeler map service.
+
+    Created so we can show maps without leaking the IP of our visitors.
     """
 
     PROXY_URL = "/maps/kfproxy"
-    VALID_ENDPOINTS = [
+    VALID_ENDPOINTS: ClassVar[list[str]] = [
         "/GeoDanmarkOrto/orto_foraar_wmts/1.0.0/WMTS",
         "/GeoDanmarkOrto/orto_foraar/1.0.0/WMS",
         "/Dkskaermkort/topo_skaermkort/1.0.0/wms",
         "/DHMNedboer/dhm/1.0.0/wms",
     ]
 
-    def get(self, *args, **kwargs):
+    def get(self, *args, **kwargs) -> HttpResponse:
         """Before we make the request we check that the path is in our whitelist.
+
         Before we return the response we copy headers except for a list we dont want.
         """
         # Raise PermissionDenied if endpoint isn't valid
@@ -201,7 +226,7 @@ class MapProxyView(View):
         path = self.append_credentials(path)
 
         # make the request
-        r = requests.get("https://services.datafordeler.dk" + path)
+        r = requests.get("https://services.datafordeler.dk" + path, timeout=10)
 
         # make the response
         response = HttpResponse(r.content, status=r.status_code)
@@ -237,7 +262,7 @@ class MapProxyView(View):
                 endpoint,
                 self.VALID_ENDPOINTS,
             )
-            raise PermissionDenied("No thanks")
+            raise PermissionDenied
 
     def sanitize_path(self, path: str) -> str:
         """Sanitize path by removing PROXY_URL and set 'transparent' value to upper."""
@@ -256,7 +281,7 @@ class MapProxyView(View):
             logger.error(
                 "Missing credentials for 'DATAFORDELER_USER' or 'DATAFORDELER_PASSWORD'",
             )
-            raise MissingCredentials
+            raise MissingCredentialsError
         path += f"&username={username}&password={password}"
         return path
 
@@ -267,7 +292,8 @@ class MapProxyView(View):
 class UserLocationLayerView(CampViewMixin, JsonView):
     """UserLocation geojson view."""
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get context data."""
         context = {}
         context["type"] = "FeatureCollection"
         context["features"] = self.dump_locations()
@@ -275,37 +301,36 @@ class UserLocationLayerView(CampViewMixin, JsonView):
 
     def dump_locations(self) -> list[object]:
         """GeoJSON Formatter."""
-        output = []
-        for location in UserLocation.objects.filter(
-            camp=self.camp,
-            type__slug=self.kwargs["user_location_type_slug"],
-        ):
-            output.append(
-                {
-                    "type": "Feature",
-                    "id": location.pk,
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [location.location.x, location.location.y],
-                    },
-                    "properties": {
-                        "name": location.name,
-                        "type": location.type.name,
-                        "icon": location.type.icon,
-                        "marker": location.type.marker,
-                        "user": location.user.profile.get_public_credit_name,
-                        "data": location.data,
-                    },
+        return [
+            {
+                "type": "Feature",
+                "id": location.pk,
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [location.location.x, location.location.y],
                 },
+                "properties": {
+                    "name": location.name,
+                    "type": location.type.name,
+                    "icon": location.type.icon,
+                    "marker": location.type.marker,
+                    "user": location.user.profile.get_public_credit_name,
+                    "data": location.data,
+                },
+            }
+            for location in UserLocation.objects.filter(
+                camp=self.camp,
+                type__slug=self.kwargs["user_location_type_slug"],
             )
-        return output
-
+        ]
 
 class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
+    """UserLocation view."""
     template_name = "user_location_list.html"
     model = UserLocation
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get data for the view."""
         context = super().get_context_data(**kwargs)
         context["user_location_types"] = UserLocationType.objects.all().values_list(
             "slug",
@@ -313,19 +338,23 @@ class UserLocationListView(LoginRequiredMixin, CampViewMixin, ListView):
         )
         return context
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args, **kwargs) -> QuerySet:
         """Show only entries belonging to the current user."""
         qs = super().get_queryset(*args, **kwargs)
         return qs.filter(user=self.request.user)
 
 
 class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
+    """Create view for UserLocation."""
     model = UserLocation
     template_name = "user_location_form.html"
-    fields = ["name", "type", "location", "data"]
+    fields: ClassVar[list[str]] = ["name", "type", "location", "data"]
 
-    def dispatch(self, *args, **kwargs):
-        if UserLocation.objects.filter(user=self.request.user, camp=self.camp).count() > 49:
+    def dispatch(self, *args, **kwargs) -> str:
+        """Check user limits."""
+        if (UserLocation.objects.filter(
+                user=self.request.user,
+                camp=self.camp).count() >= settings.MAPS_USER_LOCATION_MAX):
             messages.error(
                 self.request,
                 "To many User Locations (50), please delete some.",
@@ -338,7 +367,8 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
             )
         return super().dispatch(*args, **kwargs)
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args, **kwargs) -> BaseForm:
+        """Prepare the form."""
         form = super().get_form(*args, **kwargs)
         form.fields["location"].widget = LeafletWidget(
             attrs={
@@ -350,7 +380,8 @@ class UserLocationCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         )
         return form
 
-    def form_valid(self, form):
+    def form_valid(self, form: BaseForm) -> str:
+        """Check if the form is valid."""
         location = form.save(commit=False)
         location.camp = self.camp
         location.user = self.request.user
@@ -373,18 +404,21 @@ class UserLocationUpdateView(
     UserIsObjectOwnerMixin,
     UpdateView,
 ):
+    """Update view for UserLocation."""
     model = UserLocation
     template_name = "user_location_form.html"
-    fields = ["name", "type", "location", "data"]
+    fields: ClassVar[list[str]] = ["name", "type", "location", "data"]
     slug_url_kwarg = "user_location"
     slug_field = "pk"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Get the context data for the view."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
         return context
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args, **kwargs) -> BaseForm:
+        """get_form preparing the form."""
         form = super().get_form(*args, **kwargs)
         form.fields["location"].widget = LeafletWidget(
             attrs={
@@ -396,7 +430,8 @@ class UserLocationUpdateView(
         )
         return form
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Produce the success url."""
         return reverse(
             "maps_user_location_list",
             kwargs={"camp_slug": self.camp.slug},
@@ -409,12 +444,14 @@ class UserLocationDeleteView(
     UserIsObjectOwnerMixin,
     DeleteView,
 ):
+    """Delete view for UserLocation."""
     model = UserLocation
     template_name = "user_location_delete.html"
     slug_url_kwarg = "user_location"
     slug_field = "pk"
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Produce the success url."""
         messages.success(
             self.request,
             f"Your User Location {self.get_object().name} has been deleted successfully.",
@@ -433,9 +470,10 @@ class UserLocationApiView(
 ):
     """This view has 2 endpoints /create/api (POST) AND /<uuid>/api (GET, PATCH, DELETE)."""
 
-    required_scopes = ["location:write"]
+    required_scopes: ClassVar[list[str]] = ["location:write"]
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs) -> dict:
+        """HTTP Method for viewing a user location."""
         if "user_location" not in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["POST"])
         location = get_object_or_404(
@@ -451,10 +489,11 @@ class UserLocationApiView(
             "data": location.data,
         }
 
-    def post(self, request, **kwargs):
+    def post(self, request: HttpRequest, **kwargs) -> dict:
+        """HTTP Method for creating a user location."""
         if "user_location" in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["GET", "PATCH", "DELETE"])
-        if UserLocation.objects.filter(user=request.user, camp=self.camp).count() > 49:
+        if UserLocation.objects.filter(user=request.user, camp=self.camp).count() >= settings.MAPS_USER_LOCATION_MAX:
             return {"error": "To many user locations created (50)"}
         data = json.loads(request.body)
         try:
@@ -481,7 +520,8 @@ class UserLocationApiView(
             "data": location.data,
         }
 
-    def patch(self, request, **kwargs):
+    def patch(self, request: HttpRequest, **kwargs) -> dict:
+        """HTTP Method for updating a user location."""
         if "user_location" not in kwargs and "camp_slug" not in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["POST"])
         location = get_object_or_404(
@@ -513,7 +553,8 @@ class UserLocationApiView(
             "data": location.data,
         }
 
-    def delete(self, request, **kwargs):
+    def delete(self, request: HttpRequest, **kwargs) -> dict:
+        """HTTP Method for deleting a user location."""
         if "user_location" not in kwargs and "camp_slug" not in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["POST"])
         location = get_object_or_404(

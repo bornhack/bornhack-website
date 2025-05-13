@@ -1,3 +1,4 @@
+"""Test cases for the Maps application."""
 from __future__ import annotations
 
 from unittest import mock
@@ -19,7 +20,9 @@ PASSWORD = "password"
     DATAFORDELER_PASSWORD=PASSWORD,
 )
 class MapProxyViewTest(TestCase):
+    """Test the Proxy view."""
     def setUp(self):
+        """Setup function."""
         self.rf = RequestFactory()
 
         self.allowed_endpoints = [
@@ -29,12 +32,14 @@ class MapProxyViewTest(TestCase):
         ]
 
     def test_endpoint_not_allowed_raises_perm_denied(self):
+        """Test endpoint not allowed."""
         fix_request = self.rf.get("/maps/kfproxy/not/allowed/endpoint")
 
         with self.assertRaises(PermissionDenied):
             MapProxyView.as_view()(fix_request)
 
     def test_all_allowed_endpoints(self):
+        """Test allowed endpoints."""
         for endpoint in self.allowed_endpoints:
             fix_request = self.rf.get("/maps/kfproxy" + endpoint)
             with self.subTest(request=fix_request):
@@ -45,6 +50,7 @@ class MapProxyViewTest(TestCase):
                 self.assertEqual(result.status_code, 200)
 
     def test_sanitizing_path(self):
+        """Test sanitization of paths."""
         fix_path = "/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms?transparent=true"
 
         result = MapProxyView().sanitize_path(fix_path)
@@ -52,6 +58,7 @@ class MapProxyViewTest(TestCase):
         self.assertEqual(result, "/DHMNedboer/dhm/1.0.0/wms?transparent=TRUE")
 
     def test_sanitizing_path_not_failing_without_query(self):
+        """Test sanitization of paths without query."""
         fix_path = "/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms"
 
         result = MapProxyView().sanitize_path(fix_path)
@@ -59,6 +66,7 @@ class MapProxyViewTest(TestCase):
         self.assertEqual(result, "/DHMNedboer/dhm/1.0.0/wms")
 
     def test_append_credentials(self):
+        """Test appending credentials."""
         fix_path = "/path"
         fix_result = fix_path + f"&username={USER}&password={PASSWORD}"
 
@@ -67,6 +75,7 @@ class MapProxyViewTest(TestCase):
         self.assertEqual(result, fix_result)
 
     def test_append_credentials_raises_perm_denied_if_no_creds_is_set(self):
+        """Test appending credentials exceptions."""
         with self.settings(
             DATAFORDELER_USER="",
             DATAFORDELER_PASSWORD="",
