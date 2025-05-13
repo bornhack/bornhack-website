@@ -77,8 +77,9 @@ class Plugin:
         """Triggered when a channel is joined by someone, including the bot itself."""
         if mask.nick == self.bot.nick:
             # the bot just joined a channel
-            if (
-                channel in self.get_managed_team_channels() or channel in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL)
+            if channel in self.get_managed_team_channels() or channel in (
+                settings.IRCBOT_PUBLIC_CHANNEL,
+                settings.IRCBOT_VOLUNTEER_CHANNEL,
             ):
                 logger.debug(
                     f"Just joined a channel I am supposed to be managing, asking ChanServ for info about {channel}",

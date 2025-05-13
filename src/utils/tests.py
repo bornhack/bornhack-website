@@ -1,4 +1,5 @@
 """Base file for tests."""
+
 from __future__ import annotations
 
 import logging
@@ -26,6 +27,7 @@ class TestBootstrapScript(TestCase):
 
 class BornhackTestBase(TestCase):
     """Bornhack base TestCase."""
+
     users: list[User]
     camp: Camp
     team: Team

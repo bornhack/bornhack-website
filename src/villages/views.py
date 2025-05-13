@@ -1,4 +1,5 @@
 """Village related views."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -31,13 +32,15 @@ if TYPE_CHECKING:
     from django.http import HttpRequest
     from django.http import HttpResponse
 
+
 class VillageListView(CampViewMixin, ListView):
     """List villages."""
+
     model = Village
     template_name = "village_list.html"
     context_object_name = "villages"
 
-    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+    def get_context_data(self, **kwargs) -> dict[str, dict[str, str]]:
         """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
@@ -50,6 +53,7 @@ class VillageListView(CampViewMixin, ListView):
 
 class VillageMapView(CampViewMixin, ListView):
     """The village map view."""
+
     model = Village
     template_name = "village_map.html"
     context_object_name = "villages"
@@ -71,6 +75,7 @@ class VillageMapView(CampViewMixin, ListView):
 
 class VillageListGeoJSONView(CampViewMixin, JsonView):
     """GeoJSON view for the village list."""
+
     def get_context_data(self, **kwargs) -> dict[str, str | dict[str, str]]:
         """Add type and features to context."""
         return {"type": "FeatureCollection", "features": self.dump_features()}
@@ -111,6 +116,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
 
 class VillageDetailView(CampViewMixin, DetailView):
     """DetailView for villages."""
+
     model = Village
     template_name = "village_detail.html"
     context_object_name = "village"
@@ -143,11 +149,12 @@ class VillageCreateView(
     CreateView,
 ):
     """Village CreateView."""
+
     model = Village
     template_name = "village_form.html"
     fields = ("name", "description", "private", "location")
 
-    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+    def get_context_data(self, **kwargs) -> dict[str, dict[str, str]]:
         """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
@@ -189,6 +196,7 @@ class VillageCreateView(
 
 class EnsureUserOwnsVillageMixin(SingleObjectMixin):
     """Mixin to ensure user is contact for the village, or staff."""
+
     model = Village
 
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -205,11 +213,12 @@ class VillageUpdateView(
     UpdateView,
 ):
     """Village update view."""
+
     model = Village
     template_name = "village_form.html"
     fields = ("name", "description", "private", "location")
 
-    def get_context_data(self, **kwargs) -> dict[str, dict[str,str]]:
+    def get_context_data(self, **kwargs) -> dict[str, dict[str, str]]:
         """Add village map data to context."""
         context = super().get_context_data(**kwargs)
         context["mapData"] = {"grid": static("json/grid.geojson")}
@@ -257,6 +266,7 @@ class VillageDeleteView(
     DeleteView,
 ):
     """Village delete view."""
+
     model = Village
     template_name = "village_confirm_delete.html"
     context_object_name = "village"

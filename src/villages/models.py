@@ -1,4 +1,5 @@
 """The Village model."""
+
 from __future__ import annotations
 
 from django.contrib.gis.db.models import PointField
@@ -14,8 +15,10 @@ from utils.slugs import unique_slugify
 
 class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel):
     """The Village model."""
+
     class Meta:
         """Model settings."""
+
         ordering = ("name",)
         unique_together = ("slug", "camp")
 
@@ -64,7 +67,7 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
             )
         super().save(**kwargs)
 
-    def delete(self, *, using: str|None=None, keep_parents: bool=False) -> None:
+    def delete(self, *, using: str | None = None, keep_parents: bool = False) -> None:
         """Soft-delete villages."""
         self.deleted = True
         self.save()

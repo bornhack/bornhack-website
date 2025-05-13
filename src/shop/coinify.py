@@ -50,7 +50,6 @@ def save_coinify_callback(request, order):
     )
 
 
-
 def coinify_api_request(api_method, order, payload):
     url = f"{settings.COINIFY_API_URL}{api_method}"
     headers = {
