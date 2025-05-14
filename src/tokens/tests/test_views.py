@@ -112,7 +112,7 @@ class TestTokenViews(BornhackTestBase):
         # Test finding a false token
         url = reverse("tokens:details", kwargs={"token": "F00000001234"})
         response = self.client.get(path=url, follow=True)
-        self.assertEqual(response.status_code, 404, "Did not find a non-excisting token")
+        self.assertEqual(response.status_code, 404, "Did not find a non-existing token")
 
         # Test finding a inactive token
         url = reverse("tokens:details", kwargs={"token": self.token_inactive.token})
