@@ -1,4 +1,5 @@
 """Token template tags for the Token application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

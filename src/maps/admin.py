@@ -30,7 +30,6 @@ class FeatureAdmin(LeafletGeoAdmin, admin.ModelAdmin):
     ]
 
 
-
 @admin.register(Layer)
 class LayerAdmin(admin.ModelAdmin):
     """Layer admin."""

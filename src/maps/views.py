@@ -57,6 +57,7 @@ from .models import UserLocationType
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+
 class MissingCredentialsError(Exception):
     """Missing Credentials Exception."""
 

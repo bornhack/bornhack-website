@@ -7,14 +7,15 @@ from datetime import datetime
 from unittest import skip
 
 import pytz
-from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import Client
 from django.test import TestCase
 
 from camps.models import Camp
 from teams.models import Team
+
 
 class TestBootstrapScript(TestCase):
     """Test bootstrap_devsite script (touching many codepaths)"""
@@ -73,7 +74,7 @@ class BornhackTestBase(TestCase):
         user.save()
         cls.users.append(user)
 
-        #Create a team
+        # Create a team
         team_group = Group(name="Test Team Group")
         team_group.save()
         cls.team = Team(

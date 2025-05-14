@@ -27,7 +27,7 @@ urlpatterns = [
                 path("", VillageDetailView.as_view(), name="village_detail"),
                 path("update/", VillageUpdateView.as_view(), name="village_update"),
                 path("delete/", VillageDeleteView.as_view(), name="village_delete"),
-            ]
+            ],
         ),
     ),
 ]

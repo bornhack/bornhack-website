@@ -1,4 +1,5 @@
 """Test cases for the Maps application."""
+
 from __future__ import annotations
 
 from unittest import mock
@@ -29,6 +30,7 @@ PASSWORD = "password"
 )
 class MapProxyViewTest(TestCase):
     """Test the Proxy view."""
+
     def setUp(self):
         """Setup function."""
         self.rf = RequestFactory()
@@ -84,11 +86,15 @@ class MapProxyViewTest(TestCase):
 
     def test_append_credentials_raises_perm_denied_if_no_creds_is_set(self):
         """Test appending credentials exceptions."""
-        with self.settings(
-            DATAFORDELER_USER="",
-            DATAFORDELER_PASSWORD="",
-        ), self.assertRaises(MissingCredentialsError):
+        with (
+            self.settings(
+                DATAFORDELER_USER="",
+                DATAFORDELER_PASSWORD="",
+            ),
+            self.assertRaises(MissingCredentialsError),
+        ):
             MapProxyView().append_credentials("path")
+
 
 class MapsViewTest(BornhackTestBase):
     """Test Maps View"""
@@ -146,6 +152,7 @@ class MapsViewTest(BornhackTestBase):
             response = self.client.get(url, raise_request_exception=True)
             assert response.status_code == 400
 
+
 class MapsUserLocationViewTest(BornhackTestBase):
     """Test User Location Views"""
 
@@ -157,7 +164,7 @@ class MapsUserLocationViewTest(BornhackTestBase):
         """Setup test data."""
         super().setUpTestData()
 
-        #Create user location type
+        # Create user location type
         cls.user_location_type = UserLocationType(
             name="Test Type",
             slug="test",
@@ -166,31 +173,37 @@ class MapsUserLocationViewTest(BornhackTestBase):
         )
         cls.user_location_type.save()
 
-        #Create user location
+        # Create user location
         cls.user_location = UserLocation(
             name="Test User Location",
-            type = cls.user_location_type,
+            type=cls.user_location_type,
             camp=cls.camp,
             user=cls.users[0],
-            location=Point([9.940218,55.388329]),
+            location=Point([9.940218, 55.388329]),
         )
         cls.user_location.save()
 
     def test_user_location_geojson_view(self) -> None:
         """Test the user location geojson view."""
-        url = reverse("maps_user_location_layer", kwargs={
-            "camp_slug": self.camp.slug,
-            "user_location_type_slug": self.user_location_type.slug,
-        })
+        url = reverse(
+            "maps_user_location_layer",
+            kwargs={
+                "camp_slug": self.camp.slug,
+                "user_location_type_slug": self.user_location_type.slug,
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
     def test_user_location_view(self) -> None:
         """Test the user location list view."""
         self.client.force_login(self.users[0])
-        url = reverse("maps_user_location_list", kwargs={
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "maps_user_location_list",
+            kwargs={
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -202,9 +215,12 @@ class MapsUserLocationViewTest(BornhackTestBase):
     def test_user_location_create(self) -> None:
         """Test the user location create view."""
         self.client.force_login(self.users[0])
-        url = reverse("maps_user_location_create", kwargs={
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "maps_user_location_create",
+            kwargs={
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.post(
             path=url,
             data={
