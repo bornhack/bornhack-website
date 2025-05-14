@@ -13,7 +13,7 @@ from utils.tests import BornhackTestBase
 
 
 class TestTokenViews(BornhackTestBase):
-    """Test Phonebook view."""
+    """Test Token view."""
 
     token: Token
     token_inactive: Token
