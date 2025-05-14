@@ -43,7 +43,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
     slug_field = "token"
     slug_url_kwarg = "token"
 
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponsePermanentRedirect:
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponseRedirect:
         """Method for submitting the token found."""
         if not self.get_object().active:
             messages.warning(
