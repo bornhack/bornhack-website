@@ -17,7 +17,7 @@ from prometheus_client import Gauge
 if TYPE_CHECKING:
     from django.db.models import QuerySet
     from django.http import HttpRequest
-    from django.http import HttpResponsePermanentRedirect
+    from django.http import HttpResponseRedirect
 
 from utils.models import CampReadOnlyModeError
 
