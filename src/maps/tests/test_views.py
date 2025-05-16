@@ -117,7 +117,7 @@ class MapsViewTest(BornhackTestBase):
             description="Test Layer",
             icon="fas fa-tractor",
             group=cls.group,
-            responsible_team=cls.team,
+            responsible_team=cls.teams['noc'],
         )
         cls.layer.save()
 
@@ -209,7 +209,7 @@ class MapsUserLocationViewTest(BornhackTestBase):
 
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 1, "user location list does not return 1 entries")
 
     def test_user_location_create(self) -> None:
@@ -234,5 +234,5 @@ class MapsUserLocationViewTest(BornhackTestBase):
 
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 2, "user location list does not return 2 entries after create")

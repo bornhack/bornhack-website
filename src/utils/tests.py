@@ -3,12 +3,8 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
 from unittest import skip
 
-import pytz
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import Client
 from django.test import TestCase
@@ -16,6 +12,7 @@ from django.test import TestCase
 from camps.models import Camp
 from teams.models import Team
 
+from utils.bootstrap.base import Bootstrap
 
 class TestBootstrapScript(TestCase):
     """Test bootstrap_devsite script (touching many codepaths)"""
@@ -29,9 +26,10 @@ class TestBootstrapScript(TestCase):
 class BornhackTestBase(TestCase):
     """Bornhack base TestCase."""
 
-    users: list[User]
+    users: dict
     camp: Camp
     team: Team
+    bootstrap: Bootstrap
 
     @classmethod
     def setUpTestData(cls) -> None:
@@ -41,49 +39,8 @@ class BornhackTestBase(TestCase):
 
         cls.client = Client(enforce_csrf_checks=False)
 
-        tz = pytz.timezone("Europe/Copenhagen")
-        year = datetime.now(tz).year
-        cls.camp = Camp(
-            title="Test Camp",
-            slug="test-camp",
-            tagline="Such test much wow",
-            shortslug="test-camp",
-            buildup=(
-                datetime(year, 8, 25, 12, 0, tzinfo=tz),
-                datetime(year, 8, 27, 12, 0, tzinfo=tz),
-            ),
-            camp=(
-                datetime(year, 8, 27, 12, 0, tzinfo=tz),
-                datetime(year, 9, 3, 12, 0, tzinfo=tz),
-            ),
-            teardown=(
-                datetime(year, 9, 3, 12, 0, tzinfo=tz),
-                datetime(year, 9, 5, 12, 0, tzinfo=tz),
-            ),
-            colour="#ffffff",
-            light_text=False,
-        )
-        cls.camp.save()
-
-        cls.users = []
-        user = User.objects.create_user(
-            username="user0",
-            email="user0@example.com",
-        )
-        user.set_password("user0")
-        user.save()
-        cls.users.append(user)
-
-        # Create a team
-        team_group = Group(name="Test Team Group")
-        team_group.save()
-        cls.team = Team(
-            camp=cls.camp,
-            name="Test Team",
-            group=team_group,
-            slug="test",
-            shortslug="test",
-            description="Many test Such Team",
-            needs_members=True,
-        )
-        cls.team.save()
+        cls.bootstrap = Bootstrap()
+        cls.bootstrap.bootstrap_tests()
+        cls.camp = cls.bootstrap.camp
+        cls.users = cls.bootstrap.users
+        cls.teams = cls.bootstrap.teams

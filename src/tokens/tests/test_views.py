@@ -83,7 +83,7 @@ class TestTokenViews(BornhackTestBase):
 
     def test_token_list_view(self) -> None:
         """Test the basics of the token list view."""
-        self.client.login(username="user0", password="user0")
+        self.client.force_login(self.users[0])
         url = reverse("tokens:tokenfind_list")
 
         response = self.client.get(url)
@@ -94,7 +94,7 @@ class TestTokenViews(BornhackTestBase):
 
     def test_token_find_view(self) -> None:
         """Test the basics of the token find view."""
-        self.client.login(username="user0", password="user0")
+        self.client.force_login(self.users[0])
 
         url = reverse("tokens:details", kwargs={"token": self.token.token})
 
