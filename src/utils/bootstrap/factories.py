@@ -1,3 +1,5 @@
+"""Factories for bootstrapping the application."""
+
 from __future__ import annotations
 
 import logging
@@ -7,6 +9,7 @@ import factory
 import pytz
 from allauth.account.models import EmailAddress
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 from faker import Faker
 
 from camps.models import Camp
@@ -21,10 +24,9 @@ from program.models import Url
 from program.models import UrlType
 from teams.models import Team
 from utils.slugs import unique_slugify
-from django.db.models.signals import post_save
 
-from .functions import output_fake_md_description
 from .functions import output_fake_description
+from .functions import output_fake_md_description
 
 fake = Faker()
 tz = pytz.timezone("Europe/Copenhagen")
@@ -32,7 +34,11 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ChainFactory(factory.django.DjangoModelFactory):
+    """Factory for creating chains."""
+
     class Meta:
+        """Meta."""
+
         model = Chain
 
     name = factory.Faker("company")
@@ -45,7 +51,11 @@ class ChainFactory(factory.django.DjangoModelFactory):
 
 
 class CredebtorFactory(factory.django.DjangoModelFactory):
+    """Factory for creating Creditors and debitors."""
+
     class Meta:
+        """Meta."""
+
         model = Credebtor
 
     chain = factory.SubFactory(ChainFactory)
@@ -61,7 +71,11 @@ class CredebtorFactory(factory.django.DjangoModelFactory):
 
 
 class ExpenseFactory(factory.django.DjangoModelFactory):
+    """Factory for creating expense data."""
+
     class Meta:
+        """Meta."""
+
         model = Expense
 
     camp = factory.Faker("random_element", elements=Camp.objects.all())
@@ -71,7 +85,7 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
     description = factory.Faker("text")
     paid_by_bornhack = factory.Faker("random_element", elements=[True, True, False])
     invoice = factory.django.ImageField(
-        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),  # noqa: S311
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
@@ -80,7 +94,11 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
 
 
 class RevenueFactory(factory.django.DjangoModelFactory):
+    """Factory for creating revenue data."""
+
     class Meta:
+        """Meta."""
+
         model = Revenue
 
     camp = factory.Faker("random_element", elements=Camp.objects.all())
@@ -89,7 +107,7 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     amount = factory.Faker("random_int", min=20, max=20000)
     description = factory.Faker("text")
     invoice = factory.django.ImageField(
-        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),  # noqa: S311
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
@@ -98,7 +116,11 @@ class RevenueFactory(factory.django.DjangoModelFactory):
 
 
 class ProfileFactory(factory.django.DjangoModelFactory):
+    """Factory for creating user profiles."""
+
     class Meta:
+        """Meta."""
+
         model = Profile
 
     user = factory.SubFactory("self.UserFactory", profile=None)
@@ -110,21 +132,34 @@ class ProfileFactory(factory.django.DjangoModelFactory):
 
 @factory.django.mute_signals(post_save)
 class UserFactory(factory.django.DjangoModelFactory):
+    """Factory for creating a User."""
+
     class Meta:
+        """Meta."""
+
         model = User
 
     profile = factory.RelatedFactory(ProfileFactory, "user")
 
 
 class EmailAddressFactory(factory.django.DjangoModelFactory):
+    """Factory for email address."""
+
     class Meta:
+        """Meta."""
+
         model = EmailAddress
 
     primary = False
     verified = True
 
+
 class SpeakerProposalFactory(factory.django.DjangoModelFactory):
+    """Factory for speaker proposals."""
+
     class Meta:
+        """Meta."""
+
         model = SpeakerProposal
 
     name = factory.Faker("name")
@@ -135,7 +170,11 @@ class SpeakerProposalFactory(factory.django.DjangoModelFactory):
 
 
 class EventProposalFactory(factory.django.DjangoModelFactory):
+    """Factory for event proposals."""
+
     class Meta:
+        """Meta."""
+
         model = EventProposal
 
     user = factory.Iterator(User.objects.all())
@@ -148,7 +187,11 @@ class EventProposalFactory(factory.django.DjangoModelFactory):
 
 
 class EventProposalUrlFactory(factory.django.DjangoModelFactory):
+    """Factory for event proposal urls."""
+
     class Meta:
+        """Meta."""
+
         model = Url
 
     url = factory.Faker("url")
@@ -156,10 +199,12 @@ class EventProposalUrlFactory(factory.django.DjangoModelFactory):
 
 
 class SpeakerProposalUrlFactory(factory.django.DjangoModelFactory):
+    """Factory for speaker proposal urls."""
+
     class Meta:
+        """Meta."""
+
         model = Url
 
     url = factory.Faker("url")
     url_type = factory.Iterator(UrlType.objects.all())
-
-
