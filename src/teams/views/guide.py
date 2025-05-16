@@ -1,3 +1,4 @@
+"""Views for the guide of the teams application."""
 from __future__ import annotations
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,6 +11,7 @@ from teams.models import TeamMember
 
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, DetailView):
+    """View for the team guide."""
     template_name = "team_guide.html"
     context_object_name = "team"
     model = Team
@@ -17,7 +19,7 @@ class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, Deta
     active_menu = "guide"
 
     def test_func(self) -> bool:
-        # Make sure that the user is an approved member of the team
+        """Method to test if the user is approved for this team."""
         try:
             TeamMember.objects.get(
                 user=self.request.user,
@@ -31,4 +33,8 @@ class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, Deta
 
 
 class TeamGuidePrintView(TeamGuideView):
+    """View for printing the team guide.
+
+    Includes permissions from TeamGuideView
+    """
     template_name = "team_guide_print.html"

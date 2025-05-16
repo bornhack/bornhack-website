@@ -19,12 +19,12 @@
     </a>
   {% endif %}
 
-  <table class="table table-condensed">
+  <table id="main_table" class="table table-condensed">
     <tbody>
       {% for shift in shifts %}
         {% ifchanged shift.shift_range.lower|date:'d' %}
           <tr>
-            <td colspan=4>
+            <td colspan=5>
               <h4>
                 {{ shift.shift_range.lower|date:'Y-m-d l' }}
               </h4>

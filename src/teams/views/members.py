@@ -22,6 +22,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamMembersView(CampViewMixin, DetailView):
+    """List view for team members."""
     template_name = "team_members.html"
     context_object_name = "team"
     model = Team
@@ -30,13 +31,14 @@ class TeamMembersView(CampViewMixin, DetailView):
 
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
+    """View displayed when joining a team."""
     template_name = "team_join.html"
     model = Team
     fields = []
     slug_url_kwarg = "team_slug"
     active_menu = "members"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) ->HttpResponse:
         if not Profile.objects.get(user=request.user).description:
             messages.warning(
                 request,
