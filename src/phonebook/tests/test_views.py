@@ -53,23 +53,23 @@ class TestPhonebookViews(BornhackTestBase):
         response = self.client.get(url)
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 2, "phonebook list does not return 2 entries")
 
     def test_dect_registration_list_view(self) -> None:
         """Test the basics of the dect registrations list view."""
         url = reverse("phonebook:dectregistration_list", kwargs={"camp_slug": self.camp.slug})
-        self.client.login(username="user0", password="user0")
+        self.client.force_login(self.users[0]) 
 
         response = self.client.get(url)
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > div > div > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 3, "dect registration list does not return 2 registrations")
 
     def test_dect_registration_create_view(self) -> None:
         """Test the basics of the dect registrations create view."""
-        self.client.login(username="user0", password="user0")
+        self.client.force_login(self.users[0]) 
 
         url = reverse("phonebook:dectregistration_create", kwargs={"camp_slug": self.camp.slug})
 
@@ -90,7 +90,7 @@ class TestPhonebookViews(BornhackTestBase):
         # Test if the registration shows up
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > div > div > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 4, "dect registration create number failed")
 
         # Test Named number
@@ -110,7 +110,7 @@ class TestPhonebookViews(BornhackTestBase):
         # Test if the registration shows up
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > div > div > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 5, "dect registration create INFO failed")
 
         # Test duplicated number
@@ -158,5 +158,5 @@ class TestPhonebookViews(BornhackTestBase):
         response = self.client.get(url)
         content = response.content.decode()
         soup = BeautifulSoup(content, "html.parser")
-        rows = soup.select("div#main > table > tbody > tr")
+        rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 3, "phonebook list does not return 3 entries after create")
