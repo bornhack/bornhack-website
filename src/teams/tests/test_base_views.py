@@ -96,7 +96,7 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         soup = BeautifulSoup(content, "html.parser")
         rows = soup.select("div.alert.alert-warning")
         matches = [s for s in rows if "This team does not need members right now" in str(s)]
-        self.assertEqual(len(matches), 1, "member was able to join twice.")
+        self.assertEqual(len(matches), 1, "member was able to join a team which does not need members.")
 
         # Test leaving the team.
         url = reverse("teams:leave", kwargs={
