@@ -21,6 +21,8 @@ from django.views.generic import View
 from psycopg2.extras import DateTimeTZRange
 
 from camps.mixins import CampViewMixin
+from teams.exceptions import StartAfterEndError
+from teams.exceptions import StartSameAsEndError
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
@@ -69,7 +71,7 @@ def date_choices(camp: Camp) -> list:
         minute_choices.append(minutes)
         index += 1
 
-    def get_time_choices(date) -> list:
+    def get_time_choices(date: str) -> list:
         """Method for making a list of time options."""
         time_choices = []
         for hour in range(24):
@@ -136,9 +138,9 @@ class ShiftForm(forms.ModelForm):
         self.lower = self._get_from_datetime()
         self.upper = self._get_to_datetime()
         if self.lower > self.upper:
-            raise forms.ValidationError("Start can not be after end.")
+            raise StartAfterEndError
         if self.lower == self.upper:
-            raise forms.ValidationError("Start can not be the same as end.")
+            raise StartSameAsEndError
 
     def save(self, commit=True) -> TeamShift:
         """Method for saving shift_range from self.lower and self.upper."""

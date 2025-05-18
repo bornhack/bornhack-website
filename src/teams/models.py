@@ -9,7 +9,6 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateTimeRangeField
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
@@ -19,6 +18,9 @@ from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 from utils.slugs import unique_slugify
+
+from .exceptions import IrcChannelInUseError
+from .exceptions import ReservedIrcNameError
 
 if TYPE_CHECKING:
     from typing import ClassVar
@@ -225,9 +227,9 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
         # make sure the channel names are not reserved
         if self.public_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL):
-            raise ValidationError("The public IRC channel name is reserved")
+            raise ReservedIrcNameError
         if self.private_irc_channel_name in (settings.IRCBOT_PUBLIC_CHANNEL, settings.IRCBOT_VOLUNTEER_CHANNEL):
-            raise ValidationError("The private IRC channel name is reserved")
+            raise ReservedIrcNameError
 
         # make sure public_irc_channel_name is not in use as public or private irc channel for another team,
         # case insensitive
@@ -243,9 +245,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
             .exclude(pk=self.pk)
             .exists()
         ):
-            raise ValidationError(
-                "The public IRC channel name is already in use on another team!",
-            )
+            raise IrcChannelInUseError
 
         # make sure private_irc_channel_name is not in use as public or private irc channel for another team,
         # case insensitive
@@ -261,9 +261,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
             .exclude(pk=self.pk)
             .exists()
         ):
-            raise ValidationError(
-                "The private IRC channel name is already in use on another team!",
-            )
+            raise IrcChannelInUseError
 
     @property
     def memberships(self) -> QuerySet:

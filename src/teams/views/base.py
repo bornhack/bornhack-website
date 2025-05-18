@@ -42,12 +42,12 @@ class TeamListView(CampViewMixin, ListView):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related("members")
         return qs.prefetch_related("members__profile")
-        # FIXME: there is more to be gained here but the templatetag we use to see if
+        # TODO(someone): there is more to be gained here but the templatetag we use to see if
         # the logged-in user is a member of the current team does not benefit from the prefetching,
         # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
 
-    def get_context_data(self, *, object_list=None, **kwargs) -> dict:
+    def get_context_data(self, *, object_list: list|None =None, **kwargs) -> dict:
         """Method for adding user_teams to the context."""
         context = super().get_context_data(object_list=object_list, **kwargs)
         if self.request.user.is_authenticated:
