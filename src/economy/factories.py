@@ -1,20 +1,31 @@
 from __future__ import annotations
 
+import random
+
 import factory
+from django.contrib.auth.models import User
 from django.utils import timezone
+from utils.slugs import unique_slugify
+
+from camps.models import Camp
+from teams.models import Team
 
 from .models import Bank
 from .models import BankAccount
 from .models import BankTransaction
+from .models import Chain
 from .models import ClearhausSettlement
 from .models import CoinifyBalance
 from .models import CoinifyInvoice
 from .models import CoinifyPaymentIntent
 from .models import CoinifyPayout
 from .models import CoinifySettlement
+from .models import Credebtor
 from .models import EpayTransaction
+from .models import Expense
 from .models import MobilePayTransaction
 from .models import Pos
+from .models import Revenue
 from .models import ZettleBalance
 from .models import ZettleReceipt
 
@@ -482,3 +493,84 @@ class PosFactory(factory.django.DjangoModelFactory):
     team = factory.SubFactory("teams.factories.TeamFactory")
     name = factory.Faker("name")
     external_id = factory.Faker("word")
+
+
+class ChainFactory(factory.django.DjangoModelFactory):
+    """Factory for creating chains."""
+
+    class Meta:
+        """Meta."""
+
+        model = Chain
+
+    name = factory.Faker("company")
+    slug = factory.LazyAttribute(
+        lambda f: unique_slugify(
+            f.name,
+            Chain.objects.all().values_list("slug", flat=True),
+        ),
+    )
+
+
+class CredebtorFactory(factory.django.DjangoModelFactory):
+    """Factory for creating Creditors and debitors."""
+
+    class Meta:
+        """Meta."""
+
+        model = Credebtor
+
+    chain = factory.SubFactory(ChainFactory)
+    name = factory.Faker("company")
+    slug = factory.LazyAttribute(
+        lambda f: unique_slugify(
+            f.name,
+            Credebtor.objects.all().values_list("slug", flat=True),
+        ),
+    )
+    address = factory.Faker("address", locale="dk_DK")
+    notes = factory.Faker("text")
+
+class ExpenseFactory(factory.django.DjangoModelFactory):
+    """Factory for creating expense data."""
+
+    class Meta:
+        """Meta."""
+
+        model = Expense
+
+    camp = factory.Faker("random_element", elements=Camp.objects.all())
+    creditor = factory.Faker("random_element", elements=Credebtor.objects.all())
+    user = factory.Faker("random_element", elements=User.objects.all())
+    amount = factory.Faker("random_int", min=20, max=20000)
+    description = factory.Faker("text")
+    paid_by_bornhack = factory.Faker("random_element", elements=[True, True, False])
+    invoice = factory.django.ImageField(
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
+    )
+    invoice_date = factory.Faker("date")
+    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
+    approved = factory.Faker("random_element", elements=[True, True, False])
+    notes = factory.Faker("text")
+
+
+class RevenueFactory(factory.django.DjangoModelFactory):
+    """Factory for creating revenue data."""
+
+    class Meta:
+        """Meta."""
+
+        model = Revenue
+
+    camp = factory.Faker("random_element", elements=Camp.objects.all())
+    debtor = factory.Faker("random_element", elements=Credebtor.objects.all())
+    user = factory.Faker("random_element", elements=User.objects.all())
+    amount = factory.Faker("random_int", min=20, max=20000)
+    description = factory.Faker("text")
+    invoice = factory.django.ImageField(
+        color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
+    )
+    invoice_date = factory.Faker("date")
+    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
+    approved = factory.Faker("random_element", elements=[True, True, False])
+    notes = factory.Faker("text")
