@@ -3,6 +3,8 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from django.conf import settings
+
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -37,6 +39,23 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
 
     raise_exception = True
 
+class IsPermissionMixin:
+    """Mixing for adding is_team_{perm} to context"""
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        perms = self.request.user.get_all_permissions()
+        # add bools for each of settings.BORNHACK_TEAM_PERMISSIONS
+        for perm in settings.BORNHACK_TEAM_PERMISSIONS:
+            # loop over user permissions and set context
+            for user_perm in perms:
+                if user_perm.startswith("camps.") and user_perm.endswith(
+                    f"_team_{perm}",
+                ):
+                    context[f"is_team_{perm}"] = True
+                    break
+            else:
+                context[f"is_team_{perm}"] = False
+        return context
 
 class BaseTeamPermRequiredMixin:
     """Base class for Team<foo>RequiredMixins."""

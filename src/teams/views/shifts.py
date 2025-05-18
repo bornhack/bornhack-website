@@ -24,6 +24,9 @@ from camps.mixins import CampViewMixin
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
+from utils.mixins import IsPermissionMixin
+
+from .mixins import EnsureTeamLeadMixin
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -33,7 +36,7 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 
-class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
+class ShiftListView(LoginRequiredMixin, CampViewMixin, IsPermissionMixin, ListView):
     """Shift list view."""
     model = TeamShift
     template_name = "team_shift_list.html"
@@ -94,7 +97,7 @@ class ShiftForm(forms.ModelForm):
         model = TeamShift
         fields = ("from_datetime", "to_datetime", "people_required")
 
-    def __init__(self, instance: dict|None=None, **kwargs) -> None:
+    def __init__(self, instance: TeamShift|None=None, **kwargs) -> None:
         """Method for setting up the form."""
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
@@ -125,11 +128,17 @@ class ShiftForm(forms.ModelForm):
         return self.cleaned_data["to_datetime"].astimezone(current_timezone)
 
     def clean(self) -> None:
-        """Method for cleaning the form data and check lower is bigger then upper."""
+        """Method for cleaning the form data.
+
+        Check lower is bigger then upper
+        Check lower and upper are not the same
+        """
         self.lower = self._get_from_datetime()
         self.upper = self._get_to_datetime()
         if self.lower > self.upper:
             raise forms.ValidationError("Start can not be after end.")
+        if self.lower == self.upper:
+            raise forms.ValidationError("Start can not be the same as end.")
 
     def save(self, commit=True) -> TeamShift:
         """Method for saving shift_range from self.lower and self.upper."""
@@ -138,7 +147,7 @@ class ShiftForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
+class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, CreateView):
     """View for creating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
@@ -171,7 +180,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
-class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
+class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, UpdateView):
     """View for updating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
@@ -196,7 +205,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
-class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
+class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, DeleteView):
     """View for deleting a shift."""
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
@@ -236,7 +245,7 @@ class MultipleShiftForm(forms.Form):
     people_required = forms.IntegerField()
 
 
-class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
+class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, FormView):
     """View for creating multiple shifts."""
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm

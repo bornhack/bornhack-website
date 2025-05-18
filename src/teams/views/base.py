@@ -1,6 +1,8 @@
+"""Base view for teams."""
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib import messages
@@ -14,19 +16,29 @@ from django.views.generic.edit import UpdateView
 from camps.mixins import CampViewMixin
 from teams.models import Team
 from teams.models import TeamMember
+from utils.mixins import IsPermissionMixin
 from utils.widgets import MarkdownWidget
 
 from .mixins import EnsureTeamLeadMixin
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.forms import Form
+    from django.http import HttpRequest
+    from django.http import HttpResponse
+    from django.http import HttpResponseRedirect
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class TeamListView(CampViewMixin, ListView):
+    """View for the list of teams."""
     template_name = "team_list.html"
     model = Team
     context_object_name = "teams"
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args, **kwargs) -> QuerySet:
+        """Method for prefetching team members."""
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related("members")
         return qs.prefetch_related("members__profile")
@@ -35,7 +47,8 @@ class TeamListView(CampViewMixin, ListView):
         # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
 
-    def get_context_data(self, *, object_list=None, **kwargs):
+    def get_context_data(self, *, object_list=None, **kwargs) -> dict:
+        """Method for adding user_teams to the context."""
         context = super().get_context_data(object_list=object_list, **kwargs)
         if self.request.user.is_authenticated:
             context["user_teams"] = self.request.user.teammember_set.filter(
@@ -44,24 +57,27 @@ class TeamListView(CampViewMixin, ListView):
         return context
 
 
-class TeamGeneralView(CampViewMixin, DetailView):
+class TeamGeneralView(CampViewMixin, IsPermissionMixin, DetailView):
+    """General view for a team."""
     template_name = "team_general.html"
     context_object_name = "team"
     model = Team
     slug_url_kwarg = "team_slug"
     active_menu = "general"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding ircbot info to context."""
         context = super().get_context_data(**kwargs)
         context["IRCBOT_SERVER_HOSTNAME"] = settings.IRCBOT_SERVER_HOSTNAME
         context["IRCBOT_PUBLIC_CHANNEL"] = settings.IRCBOT_PUBLIC_CHANNEL
         return context
 
 
-class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, UpdateView):
+class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, UpdateView):
+    """View for mananaging team members."""
     model = Team
     template_name = "team_manage.html"
-    fields = [
+    fields = (
         "description",
         "needs_members",
         "public_irc_channel_name",
@@ -73,32 +89,37 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, UpdateView):
         "public_signal_channel_link",
         "private_signal_channel_link",
         "guide",
-    ]
+    )
     slug_url_kwarg = "team_slug"
 
-    def get_form(self, *args, **kwargs):
+    def get_form(self, *args, **kwargs) -> Form:
+        """Method for updating form widgets."""
         form = super().get_form(*args, **kwargs)
         form.fields["guide"].widget = MarkdownWidget()
         return form
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Method for returning the success url."""
         return reverse_lazy(
             "teams:general",
             kwargs={"camp_slug": self.camp.slug, "team_slug": self.get_object().slug},
         )
 
-    def form_valid(self, form):
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method for sending success message if form is valid."""
         messages.success(self.request, "Team has been saved")
         return super().form_valid(form)
 
 
-class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
+class FixIrcAclView(LoginRequiredMixin, CampViewMixin, IsPermissionMixin, UpdateView):
+    """View for fixing IRC ACL's."""
     template_name = "fix_irc_acl.html"
     model = Team
-    fields = []
+    fields = ()
     slug_url_kwarg = "team_slug"
 
-    def dispatch(self, request, *args, **kwargs):
+    def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """Method dispatch."""
         # we need to call the super().dispatch() method early so self.camp gets populated by CampViewMixin,
         # because the lookups below depend on self.camp being set :)
         response = super().dispatch(request, *args, **kwargs)
@@ -128,7 +149,8 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         if not request.user.profile.nickserv_username:
             messages.error(
                 request,
-                "Please go to your profile and set your NickServ username first. Make sure the account is registered with NickServ first!",
+                "Please go to your profile and set your NickServ username first. "
+                "Make sure the account is registered with NickServ first!",
             )
             return redirect(
                 "teams:general",
@@ -138,8 +160,8 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
         return response
 
-    def get(self, request, *args, **kwargs):
-        # get membership
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """Get membership."""
         try:
             TeamMember.objects.get(
                 user=request.user,
@@ -148,10 +170,10 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
                 irc_channel_acl_ok=True,
             )
         except TeamMember.DoesNotExist:
-            # this membership is already marked as membership.irc_channel_acl_ok=False, no need to do anything
             messages.error(
                 request,
-                "No need, this membership is already marked as irc_channel_acl_ok=False, so the bot will fix the ACL soon",
+                "No need, this membership is already marked as irc_channel_acl_ok=False, "
+                "so the bot will fix the ACL soon",
             )
             return redirect(
                 "teams:general",
@@ -161,7 +183,8 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
         return super().get(request, *args, **kwargs)
 
-    def form_valid(self, form):
+    def form_valid(self, form: Form) -> HttpResponseRedirect:
+        """Method for adding membership and returning a message."""
         membership = TeamMember.objects.get(
             user=self.request.user,
             team=self.get_object(),
@@ -173,7 +196,8 @@ class FixIrcAclView(LoginRequiredMixin, CampViewMixin, UpdateView):
         membership.save()
         messages.success(
             self.request,
-            f"OK, hang on while we fix the permissions for your NickServ user '{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'",
+            f"OK, hang on while we fix the permissions for your NickServ user "
+            f"'{self.request.user.profile.nickserv_username}' for IRC channel '{form.instance.irc_channel_name}'",
         )
         return redirect(
             "teams:general",
