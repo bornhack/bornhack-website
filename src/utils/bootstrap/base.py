@@ -1,4 +1,4 @@
-"""Base class for bootstrapping the application."""
+"""Base class for bootstrapping testdata in the application."""
 
 from __future__ import annotations
 
@@ -35,8 +35,11 @@ from economy.factories import CoinifyInvoiceFactory
 from economy.factories import CoinifyPaymentIntentFactory
 from economy.factories import CoinifyPayoutFactory
 from economy.factories import CoinifySettlementFactory
+from economy.factories import CredebtorFactory
 from economy.factories import EpayTransactionFactory
+from economy.factories import ExpenseFactory
 from economy.factories import MobilePayTransactionFactory
+from economy.factories import RevenueFactory
 from economy.factories import ZettleBalanceFactory
 from economy.factories import ZettleReceiptFactory
 from economy.models import Chain
@@ -44,6 +47,10 @@ from economy.models import Credebtor
 from economy.models import Expense
 from economy.models import Pos
 from economy.models import Reimbursement
+from events.factories import EventProposalFactory
+from events.factories import EventProposalUrlFactory
+from events.factories import SpeakerProposalFactory
+from events.factories import SpeakerProposalUrlFactory
 from events.models import Routing
 from events.models import Type
 from facilities.models import Facility
@@ -57,6 +64,8 @@ from maps.models import Feature
 from maps.models import Group as MapGroup
 from maps.models import Layer
 from news.models import NewsItem
+from profiles.factories import EmailAddressFactory
+from profiles.factories import UserFactory
 from program.autoscheduler import AutoScheduler
 from program.models import Event
 from program.models import EventLocation
@@ -85,15 +94,6 @@ from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
 
-from .factories import CredebtorFactory
-from .factories import EmailAddressFactory
-from .factories import EventProposalFactory
-from .factories import EventProposalUrlFactory
-from .factories import ExpenseFactory
-from .factories import RevenueFactory
-from .factories import SpeakerProposalFactory
-from .factories import SpeakerProposalUrlFactory
-from .factories import UserFactory
 from .functions import output_fake_md_description
 
 fake = Faker()
@@ -2160,6 +2160,7 @@ class Bootstrap:
             teams[year] = self.create_camp_teams(camp)
             self.create_camp_team_memberships(camp, teams[year], self.users)
 
+
             camp.read_only = read_only
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
@@ -2292,7 +2293,6 @@ class Bootstrap:
             if camp.camp.lower.year == settings.UPCOMING_CAMP_YEAR:
                 for member in TeamMember.objects.filter(team__camp=camp):
                     member.save()
-
 
     def bootstrap_base(self, options: dict) -> None:
         """Bootstrap the data for the application."""

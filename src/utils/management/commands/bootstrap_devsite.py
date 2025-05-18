@@ -2,10 +2,11 @@ from __future__ import annotations
 
 import logging
 
-from utils.bootstrap.base import Bootstrap
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from utils.bootstrap.base import Bootstrap
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
