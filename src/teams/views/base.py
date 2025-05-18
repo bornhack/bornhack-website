@@ -42,7 +42,7 @@ class TeamListView(CampViewMixin, ListView):
         qs = super().get_queryset(*args, **kwargs)
         qs = qs.prefetch_related("members")
         return qs.prefetch_related("members__profile")
-        # TODO(someone): there is more to be gained here but the templatetag we use to see if
+        # TODO(tyk): there is more to be gained here but the templatetag we use to see if
         # the logged-in user is a member of the current team does not benefit from the prefetching,
         # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
