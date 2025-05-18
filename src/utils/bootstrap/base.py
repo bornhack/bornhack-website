@@ -1,4 +1,4 @@
-"""Base class for bootstrapping the application."""
+"""Base class for bootstrapping testdata in the application."""
 
 from __future__ import annotations
 
