@@ -170,6 +170,7 @@ ignore_missing_model_attributes = true
 omit = [
     "*/tests.py",
     "*/tests/test_*.py",
+    "*/migrations/*.py",
 ]
 
 [tool.coverage.report]
