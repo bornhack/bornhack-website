@@ -1,4 +1,13 @@
+"""Django admin for teams."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import ClassVar
+
+    from django.db.models import QuerySet
+    from django.http import HttpRequest
 
 from django.contrib import admin
 
@@ -14,26 +23,30 @@ from .models import TeamTask
 
 @admin.register(TeamTask)
 class TeamTaskAdmin(admin.ModelAdmin):
-    list_display = ["id", "team", "name", "description"]
+    """Django admin for team tasks."""
+    list_display: ClassVar[list[str]] = ["id", "team", "name", "description"]
 
 
 class TeamMemberInline(admin.TabularInline):
+    """Django admin inline field for team member."""
     model = TeamMember
 
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
+    """Django admin for teams."""
     save_as = True
 
     @admin.display(
         description="Leads",
     )
-    def get_leads(self, obj):
+    def get_leads(self, obj: Team) -> str:
+        """Method to return team leads."""
         return ", ".join(
             [lead.profile.public_credit_name for lead in obj.leads.all()],
         )
 
-    list_display = [
+    list_display: ClassVar[list[str]] = [
         "name",
         "camp",
         "get_leads",
@@ -46,7 +59,7 @@ class TeamAdmin(admin.ModelAdmin):
         "private_irc_channel_managed",
     ]
 
-    list_filter = [
+    list_filter: ClassVar[list[str]] = [
         CampPropertyListFilter,
         "needs_members",
         "public_irc_channel_bot",
@@ -54,16 +67,18 @@ class TeamAdmin(admin.ModelAdmin):
         "private_irc_channel_bot",
         "private_irc_channel_managed",
     ]
-    inlines = [TeamMemberInline]
+    inlines: ClassVar[list] = [TeamMemberInline]
 
 
 @admin.register(TeamMember)
 class TeamMemberAdmin(admin.ModelAdmin):
-    list_filter = [CampPropertyListFilter, "team", "approved"]
+    """Django admin for team members."""
+    list_filter: ClassVar[list] = [CampPropertyListFilter, "team", "approved"]
 
-    actions = ["approve_membership", "remove_member"]
+    actions: ClassVar[list[str]] = ["approve_membership", "remove_member"]
 
-    def approve_membership(self, request, queryset) -> None:
+    def approve_membership(self, request: HttpRequest, queryset: QuerySet) -> None:
+        """Method for approving team membership status."""
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 
@@ -80,7 +95,8 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
     approve_membership.description = "Approve membership."
 
-    def remove_member(self, request, queryset) -> None:
+    def remove_member(self, request: HttpRequest, queryset: QuerySet) -> None:
+        """Method for removing team membership status."""
         teams_count = queryset.values("team").distinct().count()
         updated = 0
 
@@ -99,4 +115,5 @@ class TeamMemberAdmin(admin.ModelAdmin):
 
 @admin.register(TeamShift)
 class TeamShiftAdmin(admin.ModelAdmin):
-    list_filter = ["team"]
+    """Django admin for team shifts."""
+    list_filter: ClassVar[list[str]] = ["team"]

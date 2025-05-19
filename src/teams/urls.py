@@ -1,3 +1,4 @@
+"""Django URLs for application Teams."""
 from __future__ import annotations
 
 from django.urls import include

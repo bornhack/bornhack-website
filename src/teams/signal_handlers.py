@@ -1,13 +1,21 @@
+"""Signals for the teams application."""
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
+
+    from teams.models import TeamMember
+
 
 from django.conf import settings
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def teammember_saved(sender, instance, created, **kwargs) -> None:
+def teammember_saved(sender: User, instance: TeamMember, created: bool, **_kwargs) -> None:
     """This signal handler is called whenever a TeamMember instance is saved."""
     # if this is a new unapproved teammember send a mail to team leads
     if created and not instance.approved:
@@ -24,14 +32,14 @@ def teammember_saved(sender, instance, created, **kwargs) -> None:
     instance.update_team_lead_permissions()
 
 
-def teammember_deleted(sender, instance, **kwargs) -> None:
+def teammember_deleted(sender: User, instance: TeamMember, **_kwargs) -> None:
     """This signal handler is called whenever a TeamMember instance is deleted."""
     if instance.team.private_irc_channel_name and instance.team.private_irc_channel_managed:
-        # TODO: remove user from private channel ACL
+        # TODO(tyk): remove user from private channel ACL
         pass
 
     if instance.team.public_irc_channel_name and instance.team.public_irc_channel_managed:
-        # TODO: remove user from public channel ACL
+        # TODO(tyk): remove user from public channel ACL
         pass
 
     # make sure the teams group membership is uptodate
@@ -39,7 +47,7 @@ def teammember_deleted(sender, instance, **kwargs) -> None:
     instance.update_team_lead_permissions(deleted=True)
 
 
-def team_saved(sender, instance, created, **kwargs) -> None:
+def team_saved(sender: User, instance: TeamMember, created: bool, **_kwargs) -> None:
     """This signal handler is called whenever a Team instance is saved."""
     # late imports
     from django.contrib.auth.models import Permission
