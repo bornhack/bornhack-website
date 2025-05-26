@@ -56,9 +56,9 @@ If you already cloned the repository without --recursive, you can change into th
     git submodule update --init --recursive
 
 #### Virtualenv
-Create a Python 3.7 virtual environment and activate it:
+Create a Python >= 3.11 virtual environment and activate it:
 ```
-$ virtualenv venv -p python3.7
+$ virtualenv venv
 $ source venv/bin/activate
 ```
 
@@ -84,6 +84,7 @@ Install system dependencies (method depends on OS):
   - OpenBSD: pkg_add libmagic
   - macOS: brew install libmagic
 - GDAL (might already be installed)
+  - Arch: gdal
   - macOS: brew install gdal
 - wkhtmltopdf (also for pdf generation):
   - OpenBSD: pkg_add wkhtmltopdf
@@ -100,7 +101,7 @@ Install system dependencies (method depends on OS):
 #### Python packages
 Install pip packages:
 ```
-(venv) $ pip install -r src/requirements/dev.txt
+(venv) $ pip install .[dev]
 ```
 
 #### Postgres
