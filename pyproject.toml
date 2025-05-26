@@ -19,7 +19,7 @@ dependencies = [
     "asyncio==3.4.3",
     "commonmark==0.9.1",
     "conference-scheduler==3.0.1",
-    "django-allauth[mfa]==65.8.0",
+    "django-allauth[mfa]==65.8.1",
     "django-bootstrap5==25.1",
     "django-colorfield==0.14.0",
     "django-cors-headers==4.7.0",
@@ -54,7 +54,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+
+bootstrap = [
+    "factory_boy==3.3.3",
+]
+
 dev = [
+    "bornhack-website[bootstrap]",
     "pre-commit==4.2.0",
     "setuptools_scm==8.3.1",
     "django-debug-toolbar==5.2.0",
@@ -64,13 +70,14 @@ dev = [
 ]
 
 test = [
+    "bornhack-website[bootstrap]",
     "beautifulsoup4==4.13.4",
     "coverage==7.8.0",
-    "factory_boy==3.3.3",
     "hypothesis==6.131.15",
     "beautifulsoup4==4.13.4",
     "unittest-xml-reporting==3.2.0",
 ]
+
 
 [project.urls]
 homepage = "https://github.com/bornhack/bornhack-website"
