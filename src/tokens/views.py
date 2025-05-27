@@ -116,4 +116,10 @@ class TokenFindListView(LoginRequiredMixin, ListView):
     def get_queryset(self) -> QuerySet:
         """Get QuerySet of active tokens."""
         qs = super().get_queryset()
-        return qs.filter(active=True)
+        return qs.filter(active=True).filter()
+
+    def get_context_data(self, **kwargs):
+        """Get all of the metrics for statistics not included by the queryset"""
+        context = super().get_context_data(**kwargs)
+        context["user_found_tokens"] = TokenFind.objects.filter(user=self.request.user)
+        return context

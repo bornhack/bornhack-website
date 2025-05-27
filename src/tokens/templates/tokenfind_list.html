@@ -1,4 +1,4 @@
-{% extends 'profile_base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load commonmark %}$
 {% load token_tags %}
@@ -7,7 +7,215 @@
   Your Secret Tokens | {{ block.super }}
 {% endblock %}
 
-{% block profile_content %}
+{% block content %}
+
+  <div class="row mb-3">
+    <div class="col-12 col-lg-6">
+      <div class="mb-5">
+        <h2 class="mb-2">Token game dashboard</h2>
+      </div>
+      <div class="row align-items-center g-4">
+        <div class="col-12 col-md-auto me-4">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="fa-solid fa-star fa-3x text-success"></i>
+            </span>
+            <div class="ms-3">
+              <h5>{{ user_found_tokens|length }} found</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-auto">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="fa-solid fa-rectangle-list fa-3x text-primary"></i>
+            </span>
+            <div class="ms-3">
+              <h5>N missing</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="my-4">
+      <div class="row">
+        <div class="col-12 col-md-auto">
+          <h3 class="mb-3">How to play?</h3>
+          <p>The <b>token game</b> lasts the whole event and is about finding little text strings matching the regular expression:</p>
+          <p><code>[0-9a-zA-Z\.@]{12,32}</code></p>
+          <p>Token examples:</p>
+          <p>
+          <ul>
+            <li><code>BornHackYYYY</code></li>
+            <li><code>cm9sbGllczIwMjR5b3V3aW4K</code></li>
+            <li><code>Ly5caCRLKRHrpiF6SQwe9geUKAxSsLQE</code></li>
+          </ul>
+          </p>
+          <p>Tokens are hidden or in plain sight physically or virtually on the BornHack venue, online and offline.</p>
+          <p>Submit the tokens you find in the field below.</p>
+        </div>
+        <div class="col-12">
+          <div class="input-group">
+            {% comment %}
+            <textarea class="form-control" aria-label="With textarea"></textarea>
+            {% endcomment %}
+              <input type="text" class="form-control" placeholder="Token" aria-label="Username" aria-describedby="basic-addon1">
+              <button type="button" class="btn btn-outline-secondary">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total players</h5>
+                  <p>Last join: <small>N min. ago</small></p>
+                </div>
+                <p class="h4">N</p>
+              </div>
+              <div class="text-center my-4">
+                <p>
+                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                </p>
+              </div>
+              <div>
+                <p class="mb-1"><b>Players:</b> N %</p>
+                <p><b>Non-Players:</b> N %</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total players</h5>
+                  <p>Last join: <small>N min. ago</small></p>
+                </div>
+                <p class="h4">N</p>
+              </div>
+              <div class="text-center my-4">
+                <p>
+                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                </p>
+              </div>
+              <div>
+                <p class="mb-1"><b>Players:</b> N %</p>
+                <p><b>Non-Players:</b> N %</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total players</h5>
+                  <p>Last join: <small>N min. ago</small></p>
+                </div>
+                <p class="h4">N</p>
+              </div>
+              <div class="text-center my-4">
+                <p>
+                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                </p>
+              </div>
+              <div>
+                <p class="mb-1"><b>Players:</b> N %</p>
+                <p><b>Non-Players:</b> N %</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total players</h5>
+                  <p>Last join: <small>N min. ago</small></p>
+                </div>
+                <p class="h4">N</p>
+              </div>
+              <div class="text-center my-4">
+                <p>
+                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                </p>
+              </div>
+              <div>
+                <p class="mb-1"><b>Players:</b> N %</p>
+                <p><b>Non-Players:</b> N %</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row bg-light-subtle">
+    <div class="col-12">
+      <h3>Your submitted tokens</h3>
+      <table class="table">
+        <tbody>
+          {% for token in object_list %}
+            {% ifchanged token.camp %}
+              <tr>
+                <td colspan="5"><h4>{{ token.camp.title }}</h4></td>
+              </tr>
+              <tr>
+                <th>Category</th>
+                <th>Time Limits</th>
+                <th>Token</th>
+                <th>Description</th>
+                <th>Found</th>
+              </tr>
+            {% endifchanged %}
+            <tr>
+              <td>{{ token.category }}</td>
+              <td>
+                {% if token.valid_now %}
+                  <i class="fas fa-check text-success"></i>
+                {% else %}
+                  <i class="fas fa-times text-error"></i>
+                {% endif %}
+
+                {% if token.valid_when.lower %}
+                  Not valid before {{ token.valid_when.lower }}<br>
+                {% endif %}
+                {% if token.valid_when.upper %}
+                  Not valid after {{ token.valid_when.upper }}<br>
+                {% endif %}
+                {% if not token.valid_when %}
+                  No time limit
+                {% endif %}
+              </td>
+
+              {% with token|found_by_user:user as user_has_found_token %}
+                {% if user_has_found_token %}
+                  <td>{{ token.token }}</td>
+                  <td>{{ token.description }}</td>
+                  <td>{{ user_has_found_token }}</td>
+                {% else %}
+                  <td>-</td>
+                  <td>-</td>
+                  <td>-</td>
+                {% endif %}
+              {% endwith %}
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="my-5">
+
   <div class="card">
     <h4 class="card-header">Your Secret Tokens</h4>
     <div class="card-body">
