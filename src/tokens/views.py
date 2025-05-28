@@ -112,7 +112,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     """A View with a list of active tokens one can find."""
 
     model = Token
-    template_name = "tokenfind_list.html"
+    template_name = "token_dashboard.html"
 
     def get_queryset(self) -> QuerySet:
         """Get active tokens filtered by camp slug"""
