@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import ListView
+from django.views.generic import FormView
 from prometheus_client import Gauge
 
 if TYPE_CHECKING:
@@ -50,7 +51,7 @@ class TokenFindView(LoginRequiredMixin, DetailView):
                 self.request,
                 "Patience! You found a valid token, but it is not active. Try again later!",
             )
-            return redirect(reverse("tokens:tokenfind_list"))
+            return redirect(reverse("tokens:token_dashboard"))
 
         if self.get_object().valid_when:
             if self.get_object().valid_when.lower and self.get_object().valid_when.lower > timezone.now():
@@ -58,14 +59,14 @@ class TokenFindView(LoginRequiredMixin, DetailView):
                     self.request,
                     f"This token is not valid yet! Try again after {self.get_object().valid_when.lower}",
                 )
-                return redirect(reverse("tokens:tokenfind_list"))
+                return redirect(reverse("tokens:token_dashboard"))
 
             if self.get_object().valid_when.upper and self.get_object().valid_when.upper < timezone.now():
                 messages.warning(
                     self.request,
                     f"This token is not valid after {self.get_object().valid_when.upper}! Maybe find a flux capacitor?",
                 )
-                return redirect(reverse("tokens:tokenfind_list"))
+                return redirect(reverse("tokens:token_dashboard"))
 
         # register this token find if it isn't already
         try:
@@ -104,10 +105,10 @@ class TokenFindView(LoginRequiredMixin, DetailView):
                 f"Congratulations! You found a secret token: '{self.get_object().description}' "
                 "- Your visit has been registered! Keep hunting, there might be more tokens out there.",
             )
-        return redirect(reverse("tokens:tokenfind_list"))
+        return redirect(reverse("tokens:token_dashboard"))
 
 
-class TokenFindListView(LoginRequiredMixin, ListView):
+class TokenDashboardListView(LoginRequiredMixin, ListView):
     """A View with a list of active tokens one can find."""
 
     model = Token
