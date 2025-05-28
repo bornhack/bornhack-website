@@ -9,29 +9,39 @@
 
 {% block content %}
 
-  <div class="row mb-3">
+  <div class="row my-4">
     <div class="col-12 col-lg-6">
       <div class="mb-5">
         <h2 class="mb-2">Token game dashboard</h2>
       </div>
-      <div class="row align-items-center g-4">
-        <div class="col-12 col-md-auto me-4">
+      <div class="row justify-content-between g-4">
+        <div class="col-4 col-md-auto me-4">
           <div class="d-flex align-items-center">
             <span>
-             <i class="fa-solid fa-star fa-3x text-success"></i>
+             <i class="fa-regular fa-trophy fa-3x text-success"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ user_found_tokens|length }} found</h5>
+              <h5>{{ user_tokens|length }} found</h5>
             </div>
           </div>
         </div>
-        <div class="col-12 col-md-auto">
+        <div class="col-4 col-md-auto">
           <div class="d-flex align-items-center">
             <span>
-             <i class="fa-solid fa-rectangle-list fa-3x text-primary"></i>
+             <i class="fa-regular fa-magnifying-glass fa-3x text-warning"></i>
             </span>
             <div class="ms-3">
-              <h5>N missing</h5>
+              <h5>{{ user_missing_tokens }} missing</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-4 col-md-auto">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="fa-regular fa-rectangle-list fa-3x text-primary"></i>
+            </span>
+            <div class="ms-3">
+              <h5>{{ object_list|length }} total</h5>
             </div>
           </div>
         </div>
@@ -157,60 +167,63 @@
       </div>
     </div>
   </div>
-  <div class="row bg-light-subtle">
-    <div class="col-12">
+  <div class="row my-4">
+    <div class="col-12 mb-3">
       <h3>Your submitted tokens</h3>
-      <table class="table">
-        <tbody>
-          {% for token in object_list %}
-            {% ifchanged token.camp %}
-              <tr>
-                <td colspan="5"><h4>{{ token.camp.title }}</h4></td>
-              </tr>
-              <tr>
-                <th>Category</th>
-                <th>Time Limits</th>
-                <th>Token</th>
-                <th>Description</th>
-                <th>Found</th>
-              </tr>
-            {% endifchanged %}
+    </div>
+    <div class="col-12">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover datatable">
+          <thead>
             <tr>
-              <td>{{ token.category }}</td>
-              <td>
-                {% if token.valid_now %}
-                  <i class="fas fa-check text-success"></i>
-                {% else %}
-                  <i class="fas fa-times text-error"></i>
-                {% endif %}
-
-                {% if token.valid_when.lower %}
-                  Not valid before {{ token.valid_when.lower }}<br>
-                {% endif %}
-                {% if token.valid_when.upper %}
-                  Not valid after {{ token.valid_when.upper }}<br>
-                {% endif %}
-                {% if not token.valid_when %}
-                  No time limit
-                {% endif %}
-              </td>
-
-              {% with token|found_by_user:user as user_has_found_token %}
-                {% if user_has_found_token %}
-                  <td>{{ token.token }}</td>
-                  <td>{{ token.description }}</td>
-                  <td>{{ user_has_found_token }}</td>
-                {% else %}
-                  <td>-</td>
-                  <td>-</td>
-                  <td>-</td>
-                {% endif %}
-              {% endwith %}
-
+              <th>Category</th>
+              <th>Active</th>
+              <th>Time Limits</th>
+              <th>Token</th>
+              <th>Description</th>
+              <th>Found</th>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for token in object_list %}
+              <tr>
+                <td>{{ token.category }}</td>
+                <td>
+                  {% if token.valid_now %}
+                    <i class="fas fa-check text-success"></i>
+                  {% else %}
+                    <i class="fas fa-times text-danger"></i>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if token.valid_when.lower %}
+                    From {{ token.valid_when.lower }}<br>
+                  {% endif %}
+                  {% if token.valid_when.upper %}
+                    To {{ token.valid_when.upper  }}
+                  {% endif %}
+                  {% if not token.valid_when %}
+                    -
+                  {% endif %}
+                </td>
+
+                {% with token|found_by_user:user as user_has_found_token %}
+                  {% if user_has_found_token %}
+                    <td>{{ token.token }}</td>
+                    <td>{{ token.description }}</td>
+                    <td>{{ user_has_found_token }}</td>
+                  {% else %}
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                  {% endif %}
+                {% endwith %}
+
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

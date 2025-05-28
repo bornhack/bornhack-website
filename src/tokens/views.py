@@ -121,5 +121,11 @@ class TokenFindListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Get all of the metrics for statistics not included by the queryset"""
         context = super().get_context_data(**kwargs)
-        context["user_found_tokens"] = TokenFind.objects.filter(user=self.request.user)
+
+        user_tokens = TokenFind.objects.filter(
+            user=self.request.user).filter(token__camp=self.request.camp.pk)
+        context["user_tokens"] = user_tokens
+        all_tokens = context["object_list"]
+        context["user_missing_tokens"] = len(all_tokens) - len(user_tokens)
+
         return context
