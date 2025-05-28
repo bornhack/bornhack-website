@@ -116,7 +116,6 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
                 <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
-                <li class="nav-item"><a class="nav-link" href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
 
                 {% if request.user.is_staff %}
                   <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
