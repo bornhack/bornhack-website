@@ -73,6 +73,9 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         elif self.valid_when.lower and self.valid_when.lower > timezone.now():
             # not valid yet
             valid = False
+        elif self.valid_when.lower and self.valid_when.lower < timezone.now():
+            # is valid
+            valid = True
         elif self.valid_when.upper and self.valid_when.upper < timezone.now():
             # not valid anymore
             valid = False
