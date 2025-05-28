@@ -114,9 +114,9 @@ class TokenFindListView(LoginRequiredMixin, ListView):
     template_name = "tokenfind_list.html"
 
     def get_queryset(self) -> QuerySet:
-        """Get QuerySet of active tokens."""
+        """Get active tokens filtered by camp slug"""
         qs = super().get_queryset()
-        return qs.filter(active=True).filter()
+        return qs.filter(active=True).filter(camp=self.request.camp)
 
     def get_context_data(self, **kwargs):
         """Get all of the metrics for statistics not included by the queryset"""
