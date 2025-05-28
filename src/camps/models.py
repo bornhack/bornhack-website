@@ -241,6 +241,12 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     # convenience properties to access Camp-related stuff easily from the Camp object
 
     @property
+    def year(self) -> int:
+        """Return the year of a camp"""
+        days = self.get_days("camp")
+        return int(days[0].lower.year)
+
+    @property
     def event_types(self):
         """Return all event types with at least one event in this camp."""
         EventType = apps.get_model("program", "EventType")
