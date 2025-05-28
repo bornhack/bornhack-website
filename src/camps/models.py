@@ -59,6 +59,8 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
     )
 
+    kickoff = DateTimeRangeField(null=True, blank=True, verbose_name="Camp Kickoff", help_text="The camp kickoff period.")
+
     buildup = DateTimeRangeField(
         verbose_name="Buildup Period",
         help_text="The camp buildup period.",
