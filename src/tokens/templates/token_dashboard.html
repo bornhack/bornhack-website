@@ -64,10 +64,13 @@
           <p>Submit the tokens you find in the field below.</p>
         </div>
         <div class="col-12">
-          <div class="input-group">
-              <input type="text" class="form-control" placeholder="Token" aria-label="Username" aria-describedby="basic-addon1">
-              <button type="button" class="btn btn-outline-secondary">Submit</button>
-          </div>
+          <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Token" name="token">
+              <button type="submit" class="btn btn-outline-secondary">Submit</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
@@ -122,7 +125,7 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Your find time</h5>
+                  <h5>Avg. find time</h5>
                   <p>Last token found: <small>N min. ago</small></p>
                 </div>
                 <p class="h4">N</p>

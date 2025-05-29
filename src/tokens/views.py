@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from typing import TYPE_CHECKING
 
 from django.contrib import messages
@@ -10,20 +12,21 @@ from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView
 from django.views.generic import ListView
 from django.views.generic import FormView
 from prometheus_client import Gauge
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-    from django.http import HttpRequest
-    from django.http import HttpResponseRedirect
 
+from tokens.forms import TokenFindSubmitForm
 from utils.models import CampReadOnlyModeError
 
 from .models import Token
 from .models import TokenFind
+
+logger = logging.getLogger(f"bornhack.{__name__}")
+
 
 TOKEN_FINDS = Gauge(
     "bornhack_tokengame_token_finds_total",
@@ -35,77 +38,6 @@ FIRST_TOKEN_FINDS = Gauge(
     "The tokens found for the first time",
     ["camp", "user_id", "username", "token_id"],
 )
-
-
-class TokenFindView(LoginRequiredMixin, DetailView):
-    """View for submitting the token found."""
-
-    model = Token
-    slug_field = "token"
-    slug_url_kwarg = "token"
-
-    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponseRedirect:
-        """Method for submitting the token found."""
-        if not self.get_object().active:
-            messages.warning(
-                self.request,
-                "Patience! You found a valid token, but it is not active. Try again later!",
-            )
-            return redirect(reverse("tokens:token_dashboard"))
-
-        if self.get_object().valid_when:
-            if self.get_object().valid_when.lower and self.get_object().valid_when.lower > timezone.now():
-                messages.warning(
-                    self.request,
-                    f"This token is not valid yet! Try again after {self.get_object().valid_when.lower}",
-                )
-                return redirect(reverse("tokens:token_dashboard"))
-
-            if self.get_object().valid_when.upper and self.get_object().valid_when.upper < timezone.now():
-                messages.warning(
-                    self.request,
-                    f"This token is not valid after {self.get_object().valid_when.upper}! Maybe find a flux capacitor?",
-                )
-                return redirect(reverse("tokens:token_dashboard"))
-
-        # register this token find if it isn't already
-        try:
-            token, created = TokenFind.objects.get_or_create(
-                token=self.get_object(),
-                user=request.user,
-            )
-        except CampReadOnlyModeError as e:
-            raise Http404 from e
-
-        if created:
-            # user found a new token
-            username = request.user.profile.get_public_credit_name
-            if username == "Unnamed":
-                username = "anonymous_player_{request.user.id}"
-
-            # register metrics
-            if TokenFind.objects.filter(token=self.get_object()).count() == 1:
-                # this is the first time this token has been found, count it as such
-                FIRST_TOKEN_FINDS.labels(
-                    token.camp.title,
-                    request.user.id,
-                    username,
-                    token.id,
-                ).inc()
-            TOKEN_FINDS.labels(
-                token.camp.title,
-                request.user.id,
-                username,
-                token.id,
-            ).inc()
-
-            # message for the user
-            messages.success(
-                self.request,
-                f"Congratulations! You found a secret token: '{self.get_object().description}' "
-                "- Your visit has been registered! Keep hunting, there might be more tokens out there.",
-            )
-        return redirect(reverse("tokens:token_dashboard"))
 
 
 class TokenDashboardListView(LoginRequiredMixin, ListView):
@@ -128,5 +60,106 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         context["user_tokens"] = user_tokens
         all_tokens = context["object_list"]
         context["user_missing_tokens"] = len(all_tokens) - len(user_tokens)
+        context["form"] = TokenFindSubmitForm()
 
         return context
+
+
+class TokenSubmitFormView(LoginRequiredMixin, FormView):
+    """View for submitting a token form"""
+
+    form_class = TokenFindSubmitForm
+    template_name = "token_submit.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form_data = {"token": self.kwargs.get("token")}
+        context["form"] = TokenFindSubmitForm(initial=form_data)
+        return context
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        """Return success url when form is valid"""
+        cleaned_token = form.cleaned_data.get("token")
+        try:
+            token = Token.objects.get(token=cleaned_token)
+        except Token.DoesNotExist:
+            messages.error(
+                self.request,
+                "We did not recognize the token you submitted. Please try something else.",
+            )
+            return redirect(reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug}))
+
+        if not token.active:
+            messages.warning(
+                self.request,
+                "Patience! You found a valid token, but it is not active. Try again later!",
+            )
+            return redirect(reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug}))
+
+        if token.valid_when:
+            if token.valid_when.lower and token.valid_when.lower > timezone.now():
+                messages.warning(
+                    self.request,
+                    f"This token is not valid yet! Try again after {token.valid_when.lower}",
+                )
+                return redirect(reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug}))
+
+            if token.valid_when.upper and token.valid_when.upper < timezone.now():
+                messages.warning(
+                    self.request,
+                    f"This token is not valid after {token.valid_when.upper}! Maybe find a flux capacitor?",
+                )
+                return redirect(reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug}))
+
+        try:
+            token_find, created = TokenFind.objects.get_or_create(
+                token=token,
+                user=self.request.user,
+            )
+        except CampReadOnlyModeError as e:
+            raise Http404 from e
+
+        if created:
+            # user found a new token
+            username = self.request.user.profile.get_public_credit_name
+            if username == "Unnamed":
+                username = "anonymous_player_{request.user.id}"
+
+            # register metrics
+            if TokenFind.objects.filter(token=token).count() == 1:
+                # this is the first time this token has been found, count it as such
+                FIRST_TOKEN_FINDS.labels(
+                    token.camp.title,
+                    self.request.user.id,
+                    username,
+                    token.id,
+                ).inc()
+            TOKEN_FINDS.labels(
+                token.camp.title,
+                self.request.user.id,
+                username,
+                token.id,
+            ).inc()
+
+            # message for the user
+            messages.success(
+                self.request,
+                f"Congratulations! You found a secret token: '{token.description}' "
+                "- Your visit has been registered! Keep hunting, there might be more tokens out there.",
+            )
+
+        else:
+            messages.info(
+                self.request,
+                f"You already got this token. You submitted it at: {token_find.created}"
+            )
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        """Redirect back to dashboard on success"""
+        return reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug})
+

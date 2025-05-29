@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load commonmark %}$
+{% load token_tags %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Your Secret Tokens | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="row my-4">
+    <div class="col-12 col-lg-6">
+      <div class="mb-5">
+        <h2 class="mb-2">Submit token</h2>
+        <form method="post">
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}
