@@ -39,5 +39,5 @@
     <li><a class="{% menudropdownclass 'rideshare' %} dropdown-item" href="{% url 'rideshare:list' camp_slug=camp.slug %}">Rideshare</a></li>
   {% endif %}
 
-  <li><a class="{% menudropdownclass 'token' %} dropdown-item" href="{% url 'tokens:token_dashboard' camp_slug=camp.slug %}">Token Game</a></li>
+  <li><a class="{% menudropdownclass 'token' %} dropdown-item" href="{% url 'tokens:dashboard' camp_slug=camp.slug %}">Token Game</a></li>
 </ul>
