@@ -24,6 +24,11 @@ class LayerViewMixin:
         """Set self.layer based on layer_slug in url kwargs."""
         super().setup(*args, **kwargs)
         self.layer = get_object_or_404(Layer, slug=self.kwargs["layer_slug"])
+        if not self.layer.public:
+            if (self.layer.responsible_team and self.layer.responsible_team.member_permission_set in self.request.user.get_all_permissions()) or self.request.user.has_perm("camps.gis_team_member"):
+                return
+            raise PermissionDenied
+
 
     def get_context_data(self, *args, **kwargs) -> dict:
         """Add self.layer to context."""
