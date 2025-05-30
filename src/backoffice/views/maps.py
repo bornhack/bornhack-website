@@ -172,6 +172,7 @@ class MapLayerCreateView(CampViewMixin, AnyTeamMapperRequiredMixin, CreateView):
         "description",
         "icon",
         "invisible",
+        "public",
         "group",
         "responsible_team",
     ]
@@ -208,6 +209,7 @@ class MapLayerUpdateView(CampViewMixin, LayerMapperViewMixin, UpdateView):
         "description",
         "icon",
         "invisible",
+        "public",
         "group",
         "responsible_team",
     ]
