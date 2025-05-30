@@ -1,4 +1,7 @@
+"""View for shifts in teams application."""
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 from django import forms
 from django.contrib import messages
@@ -18,22 +21,37 @@ from django.views.generic import View
 from psycopg2.extras import DateTimeTZRange
 
 from camps.mixins import CampViewMixin
+from teams.exceptions import StartAfterEndError
+from teams.exceptions import StartSameAsEndError
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
+from utils.mixins import IsTeamPermContextMixin
+
+from .mixins import EnsureTeamLeadMixin
+
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.http import HttpRequest
+    from django.http import HttpResponse
+
+    from camps.models import Camp
 
 
-class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
+class ShiftListView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, ListView):
+    """Shift list view."""
     model = TeamShift
     template_name = "team_shift_list.html"
     context_object_name = "shifts"
     active_menu = "shifts"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
+        """Method to filter by team slug."""
         queryset = super().get_queryset()
         return queryset.filter(team__slug=self.kwargs["team_slug"])
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for setting team to context."""
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -42,17 +60,19 @@ class ShiftListView(LoginRequiredMixin, CampViewMixin, ListView):
         return context
 
 
-def date_choices(camp):
+def date_choices(camp: Camp) -> list:
+    """Method for making date/time choices."""
     index = 0
     minute_choices = []
     # To begin with we assume a shift can not be shorter than an hour
-    SHIFT_MINIMUM_LENGTH = 60
-    while index * SHIFT_MINIMUM_LENGTH < 60:
-        minutes = int(index * SHIFT_MINIMUM_LENGTH)
+    shift_minimum_length = 60
+    while index * shift_minimum_length < 60: # noqa: PLR2004
+        minutes = int(index * shift_minimum_length)
         minute_choices.append(minutes)
         index += 1
 
-    def get_time_choices(date):
+    def get_time_choices(date: str) -> list:
+        """Method for making a list of time options."""
         time_choices = []
         for hour in range(24):
             for minute in minute_choices:
@@ -73,11 +93,14 @@ def date_choices(camp):
 
 
 class ShiftForm(forms.ModelForm):
+    """Form for shifts."""
     class Meta:
+        """Meta."""
         model = TeamShift
-        fields = ["from_datetime", "to_datetime", "people_required"]
+        fields = ("from_datetime", "to_datetime", "people_required")
 
-    def __init__(self, instance=None, **kwargs) -> None:
+    def __init__(self, instance: TeamShift|None=None, **kwargs) -> None:
+        """Method for setting up the form."""
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))
@@ -96,46 +119,57 @@ class ShiftForm(forms.ModelForm):
     from_datetime = forms.DateTimeField()
     to_datetime = forms.DateTimeField()
 
-    def _get_from_datetime(self):
+    def _get_from_datetime(self) -> dict:
+        """Method to convert from_datetime to current timezone."""
         current_timezone = timezone.get_current_timezone()
         return self.cleaned_data["from_datetime"].astimezone(current_timezone)
 
-    def _get_to_datetime(self):
+    def _get_to_datetime(self) -> dict:
+        """Method to convert to_datetime to current timezone."""
         current_timezone = timezone.get_current_timezone()
         return self.cleaned_data["to_datetime"].astimezone(current_timezone)
 
     def clean(self) -> None:
+        """Method for cleaning the form data.
+
+        Check lower is bigger then upper
+        Check lower and upper are not the same
+        """
         self.lower = self._get_from_datetime()
         self.upper = self._get_to_datetime()
         if self.lower > self.upper:
-            raise forms.ValidationError("Start can not be after end.")
+            raise StartAfterEndError
+        if self.lower == self.upper:
+            raise StartSameAsEndError
 
-    def save(self, commit=True):
+    def save(self, commit=True) -> TeamShift:
+        """Method for saving shift_range from self.lower and self.upper."""
         # self has .lower and .upper from .clean()
         self.instance.shift_range = DateTimeTZRange(self.lower, self.upper)
         return super().save(commit=commit)
 
 
-class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
+class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, CreateView):
+    """View for creating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
     active_menu = "shifts"
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict:
+        """Method for adding camp to kwargs."""
         kwargs = super().get_form_kwargs()
         kwargs["camp"] = self.camp
         return kwargs
 
-    def form_valid(self, form):
+    def form_valid(self, form: ShiftForm) -> HttpResponse:
+        """Check if the form is valid add team to the data."""
         shift = form.save(commit=False)
         shift.team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
         return super().form_valid(form)
 
-    def get_success_url(self):
-        return reverse("teams:shifts", kwargs=self.kwargs)
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding camp and team slug to context."""
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -143,34 +177,44 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, CreateView):
         )
         return context
 
+    def get_success_url(self) -> str:
+        """Method get success url."""
+        return reverse("teams:shifts", kwargs=self.kwargs)
 
-class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, UpdateView):
+
+class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
+    """View for updating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
     active_menu = "shifts"
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict:
+        """Method for adding camp to kwargs."""
         kwargs = super().get_form_kwargs()
         kwargs["camp"] = self.camp
         return kwargs
 
-    def get_success_url(self):
-        self.kwargs.pop("pk")
-        return reverse("teams:shifts", kwargs=self.kwargs)
-
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding team to context."""
         context = super().get_context_data(**kwargs)
         context["team"] = self.object.team
         return context
 
+    def get_success_url(self) -> str:
+        """Method get success url."""
+        self.kwargs.pop("pk")
+        return reverse("teams:shifts", kwargs=self.kwargs)
 
-class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
+
+class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, DeleteView):
+    """View for deleting a shift."""
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
     active_menu = "shifts"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding camp and team slug to context."""
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -178,13 +222,16 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, DeleteView):
         )
         return context
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Method get success url."""
         self.kwargs.pop("pk")
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
 class MultipleShiftForm(forms.Form):
-    def __init__(self, instance=None, **kwargs) -> None:
+    """Form for creating multple shifts."""
+    def __init__(self, instance: dict|None=None, **kwargs) -> None:
+        """Method for form init setting camp to kwargs."""
         camp = kwargs.pop("camp")
         super().__init__(**kwargs)
         self.fields["from_datetime"].widget = forms.Select(choices=date_choices(camp))
@@ -200,17 +247,20 @@ class MultipleShiftForm(forms.Form):
     people_required = forms.IntegerField()
 
 
-class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
+class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, FormView):
+    """View for creating multiple shifts."""
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm
     active_menu = "shifts"
 
-    def get_form_kwargs(self):
+    def get_form_kwargs(self) -> dict:
+        """Method for setting camp to the kwargs."""
         kwargs = super().get_form_kwargs()
         kwargs["camp"] = self.camp
         return kwargs
 
-    def form_valid(self, form):
+    def form_valid(self, form: MultipleShiftForm) -> HttpResponse:
+        """Method for checking if the form data is valid."""
         team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
         current_timezone = timezone.get_current_timezone()
 
@@ -238,10 +288,12 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 
         return super().form_valid(form)
 
-    def get_success_url(self):
+    def get_success_url(self) -> str:
+        """Method for returning the success url."""
         return reverse("teams:shifts", kwargs=self.kwargs)
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding team to the context."""
         context = super().get_context_data(**kwargs)
         context["team"] = Team.objects.get(
             camp=self.camp,
@@ -251,9 +303,11 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, FormView):
 
 
 class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
-    http_methods = ["get"]
+    """View for adding a user to a shift."""
+    http_methods = ("get",)
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+        """Method for adding user to a shift."""
         shift = TeamShift.objects.get(id=kwargs["pk"])
         team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
 
@@ -287,9 +341,11 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 
 
 class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
-    http_methods = ["get"]
+    """View for remove a user from a shift."""
+    http_methods = ("get",)
 
-    def get(self, request, **kwargs):
+    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+        """Method to remove user from shift."""
         shift = TeamShift.objects.get(id=kwargs["pk"])
         team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
 
@@ -303,9 +359,11 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
 
 
 class UserShifts(CampViewMixin, TemplateView):
+    """View for showing shifts for current user."""
     template_name = "team_user_shifts.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs) -> dict:
+        """Method for adding user_teams and user_shits to context."""
         context = super().get_context_data(**kwargs)
         context["user_teams"] = self.request.user.teammember_set.filter(
             team__camp=self.camp,
