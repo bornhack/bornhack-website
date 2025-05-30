@@ -45,7 +45,7 @@
           </li>
         {% endif %}
 
-        {% if request.user in team.responsible_members %}
+        {% if is_team_infopager %}
           <li class="nav-item">
             <a class="nav-link{% if view.active_menu == "info_categories" %} active{% endif %}" href="{% url "teams:info_categories" camp_slug=team.camp.slug team_slug=team.slug %}">
               Info categories

@@ -1,13 +1,19 @@
+"""Email functions of teams application."""
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from utils.email import add_outgoing_email
+
+if TYPE_CHECKING:
+    from django.forms import Form
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def add_added_membership_email(membership):
+def add_added_membership_email(membership: Form) -> bool:
+    """Method to send email when team membership added."""
     formatdict = {"team": membership.team.name, "camp": membership.team.camp.title}
 
     return add_outgoing_email(
@@ -21,7 +27,8 @@ def add_added_membership_email(membership):
     )
 
 
-def add_removed_membership_email(membership):
+def add_removed_membership_email(membership: Form) -> bool:
+    """Method to send email when team membership removed."""
     formatdict = {"team": membership.team.name, "camp": membership.team.camp.title}
 
     if membership.approved:
@@ -42,7 +49,8 @@ def add_removed_membership_email(membership):
     )
 
 
-def add_new_membership_email(membership):
+def add_new_membership_email(membership: Form) -> bool:
+    """Method to send email when team membership requested."""
     formatdict = {
         "team": membership.team.name,
         "camp": membership.team.camp.title,

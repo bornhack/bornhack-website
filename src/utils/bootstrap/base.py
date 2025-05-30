@@ -1469,6 +1469,7 @@ class Bootstrap:
             approved=True,
             lead=True,
         )
+        memberships["noc"]["user4"].save()
         memberships["noc"]["user1"] = TeamMember.objects.create(
             team=teams["noc"],
             user=users[1],
@@ -1620,6 +1621,11 @@ class Bootstrap:
             headline="Where do I sleep?",
             anchor="sleep",
         )
+        categories["noc"] = InfoCategory.objects.create(
+            team=teams["noc"],
+            headline="Where do I plug in?",
+            anchor="noc",
+        )
 
         return categories
 
@@ -1680,6 +1686,12 @@ class Bootstrap:
             body="We rent out a few cabins at the venue with 8 beds each for people who don't want to "
             "sleep in tents for some reason. A tent is the cheapest sleeping option (you just need a ticket), "
             "but the cabins are there if you want them.",
+        )
+        InfoItem.objects.create(
+            category=categories["noc"],
+            headline="Switches",
+            anchor="switches",
+            body="We have places for you to get your cable plugged in to a switch"
         )
 
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
@@ -2150,16 +2162,14 @@ class Bootstrap:
             },
         ]
         self.create_camps(camps)
-        self.create_users(2)
+        self.create_users(16)
         self.create_event_types()
         teams = {}
         for camp, read_only in self.camps:
             year = camp.camp.lower.year
 
             teams[year] = self.create_camp_teams(camp)
-            if year == 2025:
-                self.add_team_permissions(camp)
-
+            self.create_camp_team_memberships(camp, teams[year], self.users)
             camp.read_only = read_only
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
@@ -2167,6 +2177,8 @@ class Bootstrap:
 
         self.camp = self.camps[1][0]
         self.teams = teams[self.camp.camp.lower.year]
+        for member in TeamMember.objects.filter(team__camp=self.camp):
+            member.save()
 
     def bootstrap_camp(self, options: dict) -> None:
         """Bootstrap camp related entities."""
@@ -2285,6 +2297,11 @@ class Bootstrap:
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
             camp.save()
+            
+            # Update team permissions.
+            if camp.camp.lower.year == settings.UPCOMING_CAMP_YEAR:
+                for member in TeamMember.objects.filter(team__camp=camp):
+                    member.save()
 
     def bootstrap_base(self, options: dict) -> None:
         """Bootstrap the data for the application."""
