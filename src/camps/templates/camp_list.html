@@ -15,6 +15,7 @@
           <tr>
             <th>Name</th>
             <th>Tagline</th>
+            <th>Kickoff (volunteers only)</th>
             <th>Buildup</th>
             <th>Camp</th>
             <th>Teardown</th>
@@ -26,6 +27,7 @@
             <tr>
               <td><a href="{% url 'camp_detail' camp_slug=listcamp.slug %}">{{ listcamp.title }}</a></td>
               <td>{{ listcamp.tagline }}</td>
+              <td>{% if listcamp.kickoff %}{{ listcamp.kickoff.lower }} to {{ listcamp.kickoff.upper }}{% else %}N/A{% endif %}</td>
               <td>{{ listcamp.buildup.lower }} to {{ listcamp.buildup.upper }}</td>
               <td>{{ listcamp.camp.lower }} to {{ listcamp.camp.upper }}</td>
               <td>{{ listcamp.teardown.lower }} to {{ listcamp.teardown.upper }}</td>

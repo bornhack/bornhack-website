@@ -1973,6 +1973,7 @@ class Bootstrap:
             description="Venue areas",
             icon="fa fa-list-ul",
             group=group,
+            public=True,
         )
         Feature.objects.create(
             layer=layer,
@@ -2001,12 +2002,22 @@ class Bootstrap:
         """Create map layers for camp."""
         group = MapGroup.objects.get(name="Generic")
         team = Team.objects.get(name="Orga", camp=camp)
+        Layer.objects.create(
+            name="Non public layer",
+            slug="hiddenlayer",
+            description="Hidden layer",
+            icon="fa fa-list-ul",
+            group=group,
+            public=False,
+            team=team,
+        )
         layer = Layer.objects.create(
             name="Team Area",
             description="Team areas",
             icon="fa fa-list-ul",
             group=group,
             responsible_team=team,
+            public=True,
         )
         Feature.objects.create(
             layer=layer,
@@ -2159,8 +2170,6 @@ class Bootstrap:
 
             teams[year] = self.create_camp_teams(camp)
             self.create_camp_team_memberships(camp, teams[year], self.users)
-
-
             camp.read_only = read_only
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
