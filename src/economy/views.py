@@ -64,8 +64,8 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         ).count()
         reimbursement_total = 0
         for reimbursement in Reimbursement.objects.filter(
-            reimbursement_user=self.request.user,
-            camp=self.camp,
+                reimbursement_user=self.request.user,
+                camp=self.camp,
         ):
             reimbursement_total += reimbursement.amount
         context["reimbursement_total"] = reimbursement_total
@@ -151,9 +151,23 @@ class ChainCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
 
 
 class ChainListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
-    model = Chain
     template_name = "chain_list.html"
     permission_required = "camps.expense_create_permission"
+
+    def get_queryset(self):
+        queryset = (Chain.objects
+                    .filter(credebtors__expenses__camp=self.camp)
+                    .order_by('name'))
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """Add chains with expenses in past years"""
+        context = super().get_context_data(**kwargs)
+        context['past_year_chains'] = (Chain.objects
+                                       .filter(~Q(credebtors__expenses__camp=self.camp))
+                                       .order_by('name'))
+        return context
 
 
 class CredebtorCreateView(
@@ -387,9 +401,9 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
     def get(self, request, *args, **kwargs):
         """Check if this user has any approved and un-reimbursed expenses."""
         if not request.user.expenses.filter(
-            reimbursement__isnull=True,
-            approved=True,
-            paid_by_bornhack=False,
+                reimbursement__isnull=True,
+                approved=True,
+                paid_by_bornhack=False,
         ):
             messages.error(
                 request,
