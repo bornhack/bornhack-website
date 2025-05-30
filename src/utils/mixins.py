@@ -39,7 +39,7 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
 
     raise_exception = True
 
-class IsPermissionMixin:
+class IsTeamPermContextMixin:
     """Mixing for adding is_team_{perm} to context"""
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

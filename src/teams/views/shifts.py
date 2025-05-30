@@ -26,7 +26,7 @@ from teams.exceptions import StartSameAsEndError
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import EnsureTeamLeadMixin
 
@@ -38,7 +38,7 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 
-class ShiftListView(LoginRequiredMixin, CampViewMixin, IsPermissionMixin, ListView):
+class ShiftListView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, ListView):
     """Shift list view."""
     model = TeamShift
     template_name = "team_shift_list.html"
@@ -149,7 +149,7 @@ class ShiftForm(forms.ModelForm):
         return super().save(commit=commit)
 
 
-class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, CreateView):
+class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, CreateView):
     """View for creating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
@@ -182,7 +182,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
-class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, UpdateView):
+class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for updating a single shift."""
     model = TeamShift
     template_name = "team_shift_form.html"
@@ -207,7 +207,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
         return reverse("teams:shifts", kwargs=self.kwargs)
 
 
-class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, DeleteView):
+class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, DeleteView):
     """View for deleting a shift."""
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
@@ -247,7 +247,7 @@ class MultipleShiftForm(forms.Form):
     people_required = forms.IntegerField()
 
 
-class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, FormView):
+class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, FormView):
     """View for creating multiple shifts."""
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm

@@ -16,7 +16,7 @@ from teams.email import add_added_membership_email
 from teams.email import add_removed_membership_email
 from teams.models import Team
 from teams.models import TeamMember
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import EnsureTeamMemberLeadMixin
 from .mixins import TeamViewMixin
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-class TeamMembersView(CampViewMixin, IsPermissionMixin, DetailView):
+class TeamMembersView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """List view for team members."""
     template_name = "team_members.html"
     context_object_name = "team"

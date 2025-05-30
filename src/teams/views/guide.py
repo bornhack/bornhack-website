@@ -8,10 +8,10 @@ from django.views.generic import DetailView
 from camps.mixins import CampViewMixin
 from teams.models import Team
 from teams.models import TeamMember
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 
 
-class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, IsPermissionMixin, DetailView):
+class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, IsTeamPermContextMixin, DetailView):
     """View for the team guide."""
     template_name = "team_guide.html"
     context_object_name = "team"

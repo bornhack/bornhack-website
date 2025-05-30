@@ -17,7 +17,7 @@ from teams.models import TaskComment
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamTask
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import TeamTaskerPermissionMixin
 from .mixins import TeamViewMixin
@@ -25,7 +25,7 @@ from .mixins import TeamViewMixin
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
-class TeamTasksView(CampViewMixin, IsPermissionMixin, DetailView):
+class TeamTasksView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """List view of the team tasks."""
     template_name = "team_tasks.html"
     context_object_name = "team"
@@ -42,7 +42,7 @@ class TaskCommentForm(forms.ModelForm):
         fields = ("comment",)
 
 
-class TaskDetailView(TeamViewMixin, IsPermissionMixin, DetailView):
+class TaskDetailView(TeamViewMixin, IsTeamPermContextMixin, DetailView):
     """Task detail view."""
     template_name = "task_detail.html"
     context_object_name = "task"
@@ -93,7 +93,7 @@ class TaskCreateView(
     LoginRequiredMixin,
     TeamViewMixin,
     TeamTaskerPermissionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     CreateView,
 ):
     """View for creating a team task."""
@@ -127,7 +127,7 @@ class TaskUpdateView(
     LoginRequiredMixin,
     TeamViewMixin,
     TeamTaskerPermissionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     UpdateView,
 ):
     """Update task view used for updating tasks."""

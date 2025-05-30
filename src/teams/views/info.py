@@ -13,7 +13,7 @@ from reversion.views import RevisionMixin
 from info.models import InfoCategory
 from info.models import InfoItem
 from teams.views.mixins import TeamInfopagerPermissionMixin
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 from utils.widgets import MarkdownWidget
 
 from .mixins import TeamViewMixin
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class InfoCategoriesListView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     ListView,
 ):
     """Info Categories list view."""
@@ -37,7 +37,7 @@ class InfoCategoriesListView(
 class InfoItemCreateView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     CreateView,
 ):
     """Info item create view."""
@@ -82,7 +82,7 @@ class InfoItemUpdateView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
     RevisionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     UpdateView,
 ):
     """Info item update view."""
@@ -111,7 +111,7 @@ class InfoItemDeleteView(
     TeamViewMixin,
     TeamInfopagerPermissionMixin,
     RevisionMixin,
-    IsPermissionMixin,
+    IsTeamPermContextMixin,
     DeleteView,
 ):
     """View for deleting a info item."""

@@ -16,7 +16,7 @@ from django.views.generic.edit import UpdateView
 from camps.mixins import CampViewMixin
 from teams.models import Team
 from teams.models import TeamMember
-from utils.mixins import IsPermissionMixin
+from utils.mixins import IsTeamPermContextMixin
 from utils.widgets import MarkdownWidget
 
 from .mixins import EnsureTeamLeadMixin
@@ -57,7 +57,7 @@ class TeamListView(CampViewMixin, ListView):
         return context
 
 
-class TeamGeneralView(CampViewMixin, IsPermissionMixin, DetailView):
+class TeamGeneralView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """General view for a team."""
     template_name = "team_general.html"
     context_object_name = "team"
@@ -73,7 +73,7 @@ class TeamGeneralView(CampViewMixin, IsPermissionMixin, DetailView):
         return context
 
 
-class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, UpdateView):
+class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for mananaging team members."""
     model = Team
     template_name = "team_manage.html"
@@ -111,7 +111,7 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsPermissionMixin, Upda
         return super().form_valid(form)
 
 
-class FixIrcAclView(LoginRequiredMixin, CampViewMixin, IsPermissionMixin, UpdateView):
+class FixIrcAclView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, UpdateView):
     """View for fixing IRC ACL's."""
     template_name = "fix_irc_acl.html"
     model = Team
