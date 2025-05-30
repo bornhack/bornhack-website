@@ -4,7 +4,7 @@
 {% load token_tags %}
 
 {% block title %}
-  Your Secret Tokens | {{ block.super }}
+  Token game | {{ block.super }}
 {% endblock %}
 
 {% block content %}
@@ -66,7 +66,7 @@
         <div class="col-12">
           <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
             {% csrf_token %}
-            <div class="input-group">
+            <div class="input-group shadow-sm">
               <input type="text" class="form-control" placeholder="Token" name="token">
               <button type="submit" class="btn btn-outline-secondary">Submit</button>
             </div>
@@ -77,14 +77,14 @@
     <div class="col-12 col-lg-6">
       <div class="row g-3">
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Total players</h5>
-                  <p>Last join: <small>N min. ago</small></p>
+                  <p>Last join: <small>{{ total_players_stats.last_join }} min. ago</small></p>
                 </div>
-                <p class="h4">N</p>
+                <p class="h4">{{ total_players_stats.count }}</p>
               </div>
               <div class="text-center my-4">
                 <p>
@@ -99,14 +99,14 @@
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Token finds</h5>
-                  <p>Last token found: <small>N min. ago</small></p>
+                  <h5>Tokens found</h5>
+                  <p>Last token found: <small>{{ token_finds_stats.last_found }} min. ago</small></p>
                 </div>
-                <p class="h4">N</p>
+                <p class="h4">{{ token_finds_stats.count }}</p>
               </div>
               <div class="text-center my-4">
                 <p>
@@ -114,14 +114,14 @@
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Found:</b> N %</p>
-                <p><b>Not found:</b> N %</p>
+                <p class="mb-1"><b>Found:</b>{{ token_finds_stats.found_pct }} %</p>
+                <p><b>Not found:</b>{{ token_finds_stats.not_found_pct }} %</p>
               </div>
             </div>
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
@@ -142,7 +142,7 @@
           </div>
         </div>
         <div class="col-12 col-md-6">
-          <div class="card h-100">
+          <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>

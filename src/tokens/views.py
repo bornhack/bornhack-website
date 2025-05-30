@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
+from django.db.models import Min
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -19,6 +21,7 @@ from prometheus_client import Gauge
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
+from camps.models import Camp
 from tokens.forms import TokenFindSubmitForm
 from utils.models import CampReadOnlyModeError
 
@@ -55,14 +58,66 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         """Get all of the metrics for statistics not included by the queryset"""
         context = super().get_context_data(**kwargs)
 
+        context["form"] = TokenFindSubmitForm()
+
         user_tokens = TokenFind.objects.filter(
             user=self.request.user).filter(token__camp=self.request.camp.pk)
         context["user_tokens"] = user_tokens
+
         all_tokens = context["object_list"]
         context["user_missing_tokens"] = len(all_tokens) - len(user_tokens)
-        context["form"] = TokenFindSubmitForm()
+
+        context["total_players_stats"] = {
+            "count": self.total_player_count(),
+            "last_join": self.time_since_last_new_join()
+        }
+
+        found_pct, not_found_pct = self.token_found_percentages()
+        context["token_finds_stats"] = {
+            "count": TokenFind.objects.filter(
+                token__camp=self.request.camp.pk).filter(token__active=True).count(),
+            "last_found": self.last_token_found(),
+            "found_pct": f"{found_pct:.1f}",
+            "not_found_pct": f"{not_found_pct:.1f}"
+        }
 
         return context
+
+    def total_player_count(self) -> int:
+        """Find count of players submitting tokens for this camp"""
+        return TokenFind.objects.filter(
+            token__camp=self.request.camp.pk
+        ).distinct("user").count()
+
+    def time_since_last_new_join(self) -> int:
+        """
+        Return the time since the last new player joined the game
+        by submitting a token
+        """
+        last_new_join = User.objects.filter(
+            token_finds__isnull = False,
+            token_finds__token__camp = self.request.camp.pk
+        ).annotate(latest_token_find=Min("token_finds__created")).order_by("-latest_token_find").first().latest_token_find
+        delta = timezone.now() - last_new_join
+        return int(delta.total_seconds() // 60)
+
+    def last_token_found(self) -> int:
+        """
+        Retrieve the last token found and return the time delta in minutes
+        """
+        last_found = TokenFind.objects.filter(
+            token__camp=self.request.camp.pk
+        ).order_by("-created").first()
+        delta = timezone.now() - last_found.created
+        return int(delta.total_seconds() // 60)
+
+    def token_found_percentages(self) -> tuple[int, int]:
+        """Return percentage for tokens found and not found"""
+        active_tokens = Token.objects.filter(camp=self.request.camp.pk).filter(active=True).count()
+        tokens_found = TokenFind.objects.filter(
+            token__camp=self.request.camp.pk).distinct("token").count()
+        pct = (tokens_found / active_tokens) * 100
+        return pct, (100 - pct)
 
 
 class TokenSubmitFormView(LoginRequiredMixin, FormView):
@@ -147,8 +202,8 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
             # message for the user
             messages.success(
                 self.request,
-                f"Congratulations! You found a secret token: '{token.description}' "
-                "- Your visit has been registered! Keep hunting, there might be more tokens out there.",
+                f"Congratulations! You found a token: '{token.description}' "
+                "- Keep hunting, there might be more tokens out there.",
             )
 
         else:
