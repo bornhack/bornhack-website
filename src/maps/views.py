@@ -125,8 +125,9 @@ class MapView(CampViewMixin, TemplateView):
     context_object_name = "maps_map"
 
     def get_layers(self) -> QuerySet:
+        """Method to get the layers the user has access to."""
         user_teams=[]
-        if self.request.user.id != None:
+        if not self.request.user.is_anonymous:
             user_teams = self.request.user.teammember_set.filter(
                 team__camp=self.camp,
             ).values_list("team__name", flat=True)

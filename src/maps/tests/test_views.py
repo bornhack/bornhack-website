@@ -12,13 +12,13 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 
-from teams.models import TeamMember
 from maps.models import Group
 from maps.models import Layer
 from maps.models import UserLocation
 from maps.models import UserLocationType
 from maps.views import MapProxyView
 from maps.views import MissingCredentialsError
+from teams.models import TeamMember
 from utils.tests import BornhackTestBase
 
 USER = "user"
@@ -136,7 +136,7 @@ class MapsViewTest(BornhackTestBase):
         cls.hidden_layer.save()
 
         TeamMember.objects.create(
-            team=cls.teams['noc'],
+            team=cls.teams["noc"],
             user=cls.users[0],
             approved=True,
             lead=True,
@@ -152,8 +152,8 @@ class MapsViewTest(BornhackTestBase):
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": "123test"})
         response = self.client.get(url)
         assert response.status_code == 404
-        
-        # test layer not being public 
+
+        # test layer not being public
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
         response = self.client.get(url)
         content = response.content.decode()
@@ -162,7 +162,7 @@ class MapsViewTest(BornhackTestBase):
         matches = [s for s in rows if "403" in str(s)]
         self.assertEqual(len(matches), 1, "geojson layer did not return a 403")
 
-        # test layer access when not being public 
+        # test layer access when not being public
         self.client.force_login(self.users[0])
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
         response = self.client.get(url)
