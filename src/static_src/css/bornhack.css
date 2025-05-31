@@ -26,7 +26,7 @@ strong { font-weight: bold; }
 }
 
 /* Front page stuff */
-#front-logo {
+.front-logo, #front-logo {
   margin: auto;
 }
 
