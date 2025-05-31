@@ -165,6 +165,17 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
             camp=self.camp,
             debtor__chain=self.get_object(),
         ).prefetch_related("responsible_team", "user", "debtor")
+
+        # Include past years expenses and revenues for the Chain in context as separate querysets
+        context["past_expenses"] = Expense.objects.filter(
+            camp__camp__lt=self.camp.camp,
+            creditor__chain=self.get_object(),
+        ).prefetch_related("responsible_team", "user", "creditor")
+        context["past_revenues"] = Revenue.objects.filter(
+            camp__camp__lt=self.camp.camp,
+            debtor__chain=self.get_object(),
+        ).prefetch_related("responsible_team", "user", "debtor")
+
         return context
 
 

@@ -55,6 +55,17 @@
       <h3>{{ revenues.count }} Revenues for Chain {{ chain.name }}</h3>
       {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
 
+      <hr>
+
+      <h3>{{ past_expenses.count }} Expenses for Chain {{ chain.name }} in previous years</h3>
+      {% include 'includes/expense_list_panel.html' with expense_list=past_expenses past_camps=True %}
+
+      <hr>
+
+      <h3>{{ past_revenues.count }} Revenues for Chain {{ chain.name }} in previous years</h3>
+      {% include 'includes/revenue_list_panel.html' with revenue_list=past_revenues past_camps=True %}
+
+
     </div>
   </div>
 
