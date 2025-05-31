@@ -81,6 +81,11 @@ class Layer(ExportModelOperationsMixin("layer"), UUIDModel):
         blank=True,
     )
 
+    public = models.BooleanField(
+        default=True,
+        help_text="Make the layer visible to the public. A non-public layer is only visible for team members",
+    )
+
     @property
     def camp(self) -> Camp:
         """Camp object reference."""
