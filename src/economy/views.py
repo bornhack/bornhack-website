@@ -6,6 +6,9 @@ import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import OuterRef
+from django.db.models import Q
+from django.db.models import Prefetch
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -212,9 +215,27 @@ class CredebtorListView(
     RaisePermissionRequiredMixin,
     ListView,
 ):
-    model = Credebtor
     template_name = "credebtor_list.html"
     permission_required = "camps.expense_create_permission"
+
+    def get_queryset(self):
+        expenses=Expense.objects.filter(camp=self.camp)
+        revenues=Revenue.objects.filter(camp=self.camp)
+        return (Credebtor.objects.filter(
+            chain=self.chain
+        ).prefetch_related(
+            Prefetch(
+                'expenses',
+                queryset=expenses,
+                to_attr="current_expenses",
+            )
+        ).prefetch_related(
+            Prefetch(
+                'revenues',
+                queryset=revenues,
+                to_attr="current_revenues",
+            )
+        ))
 
     def get_context_data(self, **kwargs):
         """Add chain to context."""
