@@ -21,6 +21,12 @@ if TYPE_CHECKING:
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     """Token model."""
 
+    class Meta:
+        """Meta class definition for Token model"""
+
+        unique_together = ("camp", "token")
+        ordering: ClassVar[list[str]] = ["camp"]
+
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
@@ -50,11 +56,6 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     def __str__(self) -> str:
         """String formatter."""
         return f"{self.description} ({self.camp})"
-
-    class Meta:
-        """Meta."""
-
-        ordering: ClassVar[list[str]] = ["camp"]
 
     def get_absolute_url(self) -> str:
         """Get absolute url."""
