@@ -126,17 +126,14 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Avg. find time</h5>
-                  <p>Last token found: <small>N min. ago</small></p>
+                  <p>Your avg. time: <small>{{ token_finds_stats.users_avg_find_time }} min.</small></p>
                 </div>
-                <p class="h4">N</p>
+                <p class="h4">{{ token_finds_stats.avg_find_time }} min.</p>
               </div>
               <div class="text-center my-4">
                 <p>
                   <i class="fa-solid fa-chart-pie fa-5x"></i>
                 </p>
-              </div>
-              <div>
-                <p><b>Avg. times:</b> N %</p>
               </div>
             </div>
           </div>

@@ -18,6 +18,9 @@ from django.views.generic import ListView
 from django.views.generic import FormView
 from prometheus_client import Gauge
 
+from django.db.models import F, ExpressionWrapper, DurationField, Avg, Window
+from django.db.models.functions import Lead
+
 if TYPE_CHECKING:
     from django.db.models import QuerySet
 
@@ -78,7 +81,9 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
                 token__camp=self.request.camp.pk).filter(token__active=True).count(),
             "last_found": self.last_token_found(),
             "found_pct": f"{found_pct:.1f}",
-            "not_found_pct": f"{not_found_pct:.1f}"
+            "not_found_pct": f"{not_found_pct:.1f}",
+            "avg_find_time": self.avg_find_time(),
+            "users_avg_find_time": self.user_avg_find_time(),
         }
 
         return context
@@ -119,6 +124,35 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         pct = (tokens_found / active_tokens) * 100
         return pct, (100 - pct)
 
+    def avg_find_time(self) -> int:
+        """Calculate the average find time for all players"""
+        all_tokens = TokenFind.objects.filter(token__camp=self.request.camp.pk)
+        return int(self._get_avg_time_between_creations(all_tokens).total_seconds() // 60)
+
+    def user_avg_find_time(self) -> int:
+        """Calculate the average find time in minutes for requesting user"""
+        user_tokens = TokenFind.objects.filter(
+            user=self.request.user).filter(token__camp=self.request.camp.pk)
+
+        return int(self._get_avg_time_between_creations(user_tokens).total_seconds() // 60)
+
+    def _get_avg_time_between_creations(self, qs: QuerySet):
+        intervals = qs.annotate(
+            next_created=Window(
+                expression=Lead('created'),
+                order_by=F('created').asc()
+            )
+        ).annotate(
+            interval=ExpressionWrapper(
+                F('next_created') - F('created'),
+                output_field=DurationField()
+            )
+        ).exclude(
+            next_created__isnull=True
+        )
+
+        avg = intervals.aggregate(avg_interval=Avg('interval'))['avg_interval']
+        return avg
 
 class TokenSubmitFormView(LoginRequiredMixin, FormView):
     """View for submitting a token form"""
