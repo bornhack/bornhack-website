@@ -18,7 +18,7 @@
         <div class="col-4 col-md-auto me-4">
           <div class="d-flex align-items-center">
             <span>
-             <i class="fa-regular fa-trophy fa-3x text-success"></i>
+             <i class="fa-solid fa-trophy fa-3x text-success"></i>
             </span>
             <div class="ms-3">
               <h5>{{ user_tokens|length }} found</h5>
@@ -28,7 +28,7 @@
         <div class="col-4 col-md-auto">
           <div class="d-flex align-items-center">
             <span>
-             <i class="fa-regular fa-magnifying-glass fa-3x text-warning"></i>
+             <i class="fa-solid fa-magnifying-glass fa-3x text-warning"></i>
             </span>
             <div class="ms-3">
               <h5>{{ user_missing_tokens }} missing</h5>
@@ -126,7 +126,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Avg. find time</h5>
-                  <p>Your avg. time: <small>{{ token_finds_stats.users_avg_find_time }} min.</small></p>
+                  <p>Between token submits</p>
                 </div>
                 <p class="h4">{{ token_finds_stats.avg_find_time }} min.</p>
               </div>
@@ -134,6 +134,9 @@
                 <p>
                   <i class="fa-solid fa-chart-pie fa-5x"></i>
                 </p>
+              </div>
+              <div>
+                <p class="mb-1"><b>Your avg. time:</b> {{ token_finds_stats.users_avg_find_time }} min.</p>
               </div>
             </div>
           </div>
