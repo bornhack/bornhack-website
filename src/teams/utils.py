@@ -1,9 +1,10 @@
+"""Utils for the teams application."""
 from __future__ import annotations
 
 from .models import Team
 
 
-def get_team_from_irc_channel(channel):
+def get_team_from_irc_channel(channel: str) -> Team|bool:
     """Returns a Team object given an IRC channel name, if possible."""
     if not channel:
         return False

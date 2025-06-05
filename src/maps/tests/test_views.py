@@ -18,6 +18,7 @@ from maps.models import UserLocation
 from maps.models import UserLocationType
 from maps.views import MapProxyView
 from maps.views import MissingCredentialsError
+from teams.models import TeamMember
 from utils.tests import BornhackTestBase
 
 USER = "user"
@@ -100,6 +101,7 @@ class MapsViewTest(BornhackTestBase):
     """Test Maps View"""
 
     layer: Layer
+    hidden_layer: Layer
     group: Group
 
     @classmethod
@@ -117,9 +119,28 @@ class MapsViewTest(BornhackTestBase):
             description="Test Layer",
             icon="fas fa-tractor",
             group=cls.group,
-            responsible_team=cls.teams['noc'],
+            public=True,
+            responsible_team=cls.teams["noc"],
         )
         cls.layer.save()
+
+        cls.hidden_layer = Layer.objects.create(
+            name="Non public layer",
+            slug="hidden_layer",
+            description="Hidden layer",
+            icon="fa fa-list-ul",
+            group=cls.group,
+            public=False,
+            responsible_team=cls.teams["noc"],
+        )
+        cls.hidden_layer.save()
+
+        TeamMember.objects.create(
+            team=cls.teams["noc"],
+            user=cls.users[0],
+            approved=True,
+            lead=True,
+        ).save()
 
     def test_geojson_layer_views(self) -> None:
         """Test the geojson view."""
@@ -127,10 +148,25 @@ class MapsViewTest(BornhackTestBase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        # Test 404 of geojson layer
+        # test 404 of geojson layer
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": "123test"})
         response = self.client.get(url)
         assert response.status_code == 404
+
+        # test layer not being public
+        url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
+        response = self.client.get(url)
+        content = response.content.decode()
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select("p.lead")
+        matches = [s for s in rows if "403" in str(s)]
+        self.assertEqual(len(matches), 1, "geojson layer did not return a 403")
+
+        # test layer access when not being public
+        self.client.force_login(self.users[0])
+        url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
+        response = self.client.get(url)
+        assert response.status_code == 200
 
     def test_map_views(self) -> None:
         """Test the map view."""

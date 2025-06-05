@@ -11,8 +11,8 @@ from django.test import TestCase
 
 from camps.models import Camp
 from teams.models import Team
-
 from utils.bootstrap.base import Bootstrap
+
 
 class TestBootstrapScript(TestCase):
     """Test bootstrap_devsite script (touching many codepaths)"""

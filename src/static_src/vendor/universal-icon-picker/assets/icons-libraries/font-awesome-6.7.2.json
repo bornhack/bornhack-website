@@ -3,7 +3,7 @@
         "prefix": "fa-solid fa-",
 		"icon-style": "fa-solid",
 		"list-icon": "fa-solid fa-font-awesome",
-        "version": "6.6.0",
+        "version": "6.7.2",
         "icons": [
         "0",
         "1",
@@ -263,6 +263,7 @@
         "chart-area",
         "chart-bar",
         "chart-column",
+        "chart-diagram",
         "chart-gantt",
         "chart-line",
         "chart-pie",
@@ -357,6 +358,7 @@
         "comment-dollar",
         "comment-dots",
         "comment-medical",
+        "comment-nodes",
         "comments",
         "comments-dollar",
         "comment-slash",
@@ -519,6 +521,8 @@
         "file-csv",
         "file-excel",
         "file-export",
+        "file-fragment",
+        "file-half-dashed",
         "file-image",
         "file-import",
         "file-invoice",
@@ -669,6 +673,8 @@
         "helicopter-symbol",
         "helmet-safety",
         "helmet-un",
+        "hexagon-nodes",
+        "hexagon-nodes-bolt",
         "highlighter",
         "hill-avalanche",
         "hill-rockslide",
@@ -1134,6 +1140,7 @@
         "spray-can-sparkles",
         "square",
         "square-arrow-up-right",
+        "square-binary",
         "square-caret-down",
         "square-caret-left",
         "square-caret-right",
@@ -1400,13 +1407,8 @@
         "yen-sign",
         "yin-yang",
         "z"
-    ]},
-    "regular": {
-        "prefix": "fa-regular fa-",
-		"icon-style": "fa-regular",
-		"list-icon": "fa-regular fa-font-awesome",
-        "version": "6.6.0",
-        "icons": [
+    ],
+    "regular": [
         "address-book",
         "address-card",
         "bell",
@@ -1570,14 +1572,8 @@
         "window-maximize",
         "window-minimize",
         "window-restore"
-    ]},
-    "brands": {
-        "prefix": "fa-brands fa-",
-		"icon-style": "fa-brands",
-		"list-icon": "fa-brands fa-font-awesome",
-        "version": "6.6.0",
-        "icons": [
-
+    ],
+    "brands": [
         "42-group",
         "500px",
         "accessible-icon",
@@ -1674,6 +1670,7 @@
         "creative-commons-share",
         "creative-commons-zero",
         "critical-role",
+        "css",
         "css3",
         "css3-alt",
         "cuttlefish",
@@ -1723,6 +1720,7 @@
         "fedex",
         "fedora",
         "figma",
+        "files-pinwheel",
         "firefox",
         "firefox-browser",
         "firstdraft",
@@ -1945,6 +1943,7 @@
         "speaker-deck",
         "spotify",
         "square-behance",
+        "square-bluesky",
         "square-dribbble",
         "square-facebook",
         "square-font-awesome",
@@ -2070,5 +2069,6 @@
         "yoast",
         "youtube",
         "zhihu"
-    ]}
+    ]
+  }
 }

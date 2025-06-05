@@ -124,15 +124,26 @@ class MapView(CampViewMixin, TemplateView):
     template_name = "maps_map.html"
     context_object_name = "maps_map"
 
+    def get_layers(self) -> QuerySet:
+        """Method to get the layers the user has access to."""
+        user_teams=[]
+        if not self.request.user.is_anonymous:
+            user_teams = self.request.user.teammember_set.filter(
+                team__camp=self.camp,
+            ).values_list("team__name", flat=True)
+        return Layer.objects.filter(
+            ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
+            | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+
+        )
+
     def get_context_data(self, **kwargs) -> dict:
         """Get the context data."""
         context = super().get_context_data(**kwargs)
         context["facilitytype_list"] = FacilityType.objects.filter(
             responsible_team__camp=self.camp,
         )
-        context["layers"] = Layer.objects.filter(
-            Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
-        )
+        context["layers"] = self.get_layers()
         context["user_location_types"] = UserLocationType.objects.filter(
             user_locations__isnull=False,
         ).distinct()

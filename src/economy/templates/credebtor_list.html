@@ -15,7 +15,7 @@
       <div class="card-body">
         <table class="table table-hover">
           <tbody>
-            {% for credebtor in chain.credebtors.all %}
+            {% for credebtor in credebtor_list %}
               <tr>
                 <td>
                   <h4>
@@ -29,6 +29,17 @@
                     <b>Notes:</b>
                     <p>{{ credebtor.notes }}</p>
                   {% endif %}
+
+                  <hr>
+
+                  <h5>{{ credebtor.current_expenses.count }} Expenses</h5>
+                  {% include 'includes/expense_list_panel.html' with expense_list=credebtor.current_expenses %}
+
+                  <hr>
+
+                  <h5>{{ credebtor.current_revenues.count }} Revenues</h5>
+                  {% include 'includes/revenue_list_panel.html' with revenue_list=credebtor.current_revenues %}
+
                   <a href="{% url 'economy:expense_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-divide"></i> Create Expense</a>
                   <a href="{% url 'economy:revenue_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-plus"></i> Create Revenue</a>
                 </td>
