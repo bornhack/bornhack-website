@@ -178,6 +178,7 @@
               <th>Category</th>
               <th>Active</th>
               <th>Time Limits</th>
+              <th>Hint</th>
               <th>Token</th>
               <th>Description</th>
               <th>Found</th>
@@ -186,7 +187,7 @@
           <tbody>
             {% for token in object_list %}
               <tr>
-                <td>{{ token.category }}</td>
+                <td>{{ token.category.name }}</td>
                 <td>
                   {% if token.valid_now %}
                     <i class="fas fa-check text-success"></i>
@@ -205,6 +206,7 @@
                     -
                   {% endif %}
                 </td>
+                <td>{{ token.hint }}</td>
 
                 {% with token|found_by_user:user as user_has_found_token %}
                   {% if user_has_found_token %}

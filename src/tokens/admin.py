@@ -17,9 +17,9 @@ from .models import TokenFind
 class TokenAdmin(admin.ModelAdmin):
     """Django admin for tokens."""
 
-    list_filter: ClassVar[list[str]] = ["camp", "category", "active"]
-    list_display: ClassVar[list[str]] = ["token", "description", "camp", "category", "active", "valid_when"]
-    search_fields: ClassVar[list[str]] = ["token", "description", "category"]
+    list_filter: ClassVar[list[str]] = ["camp", "hint", "active"]
+    list_display: ClassVar[list[str]] = ["token", "description", "camp", "hint", "active", "valid_when"]
+    search_fields: ClassVar[list[str]] = ["token", "description", "hint"]
 
 
 @admin.register(TokenFind)

@@ -18,6 +18,33 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 
+class TokenCategory(models.Model):
+    """Model definition for TokenCategory."""
+
+    name = models.CharField(
+        max_length=64,
+        unique=True,
+        help_text="Name of the category"
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Description of the category"
+    )
+
+    class Meta:
+        """Meta definition for TokenCategory."""
+
+        verbose_name = 'TokenCategory'
+        verbose_name_plural = 'TokenCategories'
+
+    def __str__(self):
+        """Unicode representation of TokenCategory."""
+        return f"{self.name} ({self.description})"
+
+
+
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     """Token model."""
 
@@ -27,12 +54,14 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         unique_together = ("camp", "token")
         ordering: ClassVar[list[str]] = ["camp"]
 
+    #category = models.ForeignKey(TokenCategory, on_delete=models.PROTECT)
+
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
 
-    category = models.TextField(
-        help_text="The category/hint for this token (physical, website, whatever)",
+    hint = models.TextField(
+        help_text="The hint for this token",
     )
 
     description = models.TextField(help_text="The description of the token")
