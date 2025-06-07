@@ -1,9 +1,16 @@
-# TODO: docstrings because what the hell is going on here
+"""Utilities for adjusting color."""
+
 from __future__ import annotations
 
+DARK = 150
 
-def adjust_color(color, factor=0.4):
-    if len(color) == 3:
+
+def adjust_color(
+    color: tuple[int, int, int] | tuple[int, int, int, int],
+    factor: float = 0.4,
+) -> tuple[int, int, int, int]:
+    """Adjust the color by a factor."""
+    if len(color) == 3:  # noqa: PLR2004
         color = (*color, 1)
     r, g, b, a = color
     if factor > 0:
@@ -19,9 +26,11 @@ def adjust_color(color, factor=0.4):
     return (new_r, new_g, new_b, a)
 
 
-def is_dark(color):
-    return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2] < 150
+def is_dark(color: tuple[int, int, int] | tuple[int, int, int, int]) -> bool:
+    """Method to test if color is on the darker side."""
+    return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2] < DARK
 
 
-def is_light(color):
-    return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2] > 150
+def is_light(color: tuple[int, int, int] | tuple[int, int, int, int]) -> bool:
+    """Method to test if color is on the lighter side."""
+    return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2] > DARK

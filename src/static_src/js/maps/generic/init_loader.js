@@ -17,3 +17,36 @@ window.addEventListener("map:init", function (event) {
     });
   }
 });
+
+
+document.addEventListener("DOMContentLoaded", function(){
+  /* Method run when location lookup was successfull */
+  function location_place_success(pos) {
+    const crd = pos.coords;
+    const geomInput = document.getElementsByClassName('django-leaflet-raw-textarea')[0];
+    if (geomInput) {
+      geomInput.value = `{"type":"Point","coordinates":[${crd.longitude},${crd.latitude}]}`;
+      document.querySelector("form").submit();
+    } else {
+      console.log("Could not find input field");
+    }
+  }
+
+  /* Method run when location lookup failed */
+  function location_error(err) {
+    alert(`ERROR(${err.code}): ${err.message}`);
+  }
+
+  const location_options = {
+    enableHighAccuracy: true,
+    timeout: 3000,
+    maximumAge: 0, //Always retrieve position dont use cached value
+  };
+  var use_location_button = document.getElementById("use_location"); 
+  if (use_location_button) {
+    use_location_button.addEventListener("click", function(event){
+      navigator.geolocation.getCurrentPosition(location_place_success, location_error, location_options);
+      event.preventDefault()
+    });
+  }
+});

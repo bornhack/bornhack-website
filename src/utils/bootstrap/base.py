@@ -1691,7 +1691,7 @@ class Bootstrap:
             category=categories["noc"],
             headline="Switches",
             anchor="switches",
-            body="We have places for you to get your cable plugged in to a switch"
+            body="We have places for you to get your cable plugged in to a switch",
         )
 
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
@@ -2176,6 +2176,7 @@ class Bootstrap:
             camp.save()
 
         self.camp = self.camps[1][0]
+        self.add_team_permissions(self.camp)
         self.teams = teams[self.camp.camp.lower.year]
         for member in TeamMember.objects.filter(team__camp=self.camp):
             member.save()
@@ -2297,7 +2298,7 @@ class Bootstrap:
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
             camp.save()
-            
+
             # Update team permissions.
             if camp.camp.lower.year == settings.UPCOMING_CAMP_YEAR:
                 for member in TeamMember.objects.filter(team__camp=camp):
