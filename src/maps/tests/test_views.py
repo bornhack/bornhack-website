@@ -5,8 +5,6 @@ from __future__ import annotations
 from unittest import mock
 
 from bs4 import BeautifulSoup
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import Point
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
@@ -14,7 +12,6 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 
-from camps.models import Permission as CampPermission
 from maps.models import Group
 from maps.models import Layer
 from maps.models import UserLocation
@@ -171,8 +168,6 @@ class MapsViewTest(BornhackTestBase):
         self.client.force_login(self.users[0])
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
         response = self.client.get(url)
-        print(self.teams["noc"].group.permissions.all())
-        print(self.users[0].groups.all())
         assert response.status_code == 200
 
     def test_map_views(self) -> None:
