@@ -64,9 +64,9 @@
         --bs-btn-close-filter: invert(1) grayscale(100%) brightness(200%);
 
         .table-secondary {
-            --bs-table-striped-bg: rgba(var(--bs-body-bg-rgb), 0.9);
-            --bs-table-hover-bg: rgba(var(--bs-body-bg-rgb), 0.8);
-            --bs-table-bg: var(--bs-gray-800);
+            --bs-table-striped-bg: rgba(var(--bs-secondary-bg-rgb), 0.9);
+            --bs-table-hover-bg: rgba(var(--bs-secondary-color-rgb), 0.2);
+            --bs-table-bg: rgba(var(--bs-secondary-bg-rgb), 0.8);
             --bs-table-color: var(--bs-body-color);
         }
 
