@@ -147,14 +147,6 @@ class MapsViewTest(BornhackTestBase):
         )
         teammember.save()
 
-        permission_content_type = ContentType.objects.get_for_model(CampPermission)
-        cls.users[0].user_permissions.add(
-            Permission.objects.get(
-                content_type=permission_content_type,
-                codename="noc_team_member",
-            ),
-        )
-
     def test_geojson_layer_views(self) -> None:
         """Test the geojson view."""
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.layer.slug})
@@ -179,6 +171,8 @@ class MapsViewTest(BornhackTestBase):
         self.client.force_login(self.users[0])
         url = reverse("maps:map_layer_geojson", kwargs={"layer_slug": self.hidden_layer.slug})
         response = self.client.get(url)
+        print(self.teams["noc"].group.permissions.all())
+        print(self.users[0].groups.all())
         assert response.status_code == 200
 
     def test_map_views(self) -> None:
