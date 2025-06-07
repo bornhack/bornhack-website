@@ -23,11 +23,6 @@ document.addEventListener("DOMContentLoaded", function(){
   /* Method run when location lookup was successfull */
   function location_place_success(pos) {
     const crd = pos.coords;
-    //alert(`Your current position is: ${crd.latitude}/${crd.longitude} More or less ${crd.accuracy} meters.`)
-    console.log("Your current position is:");
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude: ${crd.longitude}`);
-    console.log(`More or less ${crd.accuracy} meters.`);
     const geomInput = document.getElementsByClassName('django-leaflet-raw-textarea')[0];
     if (geomInput) {
       geomInput.value = `{"type":"Point","coordinates":[${crd.longitude},${crd.latitude}]}`;
@@ -36,13 +31,16 @@ document.addEventListener("DOMContentLoaded", function(){
       console.log("Could not find input field");
     }
   }
+
+  /* Method run when location lookup failed */
   function location_error(err) {
     alert(`ERROR(${err.code}): ${err.message}`);
   }
+
   const location_options = {
     enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0,
+    timeout: 3000,
+    maximumAge: 0, //Always retrieve position dont use cached value
   };
   var use_location_button = document.getElementById("use_location"); 
   if (use_location_button) {
