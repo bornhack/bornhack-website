@@ -77,6 +77,8 @@
   .table-secondary {
       --bs-table-striped-bg: rgba(var(--bs-body-bg-rgb), 0.9); 
       --bs-table-hover-bg: rgba(var(--bs-body-bg-rgb), 0.8);
+      --bs-table-bg: rgba(var(--bs-secondary-bg-rgb), 0.8); 
+      --bs-table-color: var(--bs-body-color);
   }
 
   /* Default state */
