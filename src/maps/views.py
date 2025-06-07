@@ -36,9 +36,11 @@ from leaflet.forms.widgets import LeafletWidget
 from oauth2_provider.views.generic import ScopedProtectedResourceView
 
 if TYPE_CHECKING:
+    from uuid import UUID
+
     from django.db.models import QuerySet
     from django.forms import BaseForm
-    from django.http import TemplateResponse
+    from django.template.response import TemplateResponse
 
 from typing import ClassVar
 
@@ -78,7 +80,7 @@ class MapMarkerView(TemplateView):
     template_name = "marker.svg"
 
     @property
-    def color(self) -> tuple:
+    def color(self) -> tuple[int, int, int] | tuple[int, int, int, int]:
         """Return the color values as ints."""
         hex_color = self.kwargs["color"]
         length = len(hex_color)
@@ -97,7 +99,7 @@ class MapMarkerView(TemplateView):
             return (r, g, b, a)
         raise MarkerColorError
 
-    def get_context_data(self, **kwargs) -> dict:
+    def get_context_data(self, **kwargs) -> dict[str, tuple[int, int, int] | tuple[int, int, int, int]]:
         """Get the context data."""
         context = super().get_context_data(**kwargs)
         try:
@@ -126,7 +128,7 @@ class MapView(CampViewMixin, TemplateView):
 
     def get_layers(self) -> QuerySet:
         """Method to get the layers the user has access to."""
-        user_teams=[]
+        user_teams = []
         if not self.request.user.is_anonymous:
             user_teams = self.request.user.teammember_set.filter(
                 team__camp=self.camp,
@@ -134,7 +136,6 @@ class MapView(CampViewMixin, TemplateView):
         return Layer.objects.filter(
             ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
             | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
-
         )
 
     def get_context_data(self, **kwargs) -> dict:
@@ -550,7 +551,11 @@ class UserLocationApiView(
             "data": location.data,
         }
 
-    def patch(self, request: HttpRequest, **kwargs) -> dict:
+    def patch(
+        self,
+        request: HttpRequest,
+        **kwargs,
+    ) -> dict[str, str | int | float | UUID] | HttpResponseNotAllowed | tuple[dict[str, str], int]:
         """HTTP Method for updating a user location."""
         if "user_location" not in kwargs and "camp_slug" not in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["POST"])
@@ -583,7 +588,7 @@ class UserLocationApiView(
             "data": location.data,
         }
 
-    def delete(self, request: HttpRequest, **kwargs) -> dict:
+    def delete(self, request: HttpRequest, **kwargs) -> HttpResponse | HttpResponseNotAllowed:
         """HTTP Method for deleting a user location."""
         if "user_location" not in kwargs and "camp_slug" not in kwargs:
             return HttpResponseNotAllowed(permitted_methods=["POST"])

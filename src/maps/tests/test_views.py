@@ -135,12 +135,14 @@ class MapsViewTest(BornhackTestBase):
         )
         cls.hidden_layer.save()
 
-        TeamMember.objects.create(
+        cls.users[0].save()
+        teammember = TeamMember.objects.create(
             team=cls.teams["noc"],
             user=cls.users[0],
             approved=True,
             lead=True,
-        ).save()
+        )
+        teammember.save()
 
     def test_geojson_layer_views(self) -> None:
         """Test the geojson view."""
