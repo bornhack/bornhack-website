@@ -5,6 +5,8 @@ from __future__ import annotations
 from unittest import mock
 
 from bs4 import BeautifulSoup
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import Point
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
@@ -12,6 +14,7 @@ from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
 
+from camps.models import Permission as CampPermission
 from maps.models import Group
 from maps.models import Layer
 from maps.models import UserLocation
@@ -135,12 +138,22 @@ class MapsViewTest(BornhackTestBase):
         )
         cls.hidden_layer.save()
 
-        TeamMember.objects.create(
+        cls.users[0].save()
+        teammember = TeamMember.objects.create(
             team=cls.teams["noc"],
             user=cls.users[0],
             approved=True,
             lead=True,
-        ).save()
+        )
+        teammember.save()
+
+        permission_content_type = ContentType.objects.get_for_model(CampPermission)
+        cls.users[0].user_permissions.add(
+            Permission.objects.get(
+                content_type=permission_content_type,
+                codename="noc_team_member",
+            ),
+        )
 
     def test_geojson_layer_views(self) -> None:
         """Test the geojson view."""
