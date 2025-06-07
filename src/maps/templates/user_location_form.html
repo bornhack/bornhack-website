@@ -23,7 +23,7 @@
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button id="use_location" class="btn btn-primary"><i class="fas fa-location"></i> Use my location</button>
+        <button id="use_location" class="btn btn-primary hide-for-no-js-users"><i class="fas fa-location"></i> Use my location</button>
         <button type="submit" class="btn btn-success">
           <i class="fas fa-check"></i>
           {% if request.resolver_match.url_name == "maps_user_location_update" %}Update{% else %}Create{% endif %} Location</button>
