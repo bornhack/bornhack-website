@@ -66,7 +66,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     name = models.CharField(max_length=255, help_text="The team name")
 
-    group = models.OneToOneField(
+    group_member = models.OneToOneField(
         Group,
         on_delete=models.CASCADE,
         help_text="The django group carrying the team permissions for this team.",
@@ -206,8 +206,8 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
             self.shortslug = self.slug
 
         # generate group if needed
-        if not self.group:
-            self.group = Group.objects.create(
+        if not self.group_member:
+            self.group_member = Group.objects.create(
                 name=f"{self.camp.slug}-{self.slug}-team",
             )
 
@@ -400,13 +400,12 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     def update_group_membership(self, deleted=False) -> None:
         """Ensure group membership for this team membership is correct."""
-        if self.team.group:
-            if self.approved and not deleted:
-                logger.debug(f"Adding user {self.user} to group {self.team.group}")
-                self.team.group.user_set.add(self.user)
-            else:
-                logger.debug(f"Removing user {self.user} from group {self.team.group}")
-                self.team.group.user_set.remove(self.user)
+        if self.approved and not deleted:
+            logger.debug(f"Adding user {self.user} to group {self.team.group_member}")
+            self.team.group_member.user_set.add(self.user)
+        else:
+            logger.debug(f"Removing user {self.user} from group {self.team.group_member}")
+            self.team.group_member.user_set.remove(self.user)
 
     def update_team_lead_permissions(self, deleted=False) -> None:
         """Ensure team lead perms for this team membership are correct."""
