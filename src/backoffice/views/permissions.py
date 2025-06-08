@@ -82,15 +82,14 @@ class TeamPermissionManageView(CampViewMixin, FormView):
         """Populate the form with current permissions."""
         initial = super().get_initial(*args, **kwargs)
         # loop over users in the matrix
-        for username in self.matrix:
-            user_perms = self.team.approved_members.get(
-                username=username,
-            ).get_all_permissions()
+        for member in self.team.approved_members.all():
             # loop over perms and see if user has each
-            for perm in self.matrix[username]:
-                if f"camps.{self.team.slug}_team_{perm}" in user_perms:
-                    # default to checked for new speakers
-                    initial[f"{username}_{perm}"] = True
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                g = getattr(self.team, f"{perm}_group")
+                print(g.user_set.all())
+                if member in g.user_set.all():
+                    # make checked because the user has this perm
+                    initial[f"{member.username}_{perm}"] = True
         return initial
 
     def get_context_data(self, **kwargs):
@@ -127,14 +126,11 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             if user.is_superuser:
                 # superusers magically have all permissions, nothing to do here
                 continue
+            g = getattr(self.team, f"{perm}_group")
             if form.cleaned_data[field]:
-                user.user_permissions.add(
-                    team_permissions[perm],
-                )
+                g.user_set.add(user)
             else:
-                user.user_permissions.remove(
-                    team_permissions[perm],
-                )
+                g.user_set.remove(user)
         messages.success(
             self.request,
             f"Updated team permissions for the {self.team.name} Team",
