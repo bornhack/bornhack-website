@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
+from django.conf import settings
 
 from django.apps import apps
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import Permission as DjangoPermission
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -148,6 +151,36 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     def __str__(self) -> str:
         return f"{self.title} - {self.tagline}"
+
+
+    def activate_team_permissions(self) -> None:
+        """Add permissions to this camps teams."""
+        permission_content_type = ContentType.objects.get_for_model(Permission)
+        for team in self.teams.all():
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                fk = f"{perm}_group"
+                permission = DjangoPermission.objects.get(
+                    content_type=permission_content_type,
+                    codename=f"{team.slug}_team_{perm}",
+                )
+                group = getattr(team, fk)
+                group.permissions.add(permission)
+                logger.debug(f"Added permission {permission} to group {group}")
+
+    def deactivate_team_permissions(self) -> None:
+        """Add permissions to this camps teams."""
+        permission_content_type = ContentType.objects.get_for_model(Permission)
+        for team in self.teams.all():
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                fk = f"{perm}_group"
+                permission = DjangoPermission.objects.get(
+                    content_type=permission_content_type,
+                    codename=f"{team.slug}_team_{perm}",
+                )
+                group = getattr(team, fk)
+                group.permissions.remove(permission)
+                logger.debug(f"Removed permission {permission} from group {group}")
+
 
     @property
     def logo_small(self) -> str:
