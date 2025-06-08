@@ -68,8 +68,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.CASCADE,
         help_text="The django group carrying the team permissions for this team.",
     )
