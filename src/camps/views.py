@@ -34,3 +34,9 @@ class CampListView(ListView):
     model = Camp
     template_name = "camp_list.html"
     queryset = Camp.objects.all().order_by("camp")
+
+    def get_context_data(self, **kwargs) -> dict[str, str]:
+        """Add closest camp to context."""
+        context = super().get_context_data(**kwargs)
+        context["camp"] = get_closest_camp(timezone.now())
+        return context

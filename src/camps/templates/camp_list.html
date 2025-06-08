@@ -24,7 +24,7 @@
         </thead>
         <tbody>
           {% for listcamp in camps %}
-            <tr>
+            <tr{% if listcamp == camp %} class="table-active"{% endif %}>
               <td><a href="{% url 'camp_detail' camp_slug=listcamp.slug %}">{{ listcamp.title }}</a></td>
               <td>{{ listcamp.tagline }}</td>
               <td>{% if listcamp.kickoff %}{{ listcamp.kickoff.lower }} to {{ listcamp.kickoff.upper }}{% else %}N/A{% endif %}</td>
