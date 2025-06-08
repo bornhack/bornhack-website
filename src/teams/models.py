@@ -208,7 +208,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         # generate group if needed
         if not self.group_member:
             self.group_member = Group.objects.create(
-                name=f"{self.camp.slug}-{self.slug}-team",
+                name=f"{self.camp.slug}-{self.slug}-team-member",
             )
 
         super().save(**kwargs)
