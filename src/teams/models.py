@@ -68,8 +68,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     lead_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_lead",
         help_text="The django group carrying the team lead permissions for this team.",
@@ -78,13 +76,12 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     member_group = models.OneToOneField(
         Group,
         on_delete=models.CASCADE,
+        related_name="team_member",
         help_text="The django group carrying the team permissions for this team.",
     )
 
     mapper_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_mapper",
         help_text="The django group carrying the team mapper permissions for this team.",
@@ -92,8 +89,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     facilitator_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_facilitator",
         help_text="The django group carrying the team facilitator permissions for this team.",
@@ -101,8 +96,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     infopager_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_infopager",
         help_text="The django group carrying the team infopager permissions for this team.",
@@ -110,8 +103,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     pos_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_pos",
         help_text="The django group carrying the team pos permissions for this team.",
@@ -119,8 +110,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     tasker_group = models.OneToOneField(
         Group,
-        null=True,
-        blank=True,
         on_delete=models.PROTECT,
         related_name="team_tasker",
         help_text="The django group carrying the team tasker permissions for this team.",
@@ -261,7 +250,6 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
         # generate permission groups for this team if needed
         for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
-            print(f"checking perm {perm} ...")
             fk = f"{perm}_group"
             if not hasattr(self, fk):
                 group, created = Group.objects.get_or_create(name=f"{self.camp.slug}-{self.slug}-team-{perm}")
@@ -456,35 +444,29 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     camp_filter = "team__camp"
 
     def update_group_membership(self, deleted=False) -> None:
-        """Ensure group membership for this team membership is correct."""
-        if self.approved and not deleted:
-            logger.debug(f"Adding user {self.user} to group {self.team.member_group}")
-            self.team.member_group.user_set.add(self.user)
-        else:
-            logger.debug(f"Removing user {self.user} from group {self.team.member_group}")
-            self.team.member_group.user_set.remove(self.user)
+        """Ensure group membership for this team membership is correct.
 
-    def update_team_lead_permissions(self, deleted=False) -> None:
-        """Ensure team lead perms for this team membership are correct."""
-        try:
-            lead_perm = Permission.objects.get(
-                codename=f"{self.team.slug}_team_lead",
-                content_type=ContentType.objects.get_for_model(CampPermission),
-            )
-        except Permission.DoesNotExist:
-            logger.exception(f"team lead permission not found for {self.team}")
-            return
-        if (
-            self.approved
-            and self.lead
-            and not deleted
-            and self.team.member_permission_set in self.user.get_all_permissions()
-        ):
-            # this is a no-op if the perm is already there
-            self.user.user_permissions.add(lead_perm)
+        When approved=True and deleted=False this means making sure the user is in team.member_group and
+        if the membership has lead=True then also team.lead_group
+
+        When deleted=True or approved=False loop over all of settings.BORNHACK_TEAM_PERMISSIONS.keys()
+        and make sure user is not in any of the groups.
+        """
+        if self.approved and not deleted:
+            logger.debug(f"Making sure user {self.user} is a member of group {self.team.member_group}")
+            self.team.member_group.user_set.add(self.user)
+            if self.lead:
+                logger.debug(f"Making sure user {self.user} is a member of group {self.team.lead_group}")
+                self.team.lead_group.user_set.add(self.user)
+            else:
+                logger.debug(f"Making sure user {self.user} is not a member of group {self.team.lead_group}")
+                self.team.lead_group.user_set.remove(self.user)
         else:
-            # or if the perm is already removed
-            self.user.user_permissions.remove(lead_perm)
+            # membership deleted, remove membership of all team groups
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                group = getattr(self.team, f"{perm}_group")
+                logger.debug(f"Making sure user {self.user} is not a member of group {group}")
+                group.user_set.remove(self.user)
 
 
 class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
