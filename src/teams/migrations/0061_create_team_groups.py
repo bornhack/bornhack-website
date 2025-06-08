@@ -14,7 +14,7 @@ def create_team_groups(apps, schema_editor) -> None:
             if not hasattr(team, fk) or not getattr(team, fk):
                 group, created = Group.objects.get_or_create(name=f"{team.camp.slug}-{team.slug}-team-{perm}")
                 if created:
-                    logger.info(f"Created group {group} for team {team}")
+                    print(f"Created group {group} for team {team}")
                 setattr(team, fk, group)
         print(f"saving team {team.name} for {team.camp.title}")
         team.save()
