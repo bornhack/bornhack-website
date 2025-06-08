@@ -1962,7 +1962,7 @@ class Bootstrap:
                 content_type=permission_content_type,
                 codename=f"{team.slug}_team_member",
             )
-            team.group_member.permissions.add(permission)
+            team.member_group.permissions.add(permission)
 
     def create_maps_layer_generic(self) -> None:
         """Create map layers that do not have a camp attached."""
@@ -2009,7 +2009,6 @@ class Bootstrap:
             icon="fa fa-list-ul",
             group=group,
             public=False,
-            team=team,
         )
         layer = Layer.objects.create(
             name="Team Area",
