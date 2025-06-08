@@ -66,10 +66,64 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     name = models.CharField(max_length=255, help_text="The team name")
 
-    group_member = models.OneToOneField(
+    lead_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_lead",
+        help_text="The django group carrying the team lead permissions for this team.",
+    )
+
+    member_group = models.OneToOneField(
         Group,
         on_delete=models.CASCADE,
         help_text="The django group carrying the team permissions for this team.",
+    )
+
+    mapper_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_mapper",
+        help_text="The django group carrying the team mapper permissions for this team.",
+    )
+
+    facilitator_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_facilitator",
+        help_text="The django group carrying the team facilitator permissions for this team.",
+    )
+
+    infopager_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_infopager",
+        help_text="The django group carrying the team infopager permissions for this team.",
+    )
+
+    pos_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_pos",
+        help_text="The django group carrying the team pos permissions for this team.",
+    )
+
+    tasker_group = models.OneToOneField(
+        Group,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="team_tasker",
+        help_text="The django group carrying the team tasker permissions for this team.",
     )
 
     slug = models.SlugField(
@@ -205,12 +259,15 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
         if not self.shortslug:
             self.shortslug = self.slug
 
-        # generate group if needed
-        if not self.group_member:
-            self.group_member = Group.objects.create(
-                name=f"{self.camp.slug}-{self.slug}-team-member",
-            )
-
+        # generate permission groups for this team if needed
+        for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+            print(f"checking perm {perm} ...")
+            fk = f"{perm}_group"
+            if not hasattr(self, fk):
+                group, created = Group.objects.get_or_create(name=f"{self.camp.slug}-{self.slug}-team-{perm}")
+                if created:
+                    logger.info(f"Created group {group} for team {self}")
+                setattr(self, fk, group)
         super().save(**kwargs)
 
     def clean(self) -> None:

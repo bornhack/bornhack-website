@@ -6,7 +6,7 @@ def rename_team_groups(apps, schema_editor) -> None:
     Team = apps.get_model("teams", "Team")
 
     for team in Team.objects.filter(group_member__name__endswith="-team"):
-        print(f"renaming group for team {team.name} for {team.camp}")
+        print(f"renaming group for team {team.name} for {team.camp.title}")
         group = team.group_member
         group.name = group.name + "-member"
         group.save()
