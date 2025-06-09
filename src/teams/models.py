@@ -548,6 +548,31 @@ class TaskComment(
     comment = models.TextField()
 
 
+class TeamShiftAssignment(CampRelatedModel):
+    """Model for storing the for_sale state of the shift assignment."""
+    team_shift = models.ForeignKey(
+        "teams.TeamShift",
+        on_delete=models.CASCADE,
+        help_text="The shift",
+    )
+
+    team_member = models.ForeignKey(
+        "teams.TeamMember",
+        on_delete=models.CASCADE,
+        help_text="The team member on shift",
+    )
+
+    for_sale = models.BooleanField(
+        default=False,
+        help_text="Is the shift assignment for sale?",
+    )
+
+    @property
+    def camp(self) -> Camp:
+        """All CampRelatedModels must have a camp FK or a camp property."""
+        return self.team_shift.camp
+
+
 class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     """Model for team shifts."""
     class Meta:
@@ -563,7 +588,7 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
 
     shift_range = DateTimeRangeField()
 
-    team_members = models.ManyToManyField(TeamMember, blank=True, through=TeamShiftAssignment)
+    team_members = models.ManyToManyField("teams.TeamMember", blank=True, through=TeamShiftAssignment)
 
     people_required = models.IntegerField(default=1)
 
@@ -583,20 +608,7 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
         """Returns a list of team members on this shift."""
         return [member.user for member in self.team_members.all()]
 
-class TeamShiftAssignment(CampRelatedModel):
-    team_shift = models.ForeignKey(
-        "teams.TeamShift",
-        on_delete=models.CASCADE,
-        help_text="The shift",
-    )
-
-    team_member = models.ForeignKey(
-        "teams.TeamMember",
-        on_delete=models.CASCADE,
-        help_text="The team member on shift",
-    )
-
-    for_sale = models.BooleanField(
-        default=False,
-        help_text="Is the shift assignment for sale?",
-    )
+    @property
+    def for_sale_count(self) -> int:
+        """Returns a count of shifts for sale."""
+        return self.team_members.filter(teamshiftassignment__for_sale=False).count 

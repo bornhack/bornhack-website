@@ -209,6 +209,7 @@ class TeamShiftViewTest(BornhackTestBase):
         )
         team_shift_2.save()
 
+        # Test taking a shift
         url = reverse("teams:shift_member_take", kwargs={
             "team_slug": team_shift_1.team.slug,
             "camp_slug": self.camp.slug,
@@ -225,6 +226,7 @@ class TeamShiftViewTest(BornhackTestBase):
         matches = [s for s in rows if "Unassign me" in str(s)]
         self.assertEqual(len(matches), 1, "team shift assign failed")
 
+        # Test taking a double shift
         url = reverse("teams:shift_member_take", kwargs={
             "team_slug": team_shift_1.team.slug,
             "camp_slug": self.camp.slug,
@@ -241,6 +243,42 @@ class TeamShiftViewTest(BornhackTestBase):
         matches = [s for s in rows if "overlapping" in str(s)]
         self.assertEqual(len(matches), 1, "team shift double assign failed to fail")
 
+        # Test selling a shift 
+        url = reverse("teams:shift_member_sell", kwargs={
+            "team_slug": team_shift_1.team.slug,
+            "camp_slug": self.camp.slug,
+            "pk": team_shift_1.pk,
+        })
+        response = self.client.get(
+            path=url,
+            follow=True,
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select_one("table#main_table > tbody > tr:nth-of-type(1) td:nth-of-type(4)")
+        matches = [s for s in rows if "for sale!" in str(s)]
+        self.assertEqual(len(matches), 1, "team shift sell failed")
+
+        # Test taking a sellable shift with user1
+        self.client.force_login(self.users[1]) # Noc team member
+        url = reverse("teams:shift_member_take", kwargs={
+            "team_slug": team_shift_1.team.slug,
+            "camp_slug": self.camp.slug,
+            "pk": team_shift_1.pk,
+        })
+        response = self.client.get(
+            path=url,
+            follow=True,
+        )
+        assert response.status_code == 200
+        content = response.content.decode()
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select_one("table#main_table > tbody > tr:nth-of-type(1) td:nth-of-type(5)")
+        matches = [s for s in rows if "Unassign me" in str(s)]
+        self.assertEqual(len(matches), 1, "team shift assign failed")
+
+        # Test dropping a shift 
         url = reverse("teams:shift_member_drop", kwargs={
             "team_slug": team_shift_1.team.slug,
             "camp_slug": self.camp.slug,

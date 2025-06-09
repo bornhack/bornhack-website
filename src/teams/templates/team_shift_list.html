@@ -55,11 +55,11 @@
             {{ shift.shift_range.upper|date:'H:i' }}
           </td>
           <td>
-            {{ shift.people_required }}
+            {{ shift.team_members.count }} of {{ shift.people_required }} assigned 
           </td>
           <td>
-            {% for member in shift.team_members.all %}
-              {{ member.user.profile.get_public_credit_name }}{% if member.for_sale %} <em>(for sale!)</em>{% endif %}{% if not forloop.last %},{% endif %} 
+            {% for member in shift.teamshiftassignment_set.all %}
+              {{ member.team_member.user.profile.get_public_credit_name }}{% if member.for_sale %} <em>(for sale!)</em>{% endif %}{% if not forloop.last %},{% endif %} 
             {% empty %}
               None!
             {% endfor %}
@@ -82,9 +82,9 @@
               </a>
               <a class="btn btn-warning"
                  href="{% url 'teams:shift_member_sell' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                  <i class="fas fa-thumbs-down"></i> Sell shift
+                  <i class="fas fa-thumbs-down"></i> Mark for sale 
               </a>
-            {% elif shift.people_required > shift.team_members.count %}
+            {% elif shift.people_required > shift.for_sale_count %} 
               <a class="btn btn-success"
                  href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
                 <i class="fas fa-thumbs-up"></i> Assign me

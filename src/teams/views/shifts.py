@@ -26,6 +26,7 @@ from teams.exceptions import StartSameAsEndError
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
+from teams.models import TeamShiftAssignment
 from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import EnsureTeamLeadMixin
@@ -334,8 +335,8 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
             )
         else:
             # Remove at most one shift assignment for sale
-            for shift_assignment in shift.team_members.filter(for_sale=True)[:1]:
-                shift_assignment.delete()
+            for shift_assignment in shift.team_members.filter(teamshiftassignment__for_sale=True)[:1]:
+                shift.team_members.remove(shift_assignment)
             shift.team_members.add(team_member)
 
         kwargs.pop("pk")
@@ -370,7 +371,7 @@ class MemberSellsShift(LoginRequiredMixin, CampViewMixin, View):
 
         team_member = TeamMember.objects.get(team=team, user=request.user)
 
-        shift_assignment = shift.team_members.get(team_member = team_member.pk)
+        shift_assignment = TeamShiftAssignment.objects.get(team_member = team_member, team_shift = shift)
         shift_assignment.for_sale = True
         shift_assignment.save()
 
