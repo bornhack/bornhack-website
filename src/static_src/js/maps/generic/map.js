@@ -53,7 +53,7 @@ class BHMap {
       attribution: this.myAttributionText
     });
 
-    this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.baseLayers['OSM (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 18,
     });
