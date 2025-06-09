@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  ePay Transaction List | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">ePay Transaction List - BackOffice</h3></div>
+    <div class="card-body">
+      <p>A list of ePay / Bambora transactions. This data is imported manually using CSV files from the ePay web interface. If the data looks stale poke someone from the Economy Team!</p>
+      {% if not epaytransaction_list %}
+        <p class="lead">No ePay Transactions found. Go <a href="{% url 'backoffice:epay_csv_import' camp_slug=camp.slug %}">import a CSV!</a></p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-primary" href="{% url 'backoffice:epay_csv_import' camp_slug=camp.slug %}"><i class="fas fa-file-csv"></i> Import CSV</a>
+          {% include "includes/epay_transaction_list_table.html" %}
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

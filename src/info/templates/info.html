@@ -3,41 +3,17 @@
 {% load commonmark %}$
 
 {% block title %}
-Info | {{ block.super }}
+  Info | {{ block.super }}
 {% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/leaflet.css' %}" />
 {% endblock %}
 
 {% block content %}
-  <style>
-    .anchor{
-      display: block;
-      height: 80px; /*same height as header*/
-      margin-top: -80px; /*same height as header*/
-      visibility: hidden;
-    }
-
-    .sub-anchor{
-      display: block;
-      height: 94px; /*same height as header*/
-      margin-top: -94px; /*same height as header*/
-      visibility: hidden;
-    }
-
-    @media (min-width: 992px) {
-      .sticky {
-        position: sticky;
-        top: 100px;
-      }
-    }
-
-  </style>
-
   {% if categories %}
     <div class="row">
-      <div class="col-md-3 sticky">
+      <div class="col-sm-12 col-lg-3 sticky">
         <h3>Table of Contents</h3>
         <p class="list-group">
           {% for category in categories %}
@@ -46,39 +22,36 @@ Info | {{ block.super }}
         </p>
       </div>
 
-      <div class="col-md-9">
-    {% for category in categories %}
-        <span class="anchor" id="{{ category.anchor }}"></span>
-        <h2>{{ category.headline }} {% if category.team %}<small>Info by the {{ category.team.name }} team</small>{% endif %}</h2>
-          <div class="panel-group">
-            {% for item in category.infoitems.all %}
-              <div class="panel panel-default">
-                <div class="panel-heading">
-                  <span class="sub-anchor" id="{{ item.anchor }}"></span>
-                  <h4 class="panel-title">{{ item.headline }}
-                    <a href="#{{ item.anchor }}">
-                      <i class="glyphicon glyphicon-link"></i>
+      <div class="col-sm-12 col-lg-9">
+        {% for category in categories %}
+          <span class="anchor" id="{{ category.anchor }}"></span>
+          <h2 {% if not forloop.first %}class="mt-2"{% endif %}><a href="#{{ category.anchor }}">{{ category.headline }}</a> {% if category.team %}<span class="fs-4 text-muted">Info by the {{ category.team.name }} team</span>{% endif %}</h2>
+          {% for item in category.infoitems.all %}
+            <div class="card mb-1">
+              <span class="sub-anchor" id="{{ item.anchor }}"></span>
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="text-start m-0"><a href="#{{ item.anchor }}">{{ item.headline }}</a></h4>
+                <span class="text-end">
+                  <a href="#{{ item.anchor }}">
+                    <i class="fa-solid fa-link"></i>
+                  </a>
+                  {% if category.team.infopager_permission_set in perms %}
+                    <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=category.team.slug category_anchor=category.anchor item_anchor=item.anchor %}?next={% url 'info'  camp_slug=camp.slug %}#{{ item.anchor }}"
+                       class="btn btn-sm btn-primary">
+                      <i class="fa fa-edit"></i> Edit
                     </a>
-                    {% if request.user in category.team.responsible_members.all %}
-                      <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=category.team.slug category_anchor=category.anchor item_anchor=item.anchor %}?next={% url 'info'  camp_slug=camp.slug %}#{{ item.anchor }}"
-                         class="btn btn-xs btn-primary pull-right">
-                        <i class="fa fa-edit"></i> Edit
-                      </a>
-                    {% endif %}
-                  </h4>
-                  <small></small>
-                </div>
-                <div class="panel-body">
-                  <p>{{ item.body|trustedcommonmark }}</p>
-                </div>
+                  {% endif %}
+                </span>
               </div>
-            {% endfor %}
-          </div>
-    {% endfor %}
+              <div class="card-body">
+                <p class="break-word">{{ item.body|trustedcommonmark }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        {% endfor %}
       </div>
     </div>
   {% else %}
     <h3>No info found for {{ camp.title }}</h3>
   {% endif %}
 {% endblock %}
-

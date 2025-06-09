@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import factory
 from django.utils import timezone
 from factory.django import DjangoModelFactory
@@ -18,16 +20,16 @@ class ProductFactory(DjangoModelFactory):
         model = "shop.Product"
 
     name = factory.Faker("word")
-    slug = factory.Faker("word")
+    slug = factory.Faker("slug")
     category = factory.SubFactory(ProductCategoryFactory)
     description = factory.Faker("paragraph")
     price = factory.Faker("pyint")
     available_in = factory.LazyFunction(
         lambda: DateTimeTZRange(
-            lower=timezone.now(), upper=timezone.now() + timezone.timedelta(31)
-        )
+            lower=timezone.now(),
+            upper=timezone.now() + timezone.timedelta(31),
+        ),
     )
-    ticket_type = factory.SubFactory("tickets.factories.TicketTypeFactory")
 
 
 class OrderFactory(DjangoModelFactory):
@@ -44,4 +46,12 @@ class OrderProductRelationFactory(DjangoModelFactory):
     product = factory.SubFactory(ProductFactory)
     order = factory.SubFactory(OrderFactory)
     quantity = 1
-    ticket_generated = False
+
+
+class SubProductRelationFactory(DjangoModelFactory):
+    class Meta:
+        model = "shop.SubProductRelation"
+
+    bundle_product = factory.SubFactory(ProductFactory)
+    sub_product = factory.SubFactory(ProductFactory)
+    number_of_tickets = 1

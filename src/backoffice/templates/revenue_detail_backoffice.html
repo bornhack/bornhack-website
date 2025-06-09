@@ -1,29 +1,29 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Manage Revenue | {{ block.super }}
+  Manage Revenue | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Manage Revenue</h3>
+  <h3>Manage Revenue</h3>
 
-{% include 'includes/revenue_detail_panel.html' %}
+  {% include 'includes/revenue_detail_panel.html' %}
 
-{% if revenue.approved == None %}
-<form method="POST">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    {% bootstrap_button "<i class='fas fa-check'></i> Approve Revenue" button_type="submit" button_class="btn-success" name="approve" %}
-    {% bootstrap_button "<i class='fas fa-times'></i> Reject Revenue" button_type="submit" button_class="btn-danger" name="reject" %}
-    <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
-{% endif %}
-<br>
-{% if request.user.is_staff %}
-  <a href="{% url 'admin:index' %}economy/revenue/{{ revenue.uuid }}/change/" class="btn btn-primary"><i class="fas fa-edit"></i> Open in Admin</a>
-{% endif %}
-<a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Revenue List</a>
+  {% if revenue.approved == None %}
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% bootstrap_button "<i class='fas fa-check'></i> Approve Revenue" button_type="submit" button_class="btn-success" name="approve" %}
+      {% bootstrap_button "<i class='fas fa-times'></i> Reject Revenue" button_type="submit" button_class="btn-danger" name="reject" %}
+      <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    </form>
+  {% endif %}
+  <br>
+  {% if request.user.is_staff %}
+    <a href="{% url 'admin:index' %}economy/revenue/{{ revenue.uuid }}/change/" class="btn btn-primary"><i class="fas fa-edit"></i> Open in Admin</a>
+  {% endif %}
+  <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Revenue List</a>
+  <a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=revenue.debtor.chain.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Chain Details</a>
 
 {% endblock content %}
-

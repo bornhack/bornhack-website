@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete Facility {{ facility.name }}?</h2>
+    </div>
+    <div class="card-body">
+      {% if facility.feedbacks.count > 0 %}
+        <p class="lead">This Facility has <b>{{ facility.feedbacks.count }}</b> Feedback and can not be deleted</p>
+      {% endif %}
+      <form method="POST">
+        {% csrf_token %}
+        {% if facility.feedbacks.count == 0 %}
+          <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
+        {% endif %}
+        <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

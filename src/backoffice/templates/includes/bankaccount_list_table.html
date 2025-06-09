@@ -1,0 +1,33 @@
+{% load bornhack %}
+<table class="table table-striped datatable">
+  <thead>
+    <tr>
+      {% with bankaccount_list.0 as a %}
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Internal BornHack UUID for this bank account">ID</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ a.get_name_help_text }}">Name</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ a.get_reg_no_help_text }}">Reg. No.</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ a.get_account_no_help_text }}">Account No.</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Number of transactions for this bank account">Transactions</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="The latest known balance of this bank account">Balance</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Available actions for this bank account">Actions</th>
+      {% endwith %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for account in bankaccount_list %}
+      <tr>
+        <td><a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=account.pk %}">{{ account.pk }}</a></td>
+        <td>{{ account.name }}</td>
+        <td>{{ account.reg_no }}</td>
+        <td>{{ account.account_no }}</td>
+        <td class="text-center"><span class="badge">{{ account.transactions.count }}</span></td>
+        <td data-order="{{ account.transactions.latest.balance }}">{{ account.transactions.latest.balance }}&nbsp;DKK</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=account.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

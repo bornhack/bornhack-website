@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Team Permissions | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Team Permissions - {{ camp.title }} Backoffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">Please select a team to manage permissions</p>
+      <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a></p>
+      <div class="list-group">
+        {% for team in teams %}
+          <a href="{% url 'backoffice:team_permission_manage' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item list-group-item-action">
+            <h4 class="list-group-item-heading">{{ team.name }} Team</h4>
+            <p class="list-group-item-text">Manage permissions for {{ team.approved_members.count }} members of the {{  team.name }} Team.</p>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

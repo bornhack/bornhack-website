@@ -1,9 +1,11 @@
-from django.db.models import Func, IntegerField
+from __future__ import annotations
+
+from django.db.models import Func
+from django.db.models import IntegerField
 
 
 class CastToInteger(Func):
-    """
-    Trying to use a GIST index in postgres over a BooleanField will not work:
+    """Trying to use a GIST index in postgres over a BooleanField will not work:
 
         django.db.utils.ProgrammingError: data type boolean has no default operator class for access method "gist"
         HINT:  You must specify an operator class for the index or define a default operator class for the data type.

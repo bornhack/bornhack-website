@@ -1,21 +1,20 @@
+"""Add current camp and camps list to template context.
+
+This is done here and not in CampViewMixin because most views need the camp and camps
+list in tempalte context but not all views need queryset filtering by camp.
+"""
+
+from __future__ import annotations
+
 from .models import Camp
 
 
 def camp(request):
+    """If we have a camp in the request object (added by RequestCampMiddleware based on
+    the camp_slug url kwarg) add it to the context.
+    Also add a "camps" queryset containing all camps (used to build the menu and such).
     """
-    if we have a camp_slug url component then get the "current" Camp object.
-    Return it after adding the slug to request.session along with a "camps"
-    queryset containing all camps (used to build the menu and such)
-    """
-    if request.resolver_match and "camp_slug" in request.resolver_match.kwargs:
-        try:
-            camp = Camp.objects.get(slug=request.resolver_match.kwargs["camp_slug"])
-            request.session["campslug"] = camp.slug
-        except Camp.DoesNotExist:
-            request.session["campslug"] = None
-            camp = None
-    else:
-        request.session["campslug"] = None
-        camp = None
-
+    camp = None
+    if hasattr(request, "camp"):
+        camp = request.camp
     return {"camps": Camp.objects.all().order_by("-camp"), "camp": camp}

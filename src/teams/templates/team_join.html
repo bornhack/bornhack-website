@@ -2,22 +2,22 @@
 {% load commonmark %}
 
 {% block title %}
-Join Team: {{ team.name }} | {{ block.super }}
+  Join Team: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-<p class="lead">Really join the <b>{{ team.name }}</b> Team for <b>{{ team.camp.title }}</b>?</p>
+  <p class="lead">Really join the <b>{{ team.name }}</b> Team for <b>{{ team.camp.title }}</b>?</p>
 
-<p>Your membership will need to be approved by a team responsible. You will receive an email when your membership request has been processed.<p>
+  <p>Your membership will need to be approved by a team lead. You will receive an email when your membership request has been processed.<p>
 
-<p>
-<form method="POST">
-{% csrf_token %}
-{{ form }}
-<button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Join {{ team.name }} Team</button>
-<a href="{% url 'teams:list' camp_slug=camp.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
-</form>
-</p>
+    <p>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Join {{ team.name }} Team</button>
+        <a href="{% url 'teams:list' camp_slug=camp.slug %}" class="btn btn-secondary" type="submit"><i class="fas fa-times"></i> Cancel</a>
+      </form>
+    </p>
 
 {% endblock %}

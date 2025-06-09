@@ -1,0 +1,128 @@
+{% extends 'profile_base.html' %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
+
+{% block title %}
+  Details for Order #{{ order.id }} | {{ block.super }}
+{% endblock %}
+
+{% block profile_content %}
+
+  <div class="card">
+    <div class="card-header">
+      <h4>Details for Order #{{ order.id }} (closed, {% if not order.paid %}un{% endif %}paid)</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered {% if not order.open == None %}table-hover{% endif %}">
+        <thead>
+          <tr>
+            <th>
+              Name
+            </th>
+            <th class="text-right">
+              Quantity
+            </th>
+            <th class="text-right">
+              Used
+            </th>
+            <th class="text-right">
+              Refunded
+            </th>
+            <th class="text-right">
+              Price
+            </th>
+            <th class="text-right">
+              Total
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for opr in order.oprs.all %}
+            <tr>
+              <td>
+                {{ opr.product.name }}
+                {% if opr.product.stock_amount and opr.open != None %}
+                  <br/><small>{{ opr.product.left_in_stock }} left in stock</small>
+                {% endif %}
+              </td>
+              <td class="text-right">
+                {{ opr.quantity }}
+              </td>
+              <td class="text-right">
+                {{ opr.used_shoptickets.count }}
+              </td>
+              <td class="text-right">
+                {{ opr.refunded_quantity }}
+              </td>
+              <td class="text-right">
+                {{ opr.product.price|currency }}
+              </td>
+              <td class="text-right">
+                {{ opr.total|currency }}
+              </td>
+            </tr>
+          {% endfor %}
+
+          <tr>
+            <td colspan="4">All our products include 25% Danish VAT</td>
+            <td>
+              <strong>Included VAT (25%)</strong>
+            </td>
+            <td class="text-right">
+              {{ order.vat|currency }}
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="4">
+            </td>
+            <td>
+              <strong>Total</strong>
+            </td>
+            <td class="text-right">
+              {{ order.total|currency }}<br/>
+            </td>
+          </tr>
+
+        </table>
+
+        <h4>Comment:</h4>
+        <div class="alert alert-info">{{ order.customer_comment|default:"N/A"|linebreaks }}</div>
+
+        <h4>Invoice Address:</h4>
+        <div class="alert alert-info">{{ order.get_invoice_address|linebreaks }}</div>
+
+        {% if not order.paid %}
+          {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
+        {% endif %}
+
+        {% if not order.paid %}
+          {% bootstrap_button "Review and pay" button_type="submit" button_class="btn btn-success btn-lg ms-auto" name="review_and_pay" icon="check" %}
+        {% endif %}
+
+        {% if order.paid %}
+          {% if order.invoice.pdf %}
+            {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+            {% bootstrap_button "Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg ms-auto" %}
+          {% endif %}
+        {% else %}
+          {% if order.pdf %}
+            {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+            {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg ms-auto" %}
+          {% endif %}
+        {% endif %}
+      </div>
+      {% if order.paid %}
+        <div class="card-footer">
+          {% if order.refunded == "FULLY_REFUNDED" %}
+            <h4>This order has been fully refunded, tickets related to it are no longer valid.</h4>
+          {% elif order.refunded == "PARTIALLY_REFUNDED" %}
+            <h4>This order has been partially refunded, some tickets related to it are no longer valid.</h4>
+          {% else %}
+            <h4>This order is paid in full.</h4>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+{% endblock %}

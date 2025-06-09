@@ -4,56 +4,58 @@
 {% load static %}
 
 {% block title %}
-People | {{ block.super }}
+  People | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<h3>The People of BornHack</h3>
-<p class="lead">The following is a list of the volunteers that have helped make BornHack happen. It goes without saying that an event like BornHack would not be possible to pull off without our volunteers. We are forever grateful, and we leave your names here as a recognition of the work you put in. Thank you!
-{% for camp in camp_list %}
-    {% if camp.teams.exists %}
-    <div class="panel panel-default">
-      <div class="panel-heading">{{ camp.title }} Teams</div>
-        <div class="panel-body">
-         <img width=190 class="pull-right" src="{% static camp.logo_small %}">
-         <table class="table table-hover">
-          <thead>
-          <tr>
-            <th>Team Name</th>
-            <th>Team Responsible</th>
-            <th>Team Members</th>
-          </tr>
-          </thead>
-          <tbody>
-            {% for team in camp.teams.all %}
-            <tr>
-              <td>
-                  {{ team.name }} Team
-              </td>
-              <td>
-                {% for resp in team.responsible_members.all %}
-                  {{ resp.profile.get_public_credit_name }}<br>
+  <h3>The People of BornHack</h3>
+  <p class="lead">The following is a list of the volunteers that have helped make BornHack happen. It goes without saying that an event like BornHack would not be possible to pull off without our volunteers. We are forever grateful, and we leave your names here as a recognition of the work you put in. Thank you!
+    {% for camp in camp_list %}
+      {% if camp.teams.exists %}
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">
+              <img width=190 class="float-end bornhack-logo" src="{% static camp.logo_small %}">
+              {{ camp.title }} Teams
+            </h4>
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Team Name</th>
+                  <th>Team Leads</th>
+                  <th>Team Members</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for team in camp.teams.all %}
+                  <tr>
+                    <td>
+                      {{ team.name }} Team
+                    </td>
+                    <td>
+                      {% for resp in team.leads.all %}
+                        {{ resp.profile.get_public_credit_name }}<br>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for member in team.regular_members.all %}
+                        {% if member.profile.get_public_credit_name != "Unnamed" %}
+                          {{ member.profile.get_public_credit_name }}<br>
+                        {% endif %}
+                      {% empty %}
+                        No team members
+                      {% endfor %}
+                      {% if team.unnamed_members %}
+                        {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}<b>{{ team.unnamed_members.count }}</b> anonymous member(s).
+                      {% endif %}
+                    </td>
+                  </tr>
                 {% endfor %}
-              </td>
-              <td>
-                {% for member in team.regular_members.all %}
-                  {% if member.profile.get_public_credit_name != "Unnamed" %}
-                    {{ member.profile.get_public_credit_name }}<br>
-                  {% endif %}
-                {% empty %}
-                  No team members
-                {% endfor %}
-                {% if team.unnamed_members %}
-                  {% if team.unnamed_members.count < team.regular_members.count %}Plus {% endif %}<b>{{ team.unnamed_members.count }}</b> anonymous member(s).
-                {% endif %}
-              </td>
-           </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-       </div>
-    </div>
-    {% endif %}
-{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
 {% endblock %}

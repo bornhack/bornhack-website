@@ -4,25 +4,25 @@
 {% load bornhack %}
 
 {% block title %}
-Event List | Backoffice | {{ block.super }}
+  Event List | Backoffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Event List - BackOffice</h3></div>
-  <div class="panel-body">
-    <p><i>Events</i> are the result of approving an <i>EventProposal</i>. They contain data for the event like title, abstract, duration and more. Search for an event title, speaker names, tags or event type to filter the list. <b>Any changes made here will be reflected immediately on the live site!</b></p>
-  {% if not event_list %}
-    <p class="lead">No Events found.</p>
-  {% else %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-    {% include "includes/event_list_table_backoffice.html" %}
-  </p>
-  {% endif %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Event List - BackOffice</h3></div>
+    <div class="card-body">
+      <p><i>Events</i> are the result of approving an <i>EventProposal</i>. They contain data for the event like title, abstract, duration and more. Search for an event title, speaker names, tags or event type to filter the list. <b>Any changes made here will be reflected immediately on the live site!</b></p>
+      {% if not event_list %}
+        <p class="lead">No Events found.</p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          {% include "includes/event_list_table_backoffice.html" %}
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

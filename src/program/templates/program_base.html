@@ -1,25 +1,22 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Program | {{ block.super }}
+  Program | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-{% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speaker_proposal_create,speaker_proposal_detail,speaker_proposal_update,speaker_proposal_submit,speaker_proposal_picture,event_proposal_create,event_proposal_detail,event_proposal_update,event_proposal_submit" %}
+  {% with url_name=request.resolver_match.url_name proposal_urls="proposal_list,speaker_proposal_create,speaker_proposal_detail,speaker_proposal_update,speaker_proposal_submit,speaker_proposal_picture,event_proposal_create,event_proposal_detail,event_proposal_update,event_proposal_submit" %}
 
-<div class="row">
-  <div class="btn-group btn-group-justified hidden-xs">
-      {% include 'includes/program_menu.html' %}
-  </div>
-  <div class="btn-group-vertical visible-xs">
-      {% include 'includes/program_menu.html' %}
-  </div>
-</div>
-<p>
-{% block program_content %}
-{% endblock program_content %}
+    <div class="row">
+      <div class="d-flex flex-wrap justify-content-center mt-1">
+        {% include 'includes/program_menu.html' %}
+      </div>
+    </div>
+    <p>
+      {% block program_content %}
+      {% endblock program_content %}
 
-{% endwith %}
+  {% endwith %}
 
 {% endblock content %}

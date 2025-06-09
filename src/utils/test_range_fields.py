@@ -1,21 +1,26 @@
+from __future__ import annotations
+
 import datetime
 from decimal import Decimal
 
 from django.db import connection
 from hypothesis import given
 from hypothesis.extra.django import TestCase
-from hypothesis.strategies import (
-    dates,
-    datetimes,
-    integers,
-    none,
-    one_of,
-    sampled_from,
-    tuples,
-)
-from psycopg2.extras import DateRange, DateTimeRange, NumericRange, Range
+from hypothesis.strategies import dates
+from hypothesis.strategies import datetimes
+from hypothesis.strategies import integers
+from hypothesis.strategies import none
+from hypothesis.strategies import one_of
+from hypothesis.strategies import sampled_from
+from hypothesis.strategies import tuples
+from psycopg2.extras import DateRange
+from psycopg2.extras import DateTimeRange
+from psycopg2.extras import NumericRange
+from psycopg2.extras import Range
 
-from .range_fields import array_subtract_all, normalise, safe_subtract
+from .range_fields import array_subtract_all
+from .range_fields import normalise
+from .range_fields import safe_subtract
 
 
 def valid_range(obj):
@@ -24,7 +29,8 @@ def valid_range(obj):
 
 BOUNDS = sampled_from(["[]", "()", "[)", "(]"])
 BIGINT = one_of(
-    integers(min_value=-9223372036854775807, max_value=+9223372036854775806), none()
+    integers(min_value=-9223372036854775807, max_value=+9223372036854775806),
+    none(),
 )
 DATES = one_of(dates(), none())
 DATETIMES = one_of(datetimes(), none())
@@ -39,8 +45,8 @@ class TestRange__and__(TestCase):
         self.assertTrue(normalise(NumericRange(0, 1, "()")).isempty)
         self.assertFalse(
             normalise(
-                DateRange(datetime.date(2000, 1, 9), datetime.date(2000, 1, 10), "(]")
-            ).isempty
+                DateRange(datetime.date(2000, 1, 9), datetime.date(2000, 1, 10), "(]"),
+            ).isempty,
         )
         self.assertTrue(normalise(NumericRange(2, 2, "()")).isempty)
 
@@ -68,7 +74,8 @@ class TestRange__and__(TestCase):
     def test_can_query_db(self):
         cursor = connection.cursor()
         cursor.execute(
-            "SELECT %s::int8range && %s::int8range", [NumericRange(), NumericRange()]
+            "SELECT %s::int8range && %s::int8range",
+            [NumericRange(), NumericRange()],
         )
         self.assertTrue(cursor.fetchone()[0])
 
@@ -120,7 +127,7 @@ class TestRange__and__(TestCase):
         b = NumericRange(*b)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::int8range && %s::int8range", [a, b])
-        self.assertEqual(cursor.fetchone()[0], a & b, "{} && {}".format(a, b))
+        self.assertEqual(cursor.fetchone()[0], a & b, f"{a} && {b}")
 
     @given(date_range, date_range)
     def test_with_hypothesis_dates(self, a, b):
@@ -128,7 +135,7 @@ class TestRange__and__(TestCase):
         b = DateRange(*b)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::daterange && %s::daterange", [a, b])
-        self.assertEqual(cursor.fetchone()[0], a & b, "{} && {}".format(a, b))
+        self.assertEqual(cursor.fetchone()[0], a & b, f"{a} && {b}")
 
     @given(datetime_range, datetime_range)
     def test_with_hypothesis_datetimes(self, a, b):
@@ -136,11 +143,12 @@ class TestRange__and__(TestCase):
         b = DateTimeRange(*b)
         cursor = connection.cursor()
         cursor.execute("SELECT %s::tsrange && %s::tsrange", [a, b])
-        self.assertEqual(cursor.fetchone()[0], a & b, "{} && {}".format(a, b))
+        self.assertEqual(cursor.fetchone()[0], a & b, f"{a} && {b}")
 
     def test_with_values_found_by_hypothesis(self):
         self.assertEqual(
-            NumericRange(None, 1, "()"), normalise(NumericRange(None, 0, "[]"))
+            NumericRange(None, 1, "()"),
+            normalise(NumericRange(None, 0, "[]")),
         )
         self.assertFalse(NumericRange(0, None, "()") & NumericRange(None, 1, "()"))
 
@@ -239,14 +247,14 @@ class TestRangeIntersect(TestCase):
     def test_intersects(self):
         self.assertEqual(Range(22, 25, "[]") * Range(23, 28, "[]"), Range(23, 25, "[]"))
         self.assertEqual(
-            Range(None, 25, "(]") * Range(23, None, "[)"), Range(23, 25, "[]")
+            Range(None, 25, "(]") * Range(23, None, "[)"),
+            Range(23, 25, "[]"),
         )
 
 
 class TestRangeSubtract(TestCase):
     def test_source_within_subtract(self):
-        """
-           [ source )
+        """[ source )
         [    subtract    )
         [    subtract    ]
         (    subtract    )
@@ -279,29 +287,28 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(11, 16, "(]"), Range(0, 44, "[]")))
 
     def test_subtract_upper_bound_matches_source_lower_bound(self):
-        """
-
-                 [ source )
+        """[ source )
         [subtract]
 
         """
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[]"))
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[]")),
         )
 
     def test_subtract_lower_bound_below_bounds_only(self):
-        """
-
-                 [source)
+        """[source)
         [subtract)
         (subtract)
 
         """
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[)"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 4, "()"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 4, "()")),
         )
 
         """
@@ -309,12 +316,12 @@ class TestRangeSubtract(TestCase):
         (subtract]
         """
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "()"), Range(0, 4, "[]"))
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "()"), Range(0, 4, "[]")),
         )
 
     def test_subtract_lower_bound_below_completely(self):
-        """
-                    [source)
+        """[source)
         [subtract]
         [subtract)
         [subtract]
@@ -322,72 +329,88 @@ class TestRangeSubtract(TestCase):
 
         """
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 3, "[)"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 3, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 3, "()"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 3, "()")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 3, "[]"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 3, "[]")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 3, "(]"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 3, "(]")),
         )
 
         # Other source bounds types
         self.assertEqual(
-            [Range(4, 7, "[]")], safe_subtract(Range(4, 7, "[]"), Range(0, 3, "[)"))
+            [Range(4, 7, "[]")],
+            safe_subtract(Range(4, 7, "[]"), Range(0, 3, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "[]")], safe_subtract(Range(4, 7, "[]"), Range(0, 3, "()"))
+            [Range(4, 7, "[]")],
+            safe_subtract(Range(4, 7, "[]"), Range(0, 3, "()")),
         )
         self.assertEqual(
-            [Range(4, 7, "[]")], safe_subtract(Range(4, 7, "[]"), Range(0, 3, "[]"))
+            [Range(4, 7, "[]")],
+            safe_subtract(Range(4, 7, "[]"), Range(0, 3, "[]")),
         )
         self.assertEqual(
-            [Range(4, 7, "[]")], safe_subtract(Range(4, 7, "[]"), Range(0, 3, "(]"))
-        )
-
-        self.assertEqual(
-            [Range(4, 7, "(]")], safe_subtract(Range(4, 7, "(]"), Range(0, 3, "[)"))
-        )
-        self.assertEqual(
-            [Range(4, 7, "(]")], safe_subtract(Range(4, 7, "(]"), Range(0, 3, "()"))
-        )
-        self.assertEqual(
-            [Range(4, 7, "(]")], safe_subtract(Range(4, 7, "(]"), Range(0, 3, "[]"))
-        )
-        self.assertEqual(
-            [Range(4, 7, "(]")], safe_subtract(Range(4, 7, "(]"), Range(0, 3, "(]"))
+            [Range(4, 7, "[]")],
+            safe_subtract(Range(4, 7, "[]"), Range(0, 3, "(]")),
         )
 
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "()"), Range(0, 3, "[)"))
+            [Range(4, 7, "(]")],
+            safe_subtract(Range(4, 7, "(]"), Range(0, 3, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "()"), Range(0, 3, "()"))
+            [Range(4, 7, "(]")],
+            safe_subtract(Range(4, 7, "(]"), Range(0, 3, "()")),
         )
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "()"), Range(0, 3, "[]"))
+            [Range(4, 7, "(]")],
+            safe_subtract(Range(4, 7, "(]"), Range(0, 3, "[]")),
         )
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "()"), Range(0, 3, "(]"))
+            [Range(4, 7, "(]")],
+            safe_subtract(Range(4, 7, "(]"), Range(0, 3, "(]")),
+        )
+
+        self.assertEqual(
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "()"), Range(0, 3, "[)")),
+        )
+        self.assertEqual(
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "()"), Range(0, 3, "()")),
+        )
+        self.assertEqual(
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "()"), Range(0, 3, "[]")),
+        )
+        self.assertEqual(
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "()"), Range(0, 3, "(]")),
         )
 
     def test_upper_bound_above_bounds_only(self):
-        """
-
-        [source)
+        """[source)
                [subtract]
 
         [source]
                (subtract)
         """
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(7, 10, "[)"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(7, 10, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "[]")], safe_subtract(Range(4, 7, "[]"), Range(7, 10, "()"))
+            [Range(4, 7, "[]")],
+            safe_subtract(Range(4, 7, "[]"), Range(7, 10, "()")),
         )
 
         """
@@ -395,36 +418,37 @@ class TestRangeSubtract(TestCase):
                [subtract]
         """
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[]"), Range(7, 12, "[]"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[]"), Range(7, 12, "[]")),
         )
 
     def test_upper_bound_above_completely(self):
-        """
-
-        [source)
-                    [subtract]
-                    (subtract)
-                    [subtract)
-                    (subtract]
+        """[source)
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
 
         """
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(10, 14, "[]"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(10, 14, "[]")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(10, 14, "()"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(10, 14, "()")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(10, 14, "[)"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(10, 14, "[)")),
         )
         self.assertEqual(
-            [Range(4, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(10, 14, "(]"))
+            [Range(4, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(10, 14, "(]")),
         )
 
     def test_intersects_lower_bounds(self):
-        """
-
-                 [source)
+        """[source)
         [subtract]
              [subtract]
              [subtract)
@@ -432,22 +456,24 @@ class TestRangeSubtract(TestCase):
 
         """
         self.assertEqual(
-            [Range(4, 7, "()")], safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[]"))
+            [Range(4, 7, "()")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 4, "[]")),
         )
         self.assertEqual(
-            [Range(5, 7, "()")], safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[]"))
+            [Range(5, 7, "()")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[]")),
         )
         self.assertEqual(
-            [Range(5, 7, "[)")], safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[)"))
+            [Range(5, 7, "[)")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[)")),
         )
         self.assertEqual(
-            [Range(5, 7, "()")], safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[]"))
+            [Range(5, 7, "()")],
+            safe_subtract(Range(4, 7, "[)"), Range(0, 5, "[]")),
         )
 
     def test_lower_bounds_same(self):
-        """
-
-        [source        )
+        """[source        )
 
         [subtract]
         [subtract)
@@ -456,12 +482,13 @@ class TestRangeSubtract(TestCase):
         (   subtract   )
         (   subtract   ]
         """
-
         self.assertEqual(
-            [Range(6, 8, "()")], safe_subtract(Range(4, 8), Range(4, 6, "[]"))
+            [Range(6, 8, "()")],
+            safe_subtract(Range(4, 8), Range(4, 6, "[]")),
         )
         self.assertEqual(
-            [Range(6, 8, "[)")], safe_subtract(Range(4, 8), Range(4, 6, "[)"))
+            [Range(6, 8, "[)")],
+            safe_subtract(Range(4, 8), Range(4, 6, "[)")),
         )
 
         self.assertEqual(
@@ -474,36 +501,36 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_lower_bound_inclusive_difference_only(self):
-        """
-        [source   )
+        """[source   )
         (subtract )
         (subtract ]
         """
         self.assertEqual(
-            [Range(4, 4, "[]")], safe_subtract(Range(4, 8, "[)"), Range(4, 8, "(]"))
+            [Range(4, 4, "[]")],
+            safe_subtract(Range(4, 8, "[)"), Range(4, 8, "(]")),
         )
         self.assertEqual(
-            [Range(4, 4, "[]")], safe_subtract(Range(4, 8, "[)"), Range(4, 8, "()"))
+            [Range(4, 4, "[]")],
+            safe_subtract(Range(4, 8, "[)"), Range(4, 8, "()")),
         )
 
     def test_intersects_upper_bound(self):
-        """
-        [source)
+        """[source)
 
-            [subtract]
-            (subtract)
+        [subtract]
+        (subtract)
         """
         self.assertEqual(
-            [Range(4, 6, "[)")], safe_subtract(Range(4, 8), Range(6, 12, "[]"))
+            [Range(4, 6, "[)")],
+            safe_subtract(Range(4, 8), Range(6, 12, "[]")),
         )
         self.assertEqual(
-            [Range(4, 6, "[]")], safe_subtract(Range(4, 8), Range(6, 12, "()"))
+            [Range(4, 6, "[]")],
+            safe_subtract(Range(4, 8), Range(6, 12, "()")),
         )
 
     def test_exact_match(self):
-        """
-
-        [  source  )
+        """[  source  )
         [ subtract )
 
 
@@ -523,18 +550,17 @@ class TestRangeSubtract(TestCase):
         self.assertEqual([], safe_subtract(Range(4, 8, "(]"), Range(4, 8, "(]")))
 
     def test_upper_bounds_match(self):
+        """[  source  )
+        [subtract)
+        (subtract)
         """
-
-        [  source  )
-          [subtract)
-          (subtract)
-        """
-
         self.assertEqual(
-            [Range(4, 5, "[)")], safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[)"))
+            [Range(4, 5, "[)")],
+            safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[)")),
         )
         self.assertEqual(
-            [Range(4, 5, "[]")], safe_subtract(Range(4, 8, "[)"), Range(5, 8, "()"))
+            [Range(4, 5, "[]")],
+            safe_subtract(Range(4, 8, "[)"), Range(5, 8, "()")),
         )
 
         """
@@ -544,21 +570,21 @@ class TestRangeSubtract(TestCase):
         """
 
         self.assertEqual(
-            [Range(4, 5, "[)")], safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[]"))
+            [Range(4, 5, "[)")],
+            safe_subtract(Range(4, 8, "[)"), Range(5, 8, "[]")),
         )
         self.assertEqual(
-            [Range(4, 5, "[]")], safe_subtract(Range(4, 8, "[)"), Range(5, 8, "(]"))
+            [Range(4, 5, "[]")],
+            safe_subtract(Range(4, 8, "[)"), Range(5, 8, "(]")),
         )
 
     def test_subtract_within(self):
+        """[    source    )
+        [subtract]
+        (subtract)
+        [subtract)
+        (subtract]
         """
-        [    source    )
-           [subtract]
-           (subtract)
-           [subtract)
-           (subtract]
-        """
-
         self.assertEqual(
             [Range(4, 5, "[)"), Range(7, 8, "()")],
             safe_subtract(Range(4, 8, "[)"), Range(5, 7, "[]")),
@@ -577,8 +603,7 @@ class TestRangeSubtract(TestCase):
         )
 
     def test_bounds_only_differ(self):
-        """
-        [ source ]
+        """[ source ]
         (subtract)
         [subtract)
         (subtract]
@@ -588,10 +613,12 @@ class TestRangeSubtract(TestCase):
             safe_subtract(Range(4, 8, "[]"), Range(4, 8, "()")),
         )
         self.assertEqual(
-            [Range(8, 8, "[]")], safe_subtract(Range(4, 8, "[]"), Range(4, 8, "[)"))
+            [Range(8, 8, "[]")],
+            safe_subtract(Range(4, 8, "[]"), Range(4, 8, "[)")),
         )
         self.assertEqual(
-            [Range(4, 4, "[]")], safe_subtract(Range(4, 8, "[]"), Range(4, 8, "(]"))
+            [Range(4, 4, "[]")],
+            safe_subtract(Range(4, 8, "[]"), Range(4, 8, "(]")),
         )
 
         """
@@ -608,6 +635,7 @@ class TestRangeSubtract(TestCase):
         self.assertEqual(
             [Range(2, 6), Range(8, 12)],
             array_subtract_all(
-                [Range(0, 6), Range(7, 18)], [Range(0, 2), Range(6, 8), Range(12, None)]
+                [Range(0, 6), Range(7, 18)],
+                [Range(0, 2), Range(6, 8), Range(12, None)],
             ),
         )

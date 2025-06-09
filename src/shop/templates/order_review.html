@@ -1,148 +1,171 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
-{% load shop_tags %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
 
 {% block title %}
-Details for Order #{{ order.id }} | {{ block.super }}
+  Review Order #{{ order.id }} ({% if order.open == None %}closed{% else %}open{% endif %}, unpaid) | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
 
-    {% if order.open is not None %}
+  {% if order.open is not None %}
     <div>
-        Not ready to pay for your order yet?
-        <a href="{% url "shop:order_detail" pk=order.pk %}">Go back and edit it</a>
+      Not ready to pay for your order yet?
+      <a href="{% url "shop:order_detail" pk=order.pk %}">Go back and edit it</a>
     </div>
     <hr />
-    {% endif %}
+  {% endif %}
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4>Details for Order #{{ order.id }}</h4>
-        </div>
-        <div class="panel-body">
+  <div class="card mt-3">
+    <div class="card-header">
+      {% if order.open == None %}
+        <h4>Select Payment Method for Order #{{ order.id }} (closed, unpaid)</h4>
+      {% else %}
+        <h4>Review Order #{{ order.id }} (open, unpaid)</h4>
+      {% endif %}
+    </div>
+    <div class="card-body">
 
+      <p>
+        {% if order.open is not None %}
+          Please review your order to make sure the quantities are right.
+        {% else %}
+          This order is closed, but not paid. You can choose your payment method after the order details.
+        {% endif %}
+      </p>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>
+              Name
+            </th>
+            <th>
+              Quantity
+            </th>
+            <th>
+              Price
+            </th>
+            <th>
+              Total
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for opr in order.oprs.all %}
+            <tr>
+              <td>
+                {{ opr.product.name }}
+              </td>
+              <td>
+                {{ opr.quantity }}
+              </td>
+              <td>
+                {{ opr.product.price|currency }}
+              </td>
+              <td>
+                {{ opr.total|currency }}
+              </td>
+
+            </tr>
+          {% endfor %}
+
+          <tr>
+            <td colspan="2">
+            </td>
+            <td>
+              <strong>Included VAT (25%)</strong>
+            </td>
+            <td>
+              {{ order.vat|currency }}
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+            </td>
+            <td>
+              <strong>Total</strong>
+            </td>
+            <td>
+              {{ order.total|currency }}<br />
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      {% if order.customer_comment %}
+        <h4>Comment:</h4>
+        <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
+      {% endif %}
+
+      {% if order.invoice_address %}
+        <h4>Invoice Address:</h4>
+        <div class="alert alert-info">{{ order.invoice_address|linebreaks }}</div>
+      {% endif %}
+
+      {% if not order.paid and order.open is None %}
+        <form action="{% url "shop:order_detail" pk=order.pk %}" method="POST">
+          {% csrf_token %}
+          {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
+
+          {% if order.pdf %}
+            {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+            {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg ms-auto" %}
+          {% endif %}
+        </form>
+
+      {% endif %}
+
+    </div>
+  </div>
+
+  <div class="card mt-3">
+    <div class="card-header">
+      <h4>Terms and Payment Options</h4><i class="icon-btc"></i>
+    </div>
+    <div class="card-body">
+      <form method="POST" class="form-inline">
+        {% csrf_token %}
+        <div class="checkbox" style="margin-top: -10px;">
+          <label>
             <p>
-                {% if order.open is not None %}
-                    Please review your order to make sure the quantities are right.
-                {% else %}
-                    This order is closed, but not paid.
-                {% endif %}
+              <input type="checkbox" name="accept_terms" />
+              I accept the <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>.
+              I also accept to adhere to the <a href="{% url 'conduct' %}">Code of Conduct</a>
+              during events as well as in BornHacks online channels.
             </p>
-
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>
-                        Name
-                    <th>
-                        Quantity
-                    <th>
-                        Price
-                    <th>
-                        Total
-
-                <tbody>
-                {% for opr in order.orderproductrelation_set.all %}
-                    <tr>
-                    <td>
-                        {{ opr.product.name }}
-                    <td>
-                        {{ opr.quantity }}
-                    <td>
-                        {{ opr.product.price|currency }}
-                    <td>
-                        {{ opr.total|currency }}
-
-                {% endfor %}
-
-                <tr>
-                    <td colspan="2">
-                    <td>
-                        <strong>Included VAT (25%)</strong>
-                    <td>
-                        {{ order.vat|currency }}
-
-                <tr>
-                    <td colspan="2">
-                    <td>
-                        <strong>Total</strong>
-                    <td>
-                        {{ order.total|currency }}<br />
-
-            </table>
-
-            {% if order.customer_comment %}
-                <h4>Comment:</h4>
-                <div class="alert alert-info">{{ order.customer_comment|linebreaks }}</div>
-            {% endif %}
-
-            {% if order.invoice_address %}
-                <h4>Invoice Address:</h4>
-                <div class="alert alert-info">{{ order.invoice_address|linebreaks }}</div>
-            {% endif %}
-
-            {% if not order.paid and order.open is None %}
-                <form action="{% url "shop:order_detail" pk=order.pk %}" method="POST">
-                  {% csrf_token %}
-                  {% bootstrap_button "Cancel order" button_type="submit" button_class="btn-danger btn-lg" name="cancel_order" icon="remove" %}
-
-                {% if order.pdf %}
-                    {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                    {% bootstrap_button "Proforma Invoice PDF" icon="save-file" href=invoice_download_url button_class="btn-primary btn-lg pull-right" %}
-                {% endif %}
-                </form>
-
-            {% endif %}
-
+          </label>
         </div>
+
+        <p>
+          <strong>Please choose a payment option:</strong>
+        </p>
+
+        <div class="btn-group btn-group-justified w-100" role="group">
+          <div class="btn-group" style="flex-grow: 1;">
+            {% bootstrap_button "<i class='fab fa-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
+          </div>
+          <div class="btn-group" style="flex-grow: 1;">
+            {% bootstrap_button "<i class='fas fa-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
+          </div>
+          <div class="btn-group" style="flex-grow: 1;">
+            {% bootstrap_button "<i class='fas fa-coins'></i> In person" button_type="submit" button_class="btn-primary" name="payment_method" value="in_person" %}
+          </div>
+          <div class="btn-group" style="flex-grow: 1;">
+            {% bootstrap_button "<i class='fas fa-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
+          </div>
+        </div>
+      </form>
+      <div class="alert alert-info" style="margin-top: 5px; margin-bottom: -10px;">* If you have a Danish or SEPA bank account then please choose bank transfer, is is the cheapest way for us. If you do not have a Danish or SEPA bank account then credit card or blockchain payment is the best way.</div>
     </div>
-
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4>Terms and Payment Options</h4><i class="icon-btc"></i>
-        </div>
-        <div class="panel-body">
-            <form method="POST" class="form-inline">
-                {% csrf_token %}
-                <div class="checkbox" style="margin-top: -10px;">
-                    <label>
-                        <p>
-                            <input type="checkbox" name="accept_terms" />
-                            I accept the <a href="{% url 'general-terms' %}">general terms &amp; conditions</a>.
-                            I also accept to adhere to the <a href="{% url 'conduct' %}">Code of Conduct</a>
-                            during events as well as in BornHacks online channels.
-                        </p>
-                    </label>
-                </div>
-
-                <p>
-                    <strong>Please choose a payment option:</strong>
-                </p>
-
-                <div class="btn-group btn-group-justified">
-                    <div class="btn-group">
-                        {% bootstrap_button "<i class='fab fa-bitcoin'></i> Blockchain" button_type="submit" button_class="btn-primary" name="payment_method" value="blockchain" %}
-                    </div>
-                    <div class="btn-group">
-                        {% bootstrap_button "<i class='fas fa-piggy-bank'></i> Bank transfer" button_type="submit" button_class="btn-primary" name="payment_method" value="bank_transfer" %}
-                    </div>
-                    <div class="btn-group">
-                        {% bootstrap_button "<i class='fas fa-coins'></i> In person" button_type="submit" button_class="btn-primary" name="payment_method" value="in_person" %}
-                    </div>
-                    <div class="btn-group">
-                        {% bootstrap_button "<i class='fas fa-credit-card'></i> Credit card" button_type="submit" button_class="btn-primary" name="payment_method" value="credit_card" %}
-                    </div>
-                </div>
-            </form>
-            <div class="alert alert-info" style="margin-top: 5px; margin-bottom: -10px;">* If you have a Danish bank account then please choose bank transfer, is is the cheapest way for us. If you do not have a Danish bank account then credit card or blockchain payment is the best way.</div>
-        </div>
-        <div class="panel-footer">
-            <i>Bank transfers can take up to a week to get registered, but the other
-                payment methods should be more or less instant. Please
-                <a href="{% url 'contact' %}">contact us</a> if your have questions.</i>
-        </div>
+    <div class="card-footer">
+      <i>Bank transfers can take up to a week to get registered, but the other
+        payment methods should be more or less instant. Please
+        <a href="{% url 'contact' %}">contact us</a> if your have questions.</i>
     </div>
+  </div>
 
 {% endblock %}
-

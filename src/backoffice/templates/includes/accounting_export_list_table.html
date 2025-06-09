@@ -1,0 +1,34 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      <th>UUID</th>
+      <th>From</th>
+      <th>To</th>
+      <th>Created</th>
+      <th>Updated</th>
+      <th>Comment</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ae in accountingexport_list %}
+      <tr>
+        <td>{{ ae.uuid }}</td>
+        <td data-order="{{ ae.date_from|sortable }}">{{ ae.date_from }}</td>
+        <td data-order="{{ ae.date_to|sortable }}">{{ ae.date_to }}</td>
+        <td data-order="{{ ae.created|sortable }}">{{ ae.created }}</td>
+        <td data-order="{{ ae.updated|sortable }}">{{ ae.updated }}</td>
+        <td>{{ ae.comment|default:"N/A" }}</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:accountingexport_detail' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-primary">Details</a>
+            <a href="{% url 'backoffice:accountingexport_download_archive' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-primary">Download Archive</a>
+            <a href="{% url 'backoffice:accountingexport_update' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-secondary">Update</a>
+            <a href="{% url 'backoffice:accountingexport_delete' camp_slug=camp.slug accountingexport_uuid=ae.uuid %}" class="btn btn-danger">Delete</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

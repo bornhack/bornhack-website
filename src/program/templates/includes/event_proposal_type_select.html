@@ -1,30 +1,29 @@
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Submit New Proposal{% if speaker %} for {{ speaker.name }}{% endif %}</h3>
-  </div>
-  <div class="panel-body">
-      <h4>What would {% if speaker %}{{ speaker.name }}{% else %}you{% endif %} like to host?</h4>
+<div class="card">
+  <h4 class="card-header">
+    Submit New Proposal{% if speaker %} for {{ speaker.name }}{% endif %}
+  </h4>
+  <div class="card-body">
+    <h5>What would {% if speaker %}{{ speaker.name }}{% else %}you{% endif %} like to host?</h5>
     {% if speaker %}
-    <p>You are submitting a new proposal for {{ speaker.name }}. Please begin by selecting the type of proposal below:</p>
+      <p>You are submitting a new proposal for {{ speaker.name }}. Please begin by selecting the type of proposal below:</p>
     {% else %}
-    <p>To submit content for {{ camp.title }} please begin by selecting the type of event below:</p>
+      <p>To submit content for {{ camp.title }} please begin by selecting the type of event below:</p>
     {% endif %}
     <div class="list-group">
-    {% for event_type in event_type_list %}
+      {% for event_type in event_type_list %}
         {% if speaker %}
-            <a href="{%url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker.uuid %}" class="list-group-item">
+          <a href="{%url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker.uuid %}" class="list-group-item">
         {% else %}
-            <a href="{% url 'program:proposal_combined_person_select' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="list-group-item">
+          <a href="{% url 'program:proposal_combined_person_select' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="list-group-item">
         {% endif %}
-            <h4 class="list-group-item-heading">
-                <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
-                {{ event_type.name }}<span class="pull-right"><i class="fas fa-plus fa-2x fa-pull-right" style="color: {{ event_type.color }};"></i></span>
-            </h4>
-            {% if event_type.description %}<p class="list-group-item-text">{{ event_type.description }}</p>{% endif %}
+        <h5 class="list-group-item-heading">
+          <i class="fas fa-{{ event_type.icon }} fa-2x fa-pull-left fa-fw" style="color: {{ event_type.color }};"></i>
+          {{ event_type.name }}<span class="float-end"><i class="fas fa-plus fa-2x fa-ms-auto" style="color: {{ event_type.color }};"></i></span>
+        </h5>
+        {% if event_type.description %}<p class="list-group-item-text">{{ event_type.description }}</p>{% endif %}
         </a>
-    {% endfor %}
+      {% endfor %}
     </div>
     <p><i>If you have questions or experience problems submitting proposals here please let us know on IRC or by mail. You can also send an email with your proposal and the Content team will take care of creating it in the system.</i></p>
   </div>
 </div>
-

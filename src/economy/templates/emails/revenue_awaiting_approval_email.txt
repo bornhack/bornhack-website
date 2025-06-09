@@ -7,4 +7,3 @@ A new revenue {{ revenue.pk }} for {{ revenue.responsible_team.name }} Team was 
 Have a nice day!
 
 The {{ revenue.camp.title }} Team
-

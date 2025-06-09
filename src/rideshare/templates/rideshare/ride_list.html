@@ -2,82 +2,82 @@
 {% load static %}
 
 {% block title %}
-Ridesharing | {{ block.super }}
+  Ridesharing | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
+  <div class="page-header">
     <h1>Ridesharing</h1>
-</div>
+  </div>
 
-<p class="lead">
-On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival. Press "Details" to send a message to the author of the entry.
-</p>
+  <p class="lead">
+    On this page participants of {{ camp.title }} can communicate about ridesharing to and from the festival. Press "Details" to send a message to the author of the entry.
+  </p>
 
-<a class="btn btn-success pull-right" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
+  <a class="btn btn-success pull-right" href="{% url 'rideshare:create' camp_slug=camp.slug %}">
     <i class="fas fa-car"></i>
     Create ride
-</a>
-<span class="clearfix"></span>
+  </a>
+  <span class="clearfix"></span>
 
-<hr />
+  <hr />
 
-<table class="table table-condensed table-striped datatable">
+  <table class="table table-condensed table-striped datatable">
     <thead>
+      <th>
+        Author
         <th>
-            Author
-        <th>
-            Type
-        <th>
+          Type
+          <th>
             Leaving When
-        <th>
-            From Location
-        <th>
-            To Location
-        <th>
-            Seats Free/Needed
-        <th>
-            Actions
-    <tbody>
+            <th>
+              From Location
+              <th>
+                To Location
+                <th>
+                  Seats Free/Needed
+                  <th>
+                    Actions
+                    <tbody>
 
-{% for ride in ride_list %}
-        <tr>
-            <td>
-                {{ ride.author }}
-            <td>
-                {% if ride.has_car %}
-                    <i class="fas fa-car"></i> Has car
-                {% else %}
-                    <i class="fas fa-thumbs-up"></i> Needs ride
-                {% endif %}
-            <td>
-                {{ ride.when|date:"c" }}
-            <td>
-                {{ ride.from_location }}
-            <td>
-                {{ ride.to_location }}
-            <td class="text-center">
-                <span class="badge">{{ ride.seats }}</span>
-            <td>
-                {% if request.user == ride.user %}
-                <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
-                    <i class="fas fa-times"></i> Delete
-                </a>
-                <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
-                    <i class="fas fa-edit"></i> Update
-                </a>
-                {% endif %}
-                <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
-                    <i class="fas fa-eye"></i> Details
-                </a>
+                      {% for ride in ride_list %}
+                        <tr>
+                          <td>
+                            {{ ride.author }}
+                            <td>
+                              {% if ride.has_car %}
+                                <i class="fas fa-car"></i> Has car
+                              {% else %}
+                                <i class="fas fa-thumbs-up"></i> Needs ride
+                              {% endif %}
+                              <td data-order="{{ ride.when|date:"YmdHis"}}">
+                                {{ ride.when|date:"c" }}
+                                <td>
+                                  {{ ride.from_location }}
+                                  <td>
+                                    {{ ride.to_location }}
+                                    <td class="text-center">
+                                      <span class="badge">{{ ride.seats }}</span>
+                                      <td>
+                                        {% if request.user == ride.user %}
+                                          <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=ride.pk %}">
+                                            <i class="fas fa-times"></i> Delete
+                                          </a>
+                                          <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=ride.pk %}">
+                                            <i class="fas fa-edit"></i> Update
+                                          </a>
+                                        {% endif %}
+                                        <a class="btn btn-primary pull-right" href="{% url 'rideshare:detail' camp_slug=camp.slug pk=ride.pk %}">
+                                          <i class="fas fa-eye"></i> Details
+                                        </a>
 
-{% empty %}
+                      {% empty %}
 
-        <tr>
-            <td colspan=4>
-                No rideshares yet!
+                        <tr>
+                          <td colspan=4>
+                            No rideshares yet!
 
-{% endfor %}
-</table>
+                      {% endfor %}
+                    </table>
 
 {% endblock %}

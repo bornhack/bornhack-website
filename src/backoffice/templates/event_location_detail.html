@@ -1,89 +1,89 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">EventLocation Details</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">EventLocation Details</h3>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>Name</th>
+          <td><i class="fas fa-{{ event_location.icon }}"></i> {{ event_location.name }}</td>
+        </tr>
+        <tr>
+          <th>Icon</th>
+          <td>fas fa-{{ event_location.icon }}</td>
+        </tr>
+        <tr>
+          <th>Capacity</th>
+          <td><i class="fas fa-users"></i> {{ event_location.capacity }}</td>
+        </tr>
+        <tr>
+          <th>Conflicts</th>
+          <td>
+            {% if event_location.conflicts.all %}
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Capacity</th>
+                    <th>Sessions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for conflict in event_location.conflicts.all %}
+                    <tr>
+                      <td><a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}">{{ conflict.name }}</a></td>
+                      <td><span class="badge">{{ conflict.capacity }}</span></td>
+                      <td><span class="badge">{{ conflict.event_sessions.count }}</span></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <th>Sessions</th>
+          <td>
+            {% if event_location.event_sessions.all %}
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Session</th>
+                    <th>EventType</th>
+                    <th>When</th>
+                    <th>Description</th>
+                    <th class="text-center">Slots</th>
+                    <th class="text-center">Events</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for session in event_location.event_sessions.all %}
+                    <tr>
+                      <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.pk %}">{{ session.pk }}</a></td>
+                      <td><a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type.icon_html }} {{ session.event_type.name }}</a></td>
+                      <td>{{ session.when.lower }} to<br> {{ session.when.upper }}</td>
+                      <td>{{ session.description|default:"N/A" }}</td>
+                      <td class="text-center"><span class="badge">{{ session.event_slots.count }}</span></td>
+                      <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</span></td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              N/A
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      <a href="{% url 'backoffice:event_location_update' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Location</a>
+      <a href="{% url 'backoffice:event_location_delete' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Location</a>
+      <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> EventLocation List</a>
+    </div>
   </div>
-  <div class="panel-body">
-    <table class="table">
-      <tr>
-        <th>Name</th>
-        <td><i class="fas fa-{{ event_location.icon }}"></i> {{ event_location.name }}</td>
-      </tr>
-      <tr>
-        <th>Icon</th>
-        <td>fas fa-{{ event_location.icon }}</td>
-      </tr>
-      <tr>
-        <th>Capacity</th>
-        <td><i class="fas fa-users"></i> {{ event_location.capacity }}</td>
-      </tr>
-      <tr>
-        <th>Conflicts</th>
-        <td>
-          {% if event_location.conflicts.all %}
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Capacity</th>
-                <th>Sessions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for conflict in event_location.conflicts.all %}
-              <tr>
-                <td><a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}">{{ conflict.name }}</a></td>
-                <td><span class="badge">{{ conflict.capacity }}</span></td>
-                <td><span class="badge">{{ conflict.event_sessions.count }}</span></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          N/A
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Sessions</th>
-        <td>
-          {% if event_location.event_sessions.all %}
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Session</th>
-                <th>EventType</th>
-                <th>When</th>
-                <th>Description</th>
-                <th class="text-center">Slots</th>
-                <th class="text-center">Events</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for session in event_location.event_sessions.all %}
-              <tr>
-                <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.pk %}">{{ session.pk }}</a></td>
-                <td><a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type.icon_html }} {{ session.event_type.name }}</a></td>
-                <td>{{ session.when.lower }} to<br> {{ session.when.upper }}</td>
-                <td>{{ session.description|default:"N/A" }}</td>
-                <td class="text-center"><span class="badge">{{ session.event_slots.count }}</span></td>
-                <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</span></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          N/A
-          {% endif %}
-        </td>
-      </tr>
-    </table>
-    <a href="{% url 'backoffice:event_location_update' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Location</a>
-    <a href="{% url 'backoffice:event_location_delete' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Location</a>
-    <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> EventLocation List</a>
-  </div>
-</div>
 {% endblock content %}

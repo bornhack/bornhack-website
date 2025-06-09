@@ -1,0 +1,35 @@
+{% load bornhack %}
+<table class="table table-striped datatable">
+  <thead>
+    <tr>
+      {% thh "pk" "ID" "The internal BornHack UUID for this Clearhaus settlement" %}
+      {% thh "settled" %}
+      {% thh "period_start_date" %}
+      {% thh "period_end_date" %}
+      {% thh "payout_amount" %}
+      {% thh "payout_date" %}
+      {% thh "reserve_amount" %}
+      {% thh "reserve_date" %}
+      {% thh "foo" "Actions" "Available actions for this Clearhaus settlement" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for cs in clearhaussettlement_list %}
+      <tr>
+        <td><a href="{% url 'backoffice:clearhaussettlement_detail' camp_slug=camp.slug settlement_uuid=cs.pk %}">{{ cs.pk }}</a></td>
+        <td data-order="{{ cs.settled }}">{{ cs.settled|truefalseicon }}</td>
+        <td data-order="{{ cs.period_start_date|date:"Ymd" }}">{{ cs.period_start_date }}</td>
+        <td data-order="{{ cs.period_end_date|date:"Ymd" }}">{{ cs.period_end_date }}</td>
+        <td data-order="{{ cs.payout_amount }}">{{ cs.payout_amount }}&nbsp;{{ cs.currency }}</td>
+        <td data-order="{{ cs.payout_date|date:"Ymd" }}">{{ cs.payout_date }}</td>
+        <td data-order="{{ cs.reserve_amount }}">{{ cs.reserve_amount }}&nbsp;{{ cs.currency }}</td>
+        <td data-order="{{ cs.reserve_date|date:"Ymd" }}">{{ cs.reserve_date }}</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:clearhaussettlement_detail' camp_slug=camp.slug settlement_uuid=cs.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -4,47 +4,45 @@
 {% load imageutils %}
 
 {% block title %}
-Merchandise Orders | {{ block.super }}
+  Merchandise Orders | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h2>Merchandise Orders</h2>
-  <div class="lead">
+  <div class="row">
+    <h2>Merchandise Orders</h2>
+    <div class="lead">
       Use this view to look at merchandise orders. </div>
-  <div>
-      This table shows all OrderProductRelations which are Merchandise (not including cancelled and refunded orders). The table is initally sorted by order ID but the sorting can be changed by clicking the column headlines (if javascript is enabled).
+    <div>
+      This table shows all OrderProductRelations which are Merchandise (not including cancelled orders or refunded OrderProductRelations). The table is initially sorted by order ID but the sorting can be changed by clicking the column headlines (if javascript is enabled).
+    </div>
   </div>
-</div>
-<br>
-<div class="row">
+  <br>
+  <div class="row">
     <table class="table table-hover datatable">
       <thead>
-      <tr>
+        <tr>
           <th>Order</th>
-          <th>User</th>
           <th>Email</th>
           <th>OPR Id</th>
           <th>Product</th>
           <th>Quantity</th>
           <th>Paid</th>
           <th>Ticket Generated</th>
-       </tr>
+        </tr>
       </thead>
       <tbody>
-      {% for productrel in orderproductrelation_list %}
-      <tr>
-          <td><a href="/admin/shop/order/{{ productrel.order.id }}/change/">Order #{{ productrel.order.id }}</a></td>
-          <td>{{ productrel.order.user }}</td>
-          <td>{{ productrel.order.user.email }}</td>
-          <td>{{ productrel.id }}</td>
-          <td>{{ productrel.product.name }}</td>
-          <td>{{ productrel.quantity }}</td>
-          <td>{{ productrel.order.paid|yesno }}</td>
-          <td>{{ productrel.order.ticket_generated|yesno }}</td>
-      </tr>
-      {% endfor %}
+        {% for productrel in orderproductrelation_list %}
+          <tr>
+            <td><a href="/admin/shop/order/{{ productrel.order.id }}/change/">Order #{{ productrel.order.id }}</a></td>
+            <td>{{ productrel.order.user.email }}</td>
+            <td>{{ productrel.id }}</td>
+            <td>{{ productrel.product.name }}</td>
+            <td>{{ productrel.non_refunded_quantity }}</td>
+            <td>{{ productrel.order.paid|yesno }}</td>
+            <td>{{ productrel.order.ticket_generated|yesno }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
-</div>
+  </div>
 {% endblock content %}

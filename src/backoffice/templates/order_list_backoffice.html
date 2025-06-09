@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Orders | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h2>Orders</h2>
+
+  <div class="lead">
+    This table shows all webshop orders in the system.
+  </div>
+
+  <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+  {% include 'includes/order_list_panel.html' %}
+
+{% endblock content %}

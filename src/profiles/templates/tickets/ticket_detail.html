@@ -1,28 +1,35 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load tickets_tags %}
 
 {% block title %}
-Your Tickets | {{ block.super }}
+  Your Tickets | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h4>Your Tickets</h4>
-  </div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header">
+      <h4>Your Tickets</h4>
+    </div>
+    <div class="card-body">
 
-    <h2>{% if ticket.used %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
-    <form method="POST" class="form">
-      {% csrf_token %}
-      {% bootstrap_field form.name %}
-      {% bootstrap_field form.email %}
-      <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-check"></i> Save</button>
-    </form>
+      <h2>{% if ticket.used_at %}This ticket has been used{% else %}This ticket is unused{% endif %}</h2>
+      {% if ticket.product.ticket_type.camp.read_only %}
+        <dl>
+          <dt>Name</dt><dd>{{ form.name.value|default:"Anonymous" }}</dd>
+          <dt>Email</dt><dd>{{ form.email.value|default:"Anonymous" }}</dd>
+        </dl>
+      {% else %}
+        <form method="POST" class="form">
+          {% csrf_token %}
+          {% bootstrap_field form.name %}
+          {% bootstrap_field form.email %}
+          <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-check"></i> Save</button>
+        </form>
+      {% endif %}
 
+    </div>
   </div>
-</div>
 
 {% endblock %}

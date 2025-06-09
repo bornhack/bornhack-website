@@ -1,18 +1,17 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Reimbursement Details | {{ block.super }}
+  Reimbursement Details | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Reimbursement Details</h3>
+  <h3>Reimbursement Details</h3>
 
-{% include 'includes/reimbursement_detail_panel.html' %}
+  {% include 'includes/reimbursement_detail_panel.html' %}
 
-<a class="btn btn-primary" href="{% url "backoffice:reimbursement_update" camp_slug=camp.slug pk=reimbursement.pk %}"><i class="fas fa-edit"></i> Update</a>
-<a class="btn btn-danger" href="{% url "backoffice:reimbursement_delete" camp_slug=camp.slug pk=reimbursement.pk %}"><i class="fas fa-times"></i> Delete</a>
-<a class="btn btn-primary" href="{% url "backoffice:reimbursement_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to reimbursement list</a>
+  <a class="btn btn-primary" href="{% url "backoffice:reimbursement_update" camp_slug=camp.slug pk=reimbursement.pk %}"><i class="fas fa-edit"></i> Update</a>
+  <a class="btn btn-danger" href="{% url "backoffice:reimbursement_delete" camp_slug=camp.slug pk=reimbursement.pk %}"><i class="fas fa-times"></i> Delete</a>
+  <a class="btn btn-primary" href="{% url "backoffice:reimbursement_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to reimbursement list</a>
 
 {% endblock content %}
-

@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
+
+{% block title %}
+  Refund of order #{{ order.pk }} | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    <div class="card">
+
+      <div class="card-header">Order #{{ order.pk }} | BackOffice</div>
+      <div class="card-body">
+
+        {% if ticket_groups %}
+
+          <h4>Bundles</h4>
+          <table class="table table-striped">
+            <tr>
+              <th>Product</th>
+              <th>Possible refund</th>
+            </tr>
+
+            {% for opr, ticket_group_formset in ticket_groups.items %}
+              {{ ticket_group_formset.management_form }}
+              {% for form in ticket_group_formset %}
+                <tr>
+                  <td>
+                    {{ opr.product }}
+                    {% for subproduct in opr.product.sub_product_relations.all %}
+                      <br>
+                      <small>
+                        {{ subproduct.number_of_tickets }} x {{ subproduct.sub_product.name }}
+                      </small>
+                    {% endfor %}
+                  </td>
+
+                  <td>
+                    {% if form.instance.has_used_tickets or not form.instance.has_tickets %}
+                      No refund possible
+                      <span class="hidden">
+                        {# We include the form here to make the formset happy #}
+                        {{ form.as_p }}
+                      </span>
+                    {% else %}
+                      {{ form.as_p }}
+                    {% endif %}
+                  </td>
+                </tr>
+
+              {% endfor %}
+            {% endfor %}
+          </table>
+        {% endif %}
+
+        {% if oprs %}
+          <h4>Tickets</h4>
+          <table class="table table-striped">
+            <tr>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Used</th>
+              <th>Refunded</th>
+              <th>Refundable</th>
+              <th>Possible refund</th>
+            </tr>
+            {% for opr, formset in oprs.items %}
+              <tr>
+                <td>
+                  {{ opr.product }}
+                </td>
+
+                <td>
+                  {{ opr.quantity }}
+                  {% if opr.product.ticket_type.single_ticket_per_product %}
+                    (1 ticket)
+                  {% endif %}
+                </td>
+
+                <td>
+                  {{ opr.used_tickets_count }}
+                </td>
+
+                <td>
+                  {{ opr.refunded_quantity }}
+                </td>
+
+                <td>
+                  {{ opr.possible_refund }}
+                </td>
+
+                <td>
+                  {% if opr.possible_refund == 0 %}
+                    No refund possible
+                  {% else %}
+                    {{ formset.management_form }}
+                    {% for form in formset %}
+                      {{ form.as_p }}
+                    {% endfor %}
+                  {% endif %}
+                </td>
+              </tr>
+
+            {% endfor %}
+          </table>
+        {% endif %}
+
+        <hr>
+
+        {% bootstrap_form refund_form %}
+
+      </div>
+      <div class="card-footer">
+        <a class="btn btn-danger" href="{% url "backoffice:order_list" camp_slug=camp.slug %}">Cancel</a>
+        <button type="submit" class="btn btn-primary pull-right">Refund</button>
+        <span class="clearfix"></span>
+      </div>
+
+    </div>
+  </form>
+
+{% endblock %}

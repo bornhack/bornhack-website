@@ -1,20 +1,40 @@
 {% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
 {% load commonmark %}
+{% load bornhack %}
+
+{% block extra_head %}
+  {% leaflet_css %}
+  <link href="{% static 'css/leaflet.css' %}" rel="stylesheet">
+  <link href="{% static 'css/leaflet.awesome-markers.css' %}" rel="stylesheet">
+  <script src="{% static 'vendor/leaflet/leaflet-1.6.0.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/proj4.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/proj4leaflet.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/leaflet.awesome-markers.min.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/leaflet-color-markers.js' %}" type="text/javascript"></script>
+  {{ mapData|json_script:"mapData" }}
+  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
+{% endblock extra_head %}
+
 
 {% block title %}
-Village: {{ village.name }} | {{ block.super }}
+  Village: {{ village.name }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<h3>{{ village.name }}</h3>
+  <h3>{{ village.name }}</h3>
 
-{{ village.description|untrustedcommonmark }}
+  {{ village.description|untrustedcommonmark }}
+  <div id="map"></div>
 
-{% if user == village.contact %}
-<hr />
-<a href="{% url 'village_update' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-primary">Edit</a>
-<a href="{% url 'village_delete' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-danger">Delete</a>
-{% endif %}
+  {% if user == village.contact %}
+    <hr />
+    <a href="{% url 'villages:village_update' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-primary">Edit</a>
+    <a href="{% url 'villages:village_delete' camp_slug=village.camp.slug slug=village.slug %}" class="btn btn-danger">Delete</a>
+  {% endif %}
+  <script type="text/javascript" src="{% static 'js/villages/village_detail.js' %}"></script>
 
 {% endblock %}

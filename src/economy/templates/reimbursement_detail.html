@@ -1,16 +1,22 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Reimbursement Details | {{ block.super }}
+  Reimbursement Details | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Reimbursement Details</h3>
+  <h3>Reimbursement Details</h3>
 
-{% include 'includes/reimbursement_detail_panel.html' %}
+  {% include 'includes/reimbursement_detail_panel.html' %}
 
-<a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary">Back to list</a>
+  <div class="btn-group">
+    {% if not reimbursement.paid %}
+      <a href="{% url 'economy:reimbursement_update' camp_slug=camp.slug pk=reimbursement.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Reimbursement</a>
+      <a href="{% url 'economy:reimbursement_delete' camp_slug=camp.slug pk=reimbursement.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Reimbursement</a>
+    {% endif %}
 
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Dashboard</a>
+    <a href="{% url 'economy:reimbursement_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Reimbursement list</a>
+  </div>
 {% endblock content %}
-

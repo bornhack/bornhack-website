@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{% if form.instance.pk %}Update{% else %}Create new{% endif %} User Location Type</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">{% if form.instance.pk %}Update{% else %}Create{% endif %} User Location Type</p>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
+        <a href="{% url 'backoffice:map_user_location_type_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

@@ -1,69 +1,69 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">BackOffice - EventLocations</span>
-  </div>
-  <div class="panel-body">
-    <p><i>EventLocations</i> - the places where stuff happens!</p>
-  {% if not event_location_list %}
-      <p class="lead">
-        No EventLocations found. Create some!
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">BackOffice - EventLocations</span>
+    </div>
+    <div class="card-body">
+      <p><i>EventLocations</i> - the places where stuff happens!</p>
+      {% if not event_location_list %}
+        <p class="lead">
+          No EventLocations found. Create some!
+          <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
+        </p>
+      {% else %}
+        <p>
+          <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        </p>
+        <table class="table table-hover datatable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-center">Capacity</th>
+              <th>Location Conflicts</th>
+              <th class="text-center">Sessions</th>
+              <th class="text-center">Slots</th>
+              <th class="text-center">Events</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for location in event_location_list %}
+              <tr>
+                <td>{{ location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=location.slug %}">{{ location.name }}</a></td>
+                <td class="text-center"><span class="badge">{{ location.capacity }}</span></td>
+                <td>
+                  {% if location.conflicts.exists %}
+                    <ul class="list-group">
+                      {% for conflict in location.conflicts.all %}
+                        <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}"class="list-group-item list-group-item-action"><i class="fas fa-{{ conflict.icon }}"></i> {{ conflict.name }}</a>
+                      {% endfor %}
+                  {% else %}
+                    N/A
+                  {% endif %}
+                </ul>
+              </td>
+              <td class="text-center"><span class="badge">{{ location.event_sessions.count }}</span></td>
+              <td class="text-center"><span class="badge">{{ location.event_slots.count }}</span></td>
+              <td class="text-center"><span class="badge">{{ location.scheduled_event_slots.count }}</span></td>
+              <td>
+                <div class="btn-group-vertical">
+                  <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=location.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                  <a href="{% url 'backoffice:event_location_update' camp_slug=camp.slug slug=location.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url 'backoffice:event_location_delete' camp_slug=camp.slug slug=location.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </div>
+              </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+      <p>
         <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
-  {% else %}
-  <p>
-    <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
-  <table class="table table-hover datatable">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th class="text-center">Capacity</th>
-        <th>Location Conflicts</th>
-        <th class="text-center">Sessions</th>
-        <th class="text-center">Slots</th>
-        <th class="text-center">Events</th>
-        <th>Actions</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for location in event_location_list %}
-    <tr>
-        <td>{{ location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=location.slug %}">{{ location.name }}</a></td>
-      <td class="text-center"><span class="badge">{{ location.capacity }}</span></td>
-      <td>
-        {% if location.conflicts.exists %}
-        <ul class="list-group">
-        {% for conflict in location.conflicts.all %}
-        <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=conflict.slug %}"class="list-group-item"><i class="fas fa-{{ conflict.icon }}"></i> {{ conflict.name }}</a>
-        {% endfor %}
-        {% else %}
-        N/A
-        {% endif %}
-        </ul>
-      </td>
-      <td class="text-center"><span class="badge">{{ location.event_sessions.count }}</span></td>
-      <td class="text-center"><span class="badge">{{ location.event_slots.count }}</span></td>
-      <td class="text-center"><span class="badge">{{ location.scheduled_event_slots.count }}</span></td>
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=location.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          <a href="{% url 'backoffice:event_location_update' camp_slug=camp.slug slug=location.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-          <a href="{% url 'backoffice:event_location_delete' camp_slug=camp.slug slug=location.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-  <p>
-    <a href="{% url 'backoffice:event_location_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventLocation</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

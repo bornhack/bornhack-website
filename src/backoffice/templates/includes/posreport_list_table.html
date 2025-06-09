@@ -2,7 +2,7 @@
 <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
   <thead>
     <tr>
-      <th>Date</th>
+      <th>Period</th>
       <th>Responsible</th>
       <th>DKK Cash iZettle</th>
       <th>DKK Balance</th>
@@ -16,42 +16,42 @@
   </thead>
   <tbody>
     {% for pr in posreport_list %}
-    <tr>
-      <td><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.date }}</a></td>
-      <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
-      <td>{{ pr.dkk_sales_izettle }} DKK</td>
-      <td class="text-right">
-        {{ pr.bank_count_dkk_start }} DKK<br>
-        + {{ pr.dkk_sales_izettle }} DKK<br>
-        - {{ pr.bank_count_dkk_end }} DKK<br>
-        <b>= {{ pr.dkk_balance }} DKK</b>
-      </td>
-      <td>{{ pr.pos_json_sales.1 }} HAX ({{ pr.pos_json_sales.0 }} tx)</td>
-      <td>{{ pr.hax_sold_izettle }} HAX</td>
-      <td>{{ pr.hax_sold_website }} HAX</td>
-      <td class="text-right">
-        {{ pr.bank_start_hax }} HAX<br>
-        + {{ pr.pos_json_sales.1 }} HAX<br>
-        - {{ pr.hax_sold_izettle }} HAX<br>
-        - {{ pr.hax_sold_website }} HAX<br>
-        - {{ pr.bank_end_hax }} HAX<br>
-        <b>= {{ pr.hax_balance }} HAX</b>
-      </td>
-      <td class="text-center">{{ pr.allok | truefalseicon }}</td>
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          {% if request.user == pr.pos.bank_responsible %}
-          <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
-          <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
-          {% endif %}
-          {% if request.user == pr.pos.pos_responsible %}
-          <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
-          <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
-          {% endif %}
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td data-order="{{ pr.period.lower|sortable }}"><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.period.lower }} - {{ pr.period.upper }}</a></td>
+        <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
+        <td data-order="{{ pr.dkk_sales_izettle }}">{{ pr.dkk_sales_izettle }}&nbsp;DKK</td>
+        <td data-order="{{ pr.dkk_balance }}" class="text-right">
+          {{ pr.bank_count_dkk_start }}&nbsp;DKK<br>
+          +&nbsp;{{ pr.dkk_sales_izettle }}&nbsp;DKK<br>
+          -&nbsp;{{ pr.bank_count_dkk_end }}&nbsp;DKK<br>
+          <b>=&nbsp;{{ pr.dkk_balance }}&nbsp;DKK</b>
+        </td>
+        <td data-order="{{ pr.pos_json_sales.1 }}">{{ pr.pos_json_sales.1 }}&nbsp;HAX ({{ pr.pos_json_sales.0 }} tx)</td>
+        <td data-order="{{ pr.hax_sold_izettle }}">{{ pr.hax_sold_izettle }}&nbsp;HAX</td>
+        <td data-order="{{ pr.hax_sold_website }}">{{ pr.hax_sold_website }}&nbsp;HAX</td>
+        <td data-order="{{ pr.hax_balance }}" class="text-right">
+          {{ pr.bank_start_hax }}&nbsp;HAX<br>
+          +&nbsp;{{ pr.pos_json_sales.1 }}&nbsp;HAX<br>
+          -&nbsp;{{ pr.hax_sold_izettle }}&nbsp;HAX<br>
+          -&nbsp;{{ pr.hax_sold_website }}&nbsp;HAX<br>
+          -&nbsp;{{ pr.bank_end_hax }}&nbsp;HAX<br>
+          <b>=&nbsp;{{ pr.hax_balance }}&nbsp;HAX</b>
+        </td>
+        <td class="text-center">{{ pr.allok | truefalseicon }}</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            {% if request.user == pr.pos.bank_responsible %}
+              <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
+              <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
+            {% endif %}
+            {% if request.user == pr.pos.pos_responsible %}
+              <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
+              <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import io
 
@@ -17,7 +19,7 @@ def qr_code(value):
 
     return mark_safe(
         "<figure style='text-align: center;'>"
-        "<figcaption style='text-align: center;'>{}</figcaption>"
-        '<img src="data:image/png;base64,{}" alt="">'
-        "</figure>".format(value, data.decode())
+        f"<figcaption style='text-align: center;'>{value}</figcaption>"
+        f'<img src="data:image/png;base64,{data.decode()}" alt="">'
+        "</figure>",
     )

@@ -1,25 +1,25 @@
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>URL</th>
-            {% if not camp.read_only and request.resolver_match.app_name == "program" and event_proposal.user == request.user %}
-                <th class='text-right'>Available Actions</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for url in event_proposal.urls.all %}
-        <tr>
-            <td><i class="{{ url.url_type.icon }} fa-lg"></i><span class="h4"> {{ url.url_type.name }}</span></td>
-            <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
-            <td class='text-right'>
-                {% if not camp.read_only and request.resolver_match.app_name == "program" and event_proposal.user == request.user %}
-                    <a href="{% url 'program:event_proposal_url_update' camp_slug=camp.slug event_uuid=event_proposal.uuid url_uuid=url.uuid %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>
-                    <a href="{% url 'program:event_proposal_url_delete' camp_slug=camp.slug event_uuid=event_proposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>URL</th>
+      {% if not camp.read_only and request.resolver_match.app_name == "program" and event_proposal.user == request.user %}
+        <th class='text-right'>Available Actions</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for url in event_proposal.urls.all %}
+      <tr>
+        <td><i class="{{ url.url_type.icon }} fa-lg"></i> {{ url.url_type.name }}</td>
+        <td><a href="{{ url.url }}" target="_blank">{{ url }}</a></td>
+        <td class='text-right'>
+          {% if not camp.read_only and request.resolver_match.app_name == "program" and event_proposal.user == request.user %}
+            <a href="{% url 'program:event_proposal_url_update' camp_slug=camp.slug event_uuid=event_proposal.uuid url_uuid=url.uuid %}" class="btn btn-primary btn-sm text-nowrap"><i class="fas fa-edit"></i> Update</span></a>
+            <a href="{% url 'program:event_proposal_url_delete' camp_slug=camp.slug event_uuid=event_proposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm text-nowrap"><i class="fas fa-times"></i> Delete</span></a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>

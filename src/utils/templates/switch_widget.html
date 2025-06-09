@@ -1,0 +1,7 @@
+<div class="btn-group btn-group-sm ps-1" role="group" aria-label="Yes No">
+  <input type="radio" class="btn-check" name="{{ widget.name }}" id="{{ widget.attrs.id }}-no" autocomplete="off" value="False" {% if not widget.value %}checked{% endif %}>
+  <label class="btn btn-outline-secondary" for="{{ widget.attrs.id }}-no">No</label>
+
+  <input type="radio" class="btn-check" name="{{ widget.name }}" id="{{ widget.attrs.id }}-yes" autocomplete="off" value="True" {% if widget.value %}checked{% endif %}>
+  <label class="btn btn-outline-secondary" for="{{ widget.attrs.id }}-yes">Yes</label>
+</div>

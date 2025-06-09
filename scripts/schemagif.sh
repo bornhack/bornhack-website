@@ -66,4 +66,3 @@ for MIGRATION in $MIGRATIONS; do
     cd ..
     cd ..
 done
-

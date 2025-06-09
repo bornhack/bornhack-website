@@ -1,22 +1,51 @@
+---
+default_language_version:
+  python: "python3"
+exclude: "^.*\b(migrations)\b.*$"
 repos:
-  - repo: "https://github.com/ambv/black"
-    rev: "21.4b2"
+  - repo: "https://github.com/adamchainz/django-upgrade"
+    rev: "1.24.0"
     hooks:
-    - id: "black"
-      language_version: "python3"
-  - repo: "https://gitlab.com/pycqa/flake8"
-    rev: "3.9.1"
+      - id: "django-upgrade"
+        args: ['--target-version', '4.2']
+  - repo: "https://github.com/astral-sh/ruff-pre-commit"
+    rev: "v0.11.9"
     hooks:
-    - id: "flake8"
-  - repo: "https://github.com/pre-commit/mirrors-isort"
-    rev: "v5.8.0"
+      - id: "ruff"
+        args: ["--fix"]
+      - id: "ruff-format"
+  - repo: "https://github.com/pre-commit/mirrors-mypy"
+    rev: 'v1.15.0'
     hooks:
-    - id: "isort"
-  - repo: "https://github.com/myint/autoflake"
-    rev: "v1.4"
-    hooks:
-      - id: "autoflake"
-        args:
-          - "--in-place"
-          - "--remove-all-unused-imports"
-          - "--ignore-init-module-imports"
+      - id: "mypy"
+        exclude: "src/.*/migrations/.*.py"
+        additional_dependencies:
+          # NOTE: deps are not version pinned here. The choice between maintaing versions in two
+          # places and typechecking with potentially newer packages than the code uses is not a
+          # very nice one. In this case we've opted for the latter.
+          - "channels"
+          - "conference-scheduler"
+          - "django-stubs[compatible-mypy]"
+          - "django-stubs-ext"
+          - "types-requests"
+          - "django-allauth"
+          - "django-bootstrap5"
+          - "django-colorfield"
+          - "django-cors-headers"
+          - "django-debug-toolbar"
+          - "django-filter"
+          - "django-leaflet"
+          - "django-oauth-toolkit"
+          - "django-otp"
+          - "django-prometheus"
+          - "django-reversion"
+          - "django-tables2"
+          - "django-taggit"
+          - "django-weasyprint"
+          - "icalendar"
+          - "psycopg2-binary"
+          - "python-magic"
+          - "pytz"
+          - "qrcode" # used by django-otp
+          - "Unidecode"
+...

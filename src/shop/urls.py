@@ -1,24 +1,25 @@
-from django.urls import include, path
+from __future__ import annotations
 
-from .views import (
-    BankTransferView,
-    CoinifyCallbackView,
-    CoinifyRedirectView,
-    CoinifyThanksView,
-    CreditNoteListView,
-    DownloadCreditNoteView,
-    DownloadInvoiceView,
-    EpayCallbackView,
-    EpayFormView,
-    EpayThanksView,
-    OrderDetailView,
-    OrderListView,
-    OrderMarkAsPaidView,
-    OrderReviewAndPayView,
-    PayInPersonView,
-    ProductDetailView,
-    ShopIndexView,
-)
+from django.urls import include
+from django.urls import path
+
+from .views import BankTransferView
+from .views import CoinifyCallbackView
+from .views import CoinifyRedirectView
+from .views import CoinifyThanksView
+from .views import CreditNoteListView
+from .views import DownloadCreditNoteView
+from .views import DownloadInvoiceView
+from .views import OrderDetailView
+from .views import OrderListView
+from .views import OrderMarkAsPaidView
+from .views import OrderReviewAndPayView
+from .views import PayInPersonView
+from .views import ProductDetailView
+from .views import QuickPayCallbackView
+from .views import QuickPayLinkView
+from .views import QuickPayThanksView
+from .views import ShopIndexView
 
 app_name = "shop"
 
@@ -37,31 +38,37 @@ urlpatterns = [
                     name="order_review_and_pay",
                 ),
                 path(
-                    "invoice/", DownloadInvoiceView.as_view(), name="download_invoice"
+                    "invoice/",
+                    DownloadInvoiceView.as_view(),
+                    name="download_invoice",
                 ),
                 path(
                     "mark_as_paid/",
                     OrderMarkAsPaidView.as_view(),
                     name="mark_order_as_paid",
                 ),
-                path("pay/creditcard/", EpayFormView.as_view(), name="epay_form"),
                 path(
-                    "pay/creditcard/callback/",
-                    EpayCallbackView.as_view(),
-                    name="epay_callback",
+                    "pay/creditcard/quickpay/",
+                    include(
+                        [
+                            path("", QuickPayLinkView.as_view(), name="quickpay_link"),
+                            path(
+                                "callback/",
+                                QuickPayCallbackView.as_view(),
+                                name="quickpay_callback",
+                            ),
+                            path(
+                                "thanks/",
+                                QuickPayThanksView.as_view(),
+                                name="quickpay_thanks",
+                            ),
+                        ],
+                    ),
                 ),
                 path(
-                    "pay/creditcard/thanks/",
-                    EpayThanksView.as_view(),
-                    name="epay_thanks",
-                ),
-                path(
-                    "pay/blockchain/", CoinifyRedirectView.as_view(), name="coinify_pay"
-                ),
-                path(
-                    "pay/blockchain/callback/",
-                    CoinifyCallbackView.as_view(),
-                    name="coinify_callback",
+                    "pay/blockchain/",
+                    CoinifyRedirectView.as_view(),
+                    name="coinify_pay",
                 ),
                 path(
                     "pay/blockchain/thanks/",
@@ -74,8 +81,13 @@ urlpatterns = [
                     name="bank_transfer",
                 ),
                 path("pay/in_person/", PayInPersonView.as_view(), name="in_person"),
-            ]
+            ],
         ),
+    ),
+    path(
+        "blockchain/callback/",
+        CoinifyCallbackView.as_view(),
+        name="coinify_intent_callback",
     ),
     path("creditnotes/", CreditNoteListView.as_view(), name="creditnote_list"),
     path(

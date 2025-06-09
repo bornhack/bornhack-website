@@ -1,85 +1,111 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load commonmark %}
-{% load shop_tags %}
+{% load bornhack %}
 
 {% block title %}
-{{ product.name }} | {{ block.super }}
+  {{ product.name }} | {{ block.super }}
 {% endblock %}
 
 {% block shop_content %}
 
-<div class="row">
+  <div class="row">
 
-  <div class="col-sm-12 col-md-8">
-    <h2>{{ product.name }}</h2>
-    {{ product.description|trustedcommonmark }}
-  </div>
+    <div class="col-12">
+      <h2>{{ product.name }}</h2>
+      {{ product.description|trustedcommonmark }}
+    </div>
 
-  <div class="col-sm-12 col-md-4">
+    <div class="col-12">
 
-    <h3>
-      <small>Price</small><br />
-      {{ product.price|currency }}<br />
-    </h3>
+      <h3>
+        <small>Price</small><br />
+        {{ product.price|currency }}<br />
+      </h3>
 
-    <hr />
+      {% if product.sub_product_relations.all %}
+        <hr />
+        <h3>
+          Bundle!
+        </h3>
+        This bundle contains:<br />
+        {% for sub_product_relation in product.sub_product_relations.all %}
+          {{ sub_product_relation.number_of_tickets }} &times; <a href="{% url 'shop:product_detail' slug=sub_product_relation.sub_product.slug %}">
+            {{ sub_product_relation.sub_product.name }}
+          </a><br />
+        {% endfor %}
+      {% endif  %}
 
-    {% if product.stock_amount and product.is_time_available %}
-    <h3>
-      <small>Availability</small><br />
-      {% if product.left_in_stock > 0 %}
-      <bold>{{ product.left_in_stock }}</bold> available<br />
+      <hr />
+
+      {% if product.stock_amount and product.is_time_available %}
+        <h3>
+          <small>Availability</small><br />
+          {% if product.left_in_stock > 0 %}
+            <bold>{{ product.left_in_stock }}</bold> available<br />
+            {% if product.available_for_days < 20 %}
+              <small>This product is available for {{ product.available_for_days }} more days.</small>
+            {% else %}
+              <small>This product is available until {{ product.available_in.upper|date:"Y-m-d" }}</small>
+            {% endif %}
+          {% else %}
+            <bold>Sold out.</bold><br />
+
+            </h3>
+          {% endif %}
+
+          <hr />
       {% else %}
-      <bold>Sold out.</bold><br />
+        {% if product.available_for_days < 20 %}
+          <h3>
+            <small>Availability</small><br />
+            <small>This product is available for {{ product.available_for_days }} more days.</small>
+          </h3>
+        {% endif %}
       {% endif %}
-    </h3>
 
-    <hr />
-    {% endif %}
+      {% if product.is_stock_available %}
 
-    {% if product.is_stock_available %}
+        <h3>{% if already_in_order %}Update order{% else %}Add to order{% endif %}</h3>
 
-    <h3>{% if already_in_order %}Update order{% else %}Add to order{% endif %}</h3>
+        {% if already_in_order %}<p>You already have this product in your order. You can update the quantity below.</p>{% endif %}
 
-    {% if already_in_order %}<p>You already have this product in your order.</p>{% endif %}
+        {% if user.is_authenticated %}
 
-    {% if user.is_authenticated %}
+          {% if product.is_available %}
 
-    {% if product.is_available %}
+            <form method="POST">
+              {% csrf_token %}
+              {% bootstrap_form form show_help=False %}
+              <button type="submit" class="btn btn-primary">
+                {% if already_in_order %}Update{% else %}Add{% endif %}
+              </button>
+            </form>
 
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">
-          {% if already_in_order %}Update{% else %}Add{% endif %}
-        </button>
-    </form>
+          {% else %}
 
-    {% else %}
+            <p>
+              {% if product.is_old %}
+                This product is not available anymore.
+              {% elif product.is_upcoming %}
+                This product is available from
+                {{ product.available_in.lower|date:"Y-m-d H:i T" }}
+              {% endif %}
+            </p>
 
-    <p>
-    {% if product.is_old %}
-      This product is not available anymore.
-    {% elif product.is_upcoming %}
-      This product is available from
-      {{ product.available_in.lower|date:"Y-m-d H:i T" }}
-    {% endif %}
-    </p>
+          {% endif %}
 
-    {% endif %}
+        {% else %}
+          <a href="{% url 'account_signup' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+            Signup</a> or
+          <a href="{% url 'account_login' %}?next={% url 'shop:product_detail' slug=product.slug %}">
+            login</a>
+          to order this product
+        {% endif %}
 
-    {% else %}
-    <a href="{% url 'account_signup' %}?next={% url 'shop:product_detail' slug=product.slug %}">
-      Signup</a> or
-    <a href="{% url 'account_login' %}?next={% url 'shop:product_detail' slug=product.slug %}">
-      login</a>
-    to order this product
-    {% endif %}
+      {% endif %}
 
-    {% endif %}
+    </div>
 
   </div>
-
-</div>
 {% endblock %}

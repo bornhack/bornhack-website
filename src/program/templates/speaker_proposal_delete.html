@@ -1,19 +1,18 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Delete {{ object.name }} | {{ block.super }}
+  Delete {{ object.name }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h3>Delete {{ object.name }}</h3>
-<p class="lead">Really delete this proposal? This action cannot be undone.</p>
+  <h3>Delete {{ object.name }}</h3>
+  <p class="lead">Really delete this proposal? This action cannot be undone.</p>
 
-<form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_button "Delete" button_type="submit" button_class="btn-danger" %}
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}">{% bootstrap_button "Cancel" button_type="link" button_class="btn-primary" %}</a>
-</form>
+  </form>
 
 {% endblock program_content %}
-

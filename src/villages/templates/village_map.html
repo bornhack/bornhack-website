@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
+
+{% block title %}
+  Villages | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+  {% leaflet_css %}
+  <link href="{% static 'css/leaflet.css' %}" rel="stylesheet">
+  <link href="{% static 'css/leaflet.awesome-markers.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/leaflet-fullscreen/leaflet.fullscreen.css' %}" rel="stylesheet">
+  <script src="{% static 'vendor/leaflet/leaflet-1.6.0.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/proj4.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/proj4leaflet.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/leaflet.awesome-markers.min.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet/leaflet-color-markers.js' %}" type="text/javascript"></script>
+  <script src="{% static 'vendor/leaflet-fullscreen/Leaflet.fullscreen.min.js' %}" type="text/javascript"></script>
+  {{ mapData|json_script:"mapData" }}
+  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
+{% endblock extra_head %}
+
+{% block content %}
+  <div class="card">
+    <h3 class="card-header">Village map</h3>
+    <div class="card-body" id="container">
+      <div id="map" class="map"></div>
+    </div>
+
+    <script type="text/javascript" src="{% static 'js/villages/village_map.js' %}"></script>
+{% endblock %}

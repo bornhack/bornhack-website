@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <link href="jquery.dataTables.1.10.20.min.css" rel="stylesheet">
+    <script src="jquery-3.3.1.min.js"></script>
+    <script src="jquery.dataTables.1.10.20.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function(){
+        // enable datatables for all tables on the page,
+        $('.datatable').DataTable( {
+          "stateSave": true,
+          "pageLength": 100,
+          "lengthMenu": [ [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"] ],
+        } );
+      } );
+    </script>
+  </head>
+  <body>
+    <div id="main" class="container container-fluid">
+      <h2>BornHack Accounting</h2>
+      <p class="lead">This page is a collection of financial data for BornHack for the period from {{ period.lower }} to {{ period.upper }}, both days included.</p>
+      <hr>
+      <h3>Bank Accounts</h3>
+      <p class="lead">This table shows a list of all the bank accounts that we have used during this accounting period.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>BornHack UUID</th>
+            <th>Bank</th>
+            <th>Name</th>
+            <th>Reg. No.</th>
+            <th>Account No.</th>
+            <th>Transactions</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ba, csv, txcount in bankaccounts %}
+            <tr>
+              <td>{{ ba.pk }}</td>
+              <td>{{ ba.bank }}</td>
+              <td>{{ ba.name }}</td>
+              <td>{{ ba.reg_no }}</td>
+              <td>{{ ba.account_no }}</td>
+              <td>{{ txcount }}</td>
+              <td><a href="{{ csv }}">CSV</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <hr>
+      <h3>Invoices, Credit Notes, and Orders</h3>
+      <p class="lead">This table shows all the CSV files containing invoices and creditnotes (paid and unpaid seperately), webshop orders, and custom orders.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Paid Invoices</td>
+            <td>{{ paid_invoices.1 }}</td>
+            <td><a href="{{ paid_invoices.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Unpaid Invoices</td>
+            <td>{{ unpaid_invoices.1 }}</td>
+            <td><a href="{{ unpaid_invoices.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Paid CreditNotes</td>
+            <td>{{ paid_creditnotes.1 }}</td>
+            <td><a href="{{ paid_creditnotes.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Unpaid Creditnotes</td>
+            <td>{{ unpaid_creditnotes.1 }}</td>
+            <td><a href="{{ unpaid_creditnotes.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Webshop orders</td>
+            <td>{{ orders.1 }}</td>
+            <td><a href="{{ orders.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Custom orders</td>
+            <td>{{ customorders.1 }}</td>
+            <td><a href="{{ customorders.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>Expenses, Revenues and Reimbursements</h3>
+      <p class="lead">This table shows all the CSV files containing expenses, revenues and reimbursements.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Expenses</td>
+            <td>{{ expenses.1 }}</td>
+            <td><a href="{{ expenses.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Revenues</td>
+            <td>{{ revenues.1 }}</td>
+            <td><a href="{{ revenues.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Reimbursements</td>
+            <td>{{ reimbursements.1 }}</td>
+            <td><a href="{{ reimbursements.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>Coinify: Invoices, Payouts and Balances</h3>
+      <p class="lead">This table shows coinify invoices, payouts and daily balances. Coinify is our PSP for blockchain payments, and they payout in EUR, so multiple currencies are in play (DKK, EUR, BTC).</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Coinify Balances</td>
+            <td>{{ coinify.0.1 }}</td>
+            <td><a href="{{ invoices.0.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Coinify Payouts</td>
+            <td>{{ coinify.1.1 }}</td>
+            <td><a href="{{ coinify.1.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Coinify Invoices</td>
+            <td>{{ coinify.2.1 }}</td>
+            <td><a href="{{ coinify.2.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>ePay/Bambora transactions and Clearhaus settlements</h3>
+      <p class="lead">This table contains a CSV file with all transactions for our online creditcard PSP ePay/Bambora, and another CSV file with the payouts/settlements which are handled by Clearhaus.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ePay/Bambora Transactions</td>
+            <td>{{ epay.1 }}</td>
+            <td><a href="{{ epay.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Clearhaus Settlements</td>
+            <td>{{ clearhaus.1 }}</td>
+            <td><a href="{{ clearhaus.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>Zettle (iZettle) receipts and balances</h3>
+      <p class="lead">This table contains two CSV files with all the receipts and balances from Zettle. The receipts CSV has one row per sale, the balances CSV has one row every time something affects our Zettle balance.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Zettle Balances</td>
+            <td>{{ zettle.0.1 }}</td>
+            <td><a href="{{ zettle.0.0 }}">CSV</a></td>
+          </tr>
+          <tr>
+            <td>Zettle Receipts</td>
+            <td>{{ zettle.1.1 }}</td>
+            <td><a href="{{ zettle.1.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      <h3>MobilePay Transactions</h3>
+      <p class="lead">We use MobilePay through Zettle but they do payouts directly to our bank account. This CSV contains one row for every time something happens which affects our balance, like a sale, payout etc.</p>
+      <table class="table table-striped datatable">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Entries</th>
+            <th>CSV</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MobilePay Transactions</td>
+            <td>{{ mobilepay.1 }}</td>
+            <td><a href="{{ mobilepay.0 }}">CSV</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+      </body
+    </html>

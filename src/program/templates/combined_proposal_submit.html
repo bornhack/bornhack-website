@@ -1,28 +1,30 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load program %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block title %}
-Submit {{ camp.title }} {{ eventtype.name }} | {{ block.super }}
+  Submit {{ camp.title }} {{ eventtype.name }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h3>Submit {{ camp.title }} {{ event_type.name }} <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i></h3>
+  <h3>Submit {{ camp.title }} {{ event_type.name }} <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i></h3>
 
-<form method="POST">
+  <form method="POST">
     {% csrf_token %}
     {% for field in form %}
-    {% if field.id_for_label == "id_speaker_proposal-submission_notes" %}
-      {% availabilitytable form=form.speaker_proposal matrix=matrix %}
-      {% bootstrap_field field %}
-    {% else %}
-    {% if field.name|slice:":12" != "availability" %}
-      {% bootstrap_field field %}
-    {% endif %}
-    {% endif %}
+      {% if field.id_for_label == "id_speaker_proposal-submission_notes" %}
+        {% availabilitytable form=form.speaker_proposal matrix=matrix %}
+        {% bootstrap_field field %}
+      {% else %}
+        {% if field.name|slice:":12" != "availability" %}
+          {% bootstrap_field field %}
+        {% endif %}
+      {% endif %}
     {% endfor %}
     {% bootstrap_button "Submit for Review" button_type="submit" button_class="btn-primary" %}
-</form>
+  </form>
 
 {% endblock program_content %}
-

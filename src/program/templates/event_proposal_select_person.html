@@ -1,33 +1,30 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Add {{ event_proposal.event_type.host_title }} | {{ block.super }}
+  Add {{ event_proposal.event_type.host_title }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-<h3>Add New {{ event_proposal.event_type.host_title }} to <i>{{ event_proposal.title }}</i></h3>
+  <h3>Add New {{ event_proposal.event_type.host_title }} to <i>{{ event_proposal.title }}</i></h3>
 
-<p class="lead">Either pick an existing {{ event_proposal.event_type.host_title }} from the list below, or press the button to create a new {{ event_proposal.event_type.host_title }}. <b>Note:</b> If you need to add a {{ event_proposal.event_type.host_title }} which was not submitted by yourself you need to tell the Content Team.</p>
+  <p class="lead">Either pick an existing {{ event_proposal.event_type.host_title }} from the list below, or press the button to create a new {{ event_proposal.event_type.host_title }}. <b>Note:</b> If you need to add a {{ event_proposal.event_type.host_title }} which was not submitted by yourself you need to tell the Content Team.</p>
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Existing {{ event_proposal.event_type.host_title }}s</h3>
-  </div>
-  <div class="panel-body">
-     <div class="list-group">
-    {% for speaker_proposal in speaker_proposal_list %}
-      <a href="{% url 'program:event_proposal_add_person' camp_slug=camp.slug event_uuid=event_proposal.uuid speaker_uuid=speaker_proposal.uuid %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-            Add <b>{{ speaker_proposal.name }}</b> to <b>{{ event_proposal.title }}</b>
-        </h4>
-      </a>
-    {% endfor %}
+  <div class="card">
+    <h3 class="card-header">Existing {{ event_proposal.event_type.host_title }}s</h3>
+    <div class="card-body">
+      <div class="list-group">
+        {% for speaker_proposal in speaker_proposal_list %}
+          <a href="{% url 'program:event_proposal_add_person' camp_slug=camp.slug event_uuid=event_proposal.uuid speaker_uuid=speaker_proposal.uuid %}" class="list-group-item">
+            <h4 class="list-group-item-heading">
+              Add <b>{{ speaker_proposal.name }}</b> to <b>{{ event_proposal.title }}</b>
+            </h4>
+          </a>
+        {% endfor %}
+      </div>
     </div>
   </div>
-</div>
 
-<a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_proposal.event_type.host_title }}</a>
-<a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_proposal.event_type.host_title }}</a>
+  <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 {% endblock %}
-

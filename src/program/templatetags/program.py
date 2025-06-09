@@ -1,28 +1,30 @@
+from __future__ import annotations
+
 import logging
 
 from django import template
-from django.template import Context, Template
+from django.template import Context
+from django.template import Template
 from django.utils.safestring import mark_safe
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 register = template.Library()
 
 
 def render_datetime(datetime):
-    """Renders a datetime in the users timezone"""
+    """Renders a datetime in the users timezone."""
     t = Template("{{ datetime }}")
     return t.render(Context({"datetime": datetime}))
 
 
-def render_datetimetzrange(datetimetzrange):
-    """Renders a datetimetzrange as 14:00-16:00 in the users timezone"""
+def render_datetimetzrange(datetimetzrange) -> str:
+    """Renders a datetimetzrange as 14:00-16:00 in the users timezone."""
     return f"{render_datetime(datetimetzrange.lower.time())}-{render_datetime(datetimetzrange.upper.time())} ({datetimetzrange.lower.tzname()})"
 
 
 @register.simple_tag
 def availabilitytable(matrix, form=None):
-    """
-    Build the HTML table to show speaker availability, and hold the checkboxes
+    """Build the HTML table to show speaker availability, and hold the checkboxes
     for the speaker_availability form.
     """
     if not matrix:
@@ -36,7 +38,7 @@ def availabilitytable(matrix, form=None):
 
     # to build the <thead> for this table we need to loop over the days (dates)
     # in the matrix and create a column for each
-    for date in matrix.keys():
+    for date in matrix:
         output += f"<th>{render_datetime(date.lower.date())}</th>"
     output += "</tr></thead>"
     output += "<tbody>"
@@ -45,9 +47,9 @@ def availabilitytable(matrix, form=None):
     # need checkboxes for. We need to represent a daychunk with a <tr> table row if
     # just one of the days need a checkbox for it.
     chunks = set()
-    for date in matrix.keys():
+    for date in matrix:
         # loop over the daychunks on this date
-        for daychunk in matrix[date].keys():
+        for daychunk in matrix[date]:
             if matrix[date][daychunk]:
                 # add this daychunk it to the chunks set
                 chunks.add(render_datetimetzrange(daychunk))
@@ -61,9 +63,9 @@ def availabilitytable(matrix, form=None):
         # we need a header row for this chunk
         output += f"<tr><th class='text-nowrap'>{chunk}</th>"
         # loop over dates to find out if we need a checkbox for this chunk on this date
-        for date in matrix.keys():
+        for date in matrix:
             # loop over matrix daychunks and for each date find the chunk/row we are working with
-            for daychunk in matrix[date].keys():
+            for daychunk in matrix[date]:
                 if render_datetimetzrange(daychunk) == chunk:
                     # do we need a checkbox?
                     if matrix[date][daychunk]:
@@ -108,7 +110,7 @@ def availabilitytable(matrix, form=None):
                             output += f'<i class="fas fa-{tdicon}"></i>'
 
                         # add the info icon
-                        output += f"<i class='fas fa-info-circle pull-right text-info' data-toggle='tooltip' data-html=true data-placement='right' title='{popup}' style='margin-left: -20px;'>"
+                        output += f"<i class='fas fa-info-circle float-end text-info' data-bs-toggle='tooltip' data-bs-html='true' data-bs-placement='right' data-bs-title='{popup}' style='margin-left: -20px;margin-right: 10px;'>"
                         if form:
                             output += "</label>"
                         output += "</td>"

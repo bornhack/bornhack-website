@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  User Locations | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <h2>User Locations</h2>
+
+  <p class="lead">
+    This is a list of all your user locations for {{ camp.title }}.
+  </p>
+
+  <div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          API documentation
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <h2>Authentication</h2>
+          <p>This API uses <strong>OAuth2</strong> for authentication. All endpoints except GET require the <code>location:write</code> scope.</p>
+
+          <h2>Payload</h2>
+          <p>The API accepts (except for uuid) and returns JSON payloads with the following structure (for the <code>data</code> field the website map will only display values for first level keys):</p>
+        <pre><code>{
+  "uuid": "019a0946-32e6-499f-ac43-a898eb1f6d17",
+  "type": "sensor",
+  "name": "Super fancy sensor",
+  "lat": 9.940315,
+  "lon": 55.388354,
+  "data": {
+    "a": "b",
+    "c": "d",
+    "value": 123,
+  }
+}</code></pre>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>uuid</code></td>
+                <td>UUID</td>
+                <td>Primary key / UUID. Set by the server. Returned on <code>GET</code>, do not set on <code>POST</code> or <code>PATCH</code></td>
+              </tr>
+              <tr>
+                <td><code>type</code></td>
+                <td>string</td>
+                <td>Type of the resource, one of <code>{{ user_location_types|join:", " }}</code>.</td>
+              </tr>
+              <tr>
+                <td><code>name</code></td>
+                <td>string</td>
+                <td>Name of the resource.</td>
+              </tr>
+              <tr>
+                <td><code>lat</code></td>
+                <td>float</td>
+                <td>Latitude of the resource's location.</td>
+              </tr>
+              <tr>
+                <td><code>lon</code></td>
+                <td>float</td>
+                <td>Longitude of the resource's location.</td>
+              </tr>
+              <tr>
+                <td><code>data</code></td>
+                <td>object</td>
+                <td>Arbitrary JSON data associated with the resource.</td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <h2>Endpoints</h2>
+
+          <h3>POST <code>/{{ camp.slug }}/map/userlocation/create/api/</code></h3>
+          <p><strong>Description:</strong> Create a new resource.</p>
+          <p><strong>Required Scope:</strong> <code>location:write</code></p>
+          <p><strong>Request Body:</strong> See Payload</p>
+          <p><strong>Response:</strong> Returns the created resource.</p>
+
+          <h3>GET <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Retrieve an existing resource by uuid.</p>
+          <p><strong>Required Scope:</strong> None</p>
+          <p><strong>Response:</strong> Returns the full resource data.</p>
+
+          <h3>PATCH <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Update an existing resource by uuid.</p>
+          <p><strong>Required Scope:</strong> <code>location:write</code></p>
+          <p><strong>Request Body:</strong> Partial or full object (same format as POST).</p>
+          <p><strong>Response:</strong> Returns the updated resource.</p>
+
+          <h3>DELETE <code>/{{ camp.slug }}/map/userlocation/&lt;uuid&gt;/api/</code></h3>
+          <p><strong>Description:</strong> Delete an existing resource by uuid.</p>
+          <p><strong>Required Scope:</strong> <code>location:write</code></p>
+          <p><strong>Response:</strong> Returns confirmation of deletion (e.g., status 200 No Content).</p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <p>
+    <a href="{% url 'maps_user_location_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Create new User Location</a>
+  </p>
+
+  {% if userlocation_list %}
+    <table id="main_table" class="table table-hover table-striped datatable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Created</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in userlocation_list %}
+          <tr{% if entry.user == request.user %} class="info"{% endif %}>
+            <td>{{ entry.name }}</td>
+            <td>{{ entry.type.name }}</td>
+            <td data-order="{{ entry.created|date:"YmdHis" }}">{{ entry.created }}</td>
+            <td><a href="{% url 'maps_user_location_update' camp_slug=camp.slug user_location=entry.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'maps_user_location_delete' camp_slug=camp.slug user_location=entry.pk %}" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="lead"><i>No user locations found</i></p>
+  {% endif %}
+{% endblock %}

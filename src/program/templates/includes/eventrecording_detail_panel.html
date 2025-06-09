@@ -1,10 +1,10 @@
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load commonmark %}
-<div class="panel panel-default">
-  <div class="panel-heading">
+<div class="card">
+  <div class="card-header">
     <span class="h3">Recording for Event: {{ event.title }}</span>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
     <table class="table table-bordered">
       <tr>
         <th>Camp</th>
@@ -24,13 +24,13 @@
       <tr>
         <th>URLs</th>
         <td>
-        {% if event.urls.exists %}
-          {% for url in event.urls.all %}
-            <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
-          {% endfor %}
-        {% else %}
-          <p><i>No URLs found.</i></p>
-        {% endif %}
+          {% if event.urls.exists %}
+            {% for url in event.urls.all %}
+              <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
+            {% endfor %}
+          {% else %}
+            <p><i>No URLs found.</i></p>
+          {% endif %}
         </td>
       </tr>
 
@@ -46,4 +46,3 @@
     {% endif %}
   </div>
 </div>
-

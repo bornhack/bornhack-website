@@ -3,93 +3,93 @@
 {% load bornhack %}
 
 {% block content %}
-<p><a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to EventProposal List</a></p>
-{% if not event_proposal.can_be_approved %}
-  <br>
-  <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
-  <br>
-{% endif %}
-<div class="panel panel-default">
-  <div class="panel-heading"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
-  <div class="panel-body">
-    {{ event_proposal.abstract|untrustedcommonmark }}
+  <p><a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to EventProposal List</a></p>
+  {% if not event_proposal.can_be_approved %}
+    <br>
+    <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+    <br>
+  {% endif %}
+  <div class="card">
+    <div class="card-header"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
+    <div class="card-body">
+      {{ event_proposal.abstract|untrustedcommonmark }}
 
-    <hr>
+      <hr>
 
-    <h4>Details for <i>{{ event_proposal.title }}</i></h4>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th>UUID</th>
-          <td>{{ event_proposal.uuid }}</td>
-        </tr>
-        <tr>
-          <th>Status</th>
-          <td>{{ event_proposal.proposal_status }}</td>
-        </tr>
-        <tr>
-          <th>EventType</th>
-          <td>{{ event_proposal.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event_proposal.event_type.slug %}">{{ event_proposal.event_type }}</a></td>
-        </tr>
-        <tr>
-          <th>Duration</th>
-          <td>{{ event_proposal.duration }} minutes</td>
-        </tr>
-        <tr>
-          <th>Tags</th>
-          <td>
-            {% for tag in event_proposal.tags.all %}
-            <span class="badge">{{ tag }}</span>
-            {% empty %}
-            N/A
-            {% endfor %}
-          </td>
-        </tr>
-        <tr>
-          <th>Use provided laptop?</th>
-          <td>{{ event_proposal.use_provided_speaker_laptop|truefalseicon }}</td>
-        </tr>
-        <tr>
-          <th>Submission Notes</th>
-          <td>{{ event_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <h4>Details for <i>{{ event_proposal.title }}</i></h4>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>UUID</th>
+            <td>{{ event_proposal.uuid }}</td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>{{ event_proposal.proposal_status }}</td>
+          </tr>
+          <tr>
+            <th>EventType</th>
+            <td>{{ event_proposal.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event_proposal.event_type.slug %}">{{ event_proposal.event_type }}</a></td>
+          </tr>
+          <tr>
+            <th>Duration</th>
+            <td>{{ event_proposal.duration }} minutes</td>
+          </tr>
+          <tr>
+            <th>Tags</th>
+            <td>
+              {% for tag in event_proposal.tags.all %}
+                <span class="badge">{{ tag }}</span>
+              {% empty %}
+                N/A
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th>Use provided laptop?</th>
+            <td>{{ event_proposal.use_provided_speaker_laptop|truefalseicon }}</td>
+          </tr>
+          <tr>
+            <th>Submission Notes</th>
+            <td>{{ event_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <hr>
+      <hr>
 
-    <h4>URLs for <i>{{ event_proposal.title }}</i></h4>
-    {% if event_proposal.urls.exists %}
-      {% include 'includes/event_proposal_url_table.html' %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
+      <h4>URLs for <i>{{ event_proposal.title }}</i></h4>
+      {% if event_proposal.urls.exists %}
+        {% include 'includes/event_proposal_url_table.html' %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>{{ event_proposal.event_type.host_title }} Proposals for <i>{{ event_proposal.title }}</i></h4>
-    {% if event_proposal.speakers.exists %}
-      {% include 'includes/speaker_proposal_list_table_backoffice.html' with speaker_proposal_list=event_proposal.speakers.all nodatatable=True %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
+      <h4>{{ event_proposal.event_type.host_title }} Proposals for <i>{{ event_proposal.title }}</i></h4>
+      {% if event_proposal.speakers.exists %}
+        {% include 'includes/speaker_proposal_list_table_backoffice.html' with speaker_proposal_list=event_proposal.speakers.all nodatatable=True %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+    </div>
+    <div class="card-footer">Status: <span class="badge">{{ event_proposal.proposal_status }}</span> | ID: <span class="badge">{{ event_proposal.uuid }}</span></div>
   </div>
-  <div class="panel-footer">Status: <span class="badge">{{ event_proposal.proposal_status }}</span> | ID: <span class="badge">{{ event_proposal.uuid }}</span></div>
-</div>
 
-{% if not event_proposal.can_be_approved %}
-  <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
-  <br>
-{% endif %}
+  {% if not form.instance.can_be_approved %}
+    <p><span class="alert alert-warning">NOTE: Not all SpeakerProposals associated with this EventProposal have been approved. EventProposal can not be approved! It can still be rejected though.</span></p>
+    <br>
+  {% endif %}
 
-<p>
-{% if event_proposal.proposal_status == "pending" %}
-{% if form.instance.can_be_approved %}
-<a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve EventProposal</a>
-{% endif %}
-<a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject EventProposal</a>
-{% endif %}
-<a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to EventProposal List</a>
-</p>
+  <p>
+    {% if event_proposal.proposal_status == "pending" %}
+      {% if form.instance.can_be_approved %}
+        <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve EventProposal</a>
+      {% endif %}
+      <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject EventProposal</a>
+    {% endif %}
+    <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to EventProposal List</a>
+  </p>
 
 {% endblock content %}

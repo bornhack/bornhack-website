@@ -1,20 +1,19 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h2 class="panel-title">Really Delete Event?</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Really Delete Event?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">Really delete event <i>{{ object.title }}</i> ?</p>
+      <p class="lead">You can recreate the Event (but not the Events scheduling!) later by re-approving the EventProposal this Event came from.</p>
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Delete it</button>
+        <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=object.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <p class="lead">Really delete event <i>{{ object.title }}</i> ?</p>
-    <p class="lead">You can recreate the Event (but not the Events scheduling!) later by re-approving the EventProposal this Event came from.</p>
-    <form method="POST">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Delete it</button>
-      <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=object.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back</a>
-    </form>
-  </div>
-</div>
 {% endblock content %}
-

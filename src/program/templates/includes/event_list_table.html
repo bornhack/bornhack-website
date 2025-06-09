@@ -1,52 +1,56 @@
 {% load program %}
 {% load bornhack %}
 
-  <table class="table table-bordered table-hover datatable">
-    <thead>
-      <tr>
-        <th>Event Main Title</th>
-        <th>Event Type</th>
-        <th class="text-center">Tags</th>
-        <th>Speakers</th>
-        <th><i class="fas fa-video"></i></th>
-        <th>Scheduled</th>
-      </tr>
-    </thead>
-    <tbody>
+<table class="table table-bordered table-hover datatable">
+  <thead>
+    <tr>
+      <th data-priority="1">Event Main Title</th>
+      <th data-priority="2">Event Type</th>
+      <th data-priority="100" class="text-center">Tags</th>
+      <th data-priority="3">Speakers</th>
+      <th data-priority="100"><i class="fas fa-video" title="Recording" alt="Recording"></i></th>
+      <th data-priority="100"><i class="fas fa-floppy-disk" title="Recording" alt="Recording"></i></th>
+      <th data-priority="100"><i class="fas fa-broadcast-tower" title="Streaming" alt="Streaming"></i></th>
+      <th data-priority="1">Scheduled</th>
+    </tr>
+  </thead>
+  <tbody>
     {% for event in event_list %}
-    {% if event.event_type.include_in_event_list %}
-      <tr>
-        <td>
-          <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
-        </td>
-        <td>
-          <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>
-          </a>
-        </td>
-        <td class="text-center">
-          {% for tag in event.tags.all %}
-          <span class="badge">{{ tag }}</span><br>
-          {% empty %}
-          N/A
-          {% endfor %}
-        </td>
-        <td>
-          {% for speaker in event.speakers.all %}
-            <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
-          {% empty %}
-            N/A
-          {% endfor %}
-        </td>
-        <td class="text-center"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
-        <td>
-          {% for slot in event.event_slots.all %}
-          {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
-          {% empty %}
-            <i>Not scheduled yet</i>
-          {% endfor %}
-        </td>
-      </tr>
-    {% endif %}
+      {% if event.event_type.include_in_event_list %}
+        <tr>
+          <td>
+            <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a>
+          </td>
+          <td>
+            <a href="{% url 'program:schedule_index' camp_slug=camp.slug %}#/?type={{ event.event_type.slug }}"><i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> <span style="font-size: larger">{{ event.event_type.name }}</span>
+            </a>
+          </td>
+          <td class="text-center event-table-tags">
+            {% for tag in event.tags.all %}
+              <span class="badge text-bg-secondary">{{ tag }}</span>
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
+          <td>
+            {% for speaker in event.speakers.all %}
+              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a><br>
+            {% empty %}
+              N/A
+            {% endfor %}
+          </td>
+          <td class="text-center"><span class="hidden">{% if event.video_recording or event.video_streaming %}True</span>{{ True|truefalseicon }}{% else %}False</span>{{ False|truefalseicon }}{% endif %}</td>
+            <td class="text-center" title="Recording: {{ event.video_recording|yesno }}"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
+            <td class="text-center" title="Streaming: {{ event.video_streaming|yesno }}"><span class="hidden">{{ event.video_streaming }}</span>{{ event.video_streaming|truefalseicon }}</td>
+            <td data-order="{{ event.event_slots.all.0.when.lower|date:"YmdHis" }}">
+              {% for slot in event.event_slots.all %}
+                {{ slot.event_location.icon_html }} {{ slot.event_location.name }} at {{ slot.when.lower }}<br>
+              {% empty %}
+                <i>Not scheduled yet</i>
+              {% endfor %}
+            </td>
+          </tr>
+      {% endif %}
     {% endfor %}
-    </tbody>
-  </table>
+  </tbody>
+</table>

@@ -4,79 +4,79 @@
 {% load bornhack %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">BackOffice - EventSlots</span>
-  </div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">BackOffice - EventSlots</span>
+    </div>
+    <div class="card-body">
       <p><i>EventSlots</i> are what we schedule <i>Events</i> in. Search for an Event, Speaker, EventType, EventLocation, or day to filter the list.</p>
-  {% if not event_slot_list %}
-    <p class="lead">
-      No EventSlots found. Go create some EventSessions!
-      <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventSession</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-    </p>
-  {% else %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
-  <table class="table table-striped datatable">
-    <thead>
-    <tr>
-        <th>Start</th>
-        <th>End</th>
-        <th>Session</th>
-        <th>Type</th>
-        <th>Location</th>
-        <th>Event</th>
-        <th>Speakers</th>
-        <th>Overflow</th>
-        <th>Actions</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for slot in event_slot_list %}
-    <tr>
-      <td>{{ slot.when.lower }}</td>
-      <td>{{ slot.when.upper }}</td>
-      <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=slot.event_session.id %}" class="btn btn-primary"><i class="fas fa-chess-board"></i> {{ slot.event_session.id }}</a></td>
-      <td>{{ slot.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=slot.event_type.slug %}">{{ slot.event_type.name }}</a></td>
-      <td>{{ slot.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.event_location.slug %}">{{ slot.event_location.name }}</a></td>
-      {% if slot.event %}
-      <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=slot.event.slug %}">{{ slot.event.title }}</a><br>({% if slot.autoscheduled %}autoscheduled{% else %}manual{% endif %})</td>
-      <td>
-        {% if slot.event.speakers.exists %}
-        <ul class="list-group">
-        {% for speaker in slot.event.speakers.all %}
-          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}</li></a>
-        {% endfor %}
-        {% else %}
-        N/A
-        {% endif %}
-        </ul>
-      </td>
-      <td class="text-center {% if slot.overflow %}danger{% endif %}"><span class="badge">{{ slot.overflow }}</span></td>
+      {% if not event_slot_list %}
+        <p class="lead">
+          No EventSlots found. Go create some EventSessions!
+          <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create EventSession</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        </p>
       {% else %}
-      <td>N/A</td>
-      <td>N/A</td>
-      <td>N/A</td>
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        </p>
+        <table class="table table-striped datatable">
+          <thead>
+            <tr>
+              <th>Start</th>
+              <th>End</th>
+              <th>Session</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Event</th>
+              <th>Speakers</th>
+              <th>Overflow</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in event_slot_list %}
+              <tr>
+                <td>{{ slot.when.lower }}</td>
+                <td>{{ slot.when.upper }}</td>
+                <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=slot.event_session.id %}" class="btn btn-primary"><i class="fas fa-chess-board"></i> {{ slot.event_session.id }}</a></td>
+                <td>{{ slot.event_type.icon_html }} <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=slot.event_type.slug %}">{{ slot.event_type.name }}</a></td>
+                <td>{{ slot.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.event_location.slug %}">{{ slot.event_location.name }}</a></td>
+                {% if slot.event %}
+                  <td><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=slot.event.slug %}">{{ slot.event.title }}</a><br>({% if slot.autoscheduled %}autoscheduled{% else %}manual{% endif %})</td>
+                  <td>
+                    {% if slot.event.speakers.exists %}
+                      <ul class="list-group">
+                        {% for speaker in slot.event.speakers.all %}
+                          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> {{ speaker.name }}</li></a>
+                        {% endfor %}
+                    {% else %}
+                      N/A
+                    {% endif %}
+                  </ul>
+                  </td>
+                  <td class="text-center {% if slot.overflow %}danger{% endif %}"><span class="badge">{{ slot.overflow }}</span></td>
+                {% else %}
+                  <td>N/A</td>
+                  <td>N/A</td>
+                  <td>N/A</td>
+                {% endif %}
+                <td>
+                  <div class="btn-group-vertical">
+                    <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.id %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                    {% if slot.event %}
+                      <a href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=slot.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Unschedule</a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% endif %}
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.id %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          {% if slot.event %}
-          <a href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=slot.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Unschedule</a>
-          {% endif %}
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

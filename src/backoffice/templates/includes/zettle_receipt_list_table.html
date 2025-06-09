@@ -1,0 +1,31 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "zettle_created" "Receipt Time" %}
+      {% thh "receipt_number" "Receipt Number" %}
+      {% thh "total" %}
+      {% thh "fee" %}
+      {% thh "net" %}
+      {% thh "payment_method" %}
+      {% thh "card_issuer" %}
+      {% thh "staff" %}
+      {% thh "description" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for zr in zettlereceipt_list %}
+      <tr>
+        <td data-order="{{ zr.zettle_created|sortable }}">{{ zr.zettle_created }}</td>
+        <td>{{ zr.receipt_number }}</td>
+        <td>{{ zr.total }}&nbsp;DKK</td>
+        <td>{{ zr.fee }}&nbsp;DKK</td>
+        <td>{{ zr.net }}&nbsp;DKK</td>
+        <td>{{ zr.payment_method }}</td>
+        <td>{{ zr.card_issuer|default:"N/A" }}</td>
+        <td>{{ zr.staff }}</td>
+        <td>{{ zr.description }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

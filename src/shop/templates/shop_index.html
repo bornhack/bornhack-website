@@ -1,94 +1,119 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
-{% load shop_tags %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
 
 {% block title %}
-All products | {{ block.super }}
+  All products | {{ block.super }}
 {% endblock %}
 
 {% block shop_content %}
 
-<div class="row">
-  <div class="col-md-12">
-    <p>
-      Categories:<br />
-      {% for category in categories %}
-      <a href="{% url 'shop:index' %}?category={{category.slug}}"
-         class="label label-{% if category.slug == current_category.slug %}primary{% else %}default{% endif %}">
-        {{category}}
-      </a>&nbsp;
-      {% endfor %}
-    </p>
+  <div class="row">
+    <div class="col-12">
+      <p>
+        Categories:<br />
+        {% for category in categories %}
+          <a href="{% url 'shop:index' %}?category={{category.slug}}"
+             class="label label-{% if category.slug == current_category.slug %}primary{% else %}default{% endif %}"><span class="badge text-bg-secondary">{{category}}</span></a>&nbsp;
+        {% endfor %}
+      </p>
+    </div>
   </div>
-</div>
 
-<hr />
+  <hr />
 
-<div class="row">
-  <div class="col-md-12">
+  <div class="row">
+    <div class="col-12 table-responsive">
 
-    <table class="table table-hover table-condensed table-striped">
-      <thead>
-        <tr>
-          <th>Product</th>
-          <th class="pull-right">Price</th>
-        </tr>
-      </thead>
-      <tbody>
+      <table class="table table-hover table-condensed table-striped">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>
+              <div class="ms-auto">
+                Price
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
 
-      {% for product in products %}
+          {% for product in products %}
 
-        {% ifchanged product.category %}
-        <tr style="background-color: #cccccc">
-          <td colspan="2">
-            <strong>
-              <a href="{% url 'shop:index' %}?category={{product.category.slug}}">
-                {{ product.category }}
-              </a>
-            </strong>
-          </td>
-        </tr>
-        {% endifchanged %}
+            {% ifchanged product.category %}
+              <tr class="table-secondary">
+                <td colspan="2">
+                  <strong>
+                    <a href="{% url 'shop:index' %}?category={{product.category.slug}}">
+                      {{ product.category }}
+                    </a>
+                  </strong>
+                </td>
+              </tr>
+            {% endifchanged %}
 
-        <tr>
-          <td>
-            <a href="{% url 'shop:product_detail' slug=product.slug %}">
-            {{ product.name }}
-            </a>
+            <tr>
+              <td>
+                <a href="{% url 'shop:product_detail' slug=product.slug %}">
+                  {{ product.name }}
+                </a>
 
 
-            {% if product.stock_amount %}
+                {% if product.stock_amount %}
+                  {% if product.left_in_stock <= 0 or not product.is_time_available %}
+                    <div class="label label-danger" style="margin-left: 1em;"><!-- We can replace the style when we upgrade to Bootstrap 5. -->
+                      Sold out!
+                    </div>
+                  {% else %}
 
-            {% if product.left_in_stock == 0 %}
-            <div class="label label-danger">
-              Sold out!
-            </div>
-            {% elif product.left_in_stock <= 10 %}
-            <div class="label label-info">
-              Only {{ product.left_in_stock }} left!
-            </div>
-            {% endif %}
+                    {% if product.left_in_stock <= 10 %}
+                      <div class="label label-info" style="margin-left: 1em;">
+                        Only {{ product.left_in_stock }} left!
+                      </div>
+                    {% endif %}
 
-            {% endif %}
+                  {% endif %}
 
-          </td>
-          <td>
-            <div class="pull-right">
-              {{ product.price|currency }}
-            </div>
-          </td>
-        </tr>
-      {% empty %}
-      <tr>
-        <td colspan="2">
-            Sorry no products found.
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    <p class="lead text-center">All prices mentioned include 25% Danish VAT!</p>
+                  {% if product.left_in_stock > 0 %}
+                    <div class="label label-info" style="margin-left: 1em;">
+                      Sales end in {{ product.available_for_days }} days!
+                    </dev>
+                  {% endif %}
+
+                {% else %}
+
+                  {% if product.available_for_days < 20 %}
+                    <div class="label label-info" style="margin-left: 1em;">
+                      Sales end in {{ product.available_for_days }} days!
+                    </dev>
+                  {% endif %}
+
+                {% endif %}
+
+                {% if product.has_subproducts %}
+                  <div class="label label-info" style="margin-left: 1em;"><!-- We can replace the style when we upgrade to Bootstrap 5. -->
+                    Bundle
+                  </div>
+                {% endif %}
+
+              </td>
+              <td>
+                <div class="ms-auto">
+                  {{ product.price|currency }}
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="2">
+                Sorry no products found.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="lead text-center">All prices mentioned include 25% Danish VAT!</p>
+    </div>
   </div>
-</div>
 
 {% endblock %}

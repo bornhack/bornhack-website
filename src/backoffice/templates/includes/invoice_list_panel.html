@@ -1,34 +1,33 @@
 {% load bornhack %}
 {% if invoice_list %}
-<table class="table table-hover datatable">
-  <thead>
-  <tr>
-    <th>Invoice #</th>
-    <th>Customer</th>
-    <th>Invoice Date</th>
-    <th>Amount</th>
-    <th>Order</th>
-    <th>Paid</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-    {% for invoice in invoice_list %}
-    <tr>
-      <td>{{ invoice.id }}</td>
-      <td>{% if invoice.order %}{{ invoice.order.user.username }} &lt;{{ invoice.order.user.email }}&gt;{% else %}{{ invoice.customorder.customer }}{% endif %}</td>
-      <td>{{ invoice.created|date }}</td>
-      <td>{% if invoice.order %}{{ invoice.order.total }}{% else %}{{ invoice.customorder.amount }}{% endif %}&nbsp;DKK</td>
-      <td>{{ invoice.get_order }}</td>
-      <td>{{ invoice.get_order.paid|truefalseicon }} {% if invoice.get_order.paid %}paid{% else %}unpaid{% endif %}</td>
-      <td>
-          n/a
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  <table class="table table-hover datatable">
+    <thead>
+      <tr>
+        <th>Invoice #</th>
+        <th>Customer</th>
+        <th>Invoice Date</th>
+        <th>Amount</th>
+        <th>Order</th>
+        <th>Paid</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoice in invoice_list %}
+        <tr>
+          <td>{{ invoice.id }}</td>
+          <td>{% if invoice.order %}{{ invoice.order.user.username }} &lt;{{ invoice.order.user.email }}&gt;{% else %}{{ invoice.customorder.customer }}{% endif %}</td>
+          <td data-order="{{ invoice.created|sortable }}">{{ invoice.created|date }}</td>
+          <td data-order="{% if invoice.order %}{{ invoice.order.total }}{% else %}{{ invoice.customorder.amount }}{% endif %}">{% if invoice.order %}{{ invoice.order.total }}{% else %}{{ invoice.customorder.amount }}{% endif %}&nbsp;DKK</td>
+          <td>{{ invoice.get_order }}</td>
+          <td>{{ invoice.get_order.paid|truefalseicon }} {% if invoice.get_order.paid %}paid{% else %}unpaid{% endif %}</td>
+          <td>
+            {% if invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=invoice.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download Invoice #{{ invoice.pk }}</a>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 {% else %}
   <h4>No invoices found.</h4>
 {% endif %}
-

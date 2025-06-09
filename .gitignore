@@ -6,6 +6,12 @@ db.sqlite3
 *.sw*
 *.pyc
 venv/
+.venv/
 environment_settings.py
 elm-stuff/
 .coverage
+media
+docker/.env
+node_modules
+package-lock.json
+.sass-cache

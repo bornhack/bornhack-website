@@ -1,35 +1,37 @@
 {% extends 'base.html' %}
 {% load commonmark %}
 {% load static %}
+{% load bornhack %}
 
 {% block title %}
-News | {{ block.super }}
+  News | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-{% if request.resolver_match.kwargs.archived %}
-<i>Showing archived news items. <a href="{% url 'news:index' archived=False %}">Show regular news items</a></i>
-{% else %}
-<br />
-<a href="{% url 'news:feed' %}" class="btn btn-default">
-<img src="{% static 'img/feed-icon-14x14.png' %}"> Get BornHack news as a RSS feed
-</a>
-<hr />
-{% endif %}
-{% for item in news_items %}
-  <div>
-    <h3><a href="{% url 'news:detail' slug=item.slug %}">{{ item.title }}</a> <small>{{ item.published_at }}</small></h3>
-  </div>
-  {{ item.content|trustedcommonmark }}
-  {% if not forloop.last %}
+  {% if request.resolver_match.kwargs.archived %}
+    <i>Showing archived news items. <a href="{% url 'news:index' archived=False %}">Show regular news items</a></i>
+  {% else %}
+    <br />
+    <a href="{% url 'news:feed' %}" class="btn btn-secondary">
+      <img src="{% static 'img/feed-icon-14x14.png' %}"> Get BornHack news as a RSS feed
+    </a>
     <hr />
   {% endif %}
-{% empty %}
-  <h3>No news yet. Stay tuned!</h3>
-{% endfor %}
-{% if not request.resolver_match.kwargs.archived %}
-<hr />
-<i><a href="{% url 'news:archive' archived=True %}">Show archived news items</a></i>
-{% endif %}
+  {% for item in news_items %}
+    <div class="card mb-3">
+      <h4 class="card-header"><a href="{% url 'news:detail' slug=item.slug %}">{{ item.title }}</a></h4>
+      <div class="card-body">
+        <p class="card-title text-end">{{ item.published_at }}</p>
+        <p class="text-start">{{ item.content|templaterender|trustedcommonmark }}</p>
+      </div>
+    </div>
+  {% empty %}
+    <div class="card">
+      <h3 class="card-header">No news yet. Stay tuned!</h3>
+    </div>
+  {% endfor %}
+  {% if not request.resolver_match.kwargs.archived %}
+    <hr />
+    <i><a href="{% url 'news:archive' archived=True %}">Show archived news items</a></i>
+  {% endif %}
 {% endblock %}
-

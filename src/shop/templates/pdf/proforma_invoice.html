@@ -1,87 +1,183 @@
 {% load static %}
-{% load shop_tags %}
+{% load bornhack %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css" media="all">
+  @page {
+        /*size: A4 portrait; /* can use also 'landscape' for orientation */
+    margin: 1cm;
+
+    @top-center{
+      content: element(header);
+    }
+
+    @bottom-center{
+      content: element(footer);
+    }
+
+  }
+  body {
+    font-size: 12px;
+    font-family: "Liberation Serif";
+    {% if dev %}
+      background: no-repeat center url('{% static 'images/test_letter.png' %}')
+                {% endif %}
+  }
+
+  header, footer {
+    font-size: 10px;
+    font-family: "Liberation Serif";
+    width: 100%;
+    position: relative;
+  }
+
+  header {
+    display: block;
+    height: 150px;
+    background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
+    background-size: 571px 150px;
+  }
+
+  .footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+    display: block;
+    text-align: center;
+    bottom: 0;
+    margin: auto;
+    width: 50%;
+  }
+
+  footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+        /*display: block;*/
+    text-align: center;
+  }
+
+  .alignRight {
+    text-align: right;
+  }
+</style>
+<header>
+  <div>
+  </div>
+</header>
 
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                Order Date: {{ order.created|date:"b jS, Y" }}<br>
-                Order #{{ order.pk }}<br>
-                Proforma Invoice
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        Order Date: {{ order.created|date:"b jS, Y" }}<br>
+        Order #{{ order.pk }}<br>
+        Proforma Invoice
+      </h3>
+    </td>
+  </tr>
 </table>
 {% if order.invoice_address %}
-<h2>CUSTOMER</h2>
-<p class="lead">{{ order.invoice_address|linebreaks }}</p>
+  <h2>CUSTOMER</h2>
+  <p class="lead">{{ order.invoice_address|linebreaks }}</p>
 {% else %}
-<h3>Customer: {{ order.user.email }}</h3>
+  <h3>Customer: {{ order.user.email }}</h3>
 {% endif %}
 <br>
 <h2>PROFORMA INVOICE</h2>
 <table style="width:90%; margin:1em;">
+  <thead>
     <tr>
       <td>
-        <b>Name
+        <b>Name</b>
+      </td>
       <td>
         <b>Quantity
-      <td align="right">
-        <b>Price
-      <td align="right">
-        <b>Total
+        </td>
+        <td align="right" class="alignRight">
+          <b>Price
+          </td>
+          <td align="right" class="alignRight">
+            <b>Total
+            </td>
+          </tr>
 
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+          <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+        </thead>
+        <tbody>
 
-{% for order_product in order.orderproductrelation_set.all %}
-  <tr>
-      <td>
-      {{ order_product.product.name }}
-    <td>
-      {{ order_product.quantity }}
-    <td align="right">
-      {{ order_product.product.price|currency }}
-    <td align="right">
-      {{ order_product.total|currency }}
-{% endfor %}
+          {% for order_product in order.oprs.all %}
+            <tr>
+              <td>
+                {{ order_product.product.name }}
+              </td>
+              <td>
+                {{ order_product.quantity }}
+              </td>
+              <td align="right" class="alignRight">
+                {{ order_product.product.price|currency }}
+              </td>
+              <td align="right" class="alignRight">
+                {{ order_product.total|currency }}
+              </td>
+            </tr>
+          {% endfor %}
 
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+          <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
 
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Included Danish VAT (25%)</strong>
-    <td align="right">
-      {{ order.vat|currency }}
+          <tr>
+            <td colspan="2">
 
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Invoice Total</strong>
-    <td align="right">
-      {{ order.total|currency }}
+            </td>
+            <td>
+              <strong>Included Danish VAT (25%)</strong>
+            </td>
+            <td align="right" class="alignRight">
+              {{ order.vat|currency }}
+            </td>
 
-  <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+          </tr>
+          <tr>
+            <td colspan="2">
+            </td>
+            <td>
+              <strong>Invoice Total</strong>
+            </td>
+            <td align="right" class="alignRight">
+              {{ order.total|currency }}
+            </td>
+          </tr>
 
-</table>
+          <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+        </tbody>
+      </table>
 
-<br>
+      <br>
 
-<h3>This is a proforma invoice. The order has not been paid. The payment options are:</h3>
-<h4>Bank Transfer</h4>
-<ul>
-  <li>Bank: {{ bank }}
-  <li>DK Reg. {{ bank_dk_reg }}, DK account no. {{ bank_dk_accno }}</li>
-  <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
-  <li>Please remember to add Order number in the transfer notes, and pay the transfer fees in your end.</li>
-</ul>
+      <h3>This is a proforma invoice. The order has not been paid. The payment options are:</h3>
+      <h4>Bank Transfer</h4>
+      <ul>
+        <li>Bank: {{ bank }}</li>
+        <li>DK Reg. {{ bank_dk_reg }}, DK account no. {{ bank_dk_accno }}</li>
+        <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
+        <li>Please remember to add Order number in the transfer notes, and pay the transfer fees in your end.</li>
+      </ul>
 
-<h4>Other Payment Methods</h4>
-<ul>
-    <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:epay_form' pk=order.pk %} (requires login)</li>
-    <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
-    <li><b>In person:</b> https://{{ hostname }}{% url 'shop:in_person' pk=order.pk %} (requires geographical proximity to infodesk or an organiser)</li>
-</ul>
+      <h4>Other Payment Methods</h4>
+      <ul>
+        <li><b>Credit Card:</b> https://{{ hostname }}{% url 'shop:quickpay_link' pk=order.pk %} (requires login)</li>
+        <li><b>Blockchain (multiple currencies)</b>: https://{{ hostname }}{% url 'shop:coinify_pay' pk=order.pk %} (requires login)</li>
+        <li><b>In person:</b> https://{{ hostname }}{% url 'shop:in_person' pk=order.pk %} (requires geographical proximity to infodesk or an organiser)</li>
+      </ul>
 
+
+      <div class="footer" style="opacity: 0;">
+      </div>
+      <div class="footer" style="position: absolute; bottom: 0; left: 0; width: 100%">
+        The legal entity behind BornHack is:<br>
+        BornHack ApS c/o Thomas Steen Rasmussen, Skelbyvej 147, Næsby,<br>
+        4171 Glumsø, Denmark. CVR# 37666521<br>
+        email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a> - web <a href="https://www.bornhack.dk">https://www.bornhack.dk</a>
+      </div>

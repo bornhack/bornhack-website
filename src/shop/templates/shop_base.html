@@ -1,41 +1,42 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Shop | {{ block.super }}
+  Shop | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<div class="row">
-  <div class="col-md-12">
-    <ol class="breadcrumb">
-      <li><a href="{% url 'shop:index' %}">Shop</a></li>
-      {% if product %}
-        <li><a href="{% url 'shop:index' %}?category={{product.category.slug}}">{{ product.category }}</a></li>
-        <li class="active">{{ product.name }}</li>
-      {% elif current_category %}
-        <li class="active">{{ current_category }}</li>
-      {% endif %}
-      {% if user.is_authenticated and user.orders.exists %}
-        {% if user.creditnotes.exists %}
-          <li class="pull-right"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
-        {% endif %}
-        {% if current_order %}
-        <li class="pull-right no-before">
-          <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
-            <i class="glyphicon glyphicon-shopping-cart"></i> Shopping Cart ({{ current_order.get_number_of_items|default:0 }} items)</a>
-        </li>
-        {% else %}
-        <li class="pull-right no-before"><a href="{% url 'shop:order_list' %}">Show Orders</a></li>
-        {% endif %}
-      {% endif %}
-    </ol>
+  <div class="row">
+    <div class="col-12">
+      <nav aria-label="breadcrumb" class="bg-dark-subtle text-secondary">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'shop:index' %}">Shop</a></li>
+          {% if product %}
+            <li class="breadcrumb-item"><a href="{% url 'shop:index' %}?category={{product.category.slug}}">{{ product.category }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+          {% elif current_category %}
+            <li class="breadcrumb-item active">{{ current_category }}</li>
+          {% endif %}
+          {% if user.is_authenticated and user.orders.exists %}
+            {% if user.creditnotes.exists %}
+              <li class="breadcrumb-item ms-auto"><a href="{% url 'shop:creditnote_list' %}">Credit Notes</a></li>
+            {% endif %}
+            {% if current_order %}
+              <li class="breadcrumb-item ms-auto no-before">
+                <a href="{% url 'shop:order_detail' pk=current_order.pk %}">
+                  <i class="fa-solid fa-cart-shopping"></i> Shopping Cart ({{ current_order.get_number_of_items|default:0 }} items)</a>
+              </li>
+            {% else %}
+              <li class="breadcrumb-item ms-auto no-before"><a href="{% url 'shop:order_list' %}">Show Orders</a></li>
+            {% endif %}
+          {% endif %}
+        </ol>
+      </nav>
+    </div>
   </div>
-</div>
 
-{% block shop_content %}
+  {% block shop_content %}
+
+  {% endblock %}
 
 {% endblock %}
-
-{% endblock %}
-

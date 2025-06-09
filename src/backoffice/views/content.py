@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 
 from django.contrib import messages
@@ -6,27 +8,28 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic.edit import FormView
 
+from backoffice.forms import AddRecordingForm
+from backoffice.mixins import ContentTeamPermissionMixin
 from camps.mixins import CampViewMixin
-from program.models import Event, EventFeedback, Url, UrlType
+from program.models import Event
+from program.models import EventFeedback
+from program.models import Url
+from program.models import UrlType
 
-from ..forms import AddRecordingForm
-from ..mixins import ContentTeamPermissionMixin
-
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of EventFeedback objects which are pending approval.
-    """
+    """This view shows a list of EventFeedback objects which are pending approval."""
 
     model = EventFeedback
     template_name = "approve_feedback.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.queryset = EventFeedback.objects.filter(
-            event__track__camp=self.camp, approved__isnull=True
+            event__track__camp=self.camp,
+            approved__isnull=True,
         )
 
         self.form_class = modelformset_factory(
@@ -40,8 +43,7 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """
@@ -54,28 +56,29 @@ class ApproveFeedbackView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         form.save()
         if form.changed_objects:
             messages.success(
-                self.request, f"Updated {len(form.changed_objects)} EventFeedbacks"
+                self.request,
+                f"Updated {len(form.changed_objects)} EventFeedbacks",
             )
         return redirect(self.get_success_url())
 
     def get_success_url(self, *args, **kwargs):
         return reverse(
-            "backoffice:approve_event_feedback", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:approve_event_feedback",
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
 class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
-    """
-    This view shows a list of events that is set to be recorded, but without a recording URL attached.
-    """
+    """This view shows a list of events that is set to be recorded, but without a recording URL attached."""
 
     model = Event
     template_name = "add_recording.html"
 
-    def setup(self, *args, **kwargs):
+    def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
         self.queryset = Event.objects.filter(
-            track__camp=self.camp, video_recording=True
+            track__camp=self.camp,
+            video_recording=True,
         ).exclude(urls__url_type__name="Recording")
 
         self.form_class = modelformset_factory(
@@ -89,8 +92,7 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
         )
 
     def get_context_data(self, *args, **kwargs):
-        """
-        Include the queryset used for the modelformset_factory so we have
+        """Include the queryset used for the modelformset_factory so we have
         some idea which object is which in the template
         Why the hell do the forms in the formset not include the object?
         """
@@ -118,5 +120,6 @@ class AddRecordingView(CampViewMixin, ContentTeamPermissionMixin, FormView):
 
     def get_success_url(self, *args, **kwargs):
         return reverse(
-            "backoffice:add_eventrecording", kwargs={"camp_slug": self.camp.slug}
+            "backoffice:add_eventrecording",
+            kwargs={"camp_slug": self.camp.slug},
         )

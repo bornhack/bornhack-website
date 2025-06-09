@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load bornhack %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">Coinify Dashboard - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>This view shows a quick overview of Coinify stats and links to detailed views for invoices, payouts and balances. <b>All data is imported manually using CSV files exported from Coinifys webinterface. Poke someone in the Economy Team if data is looking stale!</b></p>
+
+      <p>We currently have <b>{{ invoices }} invoices</b> in the system. We have <b>{{ payouts }} payouts</b> and <b>{{ balances }} balances</b> registered.</p>
+
+      {% if balance %}
+        <p>The latest Coinify balance is from <b>{{ balance.when }}</b> and at UTC midnight on that date our balance in Coinify was:
+
+          <ul>
+            <li><i class="fab fa-bitcoin"></i> <b>{{ balance.btc }} BTC</b></li>
+            <li><i class="fas fa-euro-sign"></i> <b>{{ balance.eur }} EUR</b></li>
+            <li><i class="fas fa-money-bill-wave"></i> <b>{{ balance.dkk }} DKK</b></li>
+          </ul>
+
+          Use the links below to see details or to import new CSV files.</p>
+      {% endif %}
+
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifypayment_intent_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Coinify Payment Intents</h4>
+          <p class="list-group-item-text">Use this view to see {{ payment_intents }} Coinify Payment Intents.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifysettlement_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Coinify Settlements</h4>
+          <p class="list-group-item-text">Use this view to see {{ settlements }} Coinify Settlements.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifyinvoice_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Coinify Invoices</h4>
+          <p class="list-group-item-text">Use this view to see {{ invoices }} Coinify invoices.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifypayout_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Coinify Payouts</h4>
+          <p class="list-group-item-text">Use this view to see {{ payouts }} Coinify payouts.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinifybalance_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Coinify Balances</h4>
+          <p class="list-group-item-text">Use this view to see {{ balances }} Coinify balances.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:coinify_csv_import' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading">Import CSV Files</h4>
+          <p class="list-group-item-text">Use this view to import CSV files with new invoices, payouts or balances.</p>
+        </a>
+      </div>
+      <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
+    </div>
+  </div>
+{% endblock content %}

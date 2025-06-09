@@ -1,19 +1,18 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h2 class="panel-title">Delete EventSession?</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete EventSession?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">This EventSession runs from <b>{{ session.when.lower }}</b> to <b>{{ session.when.upper }}</b>. We currently have <b>{{ session.scheduled_event_slots.count }}</b> Events scheduled in this session, leaving <b>{{ session.free_time }}</b> time unused. Deleting an EventSession means deleting all the EventSlots, which means anything scheduled will no longer be scheduled.</p>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
+        <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <p class="lead">This EventSession runs from <b>{{ session.when.lower }}</b> to <b>{{ session.when.upper }}</b>. We currently have <b>{{ session.scheduled_event_slots.count }}</b> Events scheduled in this session, leaving <b>{{ session.free_time }}</b> time unused. Deleting an EventSession means deleting all the EventSlots, which means anything scheduled will no longer be scheduled.</p>
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
-      <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-  </div>
-</div>
 {% endblock content %}
-

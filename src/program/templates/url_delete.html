@@ -1,25 +1,24 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Delete URL? | {{ block.super }}
+  Delete URL? | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h3>Delete URL?</h3>
-<p class="lead">Really delete this URL?</p>
-<p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
-<p class="lead">This action cannot be undone.</p>
+  <h3>Delete URL?</h3>
+  <p class="lead">Really delete this URL?</p>
+  <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
+  <p class="lead">This action cannot be undone.</p>
 
-<form method="POST">
+  <form method="POST">
     {% csrf_token %}
     {% bootstrap_button "<i class='fas fa-times'></i> Delete" button_type="submit" button_class="btn-danger" %}
     {% if speaker_proposal %}
-        <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary">
+      <a href="{% url 'program:speaker_proposal_detail' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary">
     {% else %}
-        <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary">
+      <a href="{% url 'program:event_proposal_detail' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary">
     {% endif %}
     <i class='fas fa-undo'></i> Cancel</a>
-</form>
+  </form>
 {% endblock program_content %}
-

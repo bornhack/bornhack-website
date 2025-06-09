@@ -2,10 +2,9 @@
 {% load commonmark %}
 
 {% block title %}
-Event Feedback | {{ block.super }}
+  Event Feedback | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-{% include 'includes/event_feedback_detail_panel.html' with buttoninclude="includes/event_feedback_buttons.html"%}
+  {% include 'includes/event_feedback_detail_panel.html' with buttoninclude="includes/event_feedback_buttons.html"%}
 {% endblock program_content %}
-

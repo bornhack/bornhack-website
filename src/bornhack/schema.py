@@ -1,4 +1,8 @@
-from graphene import ObjectType, Schema, relay
+from __future__ import annotations
+
+from graphene import ObjectType
+from graphene import Schema
+from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
@@ -32,7 +36,7 @@ class CampNode(DjangoObjectType):
         return [self.teardown.lower, self.teardown.upper]
 
 
-class CampQuery(object):
+class CampQuery:
     camp = relay.Node.Field(CampNode)
     all_camps = DjangoFilterConnectionField(CampNode)
 

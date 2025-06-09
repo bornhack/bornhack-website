@@ -1,63 +1,62 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load tz %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">{% if form.instance.pk %}Update{% else %}Create new{% endif %} EventSession</h3>
-  </div>
-  <div class="panel-body">
-    <p class="lead">{% if form.instance.pk %}Update{% else %}Create new{% endif %} EventSession for Event Type <b>{{ event_type }}</b> at location <b>{{ event_location.name }}</b>.</p>
-    <form method="POST">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{% if form.instance.pk %}Update{% else %}Create new{% endif %} EventSession</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">{% if form.instance.pk %}Update{% else %}Create new{% endif %} EventSession for Event Type <b>{{ event_type }}</b> at location <b>{{ event_location.name }}</b>.</p>
+      <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
         {% get_current_timezone as TIME_ZONE %}
         <div class="alert alert-info">Note: Input will be interpreted as being in time zone {{ TIME_ZONE }}.</div>
         <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
-        <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
+        <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-</div>
-{% if sessions %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h4 class="panel-title">We have {{ sessions.count }} existing EventSessions for EventType <b>{{ event_type }}</b> at location <b>{{ event_location.name }}</b>:</h4>
-  </div>
-  <div class="panel-body">
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>id</th>
-          <th>Session Start</th>
-          <th>Session End</th>
-          <th>Session Length</th>
-          <th>Events</th>
-          <th>Free Time</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for session in sessions %}
-        <tr>
-          <td>{{ session.id }}</td>
-          <td>{{ session.when.lower }}</td>
-          <td>{{ session.when.upper }}</td>
-          <td>{{ session.duration }}</td>
-          <td>{{ session.event_count }}</td>
-          <td>{{ session.free_time }}</td>
-          <td>
-            <div class="btn-group-vertical">
-              <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary btn-xs"><i class="fas fa-search"></i> Details</a>
-              <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary btn-xs"><i class="fas fa-edit"></i> Update</a>
-              <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger btn-xs"><i class="fas fa-times"></i> Delete</a>
-            </div>
-          </td>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-{% endif %}
+  {% if sessions %}
+    <div class="card">
+      <div class="card-header">
+        <h4 class="card-title">We have {{ sessions.count }} existing EventSessions for EventType <b>{{ event_type }}</b> at location <b>{{ event_location.name }}</b>:</h4>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th>Session Start</th>
+              <th>Session End</th>
+              <th>Session Length</th>
+              <th>Events</th>
+              <th>Free Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for session in sessions %}
+              <tr>
+                <td>{{ session.id }}</td>
+                <td>{{ session.when.lower }}</td>
+                <td>{{ session.when.upper }}</td>
+                <td>{{ session.duration }}</td>
+                <td>{{ session.event_count }}</td>
+                <td>{{ session.free_time }}</td>
+                <td>
+                  <div class="btn-group-vertical">
+                    <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary btn-xs"><i class="fas fa-search"></i> Details</a>
+                    <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary btn-xs"><i class="fas fa-edit"></i> Update</a>
+                    <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger btn-xs"><i class="fas fa-times"></i> Delete</a>
+                  </div>
+                </td>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
 {% endblock content %}
-

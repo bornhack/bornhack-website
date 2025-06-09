@@ -1,36 +1,47 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if object %}Update{% else %}Create{% endif %} Expense | {{ block.super }}
+  {% if object %}Update{% else %}Create{% endif %} Expense | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>
-{% if object %}
-Update {{ camp.title }} Expense {{ object.uuid }} for {{ creditor.name }}
-{% else %}
-Create {{ camp.title }} Expense for {{ creditor.name }}
-{% endif %}
-</h3>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <b>Chain</b>
-  <p>{{ creditor.chain.name }}{% if not object %} <span class="small"><a href="{% url 'economy:chain_list' camp_slug=camp.slug %}">Change</a></span>{% endif %}</p>
-{% if creditor.chain.notes %}
-  <b>Chain Notes</b>
-  <p>{{ creditor.chain.notes }}</p>
-{% endif %}
-  <b>Creditor</b>
-  <p>{{ creditor.name }}{% if not object %} <span class="small"><a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=creditor.chain.slug %}">Change</a></span>{% endif %}</p>
-  <b>Creditor Address</b>
-  <address>{{ creditor.address }}</address>
-  {% if creditor.notes %}
-  <b>Creditor Notes</b>
-  <p>{{ creditor.notes }}</p>
-  {% endif %}
-  {% bootstrap_form form %}
-  <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Save</button>
-  <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <h3>
+    {% if object %}
+      Update {{ camp.title }} Expense {{ object.uuid }} for {{ creditor.name }}
+    {% else %}
+      Create {{ camp.title }} Expense for {{ creditor.name }}
+    {% endif %}
+  </h3>
+
+  <div class="alert alert-warning" role="alert">
+    <p><b>Note:</b> Please make sure to get the BornHack company info added on <b>ALL</b> invoices.</p>
+    <p>
+      <ul>
+        <li>Name: BornHack ApS</li>
+        <li>VAT: 37666521</li>
+      </ul>
+    </p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <b>Chain</b>
+    <p>{{ creditor.chain.name }}{% if not object %} <span class="small"><a href="{% url 'economy:chain_list' camp_slug=camp.slug %}">Change</a></span>{% endif %}</p>
+    {% if creditor.chain.notes %}
+      <b>Chain Notes</b>
+      <p>{{ creditor.chain.notes }}</p>
+    {% endif %}
+    <b>Creditor</b>
+    <p>{{ creditor.name }}{% if not object %} <span class="small"><a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=creditor.chain.slug %}">Change</a></span>{% endif %}</p>
+    <b>Creditor Address</b>
+    <address>{{ creditor.address }}</address>
+    {% if creditor.notes %}
+      <b>Creditor Notes</b>
+      <p>{{ creditor.notes }}</p>
+    {% endif %}
+    {% bootstrap_form form %}
+    <button class="btn btn-success" type="submit"><i class="fas fa-check"></i> Save</button>
+    <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
 {% endblock %}

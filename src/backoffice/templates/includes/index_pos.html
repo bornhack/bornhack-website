@@ -1,0 +1,23 @@
+{% if perms.camps.orga_team_member or is_team_pos %}
+  <h3>Point of Sale</h3>
+  <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Point of Sale Locations</h4>
+    <p class="list-group-item-text">Use this view to see a list of Pos objects, and to see and submit PosReports</p>
+  </a>
+  <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Point of Sale Products</h4>
+    <p class="list-group-item-text">Use this view to see a list of Pos products.</p>
+  </a>
+  <a href="{% url 'backoffice:posproductcost_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Point of Sale Product Costs</h4>
+    <p class="list-group-item-text">Use this view to see and update Pos Product Cost objects. They are used when calculating the profits for Pos sales.</p>
+  </a>
+  <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Point of Sale Transactions</h4>
+    <p class="list-group-item-text">Use this view to see a list of Pos transactions.</p>
+  </a>
+  <a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Point of Sale Sales</h4>
+    <p class="list-group-item-text">Use this view to see a list of Pos sales.</p>
+  </a>
+{% endif %}

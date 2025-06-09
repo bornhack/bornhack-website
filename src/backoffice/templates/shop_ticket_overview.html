@@ -1,47 +1,50 @@
 {% extends 'base.html' %}
+{% load bornhack %}
 {% load commonmark %}
 {% load static %}
 {% load imageutils %}
 
 {% block title %}
-Shop Tickets | {{ block.super }}
+  Shop Tickets | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h2>Shop Tickets</h2>
-</div>
-<br>
+  <div class="row">
+    <h2>Shop Tickets</h2>
+  </div>
+  <br>
 
-<span class="clearfix"></span>
-<hr class="clearfix"/>
+  <span class="clearfix"></span>
+  <hr class="clearfix"/>
 
-    <table class="table table-hover datatable">
-      <thead>
+  <table class="table table-hover datatable">
+    <thead>
       <tr>
-          <th>Ticket Type</th>
-          <th>Product</th>
-          <th>Order comment</th>
-          <th>User / Email</th>
-          <th>Used?</th>
-          <th>Payment method</th>
-          <th>Paid?</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for ticket in shop_tickets %}
-      <tr>
-        <td>{{ ticket.ticket_type.name }}</td>
-        <td>{{ ticket.product.name }}</td>
-        <td>{{ ticket.order.customer_comment|default:"None" }}</td>
-        <td>{{ ticket.order.user.profile.name }}
-         / {{ ticket.order.user.email }}</td>
-        <td>{{ ticket.used }}</td>
-        <td>{{ ticket.order.payment_method }}</td>
-        <td>{{ ticket.order.paid }}</td>
+        <th>Ticket Type</th>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Order comment</th>
+        <th>User / Email</th>
+        <th>Used?</th>
+        <th>Payment method</th>
+        <th>Paid?</th>
       </tr>
+    </thead>
+    <tbody>
+      {% for ticket in shop_tickets %}
+        <tr>
+          <td>{{ ticket.ticket_type.name }}</td>
+          <td>{{ ticket.product.name }}</td>
+          <td class="text-center">{{ ticket.opr.quantity }}</td>
+          <td>{{ ticket.order.customer_comment|default:"None" }}</td>
+          <td>{{ ticket.order.user.profile.name }}
+            / {{ ticket.order.user.email }}</td>
+          <td data-order="{{ ticket.used_at|sortable }}">{{ ticket.used_at|default:"N/A" }}</td>
+          <td>{{ ticket.order.payment_method }}</td>
+          <td>{{ ticket.order.paid }}</td>
+        </tr>
       {% endfor %}
-      </tbody>
-    </table>
-</div>
+    </tbody>
+  </table>
+  </div>
 {% endblock content %}

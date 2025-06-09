@@ -3,88 +3,88 @@
 {% load program %}
 
 {% block content %}
-<p><a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a></p>
-<div class="panel panel-default">
-  <div class="panel-heading"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
-  <div class="panel-body">
-    {{ speaker_proposal.biography|untrustedcommonmark }}
+  <p><a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a></p>
+  <div class="card">
+    <div class="card-header"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
+    <div class="card-body">
+      {{ speaker_proposal.biography|untrustedcommonmark }}
 
-    <hr>
+      <hr>
 
-    <h4>Details for <i>{{ speaker_proposal.name }}</i></h4>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th>UUID</th>
-          <td>{{ speaker_proposal.uuid }}</td>
-        </tr>
-        <tr>
-          <th>Status</th>
-          <td>{{ speaker_proposal.proposal_status }}</td>
-        </tr>
-        <tr>
-          <th>Speaker Object</th>
-          <td>
-            {% if speaker_proposal.speaker %}
-            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-default"><i class="fas fa-user"></i> Show</a>
-            {% else %}
-            N/A
-            {% endif %}
-          </td>
-        </tr>
-        <tr>
-          <th>Username</th>
-          <td>{{ speaker_proposal.user }}</td>
-        </tr>
-        <tr>
-          <th>Submission Notes</th>
-          <td>{{ speaker_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
-        </tr>
-      </tbody>
-    </table>
+      <h4>Details for <i>{{ speaker_proposal.name }}</i></h4>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>UUID</th>
+            <td>{{ speaker_proposal.uuid }}</td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>{{ speaker_proposal.proposal_status }}</td>
+          </tr>
+          <tr>
+            <th>Speaker Object</th>
+            <td>
+              {% if speaker_proposal.speaker %}
+                <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker_proposal.speaker.slug %}" class="btn btn-secondary"><i class="fas fa-user"></i> Show</a>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th>Username</th>
+            <td>{{ speaker_proposal.user }}</td>
+          </tr>
+          <tr>
+            <th>Submission Notes</th>
+            <td>{{ speaker_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
+          </tr>
+        </tbody>
+      </table>
 
-    <hr>
+      <hr>
 
-    <h4>Availability for <i>{{ speaker_proposal.name }}</i></h4>
-    {% availabilitytable matrix=matrix %}
+      <h4>Availability for <i>{{ speaker_proposal.name }}</i></h4>
+      {% availabilitytable matrix=matrix %}
 
-    <hr>
+      <hr>
 
-    <h4>URLs for <i>{{ speaker_proposal.name }}</i></h4>
+      <h4>URLs for <i>{{ speaker_proposal.name }}</i></h4>
       {% if speaker_proposal.urls.exists %}
         {% include 'includes/speaker_proposal_url_table.html' %}
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>EventProposals involving <i>{{ speaker_proposal.name }}</i></h4>
-    {% if speaker_proposal.event_proposals.exists %}
-      {% include 'includes/event_proposal_list_table_backoffice.html' with event_proposal_list=speaker_proposal.event_proposals.all nodatatable=True %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
+      <h4>EventProposals involving <i>{{ speaker_proposal.name }}</i></h4>
+      {% if speaker_proposal.event_proposals.exists %}
+        {% include 'includes/event_proposal_list_table_backoffice.html' with event_proposal_list=speaker_proposal.event_proposals.all nodatatable=True %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>Event Conflicts for <i>{{ speaker_proposal.name }}</i></h4>
-    {% if speaker_proposal.event_conflicts.exists %}
-      {% include 'includes/event_list_table_backoffice.html' with event_list=speaker_proposal.event_conflicts.all nodatatable=True nopeople=True noactions=True noschedule=True %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
+      <h4>Event Conflicts for <i>{{ speaker_proposal.name }}</i></h4>
+      {% if speaker_proposal.event_conflicts.exists %}
+        {% include 'includes/event_list_table_backoffice.html' with event_list=speaker_proposal.event_conflicts.all nodatatable=True nopeople=True noactions=True noschedule=True %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
 
+    </div>
+    <div class="card-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
   </div>
-  <div class="panel-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
-</div>
 
-<p>
-{% if speaker_proposal.proposal_status == "pending" %}
-<a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve SpeakerProposal</a>
-<a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject SpeakerProposal</a>
-{% endif %}
-<a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a>
-</p>
+  <p>
+    {% if speaker_proposal.proposal_status == "pending" %}
+      <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve SpeakerProposal</a>
+      <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject SpeakerProposal</a>
+    {% endif %}
+    <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to SpeakerProposal List</a>
+  </p>
 
 {% endblock content %}

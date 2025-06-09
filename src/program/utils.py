@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import logging
 from collections import OrderedDict
@@ -10,12 +12,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from psycopg2.extras import DateTimeTZRange
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def get_daychunks(day):
-    """
-    Given a DateTimeTZRange day returns a list of "daychunks" which are
+    """Given a DateTimeTZRange day returns a list of "daychunks" which are
     DateTimeTZRanges of length settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS
     starting from day.lower. If day.lower is midnight and day.upper is 10 AM and
     settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=2 then a list of 5 daychunks
@@ -33,15 +34,18 @@ def get_daychunks(day):
         # increase our counter
         i += 1
         daychunk = DateTimeTZRange(
-            day.lower
-            + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
-            day.lower
-            + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
         )
 
     # cap the final chunk to be equal to the end of the day
-    if daychunk.upper > day.upper:
-        daychunk.upper = day.upper
+    daychunk = DateTimeTZRange(
+        day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * i),
+        min(
+            day.lower + timedelta(hours=settings.SPEAKER_AVAILABILITY_DAYCHUNK_HOURS * (i + 1)),
+            day.upper,
+        ),
+    )
 
     # append the final chunk and return
     chunks.append(daychunk)
@@ -49,8 +53,7 @@ def get_daychunks(day):
 
 
 def get_speaker_availability_form_matrix(sessions):
-    """
-    Create a speaker availability matrix of columns, rows and checkboxes for the HTML form.
+    """Create a speaker availability matrix of columns, rows and checkboxes for the HTML form.
 
     Returns a "matrix" - a dict of dicts, where the outer dict keys are DateTimeTZRanges
     representing a full camp "day" (as returned by camp.get_days("camp")), and the
@@ -85,10 +88,10 @@ def get_speaker_availability_form_matrix(sessions):
             # skip this chunk if we found no sessions
             if event_types:
                 # build the dict for this daychunk
-                matrix[day][daychunk] = dict()
-                matrix[day][daychunk][
-                    "fieldname"
-                ] = f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
+                matrix[day][daychunk] = {}
+                matrix[day][daychunk]["fieldname"] = (
+                    f"availability_{daychunk.lower.strftime('%Y_%m_%d_%H_%M')}_to_{daychunk.upper.strftime('%Y_%m_%d_%H_%M')}"
+                )
                 matrix[day][daychunk]["event_types"] = []
                 # pass a list of dicts instead of the queryset to avoid one million lookups
                 for et in event_types:
@@ -97,7 +100,7 @@ def get_speaker_availability_form_matrix(sessions):
                             "name": et.name,
                             "icon": et.icon,
                             "color": et.color,
-                        }
+                        },
                     )
                 matrix[day][daychunk]["initial"] = None
             else:
@@ -108,8 +111,8 @@ def get_speaker_availability_form_matrix(sessions):
     # where none of the chunks need a checkbox. Loop over and remove any days with
     # 0 checkboxes before returning
     new_matrix = matrix.copy()
-    for date in matrix.keys():
-        for chunk in matrix[date].keys():
+    for date in matrix:
+        for chunk in matrix[date]:
             if matrix[date][chunk]:
                 # we have at least one checkbox on this date, keep it
                 break
@@ -120,9 +123,8 @@ def get_speaker_availability_form_matrix(sessions):
     return new_matrix
 
 
-def save_speaker_availability(form, obj):
-    """
-    Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
+def save_speaker_availability(form, obj) -> None:
+    """Called from SpeakerProposalCreateView, SpeakerProposalUpdateView,
     and CombinedProposalSubmitView to create SpeakerProposalAvailability
     objects based on the submitted form.
     Also called from SpeakerUpdateView in backoffice to update
@@ -146,7 +148,7 @@ def save_speaker_availability(form, obj):
 
     # count availability form fields
     fieldcounter = 0
-    for field in form.cleaned_data.keys():
+    for field in form.cleaned_data:
         if field[:13] == "availability_":
             fieldcounter += 1
 
@@ -170,7 +172,7 @@ def save_speaker_availability(form, obj):
                     int(elements[3]),
                     int(elements[4]),
                     int(elements[5]),
-                )
+                ),
             ),
             tz.localize(
                 datetime.datetime(
@@ -179,7 +181,7 @@ def save_speaker_availability(form, obj):
                     int(elements[9]),
                     int(elements[10]),
                     int(elements[11]),
-                )
+                ),
             ),
         )
         available = form.cleaned_data[field]
@@ -187,7 +189,9 @@ def save_speaker_availability(form, obj):
         if fieldcounter == 1:
             # we only have one field in the form, no field merging to be done
             AvailabilityModel.objects.create(
-                when=daychunk, available=available, **kwargs
+                when=daychunk,
+                available=available,
+                **kwargs,
             )
             continue
 
@@ -220,29 +224,30 @@ def save_speaker_availability(form, obj):
     # save the last chunk?
     if formerchunk:
         AvailabilityModel.objects.create(
-            when=formerchunk, available=available, **kwargs
+            when=formerchunk,
+            available=available,
+            **kwargs,
         )
 
 
-def add_existing_availability_to_matrix(matrix, speaker_proposal):
-    """
-    Loops over the matrix and adds an "intial" member to the daychunk dicts
+def add_existing_availability_to_matrix(matrix, speaker_proposal) -> None:
+    """Loops over the matrix and adds an "intial" member to the daychunk dicts
     with the availability info for the speaker_proposal.
     This is used to populate initial form field values and to set <td> background
     colours in the html table.
     speaker_proposal can be either a SpeakerProposal object or a Speaker object.
     """
     # loop over dates in the matrix
-    for date in matrix.keys():
+    for date in matrix:
         # loop over daychunks and check if we need a checkbox
-        for daychunk in matrix[date].keys():
+        for daychunk in matrix[date]:
             if not matrix[date][daychunk]:
                 # we have no event_session here, carry on
                 continue
             # do we have any availability info for this speakerproposal?
             try:
                 availability = speaker_proposal.availabilities.get(
-                    when__contains=daychunk
+                    when__contains=daychunk,
                 )
                 matrix[date][daychunk]["initial"] = availability.available
             except ObjectDoesNotExist:
@@ -250,9 +255,7 @@ def add_existing_availability_to_matrix(matrix, speaker_proposal):
 
 
 def get_slots(period, duration, bounds="()"):
-    """
-    Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them
-    """
+    """Cuts a DateTimeTZRange into slices of duration minutes length and returns a list of them."""
     slots = []
     if period.upper - period.lower < timedelta(minutes=duration):
         # this period is shorter than the duration, no slots
@@ -260,7 +263,9 @@ def get_slots(period, duration, bounds="()"):
 
     # create the first slot
     slot = DateTimeTZRange(
-        period.lower, period.lower + timedelta(minutes=duration), bounds=bounds
+        period.lower,
+        period.lower + timedelta(minutes=duration),
+        bounds=bounds,
     )
 
     # loop until we pass the end
@@ -268,7 +273,9 @@ def get_slots(period, duration, bounds="()"):
         slots.append(slot)
         # the next slot starts when this one ends
         slot = DateTimeTZRange(
-            slot.upper, slot.upper + timedelta(minutes=duration), bounds=bounds
+            slot.upper,
+            slot.upper + timedelta(minutes=duration),
+            bounds=bounds,
         )
 
     # append the final slot to the list unless it continues past the end
@@ -284,7 +291,8 @@ def get_tzrange_days(tzranges):
     for tzrange in tzranges:
         # convert this range to local timezone
         localrange = DateTimeTZRange(
-            timezone.localtime(tzrange.lower), timezone.localtime(tzrange.upper)
+            timezone.localtime(tzrange.lower),
+            timezone.localtime(tzrange.upper),
         )
         # find the first date in this range
         day = DateTimeTZRange(

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete Layer {{ layer.name }}?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">This layer has <b>{{ layer.features.count }}</b> features which will also be deleted.</p>
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
+        <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

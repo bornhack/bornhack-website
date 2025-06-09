@@ -1,51 +1,50 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load bornhack %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Select EventSlot for <i>{{ event.title }}</i></h3>
-  </div>
-  <div class="panel-body">
-    <p>The following EventSlots are available and suitable for scheduling <i>{{ event.title }}</i></p>
-    <p>This event has a duration <b>{{ event.duration }}</b> hours.</p>
-    <p>This event has a demand of <b>{{ event.demand }} people</b>.</p>
-    <form method="POST">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Select EventSlot for <i>{{ event.title }}</i></h3>
+    </div>
+    <div class="card-body">
+      <p>The following EventSlots are available and suitable for scheduling <i>{{ event.title }}</i></p>
+      <p>This event has a duration <b>{{ event.duration }}</b> hours.</p>
+      <p>This event has a demand of <b>{{ event.demand }} people</b>.</p>
+      <form method="POST">
         {% csrf_token %}
         {% if event_slots %}
-        <table class="table table-hover datatable">
-          <thead>
-            <tr>
-              <th>Pick</th>
-              <th>Start</th>
-              <th>End</th>
-              <th>Duration</th>
-              <th>Location</th>
-              <th class="text-center">Capacity</th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for slot in event_slots %}
-            <tr>
-              <td><input id="id_slot_{{ slot.index }}" name="slot" value="{{ slot.index }}" type="radio" required></td>
-              <td>{{ slot.slot.when.lower }}</td>
-              <td>{{ slot.slot.when.upper }}</td>
-              <td><i class="fas fa-{{ slot.slot.event_session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.slot.event_location.slug %}">{{ slot.slot.event_session.event_location.name }}</a></td>
-              <td>{{ slot.slot.duration }}</td>
-              <td class="text-center{% if event.demand > slot.slot.event_session.event_location.capacity %} danger{% endif %}"><span class="badge">{{ slot.slot.event_session.event_location.capacity }}</span></td>
-            </tr>
-        {% endfor %}
-          </tbody>
-        </table>
-        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Schedule Event</button>
+          <table class="table table-hover datatable">
+            <thead>
+              <tr>
+                <th>Pick</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Duration</th>
+                <th>Location</th>
+                <th class="text-center">Capacity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for slot in event_slots %}
+                <tr>
+                  <td><input id="id_slot_{{ slot.index }}" name="slot" value="{{ slot.index }}" type="radio" required></td>
+                  <td>{{ slot.slot.when.lower }}</td>
+                  <td>{{ slot.slot.when.upper }}</td>
+                  <td><i class="fas fa-{{ slot.slot.event_session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=slot.slot.event_location.slug %}">{{ slot.slot.event_session.event_location.name }}</a></td>
+                  <td>{{ slot.slot.duration }}</td>
+                  <td class="text-center{% if event.demand > slot.slot.event_session.event_location.capacity %} danger{% endif %}"><span class="badge">{{ slot.slot.event_session.event_location.capacity }}</span></td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Schedule Event</button>
         {% else %}
-        <p class="lead">No available slots found</p>
+          <p class="lead">No available slots found</p>
         {% endif %}
-        <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
+        <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-</div>
 {% endblock content %}
-

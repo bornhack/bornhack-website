@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
+
+{% block title %}
+  Order #{{ order.pk }} | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">Order #{{ order.pk }} | BackOffice</div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>User</th>
+          <td>{{ order.user }}</td>
+        </tr>
+        <tr>
+          <th>Created</th>
+          <td>{{ order.created }}</td>
+        </tr>
+        <tr>
+          <th>Updated</th>
+          <td>{{ order.updated }}</td>
+        </tr>
+        <tr>
+          <th>Payment Method</th>
+          <td>{{ order.payment_method }}</td>
+        </tr>
+        <tr>
+          <th>Paid</th>
+          <td>{{ order.paid|truefalseicon }}</td>
+        </tr>
+        <tr>
+          <th>Cancelled</th>
+          <td>{{ order.cancelled|truefalseicon }}</td>
+        </tr>
+        <tr>
+          <th>Refunded</th>
+          <td>{{ order.refunded }}</td>
+        </tr>
+        <tr>
+          <th>Customer Comment</th>
+          <td>{{ order.customer_comment|default:"N/A" }}</td>
+        </tr>
+        <tr>
+          <th>Invoice Address</th>
+          <td>{{ order.get_invoice_address }}</td>
+        </tr>
+        <tr>
+          <th>Internal Notes</th>
+          <td>{{ order.notes|default:"N/A" }}</td>
+        </tr>
+        <tr>
+          <th>Proforma Invoice</th>
+          <td><a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary">Download Proforma Invoice</a></td>
+        </tr>
+        <tr>
+          <th>Invoice</th>
+          <td>{% if order.invoice.pdf %}<a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.pk %}" class="btn btn-primary">Download Invoice #{{ order.invoice.pk }}</a>{% else %}N/A{% endif %}</td>
+        </tr>
+        <tr>
+          <th>Products</th>
+          <td>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                  <th>Used</th>
+                  <th>Refunded</th>
+                  <th>Available</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for opr in order.oprs.all %}
+                  <tr>
+                    <td>{{ opr.product.name }}</td>
+                    <td>{{ opr.quantity }}</td>
+                    <td>{{ opr.product.price|currency }}</td>
+                    <td>{{ opr.total|currency }}</td>
+                    <td>{{ opr.used_shoptickets.count }}</td>
+                    <td>{{ opr.refunded_quantity }}</td>
+                    <td>{{ opr.unused_shoptickets.count }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <a href="{% url 'backoffice:order_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Order List</a>
+{% endblock content %}

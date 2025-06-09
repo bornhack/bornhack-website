@@ -1,52 +1,52 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Select Chain | {{ block.super }}
+  Select Chain | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Chains - BackOffice</h3></div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Chains - BackOffice</h3></div>
+    <div class="card-body">
       <p class="lead">Showing {{ chain_list.count }} chains. Not all chains have expenses or revenues for {{ camp.title }}.</p>
-    <p><a class="btn btn-default" href="{% url "backoffice:index" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Backoffice Index</a></p>
+      <p><a class="btn btn-secondary" href="{% url "backoffice:index" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Backoffice Index</a></p>
 
-    {% if chain_list %}
-    <table class="table table-hover datatable">
-      <thead>
-        <tr>
-          <th>Chain Name</th>
-          <th>Notes</th>
-          <th class="text-center">Credebtors</th>
-          <th class="text-center">Expenses</th>
-          <th class="text-center">Expenses Total</th>
-          <th class="text-center">Revenues</th>
-          <th class="text-center">Revenues Total</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for chain in chain_list %}
-        <tr>
-          <td>{{ chain.name }}</td>
-          <td>{{ chain.notes|default:"N/A" }}</td>
-          <td class="text-center"><span class="badge">{{ chain.credebtors.count }}</span></td>
-          <td class="text-center"><span class="badge">{{ chain.camp_expenses_count }}</span></td>
-          <td class="text-center">{{ chain.camp_expenses_amount|default:"0" }} DKK</td>
-          <td class="text-center"><span class="badge">{{ chain.camp_revenues_count }}</span></td>
-          <td class="text-center">{{ chain.camp_revenues_amount|default:"0" }} DKK</td>
-          <td>
-            <a class="btn btn-primary" href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}"><i class="fas fa-search"></i> Details</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <p class="lead"><i>No Chains found.</i></p>
-    {% endif %}
+      {% if chain_list %}
+        <table class="table table-hover datatable">
+          <thead>
+            <tr>
+              <th>Chain Name</th>
+              <th>Notes</th>
+              <th class="text-center">Credebtors</th>
+              <th class="text-center">Expenses</th>
+              <th class="text-center">Expenses Total</th>
+              <th class="text-center">Revenues</th>
+              <th class="text-center">Revenues Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for chain in chain_list %}
+              <tr>
+                <td>{{ chain.name }}</td>
+                <td>{{ chain.notes|default:"N/A" }}</td>
+                <td class="text-center"><span class="badge">{{ chain.credebtors.count }}</span></td>
+                <td class="text-center"><span class="badge">{{ chain.camp_expenses_count }}</span></td>
+                <td class="text-center">{{ chain.camp_expenses_amount|default:"0" }} DKK</td>
+                <td class="text-center"><span class="badge">{{ chain.camp_revenues_count }}</span></td>
+                <td class="text-center">{{ chain.camp_revenues_amount|default:"0" }} DKK</td>
+                <td>
+                  <a class="btn btn-primary" href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=chain.slug %}"><i class="fas fa-search"></i> Details</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="lead"><i>No Chains found.</i></p>
+      {% endif %}
+    </div>
   </div>
-</div>
 {% endblock %}

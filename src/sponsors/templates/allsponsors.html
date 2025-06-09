@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load commonmark %}
+
+{% block title %}
+  All Sponsors | {{ block.super }}
+{% endblock %}
+
+
+{% block content %}
+
+  {% if sponsors %}
+
+    <h2>BornHack Sponsors</h2>
+
+    <p class="lead">
+      This page lists all BornHack sponsors since the beginning in 2016. An event like BornHack
+      can not be built on hard work and good intentions alone - it would simply not
+      have been possible without the financial help from these organisations. Thank
+      you, we are immensely grateful!
+    </p>
+
+  {% endif %}
+
+  {% for sponsor in sponsors %}
+
+    <div class="text-center" style="margin-bottom: 0.2em;">{% for year in sponsor.years %}<span class="badge badge-info">{{ year }}</span>{% endfor %}</div>
+    <p class="lead">
+      {% if sponsor.url %}
+        <a href="{{ sponsor.url }}">
+      {% endif %}
+      <img class="img-responsive center-block bornhack-sponsor-white" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300" />
+      {% if sponsor.url %}
+        </a>
+      {% endif %}
+    </p>
+    <br>
+  {% endfor %}
+
+{% endblock %}

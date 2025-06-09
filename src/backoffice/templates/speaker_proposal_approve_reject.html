@@ -1,21 +1,20 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Approve or Reject SpeakerProposal: {{ speaker_proposal.name }}</h3>
-  </div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Approve or Reject SpeakerProposal: {{ speaker_proposal.name }}</h3>
+    </div>
+    <div class="card-body">
       <p>{{ speaker_proposal.name }} will receive an email when the proposal is approved or rejected. It is possible to include an extra message in the form below explaining why the proposal was accepted or rejected. If the field is left blank a standard email is sent.</p>
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      <button type="submit" class="btn btn-success" name="approve"><i class='fas fa-check'></i> Approve Proposal</button>
-      <button type="reject" class="btn btn-danger" name="reject"><i class='fas fa-times'></i> Reject Proposal</button>
-      <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success" name="approve"><i class='fas fa-check'></i> Approve Proposal</button>
+        <button type="reject" class="btn btn-danger" name="reject"><i class='fas fa-times'></i> Reject Proposal</button>
+        <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-</div>
 {% endblock content %}
-

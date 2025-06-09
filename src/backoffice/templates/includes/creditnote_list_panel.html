@@ -1,0 +1,35 @@
+{% load bornhack %}
+{% if creditnote_list %}
+  <table class="table table-hover datatable">
+    <thead>
+      <tr>
+        <th>CreditNote #</th>
+        <th>Customer</th>
+        <th>CreditNote Date</th>
+        <th>Amount</th>
+        <th>Refund</th>
+        <th>Text</th>
+        <th>Paid</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for cn in creditnote_list %}
+        <tr>
+          <td>{{ cn.id }}</td>
+          <td>{% if cn.user %}{{ cn.user }} &lt;{{ cn.user.email }}&gt;{% else %}{{ cn.customer }}{% endif %}</td>
+          <td data-order="{{ cn.created|sortable }}">{{ cn.created|date }}</td>
+          <td data-order="{{ cn.amount }}">{{ cn.amount }}&nbsp;DKK</td>
+          <td>{% if cn.refund %}<a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=cn.refund.id %}">{{ cn.refund }}</a>{% else %}N/A{% endif %}</td>
+          <td>{{ cn.text|default:"N/A" }}</td>
+          <td>{{ cn.paid|truefalseicon }} {% if cn.paid %}paid{% else %}unpaid{% endif %}</td>
+          <td>
+            {% if cn.pdf %}<a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=cn.pk %}" class="btn btn-primary"><i class="fas fa-file-pdf"></i> Download</a>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <h4>No creditnotes found.</h4>
+{% endif %}

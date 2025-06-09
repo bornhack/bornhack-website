@@ -1,51 +1,50 @@
-<div class="panel panel-default">
-    <div class="panel-heading">Revenue Details for {{ revenue.pk }}</div>
-    <div class="panel-body">
-        <table class="table">
-            <tr>
-              <th>Created By</th>
-              <td>{{ revenue.user }}</td>
-            </tr>
-            <tr>
-              <th>Amount</th>
-              <td>{{ revenue.amount }} DKK</td>
-            </tr>
-            <tr>
-              <th>Chain</th>
-              <td>{{ revenue.debtor.chain.name }}</td>
-            </tr>
-            <tr>
-              <th>Creditor</th>
-              <td>{{ revenue.debtor.name }}</td>
-            </tr>
-            <tr>
-              <th>Invoice Date</th>
-              <td>{{ revenue.invoice_date }}</td>
-            </tr>
-            <tr>
-              <th>Description</th>
-              <td>{{ revenue.description }}</td>
-            </tr>
-            <tr>
-              <th>Filename</th>
-              <td>{{ revenue.invoice }}</td>
-            </tr>
-            <tr>
-              <th>Approved?</th>
-              <td>{{ revenue.approval_status }}</td>
-            </tr>
-            <tr>
-              <th>Invoice</th>
-              <td>
-                  <a href="{% url 'economy:revenue_invoice' camp_slug=camp.slug pk=revenue.pk %}"><img src="{% url 'economy:revenue_invoice' camp_slug=camp.slug pk=revenue.pk %}?preview" height=200></a><br>
-                  Filename: {{ revenue.invoice_filename }}
-              </td>
-            </tr>
-            <tr>
-              <th>Economy Team Notes</th>
-              <td>{{ revenue.notes|default:"N/A" }}</td>
-            </tr>
-        </table>
-    </div>
+<div class="card">
+  <div class="card-header">Revenue Details for {{ revenue.pk }}</div>
+  <div class="card-body">
+    <table class="table">
+      <tr>
+        <th>Created By</th>
+        <td>{{ revenue.user }}</td>
+      </tr>
+      <tr>
+        <th>Amount</th>
+        <td>{{ revenue.amount }} DKK</td>
+      </tr>
+      <tr>
+        <th>Chain</th>
+        <td>{{ revenue.debtor.chain.name }}</td>
+      </tr>
+      <tr>
+        <th>Creditor</th>
+        <td>{{ revenue.debtor.name }}</td>
+      </tr>
+      <tr>
+        <th>Invoice Date</th>
+        <td>{{ revenue.invoice_date }}</td>
+      </tr>
+      <tr>
+        <th>Description</th>
+        <td>{{ revenue.description }}</td>
+      </tr>
+      <tr>
+        <th>Filename</th>
+        <td>{{ revenue.invoice }}</td>
+      </tr>
+      <tr>
+        <th>Approved?</th>
+        <td>{{ revenue.approval_status }}</td>
+      </tr>
+      <tr>
+        <th>Invoice</th>
+        <td>
+          <a href="{% url 'economy:revenue_invoice' camp_slug=camp.slug pk=revenue.pk %}"><img src="{% url 'economy:revenue_invoice' camp_slug=camp.slug pk=revenue.pk %}?preview" height=200></a><br>
+          Filename: {{ revenue.invoice_filename }}
+        </td>
+      </tr>
+      <tr>
+        <th>Economy Team Notes</th>
+        <td>{{ revenue.notes|default:"N/A" }}</td>
+      </tr>
+    </table>
+  </div>
 </div>
-

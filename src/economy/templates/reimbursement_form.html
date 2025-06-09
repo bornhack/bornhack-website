@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  {{ verb }} Reimbursement | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h3>{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
+  <div class="card">
+    <h3 class="card-header">This reimbursement covers the following approved expenses:</h3>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Invoice</th>
+            <th>Responsible Team</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for expense in expenses %}
+            <tr>
+              <td>{{ expense.description }}</td>
+              <td>{{ expense.amount }}</td>
+              <td>{{ expense.invoice }}</td>
+              <td>{{ expense.responsible_team }} Team</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <p class="lead">The total amount for this reimbursement will be <b>{{ total_amount.amount__sum }} DKK</b></p>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    {% bootstrap_button "<i class='fas fa-check'></i> "|add:verb button_type="submit" button_class="btn-success" name="submit" %}
+    <a href="{{ cancelurl }}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
+{% endblock content %}

@@ -1,67 +1,96 @@
 {% extends 'profile_base.html' %}
 
 {% block title %}
-Your information | {{ block.super }}
+  Your information | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
-{% if not profile.description %}
-<div class="alert alert-danger">
-  <h4><strong>Attention!</strong></h4>
-  <p>
-    You have not written anything in your "description".
-  </p>
-  <p>
-    If you intend to join one or more teams you can use the profile to help the team responsible understand who you are and what you have to offer. Please also include availability if you are not joining us for the entire week.
-  </p>
-</div>
-{% endif %}
+  {% if not profile.description %}
+    <div class="alert alert-danger">
+      <h4><strong>Attention!</strong></h4>
+      <p>
+        You have not written anything in your "description".
+      </p>
+      <p>
+        If you intend to join one or more teams you can use the profile to help the team leads understand who you are and what you have to offer. Please also include availability if you are not joining us for the entire week.
+      </p>
+    </div>
+  {% endif %}
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <a href="{% url 'profiles:update' %}" class="btn btn-primary pull-right clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
-    <h4>Your information</h4>
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4>Your information</h4>
+      <a href="{% url 'profiles:update' %}" class="btn btn-primary btn-xs clearfix"><i class="fas fa-edit"></i> Edit Profile</a>
+    </div>
+    <div class="card-body">
+
+      <table class="table table-striped">
+        <tr>
+          <td width="30%">
+            <b>Name</b><br />
+            <small>Not visible to the public.</small></td>
+          <td width="70%">
+            {{ profile.name|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Description</b><br />
+            <small>Not visible to the public.</small>
+          </td>
+          <td>{{ profile.description|default:"N/A" }}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Public Credit Name</b><br />
+            <small>Visible to the public, leave empty if you want no credits on this website.</small>
+          </td>
+          <td>
+            {{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Phone Number</b><br />
+            <small>Not visible to the public. You can choose to make this accessible to external sites using BornHack as IDP.</small>
+          </td>
+          <td>
+            {{ profile.phonenumber|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>NickServ username</b><br />
+            <small>Visible to the public on IRC, used to handle team channel ACLs.</small>
+          </td>
+          <td>
+            {{ profile.nickserv_username|default:"N/A" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>Theme</b><br />
+            <small>Theme used on the website.</small>
+          </td>
+          <td>
+            {{ profile.get_theme_display|default:"Auto" }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <b>OIDC Preferred Username</b><br />
+            <small>When using BornHack as an IDP this value is available to remote sites with the <code>profile</code> scope. Set this to the username you prefer to use on the remote sites where you login with your BornHack account.</small>
+          </td>
+          <td>
+            {{ profile.preferred_username|default:"N/A" }}
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
-  <div class="panel-body">
-
-    <table class="table table-striped">
-      <tr>
-        <td width="30%">
-          <b>Name</b><br />
-          <small>Not visible to the public.</small></td>
-        <td width="70%">
-          {{ profile.name|default:"N/A" }}
-        </td>
-      </tr>
-
-      <tr>
-        <td>
-          <b>Description</b><br />
-          <small>Not visible to the public.</small>
-        </td>
-        <td>{{ profile.description|default:"N/A" }}</td>
-      </tr>
-
-      <tr>
-        <td>
-          <b>Public Credit Name</b><br />
-          <small>Visible to the public, leave empty if you want no credits on this website.</small>
-        </td>
-        <td>
-          {{ profile.public_credit_name|default:"N/A" }} {% if profile.public_credit_name %}({% if profile.public_credit_name_approved %}<span class="text-success">approved</span>{% else %}<span class="text-danger">pending approval</span>{% endif %}){% endif %}</td>
-      </tr>
-
-      <tr>
-        <td>
-          <b>NickServ username</b><br />
-          <small>Visible to the public on IRC, used to handle team channel ACLs.</small>
-        </td>
-        <td>
-          {{ profile.nickserv_username|default:"N/A" }}
-        </td>
-      </tr>
-
-    </table>
-  </div>
-</div>
 {% endblock profile_content %}

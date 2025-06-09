@@ -3,50 +3,54 @@
 {% load static %}
 
 {% block title %}
-Facility Types | BackOffice | {{ block.super }}
+  Facility Types | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Facility Types - BackOffice</h3>
-  </div>
-  <div class="panel-body">
-    <p class="lead">The following {{ facility_type_list.count }} facility types are defined for {{ camp.title }}</p>
-    <p>
-      <a href="{% url 'backoffice:facility_type_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Facility Type</a>
-      <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-    </p>
-    <table class="table datatable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Team</th>
-          <th class="text-center">Icon</th>
-          <th class="text-center">Marker</th>
-          <th class="text-center">QuickFeedbacks</th>
-          <th class="text-center">Facilities</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for ft in facility_type_list %}
-      <tr>
-        <td>{{ ft.name }}</td>
-        <td>{{ ft.description|default:"N/A" }}</td>
-        <td>{{ ft.responsible_team.name }} Team</td>
-        <td class="text-center"><i class="fas fa-{{ ft.icon }} fa-2x fa-fw"></i></td>
-        <td class="text-center"><img src="{% static 'img/leaflet/marker-icon-'|add:ft.marker|slice:"-4"|add:'.png' %}"></td>
-        <td class="text-center"><span class="badge">{{ ft.quickfeedback_options.count }}</span></td>
-        <td class="text-center"><span class="badge">{{ ft.facilities.count }}</span></td>
-        <td>
-          <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-          <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-  </div>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Facility Types - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">The following {{ facility_type_list.count }} facility types are defined for {{ camp.title }}</p>
+      <p>
+        <a href="{% url 'backoffice:facility_type_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Facility Type</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+      <table class="table datatable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Team</th>
+            <th class="text-center">Icon</th>
+            <th class="text-center">Marker</th>
+            <th class="text-center">QuickFeedbacks</th>
+            <th class="text-center">Facilities</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ft in facility_type_list %}
+            <tr>
+              <td>{{ ft.name }}</td>
+              <td>{{ ft.description|default:"N/A" }}</td>
+              <td>{{ ft.responsible_team.name }} Team</td>
+              <td class="text-center"><i class="fas fa-{{ ft.icon }} fa-2x fa-fw"></i></td>
+              <td class="text-center"><img src="{% static 'img/leaflet/marker-icon-'|add:ft.marker|slice:"-4"|add:'.png' %}"></td>
+              <td class="text-center"><span class="badge">{{ ft.quickfeedback_options.count }}</span></td>
+              <td class="text-center"><span class="badge">{{ ft.facilities.count }}</span></td>
+              <td>
+                <div class="btn-group" role="group" aria-label="Controls">
+                  <a href="{% url "backoffice:facility_type_import" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-success"><i class="fas fa-file-import"></i> Import</a>
+                  <a href="{% url "facilities:facility_list_geojson" camp_slug=camp.slug facility_type_slug=ft.slug %}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-file-export"></i> Export</a>
+                  <a href="{% url "backoffice:facility_type_update" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:facility_type_delete" camp_slug=camp.slug slug=ft.slug %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
 {% endblock %}

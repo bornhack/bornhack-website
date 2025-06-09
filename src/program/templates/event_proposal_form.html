@@ -1,21 +1,23 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block title %}
-{% if speaker %}Submit new {{ event_type.name }} by {{ speaker.name }}{% else %}{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} {{ event_type.name }}{% endif %} | {{ block.super }}
+  {% if speaker %}Submit new {{ event_type.name }} by {{ speaker.name }}{% else %}{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} {{ event_type.name }}{% endif %} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-{% if speaker %}
-<h3>Submit new {{ event_type.name }} by {{ speaker.name }}</h3>
-{% else %}
-<h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} {{ event_type.name }}</h3>
-{% endif %}
+  {% if speaker %}
+    <h3>Submit new {{ event_type.name }} by {{ speaker.name }}</h3>
+  {% else %}
+    <h3>{% if object %}Update{% else %}Create{% endif %} {{ camp.title }} {{ event_type.name }}</h3>
+  {% endif %}
 
-<form method="POST">
+  <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "Submit for Review" button_type="submit" button_class="btn-primary" %}
-</form>
+  </form>
 {% endblock program_content %}
-

@@ -1,41 +1,57 @@
+{% load bornhack %}
 {% if reimbursement_list %}
-    <table class="table table-hover">
-      <thead>
+  <table class="table table-hover datatable">
+    <thead>
       <tr>
+        {% if request.resolver_match.app_name == "backoffice" %}
+          <th>ID</th>
+        {% else %}
           <th>Camp</th>
-          <th>Created By</th>
-          <th>Created For</th>
-          <th>Economy Team Notes</th>
-          <th>Amount</th>
-          <th>Paid</th>
-          <th>Actions</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for reim in reimbursement_list %}
-      <tr>
-        <td>{{ reim.camp }}</td>
-        <td>{{ reim.user }}</td>
-        <td>{{ reim.reimbursement_user }}</td>
-        <td>{{ reim.notes|default:"N/A" }}</td>
-        <td>{{ reim.amount }} DKK</td>
-        <td>{{ reim.paid }}</td>
-        <td>
-          {% if request.resolver_match.app_name == "backoffice" %}
-            <a class="btn btn-primary" href="{% url "backoffice:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-search"></i> Details</a>
-            <a class="btn btn-primary" href="{% url "backoffice:reimbursement_update" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-edit"></i> Update</a>
-            {% if not reim.paid %}
-              <a class="btn btn-danger" href="{% url "backoffice:reimbursement_delete" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-times"></i> Delete</a>
-            {% endif %}
-          {% else %}
-            <a class="btn btn-primary" href="{% url "economy:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-search"></i> Details</a>
-          {% endif %}
-        </td>
+        {% endif %}
+        <th>Created By</th>
+        <th>Created For</th>
+        <th>Bank Account</th>
+        <th>Economy Team Notes</th>
+        <th>Amount</th>
+        <th>Paid</th>
+        <th>Actions</th>
       </tr>
+    </thead>
+    <tbody>
+      {% for reim in reimbursement_list %}
+        <tr>
+          {% if request.resolver_match.app_name == "backoffice" %}
+            <td>{{ reim.pk }}</td>
+          {% else %}
+            <td>{{ reim.camp }}</td>
+          {% endif %}
+          <td>{{ reim.user.username }}</td>
+          <td>{{ reim.reimbursement_user.username }}</td>
+          <td>{{ reim.bank_account|default:"N/A" }}</td>
+          <td>{{ reim.notes|default:"N/A" }}</td>
+          <td data-order="{{ reim.amount }}">{{ reim.amount }} DKK</td>
+          <td>{{ reim.paid|truefalseicon }}</td>
+          <td>
+            <div class="btn-group-vertical">
+              {% if request.resolver_match.app_name == "backoffice" %}
+                <a class="btn btn-primary" href="{% url "backoffice:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-search"></i> Details</a>
+                <a class="btn btn-primary" href="{% url "backoffice:reimbursement_update" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-edit"></i> Update</a>
+                {% if not reim.paid %}
+                  <a class="btn btn-danger" href="{% url "backoffice:reimbursement_delete" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-times"></i> Delete</a>
+                {% endif %}
+              {% else %}
+                <a class="btn btn-primary" href="{% url "economy:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-search"></i> Details</a>
+                {% if not reim.paid %}
+                  <a class="btn btn-primary" href="{% url "economy:reimbursement_update" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-edit"></i> Update</a>
+                  <a class="btn btn-danger" href="{% url "economy:reimbursement_delete" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-times"></i> Delete</a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </td>
+        </tr>
       {% endfor %}
-      </tbody>
-    </table>
+    </tbody>
+  </table>
 {% else %}
-    <h4>No reimbursements found for {{ camp.title }}</h4>
+  <h4>No reimbursements found for {{ camp.title }}</h4>
 {% endif %}
-

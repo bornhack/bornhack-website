@@ -2,45 +2,52 @@
 {% load static %}
 
 {% block title %}
-Economy | {{ block.super }}
+  Economy | {{ block.super }}
 {% endblock %}
 
 <{% block content %}
-<h3>Your {{ camp.title }} Economy Overview</h3>
+  <h3>Your {{ camp.title }} Economy Overview</h3>
 
-<p>This page shows your personal {{ camp.title }} economy overview. You can use the buttons to see the Expenses and Revenues you've registered in the system. You can also see any reimbursements you might have. If you registered an expense and you are waiting for a reimbursement please ask someone in the <a href="{% url 'teams:general' camp_slug=camp.slug team_slug='economy' %}">Economy Team</a> to make a reimbursement.</p>
-<table class="table table-hover">
-  <thead>
-  <tr>
-      <th>What</th>
-      <th>Description</th>
-      <th>Actions</th>
-   </tr>
-  </thead>
-  <tbody>
-  <tr>
-    <td><h4>Expenses</h4></td>
-    <td>You have <b>{{ expense_count }} expense{{ expense_count|pluralize }}</b> ({{ approved_expense_count }} approved, {{ rejected_expense_count }} rejected, and {{ unapproved_expense_count }} pending approval) for {{ camp.title }}, for a total of <b>{{ expense_total|default:"0" }} DKK</b>.</td>
-    <td>
-      <a href="{% url "economy:expense_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Expenses</a>
-      <a href="{% url "economy:chain_list" camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Expense</a>
-    </td>
-  </tr>
-  <tr>
-    <td><h4>Reimbursements</h4></td>
-    <td>You have <b>{{ reimbursement_count }} reimbursement{{ reimbursement_count|pluralize }}</b> ({{ paid_reimbursement_count }} paid, {{ unpaid_reimbursement_count }} pending payment) for {{ camp.title }}, for a total of <b>{{ reimbursement_total }} DKK</b>.</td>
-    <td>
-      <a href="{% url "economy:reimbursement_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Reimbursements</a>
-    </td>
-  </tr>
-  <tr>
-    <td><h4>Revenue</h4></td>
-    <td>You have <b>{{ revenue_count }} revenue{{ revenue_count|pluralize }}</b> ({{ approved_revenue_count }} approved, {{ rejected_revenue_count }} rejected, and {{ unapproved_revenue_count }} still pending approval) for {{ camp.title }}, for a total of <b>{{ revenue_total|default:"0" }} DKK</b>.</td>
-    <td>
-      <a href="{% url "economy:revenue_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Revenues</a>
-      <a href="{% url "economy:chain_list" camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Revenue</a>
-    </td>
-  </tr>
-  </tbody>
-</table>
+  <p>This page shows your personal {{ camp.title }} economy overview. You can use the buttons to see the Expenses and Revenues you've registered in the system. You can also see any reimbursements you might have. Once you have registered all your expenses you can create a reimbursement to get your money refunded.</p>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>What</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><h4>Expenses</h4></td>
+        <td>You have <b>{{ expense_count }} expense{{ expense_count|pluralize }}</b> ({{ approved_expense_count }} approved, {{ rejected_expense_count }} rejected, and {{ unapproved_expense_count }} pending approval) for {{ camp.title }}, for a total of <b>{{ expense_total|default:"0" }} DKK</b>.</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url "economy:expense_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Expenses</a>
+            <a href="{% url "economy:chain_list" camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Expense</a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><h4>Reimbursements</h4></td>
+        <td>You have <b>{{ reimbursement_count }} reimbursement{{ reimbursement_count|pluralize }}</b> ({{ paid_reimbursement_count }} paid, {{ unpaid_reimbursement_count }} pending payment) for {{ camp.title }}, for a total of <b>{{ reimbursement_total }} DKK</b>.</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url "economy:reimbursement_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Reimbursements</a>
+            <a href="{% url "economy:reimbursement_create" camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Reimbursement</a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><h4>Revenue</h4></td>
+        <td>You have <b>{{ revenue_count }} revenue{{ revenue_count|pluralize }}</b> ({{ approved_revenue_count }} approved, {{ rejected_revenue_count }} rejected, and {{ unapproved_revenue_count }} still pending approval) for {{ camp.title }}, for a total of <b>{{ revenue_total|default:"0" }} DKK</b>.</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url "economy:revenue_list" camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> List Revenues</a>
+            <a href="{% url "economy:chain_list" camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create Revenue</a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 {% endblock %}

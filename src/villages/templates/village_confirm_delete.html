@@ -2,17 +2,17 @@
 {% load commonmark %}
 
 {% block title %}
-Are you sure you want to delete the village "{{ village }}"? | {{ block.super }}
+  Are you sure you want to delete the village "{{ village }}"? | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<form action="" method="post" class="col-md-6 col-md-offset-3">{% csrf_token %}
+  <form action="" method="post" class="col-md-6 col-md-offset-3">{% csrf_token %}
     <p>Are you sure you want to delete the village "{{ village }}"?</p>
     <button type="submit" class="btn btn-danger form-control">Confirm</button>
     <br />
     <br />
-    <a href="{% url 'village_detail' camp_slug=village.camp.slug slug=village.slug %}"
-       class="btn btn-default form-control">Cancel</a>
-</form>
+    <a href="{% url 'villages:village_detail' camp_slug=village.camp.slug slug=village.slug %}"
+       class="btn btn-secondary form-control">Cancel</a>
+  </form>
 {% endblock %}

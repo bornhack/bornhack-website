@@ -2,12 +2,22 @@
 {% load static %}
 
 {% block title %}
-Expenses | {{ block.super }}
+  Expenses | {{ block.super }}
 {% endblock %}
 
 <{% block content %}
-<h3>Your {{ camp.title }} Reimbursements</h3>
+  <h3>Your {{ camp.title }} Reimbursements</h3>
 
-{% include 'includes/reimbursement_list_panel.html' %}
+  <p><div class="btn-group">
+    <a href="{% url 'economy:reimbursement_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Dashboard</a>
+  </div></p>
+
+  {% include 'includes/reimbursement_list_panel.html' %}
+
+  <p><div class="btn-group">
+    <a href="{% url 'economy:reimbursement_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create New Reimbursement</a>
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Dashboard</a>
+  </div></p>
 
 {% endblock %}

@@ -1,5 +1,4 @@
-"""
-Borrowed from https://gist.github.com/schinckel/aeea9c0f807dd009bf47566df7ac5054
+"""Borrowed from https://gist.github.com/schinckel/aeea9c0f807dd009bf47566df7ac5054.
 
 This module overrides the Range.__and__ function, so that it returns a boolean value
 based on if the two objects overlap.
@@ -10,6 +9,9 @@ There is also a more complete `isempty()` method, which examines the bounds type
 and determines if the object is indeed empty. This is required when python-created range objects
 are dealt with, as these are not normalised the same way that postgres does.
 """
+
+from __future__ import annotations
+
 import datetime
 
 from psycopg2.extras import Range
@@ -21,10 +23,9 @@ OFFSET = {
 
 
 def normalise(instance):
-    """
-    In the case of discrete ranges (integer, date), then we normalise the values
+    """In the case of discrete ranges (integer, date), then we normalise the values
     so it is in the form [start,finish), the same way that postgres does.
-    If the lower value is None, we normalise this to (None,finish)
+    If the lower value is None, we normalise this to (None,finish).
     """
     if instance.isempty:
         return instance
@@ -57,9 +58,7 @@ def normalise(instance):
 def __and__(self, other):
     if not isinstance(other, self.__class__):
         raise TypeError(
-            "unsupported operand type(s) for &: '{}' and '{}'".format(
-                self.__class__.__name__, other.__class__.__name__
-            )
+            f"unsupported operand type(s) for &: '{self.__class__.__name__}' and '{other.__class__.__name__}'",
         )
 
     self = normalise(self)
@@ -91,8 +90,7 @@ def __and__(self, other):
     # Now, all we care about is self.upper_inc and other.lower_inc
     if self.upper_inc and other.lower_inc:
         return self.upper >= other.lower
-    else:
-        return self.upper > other.lower
+    return self.upper > other.lower
 
 
 def __eq__(self, other):
@@ -102,15 +100,11 @@ def __eq__(self, other):
     self = normalise(self)
     other = normalise(other)
 
-    return (
-        self._lower == other._lower
-        and self._upper == other._upper
-        and self._bounds == other._bounds
-    )
+    return self._lower == other._lower and self._upper == other._upper and self._bounds == other._bounds
 
 
 def range_merge(self, other):
-    "Union"
+    """Union."""
     self = normalise(self)
     other = normalise(other)
     bounds = [None, None]
@@ -136,7 +130,7 @@ def range_merge(self, other):
         bounds[0] = "("
     elif self.lower_inc != other.lower_inc:
         # The bounds differ, so we need to use the complicated logic.
-        raise NotImplementedError()
+        raise NotImplementedError
     else:
         # The bounds are the same, so we can just use the lower value.
         lower = min(self.lower, other.lower)
@@ -146,7 +140,7 @@ def range_merge(self, other):
         upper = None
         bounds[1] = ")"
     elif self.upper_inc != other.upper_inc:
-        raise NotImplementedError()
+        raise NotImplementedError
     else:
         upper = max(self.upper, other.upper)
         bounds[1] = self._bounds[1]
@@ -184,7 +178,7 @@ def range_contains(self, other):
     if self._bounds is None:
         return False
 
-    if type(self) == type(other):
+    if type(self) is type(other):
         return self & other and self + other == self
 
     # We have two tests to make in each case - is the value out of the lower bound,
@@ -210,7 +204,7 @@ def range_contains(self, other):
 
 def deconstruct(self):
     return (
-        "{}.{}".format(self.__class__.__module__, self.__class__.__name__),
+        f"{self.__class__.__module__}.{self.__class__.__name__}",
         [self.lower, self.upper, self._bounds],
         {},
     )
@@ -234,8 +228,7 @@ _BOUNDS_SWAP = {
 
 
 def safe_subtract(initial, subtract):
-    """
-    Subtract the range "subtract" from the range "initial".
+    """Subtract the range "subtract" from the range "initial".
     Always return an array of ranges (which may be empty).
     """
     _Range = initial.__class__
@@ -253,48 +246,38 @@ def safe_subtract(initial, subtract):
     # We will have either one or two objects, depending upon if the subtractor overlaps one of the bounds or not.
     # We know that both of them will not overlap the bounds, because that case has already been dealt with.
 
-    if initial.upper in subtract or (
-        not initial.upper_inc and initial.upper == subtract.upper
-    ):
+    if initial.upper in subtract or (not initial.upper_inc and initial.upper == subtract.upper):
         return [
             _Range(
                 initial.lower,
                 subtract.lower,
-                "{}{}".format(
-                    initial._bounds[0],
-                    sub_bounds[0],
-                ),
-            )
+                f"{initial._bounds[0]}{sub_bounds[0]}",
+            ),
         ]
-    elif initial.lower in subtract or (
-        not initial.lower_inc and initial.lower == subtract.lower
-    ):
+    if initial.lower in subtract or (not initial.lower_inc and initial.lower == subtract.lower):
         return [
             _Range(
                 subtract.upper,
                 initial.upper,
-                "{}{}".format(sub_bounds[1], initial._bounds[1]),
-            )
-        ]
-    else:
-        return [
-            _Range(
-                initial.lower,
-                subtract.lower,
-                "{}{}".format(initial._bounds[0], sub_bounds[0]),
-            ),
-            _Range(
-                subtract.upper,
-                initial.upper,
-                "{}{}".format(sub_bounds[1], initial._bounds[1]),
+                f"{sub_bounds[1]}{initial._bounds[1]}",
             ),
         ]
+    return [
+        _Range(
+            initial.lower,
+            subtract.lower,
+            f"{initial._bounds[0]}{sub_bounds[0]}",
+        ),
+        _Range(
+            subtract.upper,
+            initial.upper,
+            f"{sub_bounds[1]}{initial._bounds[1]}",
+        ),
+    ]
 
 
 def array_subtract(initial, subtract):
-    """
-    subtract the range from each item in the initial array.
-    """
+    """Subtract the range from each item in the initial array."""
     result = []
     for _range in initial:
         result.extend(safe_subtract(_range, subtract))
@@ -302,9 +285,7 @@ def array_subtract(initial, subtract):
 
 
 def array_subtract_all(initial, subtract):
-    """
-    Subtract all overlapping ranges in subtract from all ranges in initial.
-    """
+    """Subtract all overlapping ranges in subtract from all ranges in initial."""
     result = list(initial)
     for other in subtract:
         result = array_subtract(result, other)

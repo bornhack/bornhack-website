@@ -1,0 +1,27 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "coinify_id" "ID" %}
+      {% thh "coinify_created" "Created" %}
+      {% thh "amount" "Amount" %}
+      {% thh "fee" "Fee" %}
+      {% thh "transferred" "Transferred" %}
+      {% thh "btc_txid" "BTC TXID" %}
+      {% thh "created" "Imported" "The date this Coinify invoice was imported" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for cp in coinifypayout_list %}
+      <tr>
+        <td>{{ cp.coinify_id }}</td>
+        <td data-order="{{ cp.coinify_created|sortable }}">{{ cp.coinify_created }}</td>
+        <td data-order="{{ cp.amount_dkk }}">{% if cp.currency == "BTC" %}{{ cp.amount }}{% else %}{{ cp.amount|floatformat:2 }}{% endif %}&nbsp;{{ cp.currency }}</td>
+        <td data-order="{{ cp.fee_dkk }}">{{ cp.fee }}&nbsp;{{ cp.currency }}</td>
+        <td data-order="{{ cp.transferred_dkk }}">{{ cp.transferred }}&nbsp;{{ cp.currency }}</td>
+        <td>{{ cp.btc_txid|default:"N/A" }}</td>
+        <td data-order="{{ cp.created|sortable }}">{{ cp.created }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

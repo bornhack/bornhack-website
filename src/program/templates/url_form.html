@@ -1,25 +1,24 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if object %}Update URL{% else %}Add URL to {% if speakerproposal %}{{ speakerproposal.name }}{% else %}{{ eventproposal.title }}{% endif %}{% endif %} | {{ block.super }}
+  {% if object %}Update URL{% else %}Add URL to {% if speakerproposal %}{{ speakerproposal.name }}{% else %}{{ eventproposal.title }}{% endif %}{% endif %} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-<h3>
+  <h3>
     {% if object %}
-        Update URL
+      Update URL
     {% else %}
-        Add URL to {% if speaker_proposal %}{{ speaker_proposal.name }}{% else %}{{ event_proposal.title }}{% endif %}
+      Add URL to {% if speaker_proposal %}{{ speaker_proposal.name }}{% else %}{{ event_proposal.title }}{% endif %}
     {% endif %}
-</h3>
+  </h3>
 
-<form method="POST">
+  <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     {% bootstrap_button "Save URL" button_type="submit" button_class="btn-primary" %}
-</form>
+  </form>
 
 {% endblock program_content %}
-

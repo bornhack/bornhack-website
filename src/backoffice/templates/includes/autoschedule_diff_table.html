@@ -1,63 +1,62 @@
-    <table class="table">
-      <caption>Event Differences - each row shows an event which changed time or location</caption>
-      <thead>
-        <tr>
-          <th>Event</th>
-          <th>Old Location</th>
-          <th>New Location</th>
-          <th>Old Start Time</th>
-          <th>New Start Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for eventdiff in diff.event_diffs %}
-        <tr>
-          <td>
-            {% if eventdiff.event.slug %}
+<table class="table">
+  <caption>Event Differences - each row shows an event which changed time or location</caption>
+  <thead>
+    <tr>
+      <th>Event</th>
+      <th>Old Location</th>
+      <th>New Location</th>
+      <th>Old Start Time</th>
+      <th>New Start Time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for eventdiff in diff.event_diffs %}
+      <tr>
+        <td>
+          {% if eventdiff.event.slug %}
             <a href="{% url "program:event_detail" camp_slug=camp.slug event_slug=eventdiff.event.slug %}">{{ eventdiff.event.title }}</a>
-            {% else %}
+          {% else %}
             Event ID {{ eventdiff.event }} (deleted)
-            {% endif %}
-          </td>
-          <td>{{ eventdiff.old.event_location.name|default:"N/A" }}</td>
-          <td>{{ eventdiff.new.event_location.name|default:"N/A" }}</td>
-          <td>{{ eventdiff.old.starttime|default:"N/A" }}</td>
-          <td>{{ eventdiff.new.starttime|default:"N/A" }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <table class="table">
-      <caption>Slot Differences - each row represents a slot with changed content</caption>
-      <thead>
-        <tr>
-          <th>EventLocation</th>
-          <th>Start Time</th>
-          <th>Old Event</th>
-          <th>New Event</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for slotdiff in diff.slot_diffs %}
-        <tr>
-          <td>{{ slotdiff.event_location.name }}</td>
-          <td>{{ slotdiff.starttime }}</td>
-          <td>
-            {% if slotdiff.old.event %}
-              {% if slotdiff.old.event.title %}{{ slotdiff.old.event.title }}{% else %}Event ID {{ slotdiff.old.event }} (deleted){% endif %}
-            {% else %}
-              N/A
-            {% endif %}
-          </td>
-          <td>
-            {% if slotdiff.new.event %}
-              {% if slotdiff.new.event.title %}{{ slotdiff.new.event.title }}{% else %}Event ID {{ slotdiff.new.event }} (deleted){% endif %}
-            {% else %}
-              N/A
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-
+          {% endif %}
+        </td>
+        <td>{{ eventdiff.old.event_location.name|default:"N/A" }}</td>
+        <td>{{ eventdiff.new.event_location.name|default:"N/A" }}</td>
+        <td>{{ eventdiff.old.starttime|default:"N/A" }}</td>
+        <td>{{ eventdiff.new.starttime|default:"N/A" }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<table class="table">
+  <caption>Slot Differences - each row represents a slot with changed content</caption>
+  <thead>
+    <tr>
+      <th>EventLocation</th>
+      <th>Start Time</th>
+      <th>Old Event</th>
+      <th>New Event</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slotdiff in diff.slot_diffs %}
+      <tr>
+        <td>{{ slotdiff.event_location.name }}</td>
+        <td>{{ slotdiff.starttime }}</td>
+        <td>
+          {% if slotdiff.old.event %}
+            {% if slotdiff.old.event.title %}{{ slotdiff.old.event.title }}{% else %}Event ID {{ slotdiff.old.event }} (deleted){% endif %}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+        <td>
+          {% if slotdiff.new.event %}
+            {% if slotdiff.new.event.title %}{{ slotdiff.new.event.title }}{% else %}Event ID {{ slotdiff.new.event }} (deleted){% endif %}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

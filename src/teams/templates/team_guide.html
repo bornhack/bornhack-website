@@ -2,38 +2,37 @@
 {% load commonmark %}
 
 {% block title %}
-Guide for: {{ team.name }} | {{ block.super }}
+  Guide for: {{ team.name }} | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="btn-group pull-right">
-            <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
-                class="btn btn-default"
-                target="_blank">
-                Print
-            </a>
-            {% if request.user in team.responsible_members.all %}
-            <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
-            {% endif %}
-        </div>
-        <h4>
-            Guide / Howto for {{ team.name }}
-        </h4>
+  <div class="card">
+    <div class="card-header">
+      <div class="btn-group pull-right">
+        <a href="{% url 'teams:guide_print' camp_slug=camp.slug team_slug=team.slug %}"
+           class="btn btn-secondary"
+           target="_blank">
+          Print
+        </a>
+        {% if request.user in team.leads.all %}
+          <a href="{% url 'teams:manage' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-primary">Edit</a>
+        {% endif %}
+      </div>
+      <h4>
+        Guide / Howto for {{ team.name }}
+      </h4>
     </div>
-    <div class="panel-body">
-        <p>
-        </p>
+    <div class="card-body">
+      <p>
+      </p>
 
-        <div class="team-guide-markdown">
+      <div class="team-guide-markdown">
         {{ team.guide|untrustedcommonmark }}
-        </div>
+      </div>
     </div>
-</div>
+  </div>
 
 
 
 {% endblock %}
-

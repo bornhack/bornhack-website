@@ -4,67 +4,67 @@
 {% load bornhack %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">BackOffice - EventSessions</span>
-  </div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">BackOffice - EventSessions</span>
+    </div>
+    <div class="card-body">
       <p><i>EventSessions</i> define the <i>EventSlots</i> where <i>Events</i> of a certain <i>EventType</i> at a certain <i>EventLocation</i> can be scheduled. <i>EventSessions</i> and <i>EventSlots</i> are used in the following ways in the system:</p>
-    <ul>
-      <li>To customise the speaker availability form shown when users submit speakers.</li>
-      <li>They are also used to assist and restrict manual scheduling in backoffice.</li>
-      <li>They are also used by the AutoScheduler.</li>
-    </ul>
-    <p>Search for an EventType or EventLocation to filter the list.</p>
-  {% if not event_session_list %}
-      <p class="lead">
-        No EventSessions found. Go create one!
-        <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create New EventSession</a>
+      <ul>
+        <li>To customise the speaker availability form shown when users submit speakers.</li>
+        <li>They are also used to assist and restrict manual scheduling in backoffice.</li>
+        <li>They are also used by the AutoScheduler.</li>
+      </ul>
+      <p>Search for an EventType or EventLocation to filter the list.</p>
+      {% if not event_session_list %}
+        <p class="lead">
+          No EventSessions found. Go create one!
+          <a href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create New EventSession</a>
+        </p>
+      {% else %}
+        <p>
+          <a class="btn btn-success" href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New EventSession</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        </p>
+        <table class="table table-hover datatable">
+          <thead>
+            <tr>
+              <th>Session ID</th>
+              <th>When</th>
+              <th>Description</th>
+              <th class="text-center">Duration</th>
+              <th class="text-center">Scheduled Events</th>
+              <th>Event Type</th>
+              <th>Event Location</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for session in event_session_list %}
+              <tr>
+                <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}"> {{ session.id }}</a></td>
+                <td>{{ session.when.lower }} to<br>{{ session.when.upper }}</td>
+                <td>{{ session.description|default:"N/A" }}</td>
+                <td class="text-center"><span class="badge">{{ session.duration }}</span><br><span class="badge">{{ session.event_slots.count }} slots</span></td>
+                <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</td>
+                  <td><i class="fas fa-{{ session.event_type.icon }}" style="color: {{ session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type }}</a></td>
+                  <td><i class="fas fa-{{ session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</a></td>
+                  <td>
+                    <div class="btn-group-vertical">
+                      <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                      <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                      <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                    </div>
+                  </td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+      <p>
+        <a class="btn btn-success" href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Session</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
-  {% else %}
-  <p>
-    <a class="btn btn-success" href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New EventSession</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
-  <table class="table table-hover datatable">
-    <thead>
-    <tr>
-        <th>Session ID</th>
-        <th>When</th>
-        <th>Description</th>
-        <th class="text-center">Duration</th>
-        <th class="text-center">Scheduled Events</th>
-        <th>Event Type</th>
-        <th>Event Location</th>
-        <th>Action</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for session in event_session_list %}
-    <tr>
-        <td><a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}"> {{ session.id }}</a></td>
-        <td>{{ session.when.lower }} to<br>{{ session.when.upper }}</td>
-        <td>{{ session.description|default:"N/A" }}</td>
-        <td class="text-center"><span class="badge">{{ session.duration }}</span><br><span class="badge">{{ session.event_slots.count }} slots</span></td>
-        <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</td>
-        <td><i class="fas fa-{{ session.event_type.icon }}" style="color: {{ session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type }}</a></td>
-        <td><i class="fas fa-{{ session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</a></td>
-        <td>
-          <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-            <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-            <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-          </div>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-  <p>
-    <a class="btn btn-success" href="{% url 'backoffice:event_session_create_type_select' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Session</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

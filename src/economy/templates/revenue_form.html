@@ -1,32 +1,32 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if object %}Update{% else %}Create{% endif %} Revenue | {{ block.super }}
+  {% if object %}Update{% else %}Create{% endif %} Revenue | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>
-{% if object %}
-Update {{ camp.title }} Revenue {{ object.uuid }} for {{ debtor.name }}
-{% else %}
-Create {{ camp.title }} Revenue for {{ debtor.name }}
-{% endif %}
-</h3>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <b>Chain</b>
-  <p>{{ debtor.chain.name }}{% if not object %} <span class="small"><a href="{% url 'economy:chain_list' camp_slug=camp.slug %}">Change</a></span>{% endif %}</p>
-{% if creditor.chain.notes %}
-  <b>Chain Notes</b>
-  <p>{{ creditor.chain.notes }}</p>
-{% endif %}
-  <b>Debtor</b>
-  <p>{{ debtor.name }}{% if not object %} <span class="small"><a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=debtor.chain.slug %}">Change</a></span>{% endif %}</p>
-  <b>Debtor Address</b>
-  <address>{{ debtor.address }}</address>
-  {% bootstrap_form form %}
-  <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Save</button>
-  <a href="{% url 'economy:revenue_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <h3>
+    {% if object %}
+      Update {{ camp.title }} Revenue {{ object.uuid }} for {{ debtor.name }}
+    {% else %}
+      Create {{ camp.title }} Revenue for {{ debtor.name }}
+    {% endif %}
+  </h3>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <b>Chain</b>
+    <p>{{ debtor.chain.name }}{% if not object %} <span class="small"><a href="{% url 'economy:chain_list' camp_slug=camp.slug %}">Change</a></span>{% endif %}</p>
+    {% if creditor.chain.notes %}
+      <b>Chain Notes</b>
+      <p>{{ creditor.chain.notes }}</p>
+    {% endif %}
+    <b>Debtor</b>
+    <p>{{ debtor.name }}{% if not object %} <span class="small"><a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=debtor.chain.slug %}">Change</a></span>{% endif %}</p>
+    <b>Debtor Address</b>
+    <address>{{ debtor.address }}</address>
+    {% bootstrap_form form %}
+    <button class="btn btn-primary" type="submit"><i class="fas fa-check"></i> Save</button>
+    <a href="{% url 'economy:revenue_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
 {% endblock %}

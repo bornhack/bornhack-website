@@ -1,0 +1,31 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "transaction_id" %}
+      {% thh "order_id" %}
+      {% thh "auth_date" %}
+      {% thh "auth_amount" %}
+      {% thh "captured_date" %}
+      {% thh "captured_amount" %}
+      {% thh "card_type" %}
+      {% thh "description" %}
+      {% thh "transaction_fee" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for et in epaytransaction_list %}
+      <tr>
+        <td>{{ et.transaction_id }}</td>
+        <td>{{ et.order_id }}</td>
+        <td data-order="{{ et.auth_date|sortable }}">{{ et.auth_date }}</td>
+        <td data-order="{{ et.auth_amount }}">{{ et.auth_amount }}&nbsp;{{ et.currency }}</td>
+        <td data-order="{{ et.captured_date|sortable }}">{{ et.captured_date }}</td>
+        <td data-order="{{ et.captured_amount }}">{{ et.captured_amount }}&nbsp;{{ et.currency }}</td>
+        <td>{{ et.card_type }}</td>
+        <td>{{ et.description }}</td>
+        <td data-order="{{ et.transaction_fee }}">{{ et.transaction_fee }}&nbsp;{{ et.currency }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

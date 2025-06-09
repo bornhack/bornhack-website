@@ -1,36 +1,36 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Contact | {{ block.super }}
+  Contact | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<p class="lead">
-  You can get in contact with the BornHack organisers via multiple channels:
-</p>
+  <p class="lead">
+    You can get in contact with the BornHack organisers via multiple channels:
+  </p>
 
-{% include 'includes/contact.html' %}
+  {% include 'includes/contact.html' %}
 
-<hr />
+  <hr />
 
-<p>
-  <b>The legal entity behind BornHack is:</b><br />
-  BornHack IVS c/o Thomas Steen Rasmussen<br />
-  Skelbyvej 147<br />
-  Næsby<br />
-  4171 Glumsø<br />
-  Denmark<br />
-  CVR# 37666521<br />
-  Phone +4531550497<br />
-</p>
+  <p>
+    <b>The legal entity behind BornHack is:</b><br />
+    BornHack ApS c/o Thomas Steen Rasmussen<br />
+    Skelbyvej 147<br />
+    Næsby<br />
+    4171 Glumsø<br />
+    Denmark<br />
+    CVR no. 37666521<br />
+    Phone +45 3155 0497<br />
+  </p>
 
-<p>
-  <b>Our bank account details are:</b><br>
-  Bank Name: Folke Sparekassen<br>
-  IBAN: DK0398600000747866<br>
-  BIC: FOSPDK21<br>
-  DK Reg No: 9860<br>
-  DK Account No: 747866<br>
-</p>
+  <p>
+    <b>Our bank account details are:</b><br>
+    Bank Name: {{ bank }}<br>
+    IBAN: {{ bank_iban }}<br>
+    BIC: {{ bank_bic }}<br>
+    DK Reg No: {{ bank_dk_reg }}<br>
+    DK Account No: {{ bank_dk_accno }}<br>
+  </p>
 {% endblock %}

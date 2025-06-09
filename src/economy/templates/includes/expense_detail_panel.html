@@ -1,70 +1,69 @@
-<div class="panel panel-default">
-    <div class="panel-heading">Expense Details for {{ expense.pk }}</div>
-    <div class="panel-body">
-      <table class="table">
-        <tr>
-          <th>Created By</th>
-          <td>{{ expense.user }}</td>
-        </tr>
-        <tr>
-          <th>Amount</th>
-          <td>{{ expense.amount }} DKK</td>
-        </tr>
-        <tr>
-          <th>Chain</th>
-          <td>{{ expense.creditor.chain.name }}</td>
-        </tr>
-        <tr>
-          <th>Creditor</th>
-          <td>{{ expense.creditor.name }}</td>
-        </tr>
-        <tr>
-          <th>Invoice Date</th>
-          <td>{{ expense.invoice_date }}</td>
-        </tr>
-        <tr>
-          <th>Description</th>
-          <td>{{ expense.description }}</td>
-        </tr>
-        <tr>
-          <th>Paid by BornHack?</th>
-          <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user }}</b>, and will be reimbursed when approved.{% endif %}</td>
-        </tr>
-        <tr>
-          <th>Filename</th>
-          <td>{{ expense.invoice }}</td>
-        </tr>
-        <tr>
-          <th>Approved?</th>
-          <td>{{ expense.approval_status }}</td>
-        </tr>
-        {% if not expense.paid_by_bornhack %}
+<div class="card">
+  <div class="card-header">Expense Details for {{ expense.pk }}</div>
+  <div class="card-body">
+    <table class="table">
+      <tr>
+        <th>Created By</th>
+        <td>{{ expense.user }}</td>
+      </tr>
+      <tr>
+        <th>Amount</th>
+        <td>{{ expense.amount }} DKK</td>
+      </tr>
+      <tr>
+        <th>Chain</th>
+        <td>{{ expense.creditor.chain.name }}</td>
+      </tr>
+      <tr>
+        <th>Creditor</th>
+        <td>{{ expense.creditor.name }}</td>
+      </tr>
+      <tr>
+        <th>Invoice Date</th>
+        <td>{{ expense.invoice_date }}</td>
+      </tr>
+      <tr>
+        <th>Description</th>
+        <td>{{ expense.description }}</td>
+      </tr>
+      <tr>
+        <th>Paid by BornHack?</th>
+        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user }}</b>, and will be reimbursed.{% endif %}</td>
+      </tr>
+      <tr>
+        <th>Filename</th>
+        <td>{{ expense.invoice }}</td>
+      </tr>
+      <tr>
+        <th>Approved?</th>
+        <td>{{ expense.approval_status }}</td>
+      </tr>
+      {% if not expense.paid_by_bornhack %}
         <tr>
           <th>Reimbursement?</th>
           <td>
-          {% if expense.reimbursement %}
-            {% if request.resolver_match.app_name == "backoffice" %}
-              <a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
+            {% if expense.reimbursement %}
+              {% if request.resolver_match.app_name == "backoffice" %}
+                <a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
+              {% else %}
+                <a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
+              {% endif %}
             {% else %}
-              <a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
+              N/A
             {% endif %}
-          {% else %}
-            N/A
-          {% endif %}
-        </tr>
-        {% endif %}
-        <tr>
-          <th>Invoice</th>
-          <td>
-              <a href="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}" target="_blank"><img src="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}?preview" height=200></a><br>
-              Filename: {{ expense.invoice_filename }}
-          </td>
-        </tr>
-        <tr>
-          <th>Economy Team Notes</th>
-          <td>{{ expense.notes|default:"N/A" }}</td>
-        </tr>
-      </table>
-    </div>
+          </tr>
+      {% endif %}
+      <tr>
+        <th>Invoice</th>
+        <td>
+          <a href="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}" target="_blank"><img src="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}?preview" height=200></a><br>
+          Filename: {{ expense.invoice_filename }}
+        </td>
+      </tr>
+      <tr>
+        <th>Economy Team Notes</th>
+        <td>{{ expense.notes|default:"N/A" }}</td>
+      </tr>
+    </table>
+  </div>
 </div>
-

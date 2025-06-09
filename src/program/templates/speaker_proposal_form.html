@@ -1,28 +1,31 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load program %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block program_content %}
-<h3>
+  <h3>
     {% if object %}
-        Update {{ object.name }} Details
+      Update {{ object.name }} Details
     {% else %}
-        Add {{ event_proposal.event_type.host_title }} to {{ event_proposal.title }}
+      Add {{ event_proposal.event_type.host_title }} to {{ event_proposal.title }}
     {% endif %}
-</h3>
+  </h3>
 
-<form method="POST">
-  {% csrf_token %}
-  {% for field in form %}
-    {% if field.id_for_label == "id_submission_notes" %}
-      {% availabilitytable form=form matrix=matrix %}
-      {% bootstrap_field field %}
-    {% else %}
-    {% if field.name|slice:":12" != "availability" %}
-      {% bootstrap_field field %}
-    {% endif %}
-    {% endif %}
-  {% endfor %}
-  {% bootstrap_button "Submit for review" button_type="submit" button_class="btn-primary" %}
-</form>
+  <form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+      {% if field.id_for_label == "id_submission_notes" %}
+        {% availabilitytable form=form matrix=matrix %}
+        {% bootstrap_field field %}
+      {% else %}
+        {% if field.name|slice:":12" != "availability" %}
+          {% bootstrap_field field %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {% bootstrap_button "Submit for review" button_type="submit" button_class="btn-primary" %}
+  </form>
 {% endblock program_content %}

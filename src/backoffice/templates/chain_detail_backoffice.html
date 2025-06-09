@@ -1,61 +1,72 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Details for Chain {{ chain.name }} | {{ block.super }}
+  Details for Chain {{ chain.name }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Details for Chain {{ chain.name }} - BackOffice</h3></div>
-  <div class="panel-body">
-    <p class="lead">This chain has <b>{{ chain.camp_expenses_count }} expenses</b> for a total of <b>{{ chain.camp_expenses_amount }} DKK</b> and <b>{{ chain.camp_revenues_count }} revenues</b> for a total of <b>{{ chain.camp_revenues_amount }} DKK</b> for {{ camp.title }}.</p>
-    <p class="lead">This chain has <b>{{ chain.all_expenses_count }} expenses</b> for a total of <b>{{ chain.all_expenses_amount }} DKK</b> and <b>{{ chain.all_revenues_count }} revenues</b> for a total of <b>{{ chain.all_revenues_amount }} DKK</b> across all camps.</p>
-    <a class="btn btn-default" href="{% url "backoffice:chain_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Chain list</a>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Details for Chain {{ chain.name }} - BackOffice</h3></div>
+    <div class="card-body">
+      <p class="lead">This chain has <b>{{ chain.camp_expenses_count }} expenses</b> for a total of <b>{{ chain.camp_expenses_amount }} DKK</b> and <b>{{ chain.camp_revenues_count }} revenues</b> for a total of <b>{{ chain.camp_revenues_amount }} DKK</b> for {{ camp.title }}.</p>
+      <p class="lead">This chain has <b>{{ chain.all_expenses_count }} expenses</b> for a total of <b>{{ chain.all_expenses_amount }} DKK</b> and <b>{{ chain.all_revenues_count }} revenues</b> for a total of <b>{{ chain.all_revenues_amount }} DKK</b> across all camps.</p>
+      <a class="btn btn-secondary" href="{% url "backoffice:chain_list" camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Chain list</a>
 
-    <hr>
+      <hr>
 
-    <h3>{{ chain.credebtors.count }} Credebtors for Chain {{ chain.name }}</h3>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Credebtor Name</th>
-          <th>Address</th>
-          <th>Notes</th>
-          <th class="text-center">Expenses</th>
-          <th class="text-center">Expenses Total</th>
-          <th class="text-center">Revenues</th>
-          <th class="text-center">Revenues Total</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-      {% for credebtor in credebtors %}
-        <tr>
-          <td><a class="btn btn-primary" href="{% url 'backoffice:credebtor_detail' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}">{{ credebtor.name }}</a></td>
-          <td><address>{{ credebtor.address }}</address></td>
-          <td>{{ credebtor.notes|default:"N/A" }}</td>
-          <td class="text-center"><span class="badge">{{ credebtor.camp_expenses_count }}</span></td>
-          <td class="text-center">{{ credebtor.camp_expenses_amount }} DKK</td>
-          <td class="text-center"><span class="badge">{{ credebtor.camp_revenues_count }}</span></td>
-          <td class="text-center">{{ credebtor.camp_revenues_amount }} DKK</td>
-          <td>
-            <a class="btn btn-primary" href="{% url 'backoffice:credebtor_detail' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}"><i class="fas fa-search"></i> Details</a>
-      {% endfor %}
-      </tbody>
-    </table>
+      <h3>{{ chain.credebtors.count }} Credebtors for Chain {{ chain.name }}</h3>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Credebtor Name</th>
+            <th>Address</th>
+            <th>Notes</th>
+            <th class="text-center">Expenses</th>
+            <th class="text-center">Expenses Total</th>
+            <th class="text-center">Revenues</th>
+            <th class="text-center">Revenues Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for credebtor in credebtors %}
+            <tr>
+              <td><a class="btn btn-primary" href="{% url 'backoffice:credebtor_detail' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}">{{ credebtor.name }}</a></td>
+              <td><address>{{ credebtor.address }}</address></td>
+              <td>{{ credebtor.notes|default:"N/A" }}</td>
+              <td class="text-center"><span class="badge">{{ credebtor.camp_expenses_count }}</span></td>
+              <td class="text-center">{{ credebtor.camp_expenses_amount }} DKK</td>
+              <td class="text-center"><span class="badge">{{ credebtor.camp_revenues_count }}</span></td>
+              <td class="text-center">{{ credebtor.camp_revenues_amount }} DKK</td>
+              <td>
+                <a class="btn btn-primary" href="{% url 'backoffice:credebtor_detail' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}"><i class="fas fa-search"></i> Details</a>
+          {% endfor %}
+        </tbody>
+      </table>
 
-    <hr>
+      <hr>
 
-    <h3>{{ expenses.count }} Expenses for Chain {{ chain.name }}</h3>
-    {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
+      <h3>{{ expenses.count }} Expenses for Chain {{ chain.name }}</h3>
+      {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
 
-    <hr>
+      <hr>
 
-    <h3>{{ revenues.count }} Revenues for Chain {{ chain.name }}</h3>
-    {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
+      <h3>{{ revenues.count }} Revenues for Chain {{ chain.name }}</h3>
+      {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
 
+      <hr>
+
+      <h3>{{ past_expenses.count }} Expenses for Chain {{ chain.name }} in previous years</h3>
+      {% include 'includes/expense_list_panel.html' with expense_list=past_expenses past_camps=True %}
+
+      <hr>
+
+      <h3>{{ past_revenues.count }} Revenues for Chain {{ chain.name }} in previous years</h3>
+      {% include 'includes/revenue_list_panel.html' with revenue_list=past_revenues past_camps=True %}
+
+
+    </div>
   </div>
-</div>
 
 {% endblock content %}

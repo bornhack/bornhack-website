@@ -5,6 +5,24 @@ You're now a member of the {{ team }} team at {{ camp }}.
 Thank you for helping out!
 <br>
 <br>
+<h3>Team contact info</h3>
+<h5>IRC Channel</h5>
+{% if team.public_irc_channel_name %}
+  <p>The {{ team.name }} Team public IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.public_irc_channel_name }}">{{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
+{% endif %}
+{% if team.member_permission_set in request.user.get_all_permissions and team.private_irc_channel_name %}
+  <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
+{% endif %}
+
+<h5>Signal</h5>
+{% if team.public_signal_channel_link %}
+  <p>The {{ team.name }} Team public Signal group is <a href="{{ team.public_signal_channel_link }}">{{ team.public_signal_channel_link|urlize }}</a></p>
+{% endif %}
+{% if team.member_permission_set in request.user.get_all_permissions and team.private_signal_channel_link %}
+  <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link|urlize }}</a></p>
+{% endif %}
+<br>
+<br>
 Best regards,<br>
 <br>
 The BornHack Team<br>

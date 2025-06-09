@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load imageutils %}
+
+{% block title %}
+  {{ camp.title }}
+{% endblock %}
+
+{% block content %}
+  <div class="row mt-3">
+    <div class="col-12 text-center">
+      <img src="{% static camp.logo_large %}" width="800" class="img-responsive" id="front-logo" />
+    </div>
+  </div>
+
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        <b>BornHack</b> is a 7 day <b>outdoor tent camp</b> where hackers, makers and people with an interest in technology or security come together to celebrate technology, socialise, learn and <b>have fun</b>.
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2020' 'logotent_pink_people.jpg' 'BornHack Logotent with pink light and people' %}
+    </div>
+  </div>
+
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2020' 'participant_tent_laptop.jpg' 'hacker with laptop in front of tent' %}
+    </div>
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        <strong>BornHack 2023</strong> was the eighth BornHack. It took place from <strong>Wednesday the 2nd of August to Wednesday the 9th of August 2023</strong> at our venue on the Danish island of Funen.
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        The BornHack team is very grateful for all the volunteers and participants who participated in making BornHack 2023 a great event. <a href="{% url 'teams:list' camp_slug=camp.slug %}">The volunteers are listed here</a>, thanks so much for all your help. Most of the content was recorded and is available now.
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2021' 'volunteers.jpg' 'The BornHack 2021 volunteers' %}
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9970_cropped.JPG' 'Danish politicians, government officals and IT-developers debating at BornHack 2018' %}
+    </div>
+    <div class="col-12 col-lg-9">
+      <div class="lead">The 2023 lineup consisted of hackers, makers, politicians, activists, developers, artists, sysadmins, engineers.</div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        BornHack aims to <strong>keep ticket prices affordable</strong> for everyone and for that we had some <a href="{% url 'sponsors' camp_slug=camp.slug %}">great sponsors</a>.
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7675_cropped.jpg' 'Organisers thanking the BornHack 2017 sponsors' %}
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12">
+      <p class="lead">You are very welcome to ask questions about the event:</p>
+      {% include 'includes/contact.html' %}
+    </div>
+  </div>
+  <p align="center">
+    {% thumbnail 'img/bornhack-2020' 'ellen_tesla_coil.jpg' 'Little girl and father making arcs with tesla coil' %}
+    {% thumbnail 'img/bornhack-2020' 'dome_lights.jpg' 'Geodesic dome and tents with lights' %}
+    {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7724_cropped.jpg' 'A welcoming hug upon arrival at BornHack 2017! <3' %}
+    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5168.JPG' '#irl_bar by night at BornHack 2016' %}
+    {% thumbnail 'img/bornhack-2018/flummer' 'DSC_7054_cropped.jpg' 'The BornHack 2018 badge' %}
+    {% thumbnail 'img/bornhack-2019' 'masked_jeopardy_beer_wall.jpg' 'Masked hacker jeopardy contenders behind beer can wall' %}
+    {% thumbnail 'img/bornhack-2020' 'badge_cyber.jpg' 'The BornHack 2020 badge displaying "cyber"' %}
+    {% thumbnail 'img/bornhack-2020' 'night_stars_lights.jpg' 'Stars above colorfully lit trees' %}
+    {% thumbnail 'img/bornhack-2020' 'bar_people.jpg' 'BornHack bar in 2020' %}
+    {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7521_cropped.jpg' 'Amelia Andersdotter presenting at BornHack 2017' %}
+  </p>
+{% endblock content %}

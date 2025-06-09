@@ -4,40 +4,39 @@
 {% load imageutils %}
 
 {% block title %}
-Approve Public Credit Names | {{ block.super }}
+  Approve Public Credit Names | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h2>Approve Public Credit Names</h2>
-  <div class="lead">
+  <div class="row">
+    <h2>Approve Public Credit Names</h2>
+    <div class="lead">
       Use this view to approve users public credit names.
- </div>
-</div>
-<br>
-<div class="row">
+    </div>
+  </div>
+  <br>
+  <div class="row">
     <table class="table table-hover datatable">
       <thead>
-      <tr>
+        <tr>
           <th>Username</th>
           <th>Email</th>
           <th>Public Credit Name</th>
           <th>Actions</th>
-       </tr>
+        </tr>
       </thead>
       <tbody>
-      {% for profile in profiles %}
-      <tr>
-          <td>{{ profile.user.username }}</td>
-          <td>{{ profile.user.email }}</td>
-          <td>{{ profile.public_credit_name }}</td>
-          <td>
+        {% for profile in profiles %}
+          <tr>
+            <td>{{ profile.user.username }}</td>
+            <td>{{ profile.user.email }}</td>
+            <td>{{ profile.public_credit_name }}</td>
+            <td>
               <a href="/admin/profiles/profile/{{ profile.pk }}/change/" class="btn btn-success">Open In Admin</a>
-          </td>
-      </tr>
-      {% endfor %}
+            </td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
-</div>
+  </div>
 {% endblock content %}
-

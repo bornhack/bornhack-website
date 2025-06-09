@@ -4,44 +4,44 @@
 {% load bornhack %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <span class="h3">BackOffice - IRC Overview for {{ camp.title }} Teams</span>
+    </div>
+    <div class="card-body">
+      <p class="lead">This view shows a list of all {{ camp.title }} teams with IRC channels registered in the system. Teams with neither a public IRC channel nor a private IRC channel are not listed here.</p>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>Public IRC Channel</th>
+            <th class="text-center">Bot?</th>
+            <th class="text-center">Managed?</th>
+            <th class="text-center">Fix Needed?</th>
+            <th>Private IRC Channel</th>
+            <th class="text-center">Bot?</th>
+            <th class="text-center">Managed?</th>
+            <th class="text-center">Fix Needed?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team in team_list %}
+            <tr>
+              <td>{{ team.name }}</td>
+              <td>{{ team.public_irc_channel_name|default:"N/A" }}</td>
+              <td class="text-center">{{ team.public_irc_channel_bot|truefalseicon }}</td>
+              <td class="text-center">{{ team.public_irc_channel_managed|truefalseicon }}</td>
+              <td class="text-center">{{ team.public_irc_channel_fix_needed|truefalseicon }}</td>
+              <td>{{ team.private_irc_channel_name|default:"N/A" }}</td>
+              <td class="text-center">{{ team.private_irc_channel_bot|truefalseicon }}</td>
+              <td class="text-center">{{ team.private_irc_channel_managed|truefalseicon }}</td>
+              <td class="text-center">{{ team.private_irc_channel_fix_needed|truefalseicon }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+    </p>
   </div>
-  <div class="panel-body">
-  <p class="lead">This view shows a list of all {{ camp.title }} teams with IRC channels registered in the system. Teams with neither a public IRC channel nor a private IRC channel are not listed here.</p>
-  <table class="table table-hover">
-    <thead>
-    <tr>
-        <th>Team</th>
-        <th>Public IRC Channel</th>
-        <th class="text-center">Bot?</th>
-        <th class="text-center">Managed?</th>
-        <th class="text-center">Fix Needed?</th>
-        <th>Private IRC Channel</th>
-        <th class="text-center">Bot?</th>
-        <th class="text-center">Managed?</th>
-        <th class="text-center">Fix Needed?</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for team in team_list %}
-    <tr>
-        <td>{{ team.name }}</td>
-        <td>{{ team.public_irc_channel_name|default:"N/A" }}</td>
-        <td class="text-center">{{ team.public_irc_channel_bot|truefalseicon }}</td>
-        <td class="text-center">{{ team.public_irc_channel_managed|truefalseicon }}</td>
-        <td class="text-center">{{ team.public_irc_channel_fix_needed|truefalseicon }}</td>
-        <td>{{ team.private_irc_channel_name|default:"N/A" }}</td>
-        <td class="text-center">{{ team.private_irc_channel_bot|truefalseicon }}</td>
-        <td class="text-center">{{ team.private_irc_channel_managed|truefalseicon }}</td>
-        <td class="text-center">{{ team.private_irc_channel_fix_needed|truefalseicon }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
   </div>
-</div>
 {% endblock content %}

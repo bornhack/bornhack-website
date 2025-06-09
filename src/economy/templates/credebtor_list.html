@@ -1,53 +1,62 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Credebtors in Chain {{ chain.name }} | {{ block.super }}
+  Credebtors in Chain {{ chain.name }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Credebtors in Chain {{ chain.name }}</h3>
-<p class="lead">A Credebtor is a specific store in a Chain - Like <i>Netto Gelsted</i> or <i>XL Byg Rønne</i>. Please pick an existing Credebtor below, or create a new.</p>
+  <h3>Credebtors in Chain {{ chain.name }}</h3>
+  <p class="lead">A Credebtor is a specific store in a Chain - Like <i>Netto Gelsted</i> or <i>XL Byg Rønne</i>. Please pick an existing Credebtor below, or create a new.</p>
 
-{% if credebtor_list %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Existing Credebtors</h3>
-  </div>
-  <div class="panel-body">
-    <table class="table table-hover">
-      <tbody>
-      {% for credebtor in chain.credebtors.all %}
-      <tr>
-        <td>
-            <h4>
-                <b>{{ credebtor.name }}</b>
-            </h4>
+  {% if credebtor_list %}
+    <div class="card">
+      <h3 class="card-header">Existing Credebtors</h3>
+      <div class="card-body">
+        <table class="table table-hover">
+          <tbody>
+            {% for credebtor in credebtor_list %}
+              <tr>
+                <td>
+                  <h4>
+                    <b>{{ credebtor.name }}</b>
+                  </h4>
 
-            <address>
-                {{ credebtor.address }}
-            </address>
-            {% if credebtor.notes %}
-            <b>Notes:</b>
-            <p>{{ credebtor.notes }}</p>
-            {% endif %}
-            <a href="{% url 'economy:expense_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-divide"></i> Create Expense</a>
-            <a href="{% url 'economy:revenue_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-plus"></i> Create Revenue</a>
-          </td>
-        </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-{% else %}
-<p class="lead"><i>No existing Credebtors found for {{ camp.title }}.</i></p>
-{% endif %}
+                  <address>
+                    {{ credebtor.address }}
+                  </address>
+                  {% if credebtor.notes %}
+                    <b>Notes:</b>
+                    <p>{{ credebtor.notes }}</p>
+                  {% endif %}
 
-<p>
-  <a href="{% url 'economy:credebtor_create' camp_slug=camp.slug chain_slug=chain.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Credebtor</a>
-  <a href="{% url 'economy:chain_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pick Another Chain</a>
-  <a href="{% url 'economy:chain_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Chain</a>
-  <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
-</p>
+                  <hr>
+
+                  <h5>{{ credebtor.current_expenses.count }} Expenses</h5>
+                  {% include 'includes/expense_list_panel.html' with expense_list=credebtor.current_expenses %}
+
+                  <hr>
+
+                  <h5>{{ credebtor.current_revenues.count }} Revenues</h5>
+                  {% include 'includes/revenue_list_panel.html' with revenue_list=credebtor.current_revenues %}
+
+                  <a href="{% url 'economy:expense_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-divide"></i> Create Expense</a>
+                  <a href="{% url 'economy:revenue_create' camp_slug=camp.slug chain_slug=chain.slug credebtor_slug=credebtor.slug %}" class="btn btn-primary"><i class="fas fa-coins"></i> <i class="fas fa-plus"></i> Create Revenue</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <p class="lead"><i>No existing Credebtors found for {{ camp.title }}.</i></p>
+  {% endif %}
+
+  <p>
+    <a href="{% url 'economy:credebtor_create' camp_slug=camp.slug chain_slug=chain.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Credebtor</a>
+    <a href="{% url 'economy:chain_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pick Another Chain</a>
+    <a href="{% url 'economy:chain_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Chain</a>
+    <a href="{% url 'economy:dashboard' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
+  </p>
 {% endblock %}

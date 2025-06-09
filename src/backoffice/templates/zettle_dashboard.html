@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load commonmark %}
+{% load static %}
+{% load bornhack %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">Zettle Dashboard - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>This view shows a quick overview of Zettle stats and links to detailed views for receipts and balances. <b>All data is imported manually using Excel files exported from Zettles webinterface. Poke someone in the Economy Team if data is looking stale!</b></p>
+
+      <p>We currently have <b>{{ receipts }} receipts</b> and <b>{{ balances }} balances</b> registered in the system.</p>
+
+      {% if balance %}
+        <p>The latest Zettle balance is from <b>{{ balance.statement_time }}</b> and at that time our balance in Zettle was <b>{{ balance.balance }}&nbsp;DKK</b>.
+
+          Use the links below to see details or to import new data.</p>
+      {% endif %}
+
+      <div class="list-group">
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettlereceipt_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading"><i class="fas fa-list"></i> Zettle Receipts</h4>
+          <p class="list-group-item-text">Use this view to see {{ receipts }} receipts.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettlebalance_list' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading"><i class="fas fa-balance-scale"></i> Zettle Balances</h4>
+          <p class="list-group-item-text">Use this view to see {{ balances }} account movements for our Zettle account. Each entry in the table represents money going into or out of our Zettle account.</p>
+        </a>
+        <a class="list-group-item list-group-item-action" href="{% url 'backoffice:zettle_import' camp_slug=camp.slug %}">
+          <h4 class="list-group-item-heading"><i class="fas fa-file-excel"></i> Import Zettle Data</h4>
+          <p class="list-group-item-text">Use this view to import Excel files with new receipts and balances.</p>
+        </a>
+      </div>
+      <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
+    </div>
+  </div>
+{% endblock content %}

@@ -7,4 +7,3 @@ Your revenue {{ revenue.pk }} for {{ revenue.camp.title }} has been approved. Th
 Have a nice day!
 
 The {{ revenue.camp.title }} Economy Team
-

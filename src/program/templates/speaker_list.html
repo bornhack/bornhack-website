@@ -1,27 +1,27 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Speakers and hosts at {{ camp.title }} | {{ block.super }}
+  Speakers and hosts at {{ camp.title }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-{% if speaker_list %}
-<p class="lead">
-  An alphabetical list of all speakers, workshop hosts and other
-  event anchors at {{ camp.title }}.
-</p>
+  {% if speaker_list %}
+    <p class="lead">
+      An alphabetical list of all speakers, workshop hosts and other
+      event anchors at {{ camp.title }}.
+    </p>
 
 
-<hr />
+    <hr />
 
-<div class="list-group">
-  {% for speaker in speaker_list %}
-  <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
-      {{ speaker.name }} {% for event in speaker.events.all %}<i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};" data-toggle="tooltip" title="{{ event.title }}"></i> {% endfor %}</a>
-  {% endfor %}
-</div>
-{% else %}
-<p class="lead">No speakers found for {{ camp.title }}</p>
-{% endif %}
+    <div class="list-group">
+      {% for speaker in speaker_list %}
+        <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item">
+          {{ speaker.name }} {% for event in speaker.events.all %}<i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};" data-bs-toggle="tooltip" data-bs-title="{{ event.title }}"></i> {% endfor %}</a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="lead">No speakers found for {{ camp.title }}</p>
+  {% endif %}
 {% endblock program_content %}

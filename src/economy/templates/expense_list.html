@@ -2,18 +2,30 @@
 {% load static %}
 
 {% block title %}
-Expenses | {{ block.super }}
+  Expenses | {{ block.super }}
 {% endblock %}
 
 <{% block content %}
-<h3>Your {{ camp.title }} Expenses</h3>
+  <h3>Your {{ camp.title }} Expenses</h3>
 
-{% include 'includes/expense_list_panel.html' %}
+  <p>
+    <a class="btn btn-secondary" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
+    {% if perms.camps.expense_create_permission %}
+      <a class="btn btn-primary" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Expense</a>
+    {% else %}
+      <div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add expenses. Please ask someone from the Economy team to add the permission if you need it.</p></div>
+    {% endif %}
+  </p>
 
-{% if perms.camps.expense_create_permission %}
-<a class="btn btn-primary" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Expense</a>
-{% else %}
-<div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add expenses. Please ask someone from the Economy team to add the permission if you need it.</p></div>
-{% endif %}
+  {% include 'includes/expense_list_panel.html' %}
+
+  <p>
+    <a class="btn btn-secondary" href="{% url 'economy:dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back to Economy Dashboard</a>
+    {% if perms.camps.expense_create_permission %}
+      <a class="btn btn-primary" href="{% url 'economy:chain_list' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create New Expense</a>
+    {% else %}
+      <div class="alert alert-danger"><p class="lead"><span class="text-error">You don't have permission to add expenses. Please ask someone from the Economy team to add the permission if you need it.</p></div>
+    {% endif %}
+  </p>
 
 {% endblock %}

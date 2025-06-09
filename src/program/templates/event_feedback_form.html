@@ -1,22 +1,25 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
+{% block extra_head %}
+  {{ form.media }}
+{% endblock extra_head %}
 
 {% block title %}
-{% if request.resolver_match.url_name == "eventfeedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }} | {{ block.super }}
+  {% if request.resolver_match.url_name == "eventfeedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h2>{% if request.resolver_match.url_name == "event_feedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }}</h2>
-<form method="POST">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button type="submit" class="btn btn-success">
-    <i class="fas fa-check"></i>
-    {% if request.resolver_match.url_name == "event_feedback_update" %}Update{% else %}Submit{% endif %} Feedback
-  </button>
-  <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  <h2>{% if request.resolver_match.url_name == "event_feedback_update" %}Update{% else %}Submit{% endif %} Feedback for {{ camp.title }} event: {{ event.title }}</h2>
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-success">
+      <i class="fas fa-check"></i>
+      {% if request.resolver_match.url_name == "event_feedback_update" %}Update{% else %}Submit{% endif %} Feedback
+    </button>
+    <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 
-</form>
+  </form>
 
 {% endblock program_content %}

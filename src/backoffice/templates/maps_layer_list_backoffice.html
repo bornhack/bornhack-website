@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
+
+{% block title %}
+  Maps | Layers | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Maps - Layers - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">The following {{ layers.count }} layers are defined for {{ camp.title }}</p>
+      <p>
+        <a href="{% url 'backoffice:map_layer_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Layer</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+      <table class="table datatable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Team</th>
+            <th class="text-center">Icon</th>
+            <th class="text-center">Features</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ft in layers %}
+            <tr>
+              <td><a href="{% url "backoffice:map_features_list" camp_slug=camp.slug layer_slug=ft.slug %}">{{ ft.name }}</a></td>
+              <td>{{ ft.description|default:"N/A" }}</td>
+              <td>{{ ft.responsible_team.name|default:"N/A" }}</td>
+              <td class="text-center"><i class="{{ ft.icon }} fa-2x fa-fw"></i></td>
+              <td class="text-center"><span class="badge">{{ ft.features.count }}</span></td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="{% url "backoffice:map_layer_features_import" camp_slug=camp.slug layer_slug=ft.slug %}" class="btn btn-sm btn-success"><i class="fas fa-file-import"></i> Import</a>
+                  <a href="{% url "maps:map_layer_geojson" layer_slug=ft.slug %}" class="btn btn-sm btn-info" target="_blank"><i class="fas fa-file-export"></i> Export</a>
+                  <a href="{% url "backoffice:map_layer_update" camp_slug=camp.slug layer_slug=ft.slug %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:map_layer_delete" camp_slug=camp.slug layer_slug=ft.slug %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        <h3>External Layers</h3>
+        <p>
+          <a href="{% url 'backoffice:map_external_layer_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Layer</a>
+        </p>
+        <table class="table datatable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Team</th>
+              <th>URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ft in externalLayers %}
+              <tr>
+                <td>{{ ft.name }}</td>
+                <td>{{ ft.description|default:"N/A" }}</td>
+                <td>{{ ft.responsible_team.name|default:"All" }}</td>
+                <td>{{ ft.url }}</td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="{% url "backoffice:map_external_layer_update" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                    <a href="{% url "backoffice:map_external_layer_delete" camp_slug=camp.slug external_layer_uuid=ft.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+{% endblock %}

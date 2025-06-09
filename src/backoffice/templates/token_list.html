@@ -2,53 +2,66 @@
 {% load bornhack %}
 
 {% block title %}
-Token List | Backoffice | {{ block.super }}
+  Token List | Backoffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Token List - BackOffice</h3></div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Token List - BackOffice</h3></div>
+    <div class="card-body">
       <p>This is a list of all tokens for {{ camp.title }}.</p>
-  {% if not token_list %}
-    <p class="lead">No tokens found.</p>
-  {% else %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-    <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
-      <thead>
-        <tr>
-          <th>Token</th>
-          <th>Category</th>
-          <th>Description</th>
-          <th>Finds</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for token in token_list %}
-        <tr>
-          <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
-          <td>{{ token.category }}</td>
-          <td>{{ token.description }}</td>
-          <td>{{ token.tokenfind_set.count }}</td>
-          <td>
-            <div class="btn-group-vertical">
-              <a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-              <a href="{% url 'backoffice:token_update' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-              <a href="{% url 'backoffice:token_delete' camp_slug=camp.slug pk=token.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </p>
-  {% endif %}
-  <p>
-    <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+      {% if not token_list %}
+        <p class="lead">No tokens found.</p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Active</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Finds</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for token in token_list %}
+                <tr>
+                  <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
+                  <td>
+                    {% if token.active %}
+                      <i class="fas fa-check text-success"></i>
+                    {% else %}
+                      <i class="fas fa-ban text-danger"></i>
+                    {% endif %}
+                    {% if token.valid_when %}
+                      <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ token.valid_when }}">
+                        <i class="fas fa-clock text-success"></i>
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td>{{ token.category }}</td>
+                  <td>{{ token.description }}</td>
+                  <td>{{ token.tokenfind_set.count }}</td>
+                  <td>
+                    <div class="btn-group-vertical">
+                      <a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                      <a href="{% url 'backoffice:token_update' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                      <a href="{% url 'backoffice:token_delete' camp_slug=camp.slug pk=token.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

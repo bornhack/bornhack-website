@@ -1,0 +1,60 @@
+{% load bornhack %}
+<table class="table table-hover datatable">
+  <thead>
+    <tr>
+      <th>Order #</th>
+      <th>Email</th>
+      <th>Created</th>
+      <th>Updated</th>
+      <th>Products</th>
+      <th>Payment Method</th>
+      <th>Paid</th>
+      <th>Cancelled</th>
+      <th>Refunds</th>
+      <th>Invoice</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in order_list %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.user.email }}</td>
+        <td data-order="{{ order.created|sortable }}">{{ order.created }}</td>
+        <td data-order="{{ order.updated|sortable }}">{{ order.updated }}</td>
+        <td><ul>{% for opr in order.oprs.all %}<li>{{ opr.product.name }} ({{ opr.quantity }}){% endfor %}</ul></td>
+        <td>{{ order.payment_method }}</td>
+        <td>{{ order.paid|truefalseicon }} {% if order.paid %}paid{% else %}unpaid{% endif %}</td>
+        <td>{{ order.cancelled|truefalseicon }}</td>
+        <td>
+          <ul>
+            {% for refund in order.refunds.all %}
+              <li>
+                <a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=refund.pk %}">
+                  {{ refund }}
+                </a>
+              </li>
+            {% empty %}N/A{% endfor %}
+          </ul>
+        </td>
+        <td>{% if order.invoice %}
+          <a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=order.invoice.id %}">
+            Invoice #{{ order.invoice.id }}
+          </a>
+        {% else %}
+          <a href="{% url "backoffice:order_download_proforma_invoice" camp_slug=camp.slug order_id=order.id %}">
+            (proforma)
+          </a>
+        {% endif %}
+        </td>
+        <td>
+          <div class="btn-group btn-group-vertical">
+            <a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            <a href="{% url "backoffice:order_update" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+            <a href="{% url "backoffice:order_refund" camp_slug=camp.slug order_id=order.pk %}" class="btn btn-primary"><i class="fas fa-undo"></i> Refund</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

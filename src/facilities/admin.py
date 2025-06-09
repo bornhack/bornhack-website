@@ -1,14 +1,14 @@
+from __future__ import annotations
+
 from django.contrib import admin
 from django.utils.html import format_html
 from leaflet.admin import LeafletGeoAdmin
 
-from .models import (
-    Facility,
-    FacilityFeedback,
-    FacilityOpeningHours,
-    FacilityQuickFeedback,
-    FacilityType,
-)
+from .models import Facility
+from .models import FacilityFeedback
+from .models import FacilityOpeningHours
+from .models import FacilityQuickFeedback
+from .models import FacilityType
 
 
 @admin.register(FacilityQuickFeedback)
@@ -25,6 +25,7 @@ class FacilityTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Facility)
 class FacilityAdmin(LeafletGeoAdmin):
+    display_raw = True
     save_as = True
     list_display = [
         "name",

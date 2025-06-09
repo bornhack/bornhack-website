@@ -1,23 +1,22 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if object.name %}Delete "{{ object.name }}"{% else %}Delete "{{ object.title }}"{% endif %} | {{ block.super }}
+  {% if object.name %}Delete "{{ object.name }}"{% else %}Delete "{{ object.title }}"{% endif %} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-{% if object.name %}
-<h3>Delete "{{ object.name }}"</h3>
-{% else %}
-<h3>Delete "{{ object.title }}"</h3>
-{% endif %}
-<p class="lead">Really delete this proposal? This action cannot be undone.</p>
+  {% if object.name %}
+    <h3>Delete "{{ object.name }}"</h3>
+  {% else %}
+    <h3>Delete "{{ object.title }}"</h3>
+  {% endif %}
+  <p class="lead">Really delete this proposal? This action cannot be undone.</p>
 
-<form method="POST" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     {% bootstrap_button "<i class='fas fa-times'></i> Delete" button_type="submit" button_class="btn-danger" %}
     <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary" ><i class='fas fa-undo'></i> Cancel</a>
-</form>
+  </form>
 
 {% endblock program_content %}
-

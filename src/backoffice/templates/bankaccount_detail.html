@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ bankaccount.name }} | Bank Account | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ bankaccount.name }} | Bank Account | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Bank</th>
+            <td><a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}">{{ bankaccount.bank.name }}</a></td>
+          </tr>
+          <tr>
+            <th>Account ID</th>
+            <td>{{ bankaccount.pk }}</td>
+          </tr>
+          <tr>
+            <th>Account Name</th>
+            <td>{{ bankaccount.name }}</td>
+          </tr>
+          <tr>
+            <th>Account Number</th>
+            <td>Reg: {{ bankaccount.reg_no }} Account: {{ bankaccount.account_no }}</td>
+          </tr>
+          <tr>
+            <th>Account Created</th>
+            <td>{{ bankaccount.created }}</td>
+          </tr>
+          <tr>
+            <th>Account Updated</th>
+            <td>{{ bankaccount.updated }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Bank Account Transactions</h3>
+      {% if bankaccount.transactions.exists %}
+        {% include "includes/banktransaction_list_table.html" with banktransaction_list=bankaccount.transactions.all %}
+      {% else %}
+        No transactions found for this bank account.
+      {% endif %}
+      <p>
+        <a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bankaccount.bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Create Chain | {{ block.super }}
+  Create Chain | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Create {{ camp.title }} Creditor/Debtor Chain</h3>
-<form method="post">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Create Chain</button>
-  <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <h3>Create {{ camp.title }} Creditor/Debtor Chain</h3>
+  <form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn btn-success" type="submit"><i class="fas fa-plus"></i> Create Chain</button>
+    <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
 {% endblock %}

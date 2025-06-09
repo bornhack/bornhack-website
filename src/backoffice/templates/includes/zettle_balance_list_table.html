@@ -1,0 +1,27 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "pk" "BornHack ID" "BornHack internal UUID for this Zettle Balance" %}
+      {% thh "statement_time" %}
+      {% thh "payment_time" %}
+      {% thh "payment_reference" %}
+      {% thh "description" %}
+      {% thh "amount" %}
+      {% thh "balance" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for zb in zettlebalance_list %}
+      <tr>
+        <td>{{ zb.pk }}</td>
+        <td data-order="{{ zb.statement_time|sortable }}">{{ zb.statement_time }}</td>
+        <td data-order="{{ zb.payment_time|sortable }}">{{ zb.payment_time|default:"N/A" }}</td>
+        <td>{{ zb.payment_reference|default:"N/A" }}</td>
+        <td>{{ zb.description }}</td>
+        <td data-order="{{ zb.amount }}">{{ zb.amount }}&nbsp;DKK</td>
+        <td data-order="{{ zb.balance }}">{{ zb.balance }}&nbsp;DKK</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

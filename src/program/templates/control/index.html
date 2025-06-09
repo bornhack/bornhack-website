@@ -3,45 +3,45 @@
 {% block content %}
 
 
-<table class="table">
+  <table class="table">
 
-  <thead>
-    <th>
-      Title
-    <th>
-      Submitter email
-    <th>
-      Status
-    <th>
-      Instances
-    <th>
-      Video recording
+    <thead>
+      <th>
+        Title
+        <th>
+          Submitter email
+          <th>
+            Status
+            <th>
+              Instances
+              <th>
+                Video recording
 
-{% for proposal in proposals %}
-<tr>
-  <td>
-    {{ proposal.title }}
-  <td>
-    {{ proposal.user.email }}
-  <td>
-    {{ proposal.proposal_status }}
-  <td>
-    {% for instance in proposal.event.instances.all %}
-    <li>
-      <strong>When:</strong> {{ instance.when.lower|date:"l d. b H:i" }} - {{ instance.when.upper|date:"H:i" }}<br />
-      <strong>Where:</strong> {{ instance.location.name }}
-    </li>
-    {% endfor %}
-  <td>
-    {{ proposal.event.video_recording }}
+                {% for proposal in proposals %}
+                  <tr>
+                    <td>
+                      {{ proposal.title }}
+                      <td>
+                        {{ proposal.user.email }}
+                        <td>
+                          {{ proposal.proposal_status }}
+                          <td>
+                            {% for instance in proposal.event.instances.all %}
+                              <li>
+                                <strong>When:</strong> {{ instance.when.lower|date:"l d. b H:i" }} - {{ instance.when.upper|date:"H:i" }}<br />
+                                <strong>Where:</strong> {{ instance.location.name }}
+                              </li>
+                            {% endfor %}
+                            <td>
+                              {{ proposal.event.video_recording }}
 
-{% endfor %}
+                {% endfor %}
 
-</table>
+              </table>
 
-<h4>CSV</h4>
-<textarea rows=10 cols=100>
-{{ csv }}
-</textarea>
+              <h4>CSV</h4>
+              <textarea rows=10 cols=100>
+                {{ csv }}
+              </textarea>
 
 {% endblock %}

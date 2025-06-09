@@ -1,0 +1,71 @@
+---
+name: "CI"
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: "ubuntu-latest"
+
+    strategy:
+      matrix:
+        python-version:
+          - "3.11"
+
+    services:
+      postgres:
+        image: "postgis/postgis:14-3.3-alpine"
+        env:
+          POSTGRES_USER: "bornhack"
+          POSTGRES_PASSWORD: "bornhack"
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: "actions/checkout@v3"
+
+      - name: "Update apt"
+        run: "sudo apt update"
+
+      - name: "Install OS deps"
+        run: "sudo apt -y install libgdal-dev libpq-dev libmagic1 git binutils libproj-dev gdal-bin"
+
+      - name: "Set up Python ${{ matrix.python-version }}"
+        uses: "actions/setup-python@v4"
+        with:
+          python-version: "${{ matrix.python-version }}"
+          cache: 'pip'
+
+      - name: "Install python dependencies"
+        run: "python -m pip install .[test]"
+
+      - name: "Copy settings"
+        run: "cp src/bornhack/environment_settings.py.dist.dev src/bornhack/environment_settings.py"
+
+      - name: "Check migrations"
+        run: "python src/manage.py makemigrations --check --dry-run"
+
+      - name: "Run tests"
+        run: |
+          cd src
+          coverage run --rcfile ../pyproject.toml manage.py test . --noinput --parallel=4
+          coverage xml --rcfile ../pyproject.toml
+        env:
+          POSTGRES_HOST: "localhost"
+          POSTGRES_PORT: 5432
+
+      - name: "Upload coverage to codecov"
+        uses: "codecov/codecov-action@v5"
+        with:
+          token: "${{ secrets.CODECOV_TOKEN }}"
+          slug: "bornhack/bornhack-website"
+...

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from django.contrib import admin
 from reversion.admin import VersionAdmin
 
-from .models import InfoCategory, InfoItem
+from .models import InfoCategory
+from .models import InfoItem
 
 
 @admin.register(InfoItem)
@@ -21,6 +24,6 @@ class InfoItemInlineAdmin(admin.StackedInline):
 class InfoCategoryAdmin(admin.ModelAdmin):
     save_as = True
     list_filter = ["team__camp"]
-    list_display = ["headline"]
+    list_display = ["headline", "team"]
     search_fields = ["headline", "body"]
     inlines = [InfoItemInlineAdmin]

@@ -1,20 +1,32 @@
+"""Template tags for teams."""
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django import template
 from django.utils.safestring import mark_safe
 
 from teams.models import TeamMember
 
+if TYPE_CHECKING:
+    from django.contrib.auth.models import User
+
+    from teams.models import Team
+
 register = template.Library()
 
 
 @register.filter
-def is_team_member(user, team):
+def is_team_member(user: User, team: Team) -> bool:
+    """Template tag to return team member status."""
     return TeamMember.objects.filter(team=team, user=user, approved=True).exists()
 
 
 @register.simple_tag
-def membershipstatus(user, team, showicon=False):
-    if user in team.responsible_members.all():
-        text = "Responsible"
+def membershipstatus(user: User, team: Team, showicon: bool=False) -> str:
+    """Template tag to return membership status."""
+    if user in team.leads.all():
+        text = "Lead"
         icon = "fa-star"
     elif user in team.approved_members.all():
         text = "Member"
@@ -27,6 +39,5 @@ def membershipstatus(user, team, showicon=False):
         icon = "fa-times"
 
     if showicon:
-        return mark_safe("<i class='fa %s' title='%s'></i>" % (icon, text))
-    else:
-        return text
+        return mark_safe(f"<i class='fa {icon}' title='{text}'></i>") # noqa: S308
+    return text

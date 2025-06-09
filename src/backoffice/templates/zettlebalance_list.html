@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  Zettle Balance List | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Zettle Balance List - BackOffice</h3></div>
+    <div class="card-body">
+      <p>A list of {{ zettlebalance_list.count }} zettle balances imported from their system via Excel files.</p>
+      {% if not zettlebalance_list %}
+        <p class="lead">No ZettleBalances found. Go <a href="{% url 'backoffice:zettle_import' camp_slug=camp.slug %}">import an Excel file</a>!</p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:zettle_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Zettle Dashboard</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          {% include "includes/zettle_balance_list_table.html" %}
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:zettle_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Zettle Dashboard</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

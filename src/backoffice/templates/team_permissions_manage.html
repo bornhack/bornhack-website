@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
+
+{% block content %}
+  <div class="card">
+    <h3 class="card-header">Manage {{ team.name }} Team Permissions</h3>
+    <div class="card-body">
+      <p>This view makes it possible to grant/revoke permissions for {{ team.name }} Team members. The <b>lead</b> and <b>member</b> permissions are granted through team memberships and can not be changed here. Superusers have all permissions and they can not be revoked here.</p>
+      {% include "includes/permissions_explainer.html" %}
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table class="table table-striped datatable">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Public Credit Name</th>
+              <th class="text-center">Superuser</th>
+              {% for perm in perms %}
+                <th class="text-center">{{ perm }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for member in team.approved_members.all %}
+              <tr>
+                <td>{{ member.username }}</td>
+                <td>{{ member.profile.name }}</td>
+                <td>{{ member.profile.public_credit_name }}</td>
+                <td class="text-center">{{ member.is_superuser|truefalseicon }}</td>
+                {% for perm in perms %}
+                  {% for field in form.visible_fields %}
+                    {% if field.name == member.username|add:"_"|add:perm %}
+                      <td class="text-center">{{ field }}</td>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
+        <a href="{% url 'backoffice:team_permission_index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

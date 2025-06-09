@@ -1,6 +1,6 @@
 Hello!
 
-This email contains a {{ ticket.sponsor.name }} sponsor ticket for {{ ticket.sponsor.camp.title }}
+This email contains a {{ ticket.sponsor.name }} {{ ticket.ticket_type.name }} sponsor ticket for {{ ticket.sponsor.camp.title }}
 Thank you for helping out! :)
 
 Best regards,
@@ -8,4 +8,3 @@ Best regards,
 BornHack
 
 (This email is automatically generated)
-

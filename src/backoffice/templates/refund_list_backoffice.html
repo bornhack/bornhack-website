@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Refunds | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h2>Refunds</h2>
+
+  <div class="lead">
+    This table shows all refunds in the system.
+  </div>
+
+  <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+  {% include 'includes/refund_list_panel.html' %}
+
+{% endblock content %}

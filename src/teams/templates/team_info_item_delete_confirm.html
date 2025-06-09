@@ -1,30 +1,30 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if form.instance.id %}
-Edit Info Item: {{ form.instance.headline }}
-{% else %}
-Create Info item
-{% endif %}
-in {{ form.instance.category.headline }}
+  {% if form.instance.id %}
+    Edit Info Item: {{ form.instance.headline }}
+  {% else %}
+    Create Info item
+  {% endif %}
+  in {{ form.instance.category.headline }}
 {% endblock %}
 
 {% block team_content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>
-            Delete info item {{ object.name }}
-            in {{ form.instance.category.headline }}
-        </h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>
+        Delete info item {{ object.name }}
+        in {{ form.instance.category.headline }}
+      </h4>
     </div>
-    <div class="panel-body">
-        <form method="POST">
-            {% csrf_token %}
-            <p>Are you sure you want to delete "{{ object.headline }}" in the "{{ object.category.headline }}" category.</p>
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{ object.headline }}" in the "{{ object.category.headline }}" category.</p>
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form>
     </div>
-</div>
+  </div>
 {% endblock %}

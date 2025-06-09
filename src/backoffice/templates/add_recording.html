@@ -2,31 +2,30 @@
 {% load bornhack %}
 
 {% block content %}
-<div class="row">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <span class="h2">BackOffice - Add Event recordings</span>
-    </div>
-    <div class="panel-body">
-      <div class="lead">
-        The Content team can add video links to all events that are configured to be recorded
+  <div class="row">
+    <div class="card">
+      <div class="card-header">
+        <span class="h2">BackOffice - Add Event recordings</span>
       </div>
-      {% if event_list %}
-      <form method="post">
-        {{ formset.management_form }}
-        {% csrf_token %}
-        {% for form, event in formset|zip:event_list %}
-          {% include "includes/eventrecording_detail_panel.html" %}
-        {% endfor %}
-        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-      </form>
-      {% else %}
-      <div class="lead">There is no events missing links to recordings.</div>
-      <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-      {% endif %}
+      <div class="card-body">
+        <div class="lead">
+          The Content team can add video links to all events that are configured to be recorded
+        </div>
+        {% if event_list %}
+          <form method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% for form, event in formset|zip:event_list %}
+              {% include "includes/eventrecording_detail_panel.html" %}
+            {% endfor %}
+            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
+            <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+          </form>
+        {% else %}
+          <div class="lead">There is no events missing links to recordings.</div>
+          <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
 {% endblock content %}
-

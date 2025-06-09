@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ accountingexport.pk }} | Accounting Export | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ accountingexport.pk }} | Accounting Export | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:accountingexport_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Accounting Export List</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>UUID</th>
+            <td>{{ accountingexport.uuid }}</td>
+          </tr>
+          <tr>
+            <th>From Date</th>
+            <td>{{ accountingexport.date_from }}</td>
+          </tr>
+          <tr>
+            <th>To Date</th>
+            <td>{{ accountingexport.date_to }}</td>
+          </tr>
+          <tr>
+            <th>Created</th>
+            <td>{{ accountingexport.created }}</td>
+          </tr>
+          <tr>
+            <th>Updated</th>
+            <td>{{ accountingexport.updated }}</td>
+          </tr>
+          <tr>
+            <th>Archive</th>
+            <td><a href="{% url 'backoffice:accountingexport_download_archive' camp_slug=camp.slug accountingexport_uuid=accountingexport.uuid %}" class="btn btn-primary">Download</a></td>
+          </tr>
+          <tr>
+            <th>Files</th>
+            <td>
+              {% for file in files %}
+                <a href="{% url 'backoffice:accountingexport_download_file' camp_slug=camp.slug accountingexport_uuid=accountingexport.uuid filename=file %}">{{ file }}</a><br>
+              {% endfor %}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

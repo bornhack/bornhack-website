@@ -1,21 +1,24 @@
+from __future__ import annotations
+
 import logging
 from datetime import timedelta
 
-from conference_scheduler import resources, scheduler
+from conference_scheduler import resources
+from conference_scheduler import scheduler
 from conference_scheduler.lp_problem import objective_functions
-from conference_scheduler.validator import is_valid_schedule, schedule_violations
+from conference_scheduler.validator import is_valid_schedule
+from conference_scheduler.validator import schedule_violations
 from psycopg2.extras import DateTimeTZRange
 
 from program.email import add_event_scheduled_email
 
 from .models import EventType
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class AutoScheduler:
-    """
-    The BornHack AutoScheduler. Made with love by Tykling.
+    """The BornHack AutoScheduler. Made with love by Tykling.
 
     Built around https://github.com/PyconUK/ConferenceScheduler which works with lists
     of conference_scheduler.resources.Slot and conference_scheduler.resources.Event objects.
@@ -26,8 +29,8 @@ class AutoScheduler:
     Initialising this class takes a while because all the objects have to be created.
     """
 
-    def __init__(self, camp):
-        """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects"""
+    def __init__(self, camp, **kwargs) -> None:
+        """Get EventTypes, EventSessions and Events, build autoslot and autoevent objects."""
         self.camp = camp
 
         # Get all EventTypes which support autoscheduling
@@ -61,20 +64,23 @@ class AutoScheduler:
                     break
 
         # get autoevents and a lookup dict which maps Event id to autoevent index
-        self.autoevents, self.autoeventindex = self.get_autoevents(self.events)
+        self.autoevents, self.autoeventindex = self.get_autoevents(
+            self.events,
+            **kwargs,
+        )
 
     def get_event_types(self):
-        """Return all EventTypes which support autoscheduling"""
+        """Return all EventTypes which support autoscheduling."""
         return EventType.objects.filter(support_autoscheduling=True)
 
     def get_event_sessions(self, event_types):
-        """Return all EventSessions for these EventTypes"""
+        """Return all EventSessions for these EventTypes."""
         return self.camp.event_sessions.filter(
             event_type__in=event_types,
         ).prefetch_related("event_type", "event_location")
 
     def get_events(self, event_types):
-        """Return all Events that need scheduling"""
+        """Return all Events that need scheduling."""
         # return all events for these event_types, but..
         return self.camp.events.filter(event_type__in=event_types).exclude(
             # exclude Events that have been sceduled already...
@@ -84,7 +90,7 @@ class AutoScheduler:
         )
 
     def get_autoslots(self, event_sessions):
-        """Return a list of autoslots for all slots in all EventSessions"""
+        """Return a list of autoslots for all slots in all EventSessions."""
         autoslots = []
         # loop over the sessions
         for session in event_sessions:
@@ -93,8 +99,15 @@ class AutoScheduler:
                 autoslots.append(slot.get_autoscheduler_slot())
         return autoslots
 
-    def get_autoevents(self, events):
-        """Return a list of resources.Event objects, one for each Event"""
+    def get_autoevents(
+        self,
+        events,
+        event_type_constraint=True,
+        speakers_other_events_constraint=True,
+        speaker_event_conflicts_constraint=True,
+        speaker_availability_constraint=True,
+    ):
+        """Return a list of resources.Event objects, one for each Event."""
         autoevents = []
         autoeventindex = {}
         eventindex = {}
@@ -105,7 +118,7 @@ class AutoScheduler:
                     duration=event.duration_minutes,
                     tags=event.tags.names(),
                     demand=event.demand,
-                )
+                ),
             )
             # create a dict of events with the autoevent index as key and the Event as value
             autoeventindex[autoevents.index(autoevents[-1])] = event
@@ -115,86 +128,89 @@ class AutoScheduler:
         # loop over all autoevents to add unavailability...
         # (we have to do this in a seperate loop because we need all the autoevents to exist)
         for autoevent in autoevents:
-            # get the Event
-            event = autoeventindex[autoevents.index(autoevent)]
-            # loop over all other event_types...
-            for et in self.event_types.all().exclude(pk=event.event_type.pk):
-                if et in self.event_type_slots:
-                    # and add all slots for this EventType as unavailable for this event,
-                    # this means we don't schedule a talk in a workshop slot and vice versa.
-                    autoevent.add_unavailability(*self.event_type_slots[et])
+            if event_type_constraint:
+                # get the Event
+                event = autoeventindex[autoevents.index(autoevent)]
+                # loop over all other event_types...
+                for et in self.event_types.all().exclude(pk=event.event_type.pk):
+                    if et in self.event_type_slots:
+                        # and add all slots for this EventType as unavailable for this event,
+                        # this means we don't schedule a talk in a workshop slot and vice versa.
+                        autoevent.add_unavailability(*self.event_type_slots[et])
 
             # loop over all speakers for this event and add event conflicts
             for speaker in event.speakers.all():
-                # loop over other events featuring this speaker, register each conflict,
-                # this means we dont schedule two events for the same speaker at the same time
-                conflict_ids = speaker.events.exclude(id=event.id).values_list(
-                    "id", flat=True
-                )
-                for conflictevent in autoevents:
-                    if conflictevent.name in conflict_ids:
-                        # only the event with the lowest index gets the unavailability,
-                        if autoevents.index(conflictevent) > autoevents.index(
-                            autoevent
-                        ):
-                            autoevent.add_unavailability(conflictevent)
-
-                # loop over event_conflicts for this speaker, register unavailability for each,
-                # this means we dont schedule this event at the same time as something the
-                # speaker wishes to attend.
-                # Only process Events which the AutoScheduler is handling
-                for conflictevent in speaker.event_conflicts.filter(
-                    pk__in=events.values_list("pk", flat=True)
-                ):
-                    # only the event with the lowest index gets the unavailability
-                    if eventindex[conflictevent] > autoevents.index(autoevent):
-                        autoevent.add_unavailability(
-                            autoevents[eventindex[conflictevent]]
-                        )
-
-                # loop over event_conflicts for this speaker, register unavailability for each,
-                # only process Events which the AutoScheduler is not handling, and which have
-                # been scheduled in one or more EventSlots
-                for conflictevent in speaker.event_conflicts.filter(
-                    event_slots__isnull=False
-                ).exclude(pk__in=events.values_list("pk", flat=True)):
-                    # loop over the EventSlots this conflict is scheduled in
-                    for conflictslot in conflictevent.event_slots.all():
-                        # loop over all slots
-                        for slot in self.autoslots:
-                            # check if this slot overlaps with the conflictevents slot
-                            if conflictslot.when & DateTimeTZRange(
-                                slot.starts_at,
-                                slot.starts_at + timedelta(minutes=slot.duration),
-                            ):
-                                # this slot overlaps with the conflicting event
-                                autoevent.add_unavailability(slot)
-
-                # Register all slots where we have no positive availability
-                # for this speaker as unavailable
-                available = []
-                for availability in speaker.availabilities.filter(
-                    available=True
-                ).values_list("when", flat=True):
-                    availability = DateTimeTZRange(
-                        availability.lower, availability.upper, "()"
+                if speakers_other_events_constraint:
+                    # loop over other events featuring this speaker, register each conflict,
+                    # this means we dont schedule two events for the same speaker at the same time
+                    conflict_ids = speaker.events.exclude(id=event.id).values_list(
+                        "id",
+                        flat=True,
                     )
-                    for slot in self.autoslots:
-                        slotrange = DateTimeTZRange(
-                            slot.starts_at,
-                            slot.starts_at + timedelta(minutes=slot.duration),
+                    for conflictevent in autoevents:
+                        if conflictevent.name in conflict_ids:
+                            # only the event with the lowest index gets the unavailability,
+                            if autoevents.index(conflictevent) > autoevents.index(
+                                autoevent,
+                            ):
+                                autoevent.add_unavailability(conflictevent)
+
+                if speaker_event_conflicts_constraint:
+                    # loop over event_conflicts for this speaker, register unavailability for each,
+                    # this means we dont schedule this event at the same time as something the
+                    # speaker wishes to attend.
+                    # Only process Events which the AutoScheduler is handling
+                    for conflictevent in speaker.event_conflicts.filter(
+                        pk__in=events.values_list("pk", flat=True),
+                    ):
+                        # only the event with the lowest index gets the unavailability
+                        if eventindex[conflictevent] > autoevents.index(autoevent):
+                            autoevent.add_unavailability(
+                                autoevents[eventindex[conflictevent]],
+                            )
+
+                    # loop over event_conflicts for this speaker, register unavailability for each,
+                    # only process Events which the AutoScheduler is not handling, and which have
+                    # been scheduled in one or more EventSlots
+                    for conflictevent in speaker.event_conflicts.filter(
+                        event_slots__isnull=False,
+                    ).exclude(pk__in=events.values_list("pk", flat=True)):
+                        # loop over the EventSlots this conflict is scheduled in
+                        for conflictslot in conflictevent.event_slots.all():
+                            # loop over all slots
+                            for slot in self.autoslots:
+                                # check if this slot overlaps with the conflictevents slot
+                                if conflictslot.when & DateTimeTZRange(
+                                    slot.starts_at,
+                                    slot.starts_at + timedelta(minutes=slot.duration),
+                                ):
+                                    # this slot overlaps with the conflicting event
+                                    autoevent.add_unavailability(slot)
+
+                if speaker_availability_constraint:
+                    # Register all slots where we have no positive availability
+                    # for this speaker as unavailable
+                    available = []
+                    for availability in speaker.availabilities.filter(
+                        available=True,
+                    ).values_list("when", flat=True):
+                        availability = DateTimeTZRange(
+                            availability.lower,
+                            availability.upper,
                             "()",
                         )
-                        if slotrange in availability:
-                            # the speaker is available for this slot
-                            available.append(self.autoslots.index(slot))
-                autoevent.add_unavailability(
-                    *[
-                        s
-                        for s in self.autoslots
-                        if not self.autoslots.index(s) in available
-                    ]
-                )
+                        for slot in self.autoslots:
+                            slotrange = DateTimeTZRange(
+                                slot.starts_at,
+                                slot.starts_at + timedelta(minutes=slot.duration),
+                                "()",
+                            )
+                            if slotrange in availability:
+                                # the speaker is available for this slot
+                                available.append(self.autoslots.index(slot))
+                    autoevent.add_unavailability(
+                        *[s for s in self.autoslots if self.autoslots.index(s) not in available],
+                    )
 
         return autoevents, autoeventindex
 
@@ -202,12 +218,13 @@ class AutoScheduler:
         """Build an autoschedule object based on the existing published schedule.
         Returns an autoschedule, which is a list of conference_scheduler.resources.ScheduledItem
         objects, one for each scheduled Event. This function is useful for creating an "original
-        schedule" to base a new similar schedule off of."""
-
+        schedule" to base a new similar schedule off of.
+        """
         # loop over scheduled events and create a ScheduledItem object for each
         autoschedule = []
         for slot in self.camp.event_slots.filter(
-            autoscheduled=True, event__in=self.events
+            autoscheduled=True,
+            event__in=self.events,
         ):
             # loop over all autoevents to find the index of this event
             for autoevent in self.autoevents:
@@ -222,8 +239,7 @@ class AutoScheduler:
                 if (
                     autoslot.venue == slot.event_location.id
                     and autoslot.starts_at == slot.when.lower
-                    and autoslot.session
-                    in self.event_type_sessions[slot.event.event_type]
+                    and autoslot.session in self.event_type_sessions[slot.event.event_type]
                 ):
                     # This autoslot starts at the same time as the EventSlot, and at the same
                     # location. It also has the session ID of a session with the right EventType.
@@ -231,14 +247,14 @@ class AutoScheduler:
                         resources.ScheduledItem(
                             event=self.autoevents[eventindex],
                             slot=self.autoslots[self.autoslots.index(autoslot)],
-                        )
+                        ),
                     )
                     scheduled = True
                     break
 
             # did we find a slot matching this EventInstance?
             if not scheduled:
-                print(f"Could not find an autoslot for slot {slot} - skipping")
+                pass
 
         # The returned schedule might not be valid! For example if a speaker is no
         # longer available when their talk is scheduled. This is fine though, an invalid
@@ -247,7 +263,8 @@ class AutoScheduler:
 
     def calculate_autoschedule(self, original_schedule=None):
         """Calculate autoschedule based on self.autoevents and self.autoslots,
-        optionally using original_schedule to minimise changes"""
+        optionally using original_schedule to minimise changes.
+        """
         kwargs = {}
         kwargs["events"] = self.autoevents
         kwargs["slots"] = self.autoslots
@@ -258,17 +275,14 @@ class AutoScheduler:
             kwargs["objective_function"] = objective_functions.number_of_changes
         else:
             # otherwise use the capacity demand difference thing
-            kwargs[
-                "objective_function"
-            ] = objective_functions.efficiency_capacity_demand_difference
+            kwargs["objective_function"] = objective_functions.efficiency_capacity_demand_difference
         # calculate the new schedule
-        autoschedule = scheduler.schedule(**kwargs)
-        return autoschedule
+        return scheduler.schedule(**kwargs)
 
     def calculate_similar_autoschedule(self, original_schedule=None):
         """Convenience method for creating similar schedules. If original_schedule
-        is omitted the new schedule is based on the current schedule instead"""
-
+        is omitted the new schedule is based on the current schedule instead.
+        """
         if not original_schedule:
             # we do not have an original_schedule, use current EventInstances
             original_schedule = self.build_current_autoschedule()
@@ -279,15 +293,14 @@ class AutoScheduler:
         return autoschedule, diff
 
     def apply(self, autoschedule):
-        """Apply an autoschedule by creating EventInstance objects to match it"""
-
+        """Apply an autoschedule by creating EventInstance objects to match it."""
         # "The Clean Slate protocol sir?" - delete any existing autoscheduled Events
         # TODO: investigate how this affects the FRAB XML export (for which we added a UUID on
         # Slot objects). Make sure "favourite" functionality or bookmarks or w/e in
         # FRAB clients still work after a schedule "re"apply. We might need a smaller hammer here.
         deleted = self.camp.event_slots.filter(
             # get all autoscheduled EventSlots
-            autoscheduled=True
+            autoscheduled=True,
         ).update(
             # clear the Event
             event=None,
@@ -319,8 +332,7 @@ class AutoScheduler:
         return deleted, scheduled
 
     def diff(self, original_schedule, new_schedule):
-        """
-        This method returns a dict of Event differences and Slot differences between
+        """This method returns a dict of Event differences and Slot differences between
         the two schedules.
         """
         slot_diff = scheduler.slot_schedule_difference(
@@ -336,7 +348,7 @@ class AutoScheduler:
                     "starttime": item.slot.starts_at,
                     "old": {},
                     "new": {},
-                }
+                },
             )
             if item.old_event:
                 try:
@@ -368,34 +380,34 @@ class AutoScheduler:
                     "event": event,
                     "old": {},
                     "new": {},
-                }
+                },
             )
             # do we have an old slot for this event?
             if item.old_slot:
-                event_output[-1]["old"][
-                    "event_location"
-                ] = self.camp.event_locations.get(id=item.old_slot.venue)
+                event_output[-1]["old"]["event_location"] = self.camp.event_locations.get(id=item.old_slot.venue)
                 event_output[-1]["old"]["starttime"] = item.old_slot.starts_at
             # do we have a new slot for this event?
             if item.new_slot:
-                event_output[-1]["new"][
-                    "event_location"
-                ] = self.camp.event_locations.get(id=item.new_slot.venue)
+                event_output[-1]["new"]["event_location"] = self.camp.event_locations.get(id=item.new_slot.venue)
                 event_output[-1]["new"]["starttime"] = item.new_slot.starts_at
 
         # all good
         return {"event_diffs": event_output, "slot_diffs": slot_output}
 
     def is_valid(self, autoschedule, return_violations=False):
-        """Check if a schedule is valid, optionally returning a list of violations if invalid"""
+        """Check if a schedule is valid, optionally returning a list of violations if invalid."""
         valid = is_valid_schedule(
-            autoschedule, slots=self.autoslots, events=self.autoevents
+            autoschedule,
+            slots=self.autoslots,
+            events=self.autoevents,
         )
         if not return_violations:
             return valid
         return (
             valid,
             schedule_violations(
-                autoschedule, slots=self.autoslots, events=self.autoevents
+                autoschedule,
+                slots=self.autoslots,
+                events=self.autoevents,
             ),
         )

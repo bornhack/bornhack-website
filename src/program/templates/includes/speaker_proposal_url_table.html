@@ -1,25 +1,25 @@
 <table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>URL</th>
-            {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-            <th class='text-right'>Available Actions</th>
-            {% endif %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for url in speaker_proposal.urls.all %}
-        <tr>
-            <td><i class="{{ url.url_type.icon }} fa-lg"></i><span class="h4"> {{ url.url_type.name }}</span></td>
-            <td><span class="h4"><a href="{{ url.url }}" target="_blank">{{ url }}</a></span></td>
-            {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-            <td class='text-right'>
-                <a href="{% url 'program:speaker_proposal_url_update' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid url_uuid=url.uuid %}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i><span class="h5"> Update</span></a>
-                <a href="{% url 'program:speaker_proposal_url_delete' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
-            </td>
-            {% endif %}
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Type</th>
+      <th>URL</th>
+      {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
+        <th class='text-right'>Available Actions</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for url in speaker_proposal.urls.all %}
+      <tr>
+        <td><i class="{{ url.url_type.icon }} fa-lg"></i> {{ url.url_type.name }}</td>
+        <td><a href="{{ url.url }}" target="_blank">{{ url }}</a></td>
+        {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
+          <td class='text-right'>
+            <a href="{% url 'program:speaker_proposal_url_update' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid url_uuid=url.uuid %}" class="btn btn-primary btn-sm text-nowrap"><i class="fas fa-edit"></i> Update</a>
+            <a href="{% url 'program:speaker_proposal_url_delete' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid url_uuid=url.uuid %}" class="btn btn-danger btn-sm text-nowrap"><i class="fas fa-times"></i> Delete</a>
+          </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </tbody>
 </table>

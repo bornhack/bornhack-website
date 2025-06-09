@@ -1,20 +1,33 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load leaflet_tags %}
+{% load django_bootstrap5 %}
+{% load static %}
 
 {% block title %}
-Create {{ camp.title }} Village | {{ block.super }}
+  Create {{ camp.title }} Village | {{ block.super }}
 {% endblock %}
 
+{% block extra_head %}
+  {{ form.media }}
+  {% leaflet_css plugins="forms" %}
+  {% leaflet_js plugins="forms" %}
+  {{ mapData|json_script:"mapData" }}
+  <script src="{% static 'js/maps/generic/mapVars.js' %}" type="text/javascript"></script>
+  <script src="{% static 'js/maps/generic/map.js' %}" type="text/javascript"></script>
+{% endblock extra_head %}
+
+
 {% block content %}
-<h3>Create {{ camp.title }} Village</h3>
-<form method="post">
-  {% csrf_token %}
+  <h3>Create {{ camp.title }} Village</h3>
+  <form method="post">
+    {% csrf_token %}
 
-  {% bootstrap_form form %}
+    {% bootstrap_form form %}
 
-  <hr />
+    <hr />
 
-  <button class="btn btn-primary pull-right" type="submit">Save</button>
-</form>
+    <button class="btn btn-primary pull-right" type="submit">Save</button>
+  </form>
+  <script src="{% static 'js/maps/generic/init_loader.js' %}"></script>
 
 {% endblock %}

@@ -1,58 +1,59 @@
-    <table class="table table-hover {% if not nodatatable %}datatable{% endif %}">
-      <thead>
+<table class="table table-hover {% if not nodatatable %}datatable{% endif %}">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Status</th>
+      <th>Type</th>
+      <th>Tags</th>
+      <th>Speaker Proposals</th>
+      <th>Event?</th>
+      <th>User</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for proposal in event_proposal_list %}
       <tr>
-          <th>Title</th>
-          <th>Status</th>
-          <th>Type</th>
-          <th>Tags</th>
-          <th>Speaker Proposals</th>
-          <th>Event?</th>
-          <th>User</th>
-          <th>Action</th>
-       </tr>
-      </thead>
-      <tbody>
-      {% for proposal in event_proposal_list %}
-      <tr>
-          <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.pk %}">{{ proposal.title }}</a></td>
-          <td><span class="badge">{{ proposal.proposal_status }}</span></td>
-          <td><i class="fas fa-{{ proposal.event_type.icon }} fa-lg" style="color: {{ proposal.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=proposal.event_type.slug %}">{{ proposal.event_type }}</a></td>
+        <td><a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.pk %}">{{ proposal.title }}</a></td>
+        <td><span class="badge">{{ proposal.proposal_status }}</span></td>
+        <td><i class="fas fa-{{ proposal.event_type.icon }} fa-lg" style="color: {{ proposal.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=proposal.event_type.slug %}">{{ proposal.event_type }}</a></td>
         <td>
           {% for tag in proposal.tags.all %}
-          <span class="badge">{{ tag }}</span><br>
+            <span class="badge">{{ tag }}</span><br>
           {% empty %}
-          N/A
+            N/A
           {% endfor %}
         </td>
         <td>
           {% if proposal.speakers.exists %}
-          <ul class="list-group">
-          {% for speaker in proposal.speakers.all %}
-          <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-toggle="tooltip" title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}</a>
-          {% endfor %}
+            <ul class="list-group">
+              {% for speaker in proposal.speakers.all %}
+                <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.pk %}" class="list-group-item list-group-item-action"><i class="fas fa-user{% if speaker.proposal_status == "approved" %} text-success{% elif speaker.proposal_status == "rejected" %} text-danger{% endif %}" data-bs-toggle="tooltip" data-bs-title="Proposal {{ speaker.proposal_status }}"></i> {{ speaker.name }}</a>
+              {% endfor %}
           {% else %}
-          N/A
+            N/A
           {% endif %}
         </td>
         {% if proposal.event %}
-        <td>
-          <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=proposal.event.slug %}" class="btn btn-default btn-sm">{{ proposal.event_type.icon_html }} Event</a>
-        </td>
+          <td>
+            <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=proposal.event.slug %}" class="btn btn-secondary btn-sm text-nowrap">{{ proposal.event_type.icon_html }}&nbsp;Event</a>
+          </td>
         {% else %}
-        <td class="text-center"><i class="fas fa-times fa-2x text-danger"></i></td>
+          <td class="text-center"><i class="fas fa-times fa-2x text-danger"></i></td>
         {% endif %}
         <td>{{ proposal.user }}</td>
         <td>
           <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            <a href="{% url 'backoffice:event_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-primary text-nowrap"><i class="fas fa-search"></i>&nbsp;Details</a>
             {% if proposal.proposal_status == "pending" %}
-            <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve</a>
-            <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject</a>
+              {% if proposal.can_be_approved %}
+                <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-success text-nowrap"><i class="fas fa-check"></i>&nbsp;Approve</a>
+              {% endif %}
+              <a href="{% url 'backoffice:event_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-danger text-nowrap"><i class="fas fa-times"></i>&nbsp;Reject</a>
             {% endif %}
           </div>
         </td>
       </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-
+    {% endfor %}
+  </tbody>
+</table>

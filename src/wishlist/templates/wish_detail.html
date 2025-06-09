@@ -3,17 +3,17 @@
 {% load commonmark %}
 
 {% block title %}
-Wish List | {{ block.super }}
+  Wish List | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>BornHack Wish: {{ wish.name }}</h2>
+  <h2>BornHack Wish: {{ wish.name }}</h2>
 
-<p class="lead">{{ wish.description }}</p>
+  <p class="lead">{{ wish.description }}</p>
 
-<p class="lead">Number needed: {{ wish.count }}</p>
+  <p class="lead">Number needed: {{ wish.count }}</p>
 
-<p class="lead"><i>This wish was created by the <a href="{% url 'teams:general' camp_slug=wish.team.camp.slug team_slug=wish.team.slug %}">{{ wish.team.name }} Team</a> for {{ wish.team.camp.title }} on {{ wish.created }}. If you can help please visit their <a href="{% url 'teams:general' camp_slug=wish.camp.slug team_slug=wish.team.slug %}">team page</a> for contact info!</i></p>
+  <p class="lead"><i>This wish was created by the <a href="{% url 'teams:general' camp_slug=wish.team.camp.slug team_slug=wish.team.slug %}">{{ wish.team.name }} Team</a> for {{ wish.team.camp.title }} on {{ wish.created }}. If you can help please visit their <a href="{% url 'teams:general' camp_slug=wish.camp.slug team_slug=wish.team.slug %}">team page</a> for contact info!</i></p>
 
-<a class="btn btn-primary" href="{% url 'wish_list_redirect' %}"><i class="fas fa-undo"></i> Back to Wish List</a>
+  <a class="btn btn-primary" href="{% url 'wish_list_redirect' %}"><i class="fas fa-undo"></i> Back to Wish List</a>
 {% endblock %}

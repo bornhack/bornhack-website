@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ banktransaction.pk }} | Bank Transaction | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ banktransaction.pk }} | Bank Transaction | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=banktransaction.bank_account.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Account Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Bank</th>
+            <td><a href="{% url 'backoffice:bank_detail' camp_slug=camp.slug bank_uuid=banktransaction.bank_account.bank.pk %}">{{ banktransaction.bank_account.bank.name }}</a></td>
+          </tr>
+          <tr>
+            <th>Account</th>
+            <td><a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=banktransaction.bank_account.pk %}">{{ banktransaction.bank_account.name }}</a></td>
+          </tr>
+          <tr>
+            <th>Transaction ID</th>
+            <td>{{ banktransaction.pk }}</td>
+          </tr>
+          <tr>
+            <th>Transaction Date</th>
+            <td>{{ banktransaction.date }}</td>
+          </tr>
+          <tr>
+            <th>Transaction Text</th>
+            <td>{{ banktransaction.text }}</td>
+          </tr>
+          <tr>
+            <th>Transaction Amount</th>
+            <td>{{ banktransaction.amount }}&nbsp;DKK</td>
+          </tr>
+          <tr>
+            <th>Transaction Balance</th>
+            <td>{{ banktransaction.balance }}&nbsp;DKK</td>
+          </tr>
+          <tr>
+            <th>Transaction Created</th>
+            <td>{{ banktransaction.created }}</td>
+          </tr>
+          <tr>
+            <th>Transaction Updated</th>
+            <td>{{ banktransaction.updated }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>BankTransaction Relations</h3>
+      <p class="lead">The following objects are related to this bank transaction.</p>
+      <p>
+        <a href="{% url 'backoffice:bankaccount_detail' camp_slug=camp.slug bankaccount_uuid=banktransaction.bank_account.pk %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank Account Details</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

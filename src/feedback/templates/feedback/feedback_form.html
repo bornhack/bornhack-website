@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Feedback | {{ block.super }}
+  Feedback | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<div class="page-header">
+  <div class="page-header">
     <h1>Feedback <small>Help us make BornHack even better!</small></h1>
-</div>
+  </div>
 
-<div class="col-md-12">
+  <div class="col-md-12">
     <p>
-    BornHack can always improve, but we need your feedback to know how. So write your thoughts on what was good and what wasn't at {{ camp.title }}, it's highly appreciated!
+      BornHack can always improve, but we need your feedback to know how. So write your thoughts on what was good and what wasn't at {{ camp.title }}, it's highly appreciated!
     </p>
-</div>
+  </div>
 
-<div class="col-md-12">
-<form method="POST">
-    {% csrf_token %}
-    {% bootstrap_form form %}
-    <button type="submit" class="btn btn-success pull-right">
+  <div class="col-md-12">
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      <button type="submit" class="btn btn-success pull-right">
         Send feedback
-    </button>
-    <span class="clearfix"></span>
-</form>
-</div>
+      </button>
+      <span class="clearfix"></span>
+    </form>
+  </div>
 
 {% endblock %}

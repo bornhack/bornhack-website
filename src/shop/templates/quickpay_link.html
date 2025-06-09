@@ -1,0 +1,15 @@
+{% extends "shop_base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Pay by Card | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+  <meta http-equiv="refresh" content="0; url={{ payment_link }}">.
+{% endblock %}
+
+{% block shop_content %}
+  <h3>Redirecting to payment provider...</h3>
+  <p class="lead">Please wait a few seconds while your browser redirects you to our payment provider. If your browser doesn't follow the redirect you can also use this link: <a href="{{ payment_link }}">{{ payment_link }}</a></p>
+{% endblock shop_content %}

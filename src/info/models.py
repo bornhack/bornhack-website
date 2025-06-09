@@ -1,21 +1,25 @@
+from __future__ import annotations
+
 import reversion
 from django.core.exceptions import ValidationError
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
 
 
-class InfoCategory(CampRelatedModel):
+class InfoCategory(ExportModelOperationsMixin("info_category"), CampRelatedModel):
     class Meta:
         ordering = ["weight", "headline"]
         verbose_name_plural = "Info Categories"
 
     headline = models.CharField(
-        max_length=100, help_text="The headline of this info category"
+        max_length=100,
+        help_text="The headline of this info category",
     )
 
     anchor = models.SlugField(
-        help_text="The HTML anchor to use for this info category."
+        help_text="The HTML anchor to use for this info category.",
     )
 
     weight = models.PositiveIntegerField(
@@ -30,13 +34,14 @@ class InfoCategory(CampRelatedModel):
         related_name="info_categories",
     )
 
-    def clean(self):
+    def clean(self) -> None:
         if InfoItem.objects.filter(
-            category__team__camp=self.camp, anchor=self.anchor
+            category__team__camp=self.camp,
+            anchor=self.anchor,
         ).exists():
             # this anchor is already in use on an item, so it cannot be used (must be unique on the page)
             raise ValidationError(
-                {"anchor": "Anchor is already in use on an info item for this camp"}
+                {"anchor": "Anchor is already in use on an info item for this camp"},
             )
 
     @property
@@ -45,19 +50,21 @@ class InfoCategory(CampRelatedModel):
 
     camp_filter = "team__camp"
 
-    def __str__(self):
-        return "%s (%s)" % (self.headline, self.camp)
+    def __str__(self) -> str:
+        return f"{self.headline} ({self.camp})"
 
 
 # We want to have info items under version control
 @reversion.register()
-class InfoItem(CampRelatedModel):
+class InfoItem(ExportModelOperationsMixin("info_item"), CampRelatedModel):
     class Meta:
         ordering = ["weight", "headline"]
         unique_together = (("anchor", "category"), ("headline", "category"))
 
     category = models.ForeignKey(
-        "info.InfoCategory", related_name="infoitems", on_delete=models.PROTECT
+        "info.InfoCategory",
+        related_name="infoitems",
+        on_delete=models.PROTECT,
     )
 
     headline = models.CharField(max_length=100, help_text="Headline of this info item.")
@@ -77,17 +84,20 @@ class InfoItem(CampRelatedModel):
 
     camp_filter = "category__team__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         if (
             hasattr(self, "category")
             and InfoCategory.objects.filter(
-                team__camp=self.category.team.camp, anchor=self.anchor
+                team__camp=self.category.team.camp,
+                anchor=self.anchor,
             ).exists()
         ):
             # this anchor is already in use on a category, so it cannot be used here (they must be unique on the entire page)
             raise ValidationError(
-                {"anchor": "Anchor is already in use on an info category for this camp"}
+                {
+                    "anchor": "Anchor is already in use on an info category for this camp",
+                },
             )
 
-    def __str__(self):
-        return "%s (%s)" % (self.headline, self.category)
+    def __str__(self) -> str:
+        return f"{self.headline} ({self.category})"

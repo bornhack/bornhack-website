@@ -2,47 +2,46 @@
 {% load static %}
 
 {% block title %}
-Phonebook | {{ block.super }}
+  Phonebook | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<h2>{{ camp.title }} Phonebook</h2>
+  <h2>{{ camp.title }} Phonebook</h2>
 
-<p class="lead">
-This is a list of all the registered DECT numbers in our phonebook for {{ camp.title }}.
-</p>
+  <p class="lead">
+    This is a list of all the registered DECT numbers in our phonebook for {{ camp.title }}.
+  </p>
 
-{% if request.user.is_authenticated %}
-<p>
-  <a href="{% url 'phonebook:dectregistration_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-user"></i> Your DECT Registrations</a>
-  <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create  DECT Registration</a>
-</p>
-{% endif %}
+  {% if request.user.is_authenticated %}
+    <p>
+      <a href="{% url 'phonebook:dectregistration_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-user"></i> Your DECT Registrations</a>
+      <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create  DECT Registration</a>
+    </p>
+  {% endif %}
 
-{% if dectregistration_list %}
-<table class="table table-hover table-striped datatable">
-  <thead>
-  <tr>
-    <th>Number</th>
-    <th>Letters</th>
-    <th>Description</th>
-    <th>Created</th>
-  </tr>
-  </thead>
-  <tbody>
-  {% for entry in dectregistration_list %}
-  <tr{% if entry.user == request.user %} class="info"{% endif %}>
-    <td>{{ entry.number }}</td>
-    <td>{{ entry.letters|default:"N/A" }}</td>
-    <td>{{ entry.description|default:"N/A" }}</td>
-    <td>{{ entry.created }}</td>
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p class="lead"><i>No DECT registrations found</i></p>
-{% endif %}
+  {% if dectregistration_list %}
+    <table id="main_table" class="table table-hover table-striped datatable">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Letters</th>
+          <th>Description</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in dectregistration_list %}
+          <tr{% if entry.user == request.user %} class="info"{% endif %}>
+            <td>{{ entry.number }}</td>
+            <td>{{ entry.letters|default:"N/A" }}</td>
+            <td>{{ entry.description|default:"N/A" }}</td>
+            <td data-order="{{ entry.created|date:"YmdHis" }}">{{ entry.created }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="lead"><i>No DECT registrations found</i></p>
+  {% endif %}
 {% endblock %}
-

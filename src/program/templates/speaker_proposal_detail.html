@@ -4,79 +4,79 @@
 
 {% block program_content %}
 
-{% if not camp.call_for_participation_open %}
-<div class="alert alert-danger">
-    <strong>Note!</strong> This Call for Participation is not open.
-</div>
-{% endif %}
+  {% if not camp.call_for_participation_open %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Participation is not open.
+    </div>
+  {% endif %}
 
-<div class="panel panel-default">
-  <div class="panel-heading"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
-  <div class="panel-body">
-    {{ speaker_proposal.biography|untrustedcommonmark }}
-    {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-    <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
-    <br>
-    {% endif %}
+  <div class="card">
+    <div class="card-header"><span class="h3">{{ speaker_proposal.title }} Proposal: {{ speaker_proposal.name }}</span></div>
+    <div class="card-body">
+      {{ speaker_proposal.biography|untrustedcommonmark }}
+      {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
+        <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
+        <br>
+      {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>Availability for {{ speaker_proposal.name }}</h4>
-    {% availabilitytable matrix=matrix %}
-    {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-    <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Availability</span></a>
-    <br>
-    {% endif %}
+      <h4>Availability for {{ speaker_proposal.name }}</h4>
+      {% availabilitytable matrix=matrix %}
+      {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
+        <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Availability</span></a>
+        <br>
+      {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>URLs for {{ speaker_proposal.name }}</h4>
+      <h4>URLs for {{ speaker_proposal.name }}</h4>
       {% if speaker_proposal.urls.exists %}
         {% include 'includes/speaker_proposal_url_table.html' %}
       {% else %}
         <i>Nothing found.</i>
       {% endif %}
       {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-      <a href="{% url 'program:speaker_proposal_url_create' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
-      <br>
+        <a href="{% url 'program:speaker_proposal_url_create' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid %}" class="btn btn-success btn-sm ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
+        <br>
       {% endif %}
 
-    <hr>
+      <hr>
 
-    <h4>EventProposals for {{ speaker_proposal.name }}</h4>
-    {% if speaker_proposal.event_proposals.exists %}
-      {% include 'includes/event_proposal_table.html' with event_proposals=speaker_proposal.event_proposals.all %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
-    {% if camp.call_for_participation_open %}
-    <a href="{% url 'program:event_proposal_type_select' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add New EventProposal</span></a>
-    <br>
-    {% endif %}
+      <h4>EventProposals for {{ speaker_proposal.name }}</h4>
+      {% if speaker_proposal.event_proposals.exists %}
+        {% include 'includes/event_proposal_table.html' with event_proposals=speaker_proposal.event_proposals.all %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+      {% if camp.call_for_participation_open %}
+        <a href="{% url 'program:event_proposal_type_select' camp_slug=camp.slug speaker_uuid=speaker_proposal.uuid %}" class="btn btn-success btn-sm ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add New EventProposal</span></a>
+        <br>
+      {% endif %}
 
-  <hr>
+      <hr>
 
-  <h4>Event Conflicts for <i>{{ speaker_proposal.name }}</i></h4>
-  {% if speaker_proposal.event_conflicts.exists %}
-    <table class="table">
-    {% include 'includes/event_list_table.html' with event_list=speaker_proposal.event_conflicts.all nodatatable=True nopeople=True noactions=True noschedule=True %}
-    <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Conflicts</span></a>
-  {% else %}
-    <i>Nothing found.</i>
-  {% endif %}
+      <h4>Event Conflicts for <i>{{ speaker_proposal.name }}</i></h4>
+      {% if speaker_proposal.event_conflicts.exists %}
+        <table class="table">
+          {% include 'includes/event_list_table.html' with event_list=speaker_proposal.event_conflicts.all nodatatable=True nopeople=True noactions=True noschedule=True %}
+          <a href="{% url 'program:speaker_proposal_update' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-primary btn-sm ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Conflicts</span></a>
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+    </div>
+
+    <div class="card-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
   </div>
 
-  <div class="panel-footer">Status: <span class="badge">{{ speaker_proposal.proposal_status }}</span> | ID: <span class="badge">{{ speaker_proposal.uuid }}</span></div>
-</div>
+  <p>
 
-<p>
-
-<a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to List</a>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to List</a>
     {% if camp.call_for_participation_open %}
       {% if not speaker_proposal.event_proposals.all %}
-        <a href="{% url 'program:speaker_proposal_delete' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete Person</span></a>
+        <a href="{% url 'program:speaker_proposal_delete' camp_slug=camp.slug pk=speaker_proposal.uuid %}" class="btn btn-danger ms-auto"><i class="fas fa-times"></i><span class="h5"> Delete Person</span></a>
       {% endif %}
     {% endif %}
-</p>
+  </p>
 
 {% endblock program_content %}

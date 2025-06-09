@@ -1,84 +1,178 @@
 {% load static %}
-{% load shop_tags %}
+{% load bornhack %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css" media="all">
+  @page {
+        /*size: A4 portrait; /* can use also 'landscape' for orientation */
+    margin: 1cm;
+
+    @top-center{
+      content: element(header);
+    }
+
+    @bottom-center{
+      content: element(footer);
+    }
+
+  }
+  body {
+    font-size: 12px;
+    font-family: "Liberation Serif";
+    {% if dev %}
+      background: no-repeat center url('{% static 'images/test_letter.png' %}')
+                {% endif %}
+
+  }
+
+  header, footer {
+    font-size: 10px;
+    font-family: "Liberation Serif";
+    width: 100%;
+    position: relative;
+  }
+
+  header {
+    display: block;
+    height: 150px;
+    background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
+    background-size: 571px 150px;
+  }
+
+  .footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+    display: block;
+    text-align: center;
+    bottom: 0;
+    margin: auto;
+    width: 50%;
+  }
+
+  footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+        /*display: block;*/
+    text-align: center;
+  }
+
+  .alignRight {
+    text-align: right;
+  }
+</style>
+
+<header>
+  <div>
+  </div>
+</header>
 
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                {{ invoice.created|date:"b jS, Y" }}<br>
-                Order #{{ invoice.order.pk }}<br>
-                Invoice #{{ invoice.pk }}
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        {{ invoice.created|date:"b jS, Y" }}<br>
+        Order #{{ invoice.order.pk }}<br>
+        Invoice #{{ invoice.pk }}
+      </h3>
+    </td>
+  </tr>
 </table>
 {% if invoice.order.invoice_address %}
-<h2>CUSTOMER</h2>
-<p class="lead">{{ invoice.order.invoice_address|linebreaks }}</p>
+  <h2>CUSTOMER</h2>
+  <p class="lead">{{ invoice.order.invoice_address|linebreaks }}</p>
 {% else %}
-<h3>Customer: {{ invoice.order.user.email }}</h3>
+  <h3>Customer: {{ invoice.order.user.email }}</h3>
 {% endif %}
 <br>
 <h2>INVOICE</h2>
 <table style="width:90%; margin:1em;">
+  <thead>
     <tr>
       <td>
-        <b>Name
+        <b>Name</b>
+      </td>
       <td>
-        <b>Quantity
-      <td align="right">
-        <b>Price
-      <td align="right">
-        <b>Total
+        <b>Quantity</b>
+      </td>
+      <td align="right" class="alignRight">
+        <b>Price</b>
+      </td>
+      <td align="right" class="alignRight">
+        <b>Total</b>
+      </td>
+    </tr>
+    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+  </thead>
+  <tbody>
 
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+    {% for order_product in invoice.order.oprs.all %}
+      <tr>
+        <td>
+          {{ order_product.product.name }}
+        </td>
+        <td>
+          {{ order_product.quantity }}
+        </td>
+        <td align="right" class="alignRight">
+          {{ order_product.product.price|currency }}
+        </td>
+        <td align="right" class="alignRight">
+          {{ order_product.total|currency }}
+        </td>
+      </tr>
+    {% endfor %}
 
-{% for order_product in invoice.order.orderproductrelation_set.all %}
-  <tr>
+    <tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+
+    <tr>
+      <td colspan="2">
+      </td>
       <td>
-      {{ order_product.product.name }}
-    <td>
-      {{ order_product.quantity }}
-    <td align="right">
-      {{ order_product.product.price|currency }}
-    <td align="right">
-      {{ order_product.total|currency }}
-{% endfor %}
+        <strong>Included Danish VAT (25%)</strong>
+      </td>
+      <td align="right" class="alignRight">
+        {{ invoice.order.vat|currency }}
+      </td>
+    </tr>
 
-<tr><td style="height: 1px; line-height: 1px; border-top: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+    <tr>
+      <td colspan="2">
+      </td>
+      <td>
+        <strong>Invoice Total</strong>
+      </td>
+      <td align="right" class="alignRight">
+        {{ invoice.order.total|currency }}
+      </td>
+    </tr>
 
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Included Danish VAT (25%)</strong>
-    <td align="right">
-      {{ invoice.order.vat|currency }}
-
-  <tr>
-    <td colspan="2">
-    <td>
-      <strong>Invoice Total</strong>
-    <td align="right">
-      {{ invoice.order.total|currency }}
-
-  <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
-
+    <tr><td colspan="2"></td><td style="height: 1px; line-height: 1px; border-top: 1pt solid black; border-bottom: 1pt solid black;" colspan="4">&nbsp;</td></tr>
+  </tbody>
 </table>
 <br>
 <h3>The order has been paid in full.</h3>
 <p>
-    <ul>
-        <li>Tickets can be downloaded from the webshop.</li>
-        <li>Merchandise can be picked up from the info booth during the event.</li>
-        <li>Accomodation/lodges and village tents will be available when the event begins.</li>
-    </ul>
+  <ul>
+    <li>Tickets can be downloaded from the webshop.</li>
+    <li>Merchandise can be picked up from the info booth during the event.</li>
+    <li>Accomodation/lodges and village tents will be available when the event begins.</li>
+  </ul>
 </p>
 
-<p>Note: Danish law grants everyone a 14 days 'cooling-off' period for 
-internet purchases, in which the customer can regret the purchase for any 
-reason (including just changing your mind). In case you regret this purchase 
-please contact us on <b>info@bornhack.dk</b> for a full refund. This is possible until
-<b>{{ invoice.regretdate|date:"b jS, Y" }}</b>. Please see our General 
-Terms &amp; Conditions on our website for more information on order cancellation.</p>
+<p>Note: Danish law grants everyone a 14 days 'cooling-off' period for
+  internet purchases, in which the customer can regret the purchase for any
+  reason (including just changing your mind). In case you regret this purchase
+  please contact us on <b>info@bornhack.dk</b> for a full refund. This is possible until
+  <b>{{ invoice.regretdate|date:"b jS, Y" }}</b>. Please see our General Terms &amp; Conditions on our website for more information on order cancellation.</p>
+<div class="footer" style="opacity: 0;">
+</div>
+<div class="footer" style="position: absolute; bottom: 0; left: 0; width: 100%">
+  The legal entity behind BornHack is:<br>
+  BornHack ApS c/o Thomas Steen Rasmussen, Skelbyvej 147, Næsby,<br>
+  4171 Glumsø, Denmark. CVR# 37666521<br>
+  email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a> - web <a href="https://www.bornhack.dk">https://www.bornhack.dk</a>
+</div>

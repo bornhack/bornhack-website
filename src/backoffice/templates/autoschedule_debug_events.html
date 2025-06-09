@@ -2,28 +2,28 @@
 {% load bornhack %}
 
 {% block body %}
-<p class="lead">The following conflicts have been found between events in the AutoScheduler, events with a red table cell will not be scheduled together.</p>
-<p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
-<table class="table table-condensed table-bordered">
-  <thead>
-    <th><br></th>
-    {% for autoevent,event in scheduler.autoevents|zip:scheduler.events.all %}
-    <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
-    {% endfor %}
-  </thead>
-  <tbody>
-    {% for autoevent,event in scheduler.autoevents|zip:scheduler.events.all %}
-    <tr>
-      <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
-      {% for rowautoevent,rowevent in scheduler.autoevents|zip:scheduler.events.all %}
-        {% if rowautoevent in autoevent.unavailability or rowautoevent == autoevent or autoevent in rowautoevent.unavailability %}
-          <td class="text-center danger"><i class="fas fa-times"></i></td>
-        {% else %}
-          <td class="text-center success"><i class="fas fa-check"></i></td>
-        {% endif %}
-    {% endfor %}
-    </tr>
-    {% endfor %}
-</table>
-<p><a class="btn btn-default" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+  <p class="lead">The following conflicts have been found between events in the AutoScheduler, events with a red table cell will not be scheduled together.</p>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
+  <table class="table table-condensed table-bordered">
+    <thead>
+      <th><br></th>
+      {% for autoevent,event in scheduler.autoevents|zip:scheduler.events.all %}
+        <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
+      {% endfor %}
+    </thead>
+    <tbody>
+      {% for autoevent,event in scheduler.autoevents|zip:scheduler.events.all %}
+        <tr>
+          <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
+          {% for rowautoevent,rowevent in scheduler.autoevents|zip:scheduler.events.all %}
+            {% if rowautoevent in autoevent.unavailability or rowautoevent == autoevent or autoevent in rowautoevent.unavailability %}
+              <td class="text-center table-danger"><i class="fas fa-times"></i></td>
+            {% else %}
+              <td class="text-center table-success"><i class="fas fa-check"></i></td>
+            {% endif %}
+          {% endfor %}
+        </tr>
+      {% endfor %}
+    </table>
+    <p><a class="btn btn-secondary" href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Back</a></p>
 {% endblock body %}

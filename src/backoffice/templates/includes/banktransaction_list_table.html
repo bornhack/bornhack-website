@@ -1,0 +1,33 @@
+{% load bornhack %}
+<table class="table table-striped datatable">
+  <thead>
+    <tr>
+      {% with banktransaction_list.0 as t %}
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Internal BornHack UUID for this bank transaction">ID</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_date_help_text }}">Date</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_text_help_text }}">Text</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_amount_help_text }}">Amount</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="{{ t.get_balance_help_text }}">Balance</th>
+        <th data-bs-container="body" data-bs-placement="bottom" data-bs-toggle="tooltip" data-bs-title="Available actions for this bank">Actions</th>
+      {% endwith %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for tx in banktransaction_list %}
+      <tr>
+        <td><a href="{% url 'backoffice:banktransaction_detail' camp_slug=camp.slug banktransaction_uuid=tx.pk %}">{{ tx.pk }}</a></td>
+        {# force datatables to evaluate sort key as a string by prepending an X #}
+        {# because it has trouble sorting large integers correctly #}
+        <td data-order="X{{ tx.date|date:"Ymd" }}{{ tx.created|date:"Uu" }}">{{ tx.date }}</td>
+        <td>{{ tx.text }}</td>
+        <td data-order="{{ tx.amount }}">{{ tx.amount }}&nbsp;DKK</td>
+        <td data-order="{{ tx.balance }}">{{ tx.balance }}&nbsp;DKK</td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:banktransaction_detail' camp_slug=camp.slug banktransaction_uuid=tx.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

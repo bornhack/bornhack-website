@@ -1,18 +1,84 @@
 {% load static %}
-{% load shop_tags %}
+{% load bornhack %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css" media="all">
+  @page {
+        /*size: A4 portrait; /* can use also 'landscape' for orientation */
+    margin: 1cm;
+
+    @top-center{
+      content: element(header);
+    }
+
+    @bottom-center{
+      content: element(footer);
+    }
+
+  }
+  body {
+    font-size: 12px;
+    font-family: "Liberation Serif";
+    {% if dev %}
+      background: no-repeat center url('{% static 'images/test_letter.png' %}')
+                {% endif %}
+  }
+
+  header, footer {
+    font-size: 10px;
+    font-family: "Liberation Serif";
+    width: 100%;
+    position: relative;
+  }
+
+  header {
+    display: block;
+    height: 150px;
+    background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
+    background-size: 571px 150px;
+  }
+
+  .footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+    display: block;
+    text-align: center;
+    bottom: 0;
+    margin: auto;
+    width: 50%;
+  }
+
+  footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+        /*display: block;*/
+    text-align: center;
+  }
+
+  .alignRight {
+    text-align: right;
+  }
+</style>
+
+<header>
+  <div>
+  </div>
+</header>
 
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                {{ invoice.created|date:"b jS, Y" }}<br>
-                Custom Order #{{ invoice.customorder.pk }}<br>
-                Invoice #{{ invoice.pk }}
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        {{ invoice.created|date:"b jS, Y" }}<br>
+        Custom Order #{{ invoice.customorder.pk }}<br>
+        Invoice #{{ invoice.pk }}
+      </h3>
+    </td>
+  </tr>
 </table>
 
 <h2>CUSTOMER</h2>
@@ -21,42 +87,64 @@
 
 <h2>INVOICE</h2>
 <table style="width:90%">
+  <thead>
     <tr>
       <td>
-        <b>Text
+        <b>Text</b>
+      </td>
       <td align="center" style="width: 20%">
         <b>Price
-  <tr>
-    <td>
-      {{ invoice.customorder.text|linebreaks }}
-    <td align="right">
-      {{ invoice.customorder.amount|currency }}
+        </td>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            {{ invoice.customorder.text|linebreaks }}
+          </td>
+          <td align="right" class="alignRight">
+            {{ invoice.customorder.amount|currency }}
+          </td>
+        </tr>
+        <tr>
+          <td align="right" class="alignRight">
+            {% if invoice.customorder.danish_vat %}
+              <strong>Included Danish VAT (25%)</strong>
+            {% else %}
+              <strong>No VAT</strong>
+            {% endif %}
+          </td>
+          <td align="right" class="alignRight">
+            {{ invoice.customorder.vat|currency }}
+          </td>
+        </tr>
 
-  <tr>
-    <td align="right">
-      {% if invoice.customorder.danish_vat %}
-      <strong>Included Danish VAT (25%)</strong>
-      {% else %}
-      <strong>No VAT</strong>
-      {% endif %}
-    <td align="right">
-      {{ invoice.customorder.vat|currency }}
+        <tr>
+          <td align="right" class="alignRight">
+            <strong>Total</strong>
+          </td>
+          <td align="right" class="alignRight">
+            {{ invoice.customorder.amount|currency }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
 
-  <tr>
-    <td align="right">
-      <strong>Total</strong>
-    <td align="right">
-      {{ invoice.customorder.amount|currency }}
-</table>
-<br>
-
-<p class="lead">
-  Payment should be made by bank transfer to our account in {{ bank }}:
-</p>
-<ul>
-  <li>Reg. {{ bank_dk_reg }}, account no. {{ bank_dk_accno }}</li>
-  <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
-  <li>Add invoice number in the transfer notes.</li>
-  <li>Within two weeks from: {{ invoice.created|date:"b jS, Y" }}</li>
-  <li>Thank you!</li>
-</ul>
+    <p class="lead">
+      Payment should be made by bank transfer to our account in {{ bank }}:
+    </p>
+    <ul>
+      <li>Reg. {{ bank_dk_reg }}, account no. {{ bank_dk_accno }}</li>
+      <li>BIC: {{ bank_bic }}, IBAN: {{ bank_iban }}</li>
+      <li>Add invoice number in the transfer notes.</li>
+      <li>Within two weeks from: {{ invoice.created|date:"b jS, Y" }}</li>
+      <li>Thank you!</li>
+    </ul>
+    <div class="footer" style="opacity: 0;">
+    </div>
+    <div class="footer" style="position: absolute; bottom: 0; left: 0; width: 100%">
+      The legal entity behind BornHack is:<br>
+      BornHack ApS c/o Thomas Steen Rasmussen, Skelbyvej 147, Næsby,<br>
+      4171 Glumsø, Denmark. CVR# 37666521<br>
+      email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a> - web <a href="https://www.bornhack.dk">https://www.bornhack.dk</a>
+    </div>

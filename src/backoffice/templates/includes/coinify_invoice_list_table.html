@@ -1,0 +1,33 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "coinify_id" "ID" %}
+      {% thh "coinify_created" "Created" %}
+      {% thh "payment_amount" %}
+      {% thh "payment_btc_amount" %}
+      {% thh "description" %}
+      {% thh "credited_amount" %}
+      {% thh "state" %}
+      {% thh "payment_type" %}
+      {% thh "original_payment_id" %}
+      {% thh "created" "Imported" "The date this Coinify invoice was imported" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for ci in coinifyinvoice_list %}
+      <tr>
+        <td>{{ ci.coinify_id }} / {{ ci.coinify_id_alpha }}</td>
+        <td data-order="{{ ci.coinify_created|sortable }}">{{ ci.coinify_created }}</td>
+        <td data-order="{{ ci.payment_amount }}">{{ ci.payment_amount }}&nbsp;{{ ci.payment_currency }}</td>
+        <td data-order="{{ ci.payment_btc_amount }}">{{ ci.payment_btc_amount }}&nbsp;BTC</td>
+        <td>{{ ci.description }}</td>
+        <td data-order="{{ ci.credited_amount }}">{% if ci.credited_currency == "BTC" %}{{ ci.credited_amount }}{% else %}{{ ci.credited_amount|floatformat:2 }}{% endif %}&nbsp;{{ ci.credited_currency }}</td>
+        <td>{{ ci.state }}</td>
+        <td>{{ ci.payment_type }}</td>
+        <td>{{ ci.original_payment_id }}</td>
+        <td data-order="{{ ci.created|sortable }}">{{ ci.created }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

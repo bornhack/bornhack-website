@@ -1,18 +1,17 @@
 {% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Confirm Submission | {{ block.super }}
+  Confirm Submission | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h3>Confirm Submission</h3>
-<form method="POST">
+  <h3>Confirm Submission</h3>
+  <form method="POST">
     {% csrf_token %}
     {% bootstrap_form form %}
     <p class="lead">Really submit this speaker proposal for approval?</p>
     {% bootstrap_button "Submit" button_type="submit" button_class="btn-primary" %}
-</form>
+  </form>
 
 {% endblock program_content %}
-

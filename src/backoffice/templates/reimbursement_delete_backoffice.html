@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Delete Reimbursement for User {{ reimbursement_user }} | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h3>Delete Reimbursement for User {{ reimbursement_user }}</h3>
+
+  <p>The total amount for this reimbursement is <b>{{ reimbursement.amount }} DKK</b></p>
+
+  <p class="lead">Really delete this reimbursement?</p>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
+    <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
+{% endblock content %}

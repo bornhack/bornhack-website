@@ -1,61 +1,40 @@
+from __future__ import annotations
+
 import logging
 from datetime import timedelta
+from django.conf import settings
 
 from django.apps import apps
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import Permission as DjangoPermission
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 
-from utils.models import CreatedUpdatedModel, UUIDModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-class Permission(models.Model):
-    """
-    An unmanaged field-less model which holds our non-model permissions (such as team permission sets)
-    """
+class Permission(ExportModelOperationsMixin("permission"), models.Model):
+    """An unmanaged field-less model which holds our non-model permissions (such as team permission sets)."""
 
     class Meta:
         managed = False
         default_permissions = ()
         permissions = (
-            ("backoffice_permission", "BackOffice access"),
-            ("badgeteam_permission", "Badge Team permissions set"),
-            ("barteam_permission", "Bar Team permissions set"),
-            ("certteam_permission", "CERT Team permissions set"),
-            ("constructionteam_permission", "Construction Team permissions set"),
-            ("contentteam_permission", "Content Team permissions set"),
-            ("economyteam_permission", "Economy Team permissions set"),
-            ("foodareateam_permission", "Foodarea Team permissions set"),
-            ("gameteam_permission", "Game Team permissions set"),
-            ("infoteam_permission", "Info Team permissions set"),
-            ("lightteam_permission", "Light Team permissions set"),
-            ("logisticsteam_permission", "Logistics Team permissions set"),
-            ("metricsteam_permission", "Metrics Team permissions set"),
-            ("nocteam_permission", "NOC Team permissions set"),
-            ("orgateam_permission", "Orga Team permissions set"),
-            ("pocteam_permission", "POC Team permissions set"),
-            ("prteam_permission", "PR Team permissions set"),
-            ("phototeam_permission", "Photo Team permissions set"),
-            ("powerteam_permission", "Power Team permissions set"),
-            ("rocteam_permission", "ROC Team permissions set"),
-            ("sanitationteam_permission", "Sanitation Team permissions set"),
-            ("shuttleteam_permission", "Shuttle Team permissions set"),
-            ("sponsorsteam_permission", "Sponsors Team permissions set"),
-            ("sysadminteam_permission", "Sysadmin Team permissions set"),
-            ("videoteam_permission", "Video Team permissions set"),
-            ("websiteteam_permission", "Website Team permissions set"),
-            ("wellnessteam_permission", "Wellness Team permissions set"),
+            # economy
             ("expense_create_permission", "Expense Create permission"),
             ("revenue_create_permission", "Revenue Create permission"),
         )
 
 
-class Camp(CreatedUpdatedModel, UUIDModel):
+class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     class Meta:
         verbose_name = "Camp"
         verbose_name_plural = "Camps"
@@ -74,7 +53,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     slug = models.SlugField(
-        verbose_name="Url Slug", help_text="The url slug to use for this camp"
+        verbose_name="Url Slug",
+        help_text="The url slug to use for this camp",
     )
 
     shortslug = models.SlugField(
@@ -82,18 +62,23 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
     )
 
+    kickoff = DateTimeRangeField(null=True, blank=True, verbose_name="Camp Kickoff", help_text="The camp kickoff period.")
+
     buildup = DateTimeRangeField(
-        verbose_name="Buildup Period", help_text="The camp buildup period."
+        verbose_name="Buildup Period",
+        help_text="The camp buildup period.",
     )
 
     camp = DateTimeRangeField(verbose_name="Camp Period", help_text="The camp period.")
 
     teardown = DateTimeRangeField(
-        verbose_name="Teardown period", help_text="The camp teardown period."
+        verbose_name="Teardown period",
+        help_text="The camp teardown period.",
     )
 
     read_only = models.BooleanField(
-        help_text="Whether the camp is read only (i.e. in the past)", default=False
+        help_text="Whether the camp is read only (i.e. in the past)",
+        default=False,
     )
 
     colour = models.CharField(
@@ -119,7 +104,8 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     call_for_sponsors_open = models.BooleanField(
-        help_text="Check if the Call for Sponsors is open for this camp", default=False
+        help_text="Check if the Call for Sponsors is open for this camp",
+        default=False,
     )
 
     call_for_sponsors = models.TextField(
@@ -129,14 +115,24 @@ class Camp(CreatedUpdatedModel, UUIDModel):
     )
 
     show_schedule = models.BooleanField(
-        help_text="Check if the schedule should be shown.", default=True
+        help_text="Check if the schedule should be shown.",
+        default=True,
+    )
+
+    economy_team = models.ForeignKey(
+        "teams.Team",
+        on_delete=models.PROTECT,
+        help_text="The economy team for this camp.",
+        null=True,
+        blank=True,
+        related_name="+",
     )
 
     def get_absolute_url(self):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 
-    def clean(self):
-        """Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown"""
+    def clean(self) -> None:
+        """Make sure the dates make sense - meaning no overlaps and buildup before camp before teardown."""
         errors = []
         # check for overlaps buildup vs. camp
         if self.buildup.upper > self.camp.lower:
@@ -153,29 +149,57 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         if errors:
             raise ValidationError(errors)
 
-    def __str__(self):
-        return "%s - %s" % (self.title, self.tagline)
+    def __str__(self) -> str:
+        return f"{self.title} - {self.tagline}"
+
+
+    def activate_team_permissions(self) -> None:
+        """Add permissions to this camps teams."""
+        permission_content_type = ContentType.objects.get_for_model(Permission)
+        for team in self.teams.all():
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                fk = f"{perm}_group"
+                permission = DjangoPermission.objects.get(
+                    content_type=permission_content_type,
+                    codename=f"{team.slug}_team_{perm}",
+                )
+                group = getattr(team, fk)
+                group.permissions.add(permission)
+                logger.debug(f"Added permission {permission} to group {group}")
+
+    def deactivate_team_permissions(self) -> None:
+        """Add permissions to this camps teams."""
+        permission_content_type = ContentType.objects.get_for_model(Permission)
+        for team in self.teams.all():
+            for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
+                fk = f"{perm}_group"
+                permission = DjangoPermission.objects.get(
+                    content_type=permission_content_type,
+                    codename=f"{team.slug}_team_{perm}",
+                )
+                group = getattr(team, fk)
+                group.permissions.remove(permission)
+                logger.debug(f"Removed permission {permission} from group {group}")
+
 
     @property
-    def logo_small(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-s.png" % {"slug": self.slug}
+    def logo_small(self) -> str:
+        return f"img/{self.slug}/logo/{self.slug}-logo-s.png"
 
     @property
-    def logo_small_svg(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-small.svg" % {"slug": self.slug}
+    def logo_small_svg(self) -> str:
+        return f"img/{self.slug}/logo/{self.slug}-logo-small.svg"
 
     @property
-    def logo_large(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-l.png" % {"slug": self.slug}
+    def logo_large(self) -> str:
+        return f"img/{self.slug}/logo/{self.slug}-logo-l.png"
 
     @property
-    def logo_large_svg(self):
-        return "img/%(slug)s/logo/%(slug)s-logo-large.svg" % {"slug": self.slug}
+    def logo_large_svg(self) -> str:
+        return f"img/{self.slug}/logo/{self.slug}-logo-large.svg"
 
     def get_days(self, camppart):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the specified part of the camp.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the specified part of the camp."""
         if not hasattr(self, camppart):
             logger.error("nonexistant field/attribute")
             return False
@@ -185,9 +209,9 @@ class Camp(CreatedUpdatedModel, UUIDModel):
         if (
             not hasattr(field, "__class__")
             or not hasattr(field.__class__, "__name__")
-            or not field.__class__.__name__ == "DateTimeTZRange"
+            or field.__class__.__name__ != "DateTimeTZRange"
         ):
-            logger.error("this attribute is not a datetimetzrange field: %s" % field)
+            logger.error(f"this attribute is not a datetimetzrange field: {field}")
             return False
 
         # count how many unique dates we have in this range
@@ -199,70 +223,65 @@ class Camp(CreatedUpdatedModel, UUIDModel):
 
         # loop through the required number of days, append to list as we go
         days = []
-        for i in range(0, daycount):
+        for i in range(daycount):
             if i == 0:
                 # on the first day use actual start time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
                         timezone.localtime(field.lower),
                         timezone.localtime(
-                            (field.lower + timedelta(days=i + 1))
+                            field.lower + timedelta(days=i + 1),
                         ).replace(hour=0),
-                    )
+                    ),
                 )
             elif i == daycount - 1:
                 # on the last day use actual end time instead of midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        timezone.localtime((field.lower + timedelta(days=i))).replace(
-                            hour=0
+                        timezone.localtime(field.lower + timedelta(days=i)).replace(
+                            hour=0,
                         ),
                         timezone.localtime(field.lower + timedelta(days=i)),
-                    )
+                    ),
                 )
             else:
                 # neither first nor last day, goes from midnight to midnight (local time)
                 days.append(
                     DateTimeTZRange(
-                        timezone.localtime((field.lower + timedelta(days=i))).replace(
-                            hour=0
+                        timezone.localtime(field.lower + timedelta(days=i)).replace(
+                            hour=0,
                         ),
                         timezone.localtime(
-                            (field.lower + timedelta(days=i + 1))
+                            field.lower + timedelta(days=i + 1),
                         ).replace(hour=0),
-                    )
+                    ),
                 )
         return days
 
     @property
     def buildup_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the buildup.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the buildup."""
         return self.get_days("buildup")
 
     @property
     def camp_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the camp.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the camp."""
         return self.get_days("camp")
 
     @property
     def teardown_days(self):
-        """
-        Returns a list of DateTimeTZRanges representing the days during the buildup.
-        """
+        """Returns a list of DateTimeTZRanges representing the days during the buildup."""
         return self.get_days("teardown")
 
     # convenience properties to access Camp-related stuff easily from the Camp object
 
     @property
     def event_types(self):
-        """Return all event types with at least one event in this camp"""
+        """Return all event types with at least one event in this camp."""
         EventType = apps.get_model("program", "EventType")
         return EventType.objects.filter(
-            events__isnull=False, event__track__camp=self
+            events__isnull=False,
+            event__track__camp=self,
         ).distinct()
 
     @property

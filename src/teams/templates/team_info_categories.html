@@ -1,51 +1,51 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 {% block title %}
-Info Categories | {{ block.super }}
+  Info Categories | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Info Categories</h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>Info Categories</h4>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
 
-        {% for info_category in team.info_categories.all %}
+      {% for info_category in team.info_categories.all %}
 
-            <h4>{{ info_category.headline }}</h4>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Item name</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in info_category.infoitems.all %}
-                    <tr>
-                        <td>{{ item.headline }}</td>
-                        <td>
-                            <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor item_anchor=item.anchor %}"
-                               class="btn btn-primary btn-sm">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <h4>{{ info_category.headline }}</h4>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Item name</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in info_category.infoitems.all %}
+              <tr>
+                <td>{{ item.headline }}</td>
+                <td>
+                  <a href="{% url 'teams:info_item_update' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor item_anchor=item.anchor %}"
+                     class="btn btn-primary btn-sm">
+                    <i class="fas fa-edit"></i> Edit
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
 
-            <a href="{% url 'teams:info_item_create' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Info Item</a>
+        <a href="{% url 'teams:info_item_create' camp_slug=camp.slug team_slug=team.slug category_anchor=info_category.anchor %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create Info Item</a>
 
-            <hr />
+        <hr />
 
-        {% endfor %}
+      {% endfor %}
     </div>
-</div>
+  </div>
 
 {% endblock %}

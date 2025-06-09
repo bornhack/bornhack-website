@@ -1,43 +1,41 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Proposals | {{ block.super }}
+  Proposals | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-{% if camp.call_for_participation_open %}
+  {% if camp.call_for_participation_open %}
     {% include 'includes/event_proposal_type_select.html' %}
-{% else %}
-<div class="alert alert-danger">
-    <strong>Note!</strong> This Call for Participation is not open. You can not submit or change proposals.
-</div>
-{% endif %}
+  {% else %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Participation is not open. You can not submit or change proposals.
+    </div>
+  {% endif %}
 
 
-{% if speaker_proposal_list or event_proposal_list %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title"><i class="fas fa-pencil"></i> Existing Proposals</h3>
-  </div>
-  <div class="panel-body">
-    <h4>People</h4>
-    {% if speaker_proposal_list %}
-    {% include 'includes/speaker_proposal_table.html' with speaker_proposals=speaker_proposal_list %}
-    {% else %}
-    <i>Nothing found.</i>
-    {% endif %}
+  {% if speaker_proposal_list or event_proposal_list %}
+    <div class="card">
+      <h3 class="card-header"><i class="fas fa-pencil"></i> Existing Proposals</h3>
+      <div class="card-body">
+        <h4>People</h4>
+        {% if speaker_proposal_list %}
+          {% include 'includes/speaker_proposal_table.html' with speaker_proposals=speaker_proposal_list %}
+        {% else %}
+          <i>Nothing found.</i>
+        {% endif %}
 
-    <p><hr></p>
+        <p><hr></p>
 
-    <h4>Events</h4>
-    {% if event_proposal_list %}
-    {% include 'includes/event_proposal_table.html' with event_proposals=event_proposal_list %}
-    {% else %}
-    <i>Nothing found.</i>
-    {% endif %}
-  </div>
-</div>
-{% endif %}
+        <h4>Events</h4>
+        {% if event_proposal_list %}
+          {% include 'includes/event_proposal_table.html' with event_proposals=event_proposal_list %}
+        {% else %}
+          <i>Nothing found.</i>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
 
 {% endblock %}

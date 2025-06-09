@@ -2,57 +2,60 @@
 {% load static %}
 
 {% block title %}
-Your DECT Registrations | {{ block.super }}
+  Your DECT Registrations | {{ block.super }}
 {% endblock %}
 
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">Your {{ camp.title }} DECT Registrations</span>
+  <div class="card">
+    <span class="h3 card-header">Your {{ camp.title }} DECT Registrations</span>
+    <div class="card-body">
+      <p class="lead">This is a list of all the registered DECT numbers you have for {{ camp.title }}. To activate a handset just dial the <i>activation code</i> from the handset and follow instructions.</p>
+      {% if dectregistration_list %}
+        <p>
+          <a href="{% url 'phonebook:list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Phonebook</a>
+          <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
+        </p>
+        <table id="main_table" class="table table-hover table-striped">
+          <thead>
+          <tr>
+            <th>Number</th>
+            <th>Letters</th>
+            <th>Description</th>
+            <th>Publish in Phonebook</th>
+            <th>Activation Code</th>
+            <th>IPEI</th>
+            <th>Created</th>
+            <th>Modified</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          {% for entry in dectregistration_list %}
+            <tr>
+              <td>{{ entry.number }}</td>
+              <td>{{ entry.letters|default:"N/A" }}</td>
+              <td>{{ entry.description|default:"N/A" }}</td>
+              <td>{{ entry.publish_in_phonebook|yesno }}</td>
+              <td>{{ entry.activation_code }}</td>
+              <td><nobr>{{ entry.ipei.0|stringformat:"05d" }} {{ entry.ipei.1|stringformat:"07d" }}</nobr></td>
+              <td>{{ entry.created }}</td>
+              <td>{{ entry.updated }}</td>
+              <td>
+                <a href="{% url 'phonebook:dectregistration_update' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+                <a href="{% url 'phonebook:dectregistration_delete' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="lead"><i>No DECT registrations found. Go create one!</i></p>
+        <p>
+          <a href="{% url 'phonebook:list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Phonebook</a>
+          <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
+        </p>
+      {% endif %}
+    </div>
   </div>
-  <div class="panel-body">
-    <p class="lead">This is a list of all the registered DECT numbers you have for {{ camp.title }}. To activate a handset just dial the <i>activation code</i> from the handset and follow instructions.</p>
-    {% if dectregistration_list %}
-    <p>
-      <a href="{% url 'phonebook:list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Phonebook</a>
-      <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
-    </p>
-    <table class="table table-hover table-striped">
-      <tr>
-        <th>Number</th>
-        <th>Letters</th>
-        <th>Description</th>
-        <th>Publish in Phonebook</th>
-        <th>Activation Code</th>
-        <th>Created</th>
-        <th>Modified</th>
-        <th>Actions</th>
-      </tr>
-      {% for entry in dectregistration_list %}
-      <tr>
-        <td>{{ entry.number }}</td>
-        <td>{{ entry.letters|default:"N/A" }}</td>
-        <td>{{ entry.description|default:"N/A" }}</td>
-        <td>{{ entry.publish_in_phonebook|yesno }}</td>
-        <td>{{ entry.activation_code }}</td>
-        <td>{{ entry.created }}</td>
-        <td>{{ entry.updated }}</td>
-        <td>
-            <a href="{% url 'phonebook:dectregistration_update' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-            <a href="{% url 'phonebook:dectregistration_delete' camp_slug=camp.slug dect_number=entry.number %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <p class="lead"><i>No DECT registrations found. Go create one!</i></p>
-    <p>
-      <a href="{% url 'phonebook:list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Phonebook</a>
-      <a href="{% url 'phonebook:dectregistration_create' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create DECT Registration</a>
-    </p>
-    {% endif %}
-  </div>
-</div>
 {% endblock %}
-

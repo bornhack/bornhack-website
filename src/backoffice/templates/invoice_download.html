@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load django_bootstrap5 %}
+
+{% block extra_head %}
+  {{ invoices|json_script:"invoices" }}
+  <script src="{% static 'js/backoffice/invoice_download.js' %}"></script>
+{% endblock %}
+
+{% block title %}
+  Invoices | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h2>Invoices</h2>
+
+  <div class="lead">
+    This helps download multiple invoices
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download</button>
+    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+  </form>
+  {% if invoices|length > 0 %}
+    <p>Downloading {{ invoices | length }} invoices</p>
+  {% endif %}
+{% endblock content %}

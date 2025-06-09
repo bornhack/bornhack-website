@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
+
+{% block title %}
+  Layer Details | Maps | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ layer.name }} Features - Layers - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">The following {{ features.count }} features are defined for layer <b>{{ layer.name }}</b></p>
+      <p>
+        <a href="{% url 'backoffice:map_feature_create' camp_slug=camp.slug layer_slug=layer.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Add Feature</a>
+        <a href="{% url "backoffice:map_layer_features_import" camp_slug=camp.slug layer_slug=layer.slug %}" class="btn btn-success"><i class="fas fa-file-import"></i> Import</a>
+        <a href="{% url "maps:map_layer_geojson" layer_slug=layer.slug %}" class="btn btn-info" target="_blank"><i class="fas fa-file-export"></i> Export</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Layers</a>
+      </p>
+      <table class="table datatable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th class="text-center">Icon</th>
+            <th class="text-center">URL</th>
+            <th class="text-center">Topic</th>
+            <th class="text-center">Processing</th>
+            <th class="text-center">Geometries</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ft in features %}
+            <tr>
+              <td>{{ ft.name }}</td>
+              <td>{{ ft.description|default:"N/A" }}</td>
+              <td class="text-center"><i style="color: {{ ft.color }}" class="{{ ft.icon }} fa-2x fa-fw"></i></td>
+              <td class="text-center">{{ ft.url }}</td>
+              <td class="text-center">{{ ft.topic }}</td>
+              <td class="text-center">{{ ft.processing }}</td>
+              <td class="text-center">{{ ft.geom }}</td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="{% url "backoffice:map_feature_update" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Update</a>
+                  <a href="{% url "backoffice:map_feature_delete" camp_slug=camp.slug layer_slug=ft.layer.slug feature_uuid=ft.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Delete</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+{% endblock %}

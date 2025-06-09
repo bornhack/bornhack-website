@@ -9,4 +9,3 @@ We have reviewed your speaker proposal "{{ proposal.name }}" and have decided to
 Best regards,
 
 The BornHack Content Team
-

@@ -2,20 +2,20 @@
 {% load i18n admin_urls static admin_modify %}
 
 {% block object-tools-items %}
-<li>
+  <li>
     {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
     <a href="{% add_preserved_filters history_url %}" class="historylink">{% trans "History" %}</a>
-</li>
-{% if not original.paid and original.open != None %}
-<li>
-  <a href="{% url 'shop:mark_order_as_paid' original.pk|admin_urlquote %}">Mark as paid</a>
-</li>
-{% endif %}
-{% if original.paid and original.invoice %}
-<li>
-  {% url 'shop:download_invoice' original.pk|admin_urlquote as invoice_url %}
-  <a href="{% add_preserved_filters invoice_url %}" class="historylink">{% trans "Invoice PDF" %}</a>
-</li>
-{% endif %}
-{% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
+  </li>
+  {% if not original.paid and original.open != None %}
+    <li>
+      <a href="{% url 'shop:mark_order_as_paid' original.pk|admin_urlquote %}">Mark as paid</a>
+    </li>
+  {% endif %}
+  {% if original.paid and original.invoice %}
+    <li>
+      {% url 'shop:download_invoice' original.pk|admin_urlquote as invoice_url %}
+      <a href="{% add_preserved_filters invoice_url %}" class="historylink">{% trans "Invoice PDF" %}</a>
+    </li>
+  {% endif %}
+  {% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
 {% endblock %}

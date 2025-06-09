@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h2 class="panel-title">Delete EventLocation {{ event_location.name }}?</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete EventLocation {{ event_location.name }}?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">This EventLocation has <b>{{ event_location.event_sessions.count }}</b> EventSessions with <b>{{ event_location.event_slots.count }}</b> EventSlots which have a total of <b>{{ event_location.scheduled_event_slots.count }}</b> Events scheduled. Deleting the EventLocation will also delete the EventSessions and EventSlots, removing the Events from the schedule!</p>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
+        <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <p class="lead">This EventLocation has <b>{{ event_location.event_sessions.count }}</b> EventSessions with <b>{{ event_location.event_slots.count }}</b> EventSlots which have a total of <b>{{ event_location.scheduled_event_slots.count }}</b> Events scheduled. Deleting the EventLocation will also delete the EventSessions and EventSlots, removing the Events from the schedule!</p>
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
-      <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=event_location.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-  </div>
-</div>
 {% endblock content %}

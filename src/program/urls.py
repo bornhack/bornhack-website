@@ -1,47 +1,48 @@
-from django.urls import include, path
+from __future__ import annotations
 
-from .views import (
-    CallForParticipationView,
-    CombinedProposalPersonSelectView,
-    CombinedProposalSubmitView,
-    CombinedProposalTypeSelectView,
-    EventDetailView,
-    EventListView,
-    EventProposalAddPersonView,
-    EventProposalCreateView,
-    EventProposalDeleteView,
-    EventProposalDetailView,
-    EventProposalRemovePersonView,
-    EventProposalSelectPersonView,
-    EventProposalTypeSelectView,
-    EventProposalUpdateView,
-    FeedbackCreateView,
-    FeedbackDeleteView,
-    FeedbackDetailView,
-    FeedbackListView,
-    FeedbackRedirectView,
-    FeedbackUpdateView,
-    FrabXmlView,
-    ICSView,
-    NoScriptScheduleView,
-    ProgramControlCenter,
-    ProposalListView,
-    SpeakerDetailView,
-    SpeakerListView,
-    SpeakerProposalCreateView,
-    SpeakerProposalDeleteView,
-    SpeakerProposalDetailView,
-    SpeakerProposalUpdateView,
-    UrlCreateView,
-    UrlDeleteView,
-    UrlUpdateView,
-)
+from django.urls import include
+from django.urls import path
+
+from .views import CallForParticipationView
+from .views import CombinedProposalPersonSelectView
+from .views import CombinedProposalSubmitView
+from .views import CombinedProposalTypeSelectView
+from .views import EventDetailView
+from .views import EventListView
+from .views import EventProposalAddPersonView
+from .views import EventProposalCreateView
+from .views import EventProposalDeleteView
+from .views import EventProposalDetailView
+from .views import EventProposalRemovePersonView
+from .views import EventProposalSelectPersonView
+from .views import EventProposalTypeSelectView
+from .views import EventProposalUpdateView
+from .views import FeedbackCreateView
+from .views import FeedbackDeleteView
+from .views import FeedbackDetailView
+from .views import FeedbackListView
+from .views import FeedbackRedirectView
+from .views import FeedbackUpdateView
+from .views import FrabXmlView
+from .views import ICSView
+from .views import ProgramControlCenter
+from .views import ProposalListView
+from .views import ScheduleView
+from .views import SpeakerDetailView
+from .views import SpeakerListView
+from .views import SpeakerProposalCreateView
+from .views import SpeakerProposalDeleteView
+from .views import SpeakerProposalDetailView
+from .views import SpeakerProposalUpdateView
+from .views import UrlCreateView
+from .views import UrlDeleteView
+from .views import UrlUpdateView
 
 app_name = "program"
 
 urlpatterns = [
-    path("", NoScriptScheduleView.as_view(), name="schedule_index"),
-    path("noscript/", NoScriptScheduleView.as_view(), name="noscript_schedule_index"),
+    path("", ScheduleView.as_view(), name="schedule_index"),
+    path("noscript/", ScheduleView.as_view(), name="noscript_schedule_index"),
     path("ics/", ICSView.as_view(), name="ics_view"),
     path("frab.xml", FrabXmlView.as_view(), name="frab_view"),
     path("control/", ProgramControlCenter.as_view(), name="program_control_center"),
@@ -70,7 +71,7 @@ urlpatterns = [
                                 CombinedProposalPersonSelectView.as_view(),
                                 name="proposal_combined_person_select",
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -117,7 +118,7 @@ urlpatterns = [
                                 UrlDeleteView.as_view(),
                                 name="speaker_proposal_url_delete",
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -175,10 +176,10 @@ urlpatterns = [
                                 UrlDeleteView.as_view(),
                                 name="event_proposal_url_delete",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
     # Speaker views
@@ -188,9 +189,11 @@ urlpatterns = [
             [
                 path("", SpeakerListView.as_view(), name="speaker_index"),
                 path(
-                    "<slug:slug>/", SpeakerDetailView.as_view(), name="speaker_detail"
+                    "<slug:slug>/",
+                    SpeakerDetailView.as_view(),
+                    name="speaker_detail",
                 ),
-            ]
+            ],
         ),
     ),
     path("events/", EventListView.as_view(), name="event_index"),
@@ -246,10 +249,10 @@ urlpatterns = [
                                 FeedbackDeleteView.as_view(),
                                 name="event_feedback_delete",
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
 ]

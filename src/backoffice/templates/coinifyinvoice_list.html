@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  Coinify Invoice List | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Coinify Invoice List - BackOffice</h3></div>
+    <div class="card-body">
+      <p>A list of coinify invoices imported from their system via CSV files.</p>
+      {% if not coinifyinvoice_list %}
+        <p class="lead">No CoinifyInvoices found. Go import a CSV!</p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          {% include "includes/coinify_invoice_list_table.html" %}
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Coinify Dashboard</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

@@ -2,14 +2,14 @@
 {% load program %}
 
 {% block title %}
-Feedback List | {{ block.super }}
+  Feedback List | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h2>Feedback List</h2>
-<p class="lead">This is a list of all the approved feedback for your {{ camp.title }} event <b>{{ event.title }}</b>. We currently have feedback from {{ event_feedback_list|length }} users.</p>
+  <h2>Feedback List</h2>
+  <p class="lead">This is a list of all the approved feedback for your {{ camp.title }} event <b>{{ event.title }}</b>. We currently have feedback from {{ event_feedback_list|length }} users.</p>
 
-{% for event_feedback in event_feedback_list %}
-{% include 'includes/event_feedback_detail_panel.html' %}
-{% endfor %}
+  {% for event_feedback in event_feedback_list %}
+    {% include 'includes/event_feedback_detail_panel.html' %}
+  {% endfor %}
 {% endblock program_content %}

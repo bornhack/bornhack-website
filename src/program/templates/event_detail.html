@@ -1,75 +1,86 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
-{% load program %} 
+{% load program %}
 {% block program_content %}
 
-<noscript>
-<p><a href="{% url 'program:noscript_schedule_index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Return to schedule</a></p>
-</noscript>
+  <noscript>
+    <p><a href="{% url 'program:noscript_schedule_index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Return to schedule</a></p>
+  </noscript>
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span style="font-size: x-large">
-      <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
-    </span>
-    <span class="pull-right"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
-  </div>
-  <div class="panel-body">
-    <p>
-     {{ event.abstract|untrustedcommonmark }}
-    </p>
-
-    <hr>
-
-    {% if event.speakers.exists %}
-    <h4>{{ event.event_type.host_title }}s for <i>{{ event.title }}</i>:</h4>
-    <div class="list-group">
-    {% for speaker in event.speakers.all %}
-    <h4>
-     <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user fa-fw"></i> {{ speaker.name }}
-     {% for speakerevent in speaker.events.all %}
-       {{ speakerevent.event_type.icon_html }}
-     {% endfor %}
-     </a>
-    </h4>
-    {% endfor %}
+  <div class="card">
+    <div class="card-header">
+      <span style="font-size: x-large">
+        <i class="fas fa-{{ event.event_type.icon }} fa-lg" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
+      </span>
+      <span class="float-end"><a href="{% url 'program:event_feedback_redirect' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-comments"></i> Feedback</a></span>
     </div>
-    {% endif %}
+    <div class="card-body">
+      <p>
+        {{ event.abstract|untrustedcommonmark }}
+      </p>
 
-    <hr>
+      <hr>
 
-    <h4>Metadata for <i>{{ event.title }}</i></h4>
-    <strong>To be recorded</strong>:
-    <span class="fa-stack">
-      <i class="fas fa-video fa-stack-1x"></i>
-    {% if event.video_recording %}
-      <i class="far fa-circle fa-stack-2x"></i>
-    {% else %}
-      <i class="fas fa-ban fa-stack-2x text-danger"></i>
-    {% endif %}
-    </span>
-    {{ event.video_recording|yesno:"Yes,No" }}
-    <hr>
+      {% if event.speakers.exists %}
+        <h4>{{ event.event_type.host_title }}s for <i>{{ event.title }}</i>:</h4>
+        <div class="list-group">
+          {% for speaker in event.speakers.all %}
+            <h4>
+              <a href="{% url 'program:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user fa-fw"></i> {{ speaker.name }}
+                {% for speakerevent in speaker.events.all %}
+                  {{ speakerevent.event_type.icon_html }}
+                {% endfor %}
+              </a>
+            </h4>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-    <h4>URLs for <i>{{ event.title }}</i></h4>
-    {% if event.urls.exists %}
-      {% for url in event.urls.all %}
-          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
-      {% endfor %}
-    {% else %}
-      <p><i>No URLs found.</i></p>
-    {% endif %}
+      <hr>
 
-    <hr>
+      <h4>Metadata for <i>{{ event.title }}</i></h4>
+      <strong>To be recorded</strong>:
+      <span class="fa-stack">
+        {% if event.video_recording %}
+          <i class="fas fa-floppy-disk fa-stack-1x"></i>
+        {% else %}
+          <i class="fas fa-floppy-disk fa-stack-1x"></i>
+          <i class="fas fa-ban fa-stack-2x text-danger"></i>
+        {% endif %}
+      </span>
+      {{ event.video_recording|yesno:"Yes,No" }}
+      <br>
+      <strong>To be streamed</strong>:
+      <span class="fa-stack">
+        {% if event.video_streaming %}
+          <i class="far fa-broadcast-tower fa-stack-1x"></i>
+        {% else %}
+          <i class="fas fa-broadcast-tower fa-stack-1x"></i>
+          <i class="fas fa-ban fa-stack-2x text-danger"></i>
+        {% endif %}
+      </span>
+      {{ event.video_streaming|yesno:"Yes,No" }}
+      <hr>
 
-    <h4>Schedule for <i>{{ event.title }}</i></h4>
-    <ul class="list-group">
-    {% for slot in event.event_slots.all %}
-    <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }} at {{ slot.event_location.name }} <i class="fas fa-{{ slot.event_location.icon }}"></i></li>
-    {% empty %}
-      Not scheduled yet
-    {% endfor %}
-    </ul>
+      <h4>URLs for <i>{{ event.title }}</i></h4>
+      {% if event.urls.exists %}
+        {% for url in event.urls.all %}
+          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
+        {% endfor %}
+      {% else %}
+        <p><i>No URLs found.</i></p>
+      {% endif %}
+
+      <hr>
+
+      <h4>Schedule for <i>{{ event.title }}</i></h4>
+      <ul class="list-group">
+        {% for slot in event.event_slots.all %}
+          <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }} at {{ slot.event_location.name }} <i class="fas fa-{{ slot.event_location.icon }}"></i></li>
+        {% empty %}
+          Not scheduled yet
+        {% endfor %}
+      </ul>
+    </div>
   </div>
-</div>
 {% endblock program_content %}

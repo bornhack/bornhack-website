@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+{% load django_bootstrap5 %}
+{% load django_tables2 %}
+
+{% block title %}
+  Pos Transactions | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Pos Transactions | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+        <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos List</a>
+        <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product List</a>
+        <a href="{% url 'backoffice:posproductcost_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product Cost List</a>
+        <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Transaction List</a>
+        <a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Sales List</a>
+      </p>
+      <p class="lead">A Pos Transaction is created every time one or more items are sold and paid with HAX. Buying two Mate creates one Pos Transaction with two Pos Sales.</p>
+      <div class="card">
+        <div class="card-header">Filter Pos Transactions</div>
+        <div class="card-body">
+          {% if filter %}
+            <form action="" method="get" class="form form-inline">
+              {% bootstrap_form filter.form layout='inline' %}
+              <br>
+              <button class="btn btn-success"><i class="fas fa-search"></i> Filter</button>
+              <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="btn btn-danger">
+                <i class="fas fa-times"></i> Clear
+              </a>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      <div class="lead">Filter showing {{ object_list|length }} transactions ({{ filtered_sales_count }} sales for {{ filtered_sales_sum }} HAX) of {{ total_transactions }} transactions ({{ total_sales_count }} sales for {{ total_sales_sum }} HAX)</div>
+      {% include "includes/table_pagination.html" %}
+      {% render_table table %}
+      {% include "includes/table_pagination.html" %}
+    </div>
+  </div>
+{% endblock %}

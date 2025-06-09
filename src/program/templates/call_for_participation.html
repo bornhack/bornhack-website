@@ -2,21 +2,21 @@
 {% load commonmark %}
 
 {% block title %}
-Call for Participation | {{ block.super }}
+  Call for Participation | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-{% if not camp.call_for_participation_open %}
-<div class="alert alert-danger">
-    <strong>Note!</strong> This Call for Participation is not open.
-</div>
-{% endif %}
+  {% if not camp.call_for_participation_open %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Participation is not open.
+    </div>
+  {% endif %}
 
-{% if not camp.call_for_participation %}
-<p class='lead'>This CFP has not been written yet.</p>
-{% else %}
-{{ camp.call_for_participation|trustedcommonmark }}
-{% endif %}
+  {% if not camp.call_for_participation %}
+    <p class='lead'>This CFP has not been written yet.</p>
+  {% else %}
+    {{ camp.call_for_participation|trustedcommonmark }}
+  {% endif %}
 
 {% endblock %}

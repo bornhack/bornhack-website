@@ -4,63 +4,62 @@
 {% load imageutils %}
 
 {% block title %}
-{{ camp.title }}
+  {{ camp.title }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col-md-12">
-    <img src="{% static camp.logo_large %}" height="350px" width="400px" class="img-responsive" id="front-logo" />
+  <div class="row mt-3">
+    <div class="col-12">
+      <img src="{% static camp.logo_large %}" height="350px" width="400px" class="img-responsive" id="front-logo" />
 
-    <br />
+      <br />
 
-    <div class="col-md-8 col-sm-8 text-container">
-      <div class="lead">
-        <strong>BornHack 2016</strong> was the first BornHack. It took place from <strong>August 27 to September 3rd 2016</strong> on the Danish island of Bornholm. The tagline of this event was <strong>Initial Commit</strong>.
+      <div class="col-8">
+        <div class="lead">
+          <strong>BornHack 2016</strong> was the first BornHack. It took place from <strong>August 27 to September 3rd 2016</strong> on the Danish island of Bornholm. The tagline of this event was <strong>Initial Commit</strong>.
+        </div>
+      </div>
+      <div class="col-4">
+        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2612.jpg' 'A quiet moment in the chillout area by the bar' %}
       </div>
     </div>
-    <div class="col-md-4 col-sm-4 ">
-      {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2612.jpg' 'A quiet moment in the chillout area by the bar' %}
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-4">
+      {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5128.JPG' 'Emma Holten speaking at BornHack 2016' %}
+    </div>
+    <div class="col-8">
+      <div class="lead">
+        With <strong>3 keynotes, 38 talks, and 9 workshops</strong> we had an ambitious program which was well received by participants. We also had an <strong>amazing list of sponsors</strong> making the event financially possible.
+      </div>
     </div>
   </div>
-</div>
 
-<br />
+  <br />
 
-<div class="row">
-  <div class="col-md-4 col-sm-4">
-    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5128.JPG' 'Emma Holten speaking at BornHack 2016' %}
-  </div>
-  <div class="col-md-8 col-sm-8  text-container">
-    <div class="lead">
-      With <strong>3 keynotes, 38 talks, and 9 workshops</strong> we had an ambitious program which was well received by participants. We also had an <strong>amazing list of sponsors</strong> making the event financially possible.
+  <div class="row mt-3">
+    <div class="col-8">
+      <p class="lead">Many of the speakers and keynotes were present for the <strong>full week</strong>, providing participants with <strong>ample opportunity to discuss projects and exchange ideas</strong>.</p>
+    </div>
+    <div class="col-4">
+      {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5149.JPG' 'Danish politicians debating at BornHack 2016' %}
     </div>
   </div>
-</div>
 
-<br />
+  <br />
 
-<div class="row">
-  <div class="col-md-8 col-sm-8 text-container">
-    <p class="lead">Many of the speakers and keynotes were present for the <strong>full week</strong>, providing participants with <strong>ample opportunity to discuss projects and exchange ideas</strong>.</p>
-  </div>
-  <div class="col-md-4 col-sm-4">
-    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5149.JPG' 'Danish politicians debating at BornHack 2016' %}
-  </div>
-</div>
-
-<br />
-
-<div class="row">
-  <div class="col-md-4 col-sm-4">
-    {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2631.jpg' 'The BornHack 2016 organiser team' %}
-  </div>
-  <div class="col-md-8 col-sm-8 text-container">
-    <div class="lead">
-      The team behind BornHack 2016 had <strong>a lot of help</strong> from volunteer participants when it was needed. We are <strong>very grateful</strong> and will repay the kindness by continuing to organise awesome events.
+  <div class="row mt-3">
+    <div class="col-4">
+      {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2631.jpg' 'The BornHack 2016 organiser team' %}
+    </div>
+    <div class="col-8">
+      <div class="lead">
+        The team behind BornHack 2016 had <strong>a lot of help</strong> from volunteer participants when it was needed. We are <strong>very grateful</strong> and will repay the kindness by continuing to organise awesome events.
+      </div>
     </div>
   </div>
-</div>
 
 {% endblock content %}
-

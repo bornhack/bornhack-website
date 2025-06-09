@@ -1,86 +1,97 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Shifts | {{ block.super }}
+  Shifts | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-{% if request.user in team.responsible_members.all %}
-<a class="btn btn-success"
-   href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
-    Create a single shift
-</a>
-<a class="btn btn-success"
-   href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
-    Create multiple shifts
-</a>
-{% endif %}
+  {% if request.user in team.leads.all %}
+    <a class="btn btn-success"
+       href="{% url 'teams:shift_create' camp_slug=camp.slug team_slug=team.slug %}">
+      Create a single shift
+    </a>
+    <a class="btn btn-success"
+       href="{% url 'teams:shift_create_multiple' camp_slug=camp.slug team_slug=team.slug %}">
+      Create multiple shifts
+    </a>
+  {% endif %}
 
-<table class="table table-condensed">
+  <table id="main_table" class="table table-condensed">
     <tbody>
-        {% for shift in shifts %}
+      {% for shift in shifts %}
         {% ifchanged shift.shift_range.lower|date:'d' %}
-        <tr>
-            <td colspan=4>
-                <h4>
+          <thead>
+          <tr>
+            <td colspan=5>
+              <h4>
                 {{ shift.shift_range.lower|date:'Y-m-d l' }}
-                </h4>
-        <tr>
+              </h4>
+            </td>
+
+          </tr>
+          <tr>
             <th>
-                From
+              From</th>
             <th>
-                To
+              To</th>
             <th>
-                People required
+              People required</th>
             <th>
-                People
+              People</th>
             <th>
-                Actions
+              Actions</th>
+          </tr>
+        </thead>
         {% endifchanged %}
 
         <tr>
-            <td>
-                {{ shift.shift_range.lower|date:'H:i' }}
-            <td>
-                {{ shift.shift_range.upper|date:'H:i' }}
-            <td>
-                {{ shift.people_required }}
-            <td>
-                {% for member in shift.team_members.all %}
-		{{ member.user.profile.get_public_credit_name }}{% if member.for_sale %} <em>(for sale!)</em>{% endif %}{% if not forloop.last %},{% endif %}
-                {% empty %}
-                    None!
-                {% endfor %}
-
-            <td>
-                {% if request.user in team.responsible_members.all %}
-                <a class="btn btn-info"
-                   href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                <a class="btn btn-danger"
-                   href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                    <i class="fas fa-trash"></i> Delete
-                </a>
-                {% endif %}
-                {% if user in shift.users %}
-                <a class="btn btn-danger"
-                   href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                    <i class="fas fa-thumbs-down"></i> Unassign me
-                </a>
-                <a class="btn btn-warning"
-                   href="{% url 'teams:shift_member_sell' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                    <i class="fas fa-thumbs-down"></i> Sell shift
-                </a>
-                {% elif shift.people_required > shift.team_members.filter(for_sale=False).count %}
-                <a class="btn btn-success"
-                   href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
-                    <i class="fas fa-thumbs-up"></i> Assign me
-                </a>
-                {% endif %}
-        {% endfor %}
-</table>
+          <td>
+            {{ shift.shift_range.lower|date:'H:i' }}
+          </td>
+          <td>
+            {{ shift.shift_range.upper|date:'H:i' }}
+          </td>
+          <td>
+            {{ shift.people_required }}
+          </td>
+          <td>
+            {% for member in shift.team_members.all %}
+              {{ member.user.profile.get_public_credit_name }}{% if member.for_sale %} <em>(for sale!)</em>{% endif %}{% if not forloop.last %},{% endif %} 
+            {% empty %}
+              None!
+            {% endfor %}
+          </td>
+          <td>
+            {% if request.user in team.leads.all %}
+              <a class="btn btn-info"
+                 href="{% url 'teams:shift_update' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                <i class="fas fa-edit"></i> Edit
+              </a>
+              <a class="btn btn-danger"
+                 href="{% url 'teams:shift_delete' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                <i class="fas fa-trash"></i> Delete
+              </a>
+            {% endif %}
+            {% if user in shift.users %}
+              <a class="btn btn-danger"
+                 href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                <i class="fas fa-thumbs-down"></i> Unassign me
+              </a>
+              <a class="btn btn-warning"
+                 href="{% url 'teams:shift_member_sell' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                  <i class="fas fa-thumbs-down"></i> Sell shift
+              </a>
+            {% elif shift.people_required > shift.team_members.count %}
+              <a class="btn btn-success"
+                 href="{% url 'teams:shift_member_take' camp_slug=camp.slug team_slug=team.slug pk=shift.pk %}">
+                <i class="fas fa-thumbs-up"></i> Assign me
+              </a>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
 {% endblock %}

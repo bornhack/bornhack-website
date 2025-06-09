@@ -9,4 +9,3 @@ Your expense {{ expense.pk }} for {{ expense.camp.title }} has been approved. Th
 Have a nice day!
 
 The {{ expense.camp.title }} Economy Team
-

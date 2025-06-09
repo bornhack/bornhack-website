@@ -1,24 +1,89 @@
 {% load static %}
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css" media="all">
+  @page {
+        /*size: A4 portrait; /* can use also 'landscape' for orientation */
+    margin: 1cm;
+
+    @top-center{
+      content: element(header);
+    }
+
+    @bottom-center{
+      content: element(footer);
+    }
+
+  }
+  body {
+    font-size: 12px;
+    font-family: "Liberation Serif";
+    {% if dev %}
+      background: no-repeat center url('{% static 'images/test_letter.png' %}')
+                {% endif %}
+  }
+
+  header, footer {
+    font-size: 10px;
+    font-family: "Liberation Serif";
+    width: 100%;
+    position: relative;
+  }
+
+  header {
+    display: block;
+    height: 150px;
+    background: no-repeat top center url('{% static 'img/bornhack-2024/logo/bornhack-2024-logo-s.png' %}');
+    background-size: 571px 150px;
+  }
+
+  .footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+    display: block;
+    text-align: center;
+    bottom: 0;
+    margin: auto;
+    width: 50%;
+  }
+
+  footer {
+    position: fixed;
+        /*position: running(footer);*/
+        /*position: absolute;*/
+    bottom: 0;
+        /*display: block;*/
+    text-align: center;
+  }
+</style>
+
+<header>
+  <div>
+  </div>
+</header>
+
 <table style="width:100%;">
-    <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                Ticket Created:<br>
-                {{ ticket.created|date:"b jS, Y" }}<br>
-            </h3>
-        </td>
-    </tr>
+  <tr>
+    <td style="width: 75%;">&nbsp;</td>
+    <td>
+      <h3>
+        Ticket Created:<br>
+        {{ ticket.created|date:"b jS, Y" }}<br>
+      </h3>
+    </td>
+  </tr>
 </table>
+<img src="{{ ticket.get_qr_code_url }}"></img>
+<p>{{ ticket.token }}</p>
 <br>
 <h2>{{ ticket.ticket_type.camp.title }} Ticket</h2>
 <h3>Type: {{ ticket.ticket_type.name }}</h3>
 {% if ticket.product %}
-<h3>Product: {{ ticket.product.name }}</h3>
+  <h3>Product: {{ ticket.product.name }}</h3>
 {% endif %}
 {% if quantity %}
-<h3>Quantity: {{ quantity }}</h3>
+  <h3>Quantity: {{ quantity }}</h3>
 {% endif %}
 
 {% if ticket.name %}
@@ -32,14 +97,9 @@
   <img src="{% static 'img/sponsors/' %}{{ ticket.sponsor.logo_filename }}" />
 {% endif %}
 
-{% if ticket.used %}
+{% if ticket.used_at %}
   <h2>This ticket has been used.</h2>
 {% endif %}
-
-<center>
-  <img src="{{ ticket.get_qr_code_url }}"></img>
-  <p>{{ ticket.token }}</p>
-</center>
 
 <br>
 <h3>Venue</h3>
@@ -52,27 +112,31 @@
 <h5>Teardown (volunteers only): From {{ ticket.camp.teardown.lower }} to {{ ticket.camp.teardown.upper }}</h5>
 
 {% if ticket.ticket_type.includes_badge %}
-<div style="display:block; clear:both; page-break-after:always;"></div>
+  <div style="display:block; clear:both; page-break-after:always;"></div>
 
-<table style="width:100%;">
+  <table style="width:100%;">
     <tr>
-        <td style="width: 75%;">&nbsp;</td>
-        <td>
-            <h3>
-                {{ ticket.created|date:"b jS, Y" }}<br>
-            </h3>
-        </td>
+      <td style="width: 75%;">&nbsp;</td>
+      <td>
+        <h3>
+          {{ ticket.created|date:"b jS, Y" }}<br>
+        </h3>
+      </td>
     </tr>
-</table>
-<br />
+  </table>
+  <br />
 
-<h2>Badge voucher</h2>
+  <h2>Badge voucher</h2>
 
-<center>
+  <center>
     <img src="{{ ticket.get_qr_badge_code_url }}"></img>
     <p>{{ ticket.badge_token }}</p>
-</center>
+  </center>
 
 {% endif %}
-
-
+<footer>
+  The legal entity behind BornHack is:<br>
+  BornHack ApS c/o Thomas Steen Rasmussen, Skelbyvej 147, Næsby,<br>
+  4171 Glumsø, Denmark. CVR# 37666521<br>
+  email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a> - web <a href="https://www.bornhack.dk">https://www.bornhack.dk</a>
+</footer>

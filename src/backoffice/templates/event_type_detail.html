@@ -1,91 +1,91 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Details for EventType: {{ event_type.name }}</h3>
-  </div>
-  <div class="panel-body">
-    <table class="table">
-      <tr>
-        <th>Event Type</th>
-        <td>
-          <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i> {{ event_type }}
-      </tr>
-      <tr>
-        <th>EventSessions</th>
-        <td>
-          {% if event_sessions %}
-          <table class="table table-condensed table-striped">
-            <thead>
-              <tr>
-                <th>Location</th>
-                <th>Start</th>
-                <th>End</th>
-                <th class="text-center">Slots</th>
-                <th class="text-center">Events</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for session in event_sessions %}
-              <tr>
-                <td>
-                  {{ session.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</a>
-                </td>
-                <td>{{ session.when.lower }}</td>
-                <td>{{ session.when.upper }}</td>
-                <td class="text-center"><span class="badge">{{ session.event_slots.count }}</span></td>
-                <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</span></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          N/A
-          {% endif %}
-        </td>
-      </tr>
-      <tr>
-        <th>Events</th>
-        <td>
-          {% if events %}
-          <table class="table table-condensed table-striped">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>People</th>
-                <th>Slots</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for event in events %}
-              <tr>
-                <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
-                <td>
-                  <ul class="list-group">
-                  {% for speaker in event.speakers.all %}
-                     <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}</a>
-                  {% empty %}
-                  N/A
-                  {% endfor %}
-                  </ul>
-                </td>
-                <td>
-                  <ul class="list-group">
-                    {% for slot in event.event_slots.all %}
-                    <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}" class="list-group-item">From {{ slot.when.lower }} to {{ slot.when.upper }} at {{ slot.event_location.name }}</a>{% endfor %}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          N/A
-          {% endif %}
-        </td>
-      </tr>
-    </table>
-    <a href="{% url 'backoffice:event_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> EventType List</a>
-  </div>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Details for EventType: {{ event_type.name }}</h3>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>Event Type</th>
+          <td>
+            <i class="fas fa-{{ event_type.icon }}" style="color: {{ event_type.color }};"></i> {{ event_type }}
+          </tr>
+          <tr>
+            <th>EventSessions</th>
+            <td>
+              {% if event_sessions %}
+                <table class="table table-condensed table-striped">
+                  <thead>
+                    <tr>
+                      <th>Location</th>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th class="text-center">Slots</th>
+                      <th class="text-center">Events</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for session in event_sessions %}
+                      <tr>
+                        <td>
+                          {{ session.event_location.icon_html }} <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</a>
+                        </td>
+                        <td>{{ session.when.lower }}</td>
+                        <td>{{ session.when.upper }}</td>
+                        <td class="text-center"><span class="badge">{{ session.event_slots.count }}</span></td>
+                        <td class="text-center"><span class="badge">{{ session.scheduled_event_slots.count }}</span></td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          <tr>
+            <th>Events</th>
+            <td>
+              {% if events %}
+                <table class="table table-condensed table-striped">
+                  <thead>
+                    <tr>
+                      <th>Title</th>
+                      <th>People</th>
+                      <th>Slots</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for event in events %}
+                      <tr>
+                        <td>{{ event.event_type.icon_html }} <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></td>
+                        <td>
+                          <ul class="list-group">
+                            {% for speaker in event.speakers.all %}
+                              <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> {{ speaker.name }}</a>
+                            {% empty %}
+                              N/A
+                            {% endfor %}
+                          </ul>
+                        </td>
+                        <td>
+                          <ul class="list-group">
+                            {% for slot in event.event_slots.all %}
+                              <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}" class="list-group-item list-group-item-action">From {{ slot.when.lower }} to {{ slot.when.upper }} at {{ slot.event_location.name }}</a>{% endfor %}</td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+        <a href="{% url 'backoffice:event_type_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> EventType List</a>
+      </div>
+    </div>
 {% endblock content %}

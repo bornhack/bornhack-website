@@ -1,84 +1,90 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 {% block title %}
-Members | {{ block.super }}
+  Members | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Members</h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>Members</h4>
     </div>
-    <div class="panel-body">
-        <p>The following <b>{{ team.approved_members.count }}</b> people {% if team.unapproved_members.count %}(and {{ team.unapproved_members.count }} pending){% endif %} are members of the <b>{{ team.name }} Team</b>:</p>
-        <table class="table table-hover">
-          <thead>
-            <tr>
+    <div class="card-body">
+      <p>The following <b>{{ team.approved_members.count }}</b> people {% if team.unapproved_members.count %}(and {{ team.unapproved_members.count }} pending){% endif %} are members of the <b>{{ team.name }} Team</b>:</p>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>
+              Public name
+            </th>
+            <th>
+              Status
+            </th>
+            {% if request.user in team.leads.all %}
               <th>
                 Name
               </th>
               <th>
-                Status
+                Email
               </th>
-              {% if request.user in team.responsible_members.all %}
-                <th>
-                  Email
-                </th>
-                <th>
-                  Description
-                </th>
-                <th>
-                    Action
-                </th>
-              {% endif %}
-            </tr>
-          </thead>
-          <tbody>
-            {% for member in team.memberships.all %}
-              {% if member.approved or not member.approved and request.user in team.responsible_members.all %}
+              <th>
+                Description
+              </th>
+              <th>
+                Action
+              </th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in team.memberships.all %}
+            {% if member.approved or not member.approved and request.user in team.leads.all %}
               <tr>
                 <td>
-                    {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
+                  {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
                 </td>
                 <td>
-                    Team {% if member.responsible %}Responsible{% else %}Member{% endif %}
-                    {% if not member.approved %}(pending approval){% endif %}
+                  Team {% if member.lead %}Lead{% else %}Member{% endif %}
+                  {% if not member.approved %}(pending approval){% endif %}
                 </td>
-                {% if request.user in team.responsible_members.all %}
-                <td>
+                {% if request.user in team.leads.all %}
+                  <td>
+                    {{ member.user.profile.name }}
+                  </td>
+                  <td>
                     {{ member.user.email }}
-                </td>
-                <td>
+                  </td>
+                  <td>
                     {{ member.user.profile.description|untrustedcommonmark }}
-                </td>
-                <td>
-                  <div class="btn-group-vertical">
-                      <a class="btn btn-danger"
+                  </td>
+                  <td>
+                    <div class="btn-group-vertical">
+                      <a class="btn btn-danger btn-sm text-nowrap"
                          href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
-                          <i class="fas fa-trash"></i> Remove
+                        <i class="fas fa-trash"></i> Remove
                       </a>
                       {% if not member.approved %}
-                      <a class="btn btn-success"
-                         href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
+                        <a class="btn btn-success btn-sm text-nowrap"
+                           href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve
-                      </a>
+                        </a>
                       {% endif %}
-                  </div>
-                </td>
+                    </div>
+                  </td>
                 {% endif %}
               </tr>
-              {% endif %}
-            {% empty %}
-                <p>No members found!</p>
-            {% endfor %}
-          </tbody>
-        </table>
+            {% endif %}
+          {% empty %}
+            <p>No members found!</p>
+          {% endfor %}
+        </tbody>
+      </table>
 
-        {% if request.user.authorized %}
+      {% if request.user.authorized %}
 
         <p>Your membership status: <b>{% membershipstatus user team %}</b></p>
 
@@ -88,14 +94,14 @@ Members | {{ block.super }}
           {% endif %}
           <a href="{% url 'teams:leave' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Leave Team</a>
         {% else %}
-            {% if team.needs_members %}
-              <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success"><i class="fas fa-plus"></i> Join Team</a>
-            {% endif %}
+          {% if team.needs_members %}
+            <b>This team is looking for members!</b> <a href="{% url 'teams:join' camp_slug=camp.slug team_slug=team.slug %}" class="btn btn-xs btn-success"><i class="fas fa-plus"></i> Join Team</a>
+          {% endif %}
         {% endif %}
-        {% endif %}
+      {% endif %}
 
-        <hr>
+      <hr>
     </div>
-</div>
+  </div>
 
 {% endblock %}

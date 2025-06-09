@@ -3,41 +3,41 @@
 {% load commonmark %}
 
 {% block title %}
-Wish List | {{ block.super }}
+  Wish List | {{ block.super }}
 {% endblock %}
 
 
 {% block content %}
 
-<h2>BornHack Wishlist</h2>
+  <h2>BornHack Wishlist</h2>
 
-<p class="lead">
-  This is a list of things the different BornHack teams need. If you own
-  something on the list and you would like to donate it to BornHack then please
-  don't hesitate to contact the team in question. Partial donations are also welcome,
-  so if a team needs 10 of something and you have 5 then we still want to hear from you.
-  When we no longer need something it will be removed from this list.
-</p>
+  <p class="lead">
+    This is a list of things the different BornHack teams need. If you own
+    something on the list and you would like to donate it to BornHack then please
+    don't hesitate to contact the team in question. Partial donations are also welcome,
+    so if a team needs 10 of something and you have 5 then we still want to hear from you.
+    When we no longer need something it will be removed from this list.
+  </p>
 
-<table class="table table-hover table-striped">
-  <tr>
-    <th>Wish</th>
-    <th>Team</th>
-    <th>Description</th>
-    <th>Number</th>
-    <th>Created</th>
-  </tr>
-  {% for wish in wish_list %}
-  <tr>
-    <td>
-    <a href="{% url 'wishlist:detail' camp_slug=camp.slug wish_slug=wish.slug %}">{{ wish.name }}</a>
-    </td>
-    <td>{{ wish.team.name }} Team</td>
-    <td>{{ wish.description|trustedcommonmark }}</td>
-    <td>{{ wish.count }}</td>
-    <td>{{ wish.created }}</td>
-  </tr>
-  {% endfor %}
-</table>
+  <table class="table table-hover table-striped">
+    <tr>
+      <th>Wish</th>
+      <th>Team</th>
+      <th>Description</th>
+      <th>Number</th>
+      <th>Created</th>
+    </tr>
+    {% for wish in wish_list %}
+      <tr>
+        <td>
+          <a href="{% url 'wishlist:detail' camp_slug=camp.slug wish_slug=wish.slug %}">{{ wish.name }}</a>
+        </td>
+        <td>{{ wish.team.name }} Team</td>
+        <td>{{ wish.description|trustedcommonmark }}</td>
+        <td>{{ wish.count }}</td>
+        <td>{{ wish.created }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 
 {% endblock %}

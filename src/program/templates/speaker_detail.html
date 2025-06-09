@@ -2,51 +2,51 @@
 {% load commonmark %}
 
 {% block title %}
-{{ speaker.name }} | {{ block.super }}
+  {{ speaker.name }} | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><span class="h3">{{ speaker.name }}</span></div>
-  <div class="panel-body">
-    {{ speaker.biography|untrustedcommonmark }}
+  <div class="card">
+    <div class="card-header"><span class="h3">{{ speaker.name }}</span></div>
+    <div class="card-body">
+      {{ speaker.biography|untrustedcommonmark }}
 
-  <hr>
-
-  <h4>URLs for {{ speaker.name }}</h4>
-  {% if speaker.urls.exists %}
-    {% for url in speaker.urls.all %}
-        <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-toggle="tooltip" title="{{ url.url_type }}">{{ url.url }}</a></p>
-    {% endfor %}
-  {% else %}
-    <p><i>No URLs found.</i></p>
-  {% endif %}
-
-  <hr>
-
-  {% if speaker.events.exists %}
-  <h4>Events for {{ speaker.name }}</h4>
-  {% for event in speaker.events.all %}
-  <div class="panel panel-default">
-    <div class="panel-heading"><span class="h5">{{ event.event_type.icon_html }} {{ event.event_type.name }}: <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a></span></div>
-    <div class="panel-body">
-      {{ event.abstract|untrustedcommonmark|truncatechars:"500" }}
-      <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">Read more</a>
       <hr>
-      <h4>Schedule:</h4>
-      <ul class="list-group">
-        {% for slot in event.event_slots.all %}
-          <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }}</li>
-        {% empty %}
-          Not scheduled yet
+
+      <h4>URLs for {{ speaker.name }}</h4>
+      {% if speaker.urls.exists %}
+        {% for url in speaker.urls.all %}
+          <p><i class="{{ url.url_type.icon }}"></i> <b>{{ url.url_type }}</b>: <a href="{{ url.url }}" target="_blank" data-bs-toggle="tooltip" data-bs-title="{{ url.url_type }}">{{ url.url }}</a></p>
         {% endfor %}
-      </ul>
+      {% else %}
+        <p><i>No URLs found.</i></p>
+      {% endif %}
+
+      <hr>
+
+      {% if speaker.events.exists %}
+        <h4>Events for {{ speaker.name }}</h4>
+        {% for event in speaker.events.all %}
+          <div class="card">
+            <div class="card-header"><span class="h5">{{ event.event_type.icon_html }} {{ event.event_type.name }}: <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">{{ event.title }}</a></span></div>
+            <div class="card-body">
+              {{ event.abstract|untrustedcommonmark|truncatechars:"500" }}
+              <a href="{% url 'program:event_detail' camp_slug=camp.slug event_slug=event.slug %}">Read more</a>
+              <hr>
+              <h4>Schedule:</h4>
+              <ul class="list-group">
+                {% for slot in event.event_slots.all %}
+                  <li class="list-group-item">{{ slot.when.lower }} - {{ slot.when.upper }}</li>
+                {% empty %}
+                  Not scheduled yet
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        {% empty %}
+          No events registered for this speaker yet
+        {% endfor %}
+      {% endif %}
     </div>
   </div>
-  {% empty %}
-    No events registered for this speaker yet
-  {% endfor %}
-  {% endif %}
-  </div>
-</div>
 {% endblock program_content %}

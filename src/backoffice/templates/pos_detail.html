@@ -1,42 +1,53 @@
 {% extends 'base.html' %}
 
 {% block title %}
-{{ pos.name }} | Pos | BackOffice | {{ block.super }}
+  {{ pos.name }} | Pos | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">{{ pos.name }} | Pos | BackOffice</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ pos.name }} | Pos | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:pos_update' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Pos</a>
+        <a href="{% url 'backoffice:pos_delete' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Pos</a>
+        <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Pos List</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Name</th>
+            <td>{{ pos.name }}</td>
+          </tr>
+          <tr>
+            <th>Team</th>
+            <td>{{ pos.team }}</p>
+          </tr>
+          <tr>
+            <th>Pos Reports</th>
+            <td><a href="{% url 'backoffice:posreport_list' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.pos_reports.count }} reports</a></p>
+          </tr>
+          <tr>
+            <th>Transactions</th>
+            <td><a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.pos_transactions.count }} transactions</a></p>
+          </tr>
+          <tr>
+            <th>Sales</th>
+            <td><a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary"><i class="fas fa-list"></i> {{ pos.sales.count }} products sold</a></p>
+          </tr>
+          <tr>
+            <th>Total Sales</th>
+            <td>{{ pos.total_sales|default:0 }} HAX</p>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      {% if perms.camps.orgateam_permission %}
+        <a href="{% url 'backoffice:posreport_create' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create PosReport</a>
+        <a href="{% url 'backoffice:possale_import' camp_slug=camp.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Import Pos Sales JSON</a>
+      {% endif %}
+    </div>
   </div>
-  <div class="panel-body">
-    <p>
-      <a href="{% url 'backoffice:pos_update' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Pos</a>
-      <a href="{% url 'backoffice:pos_delete' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Pos</a>
-      <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Pos List</a>
-    </p>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th>Pos Name</th>
-          <td>{{ pos.name }}</td>
-        </tr>
-        <tr>
-          <th>Team</th>
-          <td>{{ pos.team }}</p>
-        </tr>
-      </tbody>
-    </table>
-  <h3>Pos Reports</h3>
-  {% if pos.pos_reports.exists %}
-  {% include "includes/posreport_list_table.html" with posreport_list=pos.pos_reports.all %}
-  {% else %}
-  None found
-  {% endif %}
-  <br>
-{% if perms.camps.orgateam_permission %}
-  <a href="{% url 'backoffice:posreport_create' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create PosReport</a>
-{% endif %}
-  </div>
-</div>
 {% endblock %}

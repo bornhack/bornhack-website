@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Delete User Location | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <span class="card-header h3">Really delete User Location {{ userlocation.name }}?</span>
+    <div class="card-body">
+      <p class="lead">Are you sure you want to delete the registration of User Location {{ userlocation.name }}?
+        <form method="post">
+          {% csrf_token %}
+          <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete User Location</button>
+          <a href="{% url 'maps_user_location_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+        </form>
+      </div>
+    </div>
+{% endblock %}

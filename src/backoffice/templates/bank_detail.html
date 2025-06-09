@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  {{ bank.name }} | Bank | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ bank.name }} | Bank | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:bank_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank List</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Bank ID</th>
+            <td>{{ bank.pk }}</td>
+          </tr>
+          <tr>
+            <th>Bank Name</th>
+            <td>{{ bank.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Bank Accounts</h3>
+      {% if bank.accounts.exists %}
+        {% include "includes/bankaccount_list_table.html" with bankaccount_list=bank.accounts.all %}
+      {% else %}
+        None found
+      {% endif %}
+      <p>
+        <a href="{% url 'backoffice:bank_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Bank List</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+        <a href="{% url 'backoffice:bank_csvupload' camp_slug=camp.slug bank_uuid=bank.pk %}" class="btn btn-primary"><i class="fas fa-file-csv"></i> Import CSV</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

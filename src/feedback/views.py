@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -22,14 +24,12 @@ class FeedbackCreate(LoginRequiredMixin, CampViewMixin, CreateView):
         thanks_message = "Thank you! Your feedback is highly appreciated!"
         try:
             token = Token.objects.get(camp=self.camp, description="Feedback thanks")
-            thanks_message += " And for your efforts, here is a token: {}".format(
-                token.token
-            )
+            thanks_message += f" And for your efforts, here is a token: {token.token}"
         except Token.DoesNotExist:
             pass
 
         messages.success(self.request, thanks_message)
 
         return HttpResponseRedirect(
-            reverse("feedback", kwargs={"camp_slug": self.camp.slug})
+            reverse("feedback", kwargs={"camp_slug": self.camp.slug}),
         )

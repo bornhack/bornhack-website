@@ -1,41 +1,41 @@
 {% load bornhack %}
 <table class="table table-hover {% if not nodatatable %}datatable{% endif %}">
-      <thead>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th class="text-center">Needs Ticket?</th>
+      <th>Proposal Status</th>
+      <th class="text-center">Has Speaker?</th>
+      <th>Submitting User</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for proposal in speaker_proposal_list %}
       <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th class="text-center">Needs Ticket?</th>
-        <th>Proposal Status</th>
-        <th class="text-center">Has Speaker?</th>
-        <th>Submitting User</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-      <tbody>
-      {% for proposal in speaker_proposal_list %}
-      <tr>
-          <td><a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}">{{ proposal.name }}</a></td>
+        <td><a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}">{{ proposal.name }}</a></td>
         <td>{{ proposal.email }}</td>
         <td class="text-center">{{ proposal.needs_oneday_ticket|truefalseicon }}</td>
         <td class="text-center"><span class="badge">{{ proposal.proposal_status }}</span></td>
         <td class="text-center">
           {% if proposal.speaker %}
-          <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-default btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
+            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=proposal.speaker.slug %}" class="btn btn-secondary btn-sm"><i class="fas fa-user"></i> Show Speaker</a>
           {% else %}
-          <i class="fas fa-times"></i>
+            <i class="fas fa-times"></i>
           {% endif %}
         </td>
         <td>{{ proposal.user }}</td>
         <td>
-           <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Details</a>
             {% if proposal.proposal_status == "pending" %}
-            <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-success"><i class="fas fa-check"></i> Approve</a>
-            <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-danger"><i class="fas fa-times"></i> Reject</a>
+              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Approve</a>
+              <a href="{% url 'backoffice:speaker_proposal_approve_reject' camp_slug=camp.slug pk=proposal.uuid %}" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Reject</a>
             {% endif %}
           </div>
         </td>
       </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    {% endfor %}
+  </tbody>
+</table>

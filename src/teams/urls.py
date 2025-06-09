@@ -1,41 +1,36 @@
-from django.urls import include, path
+"""Django URLs for application Teams."""
+from __future__ import annotations
 
-from teams.views.base import (
-    FixIrcAclView,
-    TeamGeneralView,
-    TeamListView,
-    TeamManageView,
-)
-from teams.views.guide import TeamGuidePrintView, TeamGuideView
-from teams.views.info import (
-    InfoCategoriesListView,
-    InfoItemCreateView,
-    InfoItemDeleteView,
-    InfoItemUpdateView,
-)
-from teams.views.members import (
-    TeamJoinView,
-    TeamLeaveView,
-    TeamMemberApproveView,
-    TeamMemberRemoveView,
-    TeamMembersView,
-)
-from teams.views.shifts import (
-    MemberDropsShift,
-    MemberTakesShift,
-    ShiftCreateMultipleView,
-    ShiftCreateView,
-    ShiftDeleteView,
-    ShiftListView,
-    ShiftUpdateView,
-    UserShifts,
-)
-from teams.views.tasks import (
-    TaskCreateView,
-    TaskDetailView,
-    TaskUpdateView,
-    TeamTasksView,
-)
+from django.urls import include
+from django.urls import path
+
+from teams.views.base import FixIrcAclView
+from teams.views.base import TeamGeneralView
+from teams.views.base import TeamListView
+from teams.views.base import TeamManageView
+from teams.views.guide import TeamGuidePrintView
+from teams.views.guide import TeamGuideView
+from teams.views.info import InfoCategoriesListView
+from teams.views.info import InfoItemCreateView
+from teams.views.info import InfoItemDeleteView
+from teams.views.info import InfoItemUpdateView
+from teams.views.members import TeamJoinView
+from teams.views.members import TeamLeaveView
+from teams.views.members import TeamMemberApproveView
+from teams.views.members import TeamMemberRemoveView
+from teams.views.members import TeamMembersView
+from teams.views.shifts import MemberDropsShift
+from teams.views.shifts import MemberTakesShift
+from teams.views.shifts import ShiftCreateMultipleView
+from teams.views.shifts import ShiftCreateView
+from teams.views.shifts import ShiftDeleteView
+from teams.views.shifts import ShiftListView
+from teams.views.shifts import ShiftUpdateView
+from teams.views.shifts import UserShifts
+from teams.views.tasks import TaskCreateView
+from teams.views.tasks import TaskDetailView
+from teams.views.tasks import TaskUpdateView
+from teams.views.tasks import TeamTasksView
 
 app_name = "teams"
 
@@ -68,7 +63,7 @@ urlpatterns = [
                                 TeamMemberApproveView.as_view(),
                                 name="member_approve",
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -77,7 +72,9 @@ urlpatterns = [
                         [
                             path("", TeamTasksView.as_view(), name="tasks"),
                             path(
-                                "create/", TaskCreateView.as_view(), name="task_create"
+                                "create/",
+                                TaskCreateView.as_view(),
+                                name="task_create",
                             ),
                             path(
                                 "<slug:slug>/",
@@ -93,10 +90,10 @@ urlpatterns = [
                                             TaskUpdateView.as_view(),
                                             name="task_update",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -131,13 +128,13 @@ urlpatterns = [
                                                         InfoItemDeleteView.as_view(),
                                                         name="info_item_delete",
                                                     ),
-                                                ]
+                                                ],
                                             ),
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
                 path(
@@ -184,13 +181,13 @@ urlpatterns = [
                                             MemberSellsShift.as_view(),
                                             name="shift_member_sell",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
-                        ]
+                        ],
                     ),
                 ),
-            ]
+            ],
         ),
     ),
 ]

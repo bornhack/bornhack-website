@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster
+FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
@@ -9,8 +9,6 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_DEFAULT_TIMEOUT=100
 
 WORKDIR /app
-
-ADD src/requirements/ /tmp/
 
 RUN apt-get update \
   && apt-get install -y \
@@ -28,8 +26,13 @@ RUN apt-get update \
     libgdal-dev \
     wkhtmltopdf
 
-RUN pip3 install --no-cache-dir  -r /tmp/dev.txt
+ADD pyproject.toml /app/
+ADD README.md /app/
+ADD src /app/src/
+
+RUN uv pip install --system --no-cache-dir .[dev,test]
+
+RUN rm -rf /app/*
 
 RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
-#COPY --chown=www:www ./ /app/

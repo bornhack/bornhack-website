@@ -1,118 +1,118 @@
 {% extends 'profile_base.html' %}
 
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-E-mail Addresses | {{ block.super }}
+  E-mail Addresses | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
 
-<div class="row">
-  <div class="col-md-12">
+  <div class="row">
+    <div class="col-md-12">
 
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h4>E-mail Addresses</h4>
-      </div>
-      <div class="panel-body">
+      <div class="card">
+        <div class="card-header">
+          <h4>E-mail Addresses</h4>
+        </div>
+        <div class="card-body">
 
-        {% if user.emailaddress_set.all %}
-        <p>The following e-mail addresses are associated with your account:</p>
-        <form action="{% url 'account_email' %}" class="email_list" method="post">
-          {% csrf_token %}
-          <fieldset class="blockLabels">
+          {% if user.emailaddress_set.all %}
+            <p>The following e-mail addresses are associated with your account:</p>
+            <form action="{% url 'account_email' %}" class="email_list" method="post">
+              {% csrf_token %}
+              <fieldset class="blockLabels">
 
-            <table class="table">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>Address</th>
-                  <th>Status</th>
-                  <th>Primary?</th>
-                </tr>
-              </thead>
-              <tbody>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Address</th>
+                      <th>Status</th>
+                      <th>Primary?</th>
+                    </tr>
+                  </thead>
+                  <tbody>
 
-                {% for emailaddress in user.emailaddress_set.all %}
-                <tr class="ctrlHolder">
-                  <label for="email_radio_{{forloop.counter}}" class="{% if emailaddress.primary %}primary_email{%endif%}">
-                      <td>
-                        <input
-                                id="email_radio_{{forloop.counter}}"
-                                type="radio"
-                                name="email"
-                                value="{{emailaddress.email}}"
-                                {% if emailaddress.primary or user.emailaddress_set.count == 1 %}
+                    {% for emailaddress in user.emailaddress_set.all %}
+                      <tr class="ctrlHolder">
+                        <label for="email_radio_{{forloop.counter}}" class="{% if emailaddress.primary %}primary_email{%endif%}">
+                          <td>
+                            <input
+                              id="email_radio_{{forloop.counter}}"
+                              type="radio"
+                              name="email"
+                              value="{{emailaddress.email}}"
+                              {% if emailaddress.primary or user.emailaddress_set.count == 1 %}
                                 checked="checked"
-                                {%endif %}
-                        />
-                      </td>
-                    <td>
-                      {{ emailaddress.email }}
-                    </td>
-                    <td>
-                      {% if emailaddress.verified %}
-                      <span class="label label-success">Verified</span>
-                      {% else %}
-                      <span class="label label-danger">Unverified</span>
-                      {% endif %}
-                    </td>
-                    <td>
-                      {% if emailaddress.primary %}<span class="label label-primary">Primary</span>{% endif %}
-                    </td>
-                  </label>
-                </tr>
-                {% endfor %}
+                              {%endif %}
+                            />
+                          </td>
+                          <td>
+                            {{ emailaddress.email }}
+                          </td>
+                          <td>
+                            {% if emailaddress.verified %}
+                              <span class="label label-success">Verified</span>
+                            {% else %}
+                              <span class="label label-danger">Unverified</span>
+                            {% endif %}
+                          </td>
+                          <td>
+                            {% if emailaddress.primary %}<span class="label label-primary">Primary</span>{% endif %}
+                          </td>
+                        </label>
+                      </tr>
+                    {% endfor %}
 
-              </tbody>
-            </table>
+                  </tbody>
+                </table>
 
-            <div class="buttonHolder">
-              <button class="btn btn-success" type="submit" name="action_primary" >Make Primary</button>
-              <button class="btn btn-primary" type="submit" name="action_send" >Re-send Verification</button>
-              <button class="btn btn-danger" type="submit" name="action_remove" >Remove</button>
-            </div>
+                <div class="buttonHolder">
+                  <button class="btn btn-success" type="submit" name="action_primary" >Make Primary</button>
+                  <button class="btn btn-primary" type="submit" name="action_send" >Re-send Verification</button>
+                  <button class="btn btn-danger" type="submit" name="action_remove" >Remove</button>
+                </div>
 
-          </fieldset>
-        </form>
-        {% else %}
-          <p>
-            <strong>Warning:</strong> You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc.
-          </p>
-        {% endif %}
+              </fieldset>
+            </form>
+          {% else %}
+            <p>
+              <strong>Warning:</strong> You currently do not have any e-mail address set up. You should really add an e-mail address so you can receive notifications, reset your password, etc.
+            </p>
+          {% endif %}
+        </div>
       </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h4>Add E-mail Address</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'account_email' %}" class="add_email">
+            {% csrf_token %}
+            {% bootstrap_form form %}
+            <button name="action_add" class="btn btn-success" type="submit">Add E-mail</button>
+          </form>
+        </div>
+      </div>
+
     </div>
-
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h4>Add E-mail Address</h4>
-      </div>
-      <div class="panel-body">
-        <form method="post" action="{% url 'account_email' %}" class="add_email">
-          {% csrf_token %}
-          {% bootstrap_form form %}
-          <button name="action_add" class="btn btn-success" type="submit">Add E-mail</button>
-        </form>
-      </div>
-    </div>
-
   </div>
-</div>
 
 
-<script type="text/javascript">
-(function() {
-  var message = "Do you really want to remove the selected e-mail address?";
-  var actions = document.getElementsByName('action_remove');
-  if (actions.length) {
-    actions[0].addEventListener("click", function(e) {
-      if (! confirm(message)) {
-        e.preventDefault();
+  <script type="text/javascript">
+    (function() {
+      var message = "Do you really want to remove the selected e-mail address?";
+      var actions = document.getElementsByName('action_remove');
+      if (actions.length) {
+        actions[0].addEventListener("click", function(e) {
+          if (! confirm(message)) {
+            e.preventDefault();
+          }
+        });
       }
-    });
-  }
-})();
-</script>
+    })();
+  </script>
 
 {% endblock %}

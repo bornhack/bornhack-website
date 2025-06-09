@@ -1,48 +1,59 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load teams_tags %}
 
 
 {% block team_content %}
 
-<div class="panel panel-default">
-  <div class="panel-heading">
+  <div class="card">
+    <div class="card-header">
       <h4>Description</h4>
-  </div>
-  <div class="panel-body">
-    {{ team.description|untrustedcommonmark }}
-  </div>
-</div>
-
-{# Team communications #}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Communication Channels</h4>
     </div>
-    <div class="panel-body">
-        {{ team.camp.title }} teams primarily use mailing lists and IRC to communicate. The <b>{{ team.name }} team</b> can be contacted in the following ways:</p>
-
-        <h5>Mailing List</h5>
-        {% if team.mailing_list and request.user in team.approved_members.all %}
-          <p>The {{ team.name }} Team mailinglist is <b>{{ team.mailing_list }}</b>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You should sign up for the list if you haven't already.</p>
-        {% elif team.mailing_list and team.mailing_list_nonmember_posts %}
-        <p>The {{ team.name }} Team mailinglist is <a href="mailto:{{ team.mailing_list }}">{{ team.mailing_list }}</a>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You do not need to be a member of the list to post to it, so you can contact the {{ team.name }} Team using this email address.</p>
-        {% else %}
-          <p>The {{ team.name }} Team does not have a public mailing list, but it can be contacted through our main email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a>.
-        {% endif %}
-
-        <h5>IRC Channel</h5>
-        {% if team.public_irc_channel_name %}
-          <p>The {{ team.name }} Team public IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.public_irc_channel_name }}">{{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
-        {% else %}
-          <p>The {{ team.name }} Team does not have a public IRC channel, but it can be reached through our main IRC channel <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ IRCBOT_PUBLIC_CHANNEL }}">{{ IRCBOT_PUBLIC_CHANNEL }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
-        {% endif %}
-
-        {% if request.user in team.approved_members.all and team.private_irc_channel_name %}
-          <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
-        {% endif %}
-
+    <div class="card-body">
+      {{ team.description|untrustedcommonmark }}
     </div>
-</div>
+  </div>
+
+  {# Team communications #}
+  <div class="card">
+    <div class="card-header">
+      <h4>Communication Channels</h4>
+    </div>
+    <div class="card-body">
+      {{ team.camp.title }} teams primarily use mailing lists and IRC to communicate. The <b>{{ team.name }} team</b> can be contacted in the following ways:</p>
+
+    <h5>Mailing List</h5>
+    {% if team.mailing_list and request.user in team.approved_members.all %}
+      <p>The {{ team.name }} Team mailinglist is <b>{{ team.mailing_list }}</b>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You should sign up for the list if you haven't already.</p>
+    {% elif team.mailing_list and team.mailing_list_nonmember_posts %}
+      <p>The {{ team.name }} Team mailinglist is <a href="mailto:{{ team.mailing_list }}">{{ team.mailing_list }}</a>{% if team.mailing_list_archive_public %}, and the archives are publicly available{% endif %}. You do not need to be a member of the list to post to it, so you can contact the {{ team.name }} Team using this email address.</p>
+    {% else %}
+      <p>The {{ team.name }} Team does not have a public mailing list, but it can be contacted through our main email <a href="mailto:info@bornhack.dk">info@bornhack.dk</a>.
+    {% endif %}
+
+    <h5>IRC Channel</h5>
+    {% if team.public_irc_channel_name %}
+      <p>The {{ team.name }} Team public IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.public_irc_channel_name }}">{{ team.public_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.
+    {% else %}
+      <p>The {{ team.name }} Team does not have a public IRC channel, but it can be reached through our main IRC channel <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ IRCBOT_PUBLIC_CHANNEL }}">{{ IRCBOT_PUBLIC_CHANNEL }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
+    {% endif %}
+
+    {% if request.user in team.approved_members.all and team.private_irc_channel_name %}
+      <p>The {{ team.name }} Team private IRC channel is <a href="irc://{{ IRCBOT_SERVER_HOSTNAME }}/{{ team.private_irc_channel_name }}">{{ team.private_irc_channel_name }} on {{ IRCBOT_SERVER_HOSTNAME }}</a>.</p>
+    {% endif %}
+
+    <h5>Signal</h5>
+    {% if team.public_signal_channel_link %}
+      <p>The {{ team.name }} Team public Signal group is <a href="{{ team.public_signal_channel_link }}">{{ team.public_signal_channel_link|urlize }}</a></p>
+    {% else %}
+      <p>The {{ team.name }} Team does not have a public Signal Group.</p>
+    {% endif %}
+
+    {% if request.user in team.approved_members.all and team.private_signal_channel_link %}
+      <p>The {{ team.name }} Team private Signal group is <a href="{{ team.private_signal_channel_link }}">{{ team.private_signal_channel_link|urlize }}</a></p>
+    {% endif %}
+
+  </div>
+  </div>
 {% endblock %}

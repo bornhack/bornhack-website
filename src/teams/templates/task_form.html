@@ -1,36 +1,35 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if form.instance.id %}
-Edit Task: {{ form.instance.name }}
-{% else %}
-Create Task
-{% endif %}
-for {{ team.name }} Team
+  {% if form.instance.id %}
+    Edit Task: {{ form.instance.name }}
+  {% else %}
+    Create Task
+  {% endif %}
+  for {{ team.name }} Team
 {% endblock %}
 
 {% block team_content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>
-            {% if form.instance.id %}
-            Edit Task: {{ form.instance.name }}
-            {% else %}
-            Create Task
-            {% endif %}
-            for {{ team.name }} Team
-        </h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>
+        {% if form.instance.id %}
+          Edit Task: {{ form.instance.name }}
+        {% else %}
+          Create Task
+        {% endif %}
+        for {{ team.name }} Team
+      </h4>
     </div>
-    <div class="panel-body">
-        <form method="POST">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary">{% if form.instance.id %}Save{% else %}Create{% endif %}</button>
-        </form>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">{% if form.instance.id %}Save{% else %}Create{% endif %}</button>
+      </form>
     </div>
-    <div class="panel-footer"><i>This task belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
-</div>
+    <div class="card-footer"><i>This task belongs to the <a href="{% url 'teams:general' team_slug=team.slug camp_slug=team.camp.slug %}">{{ team.name }} Team</a></i></div>
+  </div>
 {% endblock %}
-

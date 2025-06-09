@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  Bank List | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Bank List - BackOffice</h3></div>
+    <div class="card-body">
+      <p>A list of the banks where we are or have been customers.</p>
+      {% if not bank_list %}
+        <p class="lead">No Bank found.</p>
+      {% else %}
+        <p>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          {% include "includes/bank_list_table.html" %}
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

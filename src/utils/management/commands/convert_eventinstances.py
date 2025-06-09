@@ -1,38 +1,44 @@
-# coding: utf-8
+from __future__ import annotations
+
 import logging
 
 from django.core.management.base import BaseCommand
 
 from camps.models import Camp
-from program.models import EventInstance, EventSession, EventSlot, SpeakerAvailability
+from program.models import EventInstance
+from program.models import EventSession
+from program.models import EventSlot
+from program.models import SpeakerAvailability
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Command(BaseCommand):
     args = "none"
     help = "Migrate eventinstances to eventsessions and eventslots"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "campslug",
             type=str,
             help="The slug of the camp to process",
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         camp = Camp.objects.get(slug=options["campslug"])
         for event_type_id in set(
             EventInstance.objects.filter(event__track__camp=camp).values_list(
-                "event__event_type", flat=True
-            )
+                "event__event_type",
+                flat=True,
+            ),
         ):
             if event_type_id == 1:
                 # skip facilities
                 continue
             logger.info(f"processing event type id {event_type_id} ...")
             for instance in EventInstance.objects.filter(
-                event__track__camp=camp, event__event_type_id=event_type_id
+                event__track__camp=camp,
+                event__event_type_id=event_type_id,
             ):
                 logger.info(f"processing instance {instance}")
 
@@ -52,7 +58,7 @@ class Command(BaseCommand):
                             sa.when = (sa.when.lower, instance.when.upper)
                         sa.save()
                         logger.info(
-                            f"extended speakeravailability {sa} for speaker {speaker} to include instance {instance}"
+                            f"extended speakeravailability {sa} for speaker {speaker} to include instance {instance}",
                         )
                     except SpeakerAvailability.DoesNotExist:
                         sa = SpeakerAvailability.objects.create(
@@ -61,7 +67,7 @@ class Command(BaseCommand):
                             available=True,
                         )
                         logger.info(
-                            f"created speakeravailability {sa} for speaker {speaker} for instance {instance}"
+                            f"created speakeravailability {sa} for speaker {speaker} for instance {instance}",
                         )
                     except SpeakerAvailability.MultipleObjectsReturned:
                         # who the hell does three events in a row?!
@@ -79,7 +85,7 @@ class Command(BaseCommand):
                         sa.save()
 
                 duration = int(
-                    (instance.when.upper - instance.when.lower).total_seconds() / 60
+                    (instance.when.upper - instance.when.lower).total_seconds() / 60,
                 )
                 # do we have a matching slot?
                 try:
@@ -101,7 +107,7 @@ class Command(BaseCommand):
                             event_location=instance.location,
                         )
                         logger.info(
-                            f"found existing eventsession adjacent to instance {instance}"
+                            f"found existing eventsession adjacent to instance {instance}",
                         )
                         if session.when.lower == instance.when.upper:
                             # session starts when this instance ends
@@ -110,7 +116,7 @@ class Command(BaseCommand):
                             # session ends when this instance starts
                             session.when = (session.when.lower, instance.when.upper)
                         logger.info(
-                            f"session has been expanded to include instance {instance}"
+                            f"session has been expanded to include instance {instance}",
                         )
                         session.save()
                         # we should now have a matching slot

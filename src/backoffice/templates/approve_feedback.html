@@ -2,35 +2,34 @@
 {% load bornhack %}
 
 {% block title %}
-Approve Event Feedback | {{ block.super }}
+  Approve Event Feedback | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <span class="h2">BackOffice - Approve Event Feedback</span>
-    </div>
-    <div class="panel-body">
-      <div class="lead">
-        The Content team can approve or reject pending EventFeedback from this page. The feedback will not be visible to the Event owner before it is approved. The Event owner will not be able to see the username of the feedback authors. The feedback author can see when the feedback has been approved or rejected by returning to the feedback page.
+  <div class="row">
+    <div class="card">
+      <div class="card-header">
+        <span class="h2">BackOffice - Approve Event Feedback</span>
       </div>
-      {% if event_feedback_list %}
-      <form method="post">
-        {{ formset.management_form }}
-        {% csrf_token %}
-        {% for form, feedback in formset|zip:event_feedback_list %}
-          {% include "includes/event_feedback_detail_panel.html" with event_feedback=feedback event=feedback.event %}
-        {% endfor %}
-        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
-        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-      </form>
-      {% else %}
-      <div class="lead">There is no feedback awaiting approval.</div>
-      <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-      {% endif %}
+      <div class="card-body">
+        <div class="lead">
+          The Content team can approve or reject pending EventFeedback from this page. The feedback will not be visible to the Event owner before it is approved. The Event owner will not be able to see the username of the feedback authors. The feedback author can see when the feedback has been approved or rejected by returning to the feedback page.
+        </div>
+        {% if event_feedback_list %}
+          <form method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% for form, feedback in formset|zip:event_feedback_list %}
+              {% include "includes/event_feedback_detail_panel.html" with event_feedback=feedback event=feedback.event %}
+            {% endfor %}
+            <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
+            <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+          </form>
+        {% else %}
+          <div class="lead">There is no feedback awaiting approval.</div>
+          <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+        {% endif %}
+      </div>
     </div>
   </div>
-</div>
 {% endblock content %}
-

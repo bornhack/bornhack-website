@@ -1,22 +1,29 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
+{% load leaflet_tags %}
+
+{% block extra_head %}
+  {{ form.media }}
+  {% leaflet_css plugins="forms" %}
+  {% leaflet_js plugins="forms" %}
+{% endblock extra_head %}
 
 {% block title %}
-Update profile | {{ block.super }}
+  Update profile | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h4>Update Profile</h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>Update Profile</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Submit</button>
+        <a href="{% url 'profiles:detail' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Submit</button>
-      <a href="{% url 'profiles:detail' %}" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</a>
-    </form>
-  </div>
-</div>
 {% endblock profile_content %}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 
@@ -6,7 +8,7 @@ from django.conf import settings
 from teams.models import Team
 from utils.email import add_outgoing_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def add_sponsorticket_email(ticket):
@@ -15,18 +17,15 @@ def add_sponsorticket_email(ticket):
         "ticket": ticket,
     }
 
-    subject = "%s %s Sponsor Ticket %s" % (
-        ticket.sponsor.camp.title,
-        ticket.sponsor.name,
-        ticket.uuid,
-    )
+    subject = f"{ticket.sponsor.camp.title} {ticket.sponsor.name} Sponsor Ticket {ticket.uuid}"
 
-    filename = "sponsor_ticket_{}.pdf".format(ticket.pk)
+    filename = f"sponsor_ticket_{ticket.pk}.pdf"
     with open(os.path.join(settings.PDF_ARCHIVE_PATH, filename), "rb") as f:
         # add email to outgoing email queue
         return add_outgoing_email(
             responsible_team=Team.objects.get(
-                camp=ticket.sponsor.camp, name="Sponsors"
+                camp=ticket.sponsor.camp,
+                name="Sponsors",
             ),
             text_template="emails/sponsorticket_email.txt",
             html_template="emails/sponsorticket_email.html",

@@ -2,186 +2,186 @@
 {% load bornhack %}
 
 {% block title %}
-PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ block.super }}
+  PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice</h3>
-  </div>
-  <div class="panel-body">
-    <p>
-      {% if "camps.orgateam_permission" in perms %}
-      <a href="{% url 'backoffice:posreport_update' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-      {% endif %}
-      {% if request.user == posreport.bank_responsible %}
-      <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
-      <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
-      {% endif %}
-      {% if request.user == posreport.pos_responsible %}
-      <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
-      <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
-      {% endif %}
-      <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Back to Pos</a>
-    </p>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th>PosReport UUID</th>
-          <td>{{ posreport.uuid }}</td>
-        </tr>
-        <tr>
-          <th>PosReport Date</th>
-          <td>{{ posreport.date }}</td>
-        </tr>
-        <tr>
-          <th>Pos Name</th>
-          <td>{{ posreport.pos.name }}</td>
-        </tr>
-        <tr>
-          <th>Team</th>
-          <td>{{ posreport.pos.team }}</p>
-        </tr>
-        <tr>
-          <th>Bank Responsible</th>
-          <td>{{ posreport.bank_responsible }}</p>
-        </tr>
-        <tr>
-          <th>Pos Responsible</th>
-          <td>{{ posreport.pos_responsible }}</p>
-        </tr>
-        <tr>
-          <th>All OK?</th>
-          <td>{{ posreport.allok | truefalseicon }}</p>
-        </tr>
-        <tr>
-          <th>DKK cash sales from iZettle</th>
-          <td>{{ posreport.dkk_sales_izettle }} DKK</td>
-        </tr>
-        <tr>
-          <th>DKK balance (we want 0 here)</th>
-          <td>
-            <table class="table table-condensed">
-              <tbody>
-                <tr>
-                  <td class="text-right">&nbsp;</td>
-                  <td class="text-right">{{ posreport.bank_count_dkk_start }} DKK</td>
-                  <td>Bank start count</td>
-                </tr>
-                <tr>
-                  <td class="text-right">+</td>
-                  <td class="text-right">{{ posreport.dkk_sales_izettle }} DKK</td>
-                  <td>DKK cash income through iZettle</td>
-                </tr>
-                <tr>
-                  <td class="text-right">-</td>
-                  <td class="text-right">{{ posreport.bank_count_dkk_end }} DKK</td>
-                  <td>Returned to the bank at day end</td>
-                </tr>
-                <tr>
-                  <td class="text-right">=</td>
-                  <td class="text-right"><b>{{ posreport.dkk_balance }} DKK</b></td>
-                  <td><b>Final balance.<br>Negative means the POS returned too many DKK, positive means the POS returned too few DKK.</b></td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <th>Hax Sold from iZettle</th>
-          <td>{{ posreport.hax_sold_izettle }} HAX</td>
-        </tr>
-        <tr>
-          <th>Hax Sold from website</th>
-          <td>{{ posreport.hax_sold_website }} HAX</td>
-        </tr>
-        <tr>
-          <th>Hax Balance (we want 0 here)</th>
-          <td>
-            <table class="table table-condensed">
-              <tbody>
-                <tr>
-                  <td class="text-right">&nbsp;</td>
-                  <td class="text-right">{{ posreport.bank_start_hax }} HAX</td>
-                  <td>Bank start</td>
-                </tr>
-                <tr>
-                  <td class="text-right">+</td>
-                  <td class="text-right">{{ posreport.pos_json_sales.1 }} HAX</td>
-                  <td>POS Sales</td>
-                </tr>
-                <tr>
-                  <td class="text-right">-</td>
-                  <td class="text-right">{{ posreport.hax_sold_izettle }} HAX</td>
-                  <td>Sold from iZettle</td>
-                </tr>
-                <tr>
-                  <td class="text-right">-</td>
-                  <td class="text-right">{{ posreport.hax_sold_website }} HAX</td>
-                  <td>Sold from webshop tickets</td>
-                </tr>
-                <tr>
-                  <td class="text-right">-</td>
-                  <td class="text-right">{{ posreport.bank_end_hax }} HAX</td>
-                  <td>Returned to the bank at day end</td>
-                </tr>
-                <tr>
-                  <td class="text-right">=</td>
-                  <td class="text-right"><b>{{ posreport.hax_balance }} HAX</b></td>
-                  <td><b>Final balance.<br>Negative means the POS returned too many HAX, positive means the POS returned too few HAX.</b></td>
-                </tr>
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <th>Comments</th>
-          <td>{{ posreport.comments }}</td>
-        </tr>
-        <tr>
-          <th>Counts</th>
-          <td>
-            <table class="table table-condensed">
-              <thead>
-              <tr>
-                <th>What</th>
-                <th>Bank Start</th>
-                <th>Pos Start</th>
-                <th>Start OK?</th>
-                <th>Pos End</th>
-                <th>Bank End</th>
-                <th>End OK?</th>
-              </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>DKK</td>
-                  <td>{{ posreport.bank_count_dkk_start }}</td>
-                  <td>{{ posreport.pos_count_dkk_start }}</td>
-                  <td>{{ posreport.dkk_start_ok | truefalseicon }}</td>
-                  <td>{{ posreport.pos_count_dkk_end }}</td>
-                  <td>{{ posreport.bank_count_dkk_end }}</td>
-                  <td>{{ posreport.dkk_end_ok | truefalseicon }}</td>
-                </tr>
-                <tr>
-                  <td>5 HAX</td>
-                  <td>{{ posreport.bank_count_hax5_start }}</td>
-                  <td>{{ posreport.pos_count_hax5_start }}</td>
-                  <td>{{ posreport.hax5_start_ok | truefalseicon }}</td>
-                  <td>{{ posreport.pos_count_hax5_end }}</td>
-                  <td>{{ posreport.bank_count_hax5_end }}</td>
-                  <td>{{ posreport.hax5_end_ok | truefalseicon }}</td>
-                </tr>
-                <tr>
-                  <td>10 HAX</td>
-                  <td>{{ posreport.bank_count_hax10_start }}</td>
-                  <td>{{ posreport.pos_count_hax10_start }}</td>
-                  <td>{{ posreport.hax10_start_ok | truefalseicon }}</td>
-                  <td>{{ posreport.pos_count_hax10_end }}</td>
-                  <td>{{ posreport.bank_count_hax10_end }}</td>
-                  <td>{{ posreport.hax10_end_ok | truefalseicon }}</td>
-                </tr>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        {% if "camps.orgateam_permission" in perms %}
+          <a href="{% url 'backoffice:posreport_update' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+        {% endif %}
+        {% if request.user == posreport.bank_responsible %}
+          <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
+          <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
+        {% endif %}
+        {% if request.user == posreport.pos_responsible %}
+          <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
+          <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
+        {% endif %}
+        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Pos</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>PosReport UUID</th>
+            <td>{{ posreport.uuid }}</td>
+          </tr>
+          <tr>
+            <th>PosReport Period</th>
+            <td>{{ posreport.period.lower }} - {{ posreport.period.upper }}</td>
+          </tr>
+          <tr>
+            <th>Pos Name</th>
+            <td>{{ posreport.pos.name }}</td>
+          </tr>
+          <tr>
+            <th>Team</th>
+            <td>{{ posreport.pos.team }}</p>
+          </tr>
+          <tr>
+            <th>Bank Responsible</th>
+            <td>{{ posreport.bank_responsible }}</p>
+          </tr>
+          <tr>
+            <th>Pos Responsible</th>
+            <td>{{ posreport.pos_responsible }}</p>
+          </tr>
+          <tr>
+            <th>All OK?</th>
+            <td>{{ posreport.allok | truefalseicon }}</p>
+          </tr>
+          <tr>
+            <th>DKK cash sales from iZettle</th>
+            <td>{{ posreport.dkk_sales_izettle }} DKK</td>
+          </tr>
+          <tr>
+            <th>DKK balance (we want 0 here)</th>
+            <td>
+              <table class="table table-condensed">
+                <tbody>
+                  <tr>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-right">{{ posreport.bank_count_dkk_start }} DKK</td>
+                    <td>Bank start count</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">+</td>
+                    <td class="text-right">{{ posreport.dkk_sales_izettle }} DKK</td>
+                    <td>DKK cash income through iZettle</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ posreport.bank_count_dkk_end }} DKK</td>
+                    <td>Returned to the bank at day end</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">=</td>
+                    <td class="text-right"><b>{{ posreport.dkk_balance }} DKK</b></td>
+                    <td><b>Final balance.<br>Negative means the POS returned too many DKK, positive means the POS returned too few DKK.</b></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th>Hax Sold from iZettle</th>
+            <td>{{ posreport.hax_sold_izettle }} HAX</td>
+          </tr>
+          <tr>
+            <th>Hax Sold from website</th>
+            <td>{{ posreport.hax_sold_website }} HAX</td>
+          </tr>
+          <tr>
+            <th>Hax Balance (we want 0 here)</th>
+            <td>
+              <table class="table table-condensed">
+                <tbody>
+                  <tr>
+                    <td class="text-right">&nbsp;</td>
+                    <td class="text-right">{{ posreport.bank_start_hax }} HAX</td>
+                    <td>Bank start</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">+</td>
+                    <td class="text-right">{{ posreport.pos_json_sales.1 }} HAX</td>
+                    <td>POS Sales</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ posreport.hax_sold_izettle }} HAX</td>
+                    <td>Sold from iZettle</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ posreport.hax_sold_website }} HAX</td>
+                    <td>Sold from webshop tickets</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">-</td>
+                    <td class="text-right">{{ posreport.bank_end_hax }} HAX</td>
+                    <td>Returned to the bank at day end</td>
+                  </tr>
+                  <tr>
+                    <td class="text-right">=</td>
+                    <td class="text-right"><b>{{ posreport.hax_balance }} HAX</b></td>
+                    <td><b>Final balance.<br>Negative means the POS returned too many HAX, positive means the POS returned too few HAX.</b></td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <th>Comments</th>
+            <td>{{ posreport.comments }}</td>
+          </tr>
+          <tr>
+            <th>Counts</th>
+            <td>
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>What</th>
+                    <th>Bank Start</th>
+                    <th>Pos Start</th>
+                    <th>Start OK?</th>
+                    <th>Pos End</th>
+                    <th>Bank End</th>
+                    <th>End OK?</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>DKK</td>
+                    <td>{{ posreport.bank_count_dkk_start }}</td>
+                    <td>{{ posreport.pos_count_dkk_start }}</td>
+                    <td>{{ posreport.dkk_start_ok | truefalseicon }}</td>
+                    <td>{{ posreport.pos_count_dkk_end }}</td>
+                    <td>{{ posreport.bank_count_dkk_end }}</td>
+                    <td>{{ posreport.dkk_end_ok | truefalseicon }}</td>
+                  </tr>
+                  <tr>
+                    <td>5 HAX</td>
+                    <td>{{ posreport.bank_count_hax5_start }}</td>
+                    <td>{{ posreport.pos_count_hax5_start }}</td>
+                    <td>{{ posreport.hax5_start_ok | truefalseicon }}</td>
+                    <td>{{ posreport.pos_count_hax5_end }}</td>
+                    <td>{{ posreport.bank_count_hax5_end }}</td>
+                    <td>{{ posreport.hax5_end_ok | truefalseicon }}</td>
+                  </tr>
+                  <tr>
+                    <td>10 HAX</td>
+                    <td>{{ posreport.bank_count_hax10_start }}</td>
+                    <td>{{ posreport.pos_count_hax10_start }}</td>
+                    <td>{{ posreport.hax10_start_ok | truefalseicon }}</td>
+                    <td>{{ posreport.pos_count_hax10_end }}</td>
+                    <td>{{ posreport.bank_count_hax10_end }}</td>
+                    <td>{{ posreport.hax10_end_ok | truefalseicon }}</td>
+                  </tr>
                   <td>20 HAX</td>
                   <td>{{ posreport.bank_count_hax20_start }}</td>
                   <td>{{ posreport.pos_count_hax20_start }}</td>
@@ -219,5 +219,5 @@ PosReport {{ posreport.date }} {{ posreport.pos.name }} | Pos | BackOffice | {{ 
       </tbody>
     </table>
   </div>
-</div>
+  </div>
 {% endblock %}

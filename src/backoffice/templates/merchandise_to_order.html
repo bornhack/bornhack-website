@@ -4,37 +4,37 @@
 {% load imageutils %}
 
 {% block title %}
-Merchandise To Order | {{ block.super }}
+  Merchandise To Order | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-  <h2>Merchandise To Order</h2>
-  <div class="lead">
-    This is a list of merchandise to order from our supplier
+  <div class="row">
+    <h2>Merchandise To Order</h2>
+    <div class="lead">
+      This is a list of merchandise to order from our supplier
+    </div>
+    <div>
+      This table shows all different merchandise that needs to be ordered
+    </div>
   </div>
-  <div>
-    This table shows all different merchandise that needs to be ordered
-  </div>
-</div>
-<br>
-<div class="row">
+  <br>
+  <div class="row">
     <table class="table table-hover datatable">
       <thead>
-      <tr>
+        <tr>
           <th>Merchandise Type</th>
           <th>Quantity</th>
-       </tr>
+        </tr>
       </thead>
       <tbody>
-      {% for key, val in merchandise.items %}
-      <tr>
-        <td>{{ key }}</td>
-        <td>{{ val }}</td>
-      </tr>
-      {% endfor %}
+        {% for key, val in merchandise.items %}
+          <tr>
+            <td>{{ key }}</td>
+            <td>{{ val }}</td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
-</div>
-<script>
+  </div>
+  <script>
 {% endblock content %}

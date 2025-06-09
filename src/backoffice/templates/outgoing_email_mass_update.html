@@ -1,63 +1,62 @@
-{% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
-Edit and Release Held Emails | {{ block.super }}
+  Edit and Release Held Emails | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Edit and Release Held Emails ({{ formset|length }})</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Edit and Release Held Emails ({{ formset|length }})</h3>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {{ formset.management_form }}
+        {% csrf_token %}
+        {% for form in formset %}
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title">From {{ form.instance.sender }}: {{ form.instance.subject }}</h4>
+            </div>
+            <div class="card-body">
+              <table class="table">
+                <tr>
+                  <th>Created</th>
+                  <td>{{ form.instance.created }}</td>
+                </tr>
+                <tr>
+                  <th>Team</th>
+                  <td>{{ form.instance.responsible_team }}</td>
+                </tr>
+                <tr>
+                  <th>To</th>
+                  <td>{{ form.instance.to_recipients|join:"<br>"|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                  <th>Cc</th>
+                  <td>{{ form.instance.cc_recipients|join:"<br>"|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                  <th>Bcc</th>
+                  <td>{{ form.instance.bcc_recipients|join:"<br>"|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                  <th>Attachment</th>
+                  <td>{{ form.instance.attachment|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                  <th>Form</th>
+                  <td>{% bootstrap_form form %}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <form method="post">
-      {{ formset.management_form }}
-      {% csrf_token %}
-      {% for form in formset %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">From {{ form.instance.sender }}: {{ form.instance.subject }}</h4>
-        </div>
-        <div class="panel-body">
-          <table class="table">
-            <tr>
-              <th>Created</th>
-              <td>{{ form.instance.created }}</td>
-            </tr>
-            <tr>
-              <th>Team</th>
-              <td>{{ form.instance.responsible_team }}</td>
-            </tr>
-            <tr>
-              <th>To</th>
-              <td>{{ form.instance.to_recipients|join:"<br>"|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Cc</th>
-              <td>{{ form.instance.cc_recipients|join:"<br>"|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Bcc</th>
-              <td>{{ form.instance.bcc_recipients|join:"<br>"|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Attachment</th>
-              <td>{{ form.instance.attachment|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Form</th>
-              <td>{% bootstrap_form form %}</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      {% endfor %}
-      <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
-      <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-  </div>
-</div>
 {% endblock %}
-

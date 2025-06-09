@@ -1,0 +1,23 @@
+{% load bornhack %}
+<table class="table table-striped table-hover datatable">
+  <thead>
+    <tr>
+      {% thh "date" %}
+      {% thh "btc" "BTC" %}
+      {% thh "dkk" "DKK" %}
+      {% thh "eur" "EUR" %}
+      {% thh "created" "Imported" "The date this Coinify invoice was imported" %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for cb in coinifybalance_list %}
+      <tr>
+        <td data-order="{{ cb.date|sortable }}">{{ cb.date }}</td>
+        <td data-order="{{ cb.btc }}">{{ cb.btc }}&nbsp;BTC</td>
+        <td data-order="{{ cb.dkk }}">{{ cb.dkk }}&nbsp;DKK</td>
+        <td data-order="{{ cb.eur }}">{{ cb.eur }}&nbsp;EUR</td>
+        <td data-order="{{ cb.created|sortable }}">{{ cb.created }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

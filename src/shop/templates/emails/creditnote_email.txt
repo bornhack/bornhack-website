@@ -3,7 +3,7 @@ Hello!
 This email contains your creditnote from BornHack.
 The creditnote number is {{ creditnote.pk }}.
 
-The creditnote is attached in PDF format with 
+The creditnote is attached in PDF format with
 the filename {{ creditnote.filename }}. The PDF
 contains the details about what this creditnote
 covers.

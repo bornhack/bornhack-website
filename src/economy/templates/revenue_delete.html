@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Delete Revenue | {{ block.super }}
+  Delete Revenue | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h3>Really delete revenue {{ revenue.uuid }}?</h3>
-{% include 'includes/revenue_detail_panel.html' %}
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete Revenue</button>
-  <a href="{% url 'economy:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <h3>Really delete revenue {{ revenue.uuid }}?</h3>
+  {% include 'includes/revenue_detail_panel.html' %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <button class="btn btn-danger" type="submit"><i class="fas fa-times"></i> Delete Revenue</button>
+    <a href="{% url 'economy:revenue_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
 {% endblock %}

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Credit Notes | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h2>Credit Notes</h2>
+
+  <div class="lead">
+    This table shows all credit notes in the system.
+  </div>
+
+
+  <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+  {% include 'includes/creditnote_list_panel.html' %}
+
+{% endblock content %}

@@ -1,46 +1,42 @@
-    <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
-      <thead>
+<table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+  <thead>
+    <tr>
+      <th>Submitter</th>
+      <th>Proposal</th>
+      <th class="text-center">Event Conflicts</th>
+      <th class="text-center">Events</th>
+      {% if not noactions %}<th>Actions</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for speaker in speaker_list %}
       <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Submitter</th>
-          <th>Proposal</th>
-          <th class="text-center">Event Conflicts</th>
-          <th class="text-center">Events</th>
-          {% if not noactions %}<th>Actions</th>{% endif %}
-       </tr>
-      </thead>
-      <tbody>
-      {% for speaker in speaker_list %}
-      <tr>
-        <td><i class="fas fa-user"></i> <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a></td>
-        <td>{{ speaker.email }}</td>
-        <td><i class="fas fa-user"></i> {{ speaker.proposal.user }}</td>
-        <td><a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.proposal.pk %}" class="btn btn-default"><i class="fas fa-search"></i> Show</a></td>
+        <td><i class="fas fa-user"></i> <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}">{{ speaker.name }}</a> &lt;{{ speaker.email }}&gt;</td>
+        <td><a href="{% url 'backoffice:speaker_proposal_detail' camp_slug=camp.slug pk=speaker.proposal.pk %}" class="btn btn-secondary"><i class="fas fa-search"></i> Show</a></td>
         <td class="text-center"><span class="badge">{{ speaker.event_conflicts.count }}</span></td>
         <td>
           {% if speaker.events.all %}
-          <ul class="list-group">
-            {% for event in speaker.events.all %}
-            <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item">
-              <i class="fas fa-{{ event.event_type.icon }} fa-lg fa-fw" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
-            </a>
+            <ul class="list-group">
+              {% for event in speaker.events.all %}
+                <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}" class="list-group-item list-group-item-action">
+                  <i class="fas fa-{{ event.event_type.icon }} fa-lg fa-fw" style="color: {{ event.event_type.color }};"></i> {{ event.title }}
+                </a>
               {% endfor %}
-          </ul>
+            </ul>
           {% else %}
-          N/A
+            N/A
           {% endif %}
         </td>
         {% if not noactions %}
-        <td>
-          <div class="btn-group-vertical">
-            <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-            <a href="{% url 'backoffice:speaker_update' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-            <a href="{% url 'backoffice:speaker_delete' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-          </div>
-        </td>
+          <td>
+            <div class="btn-group-vertical">
+              <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+              <a href="{% url 'backoffice:speaker_update' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'backoffice:speaker_delete' camp_slug=camp.slug slug=speaker.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+            </div>
+          </td>
         {% endif %}
       </tr>
-      {% endfor %}
-      </tbody>
-    </table>
+    {% endfor %}
+  </tbody>
+</table>

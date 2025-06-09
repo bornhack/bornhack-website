@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from django.db.models import Exists
+from django.db.models import OuterRef
 from django.db.models import QuerySet
 from django.utils import timezone
 
@@ -5,6 +9,16 @@ from django.utils import timezone
 class ProductQuerySet(QuerySet):
     def available(self):
         return self.filter(available_in__contains=timezone.now(), category__public=True)
+
+    def annotate_subproducts(self):
+        from .models import SubProductRelation
+
+        subproducts = SubProductRelation.objects.filter(
+            bundle_product=OuterRef("pk"),
+        )
+        return self.annotate(
+            has_subproducts=Exists(subproducts),
+        )
 
 
 class OrderQuerySet(QuerySet):

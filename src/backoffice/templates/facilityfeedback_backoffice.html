@@ -1,68 +1,67 @@
-{% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
-Facility Feedback for {{ team.name }} Team | {{ block.super }}
+  Facility Feedback for {{ team.name }} Team | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Facility Feedback for {{ team.name }} Team</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Facility Feedback for {{ team.name }} Team ({{ feedback_list.count }})</h3>
+    </div>
+    <div class="card-body">
+      {% if feedback_list %}
+        <form method="post">
+          {{ formset.management_form }}
+          {% csrf_token %}
+          {% for form, feedback in formset|zip:feedback_list %}
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.email|default:"Anonymous User" }}</h4>
+              </div>
+              <div class="card-body">
+                <table class="table">
+                  <tr>
+                    <th>Username</th>
+                    <td>{{ feedback.user }}</td>
+                  </tr>
+                  <tr>
+                    <th>Created</th>
+                    <td>{{ feedback.created }}</td>
+                  </tr>
+                  <tr>
+                    <th>Facility</th>
+                    <td>{{ feedback.facility }}</td>
+                  </tr>
+                  <tr>
+                    <th>Quick Feedback</th>
+                    <td><i class="{{ feedback.quick_feedback.icon }} fa-2x"></i> {{ feedback.quick_feedback }}</td>
+                  </tr>
+                  <tr>
+                    <th>Comment</th>
+                    <td>{{ feedback.comment|default:"N/A" }}</td>
+                  </tr>
+                  <tr>
+                    <th>Urgent</th>
+                    <td class="{% if feedback.urgent %}text-bg-danger{% endif %}">{{ feedback.urgent|yesno }}</td>
+                  </tr>
+                  <tr>
+                    <th>Handled</th>
+                    <td>{% bootstrap_form form %}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
+          <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+        </form>
+      {% else %}
+        <p class="lead">No unhandled feedback found for any Facilities managed by {{ team.name }} Team. Good job!</p>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+      {% endif %}
+    </div>
   </div>
-  <div class="panel-body">
-    {% if feedback_list %}
-    <form method="post">
-      {{ formset.management_form }}
-      {% csrf_token %}
-      {% for form, feedback in formset|zip:feedback_list %}
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h4 class="panel-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.username|default:"Anonymous User" }}</h4>
-        </div>
-        <div class="panel-body">
-          <table class="table">
-            <tr>
-              <th>Username</th>
-              <td>{{ feedback.user }}</td>
-            </tr>
-            <tr>
-              <th>Created</th>
-              <td>{{ feedback.created }}</td>
-            </tr>
-            <tr>
-              <th>Facility</th>
-              <td>{{ feedback.facility }}</td>
-            </tr>
-            <tr>
-              <th>Quick Feedback</th>
-              <td><i class="{{ feedback.quick_feedback.icon }} fa-2x"></i> {{ feedback.quick_feedback }}</td>
-            </tr>
-            <tr>
-              <th>Comment</th>
-              <td>{{ feedback.comment|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Urgent</th>
-              <td>{{ feedback.urgent|yesno }}</td>
-            </tr>
-            <tr>
-              <th>Handled</th>
-              <td>{% bootstrap_form form %}</td>
-            </tr>
-          </table>
-        </div>
-      </div>
-      {% endfor %}
-      <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit</button>
-      <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-    {% else %}
-    <p class="lead">No unhandled feedback found for any Facilities managed by {{ team.name }} Team. Good job!</p>
-    <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a>
-    {% endif %}
-  </div>
-</div>
 {% endblock %}
-

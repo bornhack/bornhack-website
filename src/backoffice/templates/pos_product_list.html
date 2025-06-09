@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Pos Products | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Pos Products | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a>
+        <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos List</a>
+        <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product List</a>
+        <a href="{% url 'backoffice:posproductcost_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Product Cost List</a>
+        <a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Transaction List</a>
+        <a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-list"></i> Pos Sales List</a>
+      </p>
+      <p class="lead">A Pos Product is something sold at a Pos. Price, name and other product details might change over time. The sales numbers shown in this table only include transactions related to {{ camp.title }}.</p>
+      <div class="card">
+        <div class="card-header">Filter Pos Products</div>
+        <div class="card-body">
+          {% if filter %}
+            <form action="" method="get" class="form form-inline">
+              {% bootstrap_form filter.form layout='inline' %}
+              <br>
+              <button class="btn btn-success"><i class="fas fa-search"></i> Filter</button>
+              <a href="{% url 'backoffice:posproduct_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Clear</a>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+      <div class="lead">Showing {{ object_list|length }} products ({{ filtered_sales_count }} sales for {{ filtered_sales_sum }} HAX) out of total {{ total_products }} products ({{ total_sales_count }} sales for {{ total_sales_sum }} HAX) for {{ camp.title }}</div>
+      {% include "includes/table_pagination.html" %}
+      {% render_table table %}
+      {% include "includes/table_pagination.html" %}
+    </div>
+  </div>
+{% endblock %}

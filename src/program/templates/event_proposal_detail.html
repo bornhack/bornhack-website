@@ -3,105 +3,105 @@
 {% load bornhack %}
 
 {% block program_content %}
-{% if not camp.call_for_participation_open %}
-<div class="alert alert-danger">
-  <strong>Note!</strong> This Call for Participation is not open. It is no longer possible to make changes to this proposal.
-</div>
-{% endif %}
-
-<div class="panel panel-default">
-  <div class="panel-heading"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
-  <div class="panel-body">
-    {{ event_proposal.abstract|untrustedcommonmark }}
-
-    {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
-    <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
-    <br>
-    {% endif %}
-
-    <hr>
-
-    <h4>Details for <i>{{ event_proposal.title }}</i></h4>
-    <table class="table">
-      <tbody>
-        <tr>
-          <th>Title</th>
-          <td>{{ event_proposal.title }}</td>
-        </tr>
-        <tr>
-          <th>UUID</th>
-          <td>{{ event_proposal.uuid }}</td>
-        </tr>
-        <tr>
-          <th>Status</th>
-          <td>{{ event_proposal.proposal_status }}</td>
-        </tr>
-        <tr>
-          <th>Duration</th>
-          <td>{{ event_proposal.duration }} minutes</td>
-        </tr>
-        <tr>
-          <th>Tags</th>
-          <td>
-            {% for tag in event_proposal.tags.all %}
-            <span class="badge">{{ tag }}</span>
-            {% empty %}
-            N/A
-            {% endfor %}
-          </td>
-        </tr>
-        <tr>
-          <th>Use provided laptop?</th>
-          <td>{{ event_proposal.use_provided_speaker_laptop|truefalseicon }}</td>
-        </tr>
-        <tr>
-          <th>Submission Notes</th>
-          <td>{{ event_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
-        </tr>
-      </tbody>
-    </table>
-
-    {% if camp.call_for_participation_open %}
-    <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary pull-right"><i class="fas fa-edit"></i><span class="h5"> Update Details</span></a>
-    <br>
-    {% endif %}
-
-    <hr>
-
-    <h4>URLs for <i>{{ event_proposal.title }}</i></h4>
-    {% if event_proposal.urls.exists %}
-      {% include 'includes/event_proposal_url_table.html' %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
-    {% if camp.call_for_participation_open %}
-    <a href="{% url 'program:event_proposal_url_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success btn-sm pull-right"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
-    <br>
-    {% endif %}
-
-    <hr>
-
-    <h4>{{ event_proposal.event_type.host_title }} Proposals for <i>{{ event_proposal.title }}</i></h4>
-    {% if event_proposal.speakers.exists %}
-      {% include 'includes/speaker_proposal_table.html' with speaker_proposals=event_proposal.speakers.all %}
-    {% else %}
-      <i>Nothing found.</i>
-    {% endif %}
-    {% if camp.call_for_participation_open and not camp.read_only %}
-      {% if event_proposal.get_available_speaker_proposals.exists %}
-        <a href="{% url 'program:event_proposal_select_person' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
-      {% else %}
-        <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success pull-right"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
-      {% endif %}
-    {% endif %}
-  </div>
-</div>
-
-<p>
-  <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to List</a>
-  {% if camp.call_for_participation_open %}
-    <a href="{% url 'program:event_proposal_delete' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger pull-right"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
+  {% if not camp.call_for_participation_open %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Participation is not open. It is no longer possible to make changes to this proposal.
+    </div>
   {% endif %}
-</p>
+
+  <div class="card">
+    <div class="card-header"><i class="fas fa-{{ event_proposal.event_type.icon }} fa-lg" style="color: {{ event_proposal.event_type.color }}"></i> <span class="h3">{{ event_proposal.event_type.name }} Proposal: <i>{{ event_proposal.title }}</i></span></div>
+    <div class="card-body">
+      {{ event_proposal.abstract|untrustedcommonmark }}
+
+      {% if camp.call_for_participation_open and not camp.read_only and request.resolver_match.app_name == "program" %}
+        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Abstract</span></a>
+        <br>
+      {% endif %}
+
+      <hr>
+
+      <h4>Details for <i>{{ event_proposal.title }}</i></h4>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Title</th>
+            <td>{{ event_proposal.title }}</td>
+          </tr>
+          <tr>
+            <th>UUID</th>
+            <td>{{ event_proposal.uuid }}</td>
+          </tr>
+          <tr>
+            <th>Status</th>
+            <td>{{ event_proposal.proposal_status }}</td>
+          </tr>
+          <tr>
+            <th>Duration</th>
+            <td>{{ event_proposal.duration }} minutes</td>
+          </tr>
+          <tr>
+            <th>Tags</th>
+            <td>
+              {% for tag in event_proposal.tags.all %}
+                <span class="badge">{{ tag }}</span>
+              {% empty %}
+                N/A
+              {% endfor %}
+            </td>
+          </tr>
+          <tr>
+            <th>Use provided laptop?</th>
+            <td>{{ event_proposal.use_provided_speaker_laptop|truefalseicon }}</td>
+          </tr>
+          <tr>
+            <th>Submission Notes</th>
+            <td>{{ event_proposal.submission_notes|untrustedcommonmark|default:"N/A" }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      {% if camp.call_for_participation_open %}
+        <a href="{% url 'program:event_proposal_update' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-primary ms-auto"><i class="fas fa-edit"></i><span class="h5"> Update Details</span></a>
+        <br>
+      {% endif %}
+
+      <hr>
+
+      <h4>URLs for <i>{{ event_proposal.title }}</i></h4>
+      {% if event_proposal.urls.exists %}
+        {% include 'includes/event_proposal_url_table.html' %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+      {% if camp.call_for_participation_open %}
+        <a href="{% url 'program:event_proposal_url_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success btn-sm ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add URL</span></a>
+        <br>
+      {% endif %}
+
+      <hr>
+
+      <h4>{{ event_proposal.event_type.host_title }} Proposals for <i>{{ event_proposal.title }}</i></h4>
+      {% if event_proposal.speakers.exists %}
+        {% include 'includes/speaker_proposal_table.html' with speaker_proposals=event_proposal.speakers.all %}
+      {% else %}
+        <i>Nothing found.</i>
+      {% endif %}
+      {% if camp.call_for_participation_open and not camp.read_only %}
+        {% if event_proposal.get_available_speaker_proposals.exists %}
+          <a href="{% url 'program:event_proposal_select_person' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
+        {% else %}
+          <a href="{% url 'program:speaker_proposal_create' camp_slug=camp.slug event_uuid=event_proposal.uuid %}" class="btn btn-success ms-auto"><i class="fas fa-plus"></i><span class="h5"> Add {{ event_proposal.event_type.host_title }}</span></a>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  <p>
+    <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to List</a>
+    {% if camp.call_for_participation_open %}
+      <a href="{% url 'program:event_proposal_delete' camp_slug=camp.slug pk=event_proposal.uuid %}" class="btn btn-danger ms-auto"><i class="fas fa-times"></i><span class="h5"> Delete</span></a>
+    {% endif %}
+  </p>
 
 {% endblock program_content %}

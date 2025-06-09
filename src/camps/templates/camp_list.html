@@ -4,47 +4,48 @@
 {% load imageutils %}
 
 {% block title %}
-Camp List | {{ block.super }}
+  Camp List | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
+  <div class="row mt-3">
     <div class="col-md-12">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Tagline</th>
-                    <th>Buildup</th>
-                    <th>Camp</th>
-                    <th>Teardown</th>
-                    <th>Colour</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for listcamp in camps %}
-                    <tr>
-                        <td><a href="{% url 'camp_detail' camp_slug=listcamp.slug %}">{{ listcamp.title }}</a></td>
-                        <td>{{ listcamp.tagline }}</td>
-                        <td>{{ listcamp.buildup.lower }} to {{ listcamp.buildup.upper }}</td>
-                        <td>{{ listcamp.camp.lower }} to {{ listcamp.camp.upper }}</td>
-                        <td>{{ listcamp.teardown.lower }} to {{ listcamp.teardown.upper }}</td>
-                        <td style="background: {{ listcamp.colour }}">{% if listcamp.light_text %}<font color="#ffffff">{% else %}<font color="#000000">{% endif %}{{ listcamp.colour }}</font></td>
-                    </tr>
-                    </a>
-                {% empty %}
-                    <h3>No camps found, what gives?!</h3>
-                {% endfor %}
-            </tbody>
-        </table>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Tagline</th>
+            <th>Kickoff (volunteers only)</th>
+            <th>Buildup (volunteers only)</th>
+            <th>Camp</th>
+            <th>Teardown (volunteers only)</th>
+            <th>Colour</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for listcamp in camps %}
+            <tr{% if listcamp == camp %} class="table-active"{% endif %}>
+              <td><a href="{% url 'camp_detail' camp_slug=listcamp.slug %}">{{ listcamp.title }}</a></td>
+              <td>{{ listcamp.tagline }}</td>
+              <td>{% if listcamp.kickoff %}{{ listcamp.kickoff.lower }} to {{ listcamp.kickoff.upper }}{% else %}N/A{% endif %}</td>
+              <td>{{ listcamp.buildup.lower }} to {{ listcamp.buildup.upper }}</td>
+              <td class="fw-bold">{{ listcamp.camp.lower }} to {{ listcamp.camp.upper }}</td>
+              <td>{{ listcamp.teardown.lower }} to {{ listcamp.teardown.upper }}</td>
+              <td style="background: {{ listcamp.colour }}" class="align-middle font-monospace"><font color="{% if listcamp.light_text %}#ffffff{% else %}#000000{% endif %}">{{ listcamp.colour }}</font></td>
+            </tr>
+            </a>
+          {% empty %}
+            <h3>No camps found, what gives?!</h3>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-</div>
-<script>
-$("table").on("click", "tr", function(e) {
-    if ($(e.target).is("a,input")) // anything else you don't want to trigger the click
-        return;
-    location.href = $(this).find("a").attr("href");
-});
-</script>
+  </div>
+  <script>
+    $("table tbody").on("click", "tr", function(e) {
+      if ($(e.target).is("a,input")) // anything else you don't want to trigger the click
+      return;
+      location.href = $(this).find("a").attr("href");
+    });
+  </script>
 {% endblock content %}
-

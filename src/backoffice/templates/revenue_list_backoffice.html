@@ -2,26 +2,31 @@
 {% load static %}
 
 {% block title %}
-Manage Revenues for {{ camp.title }} | {{ block.super }}
+  Manage Revenues for {{ camp.title }} | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>Manage Revenues for {{ camp.title }}</h2>
+  <h2>BackOffice: Manage Revenues for {{ camp.title }}</h2>
+  <p class="lead">This view shows all revenues for {{ camp.title }}. If any unapproved revenues exist they are shown in a seperate table at the top of the page, followed by the table with all the approved revenues.</p>
 
-{% if unapproved_revenues %}
-<div class="lead">
-  This table shows unapproved revenues for {{ camp.title }}.
-</div>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
 
-{% include 'includes/revenue_list_panel.html' with revenue_list=unapproved_revenues %}
+  {% if unapproved_revenues %}
+    <div class="lead">
+      This table shows unapproved revenues for {{ camp.title }}.
+    </div>
 
-<hr>
-{% endif %}
+    {% include 'includes/revenue_list_panel.html' with revenue_list=unapproved_revenues %}
 
-<div class="lead">
-  This table shows all approved revenues for {{ camp.title }}.
-</div>
+    <hr>
+  {% endif %}
 
-{% include 'includes/revenue_list_panel.html' %}
+  <div class="lead">
+    This table shows all approved revenues for {{ camp.title }}.
+  </div>
+
+  {% include 'includes/revenue_list_panel.html' %}
+
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
 
 {% endblock content %}

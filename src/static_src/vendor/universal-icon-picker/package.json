@@ -1,0 +1,28 @@
+{
+  "name": "@migliori/universal-icon-picker",
+  "version": "1.1.8",
+  "description": "Vanilla JS Icon Picker for any Icon Library",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/migliori/universal-icon-picker.git"
+  },
+  "keywords": [
+    "icon",
+    "picker",
+    "javascript",
+    "fontawesome",
+    "bootstrap",
+    "material",
+    "icon picker"
+  ],
+  "author": "Gilles Migliori",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/migliori/universal-icon-picker/issues"
+  },
+  "homepage": "https://universal-icon-picker.miglisoft.com"
+}

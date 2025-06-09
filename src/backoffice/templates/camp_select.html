@@ -4,26 +4,25 @@
 {% load imageutils %}
 
 {% block title %}
-Camp Picker | {{ block.super }}
+  Camp Picker | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<div class="row">
-  <h2>BornHack Backoffice Camp Picker</h2>
-</div>
+  <div class="row">
+    <h2>BornHack Backoffice Camp Picker</h2>
+  </div>
 
-<div class="row">
+  <div class="row">
     <p>
-    <div class="list-group">
-      {% for camp in camp_list %}
-      <a href="{% url 'backoffice:camp_index' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">{{ camp.title }}</h4>
-        <p class="list-group-item-text">Manage {{ camp.title }}</p>
-      </a>
-      {% endfor %}
+      <div class="list-group">
+        {% for camp in camp_list %}
+          <a href="{% url 'backoffice:camp_index' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+            <h4 class="list-group-item-heading">{{ camp.title }}</h4>
+            <p class="list-group-item-text">Manage {{ camp.title }}</p>
+          </a>
+        {% endfor %}
+      </div>
     </div>
-</div>
 
 {% endblock content %}
-

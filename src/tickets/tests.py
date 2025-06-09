@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from django.test import TestCase
 
 from shop.factories import OrderProductRelationFactory
@@ -8,7 +10,6 @@ from .models import ShopTicket
 
 class TicketTests(TestCase):
     def test_correct_token_and_badge_token_are_different(self):
-
         ticket_type = TicketTypeFactory()
         opr = OrderProductRelationFactory()
         shop_ticket = ShopTicket.objects.create(

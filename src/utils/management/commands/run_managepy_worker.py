@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import importlib
 import logging
 import signal
@@ -7,7 +9,7 @@ from time import sleep
 from django.core.management.base import BaseCommand
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Command(BaseCommand):
@@ -15,7 +17,7 @@ class Command(BaseCommand):
     help = "Run a worker. Takes the worker module as the first positional argument and calls the do_work() function in it. Optional arguments can be seen with -h / --help"
     exit_now = False
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "workermodule",
             type=str,
@@ -28,18 +30,18 @@ class Command(BaseCommand):
             help="The number of seconds to sleep between calls",
         )
 
-    def reload_worker(self, signum, frame):
+    def reload_worker(self, signum, frame) -> None:
         # we exit when we receive a HUP (expecting uwsgi or another supervisor to restart this worker)
         # this is more reliable than using importlib.reload to reload the workermodule code, since that
         # doesn't reload imports inside the worker module.
-        logger.info("Signal %s (SIGHUP) received, exiting gracefully..." % signum)
+        logger.info(f"Signal {signum} (SIGHUP) received, exiting gracefully...")
         self.exit_now = True
 
-    def clean_exit(self, signum, frame):
-        logger.info("Signal %s (INT or TERM) received, exiting gracefully..." % signum)
+    def clean_exit(self, signum, frame) -> None:
+        logger.info(f"Signal {signum} (INT or TERM) received, exiting gracefully...")
         self.exit_now = True
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         logger.info("Importing worker module...")
         self.workermodule = importlib.import_module(options["workermodule"])
         if not hasattr(self.workermodule, "do_work"):
@@ -55,10 +57,14 @@ class Command(BaseCommand):
         while True:
             try:
                 # run worker code
-                getattr(self.workermodule, "do_work")()
+                if not hasattr(self.workermodule, "do_work"):
+                    raise NotImplementedError(
+                        "Worker module should have a 'do_work' function.",
+                    )
+                self.workermodule.do_work()
             except Exception:
                 logger.exception(
-                    "Got exception inside do_work for %s" % self.workermodule
+                    f"Got exception inside do_work for {self.workermodule}",
                 )
                 sys.exit(1)
 

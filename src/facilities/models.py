@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import base64
 import io
 import logging
@@ -6,20 +8,25 @@ import qrcode
 from django.contrib.gis.db.models import PointField
 from django.contrib.gis.geos import Point
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import RangeOperators
 from django.db import models
 from django.shortcuts import reverse
+from django_prometheus.models import ExportModelOperationsMixin
 
 from maps.utils import LeafletMarkerChoices
-from utils.models import CampRelatedModel, UUIDModel
+from utils.models import CampRelatedModel
+from utils.models import UUIDModel
 from utils.slugs import unique_slugify
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-class FacilityQuickFeedback(models.Model):
-    """
-    This model contains the various options for giving quick feedback which we present to the user
+class FacilityQuickFeedback(
+    ExportModelOperationsMixin("facility_quick_feedback"),
+    models.Model,
+):
+    """This model contains the various options for giving quick feedback which we present to the user
     when giving feedback on facilities. Think "Needs cleaning" or "Doesn't work" and such.
     This model is not Camp specific.
     """
@@ -33,15 +40,14 @@ class FacilityQuickFeedback(models.Model):
         help_text="Name of the fontawesome icon to use, including the 'fab fa-' or 'fas fa-' part. Defaults to an exclamation mark icon.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.feedback
 
 
-class FacilityType(CampRelatedModel):
-    """
-    Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
+class FacilityType(ExportModelOperationsMixin("facility_type"), CampRelatedModel):
+    """Facility types are used to group similar facilities, like Toilets, Showers, Thrashcans...
     facilities.Type has a m2m relationship with FeedbackChoice which determines which choices
-    are presented for giving feedback for facilities of this type
+    are presented for giving feedback for facilities of this type.
     """
 
     class Meta:
@@ -88,27 +94,27 @@ class FacilityType(CampRelatedModel):
 
     camp_filter = "responsible_team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(
-                    responsible_team=self.responsible_team
+                    responsible_team=self.responsible_team,
                 ).values_list("slug", flat=True),
             )
         super().save(**kwargs)
 
 
-class Facility(CampRelatedModel, UUIDModel):
-    """
-    Facilities are toilets, thrashcans, cooking and dishwashing areas, and any other part of the event which could need attention or maintenance.
-    """
+class Facility(ExportModelOperationsMixin("facility"), CampRelatedModel, UUIDModel):
+    """Facilities are toilets, thrashcans, cooking and dishwashing areas, and any other part of the event which could need attention or maintenance."""
 
     facility_type = models.ForeignKey(
-        "facilities.FacilityType", related_name="facilities", on_delete=models.PROTECT
+        "facilities.FacilityType",
+        related_name="facilities",
+        on_delete=models.PROTECT,
     )
 
     name = models.CharField(
@@ -120,7 +126,8 @@ class Facility(CampRelatedModel, UUIDModel):
 
     # default to near the workshop rooms / cabins
     location = PointField(
-        default=Point(9.93891, 55.38562), help_text="The location of this facility."
+        default=Point(9.93891, 55.38562),
+        help_text="The location of this facility.",
     )
 
     @property
@@ -133,7 +140,7 @@ class Facility(CampRelatedModel, UUIDModel):
 
     camp_filter = "facility_type__responsible_team__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
     def get_feedback_url(self, request):
@@ -145,10 +152,10 @@ class Facility(CampRelatedModel, UUIDModel):
                     "facility_type_slug": self.facility_type.slug,
                     "facility_uuid": self.uuid,
                 },
-            )
+            ),
         )
 
-    def get_feedback_qr(self, request):
+    def get_feedback_qr(self, request) -> str:
         qr = qrcode.make(
             self.get_feedback_url(request),
             version=1,
@@ -163,9 +170,11 @@ class Facility(CampRelatedModel, UUIDModel):
         return self.feedbacks.filter(handled=False)
 
 
-class FacilityFeedback(CampRelatedModel):
-    """
-    This model contains participant feedback for Facilities.
+class FacilityFeedback(
+    ExportModelOperationsMixin("facility_feedback"),
+    CampRelatedModel,
+):
+    """This model contains participant feedback for Facilities.
     It is linked to the user and the facility, and to the
     quick_feedback choice the user picked (if any).
     """
@@ -194,7 +203,8 @@ class FacilityFeedback(CampRelatedModel):
     )
 
     comment = models.TextField(
-        blank=True, help_text="Any comments or feedback about this facility? (optional)"
+        blank=True,
+        help_text="Any comments or feedback about this facility? (optional)",
     )
 
     urgent = models.BooleanField(
@@ -223,9 +233,11 @@ class FacilityFeedback(CampRelatedModel):
     camp_filter = "facility__facility_type__responsible_team__camp"
 
 
-class FacilityOpeningHours(CampRelatedModel):
-    """
-    This model contains opening hours for facilities which are not always open.
+class FacilityOpeningHours(
+    ExportModelOperationsMixin("facility_opening_hours"),
+    CampRelatedModel,
+):
+    """This model contains opening hours for facilities which are not always open.
     If a facility has zero entries in this model it means is always open.
     If a facility has one or more periods of opening hours defined in this model
     it is considered closed outside of the period(s) defined in this model.

@@ -4,209 +4,45 @@
 {% load imageutils %}
 
 {% block title %}
-{{ camp.title }} Backoffice | {{ block.super }}
+  {{ camp.title }} Backoffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">{{ camp.title }} Backoffice</h3>
-  </div>
-  <div class="panel-body">
-    <p class="lead">Welcome to the promised land! Please select your desired action below:</p>
-    <div class="list-group">
-      <h3>Facilities</h3>
-      {% if perms.camps.orgateam_permission %}
-      <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          Facility Types
-        </h4>
-        <p class="list-group-item-text">
-          See and manage facility types
-        </p>
-      </a>
-      <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          Facilities
-        </h4>
-        <p class="list-group-item-text">
-          See and manage facilites
-        </p>
-      </a>
-      {% endif %}
-      {% for team in facilityfeedback_teams %}
-      {% if "camps."|add:team.permission_set in perms %}
-      <a href="{% url 'backoffice:facilityfeedback' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          Feedback for {{ team.name }} Team
-        </h4>
-        <p class="list-group-item-text">
-          See unhandled feedback for facilities managed by {{ team.name }} Team
-        </p>
-      </a>
-      {% endif %}
-      {% endfor %}
-
-      {% if perms.camps.infoteam_permission %}
-      <h3>Info Team</h3>
-      <a href="{% url 'backoffice:scan_tickets' camp_slug=camp.slug %}"
-         class="list-group-item">
-        <h4 class="list-group-item-heading">
-          Scan tickets
-        </h4>
-        <p class="list-group-item-text">
-          Use this to get scan tickets
-        </p>
-      </a>
-      {% endif %}
-
-      {% if perms.camps.contentteam_permission %}
-      <h3>Content Team</h3>
-      <a href="{% url 'backoffice:approve_event_feedback' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Approve Feedback</h4>
-        <p class="list-group-item-text">Use these views to approve or reject EventFeedback</p>
-      </a>
-      <a href="{% url 'backoffice:pending_proposals' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Approve/Reject Pending Proposals</h4>
-        <p class="list-group-item-text">Use these views to approve/reject pending SpeakerProposals and EventProposals</p>
-      </a>
-      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">AutoScheduler</h4>
-        <p class="list-group-item-text">Use these views to manage the AutoScheduler</p>
-      </a>
-      <a href="{% url 'backoffice:event_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Events</h4>
-        <p class="list-group-item-text">Use these views to manage Events</p>
-      </a>
-      <a href="{% url 'backoffice:event_location_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">EventLocations</h4>
-        <p class="list-group-item-text">Use these views to manage EventLocations</p>
-      </a>
-      <a href="{% url 'backoffice:event_proposal_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">EventProposals</h4>
-        <p class="list-group-item-text">Use these views to see all EventProposals</p>
-      </a>
-      <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">EventSessions</h4>
-        <p class="list-group-item-text">Use these views to manage <i>EventSession</i> objects. Each <i>EventSession</i> is parent to one or more related <i>EventSlot</i> objects, which is what <i>Events</i> are scheduled in.</p>
-      </a>
-      <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">EventSlots</h4>
-        <p class="list-group-item-text">Use these views to see <i>EventSlot</i> objects. <i>Events</i> are scheduled in <i>EventSlots</i>. An <i>EventSlot</i> belong to an <i>EventSession</i>, which is what defines the <i>EventType</i> and <i>EventLocation</i> of the <i>EventSlot</i>.</p>
-      </a>
-      <a href="{% url 'backoffice:event_type_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">EventTypes</h4>
-        <p class="list-group-item-text">Use these views to manage EventTypes</p>
-      </a>
-      <a href="{% url 'backoffice:speaker_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Speakers</h4>
-        <p class="list-group-item-text">Use these views to manage Speakers</p>
-      </a>
-      <a href="{% url 'backoffice:speaker_proposal_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">SpeakerProposals</h4>
-        <p class="list-group-item-text">Use these views to see all SpeakerProposals</p>
-      </a>
-      <a href="{% url 'backoffice:add_eventrecording' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Add Recordings</h4>
-        <p class="list-group-item-text">Use this view to add recordings to events</p>
-      </a>
-      {% endif %}
-
-      {% if perms.camps.orgateam_permission %}
-      <h3>Orga Team</h3>
-      <a href="{% url 'backoffice:public_credit_names' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Approve Public Credit Names</h4>
-        <p class="list-group-item-text">Use this view to check and approve users Public Credit Names</p>
-      </a>
-      <a href="{% url 'backoffice:merchandise_orders' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Merchandise Orders</h4>
-        <p class="list-group-item-text">Use this view to look at Merchandise Orders</p>
-      </a>
-      <a href="{% url 'backoffice:merchandise_to_order' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Merchandise To Order</h4>
-        <p class="list-group-item-text">Use this view to generate a list of merchandise that needs to be ordered</p>
-      </a>
-      <a href="{% url 'backoffice:village_orders' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Village Orders</h4>
-        <p class="list-group-item-text">Use this view to look at Village category OrderProductRelations</p>
-      </a>
-      <a href="{% url 'backoffice:village_to_order' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Village Gear To Order</h4>
-        <p class="list-group-item-text">Use this view to generate a list of village gear that needs to be ordered</p>
-      </a>
-      <a href="{% url 'backoffice:shop_ticket_overview' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Shop Ticket Overview</h4>
-        <p class="list-group-item-text">Use this to list shop tickets</p>
-      </a>
-      <a href="{% url 'backoffice:outgoing_email_release' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Edit and Release Held Emails</h4>
-        {% if held_email_count %}
-        <p class="list-group-item-text">Use this view to edit and release <span class="label label-warning">{{ held_email_count }}</span> OutgoingEmailQueue objects on hold.</p>
-        {% else %}
-        <p class="list-group-item-text">No emails are currently held for release. Check back later!</p>
-        {% endif %}
-      </a>
-      <a href="{% url 'backoffice:irc_overview' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">IRC Overview</h4>
-        <p class="list-group-item-text">Use this view to see IRC channels for this years teams</p>
-      </a>
-      <a href="{% url 'backoffice:shop_ticket_stats' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Webshop Ticket Stats</h4>
-        <p class="list-group-item-text">Use this view to see stats for tickets created from webshop sales. This includes tickets for people (adults and children, full week and oneday tickets), merchandise, village gear, parking and so on. This view does not include sponsor tickets.</p>
-      </a>
-      <a href="{% url 'backoffice:proxy' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Proxied Content</h4>
-        <p class="list-group-item-text">Use this view to see proxied content</p>
-      </a>
-      {% endif %}
-
-      {% if perms.camps.economyteam_permission %}
-      <h3>Economy Team</h3>
-      <a href="{% url 'backoffice:chain_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Chains</h4>
-        <p class="list-group-item-text">Use this view to see the Chains and Credebtors registered in the system.</p>
-      </a>
-      <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Expenses</h4>
-        <p class="list-group-item-text">Use this view to see and approve/reject expenses.</p>
-      </a>
-      <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Reimbursements</h4>
-        <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
-      </a>
-      <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Revenues</h4>
-        <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
-      </a>
-      <a href="{% url 'backoffice:invoice_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Invoices</h4>
-        <p class="list-group-item-text">Use this view to see a list of invoices in the system.</p>
-      </a>
-      {% endif %}
-
-      {% if perms.camps.orgateam_permission or perms.camps.infoteam_permission or perms.camps.barteam_permission %}
-      <h3>Point of Sale</h3>
-      <a href="{% url 'backoffice:pos_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Point of Sale</h4>
-        <p class="list-group-item-text">Use this view to see a list of Pos objects, and to see and submit PosReports</p>
-      </a>
-      {% endif %}
-
-      {% if perms.camps.gameteam_permission %}
-      <h3>Secret Tokens</h3>
-      <a href="{% url 'backoffice:token_list' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Tokens</h4>
-        <p class="list-group-item-text">Use this view to see a list of Tokens, and to create, update and delete them</p>
-      </a>
-      <a href="{% url 'backoffice:token_stats' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">Token Stats</h4>
-        <p class="list-group-item-text">Use this view to see token find stats</p>
-      </a>
-      {% endif %}
+  <div class="card hide-for-no-js-users">
+    <div class="card-header panel-heading-nav">
+      <h3 class="ms-3">{{ camp.title }} Backoffice</h3>
+      <p class="ms-3 card-text">Welcome to the promised land! Please select your desired action below:</p>
+      <ul class="nav nav-tabs" role="tablist">
+        {% for item, value in backoffice_tabs.items %}
+          <li class="nav-item" role="presentation" class="active">
+            <a class="nav-link{% if forloop.first %} active{% endif %}" href="#{{ item }}" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab" data-bs-target="#{{ item }}">
+              {{ value.name }}{% if value.count %} <span class="badge rounded-pill text-bg-danger">{{ value.count }}</span>{% endif %}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content">
+        {% for item, value in backoffice_tabs.items %}
+          <div role="tabpanel" class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ item }}">
+            {% include "includes/index_"|add:item|add:".html" %}
+          </div>
+        {% endfor %}
+      </div>
     </div>
   </div>
-</div>
+  <div class="card unhide-for-no-js-users">
+    <div class="card-header panel-heading-nav">
+      <h3 class="card-title">{{ camp.title }} Backoffice</h3>
+      <p class="card-text">Welcome to the promised land! Please select your desired action below:</p>
+    </div>
+    <div class="card-body">
+      {% for item, value in backoffice_tabs.items %}
+        {% include "includes/index_"|add:item|add:".html" %}
+      {% endfor %}
+    </div>
+  </div>
 
 {% endblock content %}
-

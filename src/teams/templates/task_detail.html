@@ -1,49 +1,48 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{{ task.name }}
+  {{ task.name }}
 {% endblock %}
 
 {% block team_content %}
-<div class="panel panel-default">
-    <div class="panel-heading"><h4>Task: {{ task.name }} ({% if not task.completed %}Not {% endif %}Completed)</h4></div>
-    <div class="panel-body">
-        {{ task.description|untrustedcommonmark }}
-        <hr>
-        <ul>
-            <li>Start: {{ task.when.lower|default:"N/A" }}<br>
-            <li>Finish: {{ task.when.upper|default:"N/A" }}<br>
-        </ul>
-    </div>
-    {% if user in task.team.members.all %}
-    <div class="panel-footer panel-heading">
-        <h4>Comments</h4>
-    </div>
-    <div class="panel-body">
-        <ul class="list-group">
-        {% for comment in task.comments.all %}
-            <li class="list-group-item">
-                <strong>{{ comment.author.user.username }}</strong>: {{ comment.comment }}
-            </li>
-        {% empty %}
-            <li class="list-group-item">
-            No comments
-            </li>
-        {% endfor %}
-        </ul>
-        <hr />
-        <form method="POST">
-            {% csrf_token %}
-            {% bootstrap_form comment_form %}
-            <button type="submit" class="btn btn-primary pull-right">Comment</button>
-            <span class="clearfix"></span>
-        </form>
-    </div>
-    {% endif %}
-</div>
+  <div class="card">
+    <div class="card-header"><h4>Task: {{ task.name }} ({% if not task.completed %}Not {% endif %}Completed)</h4></div>
+    <div class="card-body">
+      {{ task.description|untrustedcommonmark }}
+      <hr>
+      <ul>
+        <li>Start: {{ task.when.lower|default:"N/A" }}<br>
+          <li>Finish: {{ task.when.upper|default:"N/A" }}<br>
+          </ul>
+        </div>
+        {% if user in task.team.members.all %}
+          <div class="card-footer panel-heading">
+            <h4>Comments</h4>
+          </div>
+          <div class="card-body">
+            <ul class="list-group">
+              {% for comment in task.comments.all %}
+                <li class="list-group-item">
+                  <strong>{{ comment.author.user.username }}</strong>: {{ comment.comment }}
+                </li>
+              {% empty %}
+                <li class="list-group-item">
+                  No comments
+                </li>
+              {% endfor %}
+            </ul>
+            <hr />
+            <form method="POST">
+              {% csrf_token %}
+              {% bootstrap_form comment_form %}
+              <button type="submit" class="btn btn-primary pull-right">Comment</button>
+              <span class="clearfix"></span>
+            </form>
+          </div>
+        {% endif %}
+      </div>
 
 
 {% endblock %}
-

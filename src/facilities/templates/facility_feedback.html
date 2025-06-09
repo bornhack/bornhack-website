@@ -1,31 +1,32 @@
-{% extends 'program_base.html' %}
-{% load bootstrap3 %}
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
-{{ facility.name }} Feedback | {{ block.super }}
+  {{ facility.name }} Feedback | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>{{ facility.name }} Feedback</h2>
-{% if unhandled_feedbacks %}
-<div class="alert alert-info" role="alert">Note: We already have <b>{{ unhandled_feedbacks }}</b> unhandled feedback submissions for facility <b>{{ facility.name }}</b>. This means your issue could have been reported already, but you are welcome to submit your feedback anyway!</div>
-{% endif %}
-<form method="POST">
-  {% csrf_token %}
-  {% for field in form %}
-  {% if field.name == "quick_feedback" %}
-  <div class="list-group">
-  {% for radio, option in field|zip:facility.facility_type.quickfeedback_options.all %}
-  <div class="list-group-item">{{ radio }} <i class="{{ option.icon }} fa-2x"></i></div>
-  {% endfor %}
-  </div>
-  {% else %}
-  {% bootstrap_field field %}
+  <h2>{{ facility.name }} Feedback</h2>
+  {% if unhandled_feedbacks %}
+    <div class="alert alert-info" role="alert">Note: We already have <b>{{ unhandled_feedbacks }}</b> unhandled feedback submissions for facility <b>{{ facility.name }}</b>. This means your issue could have been reported already, but you are welcome to submit your feedback anyway!</div>
   {% endif %}
-  {% endfor %}
-  <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit Feedback</button>
-  <a href="{% url 'facilities:facility_detail' camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <form method="POST">
+    {% csrf_token %}
+    {% for field in form %}
+      {% if field.name == "quick_feedback" %}
+        <div class="list-group">
+          {% for radio, option in field|zip:facility.facility_type.quickfeedback_options.all %}
+            <div class="list-group-item">{{ radio }} <i class="{{ option.icon }} fa-2x"></i></div>
+          {% endfor %}
+        </div>
+      {% else %}
+        {% bootstrap_field field %}
+      {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Submit Feedback</button>
+    <a href="{% url 'facilities:facility_detail' camp_slug=camp.slug facility_type_slug=facilitytype.slug facility_uuid=facility.uuid %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
+  <br>
+  <p>Token: TeamShitMakesStuffWork</p>
 {% endblock content %}
-

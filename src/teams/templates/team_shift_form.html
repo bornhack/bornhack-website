@@ -1,19 +1,19 @@
 {% extends 'team_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{% if object.pk %}Update{% else %}Create{% endif %} Shift | {{ block.super }}
+  {% if object.pk %}Update{% else %}Create{% endif %} Shift | {{ block.super }}
 {% endblock %}
 
 {% block team_content %}
 
-<form method="POST">
-  {% csrf_token %}
-  {% bootstrap_form form %}
-  <button type="submit" class="btn btn-success">
+  <form method="POST">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-success">
       {% if object.pk %}Update{% else %}Create{% endif %}
-  </button>
-</form>
+    </button>
+  </form>
 
 {% endblock %}

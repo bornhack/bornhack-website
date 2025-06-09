@@ -1,22 +1,22 @@
 {% extends 'program_base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Delete Your Feedback? | {{ block.super }}
+  Delete Your Feedback? | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-<h2>Delete Your Feedback?</h2>
+  <h2>Delete Your Feedback?</h2>
 
-{% include 'includes/event_feedback_detail_panel.html' %}
+  {% include 'includes/event_feedback_detail_panel.html' %}
 
-<form method="POST">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-danger">
-    <i class="fas fa-times"></i>
-    Delete Feedback
-  </button>
-  <a href="{% url 'program:event_feedback_detail' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-</form>
+  <form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+      <i class="fas fa-times"></i>
+      Delete Feedback
+    </button>
+    <a href="{% url 'program:event_feedback_detail' camp_slug=camp.slug event_slug=event.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  </form>
 {% endblock program_content %}

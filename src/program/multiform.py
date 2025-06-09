@@ -1,5 +1,4 @@
 # Copied from https://github.com/fusionbox/django-betterforms/blob/master/betterforms/multiform.py
-
 #
 # From https://github.com/fusionbox/django-betterforms/blob/master/LICENSE
 #
@@ -25,20 +24,21 @@
 # CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+from __future__ import annotations
 
 from collections import OrderedDict
 from functools import reduce
 from itertools import chain
 from operator import add
 
-from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+from django.core.exceptions import NON_FIELD_ERRORS
+from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorList
 from django.utils.safestring import mark_safe
 
 
-class MultiForm(object):
-    """
-    A container that allows you to treat multiple forms as one form.  This is
+class MultiForm:
+    """A container that allows you to treat multiple forms as one form.  This is
     great for using more than one form on a page that share the same submit
     button.  MultiForm imitates the Form API so that it is invisible to anybody
     else that you are using a MultiForm.
@@ -46,7 +46,7 @@ class MultiForm(object):
 
     form_classes = {}
 
-    def __init__(self, data=None, files=None, *args, **kwargs):
+    def __init__(self, data=None, files=None, *args, **kwargs) -> None:
         # Some things, such as the WizardView expect these to exist.
         self.data, self.files = data, files
         kwargs.update(
@@ -65,22 +65,17 @@ class MultiForm(object):
             self.forms[key] = form_class(*fargs, **fkwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        """
-        Returns the args and kwargs for initializing one of our form children.
-        """
+        """Returns the args and kwargs for initializing one of our form children."""
         fkwargs = kwargs.copy()
         prefix = kwargs.get("prefix")
-        if prefix is None:
-            prefix = key
-        else:
-            prefix = "{0}__{1}".format(key, prefix)
+        prefix = key if prefix is None else f"{key}__{prefix}"
         fkwargs.update(
             initial=self.initials.get(key),
             prefix=prefix,
         )
         return args, fkwargs
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.as_table()
 
     def __getitem__(self, key):
@@ -115,14 +110,13 @@ class MultiForm(object):
         return any(form.is_bound for form in self.forms.values())
 
     def clean(self):
-        """
-        Raises any ValidationErrors required for cross form validation. Should
+        """Raises any ValidationErrors required for cross form validation. Should
         return a dict of cleaned_data objects for any forms whose data should
         be overridden.
         """
         return self.cleaned_data
 
-    def add_crossform_error(self, e):
+    def add_crossform_error(self, e) -> None:
         self.crossform_errors.append(e)
 
     def is_valid(self):
@@ -134,11 +128,7 @@ class MultiForm(object):
         return forms_valid and not self.crossform_errors
 
     def non_field_errors(self):
-        form_errors = (
-            form.non_field_errors()
-            for form in self.forms.values()
-            if hasattr(form, "non_field_errors")
-        )
+        form_errors = (form.non_field_errors() for form in self.forms.values() if hasattr(form, "non_field_errors"))
         return ErrorList(chain(self.crossform_errors, *form_errors))
 
     def as_table(self):
@@ -167,39 +157,36 @@ class MultiForm(object):
 
     @property
     def cleaned_data(self):
-        return OrderedDict(
-            (key, form.cleaned_data)
-            for key, form in self.forms.items()
-            if form.is_valid()
-        )
+        return OrderedDict((key, form.cleaned_data) for key, form in self.forms.items() if form.is_valid())
 
     @cleaned_data.setter
-    def cleaned_data(self, data):
+    def cleaned_data(self, data) -> None:
         for key, value in data.items():
             child_form = self[key]
             if hasattr(child_form, "forms"):
-                for formlet, formlet_data in zip(child_form.forms, value):
+                for formlet, formlet_data in zip(child_form.forms, value, strict=False):
                     formlet.cleaned_data = formlet_data
             else:
                 child_form.cleaned_data = value
 
 
 class MultiModelForm(MultiForm):
-    """
-    MultiModelForm adds ModelForm support on top of MultiForm.  That simply
+    """MultiModelForm adds ModelForm support on top of MultiForm.  That simply
     means that it includes support for the instance parameter in initialization
     and adds a save method.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.instances = kwargs.pop("instance", None)
         if self.instances is None:
             self.instances = {}
-        super(MultiModelForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_form_args_kwargs(self, key, args, kwargs):
-        fargs, fkwargs = super(MultiModelForm, self).get_form_args_kwargs(
-            key, args, kwargs
+        fargs, fkwargs = super().get_form_args_kwargs(
+            key,
+            args,
+            kwargs,
         )
         try:
             # If we only pass instance when there was one specified, we make it
@@ -210,13 +197,11 @@ class MultiModelForm(MultiForm):
         return fargs, fkwargs
 
     def save(self, commit=True):
-        objects = OrderedDict(
-            (key, form.save(commit)) for key, form in self.forms.items()
-        )
+        objects = OrderedDict((key, form.save(commit)) for key, form in self.forms.items())
 
         if any(hasattr(form, "save_m2m") for form in self.forms.values()):
 
-            def save_m2m():
+            def save_m2m() -> None:
                 for form in self.forms.values():
                     if hasattr(form, "save_m2m"):
                         form.save_m2m()

@@ -4,26 +4,25 @@ SECRET_KEY = '{{ django_secret_key }}'
 ALLOWED_HOSTS = {{ django_allowed_hostnames }}
 
 # Database settings
-# https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'ENGINE': 'django_prometheus.db.backends.postgis',
         'NAME': '{{ django_postgres_dbname }}',
         'USER': '{{ django_postgres_user }}',
         'PASSWORD': '{{ django_postgres_password }}',
         'HOST': '{{ django_postgres_host }}',
+        # comment this out for non-tls connection to postgres
+        'OPTIONS': {'sslmode': 'verify-full', 'sslrootcert': 'system'},
     },
 }
 
 DEBUG={{ django_debug }}
-
-# the path to the wkhtmltopdf binary
-WKHTMLTOPDF_CMD="{{ wkhtmltopdf_path }}"
+DEBUG_TOOLBAR_ENABLED={{ django_debug_toolbar_enabled }}
 
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
-CAMP_REDIRECT_PERCENT=25
+CAMP_REDIRECT_PERCENT=15
 
 ### changes below here are only needed for production
 
@@ -41,21 +40,24 @@ ARCHIVE_EMAIL='{{ django_archive_email }}'
 
 ADMINS={{ django_admins }}
 
+# OIDC private key
+OIDC_RSA_PRIVATE_KEY="""{{ oidc_rsa_private_key }}"""
+
 # misc settings
 TIME_ZONE='{{ django_timezone }}'
 MEDIA_ROOT='{{ django_media_root }}'
+PDF_TEST_MODE = {{ pdf_test_mode }}
 PDF_ARCHIVE_PATH='{{ pdf_archive_path }}'
 
 # PSP settings
-EPAY_MERCHANT_NUMBER='{{ epay_merchant_number }}'
-EPAY_MD5_SECRET='{{ epay_md5_secret }}'
+QUICKPAY_API_KEY="{{ quickpay_api_key }}"
+QUICKPAY_PRIVATE_KEY="{{ quickpay_private_key }}"
+
+COINIFY_API_URL='{{ coinify_api_url }}'
 COINIFY_API_KEY='{{ coinify_api_key }}'
-COINIFY_API_SECRET='{{ coinify_api_secret }}'
 COINIFY_IPN_SECRET='{{ coinify_ipn_secret }}'
-COINIFY_CALLBACK_HOSTNAME='{{ coinify_callback_hostname | default('') }}' # leave empty or comment out to use hostname from request
 
 # shop settings
-PDF_LETTERHEAD_FILENAME='{{ pdf_letterhead_filename }}'
 BANKACCOUNT_BANK='{{ bank_name }}'
 BANKACCOUNT_IBAN='{{ iban }}'
 BANKACCOUNT_SWIFTBIC='{{ swiftbic }}'
@@ -63,11 +65,19 @@ BANKACCOUNT_REG='{{ regno }}'
 BANKACCOUNT_ACCOUNT='{{ accountno }}'
 TICKET_CATEGORY_NAME='Tickets'
 
+# Dataforsyningen kort (datafordeler.dk)
+# Notice! These credentials MUST be for a 'tjenestebruger' and not a 'webbruger'
+DATAFORDELER_USER='{{ datafordeler_user }}'
+DATAFORDELER_PASSWORD='{{ datafordeler_password }}'
+
 # schedule settings
 SCHEDULE_MIDNIGHT_OFFSET_HOURS=9
 SCHEDULE_TIMESLOT_LENGTH_MINUTES=30
 SCHEDULE_EVENT_NOTIFICATION_MINUTES=10
 SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3 # how many hours per speaker_availability form checkbox
+
+# Map settings
+MAPS_USER_LOCATION_MAX = 50 # Maximum number of UserLocations a user can create
 
 # irc bot settings
 IRCBOT_CHECK_MESSAGE_INTERVAL_SECONDS=10
@@ -96,6 +106,9 @@ ECONOMYTEAM_EMAIL = "{{ django_economyteam_email }}"
 ECONOMYTEAM_NAME = "Economy"
 
 BORNHACK_2019_OLD_TOKEN_TOKEN = "{{ bornhack_2019_old_token_token }}"
-KORTFORSYNINGEN_TOKEN = "{{ kortforsyningen_token }}"
 BACKOFFICE_PROXY_URLS = {{ backoffice_proxy_urls }}
 
+QUICKPAY_API_KEY="{{ quickpay_api_key }}"
+QUICKPAY_PRIVATE_KEY="{{ quickpay_private_key }}"
+
+BMA_BASEURL="{{ bma_baseurl }}"

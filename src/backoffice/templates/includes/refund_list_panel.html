@@ -1,0 +1,50 @@
+{% load bornhack %}
+<table class="table table-hover datatable">
+  <thead>
+    <tr>
+      <th>Refund #</th>
+      <th>User</th>
+      <th>Amount</th>
+      <th>Created</th>
+      <th>Updated</th>
+      <th>Products</th>
+      <th>Paid</th>
+      <th>Order</th>
+      <th>Invoice</th>
+      <th>CreditNote</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for refund in refund_list %}
+      <tr>
+        <td>{{ refund.id }}</td>
+        <td>{{ refund.order.user.username }} &lt;{{ refund.order.user.email }}&gt;</td>
+        <td data-order="{{ refund.amount }}">{{ refund.amount }} DKK</td>
+        <td data-order="{{ refund.created|sortable }}">{{ refund.created }}</td>
+        <td data-order="{{ refund.updated|sortable }}">{{ refund.updated }}</td>
+        <td><ul>{% for rpr in refund.rprs.all %}<li>{{ rpr.opr.product.name }} ({{ rpr.quantity }}){% endfor %}</ul></td>
+        <td>{{ refund.paid|truefalseicon }} {% if refund.paid %}paid{% else %}unpaid{% endif %}</td>
+        <td><a href="{% url "backoffice:order_detail" camp_slug=camp.slug order_id=refund.order.pk %}">{{ refund.order }}</a></td>
+        <td data-order="{{ refund.order.invoice.id }}"><a href="{% url "backoffice:invoice_download" camp_slug=camp.slug invoice_id=refund.order.invoice.id %}">
+          Invoice #{{ refund.order.invoice.id }}
+        </a>
+        </td>
+        {% if refund.creditnote %}
+          <td data-order="{{ refund.creditnote.id }}">
+            <a href="{% url "backoffice:credit_note_download" camp_slug=camp.slug credit_note_id=refund.creditnote.id %}">CreditNote #{{ refund.creditnote.id }}</a>
+        {% else %}
+          <td>
+            N/A
+        {% endif %}
+      </td>
+      <td>
+        <div class="btn-group btn-group-vertical">
+          <a href="{% url "backoffice:refund_detail" camp_slug=camp.slug refund_id=refund.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+          <a href="{% url "backoffice:refund_update" camp_slug=camp.slug refund_id=refund.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+        </div>
+      </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

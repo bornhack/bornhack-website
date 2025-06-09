@@ -2,38 +2,38 @@
 {% load bornhack %}
 
 {% block title %}
-Token Stats | Backoffice | {{ block.super }}
+  Token Stats | Backoffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Token Stats - BackOffice</h3></div>
-  <div class="panel-body">
-    <p>A list of users and the number of tokens they found</p>
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-    <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
-      <thead>
-        <tr>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Finds</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for user in user_list %}
-        <tr>
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.token_find_count }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-</p>
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Token Stats - BackOffice</h3></div>
+    <div class="card-body">
+      <p>A list of users and the number of tokens they found</p>
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Finds</th>
+              <th>Last token found</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in user_list %}
+              <tr>
+                <td>{{ user.profile.public_credit_name|default:user.username }}</td>
+                <td>{{ user.token_find_count }}</td>
+                <td>{{ user.last_token_find }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </p>
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
   </div>
-</div>
 {% endblock content %}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from datetime import timedelta
 from time import sleep
@@ -10,19 +12,19 @@ from camps.utils import get_current_camp
 from ircbot.models import OutgoingIrcMessage
 from program.models import EventInstance
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class Command(BaseCommand):
     args = "none"
     help = "Queue notifications for channels and users for upcoming event instances."
 
-    def output(self, message):
+    def output(self, message) -> None:
         self.stdout.write(
-            "%s: %s" % (timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message)
+            "{}: {}".format(timezone.now().strftime("%Y-%m-%d %H:%M:%S"), message),
         )
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         self.output("Schedule notification worker running...")
         while True:
             camp = get_current_camp()
@@ -34,18 +36,18 @@ class Command(BaseCommand):
                     notifications_sent=False,
                     when__startswith__lt=timezone.now()
                     + timedelta(
-                        minutes=settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES
+                        minutes=settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES,
                     ),  # start of event is less than X minutes away
                     when__startswith__gt=timezone.now(),  # but event has not started yet
                 ):
                     # this event is less than settings.SCHEDULE_EVENT_NOTIFICATION_MINUTES minutes from starting, queue an IRC notificatio
                     oim = OutgoingIrcMessage.objects.create(
                         target=settings.IRCBOT_SCHEDULE_ANNOUNCE_CHANNEL,
-                        message="starting soon: %s" % ei,
+                        message=f"starting soon: {ei}",
                         timeout=ei.when.lower,
                     )
                     logger.info(
-                        "added irc message id %s for eventinstance %s" % (oim.id, ei)
+                        f"added irc message id {oim.id} for eventinstance {ei}",
                     )
                     ei.notifications_sent = True
                     ei.save()

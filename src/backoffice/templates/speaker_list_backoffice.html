@@ -1,20 +1,20 @@
-{% extends 'program_base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}
-Speaker List | Backoffice | {{ block.super }}
+  Speaker List | Backoffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-{% if speaker_list %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Speaker List - Backoffice</h3></div>
-  <div class="panel-body">
-    <p><i>Speakers</i> are the result of approving a <i>SpeakerProposal</i>. This is an alphabetical list of all speakers, workshop hosts, artists and other event anchors at {{ camp.title }}. <b>Any changes made here will be reflected immediately on the live site!</b></p>
-    <p><a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
-    {% include "includes/speaker_list_table_backoffice.html" %}
-    <p><a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
-</div>
-{% else %}
-<p class="lead">No speakers found for {{ camp.title }}</p>
-{% endif %}
+  {% if speaker_list %}
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Speaker List - Backoffice</h3></div>
+      <div class="card-body">
+        <p><i>Speakers</i> are the result of approving a <i>SpeakerProposal</i>. This is an alphabetical list of all speakers, workshop hosts, artists and other event anchors at {{ camp.title }}. <b>Any changes made here will be reflected immediately on the live site!</b></p>
+        <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
+        {% include "includes/speaker_list_table_backoffice.html" %}
+        <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a></p>
+      </div>
+  {% else %}
+    <p class="lead">No speakers found for {{ camp.title }}</p>
+  {% endif %}
 {% endblock content %}

@@ -2,17 +2,17 @@
 {% load commonmark %}
 
 {% block title %}
-Remove member {{ teammember.user.profile.name }} from the {{ teammember.team.name }} team
+  Remove member {{ teammember.user.profile.name }} from the {{ teammember.team.name }} team
 {% endblock %}
 
 {% block team_content %}
 
-<h3>Remove member {{ teammember.user.profile.name }} from the {{ teammember.team.name }} team</h3>
-<p class="lead">Really remove the user <b>{{ teammember.user.profile.name }}</b> from the {{ teammember.team.name }} team? The user will receive an email with a message.<p>
-<form method="POST">
-{% csrf_token %}
-{{ form }}
-<button class="btn btn-danger" type="submit"><i class="fas fa-trash-o"></i> Remove teammember</button>
-<a href="{% url 'teams:general' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-default" type="submit"><i class="fas fa-times"></i> Cancel</a>
-</form>
+  <h3>Remove member {{ teammember.user.profile.name }} from the {{ teammember.team.name }} team</h3>
+  <p class="lead">Really remove the user <b>{{ teammember.user.profile.name }}</b> from the {{ teammember.team.name }} team? The user will receive an email with a message.<p>
+    <form method="POST">
+      {% csrf_token %}
+      {{ form }}
+      <button class="btn btn-danger" type="submit"><i class="fas fa-trash-o"></i> Remove teammember</button>
+      <a href="{% url 'teams:general' camp_slug=teammember.team.camp.slug team_slug=teammember.team.slug %}" class="btn btn-secondary" type="submit"><i class="fas fa-times"></i> Cancel</a>
+    </form>
 {% endblock %}

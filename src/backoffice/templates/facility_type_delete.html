@@ -1,18 +1,18 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h2 class="panel-title">Delete FacilityType {{ facility_type.name }}?</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete FacilityType {{ facility_type.name }}?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">This FacilityType has <b>{{ facility_type.facilities.count }}</b> Facilities which will also be deleted.</p>
+      <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
+        <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-  <div class="panel-body">
-    <p class="lead">This FacilityType has <b>{{ facility_type.facilities.count }}</b> Facilities which will also be deleted.</p>
-    <form method="POST">
-      {% csrf_token %}
-      <button type="submit" name="Delete" class="btn btn-danger"><i class="fas fa-times"></i> Yes, Delete it</button>
-      <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-  </div>
-</div>
 {% endblock content %}

@@ -1,18 +1,18 @@
+from __future__ import annotations
+
 import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 
-from .models import (
-    Event,
-    EventInstance,
-    EventLocation,
-    EventTrack,
-    EventType,
-    Speaker,
-    Url,
-    UrlType,
-)
+from .models import Event
+from .models import EventInstance
+from .models import EventLocation
+from .models import EventTrack
+from .models import EventType
+from .models import Speaker
+from .models import Url
+from .models import UrlType
 
 
 class EventTypeNode(DjangoObjectType):
@@ -37,7 +37,6 @@ class EventTrackNode(DjangoObjectType):
 
 
 class EventInstanceNode(DjangoObjectType):
-
     start = graphene.Int(
         required=True,
         description="When this instance of the event starts. In posix time.",
@@ -91,7 +90,7 @@ class UrlTypeNode(DjangoObjectType):
         interfaces = (relay.Node,)
 
 
-class ProgramQuery(object):
+class ProgramQuery:
     event_type = relay.Node.Field(EventTypeNode)
     all_event_types = DjangoFilterConnectionField(EventTypeNode)
 

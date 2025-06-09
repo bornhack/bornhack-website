@@ -1,31 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">AutoScheduler Crash Course</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">AutoScheduler Crash Course</h3>
+    </div>
+    <div class="card-body">
+      <p>The AutoScheduler needs a list of <i>AutoScheduler Slots</i> and a list of <i>AutoScheduler Events</i> to do its thing.</p>
+      <p>We create one <i>AutoScheduler Slot</i> for each <i>EventSlot</i> in all <i>EventSessions</i> for the AutoScheduler-enabled <i>EventTypes</i>.</p>
+      <p>We create one <i>AutoScheduler Event</i> for each <i>EventType</i> which support autoscheduling, excluding any Events which have been scheduled manually.</p>
+      <p>All scheduling constraints are attached to <i>AutoScheduler Events</i>, and they come from many sources:
+        <ul>
+          <li><b>Slot Conflicts</b>: If a Slot is unavailable because something else has been scheduled in it the Slot is removed and not considered by the AutoScheduler. The same applies if something has been scheduled in a slot in a conflicting EventLocation.</li>
+          <li><b>SpeakerAvailability</b>: For each Event we mark any Slots as unavailable if one or more speakers for that event are unavailable for any part of the Slot.</li>
+          <li><b>Speaker Conflicts</b>: For each Event we check for each speaker if they are also hosting other Events, and register conflicts as needed, so noone has to be in two places at the same time.</li>
+          <li><b>Speaker&lt;&gt;Event Conflicts</b>: If a speaker has expressed desire to attend other Events we register conflicts as needed, so we don't schedule the speakers events at the same time as something the speaker wants to attend.</li>
+          <li><b>Event Tags</b>: Events which share a tag are scheduled in the same session if possible, and may not overlap. In other words, all events tagged "Django" will be scheduled together if they can, and if that is not possible they will at least be scheduled without overlaps so it is possible to attend all of them.</li>
+        </ul>
+      </p>
+
+      <p>We use the term <i>published schedule</i> when referring the currently published Events (meaning the current schedule on the live site). We use the term <i>draft schedule</i> when referring to the "potential" schedule calculated based on the current data (EventSessions and EventSlots, Events, Speakers, SpeakerAvailability, Event conflicts, Speaker&lt;&gt;Event Conflicts, Event tags) in the database.</p>
+
+      <p>The <i>draft schedule</i> can optionally be created similar to the <i>published schedule</i>. This makes the solver keep the number of schedule changes as low as possible.</p>
+
+      <p>It is fully supported to mix manual scheduling with using the AutoScheduler. The AutoScheduler can be used as needed: It can act strictly as a validator for a manually planned schedule. It could also be used for scheduling some events, while manually scheduling others. It can also be used to do the full schedule. The AutoScheduler will avoid scheduling over manually scheduled events, and will consider manually scheduled events when looking to avoid conflicts.</p>
+
+      <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> AutoSchedule Management</a>
+    </div>
   </div>
-  <div class="panel-body">
-    <p>The AutoScheduler needs a list of <i>AutoScheduler Slots</i> and a list of <i>AutoScheduler Events</i> to do its thing.</p>
-    <p>We create one <i>AutoScheduler Slot</i> for each <i>EventSlot</i> in all <i>EventSessions</i> for the AutoScheduler-enabled <i>EventTypes</i>.</p>
-    <p>We create one <i>AutoScheduler Event</i> for each <i>EventType</i> which support autoscheduling, excluding any Events which have been scheduled manually.</p>
-    <p>All scheduling constraints are attached to <i>AutoScheduler Events</i>, and they come from many sources:
-      <ul>
-        <li><b>Slot Conflicts</b>: If a Slot is unavailable because something else has been scheduled in it the Slot is removed and not considered by the AutoScheduler. The same applies if something has been scheduled in a slot in a conflicting EventLocation.</li>
-        <li><b>SpeakerAvailability</b>: For each Event we mark any Slots as unavailable if one or more speakers for that event are unavailable for any part of the Slot.</li>
-        <li><b>Speaker Conflicts</b>: For each Event we check for each speaker if they are also hosting other Events, and register conflicts as needed, so noone has to be in two places at the same time.</li>
-        <li><b>Speaker&lt;&gt;Event Conflicts</b>: If a speaker has expressed desire to attend other Events we register conflicts as needed, so we don't schedule the speakers events at the same time as something the speaker wants to attend.</li>
-        <li><b>Event Tags</b>: Events which share a tag are scheduled in the same session if possible, and may not overlap. In other words, all events tagged "Django" will be scheduled together if they can, and if that is not possible they will at least be scheduled without overlaps so it is possible to attend all of them.</li>
-      </ul>
-    </p>
-
-    <p>We use the term <i>published schedule</i> when referring the currently published Events (meaning the current schedule on the live site). We use the term <i>draft schedule</i> when referring to the "potential" schedule calculated based on the current data (EventSessions and EventSlots, Events, Speakers, SpeakerAvailability, Event conflicts, Speaker&lt;&gt;Event Conflicts, Event tags) in the database.</p>
-
-    <p>The <i>draft schedule</i> can optionally be created similar to the <i>published schedule</i>. This makes the solver keep the number of schedule changes as low as possible.</p>
-
-    <p>It is fully supported to mix manual scheduling with using the AutoScheduler. The AutoScheduler can be used as needed: It can act strictly as a validator for a manually planned schedule. It could also be used for scheduling some events, while manually scheduling others. It can also be used to do the full schedule. The AutoScheduler will avoid scheduling over manually scheduled events, and will consider manually scheduled events when looking to avoid conflicts.</p>
-
-    <a href="{% url 'backoffice:autoschedule_manage' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> AutoSchedule Management</a>
-  </div>
-</div>
 {% endblock content %}

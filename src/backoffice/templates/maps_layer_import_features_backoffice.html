@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+  Import Features | Layer | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Import Features to map layer {{ layer.name }} - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p class="lead">
+        Use this view to import/update features in the layer <b>{{ layer.name }}</b>. Only the properties <b>name,description,icon,topic,processing,url</b> will be imported!
+        <br><br><b>Beware import will overwrite existing features!</b>
+      </p>
+      <div class="mb-3">
+        <label for="selectFiles" class="form-label">Load GeoJSON data from local file</label>
+        <input type="file" class="form-control" id="selectFiles" value="Import" />
+      </div>
+      <br>
+      <div class="mb-3">
+        <div class="mb-1">
+          <label for="importURL" class="form-label">Load GeoJSON data from URL</label>
+          <input id="importURL" class="form-control" />
+        </div>
+        <div class="mb-1">
+          <button class="btn btn-success" id="importURLFetch">Fetch</button>
+        </div>
+      </div>
+      <br><br>
+      <form class="mb-3" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success">Import</button>
+        <a href="{% url 'backoffice:map_layer_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+  <script src="{% static 'js/backoffice/maps_layer_import_backoffice.js' %}"></script>
+{% endblock %}

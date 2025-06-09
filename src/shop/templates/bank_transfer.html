@@ -1,40 +1,79 @@
 {% extends 'shop_base.html' %}
-{% load bootstrap3 %}
-{% load shop_tags %}
+{% load django_bootstrap5 %}
+{% load bornhack %}
 
 {% block title %}
-Pay by Bank Transfer | {{ block.super }}
+  Pay by Bank Transfer | {{ block.super }}
 {% endblock %}
 
 {% block shop_content %}
 
-<h2>Pay by Bank Transfer</h2>
-<p>To pay order #{{ orderid }} you need to make a bank transfer
-of the <strong>full</strong> amount of <b>{{ total|currency }}</b> using the following information:</p>
+  <h2>Pay by Bank Transfer</h2>
+  <p>To pay order #{{ orderid }} you need to make a bank transfer using the appropriate method below:</p>
 
-<ul class="lead">
-  <li><strong>Bank Name</strong>: Folke Sparekassen</li>
-  <li><strong>Account Holder/Payee</strong>: BornHack IVS</li>
-  <li><strong>Swift/BIC</strong>: {{ swiftbic }} (Danish reg. no. {{ regno }})</li>
-  <li><strong>IBAN</strong>: {{ iban }} (Danish account no. {{ accountno }})</li>
-  <li><strong>Danish bank transfer</strong>:  Reg: {{ regno }} Account: {{ accountno }}</li>
-  <li><strong>Reference*</strong>: bornhack #{{ orderid }}</li>
-</ul>
+  <div class="card">
+    <div class="card-header panel-heading-nav">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation" class="active">
+          <a class="nav-link active" href="#one" aria-controls="one" aria-selected="true" role="tab" data-bs-toggle="tab">Pay by Bank Transfer (danish bank transfer)</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" href="#two" aria-controls="two" aria-selected="false" role="tab" data-bs-toggle="tab">Pay by Bank Transfer (SEPA region)</a>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link" href="#three" aria-controls="three" aria-selected="false" role="tab" data-bs-toggle="tab">Payment by Bank Transfer (outside SEPA region)</a>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body">
+      <div class="tab-content">
+        <div role="tabpanel" class="tab-pane fade show active" id="one">
+          <p>If you have a danish bank account please pay in DKK with the below details. Please remember to include the reference <strong>bornhack BH{{ orderid }}</strong>.</p>
+          <ul class="lead">
+            <li>Amount to pay: <strong>{{ total }} DKK</strong></li>
+            <li>Reg number and account number: <strong>{{ regno }} - {{ accountno }}</strong></li>
+            <li>Reference*: <strong>bornhack BH{{ orderid }}</strong></li>
+          </ul>
+        </div>
+        <div role="tabpanel" class="tab-pane fade" id="two">
+          <p>If you have a European bank account and can do SEPA transfers please pay in EUR with the below details. Please remember to include the reference <strong>bornhack BH{{ orderid }}</strong>.</p>
+          <ul class="lead">
+            <li>Amount to pay</strong>: <strong>{{ eur }} EUR</strong></li>
+          <li>Bank Name: <strong>{{ bank }}</strong></li>
+          <li>Account Holder/Payee: <strong>BornHack ApS, Skelbyvej 147, DK-4171 Glumsø, Denmark</strong></li>
+          <li>Swift/BIC: <strong>{{ swiftbic }}</strong></li>
+          <li>IBAN: <strong>{{ iban }}</strong></li>
+          <li>Reference*: <strong>bornhack BH{{ orderid }}</strong></li>
+        </ul>
+      </div>
+      <div role="tabpanel" class="tab-pane fade" id="three">
+        <p>If you are unable to do either a Danish bank transfer or a SEPA transfer we ask you to pay the senders fee. Please remember to include the reference <strong>bornhack BH{{ orderid }}</strong>.
+          <ul class="lead">
+            <li>Amount to pay: <strong>{{ total }} DKK</strong></i>
+            <li>Bank Name: <strong>{{ bank }}</strong></li>
+            <li>Account Holder/Payee: <strong>BornHack ApS, Skelbyvej 147, DK-4171 Glumsø, Denmark</strong></li>
+            <li>Swift/BIC: <strong>{{ swiftbic }}</strong></li>
+            <li>IBAN: <strong>{{ iban }}</strong></li>
+            <li>Reference*: <strong>bornhack BH{{ orderid }}</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<div class="alert alert-info" role="alert">
-<p class="lead">
-  <strong>
-    Remember:
-  </strong>
-    If you transfer from outside of Denmark please make sure that you pay the
-    sender fees. Please allow for up to a week before we register your bank transfer,
-    especially if you are outside of the SEPA region.
-</p>
-</div>
+  <p>
+    <strong>*</strong> This reference is a message to the payee (BornHack) and
+    enables us to register your payment.
+  </p>
 
-<p>
-  <strong>*</strong> This reference is a message to the payee (BornHack) and
-  enables us to register your payment.
-</p>
+  <div class="alert alert-info" role="alert">
+    <p class="lead">
+      <strong>
+        Remember:
+      </strong>
+      Please allow for up to a week before we register your bank transfer,
+      especially if you are outside of the SEPA region.
+    </p>
+  </div>
 
 {% endblock %}

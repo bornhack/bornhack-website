@@ -3,64 +3,66 @@
 {% load commonmark %}
 
 {% block title %}
-Sponsors | {{ block.super }}
+  Sponsors | {{ block.super }}
 {% endblock %}
 
 
 {% block content %}
 
-{% if sponsors %}
+  {% if sponsors %}
 
-<h2>{{ view.camp.title }} Sponsors</h2>
+    <h2>{{ view.camp.title }} Sponsors</h2>
 
-<p class="lead">
-  This is a list of the {{ view.camp.title }}  sponsors. An event like BornHack
-  can not be built on hard work and good intentions alone - it would simply not
-  have been possible without the financial help from these organisations. Thank
-  you, we are immensely grateful!
-</p>
+    <p class="lead">
+      This is a list of the {{ view.camp.title }}  sponsors. An event like BornHack
+      can not be built on hard work and good intentions alone - it would simply not
+      have been possible without the financial help from these organisations. Thank
+      you, we are immensely grateful!
+    </p>
 
-{% endif %}
+  {% endif %}
 
-{% for sponsor in sponsors %}
+  {% for sponsor in sponsors %}
 
     {% ifchanged sponsor.tier %}
-        {% if forloop.first != True %}
+      {% if forloop.first != True %}
         </section>
-        {% endif %}
-        <div class="page-header">
-            <h1>{{ sponsor.tier.name}}</h1>
-        </div>
-        <section class="text-center">
+      {% endif %}
+      <div class="page-header">
+        <h1>{{ sponsor.tier.name}}</h1>
+      </div>
+      <section class="text-center">
 
     {% endifchanged %}
 
     <p class="lead">
-        {% if sponsor.url %}
+      {% if sponsor.url %}
         <a href="{{ sponsor.url }}">
-        {% endif %}
-        <img class="img-responsive center-block" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300" />
-        {% if sponsor.url %}
+      {% endif %}
+      <img class="img-responsive center-block bornhack-sponsor-white" src="{% static 'img/sponsors/' %}{{ sponsor.logo_filename }}" width="300"/>
+      {% if sponsor.url %}
         </a>
-        {% endif %}
+      {% endif %}
+      <p class="lead mt-3">
         {{ sponsor.description }}
+      </p>
     </p>
 
     {% if forloop.last == True %}
-        </section>
+      </section>
     {% endif %}
-{% endfor %}
+  {% endfor %}
 
-{% if not camp.call_for_sponsors_open %}
-<div class="alert alert-danger">
+  {% if not camp.call_for_sponsors_open %}
+    <div class="alert alert-danger">
       <strong>Note!</strong> This Call for Sponsors is not open.
-</div>
-{% endif %}
+    </div>
+  {% endif %}
 
-{% if not camp.call_for_sponsors %}
-<p class='lead'>This CFS has not been written yet.</p>
-{% else %}
-{{ camp.call_for_sponsors|trustedcommonmark }}
-{% endif %}
+  {% if not camp.call_for_sponsors %}
+    <p class='lead'>This CFS has not been written yet.</p>
+  {% else %}
+    {{ camp.call_for_sponsors|trustedcommonmark }}
+  {% endif %}
 
 {% endblock %}

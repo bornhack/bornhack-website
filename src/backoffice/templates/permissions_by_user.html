@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  Permissions by User | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">Permissions by User - BackOffice</h3></div>
+    <div class="panel-body">
+      <p>A list of user and group assigned custom bornhack permissions. Users with no permissions are not included in this table.</p>
+      {% include "includes/permissions_explainer.html" %}
+      <table class="table table-striped table-hover datatable">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Public Credit Name</th>
+            <th class="text-center">Staff</th>
+            <th class="text-center">Superuser</th>
+            <th>User Permissions</th>
+            <th>Group Permissions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in user_list %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.profile.name }}</td>
+              <td>{{ user.profile.public_credit_name }}</td>
+              <td class="text-center">{{ user.is_staff|truefalseicon }}</td>
+              <td class="text-center">{{ user.is_superuser|truefalseicon }}</td>
+              <td>{% if user.is_superuser %}ALL{% else %}{% for perm in user.get_user_permissions %}{% if perm|slice:"0:6" == "camps." %}{{ perm }}<br>{% endif %}{% endfor %}{% endif %}</td>
+              <td>{% if user.is_superuser %}ALL{% else %}{% for perm in user.get_group_permissions %}{% if perm|slice:"0:6" == "camps." %}{{ perm }}<br>{% endif %}{% endfor %}{% endif %}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}#permissions" class="btn btn-secondary"><i class="fas fa-undo"></i> Permissions</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

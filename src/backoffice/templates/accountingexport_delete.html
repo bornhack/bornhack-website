@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">Delete AccountingExport {{ accountingexport.uuid }}?</h2>
+    </div>
+    <div class="card-body">
+      <p class="lead">Really delete this Accounting Export? It covers the period from {{ accountingexport.date_from }} to {{ accountingexport.date_to }}, with the comment: <i>{{ accountingexport.comment|default:"N/A" }}</i>. This action cannot be undone!</p>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_button "<i class='fas fa-times'></i> Yes, Delete it" button_type="submit" button_class="btn-danger" name="Delete" %}
+        <a href="{% url 'backoffice:accountingexport_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

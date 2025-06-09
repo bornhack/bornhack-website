@@ -4,95 +4,94 @@
 {% load imageutils %}
 
 {% block title %}
-{{ camp.title }}
+  {{ camp.title }}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <img src="{% static camp.logo_large %}" width="800px" class="img-responsive" id="front-logo" />
+  <div class="row mt-3">
+    <div class="col-12 text-center">
+      <img src="{% static camp.logo_large %}" width="800px" class="img-responsive" id="front-logo" />
     </div>
-</div>
-
-<div class="row">
-   <div class="col-md-9 col-sm-9 text-container">
-        <div class="lead">
-            <b>BornHack</b> is a 7 day <b>outdoor tent camp</b> where hackers, makers and people with an interest in technology or security come together to celebrate technology, socialise, learn and <b>have fun</b>.
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-3">
-        {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9961_cropped.jpg' 'BornHack banners from previous camps.' %}
-    </div>
- </div>
-
-
-<div class="row">
-        <div class="col-md-3 col-sm-3">
-            {% thumbnail 'img/bornhack-2016/esbjerg' '1600x1000-B12A2398.jpg' 'A random hackers laptop' %}
-        </div>
-        <div class="col-md-9 col-sm-9 text-container">
-            <div class="lead">
-                <strong>BornHack 2020</strong> will be the fifth BornHack. It will take place from <strong>Tuesday the 11th of August to Tuesday the 18th of August 2020</strong> at a our venue on the Danish island of Funen.
-            </div>
-        </div>
-</div>
-
-<br />
-
-<div class="row">
-   <div class="col-md-9 col-sm-9 text-container">
-        <div class="lead">
-            The BornHack team looks forward to organising another great event for the hacker community. We <a href="{% url 'teams:list' camp_slug=camp.slug %}">still need volunteers</a>, so please let us know if you want to help!
-        </div>
-    </div>
-    <div class="col-md-3">
-        {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2631.jpg' 'The BornHack 2016 organiser team' %}
-    </div>
- </div>
-
-<br />
-
-<div class="row">
-    <div class="col-md-3 col-sm-3">
-        {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9970_cropped.JPG' 'Danish politicians, government officals and IT-developers debating at BornHack 2018' %}
-    </div>
-    <div class="col-md-9 col-sm-9 text-container">
-        <div class="lead">We want to encourage <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> with something to say to read our <a href="{% url 'program:call_for_participation' camp_slug=camp.slug %}">call for participation</a>.</div>
-    </div>
-</div>
-
-<br />
-
-<div class="row">
-    <div class="col-md-9 col-sm-9 text-container">
-        <div class="lead">
-            BornHack aims to <strong>keep ticket prices affordable</strong> for everyone and to that end <strong>we need sponsors</strong>. Please see our <a href="{% url 'sponsors' camp_slug=camp.slug %}">call for sponsors</a> if you want to sponsor us, or if you work for a company you think might be able to help.
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-3">
-        {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7675_cropped.jpg' 'Organisers thanking the BornHack 2017 sponsors' %}
-    </div>
-</div>
-
-<br />
-
-<div class="row">
-  <div class="col-md-12 col-sm-12">
-    <p class="lead">You are very welcome to ask questions and show your interest on our different channels:</p>
-{% include 'includes/contact.html' %}
   </div>
-</div>
-<p align="center">
-  {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9947_cropped.JPG' 'Speakers of all ages at BornHack 2018' %}
-  {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5126.JPG' 'Late night hacking at Baconsvin village at BornHack 2016' %}
-  {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7724_cropped.jpg' 'A welcoming hug upon arrival at BornHack 2017! <3' %}
-  {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5168.JPG' '#irl_bar by night at BornHack 2016' %}
-  {% thumbnail 'img/bornhack-2018/flummer' 'DSC_7054_cropped.jpg' 'The BornHack 2018 badge' %}
-  {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7510_cropped.jpg' 'Colored speakers tent ready for use!' %}
-  {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9916_cropped.JPG' 'Wanna take a ride? Borrow a bike for free!' %}
-  {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_7518_cropped.JPG' 'Colored light in a tree' %}
-  {% thumbnail 'img/bornhack-2018/fonsmark' 'FB2_0020_cropped.JPG' 'Colourful chairs!' %}
-  {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7521_cropped.jpg' 'Amelia Andersdotter presenting at BornHack 2017' %}
-</p>
-{% endblock content %}
 
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        <b>BornHack</b> is a 7 day <b>outdoor tent camp</b> where hackers, makers and people with an interest in technology or security come together to celebrate technology, socialise, learn and <b>have fun</b>.
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9961_cropped.jpg' 'BornHack banners from previous camps.' %}
+    </div>
+  </div>
+
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2016/esbjerg' '1600x1000-B12A2398.jpg' 'A random hackers laptop' %}
+    </div>
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        <strong>BornHack 2020</strong> will be the fifth BornHack. It will take place from <strong>Tuesday the 11th of August to Tuesday the 18th of August 2020</strong> at a our venue on the Danish island of Funen.
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        The BornHack team looks forward to organising another great event for the hacker community. We <a href="{% url 'teams:list' camp_slug=camp.slug %}">still need volunteers</a>, so please let us know if you want to help!
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2016/esbjerg' '1600x988-B12A2631.jpg' 'The BornHack 2016 organiser team' %}
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9970_cropped.JPG' 'Danish politicians, government officals and IT-developers debating at BornHack 2018' %}
+    </div>
+    <div class="col-12 col-lg-9">
+      <div class="lead">We want to encourage <strong>hackers, makers, politicians, activists, developers, artists, sysadmins, engineers</strong> with something to say to read our <a href="{% url 'program:call_for_participation' camp_slug=camp.slug %}">call for participation</a>.</div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12 col-lg-9">
+      <div class="lead">
+        BornHack aims to <strong>keep ticket prices affordable</strong> for everyone and to that end <strong>we need sponsors</strong>. Please see our <a href="{% url 'sponsors' camp_slug=camp.slug %}">call for sponsors</a> if you want to sponsor us, or if you work for a company you think might be able to help.
+      </div>
+    </div>
+    <div class="col-12 col-lg-3">
+      {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7675_cropped.jpg' 'Organisers thanking the BornHack 2017 sponsors' %}
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row mt-3">
+    <div class="col-12">
+      <p class="lead">You are very welcome to ask questions and show your interest on our different channels:</p>
+      {% include 'includes/contact.html' %}
+    </div>
+  </div>
+  <p align="center">
+    {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9947_cropped.JPG' 'Speakers of all ages at BornHack 2018' %}
+    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5126.JPG' 'Late night hacking at Baconsvin village at BornHack 2016' %}
+    {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7724_cropped.jpg' 'A welcoming hug upon arrival at BornHack 2017! <3' %}
+    {% thumbnail 'img/bornhack-2016/fonsmark' 'FB1_5168.JPG' '#irl_bar by night at BornHack 2016' %}
+    {% thumbnail 'img/bornhack-2018/flummer' 'DSC_7054_cropped.jpg' 'The BornHack 2018 badge' %}
+    {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7510_cropped.jpg' 'Colored speakers tent ready for use!' %}
+    {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_9916_cropped.JPG' 'Wanna take a ride? Borrow a bike for free!' %}
+    {% thumbnail 'img/bornhack-2018/fonsmark' 'FB1_7518_cropped.JPG' 'Colored light in a tree' %}
+    {% thumbnail 'img/bornhack-2018/fonsmark' 'FB2_0020_cropped.JPG' 'Colourful chairs!' %}
+    {% thumbnail 'img/bornhack-2017/fonsmark' 'FB1_7521_cropped.jpg' 'Amelia Andersdotter presenting at BornHack 2017' %}
+  </p>
+{% endblock content %}

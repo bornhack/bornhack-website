@@ -1,41 +1,53 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Select Chain | {{ block.super }}
+  Select Chain | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>Chains</h2>
-<p class="lead">Expenses and Revenues for {{ camp.title }} must be associated with a Creditor or Debtor. Each Creditor and Debtor belongs to a Chain - e.g. the Creditor <i>Netto Gelsted</i> Belongs to the Chain <i>Netto</i>.</p>
-<p class="lead">To continue, pick an existing Chain, or create a new.</p>
+  <h2>Chains</h2>
+  <p class="lead">Expenses and Revenues for {{ camp.title }} must be associated with a Creditor or Debtor. Each Creditor and Debtor belongs to a Chain - e.g. the Creditor <i>Netto Gelsted</i> Belongs to the Chain <i>Netto</i>.</p>
+  <p class="lead">To continue, pick an existing Chain, or create a new.</p>
 
-{% if chain_list %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Existing Chains</h3>
-  </div>
-  <div class="panel-body">
-     <div class="list-group">
-    {% for chain in chain_list %}
-      <a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-            <b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)
-        </h4>
-        {% if chain.notes %}
-        <p>{{ chain.notes }}</p>
-        {% endif %}
-      </a>
-    {% endfor %}
+  {% if chain_list %}
+    <div class="card">
+      <h3 class="card-header">Existing Chains</h3>
+      <span class="card-header"><i>Italic</i>: No current expenses for this year</span>
+      <div class="card-body">
+        <div class="list-group">
+          {% for chain in chain_list %}
+            <a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item list-group-item-action">
+              <h4 class="list-group-item-heading">
+                <b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)
+              </h4>
+              {% if chain.notes %}
+                <p>{{ chain.notes }}</p>
+              {% endif %}
+            </a>
+          {% endfor %}
+          {% if past_year_chains %}
+              <hr>
+            {% for chain in past_year_chains %}
+            <a href="{% url 'economy:credebtor_list' camp_slug=camp.slug chain_slug=chain.slug %}" class="list-group-item list-group-item-action">
+              <h4 class="list-group-item-heading">
+                <i><b>{{ chain.name }}</b> ({{ chain.credebtors.count }} credebtors)</i>
+              </h4>
+              {% if chain.notes %}
+                <p>{{ chain.notes }}</p>
+              {% endif %}
+            </a>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
     </div>
-  </div>
-</div>
-{% else %}
-<p class="lead"><i>No existing Chains found. You can create a new Chain below.</i></p>
-{% endif %}
+  {% else %}
+    <p class="lead"><i>No existing Chains found. You can create a new Chain below.</i></p>
+  {% endif %}
 
-<p>
-  <a href="{% url 'economy:chain_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Chain</a>
-  <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
-</p>
+  <p>
+    <a href="{% url 'economy:chain_create' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-plus"></i> Create New Chain</a>
+    <a href="{% url 'economy:expense_list' camp_slug=camp.slug %}" class="btn btn-danger"><i class="fas fa-undo"></i> Cancel</a>
+  </p>
 {% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Select PoS | Scan Tickets | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="list-group">
+    {% for pos in pos_list %}
+      <a href="{% url 'backoffice:scan_tickets' camp_slug=camp.slug pos_slug=pos.slug %}" class="list-group-item list-group-item-action">
+        <h4 class="list-group-item-heading">{{ pos.name }}</h4>
+      </a>
+    {% endfor %}
+  </div>
+{% endblock content %}

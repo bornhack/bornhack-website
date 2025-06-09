@@ -1,47 +1,46 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
-{% load shop_tags %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
-Credit Notes | {{ block.super }}
+  Credit Notes | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Credit Notes</h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>Credit Notes</h4>
     </div>
-    <div class="panel-body">
-        <table class="table table-hover">
-          <thead>
+    <div class="card-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Credit Note ID</th>
+            <th>Text</th>
+            <th class="text-right">Amount</th>
+            <th>Paid?</th>
+            <th>PDF</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for creditnote in creditnotes %}
             <tr>
-              <th>Credit Note ID</th>
-              <th>Text</th>
-              <th class="text-right">Amount</th>
-              <th>Paid?</th>
-              <th>PDF</th>
+              <td>{{ creditnote.id }}</td>
+              <td>{{ creditnote.text }}</td>
+              <td class="text-right">{{ creditnote.amount|currency }}</td>
+              <td class="text-center">{{ creditnote.paid|truefalseicon }}</td>
+              <td>
+                {% if creditnote.pdf %}
+                  {% url 'shop:download_creditnote' pk=creditnote.pk as creditnote_download_url %}
+                  {% bootstrap_button "PDF" icon="save-file" href=creditnote_download_url button_class="btn-primary btn-xs" %}
+                {% else %}
+                  N/A
+                {% endif %}
+              </td>
             </tr>
-          </thead>
-          <tbody>
-        {% for creditnote in creditnotes %}
-            <tr>
-                <td>{{ creditnote.id }}</td>
-                <td>{{ creditnote.text }}</td>
-                <td class="text-right">{{ creditnote.amount|currency }}</td>
-                <td class="text-center">{{ creditnote.paid|truefalseicon }}</td>
-                <td>
-                  {% if creditnote.pdf %}
-                    {% url 'shop:download_creditnote' pk=creditnote.pk as creditnote_download_url %}
-                    {% bootstrap_button "PDF" icon="save-file" href=creditnote_download_url button_class="btn-primary btn-xs" %}
-                  {% else %}
-                    N/A
-                  {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-          </tbody>
-        </table>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-</div>
+  </div>
 {% endblock %}

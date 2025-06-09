@@ -1,33 +1,30 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Use Existing {{ event_type.host_title }} or Add New? | {{ block.super }}
+  Use Existing {{ event_type.host_title }} or Add New? | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
 
-<h3>Use Existing {{ event_type.host_title }}?</h3>
+  <h3>Use Existing {{ event_type.host_title }}?</h3>
 
-<p class="lead">Pick a {{ event_type.host_title }} from the list below, or press the button at the bottom to add a new {{ event_type.host_title }} for this {{ event_type.name }}.</p>
+  <p class="lead">Pick a {{ event_type.host_title }} from the list below, or press the button at the bottom to add a new {{ event_type.host_title }} for this {{ event_type.name }}.</p>
 
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Use an Existing {{ event_type.host_title }}</h3>
-  </div>
-  <div class="panel-body">
-     <div class="list-group">
-    {% for speaker_proposal in speaker_proposal_list %}
-      <a href="{% url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker_proposal.uuid %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-            Use {{ speaker_proposal.name }} as {{ event_type.host_title }}
-        </h4>
-      </a>
-    {% endfor %}
+  <div class="card">
+    <h3 class="card-header">Use an Existing {{ event_type.host_title }}</h3>
+    <div class="card-body">
+      <div class="list-group">
+        {% for speaker_proposal in speaker_proposal_list %}
+          <a href="{% url 'program:event_proposal_create' camp_slug=camp.slug event_type_slug=event_type.slug speaker_uuid=speaker_proposal.uuid %}" class="list-group-item">
+            <h4 class="list-group-item-heading">
+              Use {{ speaker_proposal.name }} as {{ event_type.host_title }}
+            </h4>
+          </a>
+        {% endfor %}
+      </div>
     </div>
   </div>
-</div>
 
-<a href="{% url 'program:proposal_combined_submit' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_type.host_title }}</a>
-<a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+  <a href="{% url 'program:proposal_combined_submit' camp_slug=camp.slug event_type_slug=event_type.slug %}" class="btn btn-primary btn-success"><i class="fas fa-plus"></i> Add New {{ event_type.host_title }}</a>
+  <a href="{% url 'program:proposal_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
 {% endblock %}
-

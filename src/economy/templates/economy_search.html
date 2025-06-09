@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bornhack %}
+
+{% block title %}
+  Economy Search | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  {% url "backoffice:economy_search" camp_slug=camp.slug as get_url %}
+
+  <label for="uuid">Search for a UUID:</label>
+  <input type="text"
+         id="uuid"
+         name="uuid"
+         placeholder="UUID"
+         value="{{ uuid }}"
+         hx-get="{{ get_url }}"
+         hx-target="#search-result"
+         hx-select="#search-result"
+         hx-push-url="true"
+         hx-trigger="keyup changed delay:500ms" />
+
+  <button hx-get="{{ get_url }}"
+          hx-include="#uuid"
+          hx-target="#search-result"
+          hx-select="#search-result"
+          hx-push-url="true"
+          class="btn btn-primary">
+    Search
+  </button>
+
+  <div id="search-result">
+    {% if entities %}
+
+      <h2>Results</h2>
+
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>UUID</th>
+            <th>Entity type</th>
+            <th>Camp</th>
+          </tr>
+        </thead>
+        {% for entity in entities %}
+          <tr>
+            <td>
+              <a href="{{ entity.get_backoffice_url }}">
+                {{ entity.uuid|highlight_search:uuid }}
+              </a>
+            </td>
+            <td>
+              {{ entity|model_name|capfirst }}
+            </td>
+            <td>
+              {{ entity.camp }}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+
+    {% else %}
+      <p>No results</p>
+    {% endif %}
+  </div>
+
+{% endblock %}

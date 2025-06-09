@@ -7,23 +7,23 @@ import os
 # characters!
 SECRET_KEY = "something-very-random"
 
-ALLOWED_HOSTS = "*"
+ALLOWED_HOSTS = ["*"]
 
 # MODIFY THIS!
 #
 # Database settings - modify to match your database configuration!
 DATABASES = {
     "default": {
-        "ENGINE": 'django.contrib.gis.db.backends.postgis',
-        "NAME": "bornhack",
-        "USER": "bornhack",
-        #"PASSWORD": "bornhack",
-        #"HOST": "localhost",
-        #"PORT": 5433,
+        "ENGINE": "django_prometheus.db.backends.postgis",
+        "NAME": os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "bornhack")),
+        "USER": os.getenv("POSTGRES_USER", os.getenv("PGUSER", "bornhack")),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD", "bornhack")),
+        "HOST": os.getenv("POSTGRES_HOST", os.getenv("PGHOST", "localhost")),
+        "PORT": os.getenv("POSTGRES_PORT", os.getenv("PGPORT", "5432")),
     }
 }
 DEBUG = True
-WKHTMLTOPDF_CMD = "wkhtmltopdf"
+DEBUG_TOOLBAR_ENABLED = False
 CHANNEL_LAYERS = {}
 
 ASGI_APPLICATION = "bornhack.routing.application"
@@ -39,7 +39,10 @@ SCHEDULE_TIMESLOT_LENGTH_MINUTES = 30
 SCHEDULE_EVENT_NOTIFICATION_MINUTES = 10
 SPEAKER_AVAILABILITY_DAYCHUNK_HOURS=3
 
-PDF_LETTERHEAD_FILENAME = "bornhack-2017_test_letterhead.pdf"
+# Map settings
+MAPS_USER_LOCATION_MAX = 50 # Maximum number of UserLocations a user can create
+
+PDF_TEST_MODE = True
 PDF_ARCHIVE_PATH = os.path.join(MEDIA_ROOT, "pdf_archive")
 
 SENDFILE_ROOT = MEDIA_ROOT + "/protected"
@@ -79,3 +82,12 @@ CHANNEL_LAYERS = {
 }
 
 REIMBURSEMENT_MAIL = "reimbursement@example.com"
+
+TEST_RUNNER = "xmlrunner.extra.djangotestrunner.XMLTestRunner"
+TEST_OUTPUT_FILE_NAME = "test_report.xml"
+
+QUICKPAY_API_KEY="secret"
+QUICKPAY_PRIVATE_KEY="alsosecret"
+
+# OIDC private key
+OIDC_RSA_PRIVATE_KEY='CIKEY'

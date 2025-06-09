@@ -1,24 +1,24 @@
+from __future__ import annotations
+
 import logging
 
 from .email import _send_email
 from .models import OutgoingEmail
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-def do_work():
-    """
-    The outgoing email worker sends emails added to the OutgoingEmail
+def do_work() -> None:
+    """The outgoing email worker sends emails added to the OutgoingEmail
     queue.
     """
     not_processed_email = OutgoingEmail.objects.filter(processed=False, hold=False)
 
     if len(not_processed_email) > 0:
-        logger.debug("about to process {} emails".format(len(not_processed_email)))
+        logger.debug(f"about to process {len(not_processed_email)} emails")
 
     for email in not_processed_email:
-
         attachment = None
         attachment_filename = ""
         if email.attachment:
@@ -38,6 +38,6 @@ def do_work():
         if mail_send_success:
             email.processed = True
             email.save()
-            logger.debug("Successfully sent {}".format(email))
+            logger.debug(f"Successfully sent {email}")
         else:
-            logger.error("Unable to send {}".format(email))
+            logger.error(f"Unable to send {email}")

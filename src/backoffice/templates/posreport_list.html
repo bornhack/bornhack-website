@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
-{% load bornhack %}
 
 {% block title %}
-PosReport List for {{ pos.name }} | Backoffice | {{ block.super }}
+  {{ pos.name }} | Pos Reports | BackOffice | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-    <div class="panel-heading"><h3 class="panel-title">PosReport List for {{ pos.name }} - BackOffice</h3></div>
-  <div class="panel-body">
-    <p>A <i>PosReport</i> contains the start and end counts of HAX+DKK from a point-of-sale and the exported JSON file from the Pos.</p>
-  {% if not pos_list %}
-    <p class="lead">No Pos found.</p>
-  {% else %}
-  <p>
-    {% include "includes/posreport_list_table.html" %}
-  </p>
-  {% endif %}
-  <p>
-    <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ pos.name }} | Pos Reports | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Pos Details</a>
+      </p>
+
+      <h3>Pos Reports</h3>
+      {% if pos.pos_reports.exists %}
+        {% include "includes/posreport_list_table.html" with posreport_list=pos.pos_reports.all %}
+      {% else %}
+        None found
+      {% endif %}
+      <br>
+      {% if perms.camps.orgateam_permission %}
+        <a href="{% url 'backoffice:posreport_create' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-success"><i class="fas fa-plus"></i> Create PosReport</a>
+      {% endif %}
+    </div>
   </div>
-</div>
-{% endblock content %}
+{% endblock %}

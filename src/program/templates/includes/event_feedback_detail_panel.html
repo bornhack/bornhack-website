@@ -1,16 +1,16 @@
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load commonmark %}
-<div class="panel panel-default">
-  <div class="panel-heading">
+<div class="card">
+  <div class="card-header">
     <span class="h3">Feedback for Event: {{ event.title }}</span>
   </div>
-  <div class="panel-body">
+  <div class="card-body">
     <table class="table table-bordered">
       {% if request.resolver_match.url_name == "approve_event_feedback" %}
-      <tr>
-        <th>Username (feedback submitter)</th>
-        <td>{{ event_feedback.user.username }}</td>
-      </tr>
+        <tr>
+          <th>Username (feedback submitter)</th>
+          <td>{{ event_feedback.user.username }}</td>
+        </tr>
       {% endif %}
       <tr>
         <th>Were Your Expectations Fulfilled?</th>
@@ -54,4 +54,3 @@
     {% endif %}
   </div>
 </div>
-

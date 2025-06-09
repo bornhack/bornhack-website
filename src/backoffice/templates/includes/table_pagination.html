@@ -1,0 +1,10 @@
+{% load querystring %}
+<div class="lead">
+  Per page:
+  <div class="btn-group" role="group" aria-label="Per page">
+    <a href="{% querystring per_page=25 %}" class="btn btn-secondary">25</a>
+    <a href="{% querystring per_page=100 %}" class="btn btn-secondary">100</a>
+    <a href="{% querystring per_page=250 %}" class="btn btn-secondary">250</a>
+    <a href="{% querystring per_page=1000 %}" class="btn btn-secondary">1000</a>
+  </div>
+</div>

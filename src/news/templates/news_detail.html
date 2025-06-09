@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 {% load commonmark %}
+{% load bornhack %}
 
 {% block title %}
-{{ news_item.title }} | {{ block.super }}
+  {{ news_item.title }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
   <div>
     {% if not_public %}
-    <div class="alert alert-danger">
-      <strong>This news item is not yet public.</strong> {% if timed %}It will become public at {{ news_item.published_at|date:'Y-m-d H:i' }}.{% endif%}
-    </div>
+      <div class="alert alert-danger">
+        <strong>This news item is not yet public.</strong> {% if timed %}It will become public at {{ news_item.published_at|date:'Y-m-d H:i' }}.{% endif%}
+      </div>
     {% endif %}
     <h3>{{ news_item.title }} <small>{{ news_item.published_at|date:"Y-m-d" }}</small></h3>
   </div>
-  {{ news_item.content|trustedcommonmark }}
+  {{ news_item.content|templaterender|trustedcommonmark }}
 {% endblock %}

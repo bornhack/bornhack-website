@@ -2,49 +2,56 @@
 {% load commonmark %}
 
 {% block title %}
-Villages | {{ block.super }}
+  Villages | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<h2>Villages</h2>
-<p>
-  If this is your first hackercamp the term 'Village' might be confusing but it
-  is fairly simple: a village is just a spot on the campsite where you and a
-  bunch of your friends/likeminded people camp together. Apart from peoples
-  individual tents which they sleep in, many villages bring a large common tent
-  where you can hack and hang out during the day. It is also possible to rent a
-  tent, chairs and tables in the shop!
-</p>
+  <h2>Villages</h2>
+  <p>
+    If this is your first hackercamp the term 'Village' might be confusing but it
+    is fairly simple: a village is just a spot on the campsite where you and a
+    bunch of your friends/likeminded people camp together. Apart from peoples
+    individual tents which they sleep in, many villages bring a large common tent
+    where you can hack and hang out during the day. It is also possible to rent a
+    tent, chairs and tables in the shop!
+  </p>
+  <p>
+    <a class="btn btn-success" href="{% url 'villages:village_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create village</a>
+    <a class="btn btn-primary" href="{% url 'villages:village_map' camp_slug=camp.slug %}"><i class="fas fa-map"></i> Villages map</a>
+    <br>
+    <br>
+    Our <a href="{% url 'conduct'%}">Code of Conduct</a> applies to village names and descriptions!
+  </p>
 
-<hr />
-{% if villages %}
-<table class="table table-hover table-condensed table-striped">
-  <thead>
-  <tr>
-    <th>Name</th>
-    <th>Description</th>
-    <th>Public</th>
-  </tr>
-  </thead>
-  <tbody>
-    {% for village in villages %}
-    <tr>
-      <td>
-        <a href="{% url 'village_detail' camp_slug=camp.slug slug=village.slug %}">
-          {{ village.name }}
-        </a>
-      </td>
-      <td>
-        {{ village.description|untrustedcommonmark|truncatewords:50 }}
-      </td>
-      <td>
-        <i class="glyphicon glyphicon-{% if village.private %}remove{% else %}ok{% endif %}"></i>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<h4>No villages for <b>{{ camp.title }}</b> yet!</h4>
-{% endif %}
+  <hr>
+  {% if villages %}
+    <table class="table table-hover table-condensed table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Public</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for village in villages %}
+          <tr>
+            <td>
+              <a href="{% url 'villages:village_detail' camp_slug=camp.slug slug=village.slug %}">
+                {{ village.name }}
+              </a>
+            </td>
+            <td>
+              {{ village.description|untrustedcommonmark|truncatewords:50 }}
+            </td>
+            <td>
+              <i class="glyphicon glyphicon-{% if village.private %}remove{% else %}ok{% endif %}"></i>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <h4>No villages for <b>{{ camp.title }}</b> yet!</h4>
+  {% endif %}
 {% endblock %}

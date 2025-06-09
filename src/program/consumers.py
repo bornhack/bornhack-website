@@ -1,22 +1,22 @@
+from __future__ import annotations
+
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from camps.models import Camp
 
-from .models import (
-    Event,
-    EventInstance,
-    EventLocation,
-    EventTrack,
-    EventType,
-    Favorite,
-    Speaker,
-)
+from .models import Event
+from .models import EventInstance
+from .models import EventLocation
+from .models import EventTrack
+from .models import EventType
+from .models import Favorite
+from .models import Speaker
 
 
 class ScheduleConsumer(JsonWebsocketConsumer):
     groups = ["schedule_users"]
 
-    def receive(self, text_data, **kwargs):
+    def receive(self, text_data, **kwargs) -> None:
         user = self.scope["user"]
         content = self.decode_json(text_data)
         action = content.get("action")
@@ -26,40 +26,34 @@ class ScheduleConsumer(JsonWebsocketConsumer):
             camp_slug = content.get("camp_slug")
             try:
                 camp = Camp.objects.get(slug=camp_slug)
-                days = list(
-                    map(
-                        lambda day: {
-                            "repr": day.lower.strftime("%A %Y-%m-%d"),
-                            "iso": day.lower.strftime("%Y-%m-%d"),
-                            "day_name": day.lower.strftime("%A"),
-                        },
-                        camp.get_days("camp"),
-                    )
-                )
+                days = [
+                    {
+                        "repr": day.lower.strftime("%A %Y-%m-%d"),
+                        "iso": day.lower.strftime("%Y-%m-%d"),
+                        "day_name": day.lower.strftime("%A"),
+                    }
+                    for day in camp.get_days("camp")
+                ]
 
                 events_query_set = Event.objects.filter(track__camp=camp)
-                events = list([x.serialize() for x in events_query_set])
+                events = [x.serialize() for x in events_query_set]
 
                 event_instances_query_set = EventInstance.objects.filter(
-                    event__track__camp=camp
+                    event__track__camp=camp,
                 )
-                event_instances = list(
-                    [x.serialize(user=user) for x in event_instances_query_set]
-                )
+                event_instances = [x.serialize(user=user) for x in event_instances_query_set]
 
                 event_locations_query_set = EventLocation.objects.filter(camp=camp)
-                event_locations = list(
-                    [x.serialize() for x in event_locations_query_set]
-                )
+                event_locations = [x.serialize() for x in event_locations_query_set]
 
                 event_types_query_set = EventType.objects.filter()
-                event_types = list([x.serialize() for x in event_types_query_set])
+                event_types = [x.serialize() for x in event_types_query_set]
 
                 event_tracks_query_set = EventTrack.objects.filter(camp=camp)
-                event_tracks = list([x.serialize() for x in event_tracks_query_set])
+                event_tracks = [x.serialize() for x in event_tracks_query_set]
 
                 speakers_query_set = Speaker.objects.filter(camp=camp)
-                speakers = list([x.serialize() for x in speakers_query_set])
+                speakers = [x.serialize() for x in speakers_query_set]
 
                 data = {
                     "action": "init",
@@ -84,7 +78,8 @@ class ScheduleConsumer(JsonWebsocketConsumer):
                 event_instance_id = content.get("event_instance_id")
                 event_instance = EventInstance.objects.get(id=event_instance_id)
                 favorite = Favorite.objects.get(
-                    event_instance=event_instance, user=user
+                    event_instance=event_instance,
+                    user=user,
                 )
                 favorite.delete()
             except Favorite.DoesNotExist:
@@ -94,5 +89,5 @@ class ScheduleConsumer(JsonWebsocketConsumer):
         if data:
             self.send_json(data)
 
-    def disconnect(self, message, **kwargs):
+    def disconnect(self, message, **kwargs) -> None:
         pass

@@ -1,58 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">Manage AutoScheduler</h3>
-  </div>
-  <div class="panel-body">
-    <p class="lead">Select your desired action below</p>
-    <div class="list-group">
-      <a href="{% url 'backoffice:autoschedule_validate' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          <i class="fas fa-fire-extinguisher fa-fw"></i> Validate Schedule
-        </h4>
-        <p class="list-group-item-text">
-          Validate published or draft schedule. Useful to check if the published schedule is still valid after making changes to the underlying data. Can also check the draft schedule.
-        </p>
-      </a>
-      <a href="{% url 'backoffice:autoschedule_diff' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          <i class="fas fa-random fa-fw"></i> Show Schedule Diff
-        </h4>
-        <p class="list-group-item-text">
-        Show the differences between the published schedule and the similar draft schedule. Use this to predict what schedule changes would happen if the draft schedule was applied now. <i>This view takes a while to load.</i>
-        </p>
-      </a>
-      <a href="{% url 'backoffice:autoschedule_apply' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          <i class="fas fa-check fa-fw"></i> Apply Schedule
-        </h4>
-        <p class="list-group-item-text">
-          Apply the draft schedule by unscheduling any currently autoscheduled Events and scheduling new Events in EventSlots to match the Slot/Event combinations in the draft schedule. It is prudent to check the validity and diff for the draft schedule before applying!
-        </p>
-      </a>
-      <a href="{% url 'backoffice:autoschedule_debug_event_slot_unavailability' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          <i class="fas fa-chess-board fa-fw"></i> Debug Event/Slot Unavailability
-        </h4>
-        <p class="list-group-item-text">
-          This debug view shows a matrix/table with all AutoScheduler Events on the Y axis and all AutoScheduler Slots on the X axis, and red/green table cells to indicate whether an event can be scheduled in that Slot. <i>This view takes a while to load.</i>
-        </p>
-      </a>
-      <a href="{% url 'backoffice:autoschedule_debug_event_conflicts' camp_slug=camp.slug %}" class="list-group-item">
-        <h4 class="list-group-item-heading">
-          <i class="fas fa-chess-board fa-fw"></i> Debug Event Conflicts
-        </h4>
-        <p class="list-group-item-text">
-          This view shows a matrix/table with all Events on both axis, and red/green table cells to indicate conflicts between Events. Event conflicts can happen either because a Speaker on an Event is also a Speaker on other Events, or because of a SpeakerEventConflict, or because the events share one or more tags. <i>This view takes a while to load.</i>
-        </p>
-      </a>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Manage AutoScheduler</h3>
     </div>
-    <p><i>If you are new to the AutoScheduler you might wish to consult the <a href="{% url 'backoffice:autoschedule_crash_course' camp_slug=camp.slug %}">crash course</a> for a five minute introduction to the terminology and concepts used.</i></p>
-    <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> Backoffice</a></p>
+    <div class="card-body">
+      <p class="lead">Select your desired action below</p>
+      <div class="list-group">
+        <a href="{% url 'backoffice:autoschedule_validate' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            <i class="fas fa-fire-extinguisher fa-fw"></i> Validate Schedule
+          </h4>
+          <p class="list-group-item-text">
+            Validate published or draft schedule. Useful to check if the published schedule is still valid after making changes to the underlying data. Can also check the draft schedule.
+          </p>
+        </a>
+        <a href="{% url 'backoffice:autoschedule_diff' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            <i class="fas fa-random fa-fw"></i> Show Schedule Diff
+          </h4>
+          <p class="list-group-item-text">
+            Show the differences between the published schedule and the similar draft schedule. Use this to predict what schedule changes would happen if the draft schedule was applied now. <i>This view takes a while to load.</i>
+          </p>
+        </a>
+        <a href="{% url 'backoffice:autoschedule_apply' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            <i class="fas fa-check fa-fw"></i> Apply Schedule
+          </h4>
+          <p class="list-group-item-text">
+            Apply the draft schedule by unscheduling any currently autoscheduled Events and scheduling new Events in EventSlots to match the Slot/Event combinations in the draft schedule. It is prudent to check the validity and diff for the draft schedule before applying!
+          </p>
+        </a>
+        <a href="{% url 'backoffice:autoschedule_debug_event_slot_unavailability' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            <i class="fas fa-chess-board fa-fw"></i> Debug Event/Slot Unavailability
+          </h4>
+          <p class="list-group-item-text">
+            This debug view shows a matrix/table with all AutoScheduler Events on the Y axis and all AutoScheduler Slots on the X axis, and red/green table cells to indicate whether an event can be scheduled in that Slot. <i>This view takes a while to load.</i>
+          </p>
+        </a>
+        <a href="{% url 'backoffice:autoschedule_debug_event_conflicts' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            <i class="fas fa-chess-board fa-fw"></i> Debug Event Conflicts
+          </h4>
+          <p class="list-group-item-text">
+            This view shows a matrix/table with all Events on both axis, and red/green table cells to indicate conflicts between Events. Event conflicts can happen either because a Speaker on an Event is also a Speaker on other Events, or because of a SpeakerEventConflict, or because the events share one or more tags. <i>This view takes a while to load.</i>
+          </p>
+        </a>
+      </div>
+      <p><i>If you are new to the AutoScheduler you might wish to consult the <a href="{% url 'backoffice:autoschedule_crash_course' camp_slug=camp.slug %}">crash course</a> for a five minute introduction to the terminology and concepts used.</i></p>
+      <p><a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Backoffice</a></p>
+    </div>
   </div>
-</div>
 
 {% endblock content %}
-

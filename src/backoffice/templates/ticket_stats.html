@@ -4,42 +4,42 @@
 {% load bornhack %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <span class="h3">BackOffice - Ticket Stats for {{ camp.title }}</span>
+  <div class="card">
+    <div class="card-header">
+      <span class="h3">BackOffice - Ticket Stats for {{ camp.title }}</span>
+    </div>
+    <div class="card-body">
+      <p class="lead">This view shows a list of all {{ camp.title }} ticket types with at least one ticket sold, along with the number of tickets and average price per type.</p>
+      <table class="table table-hover datatable">
+        <thead>
+          <tr>
+            <th>Ticket Type</th>
+            <th class="text-center">Tickets Generated</th>
+            <th class="text-center">Products</th>
+            <th class="text-center">Units Sold</th>
+            <th class="text-right">Total Income</th>
+            <th class="text-right">Total Cost</th>
+            <th class="text-right">Total Profit</th>
+            <th class="text-right">Avg. Ticket Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tt in tickettype_list %}
+            <tr>
+              <td><a href="{% url 'backoffice:shop_ticket_stats_detail' camp_slug=camp.slug pk=tt.pk %}">{{ tt.name }}</a></td>
+              <td data-order="{{ tt.shopticket_count }}" class="text-center">{{ tt.shopticket_count }}</td>
+              <td data-order="{{ tt.product_set.count }}" class="text-center">{{ tt.product_set.count }}</td>
+              <td data-order="{{ tt.total_units_sold }}" class="text-center">{{ tt.total_units_sold }}</td>
+              <td data-order="{{ tt.total_income }}" class="text-right">{{ tt.total_income|floatformat:"2g" }}&nbsp;DKK</td>
+              <td data-order="{{ tt.total_cost }}" class="text-right">{{ tt.total_cost|floatformat:"2g" }}&nbsp;DKK</td>
+              <td data-order="{{ tt.total_profit }}" class="text-right">{{ tt.total_profit|floatformat:"2g" }}&nbsp;DKK</td>
+              <td data-order="{{ tt.avg_ticket_price }}" class="text-right">{{ tt.avg_ticket_price|floatformat:"2g" }}&nbsp;DKK</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+    </p>
   </div>
-  <div class="panel-body">
-  <p class="lead">This view shows a list of all {{ camp.title }} ticket types with at least one ticket sold, along with the number of tickets and average price per type.</p>
-  <table class="table table-hover datatable">
-    <thead>
-    <tr>
-        <th>Ticket Type</th>
-        <th class="text-center">Tickets Generated</th>
-        <th class="text-center">Products</th>
-        <th class="text-center">Units Sold</th>
-        <th class="text-right">Total Income</th>
-        <th class="text-right">Total Cost</th>
-        <th class="text-right">Total Profit</th>
-        <th class="text-right">Avg. Ticket Price</th>
-     </tr>
-    </thead>
-    <tbody>
-    {% for tt in tickettype_list %}
-    <tr>
-      <td><a href="{% url 'backoffice:shop_ticket_stats_detail' camp_slug=camp.slug pk=tt.pk %}">{{ tt.name }}</a></td>
-      <td class="text-center">{{ tt.shopticket_count }}</td>
-      <td class="text-center">{{ tt.product_set.count }}</td>
-      <td class="text-center">{{ tt.total_units_sold }}</td>
-        <td class="text-right">{{ tt.total_income|floatformat:"2" }}&nbsp;DKK</td>
-        <td class="text-right">{{ tt.total_cost|floatformat:"2" }}&nbsp;DKK</td>
-        <td class="text-right">{{ tt.total_profit|floatformat:"2" }}&nbsp;DKK</td>
-        <td class="text-right">{{ tt.avg_ticket_price|floatformat:"2" }}&nbsp;DKK</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-  </table>
-  <a class="btn btn-default" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
-  </p>
   </div>
-</div>
 {% endblock content %}

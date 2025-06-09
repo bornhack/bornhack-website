@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from django.contrib import admin
 
-from .models import Sponsor, SponsorTier
+from .models import Sponsor
+from .models import SponsorTier
 
 
 @admin.register(Sponsor)
@@ -18,7 +21,7 @@ class SponsorAdmin(admin.ModelAdmin):
 
 @admin.register(SponsorTier)
 class SponsorTierAdmin(admin.ModelAdmin):
-    list_display = ("name", "camp", "weight")
+    list_display = ("name", "camp", "weight", "week_tickets", "oneday_tickets")
     list_editable = ("weight",)
     list_filter = ("camp",)
     ordering = ("weight",)

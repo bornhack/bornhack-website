@@ -1,82 +1,82 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">EventSession Details</h3>
-  </div>
-  <div class="panel-body">
-    <table class="table">
-      <tr>
-        <th>Session ID</th>
-        <td>{{ session.pk }}</td>
-      </tr>
-      <tr>
-        <th>Event Type</th>
-        <td><i class="fas fa-{{ session.event_type.icon }}" style="color: {{ session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type }}</a></td>
-      </tr>
-      <tr>
-        <th>Event Location</th>
-        <td><i class="fas fa-{{ session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</td>
-      </tr>
-      <tr>
-        <th>Session Start</th>
-        <td>{{ session.when.lower }}</td>
-      </tr>
-      <tr>
-        <th>Session End</th>
-        <td>{{ session.when.upper }}</td>
-      </tr>
-      <tr>
-        <th>Session Duration</th>
-        <td>{{ session.duration }}</td>
-      </tr>
-      <tr>
-        <th>EventSlots and Events</th>
-        <td>
-          <table class="table table-condensed">
-            <thead>
-              <tr>
-                <th>Start</th>
-                <th>End</th>
-                <th>Event</th>
-                <th>Speakers</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for slot in session.event_slots.all %}
-              <tr>
-                <td><a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.when.lower }}</a></td>
-                <td>{{ slot.when.upper }}</td>
-                <td>
-                  {% if slot.event %}
-                    <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=slot.event.slug %}">{{ slot.event.event_type.icon_html }} {{ slot.event.title }}</a>
-                  {% else %}
-                    N/A
-                  {% endif %}
-                </td>
-                <td>
-                  {% if slot.event.speakers.exists %}
-                    <ul class="list-group">
-                    {% for speaker in slot.event.speakers.all %}
-                    <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item"><i class="fas fa-user"></i> {{ speaker.name }}</a>
-                    {% endfor %}
-                    </ul>
-                  {% else %}
-                    N/A
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </td>
-      </tr>
-    </table>
-    <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update EventSession</a>
-    <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete EventSession</a>
-    <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> List EventSessions</a>
-  </div>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">EventSession Details</h3>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>Session ID</th>
+          <td>{{ session.pk }}</td>
+        </tr>
+        <tr>
+          <th>Event Type</th>
+          <td><i class="fas fa-{{ session.event_type.icon }}" style="color: {{ session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=session.event_type.slug %}">{{ session.event_type }}</a></td>
+        </tr>
+        <tr>
+          <th>Event Location</th>
+          <td><i class="fas fa-{{ session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=session.event_location.slug %}">{{ session.event_location.name }}</td>
+          </tr>
+          <tr>
+            <th>Session Start</th>
+            <td>{{ session.when.lower }}</td>
+          </tr>
+          <tr>
+            <th>Session End</th>
+            <td>{{ session.when.upper }}</td>
+          </tr>
+          <tr>
+            <th>Session Duration</th>
+            <td>{{ session.duration }}</td>
+          </tr>
+          <tr>
+            <th>EventSlots and Events</th>
+            <td>
+              <table class="table table-condensed">
+                <thead>
+                  <tr>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Event</th>
+                    <th>Speakers</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for slot in session.event_slots.all %}
+                    <tr>
+                      <td><a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=slot.pk %}">{{ slot.when.lower }}</a></td>
+                      <td>{{ slot.when.upper }}</td>
+                      <td>
+                        {% if slot.event %}
+                          <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=slot.event.slug %}">{{ slot.event.event_type.icon_html }} {{ slot.event.title }}</a>
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if slot.event.speakers.exists %}
+                          <ul class="list-group">
+                            {% for speaker in slot.event.speakers.all %}
+                              <a href="{% url 'backoffice:speaker_detail' camp_slug=camp.slug slug=speaker.slug %}" class="list-group-item list-group-item-action"><i class="fas fa-user"></i> {{ speaker.name }}</a>
+                            {% endfor %}
+                          </ul>
+                        {% else %}
+                          N/A
+                        {% endif %}
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <a href="{% url 'backoffice:event_session_update' camp_slug=camp.slug pk=session.id %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update EventSession</a>
+        <a href="{% url 'backoffice:event_session_delete' camp_slug=camp.slug pk=session.id %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete EventSession</a>
+        <a href="{% url 'backoffice:event_session_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> List EventSessions</a>
+      </div>
+    </div>
 {% endblock content %}

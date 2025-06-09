@@ -1,37 +1,47 @@
-from allauth.account.views import LoginView, LogoutView
+from __future__ import annotations
+
+from allauth.account.views import LoginView
+from allauth.account.views import LogoutView
 from django.conf import settings
-from django.conf.urls import include
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
+from django.urls import include
 from django.urls import path
 from django.views.generic import TemplateView
 
-from bar.views import MenuView
-from camps.views import CampDetailView, CampListView, CampRedirectView
+from camps.views import CampDetailView
+from camps.views import CampListView
+from camps.views import CampRedirectView
+from contact.views import ContactView
 from feedback.views import FeedbackCreate
 from info.views import CampInfoView
+from maps.views import MapView
+from maps.views import UserLocationApiView
+from maps.views import UserLocationCreateView
+from maps.views import UserLocationDeleteView
+from maps.views import UserLocationLayerView
+from maps.views import UserLocationListView
+from maps.views import UserLocationUpdateView
 from people.views import PeopleView
+from sponsors.views import AllSponsorsView
 from sponsors.views import SponsorsView
-from villages.views import (
-    VillageDeleteView,
-    VillageDetailView,
-    VillageListView,
-    VillageUpdateView,
-)
+from utils.views import csrfview
 
 # require 2fa token entry (if enabled on admin account) when logging into /admin by using allauth login form
 admin.site.login = login_required(admin.site.login)
 
 urlpatterns = [
+    path("api/csrf/", csrfview),
     path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("profile/", include("allauth.urls")),
-    path("profile/", include("allauth_2fa.urls")),
     path("profile/", include("profiles.urls", namespace="profiles")),
     path("tickets/", include("tickets.urls", namespace="tickets")),
     path("shop/", include("shop.urls", namespace="shop")),
     path("news/", include("news.urls", namespace="news")),
     path(
-        "contact/", TemplateView.as_view(template_name="contact.html"), name="contact"
+        "contact/",
+        ContactView.as_view(),
+        name="contact",
     ),
     path("conduct/", TemplateView.as_view(template_name="coc.html"), name="conduct"),
     path("login/", LoginView.as_view(), name="account_login"),
@@ -47,11 +57,10 @@ urlpatterns = [
         name="general-terms",
     ),
     path("admin/", admin.site.urls),
-    # We don't need CSRF checks for the API
-    # path("api/", csrf_exempt(GraphQLView.as_view(graphiql=True))),
     path("camps/", CampListView.as_view(), name="camp_list"),
     path("token/", include("tokens.urls", namespace="tokens")),
     path("maps/", include("maps.urls", namespace="maps")),
+    path("", include("django_prometheus.urls")),
     # camp redirect views here
     path(
         "",
@@ -73,15 +82,38 @@ urlpatterns = [
     ),
     path(
         "sponsors/",
-        CampRedirectView.as_view(),
-        kwargs={"page": "sponsors"},
-        name="sponsors_redirect",
+        AllSponsorsView.as_view(),
+        name="allsponsors",
     ),
     path(
         "villages/",
         CampRedirectView.as_view(),
-        kwargs={"page": "village_list"},
+        kwargs={"page": "villages:village_list"},
         name="village_list_redirect",
+    ),
+    path(
+        "teams/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "teams:list"},
+        name="teams_list_redirect",
+    ),
+    path(
+        "rideshare/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "rideshare:list"},
+        name="rideshare_list_redirect",
+    ),
+    path(
+        "feedback/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "feedback"},
+        name="feedback_redirect",
+    ),
+    path(
+        "facilities/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "facilities:facility_type_list"},
+        name="facilities_list_redirect",
     ),
     path(
         "wishlist/",
@@ -96,10 +128,22 @@ urlpatterns = [
         name="backoffice_redirect",
     ),
     path(
+        "economy/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "economy:dashboard"},
+        name="economy_dashboard_redirect",
+    ),
+    path(
         "phonebook/",
         CampRedirectView.as_view(),
         kwargs={"page": "phonebook:list"},
         name="phone_book_redirect",
+    ),
+    path(
+        "userlocation/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "maps_user_location_list"},
+        name="maps_user_location_redirect",
     ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
@@ -111,31 +155,64 @@ urlpatterns = [
                 path("info/", CampInfoView.as_view(), name="info"),
                 path("program/", include("program.urls", namespace="program")),
                 path("sponsors/", SponsorsView.as_view(), name="sponsors"),
-                path("bar/menu/", MenuView.as_view(), name="menu"),
                 path(
-                    "villages/",
+                    "map/",
                     include(
                         [
-                            path("", VillageListView.as_view(), name="village_list"),
+                            path("", MapView.as_view(), name="maps_map"),
                             path(
-                                "<slug:slug>/delete/",
-                                VillageDeleteView.as_view(),
-                                name="village_delete",
+                                "userlocation_geojson/<slug:user_location_type_slug>/",
+                                UserLocationLayerView.as_view(),
+                                name="maps_user_location_layer",
                             ),
                             path(
-                                "<slug:slug>/edit/",
-                                VillageUpdateView.as_view(),
-                                name="village_update",
+                                "userlocation/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            UserLocationListView.as_view(),
+                                            name="maps_user_location_list",
+                                        ),
+                                        path(
+                                            "create/",
+                                            UserLocationCreateView.as_view(),
+                                            name="maps_user_location_create",
+                                        ),
+                                        path(
+                                            "create/api/",
+                                            UserLocationApiView.as_view(),
+                                            name="maps_user_location_create_api",
+                                        ),
+                                        path(
+                                            "<uuid:user_location>/",
+                                            include(
+                                                [
+                                                    path(
+                                                        "update/",
+                                                        UserLocationUpdateView.as_view(),
+                                                        name="maps_user_location_update",
+                                                    ),
+                                                    path(
+                                                        "delete/",
+                                                        UserLocationDeleteView.as_view(),
+                                                        name="maps_user_location_delete",
+                                                    ),
+                                                    path(
+                                                        "api/",
+                                                        UserLocationApiView.as_view(),
+                                                        name="maps_user_location_api",
+                                                    ),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
+                                ),
                             ),
-                            # this has to be the last url in the list
-                            path(
-                                "<slug:slug>/",
-                                VillageDetailView.as_view(),
-                                name="village_detail",
-                            ),
-                        ]
+                        ],
                     ),
                 ),
+                path("villages/", include("villages.urls", namespace="villages")),
                 path("teams/", include("teams.urls", namespace="teams")),
                 path("rideshare/", include("rideshare.urls", namespace="rideshare")),
                 path("backoffice/", include("backoffice.urls", namespace="backoffice")),
@@ -144,12 +221,12 @@ urlpatterns = [
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
                 path("facilities/", include("facilities.urls", namespace="facilities")),
                 path("phonebook/", include("phonebook.urls", namespace="phonebook")),
-            ]
+            ],
         ),
     ),
 ]
 
-if settings.DEBUG:
+if settings.DEBUG_TOOLBAR_ENABLED:
     import debug_toolbar
 
-    urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+    urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]

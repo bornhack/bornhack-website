@@ -1,22 +1,21 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) | {{ block.super }}
+  Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading"><h3 class="panel-title">Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) - BackOffice</h3></div>
-  <div class="panel-body">
-    <a class="btn btn-default" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list for {{ credebtor.chain.name }}</a>
+  <div class="card">
+    <div class="card-header"><h3 class="card-title">Details for Credebtor {{ credebtor.name }} (Chain {{ credebtor.chain.name }}) - BackOffice</h3></div>
+    <div class="card-body">
+      <a class="btn btn-secondary" href="{% url "backoffice:chain_detail" camp_slug=camp.slug chain_slug=credebtor.chain.slug %}"><i class="fas fa-undo"></i> Back to Credebtor list for {{ credebtor.chain.name }}</a>
 
-    <h3>{{ expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
-    {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
+      <h3>{{ expenses.count }} Expenses for Credebtor {{ credebtor.name }}</h3>
+      {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
 
-    <h3>{{ revenues.count }} Revenues for Credebtor {{ credebtor.name }}</h3>
-    {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
+      <h3>{{ revenues.count }} Revenues for Credebtor {{ credebtor.name }}</h3>
+      {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
+    </div>
   </div>
-</div>
 {% endblock content %}
-

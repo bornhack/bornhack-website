@@ -3,26 +3,30 @@
     <tr>
       <th>Name</th>
       <th>Team</th>
-      <th>Slug</th>
+      <th>Pos Reports</th>
+      <th>Total Transactions</th>
+      <th>Total Sales</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
     {% for pos in pos_list %}
-    <tr>
-      <td><a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}">{{ pos.name }}</a></td>
-      <td>{{ pos.team }}</td>
-      <td>{{ pos.slug }}</td>
-      <td>
-        <div class="btn-group-vertical">
-          <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-          {% if perms.camps.orgateam_permission %}
-          <a href="{% url 'backoffice:pos_update' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-          <a href="{% url 'backoffice:pos_delete' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-          {% endif %}
-        </div>
-      </td>
-    </tr>
+      <tr>
+        <td><a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}">{{ pos.name }}</a></td>
+        <td>{{ pos.team }}</td>
+        <td><a href="{% url 'backoffice:posreport_list' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary">{{ pos.pos_reports.count }} reports</a></td>
+        <td><a href="{% url 'backoffice:postransaction_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary">{{ pos.pos_transactions.count }} transactions</a></td>
+        <td><a href="{% url 'backoffice:possale_list' camp_slug=camp.slug %}?pos={{ pos.name }}" class="btn btn-primary">{{ pos.sales.count }} sales for {{ pos.total_sales|default:0 }} HAX</a></td>
+        <td>
+          <div class="btn-group-vertical">
+            <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+            {% if perms.camps.orgateam_permission %}
+              <a href="{% url 'backoffice:pos_update' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
+              <a href="{% url 'backoffice:pos_delete' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

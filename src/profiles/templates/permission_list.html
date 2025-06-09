@@ -1,0 +1,30 @@
+{% extends 'profile_base.html' %}
+
+{% block title %}
+  Your permissions | {{ block.super }}
+{% endblock %}
+
+{% block profile_content %}
+  <div class="card">
+    <div class="card-header">
+      <h4>Your permissions</h4>
+    </div>
+    <div class="card-body">
+      <p class="lead">This table shows all permissions for your BornHack user <b>{{ request.user.username }}</b>.</p>
+      <p>Permissions come from team memberships or they can be assigned directly to your user. Additional permissions can be granted by a team lead or orga member.</p>
+      {% if request.user.is_superuser %}<p><b>Note:</b> Your account is a superuser account so you have all possible permissions in the system. Orga responsibly! <3</p>{% endif %}
+      <table class="table table-striped">
+        <tr>
+          <th>Codename</th>
+          <th>Description</th>
+        </tr>
+        {% for perm in permissions %}
+          <tr>
+            <td>{{ perm.content_type.app_label }}.{{ perm.codename }}</td>
+            <td>{{ perm.name }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+{% endblock profile_content %}

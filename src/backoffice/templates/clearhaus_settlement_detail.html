@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  {{ cs.pk }} | Clearhaus Settlement | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ cs.pk }} | Clearhaus Settlement | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:clearhaussettlement_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Clearhaus Settlements</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>BornHack UUID</th>
+            <td>{{ cs.pk }}</td>
+          </tr>
+          <tr>
+            <th>Clearhaus UUID</th>
+            <td>{{ cs.clearhaus_uuid }}</td>
+          </tr>
+          <tr>
+            <th>Merchant ID</th>
+            <td>{{ cs.merchant_id }}</td>
+          </tr>
+          <tr>
+            <th>Merchant Name</th>
+            <td>{{ cs.merchant_name }}</td>
+          </tr>
+          <tr>
+            <th>Settled</th>
+            <td>{{ cs.settled|truefalseicon }}</td>
+          </tr>
+          <tr>
+            <th>Period Start Date</th>
+            <td>{{ cs.period_start_date }}</td>
+          </tr>
+          <tr>
+            <th>Period End Date</th>
+            <td>{{ cs.period_end_date }}</td>
+          </tr>
+          <tr>
+            <th>Payout Amount</th>
+            <td>{{ cs.payout_amount }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Payout Date</th>
+            <td>{{ cs.payout_date }}</td>
+          </tr>
+          <tr>
+            <th>Payout Reference Number</th>
+            <td>{{ cs.payout_reference_number }}</td>
+          </tr>
+          <tr>
+            <th>Payout Descriptor</th>
+            <td>{{ cs.payout_descriptor }}</td>
+          </tr>
+          <tr>
+            <th>Summary Sales</th>
+            <td>{{ cs.summary_sales }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Credits</th>
+            <td>{{ cs.summary_credits }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Refunds</th>
+            <td>{{ cs.summary_refunds }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Chargebacks</th>
+            <td>{{ cs.summary_chargebacks }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Fees</th>
+            <td>{{ cs.summary_fees }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Other Postings</th>
+            <td>{{ cs.summary_other_postings }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Summary Net</th>
+            <td>{{ cs.summary_net }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Reserve Amount</th>
+            <td>{{ cs.reserve_amount }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Reserve Date</th>
+            <td>{{ cs.reserve_date }}</td>
+          </tr>
+          <tr>
+            <th>Reserve Reference Number</th>
+            <td>{{ cs.reserve_reference_number }}</td>
+          </tr>
+          <tr>
+            <th>Reserve Descriptor</th>
+            <td>{{ cs.reserve_descriptor }}</td>
+          </tr>
+          <tr>
+            <th>Fees Sales</th>
+            <td>{{ cs.fees_sales }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Refunds</th>
+            <td>{{ cs.fees_refunds }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Authorisations</th>
+            <td>{{ cs.fees_authorisations }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Credits</th>
+            <td>{{ cs.fees_credits }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Minimum Processing</th>
+            <td>{{ cs.fees_minimum_processing }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Service</th>
+            <td>{{ cs.fees_service }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Wire Transfer</th>
+            <td>{{ cs.fees_wire_transfer }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Chargebacks</th>
+            <td>{{ cs.fees_chargebacks }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Retrieval Requests</th>
+            <td>{{ cs.fees_retrieval_requests }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Interchange</th>
+            <td>{{ cs.fees_interchange }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+          <tr>
+            <th>Fees Scheme</th>
+            <td>{{ cs.fees_scheme }}&nbsp;{{ cs.currency }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <a href="{% url 'backoffice:clearhaussettlement_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Clearhaus Settlements</a>
+        <a href="{% url 'backoffice:index' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> BackOffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock %}

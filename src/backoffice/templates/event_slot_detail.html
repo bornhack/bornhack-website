@@ -1,54 +1,54 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-      <h3 class="panel-title">EventSlot {{ event_slot.pk }} Details</h3>
-  </div>
-  <div class="panel-body">
-    <table class="table">
-      <tr>
-        <th>EventSlot ID</th>
-        <td>{{ event_slot.pk }}</td>
-      </tr>
-      <tr>
-        <th>EventSession</th>
-        <td>This EventSlot is part of <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=event_slot.event_session.pk %}">EventSession {{ event_slot.event_session.pk }}</a> which happens at <i class="fas fa-{{ event_slot.event_session.event_location.icon }}"></i> {{ event_slot.event_session.event_location.name }} from {{ event_slot.event_session.when.lower }} to {{ event_slot.event_session.when.upper }}.</td>
-      </tr>
-      <tr>
-        <th>Event Type</th>
-        <td><i class="fas fa-{{ event_slot.event_session.event_type.icon }}" style="color: {{ event_slot.event_session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event_slot.event_session.event_type.slug %}">{{ event_slot.event_session.event_type }}</a></td>
-      </tr>
-      <tr>
-        <th>Event Location</th>
-        <td><i class="fas fa-{{ event_slot.event_session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=event_slot.event_session.event_location.slug %}">{{ event_slot.event_session.event_location.name }}</td>
-      </tr>
-      <tr>
-        <th>EventSlot Start</th>
-        <td>{{ event_slot.when.lower }}</td>
-      </tr>
-      <tr>
-        <th>EventSlot End</th>
-        <td>{{ event_slot.when.upper }}</td>
-      </tr>
-      <tr>
-        <th>EventSlot Duration</th>
-        <td>{{ event_slot.duration }}</td>
-      </tr>
-      <tr>
-        <th>Scheduled Event</th>
-        <td>
-          {% if event_slot.event %}
-            <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event_slot.event.slug %}">{{ event_slot.event_type.icon_html }} {{ event_slot.event.title }}</a>
-            <a href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=event_slot.pk %}" class="btn btn-danger btn-xs"><i class="fas fa-times"></i> Unschedule Event</a>
-          {% else %}
-            N/A
-          {% endif %}
-        </td>
-      </tr>
-    </table>
-    <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="btn btn-default"><i class="fas fa-undo"></i> List EventSlots</a>
-  </div>
-</div>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">EventSlot {{ event_slot.pk }} Details</h3>
+    </div>
+    <div class="card-body">
+      <table class="table">
+        <tr>
+          <th>EventSlot ID</th>
+          <td>{{ event_slot.pk }}</td>
+        </tr>
+        <tr>
+          <th>EventSession</th>
+          <td>This EventSlot is part of <a href="{% url 'backoffice:event_session_detail' camp_slug=camp.slug pk=event_slot.event_session.pk %}">EventSession {{ event_slot.event_session.pk }}</a> which happens at <i class="fas fa-{{ event_slot.event_session.event_location.icon }}"></i> {{ event_slot.event_session.event_location.name }} from {{ event_slot.event_session.when.lower }} to {{ event_slot.event_session.when.upper }}.</td>
+        </tr>
+        <tr>
+          <th>Event Type</th>
+          <td><i class="fas fa-{{ event_slot.event_session.event_type.icon }}" style="color: {{ event_slot.event_session.event_type.color }};"></i> <a href="{% url 'backoffice:event_type_detail' camp_slug=camp.slug slug=event_slot.event_session.event_type.slug %}">{{ event_slot.event_session.event_type }}</a></td>
+        </tr>
+        <tr>
+          <th>Event Location</th>
+          <td><i class="fas fa-{{ event_slot.event_session.event_location.icon }}"></i> <a href="{% url 'backoffice:event_location_detail' camp_slug=camp.slug slug=event_slot.event_session.event_location.slug %}">{{ event_slot.event_session.event_location.name }}</td>
+          </tr>
+          <tr>
+            <th>EventSlot Start</th>
+            <td>{{ event_slot.when.lower }}</td>
+          </tr>
+          <tr>
+            <th>EventSlot End</th>
+            <td>{{ event_slot.when.upper }}</td>
+          </tr>
+          <tr>
+            <th>EventSlot Duration</th>
+            <td>{{ event_slot.duration }}</td>
+          </tr>
+          <tr>
+            <th>Scheduled Event</th>
+            <td>
+              {% if event_slot.event %}
+                <a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event_slot.event.slug %}">{{ event_slot.event_type.icon_html }} {{ event_slot.event.title }}</a>
+                <a href="{% url 'backoffice:event_slot_unschedule' camp_slug=camp.slug pk=event_slot.pk %}" class="btn btn-danger btn-xs"><i class="fas fa-times"></i> Unschedule Event</a>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+        </table>
+        <a href="{% url 'backoffice:event_slot_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> List EventSlots</a>
+      </div>
+    </div>
 {% endblock content %}

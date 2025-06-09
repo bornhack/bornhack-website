@@ -1,67 +1,67 @@
 {% extends 'base.html' %}
 {% load commonmark %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block title %}
-{{ object.author }}{% if object.has_car %} has {% else %} needs {% endif %}{{ object.seats }} seat(s) free, going from {{ object.from_location }} to {{ object.to_location }} on {{ object.when|date:"jS \o\f F \a\t H:i T" }} | {{ block.super }}
+  {{ object.author }}{% if object.has_car %} has {% else %} needs {% endif %}{{ object.seats }} seat(s) free, going from {{ object.from_location }} to {{ object.to_location }} on {{ object.when|date:"jS \o\f F \a\t H:i T" }} | {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-<a class="btn btn-primary" href="{% url 'rideshare:list' camp_slug=camp.slug %}">
+  <a class="btn btn-primary" href="{% url 'rideshare:list' camp_slug=camp.slug %}">
     <i class="fas fa-chevron-left"></i>
     Back
-</a>
+  </a>
 
-<hr />
+  <hr />
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>
-            <strong>{{ object.author }}</strong>
-            {% if object.has_car %}has {% else %}needs {% endif %}
-            <strong>{{ object.seats }}</strong>
-            seats free, going from
-            <strong>{{ object.from_location }}</strong>
-            to
-            <strong>{{ object.to_location }}</strong>
-            at
-            <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
-        </h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>
+        <strong>{{ object.author }}</strong>
+        {% if object.has_car %}has {% else %}needs {% endif %}
+        <strong>{{ object.seats }}</strong>
+        seats free, going from
+        <strong>{{ object.from_location }}</strong>
+        to
+        <strong>{{ object.to_location }}</strong>
+        at
+        <strong>{{ object.when|date:"jS \o\f F \a\t H:i T" }}</strong>
+      </h4>
     </div>
-    <div class="panel-body">
-        <strong>Description:</strong>
-        <p>
-            {{ object.description|untrustedcommonmark }}
-        </p>
+    <div class="card-body">
+      <strong>Description:</strong>
+      <p>
+        {{ object.description|untrustedcommonmark }}
+      </p>
     </div>
     {% if user == object.user %}
-    <div class="panel-footer">
+      <div class="card-footer">
         <a class="btn btn-danger pull-right" href="{% url 'rideshare:delete' camp_slug=camp.slug pk=object.pk %}">
-            <i class="fas fa-trash"></i>
-            Delete
+          <i class="fas fa-trash"></i>
+          Delete
         </a>
         <a class="btn btn-primary pull-right" href="{% url 'rideshare:update' camp_slug=camp.slug pk=object.pk %}">
-            <i class="fas fa-edit"></i>
-            Edit
+          <i class="fas fa-edit"></i>
+          Edit
         </a>
         <span class="clearfix"></span>
-    </div>
+      </div>
     {% else %}
-    <div class="panel-footer">
+      <div class="card-footer">
         <form method="POST">
-            {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-success pull-right">
-                <i class="fas fa-envelope"></i>
-                Send
-            </button>
-            <span class="clearfix"></span>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <button type="submit" class="btn btn-success pull-right">
+            <i class="fas fa-envelope"></i>
+            Send
+          </button>
+          <span class="clearfix"></span>
         </form>
-    </div>
+      </div>
 
     {% endif %}
-</div>
+  </div>
 
 
 

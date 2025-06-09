@@ -1,24 +1,23 @@
 {% extends 'base.html' %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 
 {% block content %}
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Unschedule Event <i>{{ event_slot.event.title }}</i>?</h3>
-  </div>
-  <div class="panel-body">
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Unschedule Event <i>{{ event_slot.event.title }}</i>?</h3>
+    </div>
+    <div class="card-body">
       <p>This EventSlot runs from <b>{{ event_slot.when.lower }} to {{ event_slot.when.upper }}</b>. It is part of an EventSession for {{ event_slot.event_type.icon_html }} {{ event_slot.event_type }} at location {{ event_slot.event_location }}.</p>
-    <p>The scheduled Event is titled <i>{{ event_slot.event.title }}</i></p>
+      <p>The scheduled Event is titled <i>{{ event_slot.event.title }}</i></p>
 
-    <p>Really unschedule this Event?</p>
+      <p>Really unschedule this Event?</p>
 
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Unschedule It</button>
-      <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=event_slot.pk %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-danger"><i class='fas fa-times'></i> Yes, Unschedule It</button>
+        <a href="{% url 'backoffice:event_slot_detail' camp_slug=camp.slug pk=event_slot.pk %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
   </div>
-</div>
 {% endblock content %}
-

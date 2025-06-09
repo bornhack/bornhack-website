@@ -1,70 +1,77 @@
 {% extends 'profile_base.html' %}
-{% load bootstrap3 %}
-{% load shop_tags %}
+{% load django_bootstrap5 %}
 {% load bornhack %}
 
 {% block title %}
-Orders | {{ block.super }}
+  Orders | {{ block.super }}
 {% endblock %}
 
 {% block profile_content %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h4>Orders</h4>
+  <div class="card">
+    <div class="card-header">
+      <h4>Orders</h4>
     </div>
-    <div class="panel-body">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Items</th>
-              <th>Total amount</th>
-              <th>Open?</th>
-              <th>Paid?</th>
-              <th>Refunded?</th>
-              <th>Delivered?</th>
-              <th>Invoice</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-        {% for order in orders %}
+    <div class="card-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th class="text-right">Order ID</th>
+            <th class="text-right">Items</th>
+            <th class="text-right">Total amount</th>
+            <th class="text-center">Open?</th>
+            <th class="text-center">Paid?</th>
+            <th class="text-center">Refunded?</th>
+            <th class="text-center">Used?</th>
+            <th>Invoice</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
             {% if order.products.exists %}
-            <tr {% if not order.open and order.paid and order.is_fully_ticket_generated %}style="color: lightgrey"{% endif %}>
-                <td>{{ order.id }}</td>
-                <td>{{ order.get_number_of_items }}</td>
-                <td>{{ order.total|currency }}</td>
-                <td class="text-center">{{ order.open|truefalseicon }}</td>
+              <tr {% if not order.open and order.paid and order.is_fully_ticket_generated %}style="color: lightgrey"{% endif %}>
+                <td class="text-right">{{ order.id }}</td>
+                <td class="text-right">{{ order.get_number_of_items }}</td>
+                <td class="text-right">{{ order.total|currency }}</td>
+                <td class="text-center">{% if order.open %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-danger"></i>{% endif %}</td>
                 <td class="text-center">{{ order.paid|truefalseicon }}</td>
-                <td class="text-center">{{ order.refunded|truefalseicon }}</td>
-                <td class="text-center">{{ order.ticket_generated_status }}</td>
+                <td class="text-center">
+                  {% if order.refunded == "FULLY_REFUNDED" %}
+                    Fully refunded
+                  {% elif order.refunded == "PARTIALLY_REFUNDED" %}
+                    Partially refunded
+                  {% else %}
+                    <i class="fas fa-times text-danger"></i>
+                  {% endif %}
+                </td>
+                <td class="text-center">{{ order.used_status }}</td>
                 <td>
-                {% if order.paid %}
+                  {% if order.paid %}
                     {% if order.invoice.pdf %}
-                        {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                        {% bootstrap_button "Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
+                      {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+                      {% bootstrap_button "<i class=\"fa fa-file-arrow-down\"></i> Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
                     {% else %}
-                    Not generated yet!
+                      Not generated yet!
                     {% endif %}
-                {% else %}
+                  {% else %}
                     {% if order.pdf %}
-                        {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
-                        {% bootstrap_button "Proforma Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
+                      {% url 'shop:download_invoice' pk=order.pk as invoice_download_url %}
+                      {% bootstrap_button "<i class=\"fa fa-file-arrow-down\"></i> Proforma Invoice" icon="save-file" href=invoice_download_url button_class="btn-primary btn-xs" %}
                     {% else %}
-                    Not generated yet!
+                      Not generated yet!
                     {% endif %}
-                {% endif %}
+                  {% endif %}
                 </td>
                 <td>
-                {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
-                {% bootstrap_button "Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
+                  {% url 'shop:order_detail' pk=order.pk as order_detail_url %}
+                  {% bootstrap_button "<i class=\"fa fa-list\"></i> Order details" icon="th-list" href=order_detail_url button_class="btn-primary btn-xs" %}
                 </td>
-            </tr>
-          {% endif %}
-        {% endfor %}
-          </tbody>
-        </table>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-</div>
+  </div>
 
 {% endblock %}

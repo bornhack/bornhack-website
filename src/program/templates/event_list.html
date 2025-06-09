@@ -1,14 +1,14 @@
 {% extends 'program_base.html' %}
 
 {% block title %}
-Event List | {{ block.super }}
+  Event List | {{ block.super }}
 {% endblock %}
 
 {% block program_content %}
-{% if event_list %}
-  <p class="lead">A list of all talks, workshops, keynotes and other events at {{ camp.title }}.</p>
-  {% include "includes/event_list_table.html" %}
-{% else %}
-  <h2>No events for {{ camp.title }} yet!</h2>
-{% endif %}
+  {% if event_list %}
+    <p class="lead">A list of all talks, workshops, keynotes and other events at {{ camp.title }}.</p>
+    {% include "includes/event_list_table.html" %}
+  {% else %}
+    <h2>No events for {{ camp.title }} yet!</h2>
+  {% endif %}
 {% endblock program_content %}

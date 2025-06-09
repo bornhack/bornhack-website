@@ -1,0 +1,56 @@
+{% if perms.camps.economy_team_member %}
+  <h3>Economy Team</h3>
+  <a href="{% url 'backoffice:chain_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Chains</h4>
+    <p class="list-group-item-text">Use this view to see the Chains and Credebtors registered in the system.</p>
+  </a>
+  <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Expenses</h4>
+    <p class="list-group-item-text">Use this view to see and approve/reject expenses.</p>
+  </a>
+  <a href="{% url 'backoffice:reimbursement_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Reimbursements</h4>
+    <p class="list-group-item-text">Use this view to view and create reimbursements for approved expenses.</p>
+  </a>
+  <a href="{% url 'backoffice:revenue_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Revenues</h4>
+    <p class="list-group-item-text">Use this view to see and approve/reject revenues.</p>
+  </a>
+  <a href="{% url 'backoffice:bank_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Banks</h4>
+    <p class="list-group-item-text">Use this view to see our banks, bank accounts and bank transactions.</p>
+  </a>
+  <a href="{% url 'backoffice:coinify_dashboard' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Coinify Dashboard</h4>
+    <p class="list-group-item-text">Use this view to see Coinify invoices, payouts and balances imported from CSV (from the Coinify webinterface).</p>
+  </a>
+  <a href="{% url 'backoffice:epaytransaction_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">ePay Transactions</h4>
+    <p class="list-group-item-text">Use this view to see ePay (Bambora) Transactions imported from CSV (from the ePay webinterface).</p>
+  </a>
+  <a href="{% url 'backoffice:clearhaussettlement_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Clearhaus Settlements</h4>
+    <p class="list-group-item-text">Use this view to see all Clearhaus Settlements. Clearhaus creates a settlement (bank payout) weekly (if needed). The data is imported from CSV (from the Clearhaus webinterface).</p>
+  </a>
+  <a href="{% url 'backoffice:zettle_dashboard' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Zettle Dashboard</h4>
+    <p class="list-group-item-text">Use this view to see Zettle (iZettle) receipts and balances (account movements). All data is imported from Excel files from the Zettle webinterface.</p>
+  </a>
+  <a href="{% url 'backoffice:mobilepaytransaction_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">MobilePay Transactions</h4>
+    <p class="list-group-item-text">Use this view to see all MobilePay sales, refunds, payouts and other transactions. The data is imported via CSV from the MobilePay webinterface.</p>
+  </a>
+  <a href="{% url 'backoffice:accountingexport_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Accounting Exports</h4>
+    <p class="list-group-item-text">Use this view to see and generate Accounting Exports for bookkeeping purposes. The exports include bank accounts, PSP data, expenses, revenues, and reimbursements, invoices and creditnotes.</p>
+  </a>
+  <a href="{% url 'backoffice:invoice_download_multiple' camp_slug=camp.slug %}"
+     class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">
+      Download Multiple invoices or orders
+    </h4>
+    <p class="list-group-item-text">
+      Use this view to download multiple invoices and/or orders from the system
+    </p>
+  </a>
+{% endif %}

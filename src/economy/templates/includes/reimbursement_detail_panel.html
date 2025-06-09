@@ -1,37 +1,48 @@
-<div class="panel panel-default">
-    <div class="panel-heading">Reimbursement Details for {{ reimbursement.pk }} for {{ reimbursement.reimbursement_user }}</div>
-    <div class="panel-body">
-        <table class="table">
-            <tr>
-              <th>Reimbursement User</th>
-              <td>{{ reimbursement.reimbursement_user }}</td>
-            </tr>
-            <tr>
-              <th>Created By Economy Team Member</th>
-              <td>{{ reimbursement.user }}</td>
-            </tr>
-            <tr>
-              <th>Total Amount</th>
-              <td>{{ reimbursement.amount }} DKK</td>
-            </tr>
-            <tr>
-              <th>Economy Team Notes</th>
-              <td>{{ reimbursement.notes|default:"N/A" }}</td>
-            </tr>
-            <tr>
-              <th>Paid</th>
-              <td>{{ reimbursement.paid }}</td>
-            </tr>
-            <tr>
-              <th>Created</th>
-              <td>{{ reimbursement.created }} by {{ reimbursement.user }}</td>
-            </tr>
-            <tr>
-              <th>Expenses covered by this Reimbursement</th>
-              <td>
-                {% include 'includes/expense_list_panel.html' with expense_list=reimbursement.covered_expenses.all %}
-              </td>
-            </tr>
-        </table>
-    </div>
+{% load bornhack %}
+<div class="card">
+  <div class="card-header">Reimbursement Details for {{ reimbursement.pk }} for {{ reimbursement.reimbursement_user }}</div>
+  <div class="card-body">
+    <table class="table">
+      <tr>
+        <th>Reimbursement User</th>
+        <td>{{ reimbursement.reimbursement_user }}</td>
+      </tr>
+      <tr>
+        <th>Created By</th>
+        <td>{{ reimbursement.user }}</td>
+      </tr>
+      <tr>
+        <th>Total Amount</th>
+        <td>{{ reimbursement.amount }} DKK</td>
+      </tr>
+      <tr>
+        <th>Bank Account</th>
+        <td>{{ reimbursement.bank_account|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <th>Economy Team Notes</th>
+        <td>{{ reimbursement.notes|default:"N/A" }}</td>
+      </tr>
+      <tr>
+        <th>Paid</th>
+        <td>{{ reimbursement.paid|truefalseicon }}</td>
+      </tr>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <tr>
+          <th>Payback Expense</th>
+          <td><a href="{% url 'backoffice:expense_detail' camp_slug=camp.slug pk=reimbursement.payback_expense.pk %}">{{ reimbursement.payback_expense.pk }}</a></td>
+        </tr>
+      {% endif %}
+      <tr>
+        <th>Created</th>
+        <td>{{ reimbursement.created }} by {{ reimbursement.user }}</td>
+      </tr>
+      <tr>
+        <th>Expenses covered by this Reimbursement</th>
+        <td>
+          {% include 'includes/expense_list_panel.html' with expense_list=reimbursement.covered_expenses.all %}
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>

@@ -1,0 +1,39 @@
+{% if perms.camps.orga_team_member or facilityfeedback_teams or is_team_facilitator or perms.camps.gis_team_member %}
+  <h3>Facilities</h3>
+  <div class="list-group list-group-flush">
+    {% if perms.camps.orga_team_member or perms.camps.gis_team_member %}
+      <a href="{% url 'backoffice:facility_type_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+        <h4 class="list-group-item-heading">
+          Facility Types
+        </h4>
+        <p class="list-group-item-text">
+          See and manage facility types
+        </p>
+      </a>
+    {% endif %}
+
+    {% if is_team_facilitator or perms.camps.gis_team_member %}
+      <a href="{% url 'backoffice:facility_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+        <h4 class="list-group-item-heading">
+          Facilities
+        </h4>
+        <p class="list-group-item-text">
+          See and manage facilites
+        </p>
+      </a>
+    {% endif %}
+
+    {% for team in facilityfeedback_teams %}
+      {% if team.member_permission_set in perms %}
+        <a href="{% url 'backoffice:facilityfeedback' camp_slug=camp.slug team_slug=team.slug %}" class="list-group-item list-group-item-action">
+          <h4 class="list-group-item-heading">
+            Feedback for {{ team.name }} Team
+          </h4>
+          <p class="list-group-item-text">
+            See unhandled feedback for facilities managed by {{ team.name }} Team
+          </p>
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import uuid
 from datetime import timedelta
@@ -8,43 +10,44 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.contrib.postgres.fields import RangeOperators
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.db.models import F, Q
-from django.urls import reverse, reverse_lazy
+from django.db.models import F
+from django.db.models import Q
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
+from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 from taggit.managers import TaggableManager
 
 from utils.database import CastToInteger
-from utils.models import (
-    CampRelatedModel,
-    CreatedUpdatedModel,
-    UUIDModel,
-    UUIDTaggedItem,
-)
+from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
+from utils.models import UUIDModel
+from utils.models import UUIDTaggedItem
 from utils.slugs import unique_slugify
 
-from .email import (
-    add_event_proposal_accepted_email,
-    add_event_proposal_rejected_email,
-    add_speaker_proposal_accepted_email,
-    add_speaker_proposal_rejected_email,
-)
+from .email import add_event_proposal_accepted_email
+from .email import add_event_proposal_rejected_email
+from .email import add_speaker_proposal_accepted_email
+from .email import add_speaker_proposal_rejected_email
 
-logger = logging.getLogger("bornhack.%s" % __name__)
+logger = logging.getLogger(f"bornhack.{__name__}")
 
 
-class UrlType(CreatedUpdatedModel):
-    """
-    Each Url object has a type.
-    """
+class UrlType(ExportModelOperationsMixin("url_type"), CreatedUpdatedModel):
+    """Each Url object has a type."""
 
     name = models.CharField(
-        max_length=25, help_text="The name of this type", unique=True
+        max_length=25,
+        help_text="The name of this type",
+        unique=True,
     )
 
     icon = models.CharField(
@@ -56,13 +59,12 @@ class UrlType(CreatedUpdatedModel):
     class Meta:
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
-class Url(CampRelatedModel):
-    """
-    This model contains URLs related to
+class Url(ExportModelOperationsMixin("url"), CampRelatedModel):
+    """This model contains URLs related to
     - SpeakerProposals
     - EventProposals
     - Speakers
@@ -77,7 +79,9 @@ class Url(CampRelatedModel):
     url = models.URLField(help_text="The actual URL")
 
     url_type = models.ForeignKey(
-        "program.UrlType", help_text="The type of this URL", on_delete=models.PROTECT
+        "program.UrlType",
+        help_text="The type of this URL",
+        on_delete=models.PROTECT,
     )
 
     speaker_proposal = models.ForeignKey(
@@ -85,7 +89,7 @@ class Url(CampRelatedModel):
         null=True,
         blank=True,
         help_text="The speaker proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -94,7 +98,7 @@ class Url(CampRelatedModel):
         null=True,
         blank=True,
         help_text="The event proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -103,7 +107,7 @@ class Url(CampRelatedModel):
         null=True,
         blank=True,
         help_text="The speaker proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
@@ -112,15 +116,15 @@ class Url(CampRelatedModel):
         null=True,
         blank=True,
         help_text="The event proposal object this URL belongs to",
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="urls",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.url
 
-    def clean_fk(self):
-        """Make sure we have exactly one FK"""
+    def clean_fk(self) -> None:
+        """Make sure we have exactly one FK."""
         fks = 0
         if self.speaker_proposal:
             fks += 1
@@ -132,29 +136,26 @@ class Url(CampRelatedModel):
             fks += 1
         if fks != 1:
             raise ValidationError(
-                f"Url objects must have exactly one FK, this has {fks}"
+                f"Url objects must have exactly one FK, this has {fks}",
             )
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """Just clean_fk() and super save()."""
         self.clean_fk()
         super().save(*args, **kwargs)
 
     @property
     def owner(self):
-        """
-        Return the object this Url belongs to
-        """
+        """Return the object this Url belongs to."""
         if self.speaker_proposal:
             return self.speaker_proposal
-        elif self.event_proposal:
+        if self.event_proposal:
             return self.event_proposal
-        elif self.speaker:
+        if self.speaker:
             return self.speaker
-        elif self.event:
+        if self.event:
             return self.event
-        else:
-            return None
+        return None
 
     @property
     def camp(self):
@@ -172,8 +173,7 @@ class Url(CampRelatedModel):
 
 
 class Availability(CampRelatedModel, UUIDModel):
-    """
-    This model contains all the availability info for speaker_proposals and
+    """This model contains all the availability info for speaker_proposals and
     speakers. It is inherited by SpeakerProposalAvailability and SpeakerAvailability
     models.
     """
@@ -192,11 +192,14 @@ class Availability(CampRelatedModel, UUIDModel):
     )
 
 
-class SpeakerProposalAvailability(Availability):
-    """Availability info for SpeakerProposal objects"""
+class SpeakerProposalAvailability(
+    ExportModelOperationsMixin("speaker_proposal_availability"),
+    Availability,
+):
+    """Availability info for SpeakerProposal objects."""
 
     class Meta:
-        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability"""
+        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability."""
 
         constraints = [
             # we do not want overlapping ranges
@@ -233,25 +236,28 @@ class SpeakerProposalAvailability(Availability):
 
     camp_filter = "speaker_proposal__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         if SpeakerProposalAvailability.objects.filter(
             speaker_proposal=self.speaker_proposal,
             when__adjacent_to=self.when,
             available=self.available,
         ).exists():
             raise ValidationError(
-                f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}"
+                f"An adjacent SpeakerProposalAvailability object for this SpeakerProposal already exists with the same value for available, cannot save() {self.when}",
             )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"SpeakerProposalAvailability: {self.speaker_proposal.name} is {'not ' if not self.available else ''}available from {self.when.lower} to {self.when.upper}"
 
 
-class SpeakerAvailability(Availability):
-    """Availability info for Speaker objects"""
+class SpeakerAvailability(
+    ExportModelOperationsMixin("speaker_availability"),
+    Availability,
+):
+    """Availability info for Speaker objects."""
 
     class Meta:
-        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability"""
+        """Add ExclusionConstraints preventing overlaps and adjacent ranges with same availability."""
 
         constraints = [
             # we do not want overlapping ranges
@@ -288,7 +294,7 @@ class SpeakerAvailability(Availability):
 
     camp_filter = "speaker__camp"
 
-    def clean(self):
+    def clean(self) -> None:
         # this should be an ExclusionConstraint but the boolean condition isn't conditioning :/
         if SpeakerAvailability.objects.filter(
             speaker=self.speaker,
@@ -296,7 +302,7 @@ class SpeakerAvailability(Availability):
             available=self.available,
         ).exists():
             raise ValidationError(
-                "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()"
+                "An adjacent SpeakerAvailability object for this Speaker already exists with the same value for available, cannot save()",
             )
 
 
@@ -304,8 +310,7 @@ class SpeakerAvailability(Availability):
 
 
 class UserSubmittedModel(CampRelatedModel):
-    """
-    An abstract model containing the stuff that is shared
+    """An abstract model containing the stuff that is shared
     between the SpeakerProposal and EventProposal models.
     """
 
@@ -329,7 +334,9 @@ class UserSubmittedModel(CampRelatedModel):
     ]
 
     proposal_status = models.CharField(
-        max_length=50, choices=PROPOSAL_STATUS_CHOICES, default=PROPOSAL_PENDING
+        max_length=50,
+        choices=PROPOSAL_STATUS_CHOICES,
+        default=PROPOSAL_PENDING,
     )
 
     reason = models.TextField(
@@ -337,14 +344,10 @@ class UserSubmittedModel(CampRelatedModel):
         help_text="The reason this proposal was accepted or rejected. This text will be included in the email to the submitter. Leave blank to send a standard email.",
     )
 
-    def __str__(self):
-        return "%s (submitted by: %s, status: %s)" % (
-            self.headline,
-            self.user,
-            self.proposal_status,
-        )
+    def __str__(self) -> str:
+        return f"{self.headline} (submitted by: {self.user}, status: {self.proposal_status})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.camp.call_for_participation_open:
             message = "Call for participation is not open"
             if hasattr(self, "request"):
@@ -352,7 +355,7 @@ class UserSubmittedModel(CampRelatedModel):
             raise ValidationError(message)
         super().save(**kwargs)
 
-    def delete(self, **kwargs):
+    def delete(self, **kwargs) -> None:
         if not self.camp.call_for_participation_open:
             message = "Call for participation is not open"
             if hasattr(self, "request"):
@@ -361,8 +364,11 @@ class UserSubmittedModel(CampRelatedModel):
         super().delete(**kwargs)
 
 
-class SpeakerProposal(UserSubmittedModel):
-    """A speaker proposal"""
+class SpeakerProposal(
+    ExportModelOperationsMixin("speaker_proposal"),
+    UserSubmittedModel,
+):
+    """A speaker proposal."""
 
     camp = models.ForeignKey(
         "camps.Camp",
@@ -372,7 +378,8 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     name = models.CharField(
-        max_length=150, help_text="Name or alias of the speaker/artist/host"
+        max_length=150,
+        help_text="Name or alias of the speaker/artist/host",
     )
 
     email = models.EmailField(
@@ -382,7 +389,7 @@ class SpeakerProposal(UserSubmittedModel):
     )
 
     biography = models.TextField(
-        help_text="Biography of the speaker/artist/host. Markdown is supported."
+        help_text="Biography of the speaker/artist/host. Markdown is supported.",
     )
 
     submission_notes = models.TextField(
@@ -412,8 +419,8 @@ class SpeakerProposal(UserSubmittedModel):
             kwargs={"camp_slug": self.camp.slug, "pk": self.uuid},
         )
 
-    def mark_as_approved(self, request=None):
-        """Marks a SpeakerProposal as approved, including creating/updating the related Speaker object"""
+    def mark_as_approved(self, request=None) -> None:
+        """Marks a SpeakerProposal as approved, including creating/updating the related Speaker object."""
         speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
         # create a Speaker if we don't have one
         if not hasattr(self, "speaker"):
@@ -457,39 +464,40 @@ class SpeakerProposal(UserSubmittedModel):
         # a message to the admin (if we have a request)
         if request:
             messages.success(
-                request, "Speaker object %s has been created/updated" % speaker
+                request,
+                f"Speaker object {speaker} has been created/updated",
             )
         add_speaker_proposal_accepted_email(self)
 
-    def mark_as_rejected(self, request=None):
+    def mark_as_rejected(self, request=None) -> None:
         speaker_proposalmodel = apps.get_model("program", "SpeakerProposal")
         self.proposal_status = speaker_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
             messages.success(
-                request, "SpeakerProposal %s has been rejected" % self.name
+                request,
+                f"SpeakerProposal {self.name} has been rejected",
             )
         add_speaker_proposal_rejected_email(self)
 
     @property
     def event_types(self):
-        """Return a queryset of the EventType objects for the EventProposals"""
+        """Return a queryset of the EventType objects for the EventProposals."""
         return EventType.objects.filter(
-            id__in=self.event_proposals.all().values_list("event_type", flat=True)
+            id__in=self.event_proposals.all().values_list("event_type", flat=True),
         )
 
     @property
     def title(self):
-        """Convenience method to return the proper host_title"""
+        """Convenience method to return the proper host_title."""
         if self.event_proposals.values_list("event_type").distinct().count() != 1:
             # we have no events, or events of different eventtypes, use generic title
             return "Person"
-        else:
-            return self.event_proposals.first().event_type.host_title
+        return self.event_proposals.first().event_type.host_title
 
 
-class EventProposal(UserSubmittedModel):
-    """An event proposal"""
+class EventProposal(ExportModelOperationsMixin("event_proposal"), UserSubmittedModel):
+    """An event proposal."""
 
     track = models.ForeignKey(
         "program.EventTrack",
@@ -505,7 +513,6 @@ class EventProposal(UserSubmittedModel):
 
     abstract = models.TextField(
         help_text="The abstract for this event. Describe what the audience can expect to see/hear.",
-        blank=True,
     )
 
     event_type = models.ForeignKey(
@@ -527,6 +534,11 @@ class EventProposal(UserSubmittedModel):
         help_text="Recordings are made available under the <b>CC BY-SA 4.0</b> license. Uncheck if you do not want the event recorded, or if you cannot accept the license.",
     )
 
+    allow_video_streaming = models.BooleanField(
+        default=False,
+        help_text="Uncheck if you do not want the event live streamed.",
+    )
+
     duration = models.IntegerField(
         blank=True,
         help_text="How much time (in minutes) should we set aside for this event?",
@@ -538,7 +550,8 @@ class EventProposal(UserSubmittedModel):
     )
 
     use_provided_speaker_laptop = models.BooleanField(
-        help_text="Will you be using the provided speaker laptop?", default=True
+        help_text="Will you be using the provided speaker laptop?",
+        default=True,
     )
 
     tags = TaggableManager(
@@ -556,7 +569,7 @@ class EventProposal(UserSubmittedModel):
     def headline(self):
         return self.title
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.duration:
             self.duration = self.event_type.event_duration_minutes
         super().save(**kwargs)
@@ -568,28 +581,26 @@ class EventProposal(UserSubmittedModel):
         )
 
     def get_available_speaker_proposals(self):
-        """
-        Return all SpeakerProposals submitted by the user who submitted this EventProposal,
-        which are not already added to this EventProposal
+        """Return all SpeakerProposals submitted by the user who submitted this EventProposal,
+        which are not already added to this EventProposal.
         """
         return SpeakerProposal.objects.filter(
-            camp=self.track.camp, user=self.user
+            camp=self.track.camp,
+            user=self.user,
         ).exclude(uuid__in=self.speakers.all().values_list("uuid"))
 
-    def mark_as_approved(self, request=None):
+    def mark_as_approved(self, request=None) -> None:
         eventmodel = apps.get_model("program", "Event")
         event_proposalmodel = apps.get_model("program", "EventProposal")
         # use existing event if we have one
-        if not hasattr(self, "event"):
-            event = eventmodel()
-        else:
-            event = self.event
+        event = eventmodel() if not hasattr(self, "event") else self.event
         event.track = self.track
         event.title = self.title
         event.abstract = self.abstract
         event.event_type = self.event_type
         event.proposal = self
         event.video_recording = self.allow_video_recording
+        event.video_streaming = self.allow_video_streaming
         event.save()
         # loop through the speaker_proposals linked to this event_proposal and associate any related speaker objects with this event
         for sp in self.speakers.all():
@@ -610,31 +621,29 @@ class EventProposal(UserSubmittedModel):
 
         if request:
             messages.success(
-                request, "Event object %s has been created/updated" % event
+                request,
+                f"Event object {event} has been created/updated",
             )
         add_event_proposal_accepted_email(self)
 
-    def mark_as_rejected(self, request=None):
+    def mark_as_rejected(self, request=None) -> None:
         event_proposalmodel = apps.get_model("program", "EventProposal")
         self.proposal_status = event_proposalmodel.PROPOSAL_REJECTED
         self.save()
         if request:
-            messages.success(request, "EventProposal %s has been rejected" % self.title)
+            messages.success(request, f"EventProposal {self.title} has been rejected")
         add_event_proposal_rejected_email(self)
 
     @property
-    def can_be_approved(self):
-        """We cannot approve an EventProposal until all SpeakerProposals are approved"""
-        if self.speakers.exclude(proposal_status="approved").exists():
-            return False
-        else:
-            return True
+    def can_be_approved(self) -> bool:
+        """We cannot approve an EventProposal until all SpeakerProposals are approved."""
+        return not self.speakers.exclude(proposal_status="approved").exists()
 
 
 ###############################################################################
 
 
-class EventTrack(CampRelatedModel):
+class EventTrack(ExportModelOperationsMixin("event_track"), CampRelatedModel):
     """All events belong to a track. Administration of a track can be delegated to one or more users."""
 
     name = models.CharField(max_length=100, help_text="The name of this Track")
@@ -655,7 +664,7 @@ class EventTrack(CampRelatedModel):
         help_text="If this track is managed by someone other than the Content team pick the users here.",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.camp.title})"
 
     class Meta:
@@ -665,8 +674,8 @@ class EventTrack(CampRelatedModel):
         return {"name": self.name, "slug": self.slug}
 
 
-class EventLocation(CampRelatedModel):
-    """The places where stuff happens"""
+class EventLocation(ExportModelOperationsMixin("event_location"), CampRelatedModel):
+    """The places where stuff happens."""
 
     name = models.CharField(max_length=100)
 
@@ -678,7 +687,9 @@ class EventLocation(CampRelatedModel):
     )
 
     camp = models.ForeignKey(
-        "camps.Camp", related_name="event_locations", on_delete=models.PROTECT
+        "camps.Camp",
+        related_name="event_locations",
+        on_delete=models.PROTECT,
     )
 
     capacity = models.PositiveIntegerField(
@@ -692,19 +703,20 @@ class EventLocation(CampRelatedModel):
         help_text="Select the locations which this location conflicts with. Nothing can be scheduled in a location if a conflicting location has a scheduled Event at the same time. Example: If one room can be split into two, then the big room would conflict with each of the two small rooms (but the small rooms would not conflict with eachother).",
     )
 
-    def __str__(self):
-        return "{} ({})".format(self.name, self.camp)
+    def __str__(self) -> str:
+        return f"{self.name} ({self.camp})"
 
     class Meta:
         unique_together = (("camp", "slug"), ("camp", "name"))
 
-    def save(self, **kwargs):
-        """Create a slug"""
+    def save(self, **kwargs) -> None:
+        """Create a slug."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
                 self.__class__.objects.filter(camp=self.camp).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -714,18 +726,19 @@ class EventLocation(CampRelatedModel):
 
     @property
     def icon_html(self):
-        return mark_safe(f'<i class="fas fa-{ self.icon } fa-fw"></i>')
+        return mark_safe(f'<i class="fas fa-{self.icon} fa-fw"></i>')
 
     @property
     def event_slots(self):
         return self.camp.event_slots.filter(event_session__event_location=self)
 
     def scheduled_event_slots(self):
-        """Returns a QuerySet of all EventSlots scheduled in this EventLocation"""
+        """Returns a QuerySet of all EventSlots scheduled in this EventLocation."""
         return self.event_slots.filter(event__isnull=False)
 
-    def is_available(self, when, ignore_event_slot_ids=[]):
-        """A location is available if nothing is scheduled in it at that time"""
+    def is_available(self, when, ignore_event_slot_ids=None) -> bool:
+        """A location is available if nothing is scheduled in it at that time."""
+        ignore_event_slot_ids = ignore_event_slot_ids or []
         if (
             self.event_slots.filter(event__isnull=False, when__overlap=when)
             .exclude(pk__in=ignore_event_slot_ids)
@@ -737,11 +750,13 @@ class EventLocation(CampRelatedModel):
         return True
 
 
-class EventType(CreatedUpdatedModel):
+class EventType(ExportModelOperationsMixin("event_type"), CreatedUpdatedModel):
     """Every event needs to have a type."""
 
     name = models.CharField(
-        max_length=100, unique=True, help_text="The name of this event type"
+        max_length=100,
+        unique=True,
+        help_text="The name of this event type",
     )
 
     slug = models.SlugField()
@@ -753,11 +768,13 @@ class EventType(CreatedUpdatedModel):
     )
 
     color = models.CharField(
-        max_length=50, help_text="The background color of this event type"
+        max_length=50,
+        help_text="The background color of this event type",
     )
 
     light_text = models.BooleanField(
-        default=False, help_text="Check if this event type should use white text color"
+        default=False,
+        help_text="Check if this event type should use white text color",
     )
 
     icon = models.CharField(
@@ -767,15 +784,18 @@ class EventType(CreatedUpdatedModel):
     )
 
     notifications = models.BooleanField(
-        default=False, help_text="Check to send notifications for this event type"
+        default=False,
+        help_text="Check to send notifications for this event type",
     )
 
     public = models.BooleanField(
-        default=False, help_text="Check to permit users to submit events of this type"
+        default=False,
+        help_text="Check to permit users to submit events of this type",
     )
 
     include_in_event_list = models.BooleanField(
-        default=True, help_text="Include events of this type in the event list?"
+        default=True,
+        help_text="Include events of this type in the event list?",
     )
 
     host_title = models.CharField(
@@ -800,7 +820,12 @@ class EventType(CreatedUpdatedModel):
         help_text="True if Events of this type should be selectable in the EventConflict m2m for SpeakerProposal and Speaker objects.",
     )
 
-    def __str__(self):
+    order = models.IntegerField(
+        default=0,
+        help_text="Order for showing the event type in a list",
+    )
+
+    def __str__(self) -> str:
         return self.name
 
     def serialize(self):
@@ -811,26 +836,28 @@ class EventType(CreatedUpdatedModel):
             "light_text": self.light_text,
         }
 
-    def clean(self):
+    def clean(self) -> None:
         if self.support_autoscheduling and not self.event_duration_minutes:
             raise ValidationError(
-                "You must specify event_duration_minutes to support autoscheduling"
+                "You must specify event_duration_minutes to support autoscheduling",
             )
 
     @property
     def duration(self):
-        """Just return a timedelta of the lenght of this Session"""
+        """Just return a timedelta of the lenght of this Session."""
         return timedelta(minutes=self.event_duration_minutes)
 
     def icon_html(self):
         return mark_safe(
-            f'<i class="fas fa-{ self.icon } fa-fw" style="color: { self.color };"></i>'
+            f'<i class="fas fa-{self.icon} fa-fw" style="color: {self.color};"></i>',
         )
 
+    class Meta:
+        ordering = ["order"]
 
-class EventSession(CampRelatedModel):
-    """
-    An EventSession define the "opening hours" for an EventType in an EventLocation.
+
+class EventSession(ExportModelOperationsMixin("event_session"), CampRelatedModel):
+    """An EventSession define the "opening hours" for an EventType in an EventLocation.
 
     Creating an EventSession also creates the related EventSlots. Updating an EventSesion
     adds or removes EventSlots as needed.
@@ -889,7 +916,7 @@ class EventSession(CampRelatedModel):
     )
 
     when = DateTimeRangeField(
-        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>"
+        help_text="A period of time where this type of event can be scheduled. Input format is <i>YYYY-MM-DD HH:MM</i>",
     )
 
     event_duration_minutes = models.PositiveIntegerField(
@@ -902,29 +929,28 @@ class EventSession(CampRelatedModel):
         help_text="Description of this session (optional).",
     )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"EventSession for {self.event_type} in {self.event_location.name}: {self.when}"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.event_duration_minutes:
             self.event_duration_minutes = self.event_type.event_duration_minutes
         super().save(**kwargs)
 
     @property
     def duration(self):
-        """Just return a timedelta of the lenght of this Session"""
+        """Just return a timedelta of the lenght of this Session."""
         return self.when.upper - self.when.lower
 
     @property
     def free_time(self):
         """Returns a timedelta of the free time in this Session."""
         return self.duration - timedelta(
-            minutes=self.event_duration_minutes * self.get_unavailable_slots().count()
+            minutes=self.event_duration_minutes * self.get_unavailable_slots().count(),
         )
 
     def get_available_slots(self, count_autoscheduled_as_free=False, bounds="()"):
-        """
-        Return a queryset of slots that have nothing scheduled, remember to consider
+        """Return a queryset of slots that have nothing scheduled, remember to consider
         conflicting locations too.
         """
         # do we want to count slots with autoscheduled Events as free or not?
@@ -962,7 +988,7 @@ class EventSession(CampRelatedModel):
         return self.event_slots.filter(availablefilter).exclude(excludefilter)
 
     def get_unavailable_slots(self, count_autoscheduled_as_free=False, bounds="[)"):
-        """Return a list of slots that are not available for some reason"""
+        """Return a list of slots that are not available for some reason."""
         return self.event_slots.exclude(
             id__in=self.get_available_slots(
                 count_autoscheduled_as_free=count_autoscheduled_as_free,
@@ -971,7 +997,7 @@ class EventSession(CampRelatedModel):
         )
 
     def get_slot_times(self, bounds="[)"):
-        """Return a list of the DateTimeTZRanges we want EventSlots to exists for"""
+        """Return a list of the DateTimeTZRanges we want EventSlots to exists for."""
         slots = []
         period = self.when
         duration = timedelta(minutes=self.event_duration_minutes)
@@ -993,8 +1019,8 @@ class EventSession(CampRelatedModel):
             slots.append(slot)
         return slots
 
-    def fixup_event_slots(self):
-        """This method takes care of creating and deleting EventSlots when the EventSession is created, updated or deleted"""
+    def fixup_event_slots(self) -> None:
+        """This method takes care of creating and deleting EventSlots when the EventSession is created, updated or deleted."""
         # get a set of DateTimeTZRange objects representing the EventSlots we need
         needed_slot_times = set(self.get_slot_times(bounds="[)"))
 
@@ -1013,9 +1039,8 @@ class EventSession(CampRelatedModel):
         return self.event_slots.filter(event__isnull=False)
 
 
-class EventSlot(CampRelatedModel):
-    """
-    An EventSlot defines a window where we can schedule an Event.
+class EventSlot(ExportModelOperationsMixin("event_slot"), CampRelatedModel):
+    """An EventSlot defines a window where we can schedule an Event.
 
     The EventType and EventLocation is defined by the EventSession this
     EventSlot belongs to. EventSlots are created and deleted by a post_save
@@ -1071,34 +1096,34 @@ class EventSlot(CampRelatedModel):
 
     camp_filter = "event_session__camp"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.when} ({self.event_session.event_location.name}, {self.event_session.event_type})"
 
-    def clean(self):
-        """Validate EventSlot length, time, and autoscheduled status"""
+    def clean(self) -> None:
+        """Validate EventSlot length, time, and autoscheduled status."""
         if self.when.upper - self.when.lower != timedelta(
-            minutes=self.event_session.event_duration_minutes
+            minutes=self.event_session.event_duration_minutes,
         ):
             raise ValidationError(
-                f"This EventSlot has the wrong length. It must be {self.event_session.event_duration_minutes} minutes long."
+                f"This EventSlot has the wrong length. It must be {self.event_session.event_duration_minutes} minutes long.",
             )
 
         # remember to use "[)" bounds when comparing
         if self.when not in self.event_session.get_slot_times(bounds="[)"):
             raise ValidationError(
-                "This EventSlot is not inside this EventSession, or it might be misaligned"
+                "This EventSlot is not inside this EventSession, or it might be misaligned",
             )
 
         # if we have an Event we want to know if it was autoscheduled or not
         if self.event and self.autoscheduled is None:
             raise ValidationError(
-                "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None"
+                "An EventSlot with a scheduled Event must have autoscheduled set to either True or False, not None",
             )
         self.clean_speakers()
         self.clean_location()
 
     def get_autoscheduler_slot(self):
-        """Return a conference_scheduler.resources.Slot object matching this EventSlot"""
+        """Return a conference_scheduler.resources.Slot object matching this EventSlot."""
         return resources.Slot(
             venue=self.event_session.event_location.id,
             starts_at=self.when.lower,
@@ -1115,40 +1140,40 @@ class EventSlot(CampRelatedModel):
     def event_location(self):
         return self.event_session.event_location
 
-    def clean_speakers(self):
-        """Check if all speakers are available"""
+    def clean_speakers(self) -> None:
+        """Check if all speakers are available."""
         if self.event:
             for speaker in self.event.speakers.all():
                 if not speaker.is_available(
-                    when=self.when, ignore_event_slot_ids=[self.pk]
+                    when=self.when,
+                    ignore_event_slot_ids=[self.pk],
                 ):
                     raise ValidationError(
-                        f"The speaker {speaker} is not available at this time"
+                        f"The speaker {speaker} is not available at this time",
                     )
 
-    def clean_location(self):
-        """Make sure the location is available"""
-        if self.event:
-            if not self.event_location.is_available(
-                when=self.when, ignore_event_slot_ids=[self.pk]
-            ):
-                raise ValidationError(
-                    f"The location {self.event_location} is not available at this time"
-                )
+    def clean_location(self) -> None:
+        """Make sure the location is available."""
+        if self.event and not self.event_location.is_available(
+            when=self.when,
+            ignore_event_slot_ids=[self.pk],
+        ):
+            raise ValidationError(
+                f"The location {self.event_location} is not available at this time",
+            )
 
-    def unschedule(self):
-        """Clear the Event FK and autoscheduled status, removing the Event from the schedule"""
+    def unschedule(self) -> None:
+        """Clear the Event FK and autoscheduled status, removing the Event from the schedule."""
         self.event = None
         self.autoscheduled = None
         self.save()
 
     @property
     def overflow(self):
-        """If we have more demand than capacity return the overflow"""
+        """If we have more demand than capacity return the overflow."""
         if self.event and self.event.demand > self.event_location.capacity:
             return (self.event_location.capacity - self.event.demand) * -1
-        else:
-            return 0
+        return 0
 
     @property
     def duration(self):
@@ -1163,20 +1188,32 @@ class EventSlot(CampRelatedModel):
             return False
         ievent = icalendar.Event()
         ievent["summary"] = self.event.title
-        ievent["description"] = self.event.abstract
+        domain = Site.objects.get_current().domain
+        speakers = ", ".join(self.event.speakers.all().values_list("name", flat=True))
+        recorded = "Yes" if self.event.video_recording else "No"
+        streamed = "Yes" if self.event.video_streaming else "No"
+        ievent["description"] = (
+            f"URL: https://{domain}{self.event.get_absolute_url()}\n\n"
+            f"Speaker(s): {speakers}\n\n"
+            f"Recorded: {recorded}\n\n"
+            f"Streamed: {streamed}\n\n"
+            f"{self.event.abstract}"
+        )
         ievent["dtstart"] = icalendar.vDatetime(self.when.lower).to_ical()
         ievent["dtend"] = icalendar.vDatetime(
-            self.when.lower + self.event.duration
+            self.when.lower + self.event.duration,
         ).to_ical()
         ievent["dtstamp"] = icalendar.vDatetime(timezone.now()).to_ical()
         ievent["uid"] = self.uuid
         ievent["location"] = icalendar.vText(self.event_location.name)
         return ievent
 
+    def get_absolute_url(self):
+        return reverse("program:event_detail", kwargs={"event_slug": self.slug})
+
     @property
     def uuid(self):
-        """
-        Returns a consistent UUID for this EventSlot with this Event (if any).
+        """Returns a consistent UUID for this EventSlot with this Event (if any).
 
         We want the UUID to be the same even if this EventSlot is deleted and replaced by
         another at the same start time and location, so it cannot be a regular UUIDField.
@@ -1187,7 +1224,6 @@ class EventSlot(CampRelatedModel):
         the event id, and the location id, and the rest is padded with the event uuid as needed.
 
         Examples:
-
             # timestamp=1472374800 location_id=1 event_id=27 event_uuid=748316fa-78a5-4172-850b-341fc41ba2ba
             In [1]: EventSlot.objects.filter(event__isnull=False).first().uuid
             Out[1]: UUID('14723748-0012-7748-316f-a78a54172850')
@@ -1214,10 +1250,10 @@ class EventSlot(CampRelatedModel):
         uuidbase = f"{start_timestamp}{location_id}{event_id}"
 
         # pad using event_uuid up to 32 hex chars and return
-        return uuid.UUID(f"{uuidbase}{event_uuid[0:32-len(uuidbase)]}")
+        return uuid.UUID(f"{uuidbase}{event_uuid[0 : 32 - len(uuidbase)]}")
 
 
-class Event(CampRelatedModel):
+class Event(ExportModelOperationsMixin("event"), CampRelatedModel):
     """Something that is on the program one or more times."""
 
     uuid = models.UUIDField(
@@ -1251,12 +1287,14 @@ class Event(CampRelatedModel):
         on_delete=models.PROTECT,
     )
 
-    video_url = models.URLField(
-        max_length=1000, null=True, blank=True, help_text="URL to the recording"
+    video_recording = models.BooleanField(
+        default=True,
+        help_text="Do we intend to record video of this event?",
     )
 
-    video_recording = models.BooleanField(
-        default=True, help_text="Do we intend to record video of this event?"
+    video_streaming = models.BooleanField(
+        default=True,
+        help_text="Do we intend to stream video of this event?",
     )
 
     proposal = models.OneToOneField(
@@ -1285,16 +1323,16 @@ class Event(CampRelatedModel):
         ordering = ["title"]
         unique_together = (("track", "slug"), ("track", "title"))
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.title
 
-    def save(self, **kwargs):
-        """Create a slug and get duration"""
+    def save(self, **kwargs) -> None:
+        """Create a slug and get duration."""
         if not self.slug:
             self.slug = unique_slugify(
                 self.title,
                 slugs_in_use=self.__class__.objects.filter(
-                    track__camp=self.track.camp
+                    track__camp=self.track.camp,
                 ).values_list("slug", flat=True),
             )
         if not self.duration_minutes:
@@ -1329,13 +1367,14 @@ class Event(CampRelatedModel):
             "event_type": self.event_type.name,
         }
 
-        if self.video_url:
-            video_state = "has-recording"
-            data["video_url"] = self.video_url
+        if self.video_recording and self.video_streaming:
+            video_state = "to-be-streamed-to-be-recorded"
         elif self.video_recording:
-            video_state = "to-be-recorded"
-        elif not self.video_recording:
-            video_state = "not-to-be-recorded"
+            video_state = "to-be-recorded-not-to-be-streamed"
+        elif self.video_streaming:
+            video_state = "to-be-streamed-not-to-be-recorded"
+        else:
+            video_state = "not-to-be-recorded-not-to-be-streamed"
 
         data["video_state"] = video_state
 
@@ -1346,8 +1385,8 @@ class Event(CampRelatedModel):
         return timedelta(minutes=self.duration_minutes)
 
 
-class EventInstance(CampRelatedModel):
-    """The old way of scheduling events. Model to be deleted after prod data migration"""
+class EventInstance(ExportModelOperationsMixin("event_instance"), CampRelatedModel):
+    """The old way of scheduling events. Model to be deleted after prod data migration."""
 
     uuid = models.UUIDField(
         default=uuid.uuid4,
@@ -1357,7 +1396,9 @@ class EventInstance(CampRelatedModel):
     )
 
     event = models.ForeignKey(
-        "program.event", related_name="instances", on_delete=models.PROTECT
+        "program.event",
+        related_name="instances",
+        on_delete=models.PROTECT,
     )
 
     when = DateTimeRangeField(null=True, blank=True)
@@ -1390,21 +1431,22 @@ class EventInstance(CampRelatedModel):
             ),
         ]
 
-    def __str__(self):
-        return "%s (%s)" % (self.event, self.when)
+    def __str__(self) -> str:
+        return f"{self.event} ({self.when})"
 
-    def clean_speakers(self):
-        """Check if all speakers are available"""
+    def clean_speakers(self) -> None:
+        """Check if all speakers are available."""
         for speaker in self.event.speakers.all():
             if not speaker.is_available(
-                when=self.event_slot.when, ignore_eventinstances=[self.pk]
+                when=self.event_slot.when,
+                ignore_eventinstances=[self.pk],
             ):
                 raise ValidationError(
-                    f"The speaker {speaker} is not available at this time"
+                    f"The speaker {speaker} is not available at this time",
                 )
 
-    def save(self, *args, clean_speakers=True, **kwargs):
-        """Validate speakers (unless we are asked not to)"""
+    def save(self, *args, clean_speakers=True, **kwargs) -> None:
+        """Validate speakers (unless we are asked not to)."""
         if "commit" not in kwargs or kwargs["commit"]:
             # we are saving for real
             if clean_speakers:
@@ -1419,20 +1461,17 @@ class EventInstance(CampRelatedModel):
 
     @property
     def schedule_date(self):
-        """
-        Returns the schedule date of this eventinstance. Schedule date is determined by substracting
+        """Returns the schedule date of this eventinstance. Schedule date is determined by substracting
         settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS from the eventinstance start time. This means that if
         an event is scheduled for 00:30 wednesday evening (technically thursday) then the date
         after substracting 5 hours would be wednesdays date, not thursdays
-        (given settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS=5)
+        (given settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS=5).
         """
-        return (
-            self.when.lower - timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)
-        ).date()
+        return (self.when.lower - timedelta(hours=settings.SCHEDULE_MIDNIGHT_OFFSET_HOURS)).date()
 
     @property
     def timeslots(self):
-        """Find the number of timeslots this eventinstance takes up"""
+        """Find the number of timeslots this eventinstance takes up."""
         seconds = (self.when.upper - self.when.lower).seconds
         minutes = seconds / 60
         return minutes / settings.SCHEDULE_TIMESLOT_LENGTH_MINUTES
@@ -1464,13 +1503,14 @@ class EventInstance(CampRelatedModel):
             "timeslots": self.timeslots,
         }
 
-        if self.event.video_url:
-            video_state = "has-recording"
-            data["video_url"] = self.event.video_url
+        if self.event.video_recording and self.event.video_streaming:
+            video_state = "to-be-recorded-to-be-streamed"
         elif self.event.video_recording:
-            video_state = "to-be-recorded"
-        elif not self.event.video_recording:
-            video_state = "not-to-be-recorded"
+            video_state = "to-be-recorded-not-to-be-streamed"
+        elif self.event.video_streaming:
+            video_state = "to-be-streamed-not-to-be-recorded"
+        else:
+            video_state = "not-to-be-recorded-not-to-be-streamed"
 
         data["video_state"] = video_state
 
@@ -1482,18 +1522,17 @@ class EventInstance(CampRelatedModel):
 
     @property
     def duration(self):
-        """Return a timedelta of the lenght of this EventInstance"""
+        """Return a timedelta of the lenght of this EventInstance."""
         return self.when.upper - self.when.lower
 
     @property
     def overflow(self):
         if self.event.demand > self.location.capacity:
             return (self.location.capacity - self.event.demand) * -1
-        else:
-            return 0
+        return 0
 
 
-class Speaker(CampRelatedModel):
+class Speaker(ExportModelOperationsMixin("speaker"), CampRelatedModel):
     """A Person (co)anchoring one or more events on a camp."""
 
     name = models.CharField(max_length=150, help_text="Name or alias of the speaker")
@@ -1546,17 +1585,18 @@ class Speaker(CampRelatedModel):
 
     class Meta:
         ordering = ["name"]
-        unique_together = (("camp", "name"), ("camp", "slug"))
+        unique_together = ("camp", "slug")
 
-    def __str__(self):
-        return "%s (%s)" % (self.name, self.camp)
+    def __str__(self) -> str:
+        return f"{self.name} ({self.camp})"
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> None:
         if not self.slug:
             self.slug = unique_slugify(
                 self.name,
                 slugs_in_use=self.__class__.objects.filter(camp=self.camp).values_list(
-                    "slug", flat=True
+                    "slug",
+                    flat=True,
                 ),
             )
         super().save(**kwargs)
@@ -1568,13 +1608,14 @@ class Speaker(CampRelatedModel):
         )
 
     def serialize(self):
-        data = {"name": self.name, "slug": self.slug, "biography": self.biography}
-        return data
+        return {"name": self.name, "slug": self.slug, "biography": self.biography}
 
-    def is_available(self, when, ignore_event_slot_ids=[]):
+    def is_available(self, when, ignore_event_slot_ids=None) -> bool:
         """A speaker is available if the person has positive availability for the period and
         if the speaker is not in another event at the time, or if the person has not submitted
-        any availability at all"""
+        any availability at all.
+        """
+        ignore_event_slot_ids = ignore_event_slot_ids or []
         if not self.availabilities.exists():
             # we have no availability at all for this speaker, assume they are available
             return True
@@ -1598,25 +1639,27 @@ class Speaker(CampRelatedModel):
         return True
 
     def scheduled_event_slots(self):
-        """Returns a QuerySet of all EventSlots scheduled for this speaker"""
+        """Returns a QuerySet of all EventSlots scheduled for this speaker."""
         return self.camp.event_slots.filter(event__speakers=self)
 
     @property
     def title(self):
-        """Convenience method to return the proper host_title"""
+        """Convenience method to return the proper host_title."""
         if self.events.values_list("event_type").distinct().count() > 1:
             # we have different eventtypes, use generic title
             return "Person"
-        else:
-            return self.events.first().event_type.host_title
+        return self.events.first().event_type.host_title
 
 
-class Favorite(models.Model):
+class Favorite(ExportModelOperationsMixin("favorite"), models.Model):
     user = models.ForeignKey(
-        "auth.User", related_name="favorites", on_delete=models.PROTECT
+        "auth.User",
+        related_name="favorites",
+        on_delete=models.PROTECT,
     )
     event_instance = models.ForeignKey(
-        "program.EventInstance", on_delete=models.PROTECT
+        "program.EventInstance",
+        on_delete=models.PROTECT,
     )
 
     class Meta:
@@ -1626,10 +1669,13 @@ class Favorite(models.Model):
 ###############################################################################
 
 
-class EventFeedback(CampRelatedModel, UUIDModel):
-    """
-    This model contains all feedback for Events
-    Each user can submit exactly one feedback per Event
+class EventFeedback(
+    ExportModelOperationsMixin("event_feedback"),
+    CampRelatedModel,
+    UUIDModel,
+):
+    """This model contains all feedback for Events
+    Each user can submit exactly one feedback per Event.
     """
 
     class Meta:
@@ -1660,7 +1706,7 @@ class EventFeedback(CampRelatedModel, UUIDModel):
         help_text="Would you attend another event with the same speaker?",
     )
 
-    RATING_CHOICES = [(n, f"{n}") for n in range(0, 6)]
+    RATING_CHOICES = [(n, f"{n}") for n in range(6)]
 
     rating = models.IntegerField(
         choices=RATING_CHOICES,
@@ -1692,28 +1738,24 @@ class EventFeedback(CampRelatedModel, UUIDModel):
 
 
 class CustomUrlStorage(FileSystemStorage):
-    """
-    Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
-    """
-
-
-def get_speaker_picture_upload_path():
-    """
-    Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+    """Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point.
     """
 
 
-def get_speakerproposal_picture_upload_path():
-    """
-    Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+def get_speaker_picture_upload_path() -> None:
+    """Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point.
     """
 
 
-def get_speakersubmission_picture_upload_path():
+def get_speakerproposal_picture_upload_path() -> None:
+    """Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point.
     """
-    Must exist because it is mentioned in old migrations.
-    Can be removed when we clean up old migrations at some point
+
+
+def get_speakersubmission_picture_upload_path() -> None:
+    """Must exist because it is mentioned in old migrations.
+    Can be removed when we clean up old migrations at some point.
     """

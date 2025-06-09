@@ -1,5 +1,5 @@
 {% load static %}
-{% load bootstrap3 %}
+{% load django_bootstrap5 %}
 {% load menubutton %}
 {% static "" as baseurl %}
 
@@ -12,142 +12,213 @@
 
     <title>{% block title %}BornHack{% endblock %}</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    {# Load Bootstrap CSS and JavaScript #}
+    <link href="{% static "css/bootstrap-v5.3.5.bornhackcustom.css" %}" rel="stylesheet" integrity="sha384-4PrNBKfRkYUZZt9AKlV28Xq6eIQMcESxewdNyNvdG+dF1I/VjRKfvzWXwcNLEran">
+    <link href="{% static "css/theme-system-dark.css" %}" rel="stylesheet">
+    <link href="{% static "css/theme-slate.css" %}" rel="stylesheet">
+    <link href="{% static "css/theme-solar.css" %}" rel="stylesheet">
+    <script src="{% static "vendor/bootstrap/bootstrap.bundle.min.js" %}"></script>
 
     <!-- FontAwesome CSS -->
-    <link href="{% static 'css/fontawesome-all-5.0.13.min.css' %}" rel="stylesheet">
+    <link href="{% static 'vendor/fontawesome/css/brands.css' %}" rel="stylesheet" />
+    <link href="{% static 'vendor/fontawesome/css/fontawesome.css' %}" rel="stylesheet" />
+    <link href="{% static 'vendor/fontawesome/css/regular.css' %}" rel="stylesheet" />
+    <link href="{% static 'vendor/fontawesome/css/solid.css' %}" rel="stylesheet" />
+    <!-- Compatibility with v5 -->
+    <link href="{% static 'vendor/fontawesome/css/v5-font-face.min.css' %}" rel="stylesheet" />
 
     <!-- Custom styles for this template -->
-    <link href="{% static 'css/bornhack.css' %}" rel="stylesheet">
+    <link href="{% static 'css/bornhack.css' %}?v=3" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="{% static 'vendor/jquery/jquery-3.7.1.min.js' %}"></script>
+
+    <!-- moment.js -->
+    <script src="{% static "vendor/moment/moment.min.js" %}"></script>
+
+    <!-- htmx -->
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
 
     <!-- https://datatables.net/ -->
-    <link href="{% static 'css/jquery.dataTables.1.10.20.min.css' %}" rel="stylesheet">
-
-    {% bootstrap_javascript jquery=1 %}
-
-    <!-- https://datatables.net/ -->
-    <script src="{% static "js/jquery.dataTables.1.10.20.min.js" %}"></script>
-    <script src="{% static "js/moment.2.8.4.min.js" %}"></script>
-    <script src="{% static "js/jquery.dataTables.datatime-moment.js" %}"></script>
+    <link href="{% static "vendor/datatables/dataTables.bootstrap5.css" %}" rel="stylesheet">
+    <link href="{% static "vendor/datatables/responsive.dataTables.min.css" %}" rel="stylesheet">
+    <script src="{% static "vendor/datatables/dataTables.js" %}"></script>
+    <script src="{% static "vendor/datatables/dataTables.bootstrap5.js" %}"></script>
+    <script src="{% static "vendor/datatables/dataTables.dateTime.min.js" %}"></script>
+    <script src="{% static "vendor/datatables/dataTables.responsive.min.js" %}"></script>
 
     <!-- misc. bornhack javascript bits we want on all pages -->
     <script src="{% static 'js/bornhack.js' %}"></script>
 
     <!-- favicon.ico stuff -->
-	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
-	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
-	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
-	<link rel="manifest" href="{% static 'img/favicon/site.webmanifest' %}">
-	<link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#000000">
-	<link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}">
-	<meta name="msapplication-TileColor" content="#da532c">
-	<meta name="msapplication-config" content="{% static 'img/favicon/browserconfig.xml' %}">
-	<meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'img/favicon/site.webmanifest' %}">
+    <link rel="mask-icon" href="{% static 'img/favicon/safari-pinned-tab.svg' %}" color="#000000">
+    <link rel="shortcut icon" href="{% static 'img/favicon/favicon.ico' %}">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-config" content="{% static 'img/favicon/browserconfig.xml' %}">
+    <meta name="theme-color" content="#000000">
 
-    <!-- Ab0bM9pRGrYRlvHuidAN6KTODwWjobAk -->
+    <!-- SoMe -->
+    <link rel="me" href="https://mastodon.social/@bornhack">
 
     {% block extra_head %}
     {% endblock %}
   </head>
 
-  <body class="no-js">
-  {% block body %}
-
-    <div id="main" class="container container-fluid">
-    <nav class="navbar navbar-fixed-top">
-      <div class="container container-fluid">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          {% if request.resolver_match.kwargs.camp_slug and camp %}
-            <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
-                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="img-responsive">
-            </a>
-          {% else %}
-            <a class="navbar-brand" href="/">
-              <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="img-responsive" width="200">
-            </a>
-            {% endif %}
-        </div>
-        <div id="top-navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="{% url 'news:index' %}">News</a></li>
-            <li><a href="{% url 'shop:index' %}">Shop</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2021' %}">BornHack 2021</a></li>
-                <li><a href="{% url 'camp_detail' camp_slug='bornhack-2020' %}">BornHack 2020</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'camp_list' %}">Camp List</a></li>
-              </ul>
-            </li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-            <li><a href="{% url 'people' %}">People</a></li>
-            <li><a href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
-
-            {% if request.user.is_staff %}
-            <li><a href="{% url 'admin:index' %}">Admin</a></li>
-            {% endif %}
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            {% if user.is_authenticated %}
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'profiles:detail' %}">Profile</a></li>
-                {% if user.orders.exists %}
-                {% url 'shop:order_list' as orders_list_url %}
-                <li><a href="{{ orders_list_url }}">Orders</a></li>
-          
-                {% url 'tickets:shopticket_list' as ticket_list_url %}
-                <li><a href="{{ ticket_list_url }}">Tickets</a></li>
-          
-                {% if user.creditnotes.exists %}
-                {% url 'shop:creditnote_list' as creditnote_list_url %}
-                <li><a href="{{ creditnote_list_url }}">Credit Notes</a></li>
-                {% endif %}
-                {% endif %}
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'account_logout' %}">Logout</a></li>
-              </ul>
-            </li>
+  <body class="no-js" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' {% if request.session.theme and request.session.theme != "default" %} data-bs-theme="{{request.session.theme}}"{% endif %}>
+    {% block body %}
+      <header class="py-1">
+        <nav class="navbar fixed-top navbar-expand-lg bg-body">
+          <div class="container-xl container-fluid">
+            {% if request.resolver_match.kwargs.camp_slug and camp %}
+              <a class="navbar-brand" href="{% url 'camp_detail' camp_slug=camp.slug %}">
+                <img src="{% static camp.logo_small %}" width="200" alt="bornhack" class="bornhack-logo img-responsive">
+              </a>
             {% else %}
-            <li><a href="{% url 'account_login' %}">Login</a></li>
+              <a class="navbar-brand" href="/">
+                <img src="{% static 'img/logo-small.png' %}" alt="bornhack" class="bornhack-logo img-responsive" width="200">
+              </a>
             {% endif %}
-         </ul>
-        </div>
-      </div>
-    </nav>
-      {% if camp %}
-        <div class="row">
-          <div class="btn-group btn-group-justified hidden-xs">
-              {% include 'includes/menuitems.html' %}
+            <!-- Theme switcher for small screens -->
+            <div class="theme-switch d-lg-none ms-auto me-2 col-1">
+              <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default text-secondary bornhack-hide-dark">
+                <i class="fa fa-moon"></i>
+              </a>
+              <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default text-secondary bornhack-hide-light">
+                <i class="fa fa-sun"></i>
+              </a>
+              {% if request.session.theme and request.session.theme != "default" and request.user.profile.theme != request.session.theme %}
+                <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default text-secondary">
+                  <i class="fa fa-display"></i>
+                </a>
+              {% endif %}
+            </div>
+            <!-- END: Theme switcher for small screens -->
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#top-navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div id="top-navbar" class="collapse navbar-collapse">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0 navbar-nav-scroll">
+                <li class="nav-item"><a class="nav-link" href="{% url 'news:index' %}">News</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'shop:index' %}">Shop</a></li>
+                <li class="nav-item dropdown hide-for-no-js-users">
+                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Camps<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2025' %}">BornHack 2025</a></li>
+                    <li><a class="dropdown-item" href="{% url 'camp_detail' camp_slug='bornhack-2024' %}">BornHack 2024</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'camp_list' %}">Camp List</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'camp_list' %}">Camps</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'people' %}">People</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'wish_list_redirect' %}">Wishlist</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'tokens:tokenfind_list' %}">Token</a></li>
+
+                {% if request.user.is_staff %}
+                  <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                {% endif %}
+
+                {% if user.orders.exists %}
+                  {% url 'shop:order_list' as orders_list_url %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ orders_list_url }}">Orders</a></li>
+
+                  {% url 'tickets:shopticket_list' as ticket_list_url %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ ticket_list_url }}">Tickets</a></li>
+
+                  {% if user.creditnotes.exists %}
+                    {% url 'shop:creditnote_list' as creditnote_list_url %}
+                    <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                  {% endif %}
+                {% endif %}
+                {% if user.is_authenticated %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                {% else %}
+                  <li class="nav-item hide-for-no-js-users d-lg-none"><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                {% endif %}
+              </ul>
+              <ul class="nav navbar-nav navbar-right d-none d-lg-flex">
+                <!-- normal/big screen switcher -->
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=slate&next={{ request.get_full_path|urlencode }}" title="Use dark mode" id="dark" class="btn btn-sm btn-default bornhack-theme-dark nav-link">
+                    <span class="fa fa-moon"></span>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=light&next={{ request.get_full_path|urlencode }}" title="Use light mode" id="light" class="btn btn-sm btn-default bornhack-theme-light nav-link">
+                    <i class="fa fa-sun"></i>
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a href="{% url 'profiles:theme' %}?theme=default&next={{ request.get_full_path|urlencode }}" title="Use system preferred mode" id="system" class="btn btn-sm btn-default bornhack-theme-system nav-link">
+                    <i class="fa fa-display"></i>
+                  </a>
+                </li>
+                <!-- end of switcher -->
+                {% if user.is_authenticated %}
+                  <!-- User menu if no-js -->
+                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'profiles:detail' %}">Profile</a></li>
+                  <li class="nav-item unhide-for-no-js-users"><a class="nav-link" href="{% url 'account_logout' %}">Logout</a></li>
+                  <!-- END: User menu if no-js -->
+                  <li class="nav-item dropdown hide-for-no-js-users d-none d-lg-flex">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Account<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="{% url 'profiles:detail' %}">Profile</a></li>
+                      {% if user.orders.exists %}
+                        {% url 'shop:order_list' as orders_list_url %}
+                        <li><a class="dropdown-item" href="{{ orders_list_url }}">Orders</a></li>
+
+                        {% url 'tickets:shopticket_list' as ticket_list_url %}
+                        <li><a class="dropdown-item" href="{{ ticket_list_url }}">Tickets</a></li>
+
+                        {% if user.creditnotes.exists %}
+                          {% url 'shop:creditnote_list' as creditnote_list_url %}
+                          <li><a class="dropdown-item" href="{{ creditnote_list_url }}">Credit Notes</a></li>
+                        {% endif %}
+                      {% endif %}
+                      <li><hr class="dropdown-divider"></li>
+                      <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                    </ul>
+                  </li>
+                {% else %}
+                  <li><a class="nav-link" href="{% url 'account_login' %}">Login</a></li>
+                {% endif %}
+              </ul>
+            </div>
           </div>
-          <div class="btn-group-vertical visible-xs">
+        </nav>
+      </header>
+      <div id="main" class="container-xxl overflow-auto">
+        {% if camp %}
+          <div class="row">
+            <div class="d-flex flex-wrap flex-lg-nowrap justify-content-center justify-content-lg-start">
               {% include 'includes/menuitems.html' %}
+            </div>
           </div>
-        <p>
+          <div class="row {% if request.resolver_match.app_name != "program" %}mb-3{% endif %}">
+            <div class="col w-100 {{camp.slug}}-gradient">
+              &nbsp;
+            </div>
+          </div>
+        {% endif %}
+        {% bootstrap_messages %}
+        {% block content %}{% endblock %}
       </div>
-      {% endif %}
-      {% bootstrap_messages %}
-      {% block content %}{% endblock %}
-    </div>
-    <footer>
-      <div class="col-sm-12 col-md-12 col-lg-12">
+      <footer>
+        <div class="container-fluid bg-body">
           {% block footer %}
-          <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
-          <a href="{% url 'conduct' %}">Code of Conduct</a> |
-          <a href="{% url 'privacy-policy' %}">Privacy Policy</a> |
-          <a href="{% url 'contact' %}">Contact</a>
+            <a href="{% url 'general-terms' %}">General Terms &amp; Conditions</a> |
+            <a href="{% url 'conduct' %}">Code of Conduct</a> |
+            <a href="{% url 'privacy-policy' %}">Privacy Policy</a> |
+            <a href="{% url 'contact' %}">Contact</a>
           {% endblock %}
-      </div>
-    </footer>
-  {% endblock body %}
+        </div>
+      </footer>
+    {% endblock body %}
   </body>
 </html>
