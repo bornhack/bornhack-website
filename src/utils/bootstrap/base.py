@@ -2009,6 +2009,7 @@ class Bootstrap:
             icon="fa fa-list-ul",
             group=group,
             public=False,
+            responsible_team=team,
         )
         layer = Layer.objects.create(
             name="Team Area",
