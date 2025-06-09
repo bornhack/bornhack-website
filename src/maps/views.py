@@ -12,6 +12,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.cache import cache_control
 from django.core.exceptions import BadRequest
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
@@ -222,6 +225,8 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
         )
 
 
+@method_decorator(cache_control(public=True), name="dispatch")
+@method_decorator(cache_page(86400), name="dispatch")
 class MapProxyView(View):
     """Proxy for Datafordeler map service.
 
@@ -258,16 +263,20 @@ class MapProxyView(View):
 
         # list of headers that cause trouble when proxying
         excluded_headers = [
+            "cache-control",
             "connection",
             "content-encoding",
             "content-length",
+            "expires",
             "keep-alive",
+            "pragma",
             "proxy-authenticate",
             "proxy-authorization",
             "te",
             "trailers",
             "transfer-encoding",
             "upgrade",
+            "vary",
         ]
         # proxy all headers from our upstream request to the response to our client,
         # if the headers are not in our list of troublemakers

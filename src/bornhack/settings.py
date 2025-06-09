@@ -141,6 +141,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
+    "utils.middleware.NeverVaryTilesMiddleware",
     "django.middleware.gzip.GZipMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -282,3 +283,10 @@ BORNHACK_TEAM_PERMISSIONS = {
 }
 
 FIXTURE_DIRS = ["testdata"]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "tile-cache",
+    }
+}
