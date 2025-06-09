@@ -28,8 +28,8 @@ class SpeakerProposalFactory(factory.django.DjangoModelFactory):
 
         model = SpeakerProposal
 
-    name = factory.Faker("name")
-    email = factory.Faker("email")
+    name = factory.Sequence(lambda _: fake.unique.name()) 
+    email = factory.Sequence(lambda _: fake.unique.email())
     biography = output_fake_md_description()
     submission_notes = factory.Iterator(["", output_fake_description()])
     needs_oneday_ticket = factory.Iterator([True, False])
