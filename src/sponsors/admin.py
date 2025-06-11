@@ -17,6 +17,7 @@ class SponsorAdmin(admin.ModelAdmin):
         "tickets_generated",
     )
     list_filter = ("tier__camp",)
+    save_as = True
 
 
 @admin.register(SponsorTier)
@@ -25,3 +26,4 @@ class SponsorTierAdmin(admin.ModelAdmin):
     list_editable = ("weight",)
     list_filter = ("camp",)
     ordering = ("weight",)
+    save_as = True
