@@ -51,7 +51,7 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
     def get_absolute_url(self) -> str:
         """Return village detail URL."""
         return reverse_lazy(
-            "village_detail",
+            "villages:village_detail",
             kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
         )
 
