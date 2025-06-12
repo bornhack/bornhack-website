@@ -44,7 +44,6 @@ class TokenCategory(models.Model):
         return f"{self.name} ({self.description})"
 
 
-
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     """Token model."""
 
@@ -54,15 +53,18 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         unique_together = ("camp", "token")
         ordering: ClassVar[list[str]] = ["camp"]
 
-    #category = models.ForeignKey(TokenCategory, on_delete=models.PROTECT)
+    category = models.ForeignKey(
+        TokenCategory,
+        on_delete=models.PROTECT,
+        null=True,
+        help_text="Token category"
+    )
 
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
     token = models.CharField(max_length=32, help_text="The secret token")
 
-    hint = models.TextField(
-        help_text="The hint for this token",
-    )
+    hint = models.TextField(help_text="The hint for this token")
 
     description = models.TextField(help_text="The description of the token")
 
