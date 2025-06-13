@@ -5,7 +5,7 @@
 {% block content %}
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">{% if request.resolver_match.url_name == "posreport_create" %}Create{% else %}Update{% endif %} PosReport</h3>
+      <h3 class="card-title">{% if request.resolver_match.url_name == "posreport_create" %}Create New{% else %}Update{% endif %} {{ pos.name }} PosReport</h3>
     </div>
     <div class="card-body">
       <form method="POST">

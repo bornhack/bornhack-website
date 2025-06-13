@@ -15,14 +15,10 @@
         {% if "camps.orgateam_permission" in perms %}
           <a href="{% url 'backoffice:posreport_update' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
         {% endif %}
-        {% if request.user == posreport.bank_responsible %}
-          <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
-          <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
-        {% endif %}
-        {% if request.user == posreport.pos_responsible %}
-          <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
-          <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
-        {% endif %}
+        <a href="{% url 'backoffice:posreport_bank_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count Start</a>
+        <a href="{% url 'backoffice:posreport_bank_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Bank Count End</a>
+        <a href="{% url 'backoffice:posreport_pos_count_start' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count Start</a>
+        <a href="{% url 'backoffice:posreport_pos_count_end' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=posreport.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Pos Count End</a>
         <a href="{% url 'backoffice:pos_detail' camp_slug=camp.slug pos_slug=pos.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Pos</a>
       </p>
       <table class="table">
@@ -44,12 +40,20 @@
             <td>{{ posreport.pos.team }}</p>
           </tr>
           <tr>
-            <th>Bank Responsible</th>
-            <td>{{ posreport.bank_responsible }}</p>
+            <th>Bank Responsible Start</th>
+            <td>{{ posreport.bank_responsible_start|default:"N/A" }}</p>
           </tr>
           <tr>
-            <th>Pos Responsible</th>
-            <td>{{ posreport.pos_responsible }}</p>
+            <th>Bank Responsible End</th>
+            <td>{{ posreport.bank_responsiblend|default:"N/A" }}</p>
+          </tr>
+          <tr>
+            <th>Pos Responsible Start</th>
+            <td>{{ posreport.pos_responsible_start|default:"N/A" }}</p>
+          </tr>
+          <tr>
+            <th>Pos Responsible End</th>
+            <td>{{ posreport.pos_responsible_end|default:"N/A" }}</p>
           </tr>
           <tr>
             <th>All OK?</th>
