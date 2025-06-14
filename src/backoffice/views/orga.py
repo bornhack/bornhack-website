@@ -41,14 +41,12 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
     template_name = "orders_merchandise.html"
 
     def get_queryset(self, **kwargs):
-        camp_prefix = f"BornHack {timezone.now().year}"
-
         return (
             OrderProductRelation.objects.not_fully_refunded()
             .not_cancelled()
             .filter(
                 product__category__name="Merchandise",
-                product__name__startswith=camp_prefix,
+                product__name__startswith=self.camp.title,
             )
             .order_by("order")
         )
@@ -65,7 +63,7 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
             .not_cancelled()
             .filter(
                 product__category__name="Merchandise",
-                product__name__startswith=camp_prefix,
+                product__name__startswith=self.camp.title,
             )
             .order_by("order")
         )
