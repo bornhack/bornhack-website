@@ -82,7 +82,7 @@
                 <strong>Quantity:</strong>
               </td>
               <td>
-                <h2>{{ ticket.quantity }}</h2>
+                <h2 id="product_quantity">{{ ticket.quantity }}</h2>
               </td>
             </tr>
           {% endif %}
@@ -92,7 +92,7 @@
                 <strong>ID:</strong>
               </td>
               <td>
-                <h2>{{ ticket.opr.id }}</h2>
+                <h2 id="opr">{{ ticket.opr.id }}</h2>
               </td>
             </tr>
           {% endif %}
@@ -149,7 +149,7 @@
       </div>
 
       {% if not ticket.used_at %}
-        <div class="col-md-4">
+        <div class="col-md-4" id="checkin_qr" {% if ticket.product.category.name == "Merchandise" %}hidden{% endif %}>
           {% qr_code "checkin" %}
         </div>
       {% endif %}
