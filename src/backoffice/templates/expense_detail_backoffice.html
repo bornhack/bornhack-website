@@ -2,29 +2,17 @@
 {% load django_bootstrap5 %}
 
 {% block title %}
-  Manage Expense | {{ block.super }}
+  Expense Details | {{ block.super }}
 {% endblock %}
 
 {% block content %}
-  <h3>Manage Expense</h3>
+  <h3>Expense Details</h3>
 
   {% include 'includes/expense_detail_panel.html' %}
 
-  {% if expense.approved == None %}
-    <form method="POST">
-      {% csrf_token %}
-      {% bootstrap_form form %}
-      {% bootstrap_button "<i class='fas fa-check'></i> Approve Expense" button_type="submit" button_class="btn-success" name="approve" %}
-      {% bootstrap_button "<i class='fas fa-times'></i> Reject Expense" button_type="submit" button_class="btn-danger" name="reject" %}
-      <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
-    </form>
-  {% endif %}
-
   <br>
-  {% if request.user.is_staff %}
-    <a href="{% url 'admin:index' %}economy/expense/{{ expense.uuid }}/change/" class="btn btn-primary"><i class="fas fa-edit"></i> Open in Admin</a>
-  {% endif %}
-  <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Expense List</a>
-  <a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=expense.creditor.chain.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Chain Details</a>
+  <a href="{% url 'backoffice:expense_update' camp_slug=camp.slug pk=expense.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Expense</a>
+  <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Expense List</a>
+  <a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=expense.creditor.chain.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Chain Details</a>
 
 {% endblock content %}

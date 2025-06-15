@@ -70,6 +70,7 @@ from .views import EventTypeDetailView
 from .views import EventTypeListView
 from .views import EventUpdateView
 from .views import ExpenseDetailView
+from .views import ExpenseUpdateView
 from .views import ExpenseListView
 from .views import FacilityCreateView
 from .views import FacilityDeleteView
@@ -940,8 +941,12 @@ urlpatterns = [
                             path("", ExpenseListView.as_view(), name="expense_list"),
                             path(
                                 "<uuid:pk>/",
-                                ExpenseDetailView.as_view(),
-                                name="expense_detail",
+                                include(
+                                    [
+                                        path("", ExpenseDetailView.as_view(), name="expense_detail",),
+                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update",),
+                                    ]
+                                ),
                             ),
                         ],
                     ),

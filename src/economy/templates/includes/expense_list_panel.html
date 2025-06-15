@@ -47,9 +47,9 @@
             <td>
               {% if expense.reimbursement and not expense.paid_by_bornhack %}
                 {% if request.resolver_match.app_name == "backoffice" %}
-                  <a href="{% url 'backoffice:reimbursement_detail' camp_slug=expense.camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                  <a href="{% url 'backoffice:reimbursement_detail' camp_slug=expense.camp.slug pk=expense.reimbursement.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Show</a>
                 {% else %}
-                  <a href="{% url 'economy:reimbursement_detail' camp_slug=expense.camp.slug pk=expense.reimbursement.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
+                  <a href="{% url 'economy:reimbursement_detail' camp_slug=expense.camp.slug pk=expense.reimbursement.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Show</a>
                 {% endif %}
               {% else %}
                 N/A
@@ -58,20 +58,20 @@
           {% endif %}
 
           <td>
+            <div class="btn-group-vertical">
+              <a class="btn btn-sm btn-primary" href="{% url request.resolver_match.app_name|add:':expense_detail' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
+              <a class="btn btn-sm btn-primary" href="{% url 'economy:expense_invoice' camp_slug=camp.slug pk=expense.pk %}" target="_blank"><i class="fas fa-file-download"></i> Invoice</a>
             {% if request.resolver_match.app_name == "backoffice" %}
-              <a class="btn btn-primary" href="{% url 'backoffice:expense_detail' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
-              {% if request.user.is_staff %}
-                <a class="btn btn-primary" href="{% url 'admin:index' %}economy/expense/{{ expense.uuid }}/change/"><i class="fas fa-edit"></i> Admin</a>
+              {% if not camp.read_only %}
+                <a class="btn btn-sm btn-primary" href="{% url 'backoffice:expense_update' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update</a>
               {% endif %}
             {% else %}
-            <div class="btn-group-vertical">
-              <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
-              {% if not expense.approved %}
-                <a class="btn btn-primary" href="{% url 'economy:expense_update' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update</a>
-                <a class="btn btn-danger" href="{% url 'economy:expense_delete' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-times"></i> Delete</a>
+              {% if not expense.approved and not camp.read_only %}
+                <a class="btn btn-sm btn-primary" href="{% url 'economy:expense_update' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update</a>
+                <a class="btn btn-sm btn-danger" href="{% url 'economy:expense_delete' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-times"></i> Delete</a>
               {% endif %}
-            </div>
             {% endif %}
+            </div>
           </td>
         </tr>
       {% endfor %}
