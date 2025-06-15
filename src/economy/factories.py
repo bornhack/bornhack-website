@@ -571,5 +571,5 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
-    approved = factory.Faker("random_element", elements=[True, True, False])
+    approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")

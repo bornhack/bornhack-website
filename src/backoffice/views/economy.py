@@ -352,22 +352,29 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return context
 
 
-class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+class RevenueDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
     model = Revenue
     template_name = "revenue_detail_backoffice.html"
+
+
+class RevenueUpdateView(CampViewMixin, EconomyTeamPermissionMixin, UpdateView):
+    model = Revenue
+    template_name = "revenue_update_backoffice.html"
     fields = ["notes"]
 
     def form_valid(self, form):
-        """We have two submit buttons in this form, Approve and Reject."""
+        """We have three submit buttons in this form, Save, Approve and Reject."""
         revenue = form.save()
-        if "approve" in form.data:
+        if "approve" in form.data and not expense.approved:
             # approve button was pressed
             revenue.approve(self.request)
-        elif "reject" in form.data:
+        elif "reject" in form.data and not expense.approved:
             # reject button was pressed
             revenue.reject(self.request)
+        elif "save" in form.data:
+            messages.success(self.request, "Revenue updated")
         else:
-            messages.error(self.request, "Unknown submit action")
+            messages.error(self.request, "Unknown submit action or wrong revenue status")
         return redirect(
             reverse("backoffice:revenue_list", kwargs={"camp_slug": self.camp.slug}),
         )

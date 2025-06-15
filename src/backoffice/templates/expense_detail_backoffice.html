@@ -11,7 +11,9 @@
   {% include 'includes/expense_detail_panel.html' %}
 
   <br>
+  {% if not camp.read_only %}
   <a href="{% url 'backoffice:expense_update' camp_slug=camp.slug pk=expense.uuid %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Expense</a>
+  {% endif %}
   <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Expense List</a>
   <a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=expense.creditor.chain.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back to Chain Details</a>
 
