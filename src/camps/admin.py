@@ -7,4 +7,4 @@ from . import models
 
 @admin.register(models.Camp)
 class CampModelAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["pk", "title", "camp", "read_only"]
