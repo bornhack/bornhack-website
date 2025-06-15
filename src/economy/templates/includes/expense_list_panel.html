@@ -15,7 +15,6 @@
         <th>Creditor</th>
         <th>Amount</th>
         <th>Description</th>
-        <th>Responsible Team</th>
         {% if not reimbursement %}
           <th>Approved</th>
           <th>Reimbursement</th>
@@ -27,22 +26,21 @@
       {% for expense in expense_list %}
         <tr>
           {% if request.resolver_match.app_name == "backoffice" %}
-            <td><a href="{% url 'backoffice:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
+            <td class="text-break"><a href="{% url 'backoffice:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
           {% else %}
-            <td><a href="{% url 'economy:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
+            <td class="text-break"><a href="{% url 'economy:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
           {% endif %}
           {% if past_camps %}
           <td data-order="{{ expense.camp.title|sortable }}">{{ expense.camp.title }}</td>
           {% endif %}
           <td data-order="{{ expense.invoice_date|sortable }}">{{ expense.invoice_date }}</td>
-          <td>{{ expense.user.email }}</td>
+          <td>{{ expense.user.profile.get_name }}</td>
           {% if not reimbursement %}
-            <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user.email }}{% endif %}</td>
+            <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user.profile.get_name }}{% endif %}</td>
           {% endif %}
           <td>{{ expense.creditor.name }}</td>
           <td data-order="{{ expense.amount }}">{{ expense.amount }} DKK</td>
           <td>{{ expense.description }}</td>
-          <td>{{ expense.responsible_team.name }} Team</td>
 
           {% if not reimbursement %}
             <td>{{ expense.approval_status }}</td>
@@ -66,11 +64,13 @@
                 <a class="btn btn-primary" href="{% url 'admin:index' %}economy/expense/{{ expense.uuid }}/change/"><i class="fas fa-edit"></i> Admin</a>
               {% endif %}
             {% else %}
+            <div class="btn-group-vertical">
               <a class="btn btn-primary" href="{% url 'economy:expense_detail' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>
               {% if not expense.approved %}
                 <a class="btn btn-primary" href="{% url 'economy:expense_update' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-edit"></i> Update</a>
                 <a class="btn btn-danger" href="{% url 'economy:expense_delete' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-times"></i> Delete</a>
               {% endif %}
+            </div>
             {% endif %}
           </td>
         </tr>

@@ -4,7 +4,7 @@
     <table class="table">
       <tr>
         <th>Created By</th>
-        <td>{{ expense.user }}</td>
+        <td>{{ expense.user.profile.get_name }}</td>
       </tr>
       <tr>
         <th>Amount</th>
@@ -28,7 +28,7 @@
       </tr>
       <tr>
         <th>Paid by BornHack?</th>
-        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user }}</b>, and will be reimbursed.{% endif %}</td>
+        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user.profile.get_name }}</b>, and will be reimbursed.{% endif %}</td>
       </tr>
       <tr>
         <th>Filename</th>
