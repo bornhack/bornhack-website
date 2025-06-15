@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 from django.contrib import messages
@@ -107,7 +108,10 @@ class MerchandiseOrdersLabelsView(CampViewMixin, OrgaTeamPermissionMixin, View):
         for opr in oprs:
             opr.label_printed = True
             opr.save()
-        return render(request, template_name, {"orderproductrelation_list": oprs})
+        date_time = datetime.now().strftime("%Y-%m-%d-%H_%M")
+        response = render(request, template_name, {"orderproductrelation_list": oprs})
+        response["Content-Disposition"] = f"""attachment; filename="{self.camp.slug}_merch_labels_{date_time}.zpl""" ""
+        return response
 
 
 class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):

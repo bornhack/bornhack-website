@@ -8,16 +8,16 @@
 ^FXQR Code
 ^FO20,20
 ^BQN,2,6,N,7
-^FDLA,https://example.com/product/12345^FS
+^FDLA,bornhack://opr/{{ productrel.id }}^FS
 
 ^FXOPR
 ^FO180,30
 ^A0N,90,90
-^FD{{productrel.id}}^FS
+^FD{{ productrel.id }}^FS
 
 ^FXProduct name
 ^FO190,110
-^A0N,30,30
+^A0N,25,25
 ^FD{{ productrel.product.name }}^FS
 
 {% if productrel.non_refunded_quantity > 1 %}
