@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="orderproductrelation",
             name="ready_for_pickup",
-            field=models.BooleanField(default=False, help_text="Is this OPR read for pickup"),
+            field=models.BooleanField(default=False, help_text="Is this OPR ready for pickup"),
         ),
     ]

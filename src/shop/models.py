@@ -696,7 +696,7 @@ class OrderProductRelation(
 
     ready_for_pickup = models.BooleanField(
         default=False,
-        help_text="Is this OPR read for pickup",
+        help_text="Is this OPR ready for pickup",
     )
 
     @property
