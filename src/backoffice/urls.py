@@ -106,6 +106,7 @@ from .views import MapUserLocationTypeCreateView
 from .views import MapUserLocationTypeDeleteView
 from .views import MapUserLocationTypeListView
 from .views import MapUserLocationTypeUpdateView
+from .views import MerchandiseOrdersLabelsView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -563,6 +564,11 @@ urlpatterns = [
         "merchandise_orders/",
         MerchandiseOrdersView.as_view(),
         name="merchandise_orders",
+    ),
+    path(
+        "merchandise_orders_labels/",
+        MerchandiseOrdersLabelsView.as_view(),
+        name="merchandise_orders_labels",
     ),
     path(
         "merchandise_to_order/",

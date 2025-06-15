@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.forms import modelformset_factory
 from django.shortcuts import redirect
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic import TemplateView
+from django.views.generic import View
 from django.views.generic.edit import FormView
 
 from backoffice.mixins import OrgaTeamPermissionMixin
@@ -20,14 +23,22 @@ from teams.models import Team
 from tickets.models import TicketType
 from utils.models import OutgoingEmail
 
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+    from django.http import HttpRequest
+    from django.http import HttpResponse
+
 logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    """View for showing the approved public credit names."""
+
     template_name = "approve_public_credit_names.html"
     context_object_name = "profiles"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs) -> QuerySet:
+        """Method for showing the approved public credit names."""
         return Profile.objects.filter(public_credit_name_approved=False).exclude(
             public_credit_name="",
         )
@@ -38,9 +49,12 @@ class ApproveNamesView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
 
 
 class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
+    """View for listing all merchandise orders."""
+
     template_name = "orders_merchandise.html"
 
-    def get_queryset(self, **kwargs):
+    def get_queryset(self, **kwargs) -> QuerySet:
+        """Method for listing all merchandise orders."""
         return (
             OrderProductRelation.objects.not_fully_refunded()
             .not_cancelled()
@@ -52,12 +66,54 @@ class MerchandiseOrdersView(CampViewMixin, OrgaTeamPermissionMixin, ListView):
         )
 
 
+class MerchandiseOrdersLabelsView(CampViewMixin, OrgaTeamPermissionMixin, View):
+    """Class for printing merch labels."""
+
+    def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """Method for selecting labels to be printed."""
+        template_name = "orders_merchandise_labels.html"
+        oprs = (
+            OrderProductRelation.objects.not_fully_refunded()
+            .not_cancelled()
+            .filter(
+                product__category__name="Merchandise",
+                product__name__startswith=self.camp.title,
+                order__paid=True,
+                label_printed=False,
+            )
+            .order_by("product__name", "order")
+        )
+        return render(request, template_name, {"orderproductrelation_list": oprs})
+
+    def post(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
+        """Method for returning the labels in zpl format."""
+        ids: list[int] = []
+        for key, value in request.POST.dict().items():
+            if "opr" in key and value == "on":
+                item_id = int(key.split("_")[1])
+                ids.append(item_id)
+        template_name = "orders_merchandise_labels.zpl"
+        oprs = (
+            OrderProductRelation.objects.not_fully_refunded()
+            .not_cancelled()
+            .filter(
+                product__category__name="Merchandise",
+                product__name__startswith=self.camp.title,
+                order__paid=True,
+                id__in=ids,
+            )
+            .order_by("product__name", "order")
+        )
+        for opr in oprs:
+            opr.label_printed = True
+            opr.save()
+        return render(request, template_name, {"orderproductrelation_list": oprs})
+
+
 class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateView):
     template_name = "merchandise_to_order.html"
 
     def get_context_data(self, **kwargs):
-        camp_prefix = f"BornHack {timezone.now().year}"
-
         order_relations = (
             OrderProductRelation.objects.not_fully_refunded()
             .not_cancelled()
