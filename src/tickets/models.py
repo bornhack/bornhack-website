@@ -215,17 +215,19 @@ class SponsorTicket(ExportModelOperationsMixin("sponsor_ticket"), BaseTicket):
         return "sponsor"
 
 
-class DiscountTicket(ExportModelOperationsMixin("discount_ticket"), BaseTicket):
-    price = models.IntegerField(
-        help_text=_("Price of the discounted ticket (in DKK, including VAT)."),
+class PrizeTicket(ExportModelOperationsMixin("prize_ticket"), BaseTicket):
+    user = models.ForeignKey(
+        "auth.User",
+        related_name="prize_tickets",
+        on_delete=models.PROTECT,
+        help_text="The user to whom this PrizeTicket belongs.",
     )
 
-    def __str__(self) -> str:
-        return f"DiscountTicket: {self.pk}"
+    comment = models.TextField(help_text="A comment about this PrizeTicket (what was it given for)")
 
     @property
     def shortname(self) -> str:
-        return "discount"
+        return "prize"
 
 
 class TicketGroup(
@@ -321,8 +323,6 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         blank=True,
     )
 
-    email = models.EmailField(null=True, blank=True)
-
     # overwrite the _get_token method because old tickets use the user_id
     def _get_token(self):
         return hashlib.sha256(
@@ -350,4 +350,4 @@ class ShopTicket(ExportModelOperationsMixin("shop_ticket"), BaseTicket):
         return formatdict
 
 
-TicketTypeUnion = Union[ShopTicket, SponsorTicket, DiscountTicket]
+TicketTypeUnion = Union[ShopTicket, SponsorTicket, PrizeTicket]

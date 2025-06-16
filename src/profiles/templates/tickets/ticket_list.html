@@ -17,8 +17,54 @@
         <h3> You don't have any tickets yet. We hope to see you at the next BornHack!</h3>
       {% endif %}
 
+      {% if prize_tickets %}
+        <h4>Prize tickets</h4>
+        <table class="table table-hover">
+          <tbody>
+            {% for ticket in prize_tickets %}
+              {% ifchanged ticket.ticket_type.camp %}
+                <tr class="bg-primary">
+                  <td colspan="5" class="text-center">
+                    <strong>{{ ticket.ticket_type.camp }}</strong>
+                  </td>
+                </tr>
+                <tr>
+                  <th>
+                    Ticket Type
+                  </th>
+                  <th>
+                    Comment
+                  </th>
+                  <th>
+                    Checked in
+                  </th>
+                  <th>
+                    Actions
+                  </th>
+                </tr>
+              {% endifchanged %}
+              <tr>
+                <td>
+                  {{ ticket.ticket_type.name }}
+                  <td>{{ ticket.comment }}</td>
+                  <td>
+                    {% if ticket.used_at %}
+                      Yes
+                    {% else %}
+                      Not yet
+                    {% endif %}
+                  </td>
+                  <td>
+                    <a href="{% url 'tickets:ticket_download' pk=ticket.pk %}" class="btn btn-primary"><i class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
+                  </td>
+                </tr>
+              </tbody>
+            {% endfor %}
+          </table>
+      {% endif %}
+
       {% if tickets %}
-        <h4>Individual tickets</h4>
+        <h4>Webshop tickets</h4>
         <table class="table table-hover">
           <tbody>
             {% for ticket in tickets %}
@@ -70,7 +116,7 @@
                     {% endif %}
                   </td>
                   <td>
-                    <a href="{% url 'tickets:shopticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
+                    <a href="{% url 'tickets:ticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
                       class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
                     <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary">
                       {% if ticket.product.ticket_type.camp.read_only %}
@@ -89,7 +135,7 @@
       {% endif %}
 
       {% if tickets_in_groups %}
-        <h4>Bundles</h4>
+        <h4>Webshop Ticket Bundles</h4>
         <table class="table table-hover">
           <tbody>
             {% for ticket in tickets_in_groups %}
