@@ -119,12 +119,12 @@
                     <a href="{% url 'tickets:ticket_download' pk=ticket.pk %}" class="btn btn-primary"><i
                       class="fas fa-download" aria-hidden="true"></i> Download PDF</a>
                     <a href="{% url 'tickets:shopticket_edit' pk=ticket.pk %}" class="btn btn-primary">
-                      {% if ticket.product.ticket_type.camp.read_only %}
-                        <i class="fas fa-file" aria-hidden="true"></i> View name
-                      {% elif not ticket.name %}
-                        <i class="fas fa-edit" aria-hidden="true"></i> Set name
-                      {% else %}
-                        <i class="fas fa-edit" aria-hidden="true"></i> Edit name
+                      {% if not ticket.product.ticket_type.camp.read_only %}
+                        {% if not ticket.name %}
+                          <i class="fas fa-edit" aria-hidden="true"></i> Set name
+                        {% else %}
+                          <i class="fas fa-edit" aria-hidden="true"></i> Edit name
+                        {% endif %}
                       {% endif %}
                     </a>
                   </td>
