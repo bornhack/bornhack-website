@@ -21,7 +21,7 @@
              <i class="fa-solid fa-trophy fa-3x text-success"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ user_tokens|length }} found</h5>
+              <h5>{{ user_finds | length }} found</h5>
             </div>
           </div>
         </div>
@@ -31,7 +31,7 @@
              <i class="fa-solid fa-magnifying-glass fa-3x text-warning"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ user_missing_tokens }} missing</h5>
+              <h5>{{ user_finds_missing }} missing</h5>
             </div>
           </div>
         </div>
@@ -41,7 +41,7 @@
              <i class="fa-regular fa-rectangle-list fa-3x text-primary"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ object_list|length }} total</h5>
+              <h5>{{ active_camp_tokens | length }} total</h5>
             </div>
           </div>
         </div>
@@ -82,9 +82,9 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Total players</h5>
-                  <p>Last join: <small>{{ total_players_stats.last_join }} min. ago</small></p>
+                  <p>Last join: <small>{{ widget_total_players.last_join }} min. ago</small></p>
                 </div>
-                <p class="h4">{{ total_players_stats.count }}</p>
+                <p class="h4">{{ widget_total_players.count }}</p>
               </div>
               <div class="text-center my-4">
                 <p>
@@ -104,9 +104,9 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Tokens found</h5>
-                  <p>Last token found: <small>{{ token_finds_stats.last_found }} min. ago</small></p>
+                  <p>Last token found: <small>{{ widget_tokens_found.last_found }} min. ago</small></p>
                 </div>
-                <p class="h4">{{ token_finds_stats.count }}</p>
+                <p class="h4">{{ widget_tokens_found.count }}</p>
               </div>
               <div class="text-center my-4">
                 <p>
@@ -114,8 +114,8 @@
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Found:</b>{{ token_finds_stats.found_pct }} %</p>
-                <p><b>Not found:</b>{{ token_finds_stats.not_found_pct }} %</p>
+                <p class="mb-1"><b>Found:</b>{{ widget_tokens_found.found_pct }} %</p>
+                <p><b>Not found:</b>{{ widget_tokens_found.not_found_pct }} %</p>
               </div>
             </div>
           </div>
@@ -125,10 +125,10 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Avg. find time</h5>
+                  <h5>Avg. submit time</h5>
                   <p>Between token submits</p>
                 </div>
-                <p class="h4">{{ token_finds_stats.avg_find_time }} min.</p>
+                <p class="h4">{{ widget_avg_find_time.avg_find_time }} min.</p>
               </div>
               <div class="text-center my-4">
                 <p>
@@ -136,7 +136,7 @@
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Your avg. time:</b> {{ token_finds_stats.users_avg_find_time }} min.</p>
+                <p class="mb-1"><b>Your avg. time:</b> {{ widget_avg_find_time.users_avg_find_time }} min.</p>
               </div>
             </div>
           </div>
@@ -146,10 +146,8 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Total players</h5>
-                  <p>Last join: <small>N min. ago</small></p>
+                  <h5>Activity by hour</h5>
                 </div>
-                <p class="h4">N</p>
               </div>
               <div class="text-center my-4">
                 <p>

@@ -60,83 +60,67 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         """Get all of the metrics for statistics not included by the queryset"""
         context = super().get_context_data(**kwargs)
-
         context["form"] = TokenFindSubmitForm()
 
-        user_tokens = TokenFind.objects.filter(
-            user=self.request.user).filter(token__camp=self.request.camp.pk)
-        context["user_tokens"] = user_tokens
+        camp_finds = TokenFind.objects.filter(token__camp=self.request.camp.pk)
+        user_finds = camp_finds.filter(user=self.request.user)
+        context["user_finds"] = user_finds
 
-        all_tokens = context["object_list"]
-        context["user_missing_tokens"] = len(all_tokens) - len(user_tokens)
+        context["active_camp_tokens"] = self.object_list
+        context["user_finds_missing"] = len(self.object_list) - len(user_finds)
 
-        context["total_players_stats"] = {
-            "count": self.total_player_count(),
-            "last_join": self.time_since_last_new_join()
+        context["widget_total_players"] = {
+            "count": camp_finds.distinct("user").count(),
+            "last_join": self.last_player_join()
         }
 
-        found_pct, not_found_pct = self.token_found_percentages()
-        context["token_finds_stats"] = {
-            "count": TokenFind.objects.filter(
-                token__camp=self.request.camp.pk).filter(token__active=True).count(),
-            "last_found": self.last_token_found(),
+        token_finds_count = camp_finds.distinct("token").count()
+        found_pct = (token_finds_count / self.object_list.count()) * 100
+        context["widget_tokens_found"] = {
+            "count": camp_finds.count(),
+            "last_found": self.last_token_find(camp_finds),
             "found_pct": f"{found_pct:.1f}",
-            "not_found_pct": f"{not_found_pct:.1f}",
-            "avg_find_time": self.avg_find_time(),
-            "users_avg_find_time": self.user_avg_find_time(),
+            "not_found_pct": f"{(100 - found_pct):.1f}",
+        }
+        context["widget_avg_find_time"] = {
+            "avg_find_time": self.avg_find_time(camp_finds),
+            "users_avg_find_time": self.user_avg_find_time(user_finds),
         }
 
         return context
 
-    def total_player_count(self) -> int:
-        """Find count of players submitting tokens for this camp"""
-        return TokenFind.objects.filter(
-            token__camp=self.request.camp.pk
-        ).distinct("user").count()
-
-    def time_since_last_new_join(self) -> int:
+    def last_player_join(self) -> int:
         """
-        Return the time since the last new player joined the game
-        by submitting a token
+        Return the time in minutes since the last player joined the game
+        by submitting its first token find.
         """
-        last_new_join = User.objects.filter(
-            token_finds__isnull = False,
-            token_finds__token__camp = self.request.camp.pk
-        ).annotate(latest_token_find=Min("token_finds__created")).order_by("-latest_token_find").first().latest_token_find
-        delta = timezone.now() - last_new_join
+        last_player_join = (
+            User.objects.filter(
+                token_finds__isnull = False,
+                token_finds__token__camp = self.request.camp.pk
+            )
+            .annotate(latest_find=Min("token_finds__created"))
+            .order_by("latest_find").last().latest_find
+        )
+        delta = timezone.now() - last_player_join
         return int(delta.total_seconds() // 60)
 
-    def last_token_found(self) -> int:
-        """
-        Retrieve the last token found and return the time delta in minutes
-        """
-        last_found = TokenFind.objects.filter(
-            token__camp=self.request.camp.pk
-        ).order_by("-created").first()
+    def last_token_find(self, camp_finds: QuerySet) -> int:
+        """Return the time delta in minutes for the last token submitted"""
+        last_found = camp_finds.order_by("created").last()
         delta = timezone.now() - last_found.created
         return int(delta.total_seconds() // 60)
 
-    def token_found_percentages(self) -> tuple[int, int]:
-        """Return percentage for tokens found and not found"""
-        active_tokens = Token.objects.filter(camp=self.request.camp.pk).filter(active=True).count()
-        tokens_found = TokenFind.objects.filter(
-            token__camp=self.request.camp.pk).distinct("token").count()
-        pct = (tokens_found / active_tokens) * 100
-        return pct, (100 - pct)
-
-    def avg_find_time(self) -> int:
+    def avg_find_time(self, camp_finds: QuerySet) -> int:
         """Calculate the average find time for all players"""
-        all_tokens = TokenFind.objects.filter(token__camp=self.request.camp.pk)
-        avg_time = self._get_avg_time_between_creations(all_tokens)
+        avg_time = self._get_avg_time_between_creations(camp_finds)
         if avg_time:
             return int(avg_time.total_seconds() // 60)
         return 0
 
-    def user_avg_find_time(self) -> int:
+    def user_avg_find_time(self, user_finds: QuerySet) -> int:
         """Calculate the average find time in minutes for requesting user"""
-        user_tokens = TokenFind.objects.filter(
-            user=self.request.user).filter(token__camp=self.request.camp.pk)
-        avg_time = self._get_avg_time_between_creations(user_tokens)
+        avg_time = self._get_avg_time_between_creations(user_finds)
         if avg_time:
             return int(avg_time.total_seconds() // 60)
         return 0
