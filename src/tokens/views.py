@@ -127,14 +127,19 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     def avg_find_time(self) -> int:
         """Calculate the average find time for all players"""
         all_tokens = TokenFind.objects.filter(token__camp=self.request.camp.pk)
-        return int(self._get_avg_time_between_creations(all_tokens).total_seconds() // 60)
+        avg_time = self._get_avg_time_between_creations(all_tokens)
+        if avg_time:
+            return int(avg_time.total_seconds() // 60)
+        return 0
 
     def user_avg_find_time(self) -> int:
         """Calculate the average find time in minutes for requesting user"""
         user_tokens = TokenFind.objects.filter(
             user=self.request.user).filter(token__camp=self.request.camp.pk)
-
-        return int(self._get_avg_time_between_creations(user_tokens).total_seconds() // 60)
+        avg_time = self._get_avg_time_between_creations(user_tokens)
+        if avg_time:
+            return int(avg_time.total_seconds() // 60)
+        return 0
 
     def _get_avg_time_between_creations(self, qs: QuerySet):
         intervals = qs.annotate(
