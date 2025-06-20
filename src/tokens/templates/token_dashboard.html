@@ -2,6 +2,7 @@
 {% load static %}
 {% load commonmark %}$
 {% load token_tags %}
+{% load humanize %}
 
 {% block title %}
   Token game | {{ block.super }}
@@ -21,7 +22,7 @@
              <i class="fa-solid fa-trophy fa-3x text-success"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ user_finds | length }} found</h5>
+              <h5>{{ player_stats.token_finds }} found</h5>
             </div>
           </div>
         </div>
@@ -31,7 +32,7 @@
              <i class="fa-solid fa-magnifying-glass fa-3x text-warning"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ user_finds_missing }} missing</h5>
+              <h5>{{ player_stats.tokens_missing }} missing</h5>
             </div>
           </div>
         </div>
@@ -41,7 +42,7 @@
              <i class="fa-regular fa-rectangle-list fa-3x text-primary"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ active_camp_tokens | length }} total</h5>
+              <h5>{{ player_stats.tokens_count }} total</h5>
             </div>
           </div>
         </div>
@@ -82,7 +83,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Total players</h5>
-                  <p>Last join: <small>{{ widget_total_players.last_join }} min. ago</small></p>
+                  <p>Last join: <small>{{ widget_total_players.last_join | timesince }} ago.</small></p>
                 </div>
                 <p class="h4">{{ widget_total_players.count }}</p>
               </div>
@@ -92,8 +93,8 @@
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Players:</b> N %</p>
-                <p><b>Non-Players:</b> N %</p>
+                <p class="mb-1"><b>Players:</b> N%</p>
+                <p><b>Non-Players:</b> N%</p>
               </div>
             </div>
           </div>
@@ -103,8 +104,8 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Tokens found</h5>
-                  <p>Last token found: <small>{{ widget_tokens_found.last_found }} min. ago</small></p>
+                  <h5>All tokens found</h5>
+                  <p>Last token found: <small>{{ widget_tokens_found.last_found | timesince }} ago.</small></p>
                 </div>
                 <p class="h4">{{ widget_tokens_found.count }}</p>
               </div>
@@ -114,8 +115,8 @@
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Found:</b>{{ widget_tokens_found.found_pct }} %</p>
-                <p><b>Not found:</b>{{ widget_tokens_found.not_found_pct }} %</p>
+                <p class="mb-1"><b>Found:</b> {{ widget_tokens_found.found_pct }}%</p>
+                <p><b>Not found:</b> {{ widget_tokens_found.not_found_pct }}%</p>
               </div>
             </div>
           </div>
@@ -124,19 +125,25 @@
           <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
-                <div>
-                  <h5>Avg. submit time</h5>
-                  <p>Between token submits</p>
+                <div class="mb-3">
+                  <h5>Average find times</h5>
                 </div>
-                <p class="h4">{{ widget_avg_find_time.avg_find_time }} min.</p>
               </div>
               <div class="text-center my-4">
                 <p>
-                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                  <i class="fa-solid fa-chart-line fa-5x"></i>
                 </p>
               </div>
               <div>
-                <p class="mb-1"><b>Your avg. time:</b> {{ widget_avg_find_time.users_avg_find_time }} min.</p>
+                <p class="mb-1"><b>All players:</b> {{ widget_avg_find_time.avg_find_time | timesince }}</p>
+                <p>
+                <b>Your avg. time:</b>
+                {% if widget_avg_find_time.user_avg_find_time %}
+                {{ widget_avg_find_time.user_avg_find_time | timesince }}
+                {% else %}
+                N/A
+                {% endif %}
+                </p>
               </div>
             </div>
           </div>
@@ -145,13 +152,13 @@
           <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
-                <div>
+                <div class="mb-3">
                   <h5>Activity by hour</h5>
                 </div>
               </div>
               <div class="text-center my-4">
                 <p>
-                  <i class="fa-solid fa-chart-pie fa-5x"></i>
+                  <i class="fa-solid fa-chart-simple fa-5x"></i>
                 </p>
               </div>
               <div>
