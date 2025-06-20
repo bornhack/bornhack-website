@@ -8,9 +8,18 @@
   Token game | {{ block.super }}
 {% endblock %}
 
+{% block extra_head %}
+<script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
+{{ widget_tokens_found.chart|json_script:"tokensFoundChart" }}
+<script src="{% static 'js/tokens/token_charts.js' %}"></script>
+{% endblock extra_head %}
+
 {% block content %}
 
   <div class="row my-4">
+    <div class="chart">
+      
+    </div>
     <div class="col-12 col-lg-6">
       <div class="mb-5">
         <h2 class="mb-2">Token game dashboard</h2>
@@ -83,19 +92,11 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Total players</h5>
-                  <p>Last join: <small>{{ widget_total_players.last_join | timesince }} ago.</small></p>
+                  <p><b>Last join:</b> <small>{{ widget_total_players.last_join | timesince }} ago.</small></p>
                 </div>
                 <p class="h4">{{ widget_total_players.count }}</p>
               </div>
-              <div class="text-center my-4">
-                <p>
-                  <i class="fa-solid fa-chart-pie fa-5x"></i>
-                </p>
-              </div>
-              <div>
-                <p class="mb-1"><b>Players:</b> N%</p>
-                <p><b>Non-Players:</b> N%</p>
-              </div>
+              <div id="total_players_chart"></div>
             </div>
           </div>
         </div>
@@ -104,20 +105,12 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>All tokens found</h5>
-                  <p>Last token found: <small>{{ widget_tokens_found.last_found | timesince }} ago.</small></p>
+                  <h5>Tokens found</h5>
+                  <p><b>Last found:</b> <small>{{ widget_tokens_found.last_found | timesince }} ago.</small></p>
                 </div>
                 <p class="h4">{{ widget_tokens_found.count }}</p>
               </div>
-              <div class="text-center my-4">
-                <p>
-                  <i class="fa-solid fa-chart-pie fa-5x"></i>
-                </p>
-              </div>
-              <div>
-                <p class="mb-1"><b>Found:</b> {{ widget_tokens_found.found_pct }}%</p>
-                <p><b>Not found:</b> {{ widget_tokens_found.not_found_pct }}%</p>
-              </div>
+              <div id="tokens_found_chart"></div>
             </div>
           </div>
         </div>

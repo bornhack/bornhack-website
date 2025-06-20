@@ -112,13 +112,21 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
     def widget_tokens_found(self, camp_finds: QuerySet) -> dict:
         """Return a dictionary with metrics for the 'tokens found' widget"""
         token_finds_count = camp_finds.distinct("token").count()
-        found_pct = (token_finds_count / self.object_list.count()) * 100
+        token_count = self.object_list.count()
+        found_pct = (token_finds_count / token_count) * 100
 
         return {
             "count": camp_finds.count(),
             "last_found": camp_finds.order_by("created").last().created,
             "found_pct": f"{found_pct:.1f}",
             "not_found_pct": f"{(100 - found_pct):.1f}",
+            "chart": {
+                "series": [
+                    token_finds_count,
+                    (token_count - token_finds_count )
+                ],
+                "labels": ["Found", "Not found"],
+            }
         }
 
     def widget_avg_find_time(
@@ -154,6 +162,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             )
         )
 
+        logger.error(intervals)
         avg = intervals.aggregate(avg_interval=Avg('interval'))['avg_interval']
         return (timezone.now() - avg) if avg else None
 
