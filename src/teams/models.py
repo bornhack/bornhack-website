@@ -618,7 +618,7 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
 
     @property
     def for_sale_users(self) -> list[TeamMember]:
-        """Returns a list of team members on this shift."""
+        """Returns a list of team members who marked this shift for sale."""
         return [member.user for member in self.team_members.filter(teamshiftassignment__for_sale=True)]
 
     @property
