@@ -554,7 +554,7 @@ class TaskComment(
 
 
 class TeamShiftAssignment(CampRelatedModel):
-    """Model for storing the for_sale state of the shift assignment."""
+    """Through model for the shift<>member m2m storing the for_sale state of the shift assignment."""
 
     team_shift = models.ForeignKey(
         "teams.TeamShift",
