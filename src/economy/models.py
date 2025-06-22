@@ -691,20 +691,6 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
         help_text="The Pos this PosReport belongs to.",
     )
 
-    bank_responsible = models.ForeignKey(
-        "auth.User",
-        on_delete=models.PROTECT,
-        related_name="pos_reports_banker",
-        help_text="The banker responsible for this PosReport",
-    )
-
-    pos_responsible = models.ForeignKey(
-        "auth.User",
-        on_delete=models.PROTECT,
-        related_name="pos_reports_poser",
-        help_text="The POS person responsible for this PosReport",
-    )
-
     period = DateTimeRangeField(
         null=True,
         blank=True,
@@ -739,6 +725,15 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
 
     # bank count start of day
 
+    bank_responsible_start = models.ForeignKey(
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="pos_report_banker_start",
+        help_text="The banker responsible for the day start count of this PosReport",
+    )
+
     bank_count_dkk_start = models.PositiveIntegerField(
         default=0,
         help_text="The number of DKK handed out from the bank to the POS at the start of the business day (counted by the bank responsible)",
@@ -770,6 +765,15 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
     )
 
     # POS count start of day
+
+    pos_responsible_start = models.ForeignKey(
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="pos_report_pos_start",
+        help_text="The pos responsible for the day start count of this PosReport",
+    )
 
     pos_count_dkk_start = models.PositiveIntegerField(
         default=0,
@@ -803,6 +807,15 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
 
     # bank count end of day
 
+    bank_responsible_end = models.ForeignKey(
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="pos_report_banker_end",
+        help_text="The banker responsible for the day end count of this PosReport",
+    )
+
     bank_count_dkk_end = models.PositiveIntegerField(
         default=0,
         help_text="The number of DKK handed back from the POS to the bank at the end of the business day (counted by the bank responsible)",
@@ -834,6 +847,15 @@ class PosReport(ExportModelOperationsMixin("pos_report"), CampRelatedModel, UUID
     )
 
     # pos count end of day
+
+    pos_responsible_end = models.ForeignKey(
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="pos_report_pos_end",
+        help_text="The pos responsible for the day end count of this PosReport",
+    )
 
     pos_count_dkk_end = models.PositiveIntegerField(
         default=0,

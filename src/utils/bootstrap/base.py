@@ -1314,6 +1314,8 @@ class Bootstrap:
             camp=camp,
             name="Baconsvin",
             slug="baconsvin",
+            approved=True,
+            location=Point(9.9401295, 55.3881695),
             description="The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark "
             "doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. "
             "A lot of the organizers of BornHack live in Baconsvin village. "
@@ -1324,6 +1326,7 @@ class Bootstrap:
             camp=camp,
             name="NetworkWarriors",
             slug="networkwarriors",
+            approved=True,
             description="We will have a tent which house the NOC people, various lab equipment people "
             "can play with, and have fun. If you want to talk about networking, come by, and if you have "
             "trouble with the Bornhack network contact us.",
@@ -2120,7 +2123,7 @@ class Bootstrap:
             },
             {
                 "year": 2025,
-                "tagline": "Undecided",
+                "tagline": "10 Badges",
                 "colour": "#ffafc7",
                 "read_only": False,
                 "light_text": False,

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}
+  Update Expense | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<h3>Update Expense</h3>
+
+{% include 'includes/expense_detail_panel.html' %}
+
+<div class="card mt-2">
+    <div class="card-header">Update{% if not expense.approved %}, Approve, or Reject{% endif %} Expense {{ expense.pk }}</div>
+  <div class="card-body">
+    <form method="POST">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% bootstrap_button "<i class='fas fa-save'></i> Just Save" button_type="submit" button_class="btn-success" name="save" %}
+      {% if not expense.approved %}
+        {% bootstrap_button "<i class='fas fa-check'></i> Save + Approve" button_type="submit" button_class="btn-success" name="approve" %}
+        {% bootstrap_button "<i class='fas fa-times'></i> Save + Reject" button_type="submit" button_class="btn-danger" name="reject" %}
+      {% endif %}
+      <a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
+    </form>
+  </div>
+</div>
+<hr>
+
+<a href="{% url 'backoffice:expense_list' camp_slug=camp.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Expense List</a>
+<a href="{% url 'backoffice:chain_detail' camp_slug=camp.slug chain_slug=expense.creditor.chain.slug %}" class="btn btn-primary"><i class="fas fa-undo"></i> Back to Chain Details</a>
+
+{% endblock content %}

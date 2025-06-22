@@ -9,7 +9,7 @@
   <h2>BackOffice: Manage Expenses for {{ camp.title }}</h2>
   <p class="lead">This view shows all expenses for {{ camp.title }}. If any unapproved expenses exist they are shown in a seperate table at the top of the page, followed by the table with all the approved expenses.</p>
 
-  <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> BackOffice</a></p>
+  <p><a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#economy"><i class="fas fa-undo"></i> BackOffice</a></p>
 
   {% if unapproved_expenses %}
     <p class="lead">This table shows all unapproved expenses for {{ camp.title }}.</p>

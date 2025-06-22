@@ -17,7 +17,7 @@ from django.views.generic.detail import SingleObjectMixin
 
 from utils.models import CampReadOnlyModeError
 
-from .models import ShopTicket
+from .models import ShopTicket, PrizeTicket
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -38,6 +38,7 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
     )
 
     context = {
+        "prize_tickets": PrizeTicket.objects.filter(user=request.user).order_by("ticket_type__camp"),
         "tickets": (base_queryset.filter(ticket_group__isnull=True)),
         "tickets_in_groups": (base_queryset.filter(ticket_group__isnull=False).order_by("ticket_group")),
     }
@@ -45,21 +46,29 @@ def shop_ticket_list_view(request: HttpRequest) -> HttpResponse:
     return render(request, "tickets/ticket_list.html", context)
 
 
-class ShopTicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
+class TicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
+    """This view makes it possible to download ShopTickets and PrizeTickets."""
     model = ShopTicket
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user == self.get_object().opr.order.user:
+    def get_object(self, *args, **kwargs):
+        print(kwargs)
+        pk = kwargs["pk"]
+        try:
+            return ShopTicket.objects.get(pk=pk, opr__order__user=self.request.user)
+        except ShopTicket.DoesNotExist:
+            pass
+        try:
+            return PrizeTicket.objects.get(pk=pk, user=self.request.user)
+        except PrizeTicket.DoesNotExist:
             raise Http404("Ticket not found")
 
-        return super().dispatch(request, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
+        ticket = self.get_object(*args, **kwargs)
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
-            f'attachment; filename="{self.get_object().shortname}_ticket_{self.get_object().pk}.pdf"'
+            f'attachment; filename="BornHack_{ticket.ticket_type.camp.camp.lower.year}_{ticket.shortname}_ticket_{ticket.pk}.pdf"'
         )
-        response.write(self.get_object().generate_pdf().getvalue())
+        response.write(ticket.generate_pdf().getvalue())
         return response
 
 
@@ -67,7 +76,7 @@ class ShopTicketDetailView(LoginRequiredMixin, UpdateView, DetailView):
     model = ShopTicket
     template_name = "tickets/ticket_detail.html"
     context_object_name = "ticket"
-    fields = ["name", "email"]
+    fields = ["name"]
 
     def form_valid(self, form):
         return super().form_valid(form)

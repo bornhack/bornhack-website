@@ -88,7 +88,7 @@ class VillageListGeoJSONView(CampViewMixin, JsonView):
             deleted=False,
             approved=True,
         ):
-            if village.location is None:
+            if not village.location:
                 continue
             entry = {
                 "type": "Feature",
@@ -130,12 +130,13 @@ class VillageDetailView(CampViewMixin, DetailView):
     def get_context_data(self, **kwargs) -> dict[str, str | bool]:
         """Add village map data to context."""
         context = super().get_context_data(**kwargs)
-        context["mapData"] = {
-            "grid": static("json/grid.geojson"),
-            "x": context["village"].location.x,
-            "y": context["village"].location.y,
-            "loggedIn": self.request.user.is_authenticated,
-        }
+        if context["village"].location:
+            context["mapData"] = {
+                "grid": static("json/grid.geojson"),
+                "x": context["village"].location.x,
+                "y": context["village"].location.y,
+                "loggedIn": self.request.user.is_authenticated,
+            }
         return context
 
     def get_queryset(self) -> QuerySet[Village]:
@@ -179,8 +180,6 @@ class VillageCreateView(
         village = form.save(commit=False)
         village.contact = self.request.user
         village.camp = self.camp
-        if not village.name:
-            village.name = "noname"
         village.save()
         messages.success(
             self.request,
@@ -241,8 +240,6 @@ class VillageUpdateView(
         """Set village as not approved before saving, send email."""
         village = form.save(commit=False)
         village.approved = False
-        if not village.name:
-            village.name = "noname"
         messages.success(
             self.request,
             "Your village will be republished after the changes have been reviewed for CoC compliance.",

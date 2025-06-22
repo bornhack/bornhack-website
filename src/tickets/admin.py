@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from django.contrib import admin
 
-from .models import DiscountTicket
+from .models import PrizeTicket
 from .models import ShopTicket
 from .models import SponsorTicket
 from .models import TicketType
@@ -42,8 +42,8 @@ class SponsorTicketAdmin(BaseTicketAdmin):
     search_fields = ["pk", "sponsor__name"]
 
 
-@admin.register(DiscountTicket)
-class DiscountTicketAdmin(BaseTicketAdmin):
+@admin.register(PrizeTicket)
+class PrizeTicketAdmin(BaseTicketAdmin):
     pass
 
 
