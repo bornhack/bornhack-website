@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load qrcode %}
+
+{% block title %}
+  Inventory | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+  <form id="search_form" method="POST" action="">
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Inventory: {{ pos.name }}</h3>
+        <h3>Scan the item!</h3>
+        <input type="text" class="form-control input-lg" name="token" id="token_input" autocomplete="off">
+        <div id="scan_again" {% if not failed %}hidden{% endif %}>
+          Scan again!
+          <hr/>
+        </div>
+      </div>
+    </div>
+  </form>
+    {% if opr %}
+      {% with opr.id|stringformat:"i" as opr_id %}
+        <div class="row">
+          <table>
+            <tr><td colspan=2><h2>Checkin {{ opr.product.category }}</h2></td></tr>
+            <tr>
+              <th>OPR</th>
+              <td><h2 id="opr_id">{{ opr.id }}</h2></td>
+            </tr>
+            <tr>
+              <th>Product</th>
+              <td>{{ opr.product.name }}</td>
+            </tr>
+            {% if opr.quantity > 1 %}
+              <tr>
+                <th>Quantity to check</th>
+                <td><h2 class="alert alert-warning"><span id="product_quantity">{{ opr.quantity|add:-1 }}</span>/{{ opr.quantity }}</h2></td>
+              </tr>
+            {% endif %}
+            <tr>
+              <th>Label</th>
+              <td>{{ opr.label_printed|yesno }}</td>
+            </tr>
+            <tr>
+              <th>Ready</th>
+              <td>{{ opr.ready_for_pickup|yesno }}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="row justify-content-between">
+          <div class="col-md-4">
+            {% qr_code "clear" %}
+          </div>
+          <div class="col-md-4" id="checkin_qr" {% if opr.quantity > 1 %}hidden{% endif %}>
+            {% qr_code "bornhack://opr/"|add:opr_id|add:"/checkin" %}
+          </div>
+        </div>
+      {% endwith %}
+    {% endif %}
+  <script src="{% static 'js/inventory_scan.js' %}"></script>
+
+{% endblock content %}

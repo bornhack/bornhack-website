@@ -70,8 +70,8 @@ from .views import EventTypeDetailView
 from .views import EventTypeListView
 from .views import EventUpdateView
 from .views import ExpenseDetailView
-from .views import ExpenseUpdateView
 from .views import ExpenseListView
+from .views import ExpenseUpdateView
 from .views import FacilityCreateView
 from .views import FacilityDeleteView
 from .views import FacilityDetailView
@@ -150,8 +150,10 @@ from .views import ReimbursementDetailView
 from .views import ReimbursementListView
 from .views import ReimbursementUpdateView
 from .views import RevenueDetailView
-from .views import RevenueUpdateView
 from .views import RevenueListView
+from .views import RevenueUpdateView
+from .views import ScanInventoryIndexView
+from .views import ScanInventoryView
 from .views import ScanTicketsPosSelectView
 from .views import ScanTicketsView
 from .views import ShopTicketOverview
@@ -429,6 +431,23 @@ urlpatterns = [
                                 "<slug:pos_slug>/",
                                 ScanTicketsView.as_view(),
                                 name="scan_tickets",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "scan_inventory/",
+                    include(
+                        [
+                            path(
+                                "",
+                                ScanInventoryIndexView.as_view(),
+                                name="scan_inventory_index",
+                            ),
+                            path(
+                                "<slug:pos_slug>/",
+                                ScanInventoryView.as_view(),
+                                name="scan_inventory",
                             ),
                         ],
                     ),
@@ -950,9 +969,9 @@ urlpatterns = [
                                 "<uuid:pk>/",
                                 include(
                                     [
-                                        path("", ExpenseDetailView.as_view(), name="expense_detail",),
-                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update",),
-                                    ]
+                                        path("", ExpenseDetailView.as_view(), name="expense_detail"),
+                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update"),
+                                    ],
                                 ),
                             ),
                         ],
@@ -978,7 +997,7 @@ urlpatterns = [
                                             RevenueUpdateView.as_view(),
                                             name="revenue_update",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
                         ],
