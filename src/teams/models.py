@@ -622,6 +622,6 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
         return [member.user for member in self.team_members.filter(teamshiftassignment__for_sale=True)]
 
     @property
-    def shifts_available(self) -> int:
-        """Returns the number of available shifts."""
+    def shifts_taken(self) -> int:
+        """Returns the number of taken shifts that are not for sale."""
         return self.team_members.filter(teamshiftassignment__for_sale=False).count()
