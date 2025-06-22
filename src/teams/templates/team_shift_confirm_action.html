@@ -1,0 +1,14 @@
+{% extends 'team_base.html' %}
+
+{% block title %}
+  {{ action }} | {{ block.super }}
+{% endblock %}
+
+{% block team_content %}
+
+  <form method="post">{% csrf_token %}
+    <p>{{ action }}</p>
+    <input type="submit" class="btn btn-danger" name="confirm" value="Confirm" />
+  </form>
+
+{% endblock %}

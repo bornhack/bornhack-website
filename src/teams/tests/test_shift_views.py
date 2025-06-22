@@ -242,6 +242,10 @@ class TeamShiftViewTest(BornhackTestBase):
         )
         response = self.client.get(
             path=url,
+        )
+        assert response.status_code == 200
+        response = self.client.post(
+            path=url,
             follow=True,
         )
         assert response.status_code == 200
@@ -260,7 +264,7 @@ class TeamShiftViewTest(BornhackTestBase):
                 "pk": team_shift_2.pk,
             },
         )
-        response = self.client.get(
+        response = self.client.post(
             path=url,
             follow=True,
         )
@@ -282,6 +286,10 @@ class TeamShiftViewTest(BornhackTestBase):
         )
         response = self.client.get(
             path=url,
+        )
+        assert response.status_code == 200
+        response = self.client.post(
+            path=url,
             follow=True,
         )
         assert response.status_code == 200
@@ -301,7 +309,7 @@ class TeamShiftViewTest(BornhackTestBase):
                 "pk": team_shift_1.pk,
             },
         )
-        response = self.client.get(
+        response = self.client.post(
             path=url,
             follow=True,
         )
@@ -321,8 +329,11 @@ class TeamShiftViewTest(BornhackTestBase):
                 "pk": team_shift_1.pk,
             },
         )
-
         response = self.client.get(
+            path=url,
+        )
+        assert response.status_code == 200
+        response = self.client.post(
             path=url,
             follow=True,
         )

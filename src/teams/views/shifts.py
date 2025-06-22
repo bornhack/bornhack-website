@@ -36,7 +36,7 @@ if TYPE_CHECKING:
     from django.db.models import QuerySet
     from django.http import HttpRequest
     from django.http import HttpResponse
-
+    from django.forms import ModelForm
     from camps.models import Camp
 
 
@@ -312,21 +312,34 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadM
         return context
 
 
-class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
+class MemberTakesShift(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View for adding a user to a shift."""
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
 
-    http_methods = ("get",)
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to take this {self.object}?"
+        context["team"] = Team.objects.get(
+            camp=self.camp,
+            slug=self.kwargs["team_slug"],
+        )
+        return context
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
         """Method for adding user to a shift."""
-        shift = TeamShift.objects.get(id=kwargs["pk"])
-        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+        shift = self.object 
+        team = self.object.team 
 
-        team_member = TeamMember.objects.get(team=team, user=request.user)
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
 
         overlapping_shifts = TeamShift.objects.filter(
             team__camp=self.camp,
-            team_members__user=request.user,
+            team_members__user=self.request.user,
             shift_range__overlap=shift.shift_range,
         )
 
@@ -340,7 +353,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
             """,
             )
             messages.error(
-                request,
+                self.request,
                 template.render(Context({"shifts": overlapping_shifts})),
             )
         else:
@@ -350,49 +363,78 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
                 shift.team_members.remove(shift_assignment)
             shift.team_members.add(team_member)
 
-        kwargs.pop("pk")
+        self.kwargs.pop("pk")
 
-        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
-class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
+class MemberDropsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
     """View for remove a user from a shift."""
 
-    http_methods = ("get",)
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to drop this {self.object}?"
+        context["team"] = Team.objects.get(
+            camp=self.camp,
+            slug=self.kwargs["team_slug"],
+        )
+        return context
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
         """Method to remove user from shift."""
-        shift = TeamShift.objects.get(id=kwargs["pk"])
-        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+        shift = self.object 
+        team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
 
-        team_member = TeamMember.objects.get(team=team, user=request.user)
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
 
         shift.team_members.remove(team_member)
 
-        kwargs.pop("pk")
+        self.kwargs.pop("pk")
 
-        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
-class MemberSellsShift(LoginRequiredMixin, CampViewMixin, View):
+class MemberSellsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View for making a shift available for other user to take."""
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
+    """View for making a shift available for others shift."""
+
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to this {self.object} available to others?"
+        context["team"] = Team.objects.get(
+            camp=self.camp,
+            slug=self.kwargs["team_slug"],
+        )
+        return context
 
     http_methods = ("get",)
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
         """Method for making a shift available for other user to take."""
-        shift = TeamShift.objects.get(id=kwargs["pk"])
-        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+        shift = self.object
+        team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
 
-        team_member = TeamMember.objects.get(team=team, user=request.user)
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
 
         shift_assignment = TeamShiftAssignment.objects.get(team_member=team_member, team_shift=shift)
         shift_assignment.for_sale = True
         shift_assignment.save()
 
-        kwargs.pop("pk")
+        self.kwargs.pop("pk")
 
-        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
 class UserShifts(CampViewMixin, TemplateView):
