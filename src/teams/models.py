@@ -573,6 +573,8 @@ class TeamShiftAssignment(CampRelatedModel):
         help_text="Is the shift assignment for sale?",
     )
 
+    updated_at = models.DateTimeField(auto_now=True)
+
     @property
     def camp(self) -> Camp:
         """All CampRelatedModels must have a camp FK or a camp property."""

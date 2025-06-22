@@ -324,10 +324,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         """Method for setting the page context data."""
         context = super().get_context_data(**kwargs)
         context['action'] = f"Are you sure you want to take this {self.object}?"
-        context["team"] = Team.objects.get(
-            camp=self.camp,
-            slug=self.kwargs["team_slug"],
-        )
+        context["team"] = self.object.team 
         return context
 
     def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
@@ -359,7 +356,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         else:
             # Remove at most one shift assignment for sale if any
             # When a shift is for sale and a user presses assign its first assigning the for sale one
-            for shift_assignment in shift.team_members.filter(teamshiftassignment__for_sale=True)[:1]:
+            for shift_assignment in shift.team_members.filter(teamshiftassignment__for_sale=True).order_by('teamshiftassignment__updated_at')[:1]:
                 shift.team_members.remove(shift_assignment)
             shift.team_members.add(team_member)
 
@@ -380,10 +377,7 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         """Method for setting the page context data."""
         context = super().get_context_data(**kwargs)
         context['action'] = f"Are you sure you want to drop this {self.object}?"
-        context["team"] = Team.objects.get(
-            camp=self.camp,
-            slug=self.kwargs["team_slug"],
-        )
+        context["team"] = self.object.team 
         return context
 
     def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
@@ -412,10 +406,7 @@ class MemberSellsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         """Method for setting the page context data."""
         context = super().get_context_data(**kwargs)
         context['action'] = f"Are you sure you want to this {self.object} available to others?"
-        context["team"] = Team.objects.get(
-            camp=self.camp,
-            slug=self.kwargs["team_slug"],
-        )
+        context["team"] = self.object.team 
         return context
 
     http_methods = ("get",)
