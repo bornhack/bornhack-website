@@ -407,7 +407,6 @@ class MemberSellsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
     template_name = "team_shift_confirm_action.html"
     context_object_name = "shifts"
     active_menu = "shifts"
-    """View for making a shift available for others shift."""
 
     def get_context_data(self, **kwargs) -> dict[str, object]:
         """Method for setting the page context data."""
