@@ -33,7 +33,7 @@ from shop.models import Invoice
 from shop.models import Order
 from shop.models import OrderProductRelation
 from shop.models import Refund
-from tickets.models import DiscountTicket
+from tickets.models import PrizeTicket
 from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
 from tickets.models import TicketType
@@ -44,7 +44,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 
 def _ticket_getter_by_token(token) -> TicketTypeUnion | None:
-    for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
+    for ticket_class in [ShopTicket, SponsorTicket, PrizeTicket]:
         try:
             return ticket_class.objects.get(Q(token=token) | Q(badge_token=token))
         except ticket_class.DoesNotExist:
@@ -53,7 +53,7 @@ def _ticket_getter_by_token(token) -> TicketTypeUnion | None:
 
 
 def _ticket_getter_by_pk(pk):
-    for ticket_class in [ShopTicket, SponsorTicket, DiscountTicket]:
+    for ticket_class in [ShopTicket, SponsorTicket, PrizeTicket]:
         try:
             return ticket_class.objects.get(pk=pk)
         except ticket_class.DoesNotExist:
