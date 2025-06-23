@@ -27,6 +27,16 @@ window.addEventListener("map:init", function (event) {
   if (mapData.layers) {
     mapData['layers'].forEach(function (item) {
       mapObject.loadLayer(item.url, item.name, {
+        onEachFeature: function(feature, layer) {
+          if (feature.properties.color !== "#FFFFFFFF") {
+            layer.setStyle({
+              color: feature.properties.color
+            })
+          }
+        },
+        style: {
+          color: "{{ layer.color }}"
+        }
       });
     });
   }
