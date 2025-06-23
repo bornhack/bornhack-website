@@ -20,6 +20,7 @@ from leaflet.forms.widgets import LeafletWidget
 
 from backoffice.forms import MapLayerFeaturesImportForm
 from camps.mixins import CampViewMixin
+from facilities.models import FacilityType
 from maps.mixins import ExternalLayerMapperViewMixin
 from maps.mixins import GisTeamViewMixin
 from maps.mixins import LayerMapperViewMixin
@@ -33,16 +34,88 @@ from utils.widgets import IconPickerWidget
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+# ################# Helper ########################
+
+
+class MapLayerHelper:
+    """Helper class to not repeat code in the view classes."""
+
+    camp = None
+    request = None
+
+    def __init__(self, camp_slug, request):
+        """Class init method."""
+        self.camp_slug = camp_slug
+        self.request = request
+
+    def get_layers(self) -> QuerySet:
+        """Method to get the layers the user has access to."""
+        user_teams = []
+        if not self.request.user.is_anonymous:
+            user_teams = self.request.user.teammember_set.filter(
+                team__camp__slug=self.camp_slug,
+            ).values_list("team__name", flat=True)
+        return Layer.objects.filter(
+            ((Q(responsible_team__camp__slug=self.camp_slug) | Q(responsible_team=None)) & Q(public=True))
+            | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+        )
+
+    def get_map_data(self) -> dict:
+        """Method to return the map_data."""
+        map_data = {
+            "grid": static("json/grid.geojson"),
+            "loggedIn": self.request.user.is_authenticated,
+            "layers": [],
+            "facilitytype_list": [],
+        }
+        facilitytype_list = FacilityType.objects.filter(
+            responsible_team__camp__slug=self.camp_slug,
+        )
+        map_data.update({"facilitytype_list": list(facilitytype_list.values())})
+        layers = self.get_layers()
+        map_data.update(
+            {
+                "layers": list(
+                    layers.values(
+                        "description",
+                        "name",
+                        "slug",
+                        "uuid",
+                        "icon",
+                        "invisible",
+                        "group__name",
+                    ),
+                ),
+            },
+        )
+        for facility in map_data["facilitytype_list"]:
+            facility["url"] = reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": self.camp_slug,
+                    "facility_type_slug": facility["slug"],
+                },
+            )
+        for layer in map_data["layers"]:
+            layer["url"] = reverse(
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer["slug"]},
+            )
+        return map_data
+
 
 # ################# LAYERS ########################
 
 
 class MapLayerListView(CampViewMixin, AnyTeamMapperRequiredMixin, ListView):
+    """View for the list of layers."""
+
     model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
 
     def get_context_data(self, **kwargs):
+        """Method to get the list of layers."""
         context = super().get_context_data(**kwargs)
         context["layers"] = Layer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
@@ -284,7 +357,8 @@ class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["mapData"] = {"grid": static("json/grid.geojson")}
+        helper = MapLayerHelper(self.kwargs["camp_slug"], self.request)
+        context.update({"mapData": helper.get_map_data()})
         return context
 
     def get_form(self, *args, **kwargs):
@@ -331,7 +405,8 @@ class MapFeatureUpdateView(LayerMapperViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["mapData"] = {"grid": static("json/grid.geojson")}
+        helper = MapLayerHelper(self.kwargs["camp_slug"], self.request)
+        context.update({"mapData": helper.get_map_data()})
         return context
 
     def get_form(self, *args, **kwargs):

@@ -1,11 +1,14 @@
 const mapData = JSON.parse(
   document.getElementById('mapData').textContent
 );
-
+const loggedIn = mapData['loggedIn']
 var mapObject = undefined;
 window.addEventListener("map:init", function (event) {
   var map = event.detail.map;
   mapObject = new BHMap(map);
+  mapObject.map.addControl(new L.Control.Fullscreen({
+    pseudoFullscreen: true,
+  }));
   if (mapData.grid) {
     mapObject.loadLayer(mapData.grid, "Grid squares", {
       onEachFeature: mapObject.onEachGrid,
@@ -14,6 +17,17 @@ window.addEventListener("map:init", function (event) {
         fillOpacity: 0.0,
         weight: 0.5
       },
+    });
+  }
+  if (mapData.facilitytype_list) {
+    mapData['facilitytype_list'].forEach(function (item) {
+      mapObject.loadLayer(item.url, item.name, facilityOptions, true, function(){}, "Facilities", item.icon);
+    })
+  }
+  if (mapData.layers) {
+    mapData['layers'].forEach(function (item) {
+      mapObject.loadLayer(item.url, item.name, {
+      });
     });
   }
 });
