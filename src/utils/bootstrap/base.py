@@ -2157,7 +2157,7 @@ class Bootstrap:
             },
             {
                 "year": 2025,
-                "tagline": "Undecided",
+                "tagline": "10 Badges",
                 "colour": "#ffafc7",
                 "read_only": False,
                 "light_text": False,
