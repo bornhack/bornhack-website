@@ -19,6 +19,9 @@
 
 {% block content %}
   <h3>Create {{ camp.title }} Village</h3>
+  <div class="alert alert-warning" role="alert">
+  Note: Putting a village on the map is to indicate where you village is, not to reserve space! 
+  </div>
   <form method="post">
     {% csrf_token %}
 
@@ -27,6 +30,7 @@
     <hr />
 
     <button class="btn btn-primary pull-right" type="submit">Save</button>
+    <a href="{% url 'villages:village_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Back</a>
   </form>
   <script src="{% static 'js/maps/generic/init_loader.js' %}"></script>
 

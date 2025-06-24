@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from django.contrib.gis.db.models import PointField
-from django.contrib.gis.geos import Point
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
@@ -40,7 +39,8 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
 
     # default to near general camping
     location = PointField(
-        default=Point(9.9401295, 55.3881695),
+        null=True,
+        blank=True,
         help_text="The location of this village.",
     )
 
@@ -51,7 +51,7 @@ class Village(ExportModelOperationsMixin("village"), UUIDModel, CampRelatedModel
     def get_absolute_url(self) -> str:
         """Return village detail URL."""
         return reverse_lazy(
-            "village_detail",
+            "villages:village_detail",
             kwargs={"camp_slug": self.camp.slug, "slug": self.slug},
         )
 

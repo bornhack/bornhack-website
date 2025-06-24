@@ -132,8 +132,6 @@ ACCOUNT_EMAIL_SUBJECT_PREFIX = "[bornhack] "
 ACCOUNT_SIGNUP_FORM_HONEYPOT_FIELD = "gender"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
-# include captcha field in signup form
-ACCOUNT_FORMS = {"signup": "bornhack.forms.AllAuthSignupCaptchaForm"}
 LOGIN_REDIRECT_URL = "/"
 LOGIN_URL = "/login/"
 
@@ -141,6 +139,7 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
+    "utils.middleware.NeverVaryTilesMiddleware",
     "django.middleware.gzip.GZipMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -272,8 +271,8 @@ WEASYPRINT_BASEURL = "/"
 # all these permissions are created for each team,
 # for example bar_team_lead, bar_team_member, etc.
 BORNHACK_TEAM_PERMISSIONS = {
-    "lead": "Team lead - members and permissions management",
-    "member": "Team member",
+    "lead": "Team lead - member and permission management",
+    "member": "Team member - all team members",
     "mapper": "Team mapper - layers and feature management",
     "facilitator": "Team facilitator - facilities management",
     "infopager": "Team infopager - infopage management",
@@ -282,3 +281,10 @@ BORNHACK_TEAM_PERMISSIONS = {
 }
 
 FIXTURE_DIRS = ["testdata"]
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "tile-cache",
+    }
+}

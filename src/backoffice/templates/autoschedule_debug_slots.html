@@ -17,9 +17,9 @@
           <th class="{% if autoevent.possible_slots %}success{% else %}danger{% endif %}"><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a> (demand: {{ autoevent.demand }}, slots: {{ autoevent.possible_slots }})</th>
           {% for slot in scheduler.autoslots %}
             {% if slot in autoevent.unavailability %}
-              <td class="text-center danger"><i class="fas fa-times" data-toggle='tooltip' data-html=true data-placement='right' data-bs-title='Event "{{ event.title }}" will not be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
+              <td class="text-center table-danger"><i class="fas fa-times" data-bs-toggle='tooltip' data-bs-html=true data-placement='right' title='Event "{{ event.title }}" will not be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
             {% else %}
-              <td class="text-center success"><i class="fas fa-check" data-toggle='tooltip' data-html=true data-placement='right' data-bs-title='Event "{{ event.title }}" might be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
+              <td class="text-center table-success"><i class="fas fa-check" data-bs-toggle='tooltip' data-bs-html=true data-placement='right' title='Event "{{ event.title }}" might be scheduled in the slot {{ slot.starts_at }} at venue {{ slot.venue }}'></i></td>
             {% endif %}
           {% endfor %}
         </tr>

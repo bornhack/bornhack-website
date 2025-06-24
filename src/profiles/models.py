@@ -97,3 +97,10 @@ class Profile(ExportModelOperationsMixin("profile"), CreatedUpdatedModel, UUIDMo
         if self.public_credit_name_approved:
             return self.public_credit_name
         return "Unnamed"
+
+    @property
+    def get_name(self):
+        """Convenience method to return profile.name if set, otherwise username."""
+        if self.name:
+            return self.name
+        return self.user.username

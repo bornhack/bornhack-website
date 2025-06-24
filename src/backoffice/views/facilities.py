@@ -289,6 +289,7 @@ class FacilityCreateView(CampViewMixin, AnyTeamFacilitatorRequiredMixin, CreateV
             attrs={
                 "display_raw": "true",
                 "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form
@@ -351,6 +352,7 @@ class FacilityUpdateView(FacilityFacilitatorViewMixin, UpdateView):
                 "display_raw": "true",
                 "map_height": "500px",
                 "class": "form-control",
+                "geom_type": "Point",
             },
         )
         return form

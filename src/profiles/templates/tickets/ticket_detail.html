@@ -18,13 +18,11 @@
       {% if ticket.product.ticket_type.camp.read_only %}
         <dl>
           <dt>Name</dt><dd>{{ form.name.value|default:"Anonymous" }}</dd>
-          <dt>Email</dt><dd>{{ form.email.value|default:"Anonymous" }}</dd>
         </dl>
       {% else %}
         <form method="POST" class="form">
           {% csrf_token %}
           {% bootstrap_field form.name %}
-          {% bootstrap_field form.email %}
           <button class="btn btn-primary" type="submit"><i class="glyphicon glyphicon-check"></i> Save</button>
         </form>
       {% endif %}

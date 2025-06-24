@@ -3,6 +3,7 @@ from __future__ import annotations
 import random
 
 import factory
+import faker
 from django.contrib.auth.models import User
 from django.utils import timezone
 from utils.slugs import unique_slugify
@@ -29,6 +30,7 @@ from .models import Revenue
 from .models import ZettleBalance
 from .models import ZettleReceipt
 
+fake = faker.Faker()
 
 class BankFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -202,10 +204,7 @@ class CoinifyBalanceFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = CoinifyBalance
 
-    date = factory.Faker(
-        "date_between",
-        start_date="-6y",
-    )  # 1 in ~49 chance of collision, feeling lucky? :)
+    date = factory.Sequence(lambda _: fake.unique.date_between(start_date="-6y"))
     btc = factory.Faker("pydecimal", right_digits=8, min_value=1, max_value=4)
     dkk = factory.Faker("pydecimal", right_digits=2, min_value=100, max_value=10000)
     eur = factory.Faker("pydecimal", right_digits=2, min_value=100, max_value=10000)
@@ -550,7 +549,7 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
-    approved = factory.Faker("random_element", elements=[True, True, False])
+    approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")
 
 
@@ -572,5 +571,5 @@ class RevenueFactory(factory.django.DjangoModelFactory):
     )
     invoice_date = factory.Faker("date")
     responsible_team = factory.Faker("random_element", elements=Team.objects.all())
-    approved = factory.Faker("random_element", elements=[True, True, False])
+    approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")

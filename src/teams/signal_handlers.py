@@ -27,9 +27,8 @@ def teammember_saved(sender: User, instance: TeamMember, created: bool, **_kwarg
             logger.error("Error adding email to outgoing queue")
         return
 
-    # make sure the teams group membership and permission is uptodate
+    # make sure this team memberships group memberships are uptodate
     instance.update_group_membership()
-    instance.update_team_lead_permissions()
 
 
 def teammember_deleted(sender: User, instance: TeamMember, **_kwargs) -> None:
@@ -42,9 +41,8 @@ def teammember_deleted(sender: User, instance: TeamMember, **_kwargs) -> None:
         # TODO(tyk): remove user from public channel ACL
         pass
 
-    # make sure the teams group membership is uptodate
+    # make sure this team memberships group memberships are removed
     instance.update_group_membership(deleted=True)
-    instance.update_team_lead_permissions(deleted=True)
 
 
 def team_saved(sender: User, instance: TeamMember, created: bool, **_kwargs) -> None:

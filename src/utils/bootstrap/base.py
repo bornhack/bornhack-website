@@ -1314,6 +1314,8 @@ class Bootstrap:
             camp=camp,
             name="Baconsvin",
             slug="baconsvin",
+            approved=True,
+            location=Point(9.9401295, 55.3881695),
             description="The camp with the doorbell-pig! Baconsvin is a group of happy people from Denmark "
             "doing a lot of open source, and are always happy to talk about infosec, hacking, BSD, and much more. "
             "A lot of the organizers of BornHack live in Baconsvin village. "
@@ -1324,6 +1326,7 @@ class Bootstrap:
             camp=camp,
             name="NetworkWarriors",
             slug="networkwarriors",
+            approved=True,
             description="We will have a tent which house the NOC people, various lab equipment people "
             "can play with, and have fun. If you want to talk about networking, come by, and if you have "
             "trouble with the Bornhack network contact us.",
@@ -1691,7 +1694,7 @@ class Bootstrap:
             category=categories["noc"],
             headline="Switches",
             anchor="switches",
-            body="We have places for you to get your cable plugged in to a switch"
+            body="We have places for you to get your cable plugged in to a switch",
         )
 
     def create_camp_feedback(self, camp: Camp, users: dict[User]) -> None:
@@ -1995,7 +1998,7 @@ class Bootstrap:
                 content_type=permission_content_type,
                 codename=f"{team.slug}_team_member",
             )
-            team.group.permissions.add(permission)
+            team.member_group.permissions.add(permission)
 
     def create_maps_layer_generic(self) -> None:
         """Create map layers that do not have a camp attached."""
@@ -2042,7 +2045,7 @@ class Bootstrap:
             icon="fa fa-list-ul",
             group=group,
             public=False,
-            team=team,
+            responsible_team=team,
         )
         layer = Layer.objects.create(
             name="Team Area",
@@ -2209,6 +2212,7 @@ class Bootstrap:
             camp.save()
 
         self.camp = self.camps[1][0]
+        self.add_team_permissions(self.camp)
         self.teams = teams[self.camp.camp.lower.year]
         for member in TeamMember.objects.filter(team__camp=self.camp):
             member.save()
@@ -2332,7 +2336,7 @@ class Bootstrap:
             camp.call_for_participation_open = not read_only
             camp.call_for_sponsors_open = not read_only
             camp.save()
-            
+
             # Update team permissions.
             if camp.camp.lower.year == settings.UPCOMING_CAMP_YEAR:
                 for member in TeamMember.objects.filter(team__camp=camp):

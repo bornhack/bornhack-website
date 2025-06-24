@@ -22,7 +22,7 @@ DEBUG_TOOLBAR_ENABLED={{ django_debug_toolbar_enabled }}
 
 # start redirecting to the next camp instead of the previous camp after
 # this much of the time between the camps has passed
-CAMP_REDIRECT_PERCENT=25
+CAMP_REDIRECT_PERCENT=15
 
 ### changes below here are only needed for production
 

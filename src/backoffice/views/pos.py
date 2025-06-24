@@ -113,17 +113,8 @@ class PosReportCreateView(PosViewMixin, CreateView):
     """Use this view to create new PosReports."""
 
     model = PosReport
-    fields = ["period", "bank_responsible", "pos_responsible", "comments"]
+    fields = ["period", "comments"]
     template_name = "posreport_form.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form"].fields["bank_responsible"].queryset = Team.objects.get(
-            camp=self.camp,
-            name="Orga",
-        ).approved_members.all()
-        context["form"].fields["pos_responsible"].queryset = self.pos.team.leads.all()
-        return context
 
     def form_valid(self, form):
         """Set Pos before saving."""
@@ -157,23 +148,12 @@ class PosReportUpdateView(PosViewMixin, UpdateView):
     model = PosReport
     fields = [
         "period",
-        "bank_responsible",
-        "pos_responsible",
         "hax_sold_izettle",
         "dkk_sales_izettle",
         "comments",
     ]
     template_name = "posreport_form.html"
     pk_url_kwarg = "posreport_uuid"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form"].fields["bank_responsible"].queryset = Team.objects.get(
-            camp=self.camp,
-            name="Orga",
-        ).approved_members.all()
-        context["form"].fields["pos_responsible"].queryset = self.pos.team.leads.all()
-        return context
 
 
 class PosReportDetailView(PosViewMixin, DetailView):
@@ -199,10 +179,13 @@ class PosReportBankCountStartView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs) -> None:
-        super().setup(*args, **kwargs)
-        if self.request.user != self.get_object().bank_responsible:
-            raise PermissionDenied("Only the bank responsible can do this")
+    def form_valid(self, form):
+        """Set responsible."""
+        posreport = form.save(commit=False)
+        posreport.bank_responsible_start = self.request.user
+        posreport.save()
+        messages.success(self.request, "PosReport bank start counts and responsible updated.")
+        return redirect(posreport.get_absolute_url())
 
 
 class PosReportBankCountEndView(PosViewMixin, UpdateView):
@@ -220,10 +203,13 @@ class PosReportBankCountEndView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs) -> None:
-        super().setup(*args, **kwargs)
-        if self.request.user != self.get_object().bank_responsible:
-            raise PermissionDenied("Only the bank responsible can do this")
+    def form_valid(self, form):
+        """Set responsible."""
+        posreport = form.save(commit=False)
+        posreport.bank_responsible_end = self.request.user
+        posreport.save()
+        messages.success(self.request, "PosReport bank end counts and responsible updated.")
+        return redirect(posreport.get_absolute_url())
 
 
 class PosReportPosCountStartView(PosViewMixin, UpdateView):
@@ -241,10 +227,13 @@ class PosReportPosCountStartView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs) -> None:
-        super().setup(*args, **kwargs)
-        if self.request.user != self.get_object().pos_responsible:
-            raise PermissionDenied("Only the Pos responsible can do this")
+    def form_valid(self, form):
+        """Set responsible."""
+        posreport = form.save(commit=False)
+        posreport.pos_responsible_start = self.request.user
+        posreport.save()
+        messages.success(self.request, "PosReport pos start counts and responsible updated.")
+        return redirect(posreport.get_absolute_url())
 
 
 class PosReportPosCountEndView(PosViewMixin, UpdateView):
@@ -263,10 +252,13 @@ class PosReportPosCountEndView(PosViewMixin, UpdateView):
     ]
     pk_url_kwarg = "posreport_uuid"
 
-    def setup(self, *args, **kwargs) -> None:
-        super().setup(*args, **kwargs)
-        if self.request.user != self.get_object().pos_responsible:
-            raise PermissionDenied("Only the pos responsible can do this")
+    def form_valid(self, form):
+        """Set responsible."""
+        posreport = form.save(commit=False)
+        posreport.pos_responsible_end = self.request.user
+        posreport.save()
+        messages.success(self.request, "PosReport pos end counts and responsible updated.")
+        return redirect(posreport.get_absolute_url())
 
 
 # ################## POSREPORT VIEWS END #########################

@@ -18,7 +18,12 @@
     {% for pr in posreport_list %}
       <tr>
         <td data-order="{{ pr.period.lower|sortable }}"><a href="{% url 'backoffice:posreport_detail' camp_slug=camp.slug pos_slug=pos.slug posreport_uuid=pr.uuid %}">{{ pr.period.lower }} - {{ pr.period.upper }}</a></td>
-        <td>Bank: {{ pr.bank_responsible }}<br>Pos: {{ pr.pos_responsible }}</td>
+        <td>
+            Bank&nbsp;Start:&nbsp;{{ pr.bank_responsible_start.profile.get_name|default:"N/A" }}<br>
+            Bank&nbsp;End:&nbsp;{{ pr.bank_responsible_end.profile.get_name|default:"N/A" }}<br>
+            Pos&nbsp;Start:&nbsp;{{ pr.pos_responsible_start.profile.get_name|default:"N/A" }}<br>
+            Pos&nbsp;End:&nbsp;{{ pr.pos_responsible_end.profile.get_name|default:"N/A" }}
+        </td>
         <td data-order="{{ pr.dkk_sales_izettle }}">{{ pr.dkk_sales_izettle }}&nbsp;DKK</td>
         <td data-order="{{ pr.dkk_balance }}" class="text-right">
           {{ pr.bank_count_dkk_start }}&nbsp;DKK<br>

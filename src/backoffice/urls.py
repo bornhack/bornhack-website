@@ -70,6 +70,7 @@ from .views import EventTypeDetailView
 from .views import EventTypeListView
 from .views import EventUpdateView
 from .views import ExpenseDetailView
+from .views import ExpenseUpdateView
 from .views import ExpenseListView
 from .views import FacilityCreateView
 from .views import FacilityDeleteView
@@ -148,6 +149,7 @@ from .views import ReimbursementDetailView
 from .views import ReimbursementListView
 from .views import ReimbursementUpdateView
 from .views import RevenueDetailView
+from .views import RevenueUpdateView
 from .views import RevenueListView
 from .views import ScanTicketsPosSelectView
 from .views import ScanTicketsView
@@ -940,8 +942,12 @@ urlpatterns = [
                             path("", ExpenseListView.as_view(), name="expense_list"),
                             path(
                                 "<uuid:pk>/",
-                                ExpenseDetailView.as_view(),
-                                name="expense_detail",
+                                include(
+                                    [
+                                        path("", ExpenseDetailView.as_view(), name="expense_detail",),
+                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update",),
+                                    ]
+                                ),
                             ),
                         ],
                     ),
@@ -954,8 +960,20 @@ urlpatterns = [
                             path("", RevenueListView.as_view(), name="revenue_list"),
                             path(
                                 "<uuid:pk>/",
-                                RevenueDetailView.as_view(),
-                                name="revenue_detail",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            RevenueDetailView.as_view(),
+                                            name="revenue_detail",
+                                        ),
+                                        path(
+                                            "update/",
+                                            RevenueUpdateView.as_view(),
+                                            name="revenue_update",
+                                        ),
+                                    ]
+                                ),
                             ),
                         ],
                     ),

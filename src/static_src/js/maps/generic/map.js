@@ -26,19 +26,17 @@ class BHMap {
 
     this.baseLayers['Ortophoto Map'] = L.tileLayer.wms('/maps/kfproxy/GeoDanmarkOrto/orto_foraar/1.0.0/WMS', {
       minZoom: 1,
-      maxZoom: 18,
+      maxZoom: 20,
+      maxNativeZoom: 17,
       attribution: this.myAttributionText,
       crossOrigin: true,
       layers: 'orto_foraar',
-      zoom: function (data) {
-        var zoomlevel = data.z;
-        if (zoomlevel > 13)
-          zoomlevel = 13;
-        return zoomlevel
-      },
     }).addTo(this.map);
 
     this.baseLayers['Regular Map'] = L.tileLayer.wms('/maps/kfproxy/Dkskaermkort/topo_skaermkort/1.0.0/wms', {
+      minZoom: 1,
+      maxZoom: 20,
+      maxNativeZoom: 17,
       version: '1.3.0',
       layers: 'dtk_skaermkort',
       format: 'image/png',
@@ -46,13 +44,16 @@ class BHMap {
     });
 
     this.baseLayers['Hillshade Map'] = L.tileLayer.wms('/maps/kfproxy/DHMNedboer/dhm/1.0.0/wms', {
+      minZoom: 1,
+      maxZoom: 20,
+      maxNativeZoom: 17,
       version: '1.3.0',
       layers: 'dhm_terraen_skyggekort',
       format: 'image/png',
       attribution: this.myAttributionText
     });
 
-    this.baseLayers['OSS (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    this.baseLayers['OSM (external)'] = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       maxZoom: 18,
     });

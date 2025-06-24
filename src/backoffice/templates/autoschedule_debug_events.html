@@ -17,9 +17,9 @@
           <th><a href="{% url 'backoffice:event_detail' camp_slug=camp.slug slug=event.slug %}">{{ event.title }}</a></th>
           {% for rowautoevent,rowevent in scheduler.autoevents|zip:scheduler.events.all %}
             {% if rowautoevent in autoevent.unavailability or rowautoevent == autoevent or autoevent in rowautoevent.unavailability %}
-              <td class="text-center danger"><i class="fas fa-times"></i></td>
+              <td class="text-center table-danger"><i class="fas fa-times"></i></td>
             {% else %}
-              <td class="text-center success"><i class="fas fa-check"></i></td>
+              <td class="text-center table-success"><i class="fas fa-check"></i></td>
             {% endif %}
           {% endfor %}
         </tr>

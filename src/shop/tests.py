@@ -599,7 +599,7 @@ class TestRefund(TestCase):
             content_type=permission_content_type,
             codename="info_team_member",
         )
-        infoteam.group.permissions.add(permission)
+        infoteam.member_group.permissions.add(permission)
         TeamMember.objects.create(user=cls.info_user, team=infoteam, approved=True)
         cls.bundle_product = ProductFactory()
         cls.sub_product = ProductFactory(ticket_type=TicketTypeFactory())
