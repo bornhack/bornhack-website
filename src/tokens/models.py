@@ -36,8 +36,8 @@ class TokenCategory(models.Model):
     class Meta:
         """Meta definition for TokenCategory."""
 
-        verbose_name = 'TokenCategory'
-        verbose_name_plural = 'TokenCategories'
+        verbose_name = 'Token category'
+        verbose_name_plural = 'Token categories'
 
     def __str__(self):
         """Unicode representation of TokenCategory."""
