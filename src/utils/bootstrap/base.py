@@ -89,7 +89,8 @@ from teams.models import TeamMember
 from teams.models import TeamShift
 from teams.models import TeamTask
 from tickets.models import TicketType
-from tokens.models import Token, TokenCategory
+from tokens.models import TokenCategory
+from tokens.models import Token
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
@@ -1853,26 +1854,26 @@ class Bootstrap:
 
     def create_token_categories(self, camp: Camp) -> dict[str, TokenCategory]:
         """Create the camp tokens."""
-        categories = {}
         year = camp.camp.lower.year
         self.output(f"Creating token categories for {year}...")
-        categories["physical"] = TokenCategory.objects.create(
+        categories = {}
+        categories["physical"], _ = TokenCategory.objects.get_or_create(
             name="Physical",
             description="Tokens exist in the physical space",
         )
-        categories["phone"] = TokenCategory.objects.create(
+        categories["phone"], _ = TokenCategory.objects.get_or_create(
             name="Phone",
             description="Tokens exist in a phoney space",
         )
-        categories["electrical"] = TokenCategory.objects.create(
+        categories["electrical"], _ = TokenCategory.objects.get_or_create(
             name="Electrical",
             description="Tokens with power",
         )
-        categories["internet"] = TokenCategory.objects.create(
+        categories["internet"], _ = TokenCategory.objects.get_or_create(
             name="Internet",
             description="Tokens exist in the virtual space",
         )
-        categories["website"] = TokenCategory.objects.create(
+        categories["website"], _ = TokenCategory.objects.get_or_create(
             name="Website",
             description="Tokens exist on the bornhack website",
         )
