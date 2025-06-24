@@ -11,7 +11,7 @@
     <div class="card-body">
       <p>A list of users and the number of tokens they found</p>
       <p>
-        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
         <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
           <thead>
             <tr>
@@ -32,7 +32,7 @@
         </table>
       </p>
       <p>
-        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>

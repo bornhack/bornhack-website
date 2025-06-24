@@ -14,13 +14,14 @@
         <p class="lead">No tokens found.</p>
       {% else %}
         <p>
-          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
           <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
             <thead>
               <tr>
+                <th>Category</th>
                 <th>Token</th>
                 <th>Active</th>
-                <th>Category</th>
+                <th>Hint</th>
                 <th>Description</th>
                 <th>Finds</th>
                 <th>Actions</th>
@@ -29,6 +30,7 @@
             <tbody>
               {% for token in token_list %}
                 <tr>
+                  <td>{{ token.category.name }}</td>
                   <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
                   <td>
                     {% if token.active %}
@@ -42,16 +44,14 @@
                       </span>
                     {% endif %}
                   </td>
-                  <td>{{ token.category }}</td>
+                  <td>{{ token.hint }}</td>
                   <td>{{ token.description }}</td>
                   <td>{{ token.tokenfind_set.count }}</td>
                   <td>
-                    <div class="btn-group-vertical">
-                      <a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-search"></i> Details</a>
-                      <a href="{% url 'backoffice:token_update' camp_slug=camp.slug pk=token.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update</a>
-                      <a href="{% url 'backoffice:token_delete' camp_slug=camp.slug pk=token.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete</a>
-                    </div>
-                  </td>
+                    <a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}"><i class="fas fa-search text-info"></i></a>
+                    <a href="{% url 'backoffice:token_update' camp_slug=camp.slug pk=token.pk %}"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'backoffice:token_delete' camp_slug=camp.slug pk=token.pk %}"<i class="fas fa-trash text-danger"></i></a>
+                </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -60,7 +60,7 @@
       {% endif %}
       <p>
         <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
-        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
   </div>
