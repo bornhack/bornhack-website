@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from collections import OrderedDict
 
 from typing import TYPE_CHECKING
 
@@ -19,25 +18,23 @@ from django.views.generic import ListView
 from django.views.generic import FormView
 from prometheus_client import Gauge
 
-from django.db.models import F
-from django.db.models import ExpressionWrapper
-from django.db.models import DurationField
-from django.db.models import Avg
-from django.db.models import Window
 from django.db.models import Min
 from django.db.models import Count
+from django.db.models import Q
+from django.db.models import F
+from django.db.models import OuterRef
+from django.db.models import Exists
 from django.db.models.functions import TruncHour
-from django.db.models.functions import Lead
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
-    from datetime import datetime
 
 from tokens.forms import TokenFindSubmitForm
 from utils.models import CampReadOnlyModeError
 
 from .models import Token
 from .models import TokenFind
+from .models import TokenCategory
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -81,11 +78,8 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         context["player_stats"] = self.player_stats(user_token_finds.count())
         context["widget_total_players"] = self.widget_total_players(camp_finds)
         context["widget_tokens_found"] = self.widget_tokens_found(camp_finds)
-        context["widget_avg_find_time"] = self.widget_avg_find_time(
-            camp_finds,
-            user_token_finds
-        )
         context["widget_token_activity"] = self.widget_token_activity(camp_finds)
+        context["widget_token_categories"] = self.widget_token_categories(camp_finds)
 
         return context
 
@@ -100,86 +94,62 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
     def widget_total_players(self, camp_finds: QuerySet) -> dict:
         """"Return a dictionary with metrics for the 'total players' widget"""
-        latest_find = (
-            User.objects.filter(
-                token_finds__isnull = False,
-                token_finds__token__camp = self.request.camp.pk
-            )
-            .annotate(latest_find=Min("token_finds__created"))
-            .order_by("latest_find").last().latest_find
-        )
-
         return {
             "count": camp_finds.distinct("user").count(),
-            "last_join": latest_find
+            "last_join": (
+                User.objects.filter(
+                    token_finds__isnull = False,
+                    token_finds__token__camp = self.request.camp.pk
+                )
+                .annotate(latest_find=Min("token_finds__created"))
+                .order_by("latest_find").last().latest_find
+            )
         }
 
     def widget_tokens_found(self, camp_finds: QuerySet) -> dict:
         """Return a dictionary with metrics for the 'tokens found' widget"""
         token_finds_count = camp_finds.distinct("token").count()
         token_count = self.object_list.count()
-        found_pct = (token_finds_count / token_count) * 100
 
         return {
             "count": camp_finds.count(),
             "last_found": camp_finds.order_by("created").last().created,
-            "found_pct": f"{found_pct:.1f}",
-            "not_found_pct": f"{(100 - found_pct):.1f}",
             "chart": {
                 "series": [
-                    token_finds_count,
-                    (token_count - token_finds_count )
+                    token_finds_count, (token_count - token_finds_count)
                 ],
                 "labels": ["Found", "Not found"],
             }
         }
 
-    def widget_avg_find_time(
-            self,
-            camp_finds: QuerySet,
-            user_token_finds: QuerySet
-    ) -> dict:
-        """Return a dictionary with metrics for the 'avg find time' widget"""
-        camp_avg = self._get_avg_time_between_creations(camp_finds)
-        user_avg = self._get_avg_time_between_creations(user_token_finds)
-        return {
-            "avg_find_time": camp_avg if camp_avg else None,
-            "user_avg_find_time": user_avg if user_avg else None
-        }
-
-    def _get_avg_time_between_creations(self, qs: QuerySet) -> datetime | None:
-        """
-        Calculate the average time between object creation in queryset
-        and return as a datetime object
-        """
-        intervals = (
-            qs.annotate(
-                next_created=Window(
-                    expression=Lead('created'),
-                    order_by=F('created').asc()
-                )
-            )
+    def widget_token_categories(self, camp_finds: QuerySet) -> dict:
+        """Return a dictionary with metrics for the 'token categories' widget"""
+        token_finds = TokenFind.objects.filter(token=OuterRef('pk'))
+        token_qs = Token.objects.filter(camp=self.request.camp).annotate(
+            was_found=Exists(token_finds)
+        )
+        category_data = (
+            token_qs.values(category_name=F('category__name'))
             .annotate(
-                interval=ExpressionWrapper(
-                    F('next_created') - F('created'),
-                    output_field=DurationField()
-                )
+                total_tokens=Count("id", distinct=True),
+                found_tokens=Count("id", filter=Q(was_found=True), distinct=True)
             )
         )
 
-        avg = intervals.aggregate(avg_interval=Avg('interval'))['avg_interval']
-        return (timezone.now() - avg) if avg else None
+        metrics = []
+        for cat in category_data:
+            metrics.append(
+                {
+                    "x": cat["category_name"],
+                    "y": (cat["found_tokens"] / cat["total_tokens"]) * 100
+                }
+            )
+
+        return {"chart": metrics}
 
     def widget_token_activity(self, camp_finds: QuerySet) -> dict:
         """Return a dictionary with metrics for the 'token activity' widget"""
-        widget = {}
         now = timezone.localtime()
-
-        widget["last_60min_count"] = (
-            camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
-            .count()
-        )
-
         start = now - timezone.timedelta(hours=23)
         qs = (
             camp_finds.filter(created__gte=start, created__lte=now)
@@ -189,8 +159,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             .order_by("hour")
         )
         counts_by_hour = {e["hour"]: e["count"] for e in qs}
-        labels = []
-        series = []
+        labels, series = [], []
         for i in range(24):
             dt = start + timedelta(hours=i)
             labels.append(dt.strftime("%H"))
@@ -199,12 +168,18 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             )
             series.append(count)
 
-        widget["chart"] = {
-            "series": series,
-            "labels": labels,
-        }
+        last_count = (
+            camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
+            .count()
+        )
 
-        return widget
+        return {
+            "last_hour_count": last_count,
+            "chart":  {
+                "series": series,
+                "labels": labels,
+            }
+        }
 
 class TokenSubmitFormView(LoginRequiredMixin, FormView):
     """View for submitting a token form"""

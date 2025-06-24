@@ -1,12 +1,11 @@
 const defaultOptions = {
   chart: {
     background: 'undefined',
-    height: "85%",
     toolbar: {
       show: false,
     },
   },
-  colors: ['#198754', '#dc3545'],
+  //colors: ['#198754', '#dc3545'],
   theme: {
     mode: 'dark',
   },
@@ -74,6 +73,25 @@ var tokenActivityOptions = {
   },
 };
 
+const tokenCategoryData = JSON.parse(
+    document.getElementById('tokenCategoryChart').textContent
+);
+var tokenCategoryOptions = {
+  ...defaultOptions,
+  chart: {
+    ...defaultOptions.chart,
+    type: 'radar',
+    height: '100%',
+    width: '100%'
+  },
+  series: [{
+        data: tokenCategoryData
+  }],
+  yaxis: {
+    show: false,
+  },
+};
+
 $(document).ready(function () {
   var totalPlayers = new ApexCharts(
     document.querySelector("#total_players_chart"),
@@ -90,5 +108,10 @@ $(document).ready(function () {
     tokenActivityOptions
   );
   tokenActivity.render();
+  var tokenCategory = new ApexCharts(
+    document.querySelector("#token_category_chart"),
+    tokenCategoryOptions
+  );
+  tokenCategory.render();
 });
 

@@ -12,6 +12,7 @@
 <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
 {{ widget_tokens_found.chart|json_script:"tokensFoundChart" }}
 {{ widget_token_activity.chart|json_script:"tokenActivityChart" }}
+{{ widget_token_categories.chart|json_script:"tokenCategoryChart" }}
 <script src="{% static 'js/tokens/token_charts.js' %}"></script>
 {% endblock extra_head %}
 
@@ -116,26 +117,11 @@
           <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
-                <div class="mb-3">
-                  <h5>Average find times</h5>
+                <div class="mb-0">
+                  <h5>Token categories</h5>
                 </div>
               </div>
-              <div class="text-center my-4">
-                <p>
-                  <i class="fa-solid fa-chart-line fa-5x"></i>
-                </p>
-              </div>
-              <div>
-                <p class="mb-1"><b>All players:</b> {{ widget_avg_find_time.avg_find_time | timesince }}</p>
-                <p>
-                <b>Your avg. time:</b>
-                {% if widget_avg_find_time.user_avg_find_time %}
-                {{ widget_avg_find_time.user_avg_find_time | timesince }}
-                {% else %}
-                N/A
-                {% endif %}
-                </p>
-              </div>
+              <div id="token_category_chart"></div>
             </div>
           </div>
         </div>
@@ -147,7 +133,7 @@
                   <h5>Token activity</h5>
                   <p class="mb-0"><small>Finds in last 60 min.</small></p>
                 </div>
-                <p class="h4">{{ widget_token_activity.last_60min_count }}</p>
+                <p class="h4">{{ widget_token_activity.last_hour_count }}</p>
               </div>
               <div id="token_activity_chart"></div>
             </div>
