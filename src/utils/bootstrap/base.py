@@ -1369,6 +1369,11 @@ class Bootstrap:
             description="The NOC team is in charge of establishing and running a network onsite.",
             camp=camp,
         )
+        teams["game"] = Team.objects.create(
+            name="Game",
+            description="The Game team is in charge of token game.",
+            camp=camp,
+        )
         teams["gis"] = Team.objects.create(
             name="GIS",
             description="The GIS team is in charge of managing the gis data.",
