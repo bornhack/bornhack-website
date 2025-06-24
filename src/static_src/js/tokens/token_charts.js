@@ -1,6 +1,10 @@
 const defaultOptions = {
   chart: {
-    background: 'undefined'
+    background: 'undefined',
+    height: "85%",
+    toolbar: {
+      show: false,
+    },
   },
   colors: ['#198754', '#dc3545'],
   theme: {
@@ -8,23 +12,21 @@ const defaultOptions = {
   },
 }
 
-const totalPlayersOptions = {
+var totalPlayersOptions = {
   ...defaultOptions,
   chart: {
     ...defaultOptions.chart,
     type: 'pie'
   },
-  series: [
-    5, 45,
-  ],
-  labels: [
-    'Players',
-    'Non-players',
-  ],
+  series: [5, 45],
+  labels: ['Players', 'Non-players'],
   legend: {
     show: true,
     position: 'bottom',
     horizontalAlign: 'left',
+    formatter: function(seriesName, opts) {
+        return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]]
+    },
   },
 };
 
@@ -43,6 +45,32 @@ var tokensFoundOptions = {
     show: true,
     position: 'bottom',
     horizontalAlign: 'left',
+    formatter: function(seriesName, opts) {
+        return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]]
+    },
+  },
+};
+
+const tokenActivityData = JSON.parse(
+    document.getElementById('tokenActivityChart').textContent
+);
+var tokenActivityOptions = {
+  ...defaultOptions,
+  chart: {
+    ...defaultOptions.chart,
+    type: 'bar'
+  },
+  series: [{
+    name: 'Tokens found',
+    data: tokenActivityData.series,
+  }],
+  dataLabels: {
+    enabled: false,
+  },
+  xaxis: {
+    categories: tokenActivityData.labels,
+    tickAmount: 12,
+    tickPlacement: 'on',
   },
 };
 
@@ -57,5 +85,10 @@ $(document).ready(function () {
     tokensFoundOptions
   );
   tokensFound.render();
+  var tokenActivity = new ApexCharts(
+    document.querySelector("#token_activity_chart"),
+    tokenActivityOptions
+  );
+  tokenActivity.render();
 });
 

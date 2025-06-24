@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+from datetime import timedelta
+from collections import OrderedDict
 
 from typing import TYPE_CHECKING
 
@@ -23,6 +25,8 @@ from django.db.models import DurationField
 from django.db.models import Avg
 from django.db.models import Window
 from django.db.models import Min
+from django.db.models import Count
+from django.db.models.functions import TruncHour
 from django.db.models.functions import Lead
 
 if TYPE_CHECKING:
@@ -81,6 +85,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             camp_finds,
             user_token_finds
         )
+        context["widget_token_activity"] = self.widget_token_activity(camp_finds)
 
         return context
 
@@ -162,10 +167,44 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             )
         )
 
-        logger.error(intervals)
         avg = intervals.aggregate(avg_interval=Avg('interval'))['avg_interval']
         return (timezone.now() - avg) if avg else None
 
+    def widget_token_activity(self, camp_finds: QuerySet) -> dict:
+        """Return a dictionary with metrics for the 'token activity' widget"""
+        widget = {}
+        now = timezone.localtime()
+
+        widget["last_60min_count"] = (
+            camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
+            .count()
+        )
+
+        start = now - timezone.timedelta(hours=23)
+        qs = (
+            camp_finds.filter(created__gte=start, created__lte=now)
+            .annotate(hour=TruncHour("created"))
+            .values("hour")
+            .annotate(count=Count("id"))
+            .order_by("hour")
+        )
+        counts_by_hour = {e["hour"]: e["count"] for e in qs}
+        labels = []
+        series = []
+        for i in range(24):
+            dt = start + timedelta(hours=i)
+            labels.append(dt.strftime("%H"))
+            count = counts_by_hour.get(
+                dt.replace(minute=0, second=0, microsecond=0), 0
+            )
+            series.append(count)
+
+        widget["chart"] = {
+            "series": series,
+            "labels": labels,
+        }
+
+        return widget
 
 class TokenSubmitFormView(LoginRequiredMixin, FormView):
     """View for submitting a token form"""

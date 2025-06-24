@@ -11,15 +11,13 @@
 {% block extra_head %}
 <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
 {{ widget_tokens_found.chart|json_script:"tokensFoundChart" }}
+{{ widget_token_activity.chart|json_script:"tokenActivityChart" }}
 <script src="{% static 'js/tokens/token_charts.js' %}"></script>
 {% endblock extra_head %}
 
 {% block content %}
 
   <div class="row my-4">
-    <div class="chart">
-      
-    </div>
     <div class="col-12 col-lg-6">
       <div class="mb-5">
         <h2 class="mb-2">Token game dashboard</h2>
@@ -145,19 +143,13 @@
           <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between">
-                <div class="mb-3">
-                  <h5>Activity by hour</h5>
+                <div class="mb-0">
+                  <h5>Token activity</h5>
+                  <p class="mb-0"><small>Finds in last 60 min.</small></p>
                 </div>
+                <p class="h4">{{ widget_token_activity.last_60min_count }}</p>
               </div>
-              <div class="text-center my-4">
-                <p>
-                  <i class="fa-solid fa-chart-simple fa-5x"></i>
-                </p>
-              </div>
-              <div>
-                <p class="mb-1"><b>Players:</b> N %</p>
-                <p><b>Non-Players:</b> N %</p>
-              </div>
+              <div id="token_activity_chart"></div>
             </div>
           </div>
         </div>
