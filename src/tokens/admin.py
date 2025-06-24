@@ -10,8 +10,17 @@ if TYPE_CHECKING:
 from django.contrib import admin
 
 from .models import Token
+from .models import TokenCategory
 from .models import TokenFind
 
+
+@admin.register(TokenCategory)
+class TokenCategoryAdmin(admin.ModelAdmin):
+    """Django admin for token categories."""
+
+    list_filter: ClassVar[list[str]] = ["name", "description"]
+    list_display: ClassVar[list[str]] = ["name", "description"]
+    search_fields: ClassVar[list[str]] = ["name", "description"]
 
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):

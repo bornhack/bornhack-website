@@ -89,7 +89,7 @@ from teams.models import TeamMember
 from teams.models import TeamShift
 from teams.models import TeamTask
 from tickets.models import TicketType
-from tokens.models import Token
+from tokens.models import Token, TokenCategory
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village
@@ -1848,7 +1848,34 @@ class Bootstrap:
             url="https://csis.dk",
         )
 
-    def create_camp_tokens(self, camp: Camp) -> dict[Token]:
+    def create_token_categories(self, camp: Camp) -> dict[str, TokenCategory]:
+        """Create the camp tokens."""
+        categories = {}
+        year = camp.camp.lower.year
+        self.output(f"Creating token categories for {year}...")
+        categories["physical"] = TokenCategory.objects.create(
+            name="Physical",
+            description="Tokens exist in the physical space",
+        )
+        categories["phone"] = TokenCategory.objects.create(
+            name="Phone",
+            description="Tokens exist in a phoney space",
+        )
+        categories["electrical"] = TokenCategory.objects.create(
+            name="Electrical",
+            description="Tokens with power",
+        )
+        categories["internet"] = TokenCategory.objects.create(
+            name="Internet",
+            description="Tokens exist in the virtual space",
+        )
+        categories["website"] = TokenCategory.objects.create(
+            name="Website",
+            description="Tokens exist on the bornhack website",
+        )
+        return categories
+
+    def create_camp_tokens(self, camp: Camp, categories: dict) -> dict[Token]:
         """Create the camp tokens."""
         tokens = {}
         year = camp.camp.lower.year
@@ -1856,42 +1883,48 @@ class Bootstrap:
         tokens[0] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Physical",
+            category=categories["physical"],
+            hint="Token in a tent",
             description="Token in the back of the speakers tent (in binary)",
             active=True,
         )
         tokens[1] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Internet",
-            description="Twitter",
+            category=categories["internet"],
+            hint="Social media",
+            description="Mastodon",
             active=True,
         )
         tokens[2] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Website",
+            category=categories["website"],
+            hint="Web server",
             description="Token hidden in the X-Secret-Token HTTP header on the BornHack website",
             active=True,
         )
         tokens[3] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Physical",
+            category=categories["physical"],
+            hint="QR Code",
             description="Token in infodesk (QR code)",
             active=True,
         )
         tokens[4] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Physical",
+            category=categories["physical"],
+            hint="Gadget",
             description=f"Token on the back of the BornHack {year} badge",
             active=True,
         )
         tokens[5] = Token.objects.create(
             camp=camp,
             token=get_random_string(length=32),
-            category="Website",
+            category=categories["website"],
+            hint="EXIF",
             description="Token hidden in EXIF data in the logo posted on the website sunday",
             active=True,
         )
@@ -2279,7 +2312,9 @@ class Bootstrap:
 
                 self.create_camp_sponsors(camp, sponsor_tiers)
 
-                tokens = self.create_camp_tokens(camp)
+                categories = self.create_token_categories(camp)
+
+                tokens = self.create_camp_tokens(camp, categories)
 
                 self.create_camp_token_finds(camp, tokens, self.users)
 
