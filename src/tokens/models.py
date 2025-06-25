@@ -11,6 +11,7 @@ from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
 
 if TYPE_CHECKING:
     from typing import ClassVar
@@ -18,7 +19,7 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 
-class TokenCategory(models.Model):
+class TokenCategory(CreatedUpdatedModel):
     """Model definition for TokenCategory."""
 
     name = models.CharField(

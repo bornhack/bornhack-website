@@ -18,20 +18,32 @@
       <table class="table">
         <tbody>
           <tr>
-            <th>Token</th>
-            <td>{{ token.tokene }}</td>
+            <th>Token:</th>
+            <td>{{ token.token }}</td>
           </tr>
           <tr>
-            <th>Category</th>
-            <td>{{ token.category }}</p>
+            <th>Category:</th>
+            <td><a href="{% url 'backoffice:token_category_detail' camp_slug=camp.slug pk=token.category.pk %}">{{ token.category.name }}</a></p>
           </tr>
           <tr>
-            <th>Description</th>
+            <th>Hint:</th>
+            <td>{{ token.hint }}</p>
+          </tr>
+          <tr>
+            <th>Description:</th>
             <td>{{ token.description }}</p>
           </tr>
           <tr>
-            <th>Finds</th>
+            <th>Finds:</th>
             <td>{{ token.tokenfind_set.count }} times</p>
+          </tr>
+          <tr>
+            <th>Created:</th>
+            <td>{{ token.created }}</p>
+          </tr>
+          <tr>
+            <th>Last updated:</th>
+            <td>{{ token.updated }}</p>
           </tr>
         </tbody>
       </table>

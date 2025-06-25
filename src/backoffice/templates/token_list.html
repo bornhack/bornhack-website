@@ -14,6 +14,7 @@
         <p class="lead">No tokens found.</p>
       {% else %}
         <p>
+          <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
           <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
           <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
             <thead>
@@ -21,6 +22,7 @@
                 <th>Category</th>
                 <th>Token</th>
                 <th>Active</th>
+                <th>Time Limits</th>
                 <th>Hint</th>
                 <th>Description</th>
                 <th>Finds</th>
@@ -30,7 +32,7 @@
             <tbody>
               {% for token in token_list %}
                 <tr>
-                  <td>{{ token.category.name }}</td>
+                  <td><a href="{% url 'backoffice:token_category_detail' camp_slug=camp.slug pk=token.category.pk %}">{{ token.category.name }}</a></td>
                   <td><a href="{% url 'backoffice:token_detail' camp_slug=camp.slug pk=token.pk %}">{{ token.token }}</a></td>
                   <td>
                     {% if token.active %}
@@ -42,6 +44,17 @@
                       <span data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ token.valid_when }}">
                         <i class="fas fa-clock text-success"></i>
                       </span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if token.valid_when.lower %}
+                      From {{ token.valid_when.lower }}<br>
+                    {% endif %}
+                    {% if token.valid_when.upper %}
+                      To {{ token.valid_when.upper  }}
+                    {% endif %}
+                    {% if not token.valid_when %}
+                      -
                     {% endif %}
                   </td>
                   <td>{{ token.hint }}</td>
@@ -59,7 +72,6 @@
         </p>
       {% endif %}
       <p>
-        <a class="btn btn-success" href="{% url 'backoffice:token_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create Token</a>
         <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
       </p>
     </div>
