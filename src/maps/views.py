@@ -139,6 +139,7 @@ class LayerJsonView(JsonView):
                     "team": layer.responsible_team.name if layer.responsible_team else "None",
                     "camp": layer.responsible_team.camp.slug if layer.responsible_team else "all",
                     "url": self.request.build_absolute_uri(url),
+                    "type": "layer",
                 },
             )
         for facility_type in FacilityType.objects.all():
@@ -155,6 +156,7 @@ class LayerJsonView(JsonView):
                     "team": facility_type.responsible_team.name,
                     "camp": facility_type.responsible_team.camp.slug,
                     "url": self.request.build_absolute_uri(url),
+                    "type": "facility",
                 },
             )
 
