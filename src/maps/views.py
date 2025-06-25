@@ -12,9 +12,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.views.decorators.cache import cache_control
 from django.core.exceptions import BadRequest
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
@@ -27,6 +24,8 @@ from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -121,6 +120,45 @@ class MapMarkerView(TemplateView):
             content_type="image/svg+xml",
             **kwargs,
         )
+
+
+class LayerJsonView(JsonView):
+    """View for returning all available layers in json."""
+
+    def get_context_data(self, **kwargs) -> list:
+        """Return the GeoJSON Data to the client."""
+        layers = []
+        for layer in Layer.objects.filter(public=True):
+            url = reverse(
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer.slug},
+            )
+            layers.append(
+                {
+                    "name": layer.name,
+                    "team": layer.responsible_team.name if layer.responsible_team else "None",
+                    "camp": layer.responsible_team.camp.slug if layer.responsible_team else "all",
+                    "url": self.request.build_absolute_uri(url),
+                },
+            )
+        for facility_type in FacilityType.objects.all():
+            url = reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": facility_type.responsible_team.camp.slug,
+                    "facility_type_slug": facility_type.slug,
+                },
+            )
+            layers.append(
+                {
+                    "name": facility_type.name,
+                    "team": facility_type.responsible_team.name,
+                    "camp": facility_type.responsible_team.camp.slug,
+                    "url": self.request.build_absolute_uri(url),
+                },
+            )
+
+        return layers
 
 
 class MapView(CampViewMixin, TemplateView):

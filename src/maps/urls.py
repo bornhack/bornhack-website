@@ -7,6 +7,7 @@ from django.urls import path
 from django.urls import re_path
 
 from .views import LayerGeoJSONView
+from .views import LayerJsonView
 from .views import MapMarkerView
 from .views import MapProxyView
 
@@ -14,6 +15,7 @@ app_name = "maps"
 
 urlpatterns = [
     path("marker/<color>/", MapMarkerView.as_view(), name="marker"),
+    path("layers/", LayerJsonView.as_view(), name="layers_json"),
     path(
         "<slug:layer_slug>/",
         include(
