@@ -15,7 +15,7 @@ app_name = "maps"
 
 urlpatterns = [
     path("marker/<color>/", MapMarkerView.as_view(), name="marker"),
-    path("layers/", LayerJsonView.as_view(), name="layers_json"),
+    path("layers/", LayerJsonView.as_view(), name="map_layers_json"),
     path(
         "<slug:layer_slug>/",
         include(
