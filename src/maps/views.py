@@ -12,12 +12,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.views.decorators.cache import cache_control
 from django.core.exceptions import BadRequest
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
+from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -27,6 +25,8 @@ from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -136,21 +136,34 @@ class MapView(CampViewMixin, TemplateView):
             user_teams = self.request.user.teammember_set.filter(
                 team__camp=self.camp,
             ).values_list("team__name", flat=True)
-        return Layer.objects.filter(
-            ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
-            | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+        return (
+            Layer.objects.filter(
+                ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
+                | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+            )
+            .annotate(num_features=Count("features"))
+            .filter(num_features__gt=0)
         )
 
     def get_context_data(self, **kwargs) -> dict:
         """Get the context data."""
         context = super().get_context_data(**kwargs)
-        context["facilitytype_list"] = FacilityType.objects.filter(
-            responsible_team__camp=self.camp,
+        context["facilitytype_list"] = (
+            FacilityType.objects.filter(
+                responsible_team__camp=self.camp,
+            )
+            .annotate(num_facilities=Count("facilities"))
+            .filter(num_facilities__gt=0)
         )
         context["layers"] = self.get_layers()
-        context["user_location_types"] = UserLocationType.objects.filter(
-            user_locations__isnull=False,
-        ).distinct()
+        context["user_location_types"] = (
+            UserLocationType.objects.filter(
+                user_locations__isnull=False,
+            )
+            .annotate(num_features=Count("user_locations"))
+            .filter(num_features__gt=0)
+            .distinct()
+        )
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
