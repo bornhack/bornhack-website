@@ -113,7 +113,7 @@ class MapLayerFeaturesImportView(
                 # parse single feature
                 geom = self.load_features(feature["geometry"])
             self.create_feature_object(
-                feature_uuid=feature.get("id"),
+                feature_uuid=(feature["properties"]["uuid"] if "uuid" in feature["properties"] else feature.get("id")),
                 props=feature["properties"],
                 layer=layer,
                 geom=geom,

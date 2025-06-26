@@ -96,12 +96,31 @@ class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
             else:
                 errorCount += 1
                 continue
-            obj, created = Facility.objects.update_or_create(
-                name=props["name"],
-                description=description,
-                facility_type=facility_type,
-                location=geom,
-            )
+            if "uuid" in props:
+                obj, created = Facility.objects.get_or_create(
+                    uuid=props["uuid"],
+                    facility_type=facility_type,
+                )
+                obj.name = props["name"]
+                obj.description = description
+                obj.location = geom
+                obj.save()
+            elif "id" in feature:
+                obj, created = Facility.objects.get_or_create(
+                    uuid=feature["id"],
+                    facility_type=facility_type,
+                )
+                obj.name = props["name"]
+                obj.description = description
+                obj.location = geom
+                obj.save()
+            else:
+                obj, created = Facility.objects.update_or_create(
+                    name=props["name"],
+                    description=description,
+                    facility_type=facility_type,
+                    location=geom,
+                )
             if created:
                 createdCount += 1
             else:
