@@ -267,6 +267,7 @@ class LayerGeoJSONView(LayerViewMixin, JsonView):
                 Feature.objects.filter(layer=self.layer.uuid),
                 geometry_field="geom",
                 fields=[
+                    "uuid",
                     "name",
                     "description",
                     "color",

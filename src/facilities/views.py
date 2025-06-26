@@ -54,7 +54,7 @@ class FacilityListGeoJSONView(CampViewMixin, JsonView):
             for facility in Facility.objects.filter(facility_type=ft.pk):
                 entry = {
                     "type": "Feature",
-                    "id": facility.pk,
+                    "facility_id": facility.pk,
                     "geometry": {
                         "type": "Point",
                         "coordinates": [facility.location.x, facility.location.y],
