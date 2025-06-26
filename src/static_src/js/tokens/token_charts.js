@@ -24,7 +24,7 @@ var totalPlayersOptions = {
     position: 'bottom',
     horizontalAlign: 'left',
     formatter: function(seriesName, opts) {
-        return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]]
+        return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
     },
   },
 };
@@ -45,8 +45,37 @@ var tokensFoundOptions = {
     position: 'bottom',
     horizontalAlign: 'left',
     formatter: function(seriesName, opts) {
-        return [seriesName, " - ", opts.w.globals.series[opts.seriesIndex]]
+        return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
     },
+  },
+};
+
+const tokenCategoryData = JSON.parse(
+    document.getElementById('tokenCategoryChart').textContent
+);
+var tokenCategoryOptions = {
+  ...defaultOptions,
+  chart: {
+    ...defaultOptions.chart,
+    type: 'radar',
+    height: '100%',
+  },
+  series: [
+    {
+      name: 'Found',
+      data: tokenCategoryData.series
+    }
+  ],
+  labels: tokenCategoryData.labels,
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return value + '%';
+      },
+    },
+  },
+  yaxis: {
+    show: false,
   },
 };
 
@@ -73,43 +102,24 @@ var tokenActivityOptions = {
   },
 };
 
-const tokenCategoryData = JSON.parse(
-    document.getElementById('tokenCategoryChart').textContent
-);
-var tokenCategoryOptions = {
-  ...defaultOptions,
-  chart: {
-    ...defaultOptions.chart,
-    type: 'radar',
-    height: '100%',
-    width: '100%'
-  },
-  series: [{
-        data: tokenCategoryData
-  }],
-  yaxis: {
-    show: false,
-  },
-};
-
 $(document).ready(function () {
   var totalPlayers = new ApexCharts(
-    document.querySelector("#total_players_chart"),
+    document.querySelector('#total_players_chart'),
     totalPlayersOptions
   );
   totalPlayers.render();
   var tokensFound = new ApexCharts(
-    document.querySelector("#tokens_found_chart"),
+    document.querySelector('#tokens_found_chart'),
     tokensFoundOptions
   );
   tokensFound.render();
   var tokenActivity = new ApexCharts(
-    document.querySelector("#token_activity_chart"),
+    document.querySelector('#token_activity_chart'),
     tokenActivityOptions
   );
   tokenActivity.render();
   var tokenCategory = new ApexCharts(
-    document.querySelector("#token_category_chart"),
+    document.querySelector('#token_category_chart'),
     tokenCategoryOptions
   );
   tokenCategory.render();

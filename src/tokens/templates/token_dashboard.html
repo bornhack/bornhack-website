@@ -10,9 +10,9 @@
 
 {% block extra_head %}
 <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
-{{ widget_tokens_found.chart|json_script:"tokensFoundChart" }}
-{{ widget_token_activity.chart|json_script:"tokenActivityChart" }}
-{{ widget_token_categories.chart|json_script:"tokenCategoryChart" }}
+{{ widgets.tokens_found.chart|json_script:"tokensFoundChart" }}
+{{ widgets.token_activity.chart|json_script:"tokenActivityChart" }}
+{{ widgets.token_categories.chart|json_script:"tokenCategoryChart" }}
 <script src="{% static 'js/tokens/token_charts.js' %}"></script>
 {% endblock extra_head %}
 
@@ -30,7 +30,7 @@
              <i class="fa-solid fa-trophy fa-3x text-success"></i>
             </span>
             <div class="ms-3">
-              <h5>{{ player_stats.token_finds }} found</h5>
+              <h5>{{ player_stats.tokens_found }} found</h5>
             </div>
           </div>
         </div>
@@ -91,9 +91,9 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Total players</h5>
-                  <p><b>Last join:</b> <small>{{ widget_total_players.last_join | timesince }} ago.</small></p>
+                  <p><b>Last join:</b> <small>{{ widgets.total_players.last_join | timesince }} ago.</small></p>
                 </div>
-                <p class="h4">{{ widget_total_players.count }}</p>
+                <p class="h4">{{ widgets.total_players.count }}</p>
               </div>
               <div id="total_players_chart"></div>
             </div>
@@ -105,9 +105,9 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h5>Tokens found</h5>
-                  <p><b>Last found:</b> <small>{{ widget_tokens_found.last_found | timesince }} ago.</small></p>
+                  <p><b>Last found:</b> <small>{{ widgets.tokens_found.last_found | timesince }} ago.</small></p>
                 </div>
-                <p class="h4">{{ widget_tokens_found.count }}</p>
+                <p class="h4">{{ widgets.tokens_found.count }}</p>
               </div>
               <div id="tokens_found_chart"></div>
             </div>
@@ -120,6 +120,7 @@
                 <div class="mb-0">
                   <h5>Token categories</h5>
                 </div>
+                <p class="h4">{{ widgets.token_categories.count }}</p>
               </div>
               <div id="token_category_chart"></div>
             </div>
@@ -133,7 +134,7 @@
                   <h5>Token activity</h5>
                   <p class="mb-0"><small>Finds in last 60 min.</small></p>
                 </div>
-                <p class="h4">{{ widget_token_activity.last_hour_count }}</p>
+                <p class="h4">{{ widgets.token_activity.last_60m_count }}</p>
               </div>
               <div id="token_activity_chart"></div>
             </div>

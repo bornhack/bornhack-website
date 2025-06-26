@@ -63,37 +63,41 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             self.model.objects
             .filter(active=True)
             .filter(camp=self.request.camp)
+            .prefetch_related("category")
         )
 
     def get_context_data(self, **kwargs):
         """
-        Get all of the metrics for stats/widgets, not included by the queryset
+        Return context containing form, player-statistics, and widgets metrics
         """
         context = super().get_context_data(**kwargs)
         context["form"] = TokenFindSubmitForm()
 
         camp_finds = TokenFind.objects.filter(token__camp=self.request.camp.pk)
-        user_token_finds = camp_finds.filter(user=self.request.user)
+        player_finds = camp_finds.filter(user=self.request.user)
 
-        context["player_stats"] = self.player_stats(user_token_finds.count())
-        context["widget_total_players"] = self.widget_total_players(camp_finds)
-        context["widget_tokens_found"] = self.widget_tokens_found(camp_finds)
-        context["widget_token_activity"] = self.widget_token_activity(camp_finds)
-        context["widget_token_categories"] = self.widget_token_categories(camp_finds)
+        context["player_stats"] = self.get_player_stats_metrics(player_finds)
+        context["widgets"] = {
+            "total_players": self.get_total_players_metrics(camp_finds),
+            "tokens_found": self.get_tokens_found_metrics(camp_finds),
+            "token_activity": self.get_token_activity_metrics(camp_finds),
+            "token_categories": self.get_token_categories_metrics(),
+        }
 
         return context
 
-    def player_stats(self, token_finds: int) -> dict:
-        """Return a dictionary with all of the player statistics"""
-        tokens_count = len(self.object_list)
+    def get_player_stats_metrics(self, player_finds: QuerySet) -> dict:
+        """Return all of the metrics for player statistics"""
+        player_finds_count = player_finds.count()
+        tokens_count = self.object_list.count()
         return {
-            "token_finds": token_finds,
-            "tokens_missing": tokens_count - token_finds,
+            "tokens_found": player_finds_count,
+            "tokens_missing": tokens_count - player_finds_count,
             "tokens_count": tokens_count
         }
 
-    def widget_total_players(self, camp_finds: QuerySet) -> dict:
-        """"Return a dictionary with metrics for the 'total players' widget"""
+    def get_total_players_metrics(self, camp_finds: QuerySet) -> dict:
+        """"Return metrics for the 'total players' widget"""
         return {
             "count": camp_finds.distinct("user").count(),
             "last_join": (
@@ -106,8 +110,8 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             )
         }
 
-    def widget_tokens_found(self, camp_finds: QuerySet) -> dict:
-        """Return a dictionary with metrics for the 'tokens found' widget"""
+    def get_tokens_found_metrics(self, camp_finds: QuerySet) -> dict:
+        """Return metrics for the 'tokens found' widget"""
         token_finds_count = camp_finds.distinct("token").count()
         token_count = self.object_list.count()
 
@@ -122,64 +126,71 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             }
         }
 
-    def widget_token_categories(self, camp_finds: QuerySet) -> dict:
-        """Return a dictionary with metrics for the 'token categories' widget"""
-        token_finds = TokenFind.objects.filter(token=OuterRef('pk'))
-        token_qs = Token.objects.filter(camp=self.request.camp).annotate(
-            was_found=Exists(token_finds)
+    def get_token_categories_metrics(self) -> dict:
+        """
+        Return metrics for the 'token categories' widget
+
+        Calculate the percentage of tokens found in each category by all players.
+        """
+        token_finds_qs = TokenFind.objects.filter(token=OuterRef('id'))
+        found_tokens_qs = Token.objects.filter(camp=self.request.camp).annotate(
+            was_found=Exists(token_finds_qs)
         )
         category_data = (
-            token_qs.values(category_name=F('category__name'))
+            found_tokens_qs.values(category_name=F('category__name'))
             .annotate(
                 total_tokens=Count("id", distinct=True),
                 found_tokens=Count("id", filter=Q(was_found=True), distinct=True)
             )
         )
 
-        metrics = []
-        for cat in category_data:
-            metrics.append(
-                {
-                    "x": cat["category_name"],
-                    "y": (cat["found_tokens"] / cat["total_tokens"]) * 100
-                }
+        labels, series = [], []
+        for category in category_data:
+            labels.append(category["category_name"])
+            series.append(
+                (category["found_tokens"] / category["total_tokens"]) * 100
             )
 
-        return {"chart": metrics}
+        return {
+            "count": len(labels),
+            "chart": {
+                "labels": labels,
+                "series": series
+            }
+        }
 
-    def widget_token_activity(self, camp_finds: QuerySet) -> dict:
-        """Return a dictionary with metrics for the 'token activity' widget"""
+    def get_token_activity_metrics(self, camp_finds: QuerySet) -> dict:
+        """Return metrics for the 'token activity' widget"""
         now = timezone.localtime()
         start = now - timezone.timedelta(hours=23)
-        qs = (
+        last_24h_qs = (
             camp_finds.filter(created__gte=start, created__lte=now)
             .annotate(hour=TruncHour("created"))
             .values("hour")
             .annotate(count=Count("id"))
             .order_by("hour")
         )
-        counts_by_hour = {e["hour"]: e["count"] for e in qs}
-        labels, series = [], []
-        for i in range(24):
-            dt = start + timedelta(hours=i)
-            labels.append(dt.strftime("%H"))
-            count = counts_by_hour.get(
-                dt.replace(minute=0, second=0, microsecond=0), 0
-            )
-            series.append(count)
+        count_by_hours = {entry["hour"]: entry["count"] for entry in last_24h_qs}
 
-        last_count = (
-            camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
-            .count()
-        )
+        labels, series = [], []
+        HOURS = 24
+        for i in range(HOURS):
+            delta = start + timedelta(hours=i)
+            labels.append(delta.strftime("%H"))
+
+            trunc_hour = delta.replace(minute=0, second=0, microsecond=0)
+            series.append(count_by_hours.get(trunc_hour, 0))
+
+        last_60m_qs = camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
 
         return {
-            "last_hour_count": last_count,
+            "last_60m_count": last_60m_qs.count(),
             "chart":  {
                 "series": series,
                 "labels": labels,
             }
         }
+
 
 class TokenSubmitFormView(LoginRequiredMixin, FormView):
     """View for submitting a token form"""
