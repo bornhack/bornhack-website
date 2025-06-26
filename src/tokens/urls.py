@@ -15,7 +15,7 @@ urlpatterns = [
     re_path(
         r"(?P<token>[0-9a-zA-Z\.@]{12,32})/$",
         TokenSubmitFormView.as_view(),
-        name="details",
+        name="submit",
     ),
     path("submit", TokenSubmitFormView.as_view(), name="submit"),
 ]

@@ -98,15 +98,19 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
     def get_total_players_metrics(self, camp_finds: QuerySet) -> dict:
         """"Return metrics for the 'total players' widget"""
+        last_joined_player = (
+            User.objects.filter(
+                token_finds__isnull = False,
+                token_finds__token__camp = self.request.camp.pk
+            )
+            .annotate(latest_find=Min("token_finds__created"))
+            .order_by("latest_find")
+            .last()
+        )
         return {
             "count": camp_finds.distinct("user").count(),
-            "last_join": (
-                User.objects.filter(
-                    token_finds__isnull = False,
-                    token_finds__token__camp = self.request.camp.pk
-                )
-                .annotate(latest_find=Min("token_finds__created"))
-                .order_by("latest_find").last().latest_find
+            "last_join_time": (
+                last_joined_player.latest_find if last_joined_player else None
             )
         }
 
@@ -114,10 +118,11 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         """Return metrics for the 'tokens found' widget"""
         token_finds_count = camp_finds.distinct("token").count()
         token_count = self.object_list.count()
+        last_token_find = camp_finds.order_by("created").last()
 
         return {
             "count": camp_finds.count(),
-            "last_found": camp_finds.order_by("created").last().created,
+            "last_found": last_token_find.created if last_token_find else None,
             "chart": {
                 "series": [
                     token_finds_count, (token_count - token_finds_count)
