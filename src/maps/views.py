@@ -123,6 +123,47 @@ class MapMarkerView(TemplateView):
         )
 
 
+class LayerJsonView(JsonView):
+    """View for returning all available layers in json."""
+
+    def get_context_data(self, **kwargs) -> list:
+        """Return the GeoJSON Data to the client."""
+        layers = []
+        for layer in Layer.objects.filter(public=True):
+            url = reverse(
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer.slug},
+            )
+            layers.append(
+                {
+                    "name": layer.name,
+                    "team": layer.responsible_team.name if layer.responsible_team else "None",
+                    "camp": layer.responsible_team.camp.slug if layer.responsible_team else "all",
+                    "url": self.request.build_absolute_uri(url),
+                    "type": "layer",
+                },
+            )
+        for facility_type in FacilityType.objects.all():
+            url = reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": facility_type.responsible_team.camp.slug,
+                    "facility_type_slug": facility_type.slug,
+                },
+            )
+            layers.append(
+                {
+                    "name": facility_type.name,
+                    "team": facility_type.responsible_team.name,
+                    "camp": facility_type.responsible_team.camp.slug,
+                    "url": self.request.build_absolute_uri(url),
+                    "type": "facility",
+                },
+            )
+
+        return layers
+
+
 class MapView(CampViewMixin, TemplateView):
     """Global map view."""
 
