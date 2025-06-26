@@ -96,6 +96,7 @@ class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
             else:
                 errorCount += 1
                 continue
+            # Check if UUID in props then create/update with UUID
             if "uuid" in props:
                 obj, created = Facility.objects.get_or_create(
                     uuid=props["uuid"],
@@ -105,6 +106,7 @@ class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
                 obj.description = description
                 obj.location = geom
                 obj.save()
+            # Check if id in feature then create/update with id as UUID
             elif "id" in feature:
                 obj, created = Facility.objects.get_or_create(
                     uuid=feature["id"],
@@ -114,6 +116,7 @@ class FacilityTypeImportView(CampViewMixin, OrgaOrGisTeamViewMixin, View):
                 obj.description = description
                 obj.location = geom
                 obj.save()
+            # Create/Update feature without UUID
             else:
                 obj, created = Facility.objects.update_or_create(
                     name=props["name"],
