@@ -176,6 +176,12 @@ class MapsViewTest(BornhackTestBase):
         response = self.client.get(url)
         assert response.status_code == 200
 
+    def test_map_layer_json_view(self) -> None:
+        """Test the map layers json view."""
+        url = reverse("maps:map_layers_json")
+        response = self.client.get(url)
+        assert response.status_code == 200
+
     def test_marker_views(self) -> None:
         """Test the marker view."""
         good = ["ffffff", "ffffff00"]

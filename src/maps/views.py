@@ -12,12 +12,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.gis.geos import Point
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
-from django.views.decorators.cache import cache_control
 from django.core.exceptions import BadRequest
 from django.core.exceptions import PermissionDenied
 from django.core.serializers import serialize
+from django.db.models import Count
 from django.db.models import Q
 from django.http import HttpRequest
 from django.http import HttpResponse
@@ -27,6 +25,8 @@ from django.shortcuts import redirect
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_control
+from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import CreateView
 from django.views.generic import DeleteView
@@ -123,6 +123,47 @@ class MapMarkerView(TemplateView):
         )
 
 
+class LayerJsonView(JsonView):
+    """View for returning all available layers in json."""
+
+    def get_context_data(self, **kwargs) -> list:
+        """Return the GeoJSON Data to the client."""
+        layers = []
+        for layer in Layer.objects.filter(public=True):
+            url = reverse(
+                "maps:map_layer_geojson",
+                kwargs={"layer_slug": layer.slug},
+            )
+            layers.append(
+                {
+                    "name": layer.name,
+                    "team": layer.responsible_team.name if layer.responsible_team else "None",
+                    "camp": layer.responsible_team.camp.slug if layer.responsible_team else "all",
+                    "url": self.request.build_absolute_uri(url),
+                    "type": "layer",
+                },
+            )
+        for facility_type in FacilityType.objects.all():
+            url = reverse(
+                "facilities:facility_list_geojson",
+                kwargs={
+                    "camp_slug": facility_type.responsible_team.camp.slug,
+                    "facility_type_slug": facility_type.slug,
+                },
+            )
+            layers.append(
+                {
+                    "name": facility_type.name,
+                    "team": facility_type.responsible_team.name,
+                    "camp": facility_type.responsible_team.camp.slug,
+                    "url": self.request.build_absolute_uri(url),
+                    "type": "facility",
+                },
+            )
+
+        return layers
+
+
 class MapView(CampViewMixin, TemplateView):
     """Global map view."""
 
@@ -136,21 +177,34 @@ class MapView(CampViewMixin, TemplateView):
             user_teams = self.request.user.teammember_set.filter(
                 team__camp=self.camp,
             ).values_list("team__name", flat=True)
-        return Layer.objects.filter(
-            ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
-            | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+        return (
+            Layer.objects.filter(
+                ((Q(responsible_team__camp=self.camp) | Q(responsible_team=None)) & Q(public=True))
+                | (Q(responsible_team__name__in=user_teams) & Q(public=False)),
+            )
+            .annotate(num_features=Count("features"))
+            .filter(num_features__gt=0)
         )
 
     def get_context_data(self, **kwargs) -> dict:
         """Get the context data."""
         context = super().get_context_data(**kwargs)
-        context["facilitytype_list"] = FacilityType.objects.filter(
-            responsible_team__camp=self.camp,
+        context["facilitytype_list"] = (
+            FacilityType.objects.filter(
+                responsible_team__camp=self.camp,
+            )
+            .annotate(num_facilities=Count("facilities"))
+            .filter(num_facilities__gt=0)
         )
         context["layers"] = self.get_layers()
-        context["user_location_types"] = UserLocationType.objects.filter(
-            user_locations__isnull=False,
-        ).distinct()
+        context["user_location_types"] = (
+            UserLocationType.objects.filter(
+                user_locations__isnull=False,
+            )
+            .annotate(num_features=Count("user_locations"))
+            .filter(num_features__gt=0)
+            .distinct()
+        )
         context["externalLayers"] = ExternalLayer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
         )
