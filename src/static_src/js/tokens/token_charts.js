@@ -1,4 +1,4 @@
-$(document).ready(function () {
+document.addEventListener('DOMContentLoaded', function () {
   const widgets = JSON.parse(document.getElementById('widgets').textContent);
   const theme = getComputedStyle(document.body).getPropertyValue('color-scheme');
 
@@ -117,5 +117,5 @@ $(document).ready(function () {
     tokenCategoryOptions
   );
   tokenCategory.render();
-});
 
+});
