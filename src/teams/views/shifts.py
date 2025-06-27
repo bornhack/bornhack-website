@@ -1,4 +1,5 @@
 """View for shifts in teams application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -26,20 +27,23 @@ from teams.exceptions import StartSameAsEndError
 from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
+from teams.models import TeamShiftAssignment
 from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import EnsureTeamLeadMixin
+from .mixins import EnsureTeamMemberMixin 
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
     from django.http import HttpRequest
     from django.http import HttpResponse
-
+    from django.forms import ModelForm
     from camps.models import Camp
 
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, ListView):
     """Shift list view."""
+
     model = TeamShift
     template_name = "team_shift_list.html"
     context_object_name = "shifts"
@@ -66,7 +70,7 @@ def date_choices(camp: Camp) -> list:
     minute_choices = []
     # To begin with we assume a shift can not be shorter than an hour
     shift_minimum_length = 60
-    while index * shift_minimum_length < 60: # noqa: PLR2004
+    while index * shift_minimum_length < 60:  # noqa: PLR2004
         minutes = int(index * shift_minimum_length)
         minute_choices.append(minutes)
         index += 1
@@ -94,12 +98,14 @@ def date_choices(camp: Camp) -> list:
 
 class ShiftForm(forms.ModelForm):
     """Form for shifts."""
+
     class Meta:
         """Meta."""
+
         model = TeamShift
         fields = ("from_datetime", "to_datetime", "people_required")
 
-    def __init__(self, instance: TeamShift|None=None, **kwargs) -> None:
+    def __init__(self, instance: TeamShift | None = None, **kwargs) -> None:
         """Method for setting up the form."""
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
@@ -151,6 +157,7 @@ class ShiftForm(forms.ModelForm):
 
 class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, CreateView):
     """View for creating a single shift."""
+
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
@@ -184,6 +191,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for updating a single shift."""
+
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
@@ -209,6 +217,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, DeleteView):
     """View for deleting a shift."""
+
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
     active_menu = "shifts"
@@ -230,7 +239,8 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class MultipleShiftForm(forms.Form):
     """Form for creating multple shifts."""
-    def __init__(self, instance: dict|None=None, **kwargs) -> None:
+
+    def __init__(self, instance: dict | None = None, **kwargs) -> None:
         """Method for form init setting camp to kwargs."""
         camp = kwargs.pop("camp")
         super().__init__(**kwargs)
@@ -249,6 +259,7 @@ class MultipleShiftForm(forms.Form):
 
 class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, FormView):
     """View for creating multiple shifts."""
+
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm
     active_menu = "shifts"
@@ -302,20 +313,31 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadM
         return context
 
 
-class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
+class MemberTakesShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
     """View for adding a user to a shift."""
-    http_methods = ("get",)
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to take this {self.object}?"
+        context["team"] = self.object.team 
+        return context
+
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
         """Method for adding user to a shift."""
-        shift = TeamShift.objects.get(id=kwargs["pk"])
-        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+        shift = self.object 
+        team = self.object.team 
 
-        team_member = TeamMember.objects.get(team=team, user=request.user)
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
 
         overlapping_shifts = TeamShift.objects.filter(
             team__camp=self.camp,
-            team_members__user=request.user,
+            team_members__user=self.request.user,
             shift_range__overlap=shift.shift_range,
         )
 
@@ -329,37 +351,86 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
             """,
             )
             messages.error(
-                request,
+                self.request,
                 template.render(Context({"shifts": overlapping_shifts})),
             )
         else:
+            # Remove at most one shift assignment for sale if any
+            # When a shift is for sale and a user presses assign its first assigning the for sale one
+            for shift_assignment in shift.team_members.filter(teamshiftassignment__for_sale=True).order_by('teamshiftassignment__updated_at')[:1]:
+                shift.team_members.remove(shift_assignment)
             shift.team_members.add(team_member)
 
-        kwargs.pop("pk")
+        self.kwargs.pop("pk")
 
-        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
-class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
+class MemberDropsShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
     """View for remove a user from a shift."""
-    http_methods = ("get",)
 
-    def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to drop this {self.object}?"
+        context["team"] = self.object.team 
+        return context
+
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
         """Method to remove user from shift."""
-        shift = TeamShift.objects.get(id=kwargs["pk"])
-        team = Team.objects.get(camp=self.camp, slug=kwargs["team_slug"])
+        shift = self.object 
+        team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
 
-        team_member = TeamMember.objects.get(team=team, user=request.user)
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
 
         shift.team_members.remove(team_member)
 
-        kwargs.pop("pk")
+        self.kwargs.pop("pk")
 
-        return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
+
+
+class MemberSellsShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
+    """View for making a shift available for other user to take."""
+    model = TeamShift
+    fields = []
+    template_name = "team_shift_confirm_action.html"
+    context_object_name = "shifts"
+    active_menu = "shifts"
+
+    def get_context_data(self, **kwargs) -> dict[str, object]:
+        """Method for setting the page context data."""
+        context = super().get_context_data(**kwargs)
+        context['action'] = f"Are you sure you want to this {self.object} available to others?"
+        context["team"] = self.object.team 
+        return context
+
+    http_methods = ("get",)
+
+    def form_valid(self, form: ModelForm[TeamShift]) -> HttpResponseRedirect:
+        """Method for making a shift available for other user to take."""
+        shift = self.object
+        team = Team.objects.get(camp=self.camp, slug=self.kwargs["team_slug"])
+
+        team_member = TeamMember.objects.get(team=team, user=self.request.user)
+
+        shift_assignment = TeamShiftAssignment.objects.get(team_member=team_member, team_shift=shift)
+        shift_assignment.for_sale = True
+        shift_assignment.save()
+
+        self.kwargs.pop("pk")
+
+        return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
 class UserShifts(CampViewMixin, TemplateView):
     """View for showing shifts for current user."""
+
     template_name = "team_user_shifts.html"
 
     def get_context_data(self, **kwargs) -> dict:
