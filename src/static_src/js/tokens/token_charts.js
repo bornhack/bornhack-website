@@ -11,7 +11,7 @@ $(document).ready(function () {
     },
     //colors: ['#198754', '#dc3545'],
     theme: {
-      mode: theme === 'light' ? 'light' : 'dark'
+      mode: theme === 'normal' ? 'light' : 'dark'
     },
   }
 
