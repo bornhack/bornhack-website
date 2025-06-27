@@ -102,20 +102,23 @@ document.addEventListener('DOMContentLoaded', function () {
     totalPlayersOptions
   );
   totalPlayers.render();
+
   var tokensFound = new ApexCharts(
     document.querySelector('#tokens_found_chart'),
     tokensFoundOptions
   );
   tokensFound.render();
-  var tokenActivity = new ApexCharts(
-    document.querySelector('#token_activity_chart'),
-    tokenActivityOptions
-  );
-  tokenActivity.render();
+
   var tokenCategory = new ApexCharts(
     document.querySelector('#token_category_chart'),
     tokenCategoryOptions
   );
   tokenCategory.render();
+
+  var tokenActivity = new ApexCharts(
+    document.querySelector('#token_activity_chart'),
+    tokenActivityOptions
+  );
+  tokenActivity.render();
 
 });

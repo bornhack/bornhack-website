@@ -107,8 +107,19 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             .order_by("latest_find")
             .last()
         )
+        unique_player_count = camp_finds.distinct("user").count()
         return {
-            "count": camp_finds.distinct("user").count(),
+            "count": unique_player_count,
+            "no_js": {
+                "Players": {
+                    "value": unique_player_count,
+                    "pct": unique_player_count / (unique_player_count + 200) * 100
+                },
+                "Non-Players": {
+                    "value": 200,
+                    "pct": 200 / (unique_player_count + 200) * 100
+                },
+            },
             "last_join_time": (
                 last_joined_player.latest_find if last_joined_player else None
             )
@@ -123,6 +134,16 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         return {
             "count": camp_finds.count(),
             "last_found": last_token_find.created if last_token_find else None,
+            "no_js": {
+                "Found": {
+                    "value": token_finds_count,
+                    "pct": (token_finds_count / token_count) * 100,
+                },
+                "Not found": {
+                    "value": (token_count - token_finds_count),
+                    "pct": (token_count - token_finds_count) / token_count * 100,
+                }
+            },
             "chart": {
                 "series": [
                     token_finds_count, (token_count - token_finds_count)
@@ -158,6 +179,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         return {
             "count": len(labels),
+            "no_js": dict(zip(labels, series)),
             "chart": {
                 "labels": labels,
                 "series": series
@@ -188,8 +210,11 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         last_60m_qs = camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
 
+        series.reverse()
+        labels.reverse()
         return {
             "last_60m_count": last_60m_qs.count(),
+            "no_js": dict(zip(labels, series)),
             "chart":  {
                 "series": series,
                 "labels": labels,
