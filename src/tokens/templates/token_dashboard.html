@@ -10,9 +10,7 @@
 
 {% block extra_head %}
 <script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
-{{ widgets.tokens_found.chart|json_script:"tokensFoundChart" }}
-{{ widgets.token_activity.chart|json_script:"tokenActivityChart" }}
-{{ widgets.token_categories.chart|json_script:"tokenCategoryChart" }}
+{{ widgets|json_script:"widgets" }}
 <script src="{% static 'js/tokens/token_charts.js' %}"></script>
 {% endblock extra_head %}
 

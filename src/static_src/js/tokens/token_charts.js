@@ -1,108 +1,102 @@
-const defaultOptions = {
-  chart: {
-    background: 'undefined',
-    toolbar: {
-      show: false,
-    },
-  },
-  //colors: ['#198754', '#dc3545'],
-  theme: {
-    mode: 'dark',
-  },
-}
+$(document).ready(function () {
+  const widgets = JSON.parse(document.getElementById('widgets').textContent);
+  const theme = getComputedStyle(document.body).getPropertyValue('color-scheme');
 
-var totalPlayersOptions = {
-  ...defaultOptions,
-  chart: {
-    ...defaultOptions.chart,
-    type: 'pie'
-  },
-  series: [5, 45],
-  labels: ['Players', 'Non-players'],
-  legend: {
-    show: true,
-    position: 'bottom',
-    horizontalAlign: 'left',
-    formatter: function(seriesName, opts) {
-        return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
-    },
-  },
-};
-
-const tokensFoundData = JSON.parse(
-  document.getElementById('tokensFoundChart').textContent
-);
-var tokensFoundOptions = {
-  ...defaultOptions,
-  chart: {
-    ...defaultOptions.chart,
-    type: 'pie'
-  },
-  series: tokensFoundData.series,
-  labels: tokensFoundData.labels,
-  legend: {
-    show: true,
-    position: 'bottom',
-    horizontalAlign: 'left',
-    formatter: function(seriesName, opts) {
-        return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
-    },
-  },
-};
-
-const tokenCategoryData = JSON.parse(
-    document.getElementById('tokenCategoryChart').textContent
-);
-var tokenCategoryOptions = {
-  ...defaultOptions,
-  chart: {
-    ...defaultOptions.chart,
-    type: 'radar',
-    height: '100%',
-  },
-  series: [
-    {
-      name: 'Found',
-      data: tokenCategoryData.series
-    }
-  ],
-  labels: tokenCategoryData.labels,
-  tooltip: {
-    y: {
-      formatter: function (value) {
-        return value + '%';
+  const defaultOptions = {
+    chart: {
+      background: 'undefined',
+      toolbar: {
+        show: false,
       },
     },
-  },
-  yaxis: {
-    show: false,
-  },
-};
+    //colors: ['#198754', '#dc3545'],
+    theme: {
+      mode: theme === 'light' ? 'light' : 'dark'
+    },
+  }
 
-const tokenActivityData = JSON.parse(
-    document.getElementById('tokenActivityChart').textContent
-);
-var tokenActivityOptions = {
-  ...defaultOptions,
-  chart: {
-    ...defaultOptions.chart,
-    type: 'bar'
-  },
-  series: [{
-    name: 'Tokens found',
-    data: tokenActivityData.series,
-  }],
-  dataLabels: {
-    enabled: false,
-  },
-  xaxis: {
-    categories: tokenActivityData.labels,
-    tickAmount: 12,
-    tickPlacement: 'on',
-  },
-};
+  var totalPlayersOptions = {
+    ...defaultOptions,
+    chart: {
+      ...defaultOptions.chart,
+      type: 'pie'
+    },
+    series: [5, 45],
+    labels: ['Players', 'Non-players'],
+    legend: {
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'left',
+      formatter: function(seriesName, opts) {
+          return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
+      },
+    },
+  };
 
-$(document).ready(function () {
+  var tokensFoundOptions = {
+    ...defaultOptions,
+    chart: {
+      ...defaultOptions.chart,
+      type: 'pie'
+    },
+    series: widgets.tokens_found.chart.series,
+    labels: widgets.tokens_found.chart.labels,
+    legend: {
+      show: true,
+      position: 'bottom',
+      horizontalAlign: 'left',
+      formatter: function(seriesName, opts) {
+          return [seriesName, '(' + opts.w.globals.series[opts.seriesIndex] + ')']
+      },
+    },
+  };
+
+  var tokenCategoryOptions = {
+    ...defaultOptions,
+    chart: {
+      ...defaultOptions.chart,
+      type: 'radar',
+      height: '100%',
+    },
+    series: [
+      {
+        name: 'Found',
+        data: widgets.token_categories.chart.series
+      }
+    ],
+    labels: widgets.token_categories.chart.labels,
+    tooltip: {
+      y: {
+        formatter: function (value) {
+          return value + '%';
+        },
+      },
+    },
+    yaxis: {
+      show: false,
+    },
+  };
+
+  var tokenActivityOptions = {
+    ...defaultOptions,
+    chart: {
+      ...defaultOptions.chart,
+      type: 'bar'
+    },
+    series: [{
+      name: 'Tokens found',
+      data: widgets.token_activity.chart.series,
+    }],
+    dataLabels: {
+      enabled: false,
+    },
+    xaxis: {
+      categories: widgets.token_activity.chart.labels,
+      tickAmount: 12,
+      tickPlacement: 'on',
+    },
+  };
+
   var totalPlayers = new ApexCharts(
     document.querySelector('#total_players_chart'),
     totalPlayersOptions
