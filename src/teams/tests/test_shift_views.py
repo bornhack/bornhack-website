@@ -343,3 +343,32 @@ class TeamShiftViewTest(BornhackTestBase):
         rows = soup.select_one("table#main_table > tbody > tr:nth-of-type(1) td:nth-of-type(5)")
         matches = [s for s in rows if "Assign me" in str(s)]
         self.assertEqual(len(matches), 1, "team shift unassign failed")
+
+        # Test taking a shift as a user not on this team
+        self.client.force_login(self.users[3]) # User not on the NOC team
+        url = reverse(
+            "teams:shift_member_take",
+            kwargs={
+                "team_slug": team_shift_1.team.slug,
+                "camp_slug": self.camp.slug,
+                "pk": team_shift_1.pk,
+            },
+        )
+        response = self.client.get(
+            path=url,
+            follow=True
+        )
+        assert response.status_code == 200
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select("div.alert.alert-danger")
+        matches = [s for s in rows if "No thanks" in str(s)]
+        self.assertEqual(len(matches), 0, "team shift authorization failed")
+        response = self.client.post(
+            path=url,
+            follow=True,
+        )
+        assert response.status_code == 200
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select("div.alert.alert-danger")
+        matches = [s for s in rows if "No thanks" in str(s)]
+        self.assertEqual(len(matches), 0, "team shift authorization failed")

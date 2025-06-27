@@ -31,6 +31,7 @@ from teams.models import TeamShiftAssignment
 from utils.mixins import IsTeamPermContextMixin
 
 from .mixins import EnsureTeamLeadMixin
+from .mixins import EnsureTeamMemberMixin 
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -312,7 +313,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadM
         return context
 
 
-class MemberTakesShift(LoginRequiredMixin, CampViewMixin, UpdateView):
+class MemberTakesShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
     """View for adding a user to a shift."""
     model = TeamShift
     fields = []
@@ -365,7 +366,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
-class MemberDropsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
+class MemberDropsShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
     model = TeamShift
     fields = []
     template_name = "team_shift_confirm_action.html"
@@ -394,7 +395,7 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
         return HttpResponseRedirect(reverse("teams:shifts", kwargs=self.kwargs))
 
 
-class MemberSellsShift(LoginRequiredMixin, CampViewMixin, UpdateView):
+class MemberSellsShift(LoginRequiredMixin, CampViewMixin, EnsureTeamMemberMixin, UpdateView):
     """View for making a shift available for other user to take."""
     model = TeamShift
     fields = []
