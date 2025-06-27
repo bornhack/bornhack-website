@@ -208,6 +208,22 @@ class TeamShiftViewTest(BornhackTestBase):
         rows = soup.select("table#main_table > tbody > tr")
         self.assertEqual(len(rows), 10, "team shift list does not return 10 entries after delete")
 
+        # Test creating a shift as a member not a lead.
+        self.client.force_login(self.users[1])  # Noc team member
+        url = reverse(
+            "teams:shift_create",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
+        response = self.client.get(url, follow=True)
+        assert response.status_code == 200
+        soup = BeautifulSoup(content, "html.parser")
+        rows = soup.select("div.alert.alert-danger")
+        matches = [s for s in rows if "No thanks" in str(s)]
+        self.assertEqual(len(matches), 0, "team shift create authorization failed incorrect")
+
     def test_team_shift_actions(self) -> None:
         """Test the team shift actions."""
         self.client.force_login(self.users[4])  # Noc teamlead
@@ -362,7 +378,7 @@ class TeamShiftViewTest(BornhackTestBase):
         soup = BeautifulSoup(content, "html.parser")
         rows = soup.select("div.alert.alert-danger")
         matches = [s for s in rows if "No thanks" in str(s)]
-        self.assertEqual(len(matches), 0, "team shift authorization failed")
+        self.assertEqual(len(matches), 0, "team shift authorization failed incorrect")
         response = self.client.post(
             path=url,
             follow=True,
@@ -371,4 +387,4 @@ class TeamShiftViewTest(BornhackTestBase):
         soup = BeautifulSoup(content, "html.parser")
         rows = soup.select("div.alert.alert-danger")
         matches = [s for s in rows if "No thanks" in str(s)]
-        self.assertEqual(len(matches), 0, "team shift authorization failed")
+        self.assertEqual(len(matches), 0, "team shift authorization failed incorrect")
