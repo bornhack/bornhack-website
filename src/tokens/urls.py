@@ -12,10 +12,6 @@ app_name = "tokens"
 
 urlpatterns = [
     path("", TokenDashboardListView.as_view(), name="dashboard"),
-    re_path(
-        r"(?P<token>[0-9a-zA-Z\.@]{12,32})/$",
-        TokenSubmitFormView.as_view(),
-        name="submit",
-    ),
+    path("<str:token>", TokenSubmitFormView.as_view()), # Allow token in URL
     path("submit", TokenSubmitFormView.as_view(), name="submit"),
 ]
