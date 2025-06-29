@@ -121,11 +121,11 @@ class TestTokenViews(BornhackTestBase):
         response = self.client.get(self.url_dashboard)
         decoded_content = response.content.decode()
         soup = BeautifulSoup(decoded_content, "html.parser")
-        rows = soup.select("div#main table tbody tr")
+        rows = soup.select("div#main table.submitted-tokens tbody tr")
         self.assertEqual(len(rows), 4, "The dashboard table does not show 4 rows")
 
-    def test_token_find_view(self) -> None:
-        """Test the basics of the token find view."""
+    def test_token_submit_form_view(self) -> None:
+        """Test the basics of the token submit form view."""
         self.client.force_login(self.users[0])
 
         # Test finding the test token
