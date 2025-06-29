@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -63,11 +64,26 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
 
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
 
-    token = models.CharField(max_length=32, help_text="The secret token")
+    token = models.CharField(
+        max_length=32,
+        validators=[
+            RegexValidator(
+                r"^[0-9a-zA-Z\.@]{12,32}$",
+                ("The token did not match the regex of 12-32 characters, "
+                 "with (letters, numbers, dot(s) and @)")
+            )
+        ],
+        help_text="The secret token (^[0-9a-zA-Z\.@]{12,32}$)"
+    )
 
-    hint = models.TextField(help_text="The hint for this token")
+    hint = models.TextField(
+        help_text="The hint for this token (always visible to players)"
+    )
 
-    description = models.TextField(help_text="The description of the token")
+    description = models.TextField(
+        help_text="The description of the token "
+        "(not visible to players until they find the token)"
+    )
 
     active = models.BooleanField(
         default=False,
