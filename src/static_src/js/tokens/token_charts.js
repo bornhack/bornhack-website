@@ -11,7 +11,11 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     //colors: ['#198754', '#dc3545'],
     theme: {
-      mode: theme === 'normal' ? 'light' : 'dark'
+      mode: theme === 'normal' ? 'light' : 'dark',
+      monochrome: {
+        enabled: true,
+        color: widgets.options.camp_colour,
+      },
     },
   }
 

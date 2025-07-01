@@ -34,7 +34,6 @@ from utils.models import CampReadOnlyModeError
 
 from .models import Token
 from .models import TokenFind
-from .models import TokenCategory
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -78,6 +77,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         context["player_stats"] = self.get_player_stats_metrics(player_finds)
         context["widgets"] = {
+            "options": {"camp_colour": self.request.camp.colour},
             "total_players": self.get_total_players_metrics(camp_finds),
             "tokens_found": self.get_tokens_found_metrics(camp_finds),
             "token_activity": self.get_token_activity_metrics(camp_finds),
