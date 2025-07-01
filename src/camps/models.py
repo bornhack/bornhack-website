@@ -128,6 +128,42 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         related_name="+",
     )
 
+    ticket_type_full_week_adult = models.ForeignKey(
+        "tickets.TicketType",
+        on_delete=models.SET_NULL,
+        help_text="The ticket type for 'Adult Full Week' for this camp",
+        null=True,
+        blank=True,
+        related_name="full_week_adult_camps"
+    )
+
+    ticket_type_one_day_adult = models.ForeignKey(
+        "tickets.TicketType",
+        on_delete=models.SET_NULL,
+        help_text="The ticket type for 'Adult One Day' for this camp",
+        null=True,
+        blank=True,
+        related_name="one_day_adult_camps"
+    )
+
+    ticket_type_full_week_child = models.ForeignKey(
+        "tickets.TicketType",
+        on_delete=models.SET_NULL,
+        help_text="The ticket type for 'Child Full Week' for this camp",
+        null=True,
+        blank=True,
+        related_name="full_week_child_camps"
+    )
+
+    ticket_type_one_day_child = models.ForeignKey(
+        "tickets.TicketType",
+        on_delete=models.SET_NULL,
+        help_text="The ticket type for 'Child One Day' for this camp",
+        null=True,
+        blank=True,
+        related_name="one_day_child_camps"
+    )
+
     def get_absolute_url(self):
         return reverse("camp_detail", kwargs={"camp_slug": self.slug})
 
