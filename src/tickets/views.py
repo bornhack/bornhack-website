@@ -51,7 +51,6 @@ class TicketDownloadView(LoginRequiredMixin, SingleObjectMixin, View):
     model = ShopTicket
 
     def get_object(self, *args, **kwargs):
-        print(kwargs)
         pk = kwargs["pk"]
         try:
             return ShopTicket.objects.get(pk=pk, opr__order__user=self.request.user)
