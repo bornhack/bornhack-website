@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import logging
 from datetime import timedelta
 from django.conf import settings
@@ -15,6 +17,11 @@ from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
 
+if TYPE_CHECKING:
+    from django.db.models import QuerySet
+
+from tickets.models import ShopTicket
+from tickets.models import SponsorTicket
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
 
@@ -339,3 +346,38 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
     def event_slots(self):
         EventSlot = apps.get_model("program", "EventSlot")
         return EventSlot.objects.filter(event_session__in=self.event_sessions.all())
+
+    @property
+    def checked_in_full_week_adults(self) -> int:
+        """
+        Return the adult tickets checked in and being valid for today
+        """
+        shop_tickets = (
+            ShopTicket.objects.filter(
+                ticket_type=self.ticket_type_full_week_adult
+            )
+            .exclude(used_at=None)
+        ).count()
+        sponsor_tickets = (
+            SponsorTicket.objects.filter(
+                ticket_type=self.ticket_type_full_week_adult
+            )
+            .exclude(used_at=None)
+        ).count()
+        # TODO
+        # prize_tickets
+        return shop_tickets + sponsor_tickets
+
+    @property
+    def checked_in_full_week_children(self) -> QuerySet:
+        """
+        Return the children tickets checked in and being valid for today
+        """
+        shop_tickets = (
+            ShopTicket.objects.filter(
+                ticket_type=self.ticket_type_full_week_child
+            )
+            .exclude(used_at=None)
+        ).count()
+        return shop_tickets
+
