@@ -384,7 +384,21 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
             .exclude(used_at=None)
         ).count()
 
-        return shop_tickets
+        sponsor_tickets = (
+            SponsorTicket.objects.filter(
+                ticket_type=self.ticket_type_full_week_child
+            )
+            .exclude(used_at=None)
+        ).count()
+
+        prize_tickets = (
+            PrizeTicket.objects.filter(
+                ticket_type=self.ticket_type_full_week_child
+            )
+            .exclude(used_at=None)
+        ).count()
+
+        return shop_tickets + sponsor_tickets + prize_tickets
 
     @property
     def checked_in_one_day_adults(self) -> int:

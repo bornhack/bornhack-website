@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from sponsors.models import Sponsor
 from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
 from tickets.models import PrizeTicket
@@ -68,6 +69,30 @@ class TestCampModel(BornhackTestBase):
         ticket1 = self.full_week_children[0]
         ticket1.used_at = self.camp.camp.lower
         ticket1.save()
+        assert self.camp.checked_in_full_week_children == 1
+
+    def test_checked_in_full_week_children_with_sponsor_ticket(self) -> None:
+        """
+        Test the return value of checked in full week children with sponsor ticket
+        """
+        sponsor = Sponsor.objects.all().first()
+        SponsorTicket.objects.create(
+            sponsor=sponsor,
+            ticket_type=self.camp.ticket_type_full_week_child,
+            used_at = self.camp.camp.lower
+        )
+        assert self.camp.checked_in_full_week_children == 1
+
+    def test_checked_in_full_week_children_with_prize_ticket(self) -> None:
+        """
+        Test the return value of checked in full week children with prize ticket
+        """
+        PrizeTicket.objects.create(
+            user=self.users[0],
+            ticket_type=self.camp.ticket_type_full_week_child,
+            comment="Prize winner",
+            used_at = self.camp.camp.lower
+        )
         assert self.camp.checked_in_full_week_children == 1
 
     def test_checked_in_one_day_adults(self) -> None:
