@@ -86,7 +86,6 @@ class TeamPermissionManageView(CampViewMixin, FormView):
             # loop over perms and see if user has each
             for perm in settings.BORNHACK_TEAM_PERMISSIONS.keys():
                 g = getattr(self.team, f"{perm}_group")
-                print(g.user_set.all())
                 if member in g.user_set.all():
                     # make checked because the user has this perm
                     initial[f"{member.username}_{perm}"] = True
