@@ -12,6 +12,7 @@ from tickets.models import SponsorTicket
 from tickets.models import PrizeTicket
 from utils.tests import BornhackTestBase
 
+
 class CampMenuTest(TestCase):
     def test_this_year_shown_on_homepage(self):
         """By March, the current year's camp should be on the homepage."""
@@ -28,31 +29,37 @@ class TestCampModel(BornhackTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.full_week_adults = { # All tickets are created by bootstrapping
+        self.full_week_adults = {  # All tickets are created by bootstrapping
             "shop_tickets": (
-                ShopTicket.objects.filter(ticket_type__camp=self.camp)
-                .filter(ticket_type=self.camp.ticket_type_full_week_adult)
+                ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                    ticket_type=self.camp.ticket_type_full_week_adult
+                )
             ),
             "sponsor_tickets": (
-                SponsorTicket.objects.filter(ticket_type__camp=self.camp)
-                .filter(ticket_type=self.camp.ticket_type_full_week_adult)
+                SponsorTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                    ticket_type=self.camp.ticket_type_full_week_adult
+                )
             ),
             "prize_tickets": (
-                PrizeTicket.objects.filter(ticket_type__camp=self.camp)
-                .filter(ticket_type=self.camp.ticket_type_full_week_adult)
+                PrizeTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                    ticket_type=self.camp.ticket_type_full_week_adult
+                )
             ),
         }
-        self.full_week_children = ( # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp)
-            .filter(ticket_type=self.camp.ticket_type_full_week_child)
+        self.full_week_children = (  # ShopTickets created by bootstrapping
+            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                ticket_type=self.camp.ticket_type_full_week_child
+            )
         )
-        self.one_day_adults = ( # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp)
-            .filter(ticket_type=self.camp.ticket_type_one_day_adult)
+        self.one_day_adults = (  # ShopTickets created by bootstrapping
+            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                ticket_type=self.camp.ticket_type_one_day_adult
+            )
         )
-        self.one_day_children = ( # ShopTickets created by bootstrapping
-            ShopTicket.objects.filter(ticket_type__camp=self.camp)
-            .filter(ticket_type=self.camp.ticket_type_one_day_child)
+        self.one_day_children = (  # ShopTickets created by bootstrapping
+            ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
+                ticket_type=self.camp.ticket_type_one_day_child
+            )
         )
 
     def test_checked_in_full_week_adults_all_ticket_types(self) -> None:
@@ -83,7 +90,7 @@ class TestCampModel(BornhackTestBase):
         SponsorTicket.objects.create(
             sponsor=sponsor,
             ticket_type=self.camp.ticket_type_full_week_child,
-            used_at = self.camp.camp.lower
+            used_at=self.camp.camp.lower,
         )
         assert self.camp.checked_in_full_week_children == 1
 
@@ -95,7 +102,7 @@ class TestCampModel(BornhackTestBase):
             user=self.users[0],
             ticket_type=self.camp.ticket_type_full_week_child,
             comment="Prize winner",
-            used_at = self.camp.camp.lower
+            used_at=self.camp.camp.lower,
         )
         assert self.camp.checked_in_full_week_children == 1
 
@@ -116,7 +123,7 @@ class TestCampModel(BornhackTestBase):
         SponsorTicket.objects.create(
             sponsor=sponsor,
             ticket_type=self.camp.ticket_type_one_day_adult,
-            used_at = timezone.localtime()
+            used_at=timezone.localtime(),
         )
 
         assert self.camp.checked_in_one_day_adults == 1
@@ -130,7 +137,7 @@ class TestCampModel(BornhackTestBase):
             user=self.users[0],
             ticket_type=self.camp.ticket_type_one_day_adult,
             comment="Prize winner",
-            used_at = timezone.localtime()
+            used_at=timezone.localtime(),
         )
 
         assert self.camp.checked_in_one_day_adults == 1
@@ -164,7 +171,7 @@ class TestCampModel(BornhackTestBase):
         SponsorTicket.objects.create(
             sponsor=sponsor,
             ticket_type=self.camp.ticket_type_one_day_child,
-            used_at = timezone.localtime()
+            used_at=timezone.localtime(),
         )
 
         assert self.camp.checked_in_one_day_children == 1
@@ -178,7 +185,7 @@ class TestCampModel(BornhackTestBase):
             user=self.users[0],
             ticket_type=self.camp.ticket_type_one_day_child,
             comment="Prize winner",
-            used_at = timezone.localtime()
+            used_at=timezone.localtime(),
         )
 
         assert self.camp.checked_in_one_day_children == 1
@@ -214,4 +221,3 @@ class TestCampModel(BornhackTestBase):
         child_one_day.save()
 
         assert self.camp.participant_count == 4
-

@@ -65,7 +65,12 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="Abbreviated version of the slug. Used in IRC channel names and other places with restricted name length.",
     )
 
-    kickoff = DateTimeRangeField(null=True, blank=True, verbose_name="Camp Kickoff", help_text="The camp kickoff period.")
+    kickoff = DateTimeRangeField(
+        null=True,
+        blank=True,
+        verbose_name="Camp Kickoff",
+        help_text="The camp kickoff period.",
+    )
 
     buildup = DateTimeRangeField(
         verbose_name="Buildup Period",
@@ -137,7 +142,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="The ticket type for 'Adult Full Week' for this camp",
         null=True,
         blank=True,
-        related_name="full_week_adult_camps"
+        related_name="full_week_adult_camps",
     )
 
     ticket_type_one_day_adult = models.ForeignKey(
@@ -146,7 +151,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="The ticket type for 'Adult One Day' for this camp",
         null=True,
         blank=True,
-        related_name="one_day_adult_camps"
+        related_name="one_day_adult_camps",
     )
 
     ticket_type_full_week_child = models.ForeignKey(
@@ -155,7 +160,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="The ticket type for 'Child Full Week' for this camp",
         null=True,
         blank=True,
-        related_name="full_week_child_camps"
+        related_name="full_week_child_camps",
     )
 
     ticket_type_one_day_child = models.ForeignKey(
@@ -164,7 +169,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         help_text="The ticket type for 'Child One Day' for this camp",
         null=True,
         blank=True,
-        related_name="one_day_child_camps"
+        related_name="one_day_child_camps",
     )
 
     def get_absolute_url(self):
@@ -190,7 +195,6 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     def __str__(self) -> str:
         return f"{self.title} - {self.tagline}"
-
 
     def activate_team_permissions(self) -> None:
         """Add permissions to this camps teams."""
@@ -219,7 +223,6 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
                 group = getattr(team, fk)
                 group.permissions.remove(permission)
                 logger.debug(f"Removed permission {permission} from group {group}")
-
 
     @property
     def logo_small(self) -> str:
@@ -349,22 +352,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         shop_tickets = (
             ShopTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_adult
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_adult
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_adult
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         return shop_tickets + sponsor_tickets + prize_tickets
@@ -375,22 +375,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         shop_tickets = (
             ShopTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_child
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_child
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
                 ticket_type=self.ticket_type_full_week_child
-            )
-            .exclude(used_at=None)
+            ).exclude(used_at=None)
         ).count()
 
         return shop_tickets + sponsor_tickets + prize_tickets
@@ -415,22 +412,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         shop_tickets = (
             ShopTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_adult
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_adult
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_adult
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         return shop_tickets + sponsor_tickets + prize_tickets
@@ -455,22 +449,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         shop_tickets = (
             ShopTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_child
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_child
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_child
-            )
-            .filter(used_at__gte=start, used_at__lt=end)
+            ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         return shop_tickets + sponsor_tickets + prize_tickets
@@ -482,8 +473,8 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         and todays used 'one day' tickets.
         """
         return (
-            self.checked_in_full_week_adults +
-            self.checked_in_full_week_children +
-            self.checked_in_one_day_adults +
-            self.checked_in_one_day_children
+            self.checked_in_full_week_adults
+            + self.checked_in_full_week_children
+            + self.checked_in_one_day_adults
+            + self.checked_in_one_day_children
         )

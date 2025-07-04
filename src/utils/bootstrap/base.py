@@ -337,7 +337,9 @@ class Bootstrap:
         )
         return facilities
 
-    def create_facility_feedbacks(self, facilities: dict, options: dict, users: dict) -> None:
+    def create_facility_feedbacks(
+        self, facilities: dict, options: dict, users: dict
+    ) -> None:
         """Create facility feedbacks."""
         self.output("Creating facility feedbacks...")
         FacilityFeedback.objects.create(
@@ -637,7 +639,9 @@ class Bootstrap:
 
         return types
 
-    def create_camp_products(self, camp: Camp, categories: dict, ticket_types: dict) -> dict:
+    def create_camp_products(
+        self, camp: Camp, categories: dict, ticket_types: dict
+    ) -> dict:
         """Create camp shop products."""
         products = {}
         year = camp.camp.lower.year
@@ -1053,7 +1057,9 @@ class Bootstrap:
             published_at=datetime(year, 9, 4, 12, 0, tzinfo=tz),
         )
 
-    def create_camp_event_sessions(self, camp: Camp, event_types: dict, event_locations: dict) -> None:
+    def create_camp_event_sessions(
+        self, camp: Camp, event_types: dict, event_locations: dict
+    ) -> None:
         """Create camp event sessions."""
         self.output(f"Creating EventSessions for {camp}...")
         days = camp.get_days(camppart="camp")[1:-1]
@@ -1084,7 +1090,8 @@ class Bootstrap:
                 event_location=event_locations["bar_area"],
                 when=(
                     datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + timedelta(hours=3),
+                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz)
+                    + timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
@@ -1121,7 +1128,9 @@ class Bootstrap:
                 event_type=event_types["keynote"],
                 event_location=event_locations["speakers_tent"],
                 when=(
-                    datetime(day.lower.year, day.lower.month, day.lower.day, 20, 0, tzinfo=tz),
+                    datetime(
+                        day.lower.year, day.lower.month, day.lower.day, 20, 0, tzinfo=tz
+                    ),
                     datetime(
                         day.lower.year,
                         day.lower.month,
@@ -1245,7 +1254,9 @@ class Bootstrap:
                     if not data:
                         continue
                     # 90% chance this speaker is available for any given chunk
-                    form.cleaned_data[data["fieldname"]] = random.randint(1, 100) < 90  # noqa: PLR2004, S311
+                    form.cleaned_data[data["fieldname"]] = (
+                        random.randint(1, 100) < 90
+                    )  # noqa: PLR2004, S311
             # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
@@ -1276,7 +1287,9 @@ class Bootstrap:
                     break
             else:
                 # all speakers are approved, approve the event? always approve keynotes!
-                if random.randint(1, 100) < 90 or ep.event_type.name == "Keynote":  # noqa: PLR2004, S311
+                if (
+                    random.randint(1, 100) < 90 or ep.event_type.name == "Keynote"
+                ):  # noqa: PLR2004, S311
                     ep.mark_as_approved()
                 else:
                     ep.mark_as_rejected()
@@ -1521,7 +1534,9 @@ class Bootstrap:
             description="We need ice cubes and crushed ice in the bar",
         )
 
-    def create_camp_team_memberships(self, camp: Camp, teams: dict, users: dict) -> dict:
+    def create_camp_team_memberships(
+        self, camp: Camp, teams: dict, users: dict
+    ) -> dict:
         """Create camp team memberships."""
         memberships = {}
         year = camp.camp.lower.year
@@ -1635,7 +1650,9 @@ class Bootstrap:
         )
         return memberships
 
-    def create_camp_team_shifts(self, camp: Camp, teams: dict, team_memberships: dict) -> None:
+    def create_camp_team_shifts(
+        self, camp: Camp, teams: dict, team_memberships: dict
+    ) -> None:
         """Create camp team shifts."""
         shifts = {}
         year = camp.camp.lower.year
@@ -1926,23 +1943,33 @@ class Bootstrap:
 
         return sponsors
 
-    def create_camp_sponsor_tickets(self, camp: Camp, sponsors: list, tiers: dict, ticket_types: dict) -> None:
+    def create_camp_sponsor_tickets(
+        self, camp: Camp, sponsors: list, tiers: dict, ticket_types: dict
+    ) -> None:
         """Create tickets for camp sponsors"""
         year = camp.camp.lower.year
         self.output(f"Creating sponsor tickets for {year}...")
         for sponsor in sponsors:
             if sponsor.tier == tiers["platinum"]:
                 for _ in range(10):
-                    SponsorTicket.objects.create(sponsor=sponsor, ticket_type=ticket_types["adult_full_week"])
+                    SponsorTicket.objects.create(
+                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                    )
             elif sponsor.tier == tiers["gold"]:
                 for _ in range(10):
-                    SponsorTicket.objects.create(sponsor=sponsor, ticket_type=ticket_types["adult_full_week"])
+                    SponsorTicket.objects.create(
+                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                    )
             elif sponsor.tier == tiers["silver"]:
                 for _ in range(5):
-                    SponsorTicket.objects.create(sponsor=sponsor, ticket_type=ticket_types["adult_full_week"])
+                    SponsorTicket.objects.create(
+                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                    )
             elif sponsor.tier == tiers["sponsor"]:
                 for _ in range(2):
-                    SponsorTicket.objects.create(sponsor=sponsor, ticket_type=ticket_types["adult_full_week"])
+                    SponsorTicket.objects.create(
+                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                    )
 
     def create_camp_tokens(self, camp: Camp) -> dict[Token]:
         """Create the camp tokens."""
@@ -1994,7 +2021,9 @@ class Bootstrap:
 
         return tokens
 
-    def create_camp_token_finds(self, camp: Camp, tokens: dict[Token], users: dict[User]) -> None:
+    def create_camp_token_finds(
+        self, camp: Camp, tokens: dict[Token], users: dict[User]
+    ) -> None:
         """Create the camp token finds."""
         year = camp.camp.lower.year
         self.output(f"Creating token finds for {year}...")
@@ -2014,7 +2043,7 @@ class Bootstrap:
         PrizeTicket.objects.create(
             user=self.users[5],
             comment="Prize winner",
-            ticket_type=ticket_types["adult_full_week"]
+            ticket_type=ticket_types["adult_full_week"],
         )
 
     def create_camp_expenses(self, camp: Camp) -> None:
@@ -2284,7 +2313,9 @@ class Bootstrap:
                 self.create_orders(self.users, camp_products)
                 sponsor_tiers = self.create_camp_sponsor_tiers(camp)
                 camp_sponsors = self.create_camp_sponsors(camp, sponsor_tiers)
-                self.create_camp_sponsor_tickets(camp, camp_sponsors, sponsor_tiers, ticket_types)
+                self.create_camp_sponsor_tickets(
+                    camp, camp_sponsors, sponsor_tiers, ticket_types
+                )
                 self.create_prize_ticket(camp, ticket_types)
 
             teams[year] = self.create_camp_teams(camp)
@@ -2336,7 +2367,9 @@ class Bootstrap:
 
                 self.create_camp_team_tasks(camp, teams)
 
-                team_memberships = self.create_camp_team_memberships(camp, teams, self.users)
+                team_memberships = self.create_camp_team_memberships(
+                    camp, teams, self.users
+                )
 
                 self.create_camp_team_shifts(camp, teams, team_memberships)
 
@@ -2383,7 +2416,9 @@ class Bootstrap:
 
                 facilities = self.create_facilities(facility_types)
 
-                self.create_facility_feedbacks(facilities, self.quickfeedback_options, self.users)
+                self.create_facility_feedbacks(
+                    facilities, self.quickfeedback_options, self.users
+                )
 
                 info_categories = self.create_camp_info_categories(camp, teams)
 
