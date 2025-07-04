@@ -8,7 +8,7 @@
       <th data-priority="2">Event Type</th>
       <th data-priority="100" class="text-center">Tags</th>
       <th data-priority="3">Speakers</th>
-      <th data-priority="100"><i class="fas fa-video" title="Recording" alt="Recording"></i></th>
+      <th data-priority="100"><i class="fas fa-video" title="Video" alt="Video"></i></th>
       <th data-priority="100"><i class="fas fa-floppy-disk" title="Recording" alt="Recording"></i></th>
       <th data-priority="100"><i class="fas fa-broadcast-tower" title="Streaming" alt="Streaming"></i></th>
       <th data-priority="1">Scheduled</th>
@@ -39,7 +39,7 @@
               N/A
             {% endfor %}
           </td>
-          <td class="text-center"><span class="hidden">{% if event.video_recording or event.video_streaming %}True</span>{{ True|truefalseicon }}{% else %}False</span>{{ False|truefalseicon }}{% endif %}</td>
+        <td class="text-center" title="Video: {% if event.video_recording or event.video_streaming %}Yes{% else %}No{% endif %}"><span class="hidden">{% if event.video_recording or event.video_streaming %}True</span>{{ True|truefalseicon }}{% else %}False</span>{{ False|truefalseicon }}{% endif %}</td>
             <td class="text-center" title="Recording: {{ event.video_recording|yesno }}"><span class="hidden">{{ event.video_recording }}</span>{{ event.video_recording|truefalseicon }}</td>
             <td class="text-center" title="Streaming: {{ event.video_streaming|yesno }}"><span class="hidden">{{ event.video_streaming }}</span>{{ event.video_streaming|truefalseicon }}</td>
             <td data-order="{{ event.event_slots.all.0.when.lower|date:"YmdHis" }}">
