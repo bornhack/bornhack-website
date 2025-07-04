@@ -88,7 +88,9 @@ from teams.models import Team
 from teams.models import TeamMember
 from teams.models import TeamShift
 from teams.models import TeamTask
-from tickets.models import PrizeTicket, SponsorTicket, TicketType
+from tickets.models import PrizeTicket
+from tickets.models import SponsorTicket
+from tickets.models import TicketType
 from tokens.models import Token
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify

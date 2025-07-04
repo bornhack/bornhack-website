@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import logging
 from datetime import timedelta
 from django.conf import settings
@@ -16,9 +14,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 from psycopg2.extras import DateTimeTZRange
-
-if TYPE_CHECKING:
-    from django.db.models import QuerySet
 
 from tickets.models import PrizeTicket
 from tickets.models import ShopTicket
@@ -408,21 +403,87 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         Count tickets with a checked in timestamp from 0600-0600 next day.
         Reason being early arriving participants might get checked in before 10.
         """
-        start = timezone.localtime().replace(hour=6, minute=00)
-        end = start + timezone.timedelta(days=1)
+        now = timezone.localtime()
+        today_06_hour = now.replace(hour=6, minute=0, second=0)
+        if now < today_06_hour:
+            start = today_06_hour - timezone.timedelta(days=1)
+            end = today_06_hour
+        else:
+            start = today_06_hour
+            end = today_06_hour + timezone.timedelta(days=1)
+
         shop_tickets = (
             ShopTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_adult
             )
-            .filter(used_at__gte=start, used_at__lte=end)
+            .filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
                 ticket_type=self.ticket_type_one_day_adult
             )
-            .filter(used_at__gte=start, used_at__lte=end)
+            .filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
-        return shop_tickets + sponsor_tickets
+        prize_tickets = (
+            PrizeTicket.objects.filter(
+                ticket_type=self.ticket_type_one_day_adult
+            )
+            .filter(used_at__gte=start, used_at__lt=end)
+        ).count()
 
+        return shop_tickets + sponsor_tickets + prize_tickets
+
+    @property
+    def checked_in_one_day_children(self) -> int:
+        """
+        Return the count of todays one day children tickets checked in.
+
+        Count tickets with a checked in timestamp from 0600-0600 next day.
+        Reason being early arriving participants might get checked in before 10.
+        """
+        now = timezone.localtime()
+        today_06_hour = now.replace(hour=6, minute=0, second=0)
+        if now < today_06_hour:
+            start = today_06_hour - timezone.timedelta(days=1)
+            end = today_06_hour
+        else:
+            start = today_06_hour
+            end = today_06_hour + timezone.timedelta(days=1)
+
+        shop_tickets = (
+            ShopTicket.objects.filter(
+                ticket_type=self.ticket_type_one_day_child
+            )
+            .filter(used_at__gte=start, used_at__lt=end)
+        ).count()
+
+        sponsor_tickets = (
+            SponsorTicket.objects.filter(
+                ticket_type=self.ticket_type_one_day_child
+            )
+            .filter(used_at__gte=start, used_at__lt=end)
+        ).count()
+
+        prize_tickets = (
+            PrizeTicket.objects.filter(
+                ticket_type=self.ticket_type_one_day_child
+            )
+            .filter(used_at__gte=start, used_at__lt=end)
+        ).count()
+
+        return shop_tickets + sponsor_tickets + prize_tickets
+
+    @property
+    def participant_count(self) -> int:
+        """
+        Retrieve the participant count for all used 'full week' tickets
+        and todays used 'one day' tickets.
+        """
+        return (
+            self.checked_in_full_week_adults +
+            self.checked_in_full_week_children +
+            self.checked_in_one_day_adults +
+            self.checked_in_one_day_children
+        )
