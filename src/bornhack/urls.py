@@ -58,7 +58,6 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("camps/", CampListView.as_view(), name="camp_list"),
-    path("token/", include("tokens.urls", namespace="tokens")),
     path("maps/", include("maps.urls", namespace="maps")),
     path("", include("django_prometheus.urls")),
     # camp redirect views here
@@ -145,6 +144,12 @@ urlpatterns = [
         kwargs={"page": "maps_user_location_list"},
         name="maps_user_location_redirect",
     ),
+    path(
+        "token/",
+        CampRedirectView.as_view(),
+        kwargs={"page": "tokens:token_find_list"},
+        name="token_find_list_redirect",
+    ),
     path("people/", PeopleView.as_view(), name="people"),
     # camp specific urls below here
     path(
@@ -221,6 +226,7 @@ urlpatterns = [
                 path("wishlist/", include("wishlist.urls", namespace="wishlist")),
                 path("facilities/", include("facilities.urls", namespace="facilities")),
                 path("phonebook/", include("phonebook.urls", namespace="phonebook")),
+                path("token/", include("tokens.urls", namespace="tokens")),
             ],
         ),
     ),

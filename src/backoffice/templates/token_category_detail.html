@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Token Category Details | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Token Category Details | BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>
+        <a href="{% url 'backoffice:token_category_update' camp_slug=camp.slug pk=object.pk %}" class="btn btn-primary"><i class="fas fa-edit"></i> Update Category</a>
+        <a href="{% url 'backoffice:token_category_delete' camp_slug=camp.slug pk=object.pk %}" class="btn btn-danger"><i class="fas fa-times"></i> Delete Category</a>
+        <a href="{% url 'backoffice:token_category_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Category List</a>
+      </p>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>Category:</th>
+            <td>{{ object.name }}</p>
+          </tr>
+          <tr>
+            <th>Description:</th>
+            <td>{{ object.description }}</p>
+          </tr>
+          <tr>
+            <th>Used by:</th>
+            <td>{{ object.token_set.count }}</td>
+          </tr>
+          <tr>
+            <th>Created:</th>
+            <td>{{ object.created }}</p>
+          </tr>
+          <tr>
+            <th>Last updated:</th>
+            <td>{{ object.updated }}</p>
+          </tr>
+        </tbody>
+      </table>
+      <h3>Related tokens</h3>
+      <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Camp</th>
+            <th>Hint</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for token in object.token_set.all %}
+            <tr>
+              <td><a href="{% url 'backoffice:token_detail' camp_slug=token.camp.slug pk=token.pk %}">{{ token.token }}</a></td>
+              <td>{{ token.camp }}</td>
+              <td>{{ token.hint }}</td>
+              <td>{{ token.description }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

@@ -46,7 +46,7 @@ class BackofficeIndexView(CampViewMixin, AnyTeamMemberRequiredMixin, TemplateVie
         if "camps.orga_team_member" in perms or context["is_team_pos"]:
             tabs["pos"] = {"name": "Pos"}
         if "camps.game_team_member" in perms:
-            tabs["game"] = {"name": "Game Team"}
+            tabs["game"] = {"name": "Games"}
         if "camps.gis_team_member" in perms or context["is_team_mapper"]:
             tabs["map"] = {"name": "Maps"}
         if "camps.orga_team_member" in perms or context["is_team_lead"]:

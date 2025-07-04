@@ -1,11 +1,14 @@
 {% if perms.camps.game_team_member %}
-  <h3>Secret Tokens</h3>
+  <h3>Game Team</h3>
   <a href="{% url 'backoffice:token_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Tokens</h4>
-    <p class="list-group-item-text">Use this view to see a list of Tokens, and to create, update and delete them</p>
-  </a>
+    <p class="list-group-item-text">Use this view to see a list of Tokens, and to <b>create</b>, <b>update</b> and <b>delete</b> them</p>  </a>
   <a href="{% url 'backoffice:token_stats' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Token Stats</h4>
     <p class="list-group-item-text">Use this view to see token find stats</p>
+  </a>
+  <a href="{% url 'backoffice:token_category_list' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Token categories</h4>
+    <p class="list-group-item-text">Use this view to see a list of Token Categories, and to <b>create</b>, <b>update</b> and <b>delete</b> them</p>
   </a>
 {% endif %}

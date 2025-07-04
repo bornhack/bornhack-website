@@ -171,6 +171,11 @@ from .views import TokenDetailView
 from .views import TokenListView
 from .views import TokenStatsView
 from .views import TokenUpdateView
+from .views import TokenCategoryListView
+from .views import TokenCategoryCreateView
+from .views import TokenCategoryDeleteView
+from .views import TokenCategoryUpdateView
+from .views import TokenCategoryDetailView
 from .views import VillageOrdersView
 from .views import VillageToOrderView
 from .views import ZettleBalanceListView
@@ -1433,6 +1438,45 @@ urlpatterns = [
                                 "delete/",
                                 TokenDeleteView.as_view(),
                                 name="token_delete",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "categories/",
+                    include(
+                        [
+                            path(
+                                "",
+                                TokenCategoryListView.as_view(),
+                                name="token_category_list"
+                            ),
+                            path(
+                                "create/",
+                                TokenCategoryCreateView.as_view(),
+                                name="token_category_create"
+                            ),
+                            path(
+                                "<int:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            TokenCategoryDetailView.as_view(),
+                                            name="token_category_detail",
+                                        ),
+                                        path(
+                                            "update/",
+                                            TokenCategoryUpdateView.as_view(),
+                                            name="token_category_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            TokenCategoryDeleteView.as_view(),
+                                            name="token_category_delete",
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),
