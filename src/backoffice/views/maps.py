@@ -9,7 +9,6 @@ from django.contrib.gis.geos import GeometryCollection
 from django.contrib.gis.geos import GEOSGeometry
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.templatetags.static import static
 from django.urls import reverse
 from django.views.generic import ListView
 from django.views.generic.edit import CreateView
@@ -22,6 +21,7 @@ from backoffice.forms import MapLayerFeaturesImportForm
 from camps.mixins import CampViewMixin
 from maps.mixins import ExternalLayerMapperViewMixin
 from maps.mixins import GisTeamViewMixin
+from maps.mixins import LayerMapMixin
 from maps.mixins import LayerMapperViewMixin
 from maps.models import ExternalLayer
 from maps.models import Feature
@@ -33,16 +33,18 @@ from utils.widgets import IconPickerWidget
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
-
 # ################# LAYERS ########################
 
 
 class MapLayerListView(CampViewMixin, AnyTeamMapperRequiredMixin, ListView):
+    """View for the list of layers."""
+
     model = Layer
     template_name = "maps_layer_list_backoffice.html"
     context_object_name = "maps_layer_list"
 
     def get_context_data(self, **kwargs):
+        """Method to get the list of layers."""
         context = super().get_context_data(**kwargs)
         context["layers"] = Layer.objects.filter(
             Q(responsible_team__camp=self.camp) | Q(responsible_team=None),
@@ -267,7 +269,7 @@ class MapFeatureListView(LayerMapperViewMixin, ListView):
         return context
 
 
-class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
+class MapFeatureCreateView(LayerMapperViewMixin, LayerMapMixin, CreateView):
     model = Feature
     template_name = "maps_feature_form.html"
     fields = [
@@ -284,7 +286,7 @@ class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["mapData"] = {"grid": static("json/grid.geojson")}
+        context.update({"mapData": self.get_map_data()})
         return context
 
     def get_form(self, *args, **kwargs):
@@ -313,7 +315,7 @@ class MapFeatureCreateView(LayerMapperViewMixin, CreateView):
         )
 
 
-class MapFeatureUpdateView(LayerMapperViewMixin, UpdateView):
+class MapFeatureUpdateView(LayerMapperViewMixin, LayerMapMixin, UpdateView):
     model = Feature
     slug_url_kwarg = "feature_uuid"
     slug_field = "uuid"
@@ -331,7 +333,7 @@ class MapFeatureUpdateView(LayerMapperViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["mapData"] = {"grid": static("json/grid.geojson")}
+        context.update({"mapData": self.get_map_data()})
         return context
 
     def get_form(self, *args, **kwargs):
