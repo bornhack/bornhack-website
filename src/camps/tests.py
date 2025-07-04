@@ -4,6 +4,7 @@ import datetime
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
@@ -35,10 +36,18 @@ class TestCampModel(BornhackTestBase):
                 SponsorTicket.objects.filter(ticket_type__camp=self.camp)
                 .filter(ticket_type=self.camp.ticket_type_full_week_adult)
             ),
+            "prize_tickets": (
+                PrizeTicket.objects.filter(ticket_type__camp=self.camp)
+                .filter(ticket_type=self.camp.ticket_type_full_week_adult)
+            ),
         }
         self.full_week_children = (
             ShopTicket.objects.filter(ticket_type__camp=self.camp)
             .filter(ticket_type=self.camp.ticket_type_full_week_child)
+        )
+        self.one_day_adults = (
+            ShopTicket.objects.filter(ticket_type__camp=self.camp)
+            .filter(ticket_type=self.camp.ticket_type_one_day_adult)
         )
 
     def test_checked_in_full_week_adults(self) -> None:
@@ -46,12 +55,13 @@ class TestCampModel(BornhackTestBase):
         tickets = [
             self.full_week_adults["shop_tickets"][0],
             self.full_week_adults["sponsor_tickets"][0],
+            self.full_week_adults["prize_tickets"][0],
         ]
         for ticket in tickets:
             ticket.used_at = self.camp.camp.lower
             ticket.save()
 
-        assert self.camp.checked_in_full_week_adults == 2
+        assert self.camp.checked_in_full_week_adults == 3
 
     def test_checked_in_full_week_children(self) -> None:
         """Test the return value of checked in full week children"""
@@ -59,4 +69,23 @@ class TestCampModel(BornhackTestBase):
         ticket1.used_at = self.camp.camp.lower
         ticket1.save()
         assert self.camp.checked_in_full_week_children == 1
+
+    def test_checked_in_one_day_adults(self) -> None:
+        """Test the return value of checked in one day adults today"""
+        for ticket in self.one_day_adults:
+            ticket.used_at = timezone.localtime()
+            ticket.save()
+
+        assert self.camp.checked_in_one_day_adults == 2
+
+    def test_checked_in_one_day_adults_before_yesterday(self) -> None:
+        """Test check in before 06 yesterday don't count"""
+        valid = self.one_day_adults[0]
+        valid.used_at = timezone.localtime()
+        valid.save()
+        not_valid = self.one_day_adults[1]
+        not_valid.used_at = timezone.localtime() - timezone.timedelta(days=2)
+        not_valid.save()
+
+        assert self.camp.checked_in_one_day_adults == 1
 

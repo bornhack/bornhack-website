@@ -2009,8 +2009,11 @@ class Bootstrap:
         """Create prize tickets"""
         year = camp.camp.lower.year
         self.output(f"Creating prize tickets for {year}...")
-        PrizeTicket.objects.create(user=self.users.keys(), ticket_type=ticket_types["adult_full_week"])
-
+        PrizeTicket.objects.create(
+            user=self.users[5],
+            comment="Prize winner",
+            ticket_type=ticket_types["adult_full_week"]
+        )
 
     def create_camp_expenses(self, camp: Camp) -> None:
         """Create camp expenses."""
