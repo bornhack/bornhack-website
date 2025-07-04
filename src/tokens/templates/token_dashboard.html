@@ -16,13 +16,13 @@
 
 {% block content %}
 
-  <div class="row my-4">
+  <div class="row my-5">
     <div class="col-12 col-lg-6">
       <div class="mb-5">
-        <h2 class="mb-2">Token game dashboard</h2>
+        <h2>Token game dashboard</h2>
       </div>
       <div class="row justify-content-between g-4">
-        <div class="col-4 col-md-auto me-4">
+        <div class="col-12 col-md-auto me-4">
           <div class="d-flex align-items-center">
             <span>
              <i class="unhide-for-no-js-users fs-2">&#127942;</i>
@@ -33,7 +33,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4 col-md-auto">
+        <div class="col-12 col-md-auto">
           <div class="d-flex align-items-center">
             <span>
              <i class="unhide-for-no-js-users fs-2">&#128269;</i>
@@ -44,7 +44,7 @@
             </div>
           </div>
         </div>
-        <div class="col-4 col-md-auto">
+        <div class="col-12 col-md-auto">
           <div class="d-flex align-items-center">
             <span>
              <i class="unhide-for-no-js-users fs-2">&#128196;</i>
@@ -56,10 +56,10 @@
           </div>
         </div>
       </div>
-      <hr class="my-4">
+      <hr class="mt-4 mb-5">
       <div class="row">
         <div class="col-12 col-md-auto">
-          <h3 class="mb-3">How to play?</h3>
+          <h3 class="mb-4">How to play?</h3>
           <p>The <b>token game</b> lasts the whole event and is about finding little text strings matching the regular expression:</p>
           <p><code>[0-9a-zA-Z\.@]{12,32}</code></p>
           <p>Token examples:</p>
@@ -71,9 +71,9 @@
           </ul>
           </p>
           <p>Tokens are hidden or in plain sight physically or virtually on the BornHack venue, online and offline.</p>
-          <p>Submit the tokens you find in the field below.</p>
+          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.year }}</b></p>
         </div>
-        <div class="col-12">
+        <div class="col-12 my-4">
           <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
             {% csrf_token %}
             <div class="input-group shadow-sm">
