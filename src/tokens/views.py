@@ -148,7 +148,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             "count": camp_finds.count(),
             "latest_find": latest_find.created if latest_find else None,
             "no_js": {
-                "Found": {
+                "Unique finds": {
                     "value": total_finds_count,
                     "pct": (total_finds_count / token_count) * 100,
                 },
@@ -222,10 +222,14 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             series.append(count_by_hours.get(trunc_hour, 0))
 
         last_60m_qs = camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
+        no_js_series = series.copy()
+        no_js_series.reverse()
+        no_js_labels = labels.copy()
+        no_js_labels.reverse()
 
         return {
             "last_60m_count": last_60m_qs.count(),
-            "no_js": dict(zip(labels, series)),
+            "no_js": dict(zip(no_js_labels, no_js_series)),
             "chart":  {
                 "series": series,
                 "labels": labels,

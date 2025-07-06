@@ -147,7 +147,7 @@
                       {% for key, value in widgets.total_finds.no_js.items %}
                       <tr>
                         <td scope="row">{{ key }}</td>
-                        <td>{{ value.value }}/{{ widgets.total_finds.count}} ({{ value.pct|floatformat:'0' }}%)</td>
+                        <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
                       </tr>
                       {% endfor %}
                     </tbody>
