@@ -258,7 +258,12 @@
           </thead>
           <tbody>
             {% for token in object_list %}
+              {% with token|found_by_user:user as user_has_found_token %}
+              {% if user_has_found_token %}
+              <tr class="table-success">
+              {% else %}
               <tr>
+              {% endif %}
                 <td>{{ token.category.name }}</td>
                 <td>
                   {% if token.valid_now %}
@@ -282,7 +287,6 @@
                 </td>
                 <td>{{ token.hint }}</td>
 
-                {% with token|found_by_user:user as user_has_found_token %}
                   {% if user_has_found_token %}
                     <td>{{ token.token }}</td>
                     <td>{{ token.description }}</td>
@@ -292,9 +296,8 @@
                     <td>-</td>
                     <td>-</td>
                   {% endif %}
-                {% endwith %}
-
               </tr>
+              {% endwith %}
             {% endfor %}
           </tbody>
         </table>
