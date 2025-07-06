@@ -79,7 +79,7 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         context["widgets"] = {
             "options": {"camp_colour": self.request.camp.colour},
             "total_players": self.get_total_players_metrics(camp_finds),
-            "tokens_found": self.get_tokens_found_metrics(camp_finds),
+            "total_finds": self.get_total_finds_metrics(camp_finds),
             "token_activity": self.get_token_activity_metrics(camp_finds),
             "token_categories": self.get_token_categories_metrics(),
         }
@@ -108,47 +108,60 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             .last()
         )
         unique_player_count = camp_finds.distinct("user").count()
+        non_player_count = self.request.camp.participant_count
+
+        if non_player_count:  # Avoid ZeroDivisionError
+            players_pct = unique_player_count / (unique_player_count + non_player_count) * 100
+            non_players_pct = non_player_count / (unique_player_count + non_player_count) * 100
+        else:
+            players_pct = 0
+            non_players_pct = 0
+
         return {
             "count": unique_player_count,
             "no_js": {
                 "Players": {
                     "value": unique_player_count,
-                    "pct": unique_player_count / (unique_player_count + 200) * 100
+                    "pct": players_pct
                 },
                 "Non-Players": {
-                    "value": 200,
-                    "pct": 200 / (unique_player_count + 200) * 100
+                    "value": non_player_count,
+                    "pct": non_players_pct
                 },
+            },
+            "chart": {
+                "series": [unique_player_count, non_player_count],
+                "labels": ["Players", "Non-players"],
             },
             "last_join_time": (
                 last_joined_player.latest_find if last_joined_player else None
             )
         }
 
-    def get_tokens_found_metrics(self, camp_finds: QuerySet) -> dict:
-        """Return metrics for the 'tokens found' widget"""
-        token_finds_count = camp_finds.distinct("token").count()
+    def get_total_finds_metrics(self, camp_finds: QuerySet) -> dict:
+        """Return metrics for the 'total finds' widget"""
+        total_finds_count = camp_finds.distinct("token").count()
         token_count = self.object_list.count()
-        last_token_find = camp_finds.order_by("created").last()
+        latest_find = camp_finds.order_by("created").last()
 
         return {
             "count": camp_finds.count(),
-            "last_found": last_token_find.created if last_token_find else None,
+            "latest_find": latest_find.created if latest_find else None,
             "no_js": {
                 "Found": {
-                    "value": token_finds_count,
-                    "pct": (token_finds_count / token_count) * 100,
+                    "value": total_finds_count,
+                    "pct": (total_finds_count / token_count) * 100,
                 },
                 "Not found": {
-                    "value": (token_count - token_finds_count),
-                    "pct": (token_count - token_finds_count) / token_count * 100,
+                    "value": (token_count - total_finds_count),
+                    "pct": (token_count - total_finds_count) / token_count * 100,
                 }
             },
             "chart": {
                 "series": [
-                    token_finds_count, (token_count - token_finds_count)
+                    total_finds_count, (token_count - total_finds_count)
                 ],
-                "labels": ["Found", "Not found"],
+                "labels": ["Unique finds", "Not found"],
             }
         }
 
@@ -210,8 +223,6 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         last_60m_qs = camp_finds.filter(created__gte=(now - timedelta(minutes=60)))
 
-        series.reverse()
-        labels.reverse()
         return {
             "last_60m_count": last_60m_qs.count(),
             "no_js": dict(zip(labels, series)),

@@ -2021,7 +2021,7 @@ class Bootstrap:
         )
         return categories
 
-    def create_camp_tokens(self, camp: Camp) -> dict[Token]:
+    def create_camp_tokens(self, camp: Camp, categories: dict) -> dict[Token]:
         """Create the camp tokens."""
         tokens = {}
         year = camp.camp.lower.year

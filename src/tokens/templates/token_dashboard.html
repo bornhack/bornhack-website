@@ -65,13 +65,13 @@
           <p>Token examples:</p>
           <p>
           <ul>
-            <li><code>BornHack{{ camp.year }}</code></li>
+            <li><code>BornHack{{ camp.camp.lower.year }}</code></li>
             <li><code>cm9sbGllczIwMjR5b3V3aW4K</code></li>
             <li><code>Ly5caCRLKRHrpiF6SQwe9geUKAxSsLQE</code></li>
           </ul>
           </p>
           <p>Tokens are hidden or in plain sight physically or virtually on the BornHack venue, online and offline.</p>
-          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.year }}</b></p>
+          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.camp.lower.year }}</b></p>
         </div>
         <div class="col-12 my-4">
           <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
@@ -128,12 +128,12 @@
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <div>
-                  <h5>Tokens found</h5>
-                  <p><b>Last found:</b> <small>{{ widgets.tokens_found.last_found | timesince }} ago.</small></p>
+                  <h5>Total finds</h5>
+                  <p><b>Latest find:</b> <small>{{ widgets.total_finds.latest_find | timesince }} ago.</small></p>
                 </div>
-                <p class="h4">{{ widgets.tokens_found.count }}</p>
+                <p class="h4">{{ widgets.total_finds.count }}</p>
               </div>
-              <div class="hide-for-no-js-users" id="tokens_found_chart"></div>
+              <div class="hide-for-no-js-users" id="total_finds_chart"></div>
               <div class="unhide-for-no-js-users mt-3">
                 <div class="widget-content-no-js">
                   <table class="table table-sm table-striped">
@@ -144,10 +144,10 @@
                     </tr>
                     </thead>
                     <tbody>
-                      {% for key, value in widgets.tokens_found.no_js.items %}
+                      {% for key, value in widgets.total_finds.no_js.items %}
                       <tr>
                         <td scope="row">{{ key }}</td>
-                        <td>{{ value.value }}/{{ widgets.tokens_found.count}} ({{ value.pct|floatformat:'0' }}%)</td>
+                        <td>{{ value.value }}/{{ widgets.total_finds.count}} ({{ value.pct|floatformat:'0' }}%)</td>
                       </tr>
                       {% endfor %}
                     </tbody>

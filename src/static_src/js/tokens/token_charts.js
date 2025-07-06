@@ -25,8 +25,8 @@ document.addEventListener('DOMContentLoaded', function () {
       ...defaultOptions.chart,
       type: 'pie'
     },
-    series: [5, 45],
-    labels: ['Players', 'Non-players'],
+    series: widgets.total_players.chart.series,
+    labels: widgets.total_players.chart.labels,
     legend: {
       show: true,
       position: 'bottom',
@@ -37,14 +37,14 @@ document.addEventListener('DOMContentLoaded', function () {
     },
   };
 
-  var tokensFoundOptions = {
+  var totalFindsOptions = {
     ...defaultOptions,
     chart: {
       ...defaultOptions.chart,
       type: 'pie'
     },
-    series: widgets.tokens_found.chart.series,
-    labels: widgets.tokens_found.chart.labels,
+    series: widgets.total_finds.chart.series,
+    labels: widgets.total_finds.chart.labels,
     legend: {
       show: true,
       position: 'bottom',
@@ -107,11 +107,11 @@ document.addEventListener('DOMContentLoaded', function () {
   );
   totalPlayers.render();
 
-  var tokensFound = new ApexCharts(
-    document.querySelector('#tokens_found_chart'),
-    tokensFoundOptions
+  var totalFinds = new ApexCharts(
+    document.querySelector('#total_finds_chart'),
+    totalFindsOptions
   );
-  tokensFound.render();
+  totalFinds.render();
 
   var tokenCategory = new ApexCharts(
     document.querySelector('#token_category_chart'),
