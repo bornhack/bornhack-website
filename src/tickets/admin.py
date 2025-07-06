@@ -44,7 +44,8 @@ class SponsorTicketAdmin(BaseTicketAdmin):
 
 @admin.register(PrizeTicket)
 class PrizeTicketAdmin(BaseTicketAdmin):
-    pass
+    list_display = ["pk", "ticket_type", "user", "used_at"]
+    list_filter = ["ticket_type__camp", "used_at", "ticket_type", "user"]
 
 
 @admin.register(ShopTicket)
