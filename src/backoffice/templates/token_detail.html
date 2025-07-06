@@ -51,14 +51,16 @@
       <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
         <thead>
           <tr>
-            <th>Email</th>
+              <th>Public credit name</th>
+              <th>Username</th>
             <th>Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {% for tf in token.tokenfind_set.all %}
             <tr>
-              <td>{{ tf.user.email }}</td>
+              <td>{{ tf.user.profile.public_credit_name }}</td>
+              <td>{{ tf.user.username }}</td>
               <td>{{ tf.created }}</td>
             </tr>
           {% endfor %}
