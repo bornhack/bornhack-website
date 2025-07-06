@@ -7,9 +7,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from sponsors.models import Sponsor
+from tickets.models import PrizeTicket
 from tickets.models import ShopTicket
 from tickets.models import SponsorTicket
-from tickets.models import PrizeTicket
 from utils.tests import BornhackTestBase
 
 
@@ -32,33 +32,33 @@ class TestCampModel(BornhackTestBase):
         self.full_week_adults = {  # All tickets are created by bootstrapping
             "shop_tickets": (
                 ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                    ticket_type=self.camp.ticket_type_full_week_adult
+                    ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
             "sponsor_tickets": (
                 SponsorTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                    ticket_type=self.camp.ticket_type_full_week_adult
+                    ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
             "prize_tickets": (
                 PrizeTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                    ticket_type=self.camp.ticket_type_full_week_adult
+                    ticket_type=self.camp.ticket_type_full_week_adult,
                 )
             ),
         }
         self.full_week_children = (  # ShopTickets created by bootstrapping
             ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                ticket_type=self.camp.ticket_type_full_week_child
+                ticket_type=self.camp.ticket_type_full_week_child,
             )
         )
         self.one_day_adults = (  # ShopTickets created by bootstrapping
             ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                ticket_type=self.camp.ticket_type_one_day_adult
+                ticket_type=self.camp.ticket_type_one_day_adult,
             )
         )
         self.one_day_children = (  # ShopTickets created by bootstrapping
             ShopTicket.objects.filter(ticket_type__camp=self.camp).filter(
-                ticket_type=self.camp.ticket_type_one_day_child
+                ticket_type=self.camp.ticket_type_one_day_child,
             )
         )
 
@@ -83,9 +83,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_full_week_children == 1
 
     def test_checked_in_full_week_children_with_sponsor_ticket(self) -> None:
-        """
-        Test the return value of checked in full week children with sponsor ticket
-        """
+        """Test the return value of checked in full week children with sponsor ticket"""
         sponsor = Sponsor.objects.all().first()
         SponsorTicket.objects.create(
             sponsor=sponsor,
@@ -95,9 +93,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_full_week_children == 1
 
     def test_checked_in_full_week_children_with_prize_ticket(self) -> None:
-        """
-        Test the return value of checked in full week children with prize ticket
-        """
+        """Test the return value of checked in full week children with prize ticket"""
         PrizeTicket.objects.create(
             user=self.users[0],
             ticket_type=self.camp.ticket_type_full_week_child,
@@ -115,8 +111,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_one_day_adults == 2
 
     def test_checked_in_one_day_adults_with_sponsor_ticket(self) -> None:
-        """
-        Test the return value of checked in one day adults
+        """Test the return value of checked in one day adults
         with sponsor ticket today
         """
         sponsor = Sponsor.objects.all().first()
@@ -129,8 +124,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_one_day_adults == 1
 
     def test_checked_in_one_day_adults_with_prize_ticket(self) -> None:
-        """
-        Test the return value of checked in one day adults
+        """Test the return value of checked in one day adults
         with prize ticket today
         """
         PrizeTicket.objects.create(
@@ -163,8 +157,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_one_day_children == 2
 
     def test_checked_in_one_day_children_with_sponsor_ticket(self) -> None:
-        """
-        Test the return value of checked in one day children
+        """Test the return value of checked in one day children
         with sponsor ticket today
         """
         sponsor = Sponsor.objects.all().first()
@@ -177,8 +170,7 @@ class TestCampModel(BornhackTestBase):
         assert self.camp.checked_in_one_day_children == 1
 
     def test_checked_in_one_day_children_with_prize_ticket(self) -> None:
-        """
-        Test the return value of checked in one day children
+        """Test the return value of checked in one day children
         with prize ticket today
         """
         PrizeTicket.objects.create(

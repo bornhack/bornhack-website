@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-from django.conf import settings
 
 from django.apps import apps
-from django.contrib.postgres.fields import DateTimeRangeField
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.contrib.auth.models import Permission as DjangoPermission
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import DateTimeRangeField
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -351,19 +351,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         """Return the count of full week adult tickets checked in"""
         shop_tickets = (
             ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult
+                ticket_type=self.ticket_type_full_week_adult,
             ).exclude(used_at=None)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult
+                ticket_type=self.ticket_type_full_week_adult,
             ).exclude(used_at=None)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_adult
+                ticket_type=self.ticket_type_full_week_adult,
             ).exclude(used_at=None)
         ).count()
 
@@ -374,19 +374,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
         """Return the count of full week children tickets checked in"""
         shop_tickets = (
             ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child
+                ticket_type=self.ticket_type_full_week_child,
             ).exclude(used_at=None)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child
+                ticket_type=self.ticket_type_full_week_child,
             ).exclude(used_at=None)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_full_week_child
+                ticket_type=self.ticket_type_full_week_child,
             ).exclude(used_at=None)
         ).count()
 
@@ -394,8 +394,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def checked_in_one_day_adults(self) -> int:
-        """
-        Return the count of todays one day adult tickets checked in.
+        """Return the count of todays one day adult tickets checked in.
 
         Count tickets with a checked in timestamp from 0600-0600 next day.
         Reason being early arriving participants might get checked in before 10.
@@ -411,19 +410,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
         shop_tickets = (
             ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult
+                ticket_type=self.ticket_type_one_day_adult,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult
+                ticket_type=self.ticket_type_one_day_adult,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_adult
+                ticket_type=self.ticket_type_one_day_adult,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
@@ -431,8 +430,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def checked_in_one_day_children(self) -> int:
-        """
-        Return the count of todays one day children tickets checked in.
+        """Return the count of todays one day children tickets checked in.
 
         Count tickets with a checked in timestamp from 0600-0600 next day.
         Reason being early arriving participants might get checked in before 10.
@@ -448,19 +446,19 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
         shop_tickets = (
             ShopTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child
+                ticket_type=self.ticket_type_one_day_child,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         sponsor_tickets = (
             SponsorTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child
+                ticket_type=self.ticket_type_one_day_child,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
         prize_tickets = (
             PrizeTicket.objects.filter(
-                ticket_type=self.ticket_type_one_day_child
+                ticket_type=self.ticket_type_one_day_child,
             ).filter(used_at__gte=start, used_at__lt=end)
         ).count()
 
@@ -468,8 +466,7 @@ class Camp(ExportModelOperationsMixin("camp"), CreatedUpdatedModel, UUIDModel):
 
     @property
     def participant_count(self) -> int:
-        """
-        Retrieve the participant count for all used 'full week' tickets
+        """Retrieve the participant count for all used 'full week' tickets
         and todays used 'one day' tickets.
         """
         return (

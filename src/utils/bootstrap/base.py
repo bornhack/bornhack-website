@@ -338,7 +338,10 @@ class Bootstrap:
         return facilities
 
     def create_facility_feedbacks(
-        self, facilities: dict, options: dict, users: dict
+        self,
+        facilities: dict,
+        options: dict,
+        users: dict,
     ) -> None:
         """Create facility feedbacks."""
         self.output("Creating facility feedbacks...")
@@ -640,7 +643,10 @@ class Bootstrap:
         return types
 
     def create_camp_products(
-        self, camp: Camp, categories: dict, ticket_types: dict
+        self,
+        camp: Camp,
+        categories: dict,
+        ticket_types: dict,
     ) -> dict:
         """Create camp shop products."""
         products = {}
@@ -1058,7 +1064,10 @@ class Bootstrap:
         )
 
     def create_camp_event_sessions(
-        self, camp: Camp, event_types: dict, event_locations: dict
+        self,
+        camp: Camp,
+        event_types: dict,
+        event_locations: dict,
     ) -> None:
         """Create camp event sessions."""
         self.output(f"Creating EventSessions for {camp}...")
@@ -1090,8 +1099,7 @@ class Bootstrap:
                 event_location=event_locations["bar_area"],
                 when=(
                     datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz),
-                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz)
-                    + timedelta(hours=3),
+                    datetime(start.year, start.month, start.day, 22, 0, tzinfo=tz) + timedelta(hours=3),
                 ),
             )
             EventSession.objects.create(
@@ -1129,7 +1137,12 @@ class Bootstrap:
                 event_location=event_locations["speakers_tent"],
                 when=(
                     datetime(
-                        day.lower.year, day.lower.month, day.lower.day, 20, 0, tzinfo=tz
+                        day.lower.year,
+                        day.lower.month,
+                        day.lower.day,
+                        20,
+                        0,
+                        tzinfo=tz,
                     ),
                     datetime(
                         day.lower.year,
@@ -1254,9 +1267,7 @@ class Bootstrap:
                     if not data:
                         continue
                     # 90% chance this speaker is available for any given chunk
-                    form.cleaned_data[data["fieldname"]] = (
-                        random.randint(1, 100) < 90
-                    )  # noqa: PLR2004, S311
+                    form.cleaned_data[data["fieldname"]] = random.randint(1, 100) < 90
             # print(f"saving availability for speaker {sp}: {form.cleaned_data}")
             save_speaker_availability(form, sp)
 
@@ -1287,9 +1298,7 @@ class Bootstrap:
                     break
             else:
                 # all speakers are approved, approve the event? always approve keynotes!
-                if (
-                    random.randint(1, 100) < 90 or ep.event_type.name == "Keynote"
-                ):  # noqa: PLR2004, S311
+                if random.randint(1, 100) < 90 or ep.event_type.name == "Keynote":
                     ep.mark_as_approved()
                 else:
                     ep.mark_as_rejected()
@@ -1535,7 +1544,10 @@ class Bootstrap:
         )
 
     def create_camp_team_memberships(
-        self, camp: Camp, teams: dict, users: dict
+        self,
+        camp: Camp,
+        teams: dict,
+        users: dict,
     ) -> dict:
         """Create camp team memberships."""
         memberships = {}
@@ -1651,7 +1663,10 @@ class Bootstrap:
         return memberships
 
     def create_camp_team_shifts(
-        self, camp: Camp, teams: dict, team_memberships: dict
+        self,
+        camp: Camp,
+        teams: dict,
+        team_memberships: dict,
     ) -> None:
         """Create camp team shifts."""
         shifts = {}
@@ -1902,7 +1917,7 @@ class Bootstrap:
                 description="Bus Trip",
                 logo_filename="PROSA-logo.png",
                 url="https://www.prosa.dk",
-            )
+            ),
         )
         sponsors.append(
             Sponsor.objects.create(
@@ -1911,7 +1926,7 @@ class Bootstrap:
                 description="Speakers tent",
                 logo_filename="DKUUGlogo.jpeg",
                 url="http://www.dkuug.dk/",
-            )
+            ),
         )
         sponsors.append(
             Sponsor.objects.create(
@@ -1920,7 +1935,7 @@ class Bootstrap:
                 description="Shuttle",
                 logo_filename="letsgo.png",
                 url="https://letsgo.dk",
-            )
+            ),
         )
         sponsors.append(
             Sponsor.objects.create(
@@ -1929,7 +1944,7 @@ class Bootstrap:
                 description="Cash Sponsorship",
                 logo_filename="saxobank.png",
                 url="https://home.saxo",
-            )
+            ),
         )
         sponsors.append(
             Sponsor.objects.create(
@@ -1938,37 +1953,39 @@ class Bootstrap:
                 description="Cash Sponsorship",
                 logo_filename="CSIS_PRI_LOGO_TURQUOISE_RGB.jpg",
                 url="https://csis.dk",
-            )
+            ),
         )
 
         return sponsors
 
     def create_camp_sponsor_tickets(
-        self, camp: Camp, sponsors: list, tiers: dict, ticket_types: dict
+        self,
+        camp: Camp,
+        sponsors: list,
+        tiers: dict,
+        ticket_types: dict,
     ) -> None:
         """Create tickets for camp sponsors"""
         year = camp.camp.lower.year
         self.output(f"Creating sponsor tickets for {year}...")
         for sponsor in sponsors:
-            if sponsor.tier == tiers["platinum"]:
+            if sponsor.tier == tiers["platinum"] or sponsor.tier == tiers["gold"]:
                 for _ in range(10):
                     SponsorTicket.objects.create(
-                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
-                    )
-            elif sponsor.tier == tiers["gold"]:
-                for _ in range(10):
-                    SponsorTicket.objects.create(
-                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                        sponsor=sponsor,
+                        ticket_type=ticket_types["adult_full_week"],
                     )
             elif sponsor.tier == tiers["silver"]:
                 for _ in range(5):
                     SponsorTicket.objects.create(
-                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                        sponsor=sponsor,
+                        ticket_type=ticket_types["adult_full_week"],
                     )
             elif sponsor.tier == tiers["sponsor"]:
                 for _ in range(2):
                     SponsorTicket.objects.create(
-                        sponsor=sponsor, ticket_type=ticket_types["adult_full_week"]
+                        sponsor=sponsor,
+                        ticket_type=ticket_types["adult_full_week"],
                     )
 
     def create_camp_tokens(self, camp: Camp) -> dict[Token]:
@@ -2022,7 +2039,10 @@ class Bootstrap:
         return tokens
 
     def create_camp_token_finds(
-        self, camp: Camp, tokens: dict[Token], users: dict[User]
+        self,
+        camp: Camp,
+        tokens: dict[Token],
+        users: dict[User],
     ) -> None:
         """Create the camp token finds."""
         year = camp.camp.lower.year
@@ -2314,7 +2334,10 @@ class Bootstrap:
                 sponsor_tiers = self.create_camp_sponsor_tiers(camp)
                 camp_sponsors = self.create_camp_sponsors(camp, sponsor_tiers)
                 self.create_camp_sponsor_tickets(
-                    camp, camp_sponsors, sponsor_tiers, ticket_types
+                    camp,
+                    camp_sponsors,
+                    sponsor_tiers,
+                    ticket_types,
                 )
                 self.create_prize_ticket(camp, ticket_types)
 
@@ -2368,7 +2391,9 @@ class Bootstrap:
                 self.create_camp_team_tasks(camp, teams)
 
                 team_memberships = self.create_camp_team_memberships(
-                    camp, teams, self.users
+                    camp,
+                    teams,
+                    self.users,
                 )
 
                 self.create_camp_team_shifts(camp, teams, team_memberships)
@@ -2417,7 +2442,9 @@ class Bootstrap:
                 facilities = self.create_facilities(facility_types)
 
                 self.create_facility_feedbacks(
-                    facilities, self.quickfeedback_options, self.users
+                    facilities,
+                    self.quickfeedback_options,
+                    self.users,
                 )
 
                 info_categories = self.create_camp_info_categories(camp, teams)
