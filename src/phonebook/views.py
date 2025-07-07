@@ -59,7 +59,7 @@ class DectExportJsonView(
 
     def get_context_data(self, **kwargs) -> dict:
         """Fetch data from the database and add it to context."""
-        context = super().get_context_data(**kwargs)
+        context = {}
         poc = self.request.user.has_perm(
             "camps.poc_team_lead",
         ) and self.request.access_token.is_valid(
