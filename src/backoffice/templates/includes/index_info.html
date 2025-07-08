@@ -51,4 +51,15 @@
     <h4 class="list-group-item-heading">Shop Ticket Overview</h4>
     <p class="list-group-item-text">Use this to list shop tickets</p>
   </a>
+  {% if not camp.read_only %}
+    <a href="{% url 'backoffice:scan_inventory_index' camp_slug=camp.slug %}"
+       class="list-group-item list-group-item-action">
+      <h4 class="list-group-item-heading">
+        Scan inventory
+      </h4>
+      <p class="list-group-item-text">
+        Use this view to scan inventory QR codes to check in inventory.
+      </p>
+    </a>
+  {% endif %}
 {% endif %}
