@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           ticket_token_input.value = "";
         } else {
-          ticket_token_input.value = "WONG ITEM";
+          ticket_token_input.value = "WRONG ITEM";
         }
       } else {
         scan_again.removeAttribute("hidden");
