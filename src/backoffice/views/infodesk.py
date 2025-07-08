@@ -216,9 +216,14 @@ class ScanInventoryView(
         if "token" in self.request.POST:
             context["failed"] = False
             # Slice to get rid of the first character which is a '#'
-            search_token = self.request.POST.get("token")[1:].split("/")
-            token_type = search_token[2]
-            token_id = int(search_token[3])
+            try:
+                search_token = self.request.POST.get("token")[1:].split("/")
+                token_type = search_token[2]
+                token_id = int(search_token[3])
+            except IndexError:
+                self.opr = None
+                context["failed"] = True
+                return context
             token_action = None
             if len(search_token) == 5:
                 token_action = search_token[4]
@@ -234,9 +239,16 @@ class ScanInventoryView(
 
     def post(self, request, **kwargs):
         """Method for saving the checkin."""
-        search_token = self.request.POST.get("token")[1:].split("/")
-        token_type = search_token[2]
-        token_id = int(search_token[3])
+        try:
+            search_token = self.request.POST.get("token")[1:].split("/")
+            token_type = search_token[2]
+            token_id = int(search_token[3])
+        except IndexError:
+            messages.error(
+                self.request,
+                "Not found.",
+            )
+            return super().get(request, **kwargs)
         token_action = None
         if len(search_token) == 5:
             token_action = search_token[4]

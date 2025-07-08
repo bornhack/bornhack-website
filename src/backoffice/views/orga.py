@@ -137,6 +137,7 @@ class MerchandiseToOrderView(CampViewMixin, OrgaTeamPermissionMixin, TemplateVie
 
         context = super().get_context_data(**kwargs)
         context["merchandise"] = merchandise_orders
+        context["total_items"] = sum(merchandise_orders.values())
         return context
 
 
