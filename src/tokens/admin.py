@@ -22,6 +22,7 @@ class TokenCategoryAdmin(admin.ModelAdmin):
     list_display: ClassVar[list[str]] = ["name", "description"]
     search_fields: ClassVar[list[str]] = ["name", "description"]
 
+
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
     """Django admin for tokens."""

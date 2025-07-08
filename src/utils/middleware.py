@@ -45,5 +45,5 @@ class NeverVaryTilesMiddleware:
         response = self.get_response(request)
         if "Vary" in response:
             if request.path.startswith("/maps/kfproxy/"):
-                del(response["Vary"])
+                del response["Vary"]
         return response

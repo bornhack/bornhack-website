@@ -19,8 +19,8 @@ from django.views.generic.edit import UpdateView
 from backoffice.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from tokens.models import Token
-from tokens.models import TokenFind
 from tokens.models import TokenCategory
+from tokens.models import TokenFind
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
@@ -146,10 +146,9 @@ class TokenCategoryCreateView(CampViewMixin, RaisePermissionRequiredMixin, Creat
         )
         if "_addanother" in self.request.POST:
             return reverse("backoffice:token_category_create", kwargs=self.kwargs)
-        elif "_addtoken" in self.request.POST:
+        if "_addtoken" in self.request.POST:
             return reverse("backoffice:token_create", kwargs=self.kwargs)
-        else:
-            return reverse("backoffice:token_category_list", kwargs=self.kwargs)
+        return reverse("backoffice:token_category_list", kwargs=self.kwargs)
 
 
 class TokenCategoryDetailView(CampViewMixin, RaisePermissionRequiredMixin, DetailView):
@@ -175,7 +174,7 @@ class TokenCategoryDeleteView(CampViewMixin, RaisePermissionRequiredMixin, Delet
         )
         return reverse(
             "backoffice:token_category_list",
-            kwargs={"camp_slug": self.camp.slug}
+            kwargs={"camp_slug": self.camp.slug},
         )
 
 
@@ -194,6 +193,5 @@ class TokenCategoryUpdateView(CampViewMixin, RaisePermissionRequiredMixin, Updat
         )
         return reverse(
             "backoffice:token_category_list",
-            kwargs={"camp_slug": self.camp.slug}
+            kwargs={"camp_slug": self.camp.slug},
         )
-

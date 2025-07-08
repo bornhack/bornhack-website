@@ -1,9 +1,10 @@
-from django.core.exceptions import ValidationError
+from __future__ import annotations
 
-from utils.tests import BornhackTestBase
+from django.core.exceptions import ValidationError
 
 from tokens.models import Token
 from tokens.models import TokenCategory
+from utils.tests import BornhackTestBase
 
 
 class TestTokenModel(BornhackTestBase):
@@ -17,7 +18,7 @@ class TestTokenModel(BornhackTestBase):
 
         cls.category = TokenCategory.objects.create(
             name="Test",
-            description="Test category"
+            description="Test category",
         )
 
     def create_token(self, token_str: str) -> Token:
@@ -28,27 +29,21 @@ class TestTokenModel(BornhackTestBase):
             category=self.category,
             hint="Test token hint",
             description="Test token description",
-            active=True
+            active=True,
         )
 
     def test_token_regex_validator_min_length(self) -> None:
-        """
-        Test minimum length of token, with regex validator raising exception.
-        """
+        """Test minimum length of token, with regex validator raising exception."""
         with self.assertRaises(ValidationError):
             self.create_token("minlength")
 
     def test_token_regex_validator_max_length(self) -> None:
-        """
-        Test maximum length of token, with regex validator raising exception.
-        """
+        """Test maximum length of token, with regex validator raising exception."""
         with self.assertRaises(ValidationError):
             self.create_token("maxLengthOf32CharactersTokenTests")
 
     def test_token_regex_validator_invalid_char(self) -> None:
-        """
-        Test invalid characters in token, with regex validator raising exception.
-        """
+        """Test invalid characters in token, with regex validator raising exception."""
         with self.assertRaises(ValidationError):
             self.create_token("useOfInvalidCharacter+")
 
@@ -62,6 +57,5 @@ class TestTokenModel(BornhackTestBase):
         self.assertIsInstance(self.create_token("validToken12"), Token)
         self.assertIsInstance(
             self.create_token("maxLengthOf32CharactersTokenTest"),
-            Token
+            Token,
         )
-

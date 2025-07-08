@@ -4,27 +4,25 @@ from __future__ import annotations
 
 import logging
 from datetime import timedelta
-
 from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.db.models import Count
+from django.db.models import Exists
+from django.db.models import F
+from django.db.models import Min
+from django.db.models import OuterRef
+from django.db.models import Q
+from django.db.models.functions import TruncHour
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import ListView
 from django.views.generic import FormView
+from django.views.generic import ListView
 from prometheus_client import Gauge
-
-from django.db.models import Min
-from django.db.models import Count
-from django.db.models import Q
-from django.db.models import F
-from django.db.models import OuterRef
-from django.db.models import Exists
-from django.db.models.functions import TruncHour
 
 if TYPE_CHECKING:
     from django.db.models import QuerySet
@@ -58,17 +56,10 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         """Get active tokens filtered by camp slug"""
-        return (
-            self.model.objects
-            .filter(active=True)
-            .filter(camp=self.request.camp)
-            .prefetch_related("category")
-        )
+        return self.model.objects.filter(active=True).filter(camp=self.request.camp).prefetch_related("category")
 
     def get_context_data(self, **kwargs):
-        """
-        Return context containing form, player-statistics, and widgets metrics
-        """
+        """Return context containing form, player-statistics, and widgets metrics"""
         context = super().get_context_data(**kwargs)
         context["form"] = TokenFindSubmitForm()
 
@@ -93,15 +84,15 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
         return {
             "tokens_found": player_finds_count,
             "tokens_missing": tokens_count - player_finds_count,
-            "tokens_count": tokens_count
+            "tokens_count": tokens_count,
         }
 
     def get_total_players_metrics(self, camp_finds: QuerySet) -> dict:
-        """"Return metrics for the 'total players' widget"""
+        """ "Return metrics for the 'total players' widget"""
         last_joined_player = (
             User.objects.filter(
-                token_finds__isnull = False,
-                token_finds__token__camp = self.request.camp.pk
+                token_finds__isnull=False,
+                token_finds__token__camp=self.request.camp.pk,
             )
             .annotate(latest_find=Min("token_finds__created"))
             .order_by("latest_find")
@@ -122,20 +113,18 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             "no_js": {
                 "Players": {
                     "value": unique_player_count,
-                    "pct": players_pct
+                    "pct": players_pct,
                 },
                 "Non-Players": {
                     "value": non_player_count,
-                    "pct": non_players_pct
+                    "pct": non_players_pct,
                 },
             },
             "chart": {
                 "series": [unique_player_count, non_player_count],
                 "labels": ["Players", "Non-players"],
             },
-            "last_join_time": (
-                last_joined_player.latest_find if last_joined_player else None
-            )
+            "last_join_time": (last_joined_player.latest_find if last_joined_player else None),
         }
 
     def get_total_finds_metrics(self, camp_finds: QuerySet) -> dict:
@@ -155,48 +144,45 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
                 "Not found": {
                     "value": (token_count - total_finds_count),
                     "pct": (token_count - total_finds_count) / token_count * 100,
-                }
+                },
             },
             "chart": {
                 "series": [
-                    total_finds_count, (token_count - total_finds_count)
+                    total_finds_count,
+                    (token_count - total_finds_count),
                 ],
                 "labels": ["Unique finds", "Not found"],
-            }
+            },
         }
 
     def get_token_categories_metrics(self) -> dict:
-        """
-        Return metrics for the 'token categories' widget
+        """Return metrics for the 'token categories' widget
 
         Calculate the percentage of tokens found in each category by all players.
         """
-        token_finds_qs = TokenFind.objects.filter(token=OuterRef('id'))
+        token_finds_qs = TokenFind.objects.filter(token=OuterRef("id"))
         found_tokens_qs = Token.objects.filter(camp=self.request.camp).annotate(
-            was_found=Exists(token_finds_qs)
+            was_found=Exists(token_finds_qs),
         )
-        category_data = (
-            found_tokens_qs.values(category_name=F('category__name'))
-            .annotate(
-                total_tokens=Count("id", distinct=True),
-                found_tokens=Count("id", filter=Q(was_found=True), distinct=True)
-            )
+        category_data = found_tokens_qs.values(category_name=F("category__name")).annotate(
+            total_tokens=Count("id", distinct=True),
+            found_tokens=Count("id", filter=Q(was_found=True), distinct=True),
         )
 
         labels, series = [], []
         for category in category_data:
             labels.append(category["category_name"])
             series.append(
-                (category["found_tokens"] / category["total_tokens"]) * 100
+                (category["found_tokens"] / category["total_tokens"]) * 100,
             )
 
         return {
             "count": len(labels),
-            "no_js": dict(zip(labels, series)),
+            "no_js": dict(zip(labels, series, strict=False)),
             "chart": {
                 "labels": labels,
-                "series": series
-            }
+                "series": series,
+            },
         }
 
     def get_token_activity_metrics(self, camp_finds: QuerySet) -> dict:
@@ -229,11 +215,11 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
 
         return {
             "last_60m_count": last_60m_qs.count(),
-            "no_js": dict(zip(no_js_labels, no_js_series)),
-            "chart":  {
+            "no_js": dict(zip(no_js_labels, no_js_series, strict=False)),
+            "chart": {
                 "series": series,
                 "labels": labels,
-            }
+            },
         }
 
 
@@ -326,7 +312,7 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
         else:
             messages.info(
                 self.request,
-                f"You already got this token. You submitted it at: {token_find.created}"
+                f"You already got this token. You submitted it at: {token_find.created}",
             )
 
         return redirect(self.get_success_url())
@@ -334,4 +320,3 @@ class TokenSubmitFormView(LoginRequiredMixin, FormView):
     def get_success_url(self):
         """Redirect back to dashboard on success"""
         return reverse("tokens:dashboard", kwargs={"camp_slug": self.request.camp.slug})
-

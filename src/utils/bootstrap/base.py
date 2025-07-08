@@ -91,8 +91,8 @@ from teams.models import TeamTask
 from tickets.models import PrizeTicket
 from tickets.models import SponsorTicket
 from tickets.models import TicketType
-from tokens.models import TokenCategory
 from tokens.models import Token
+from tokens.models import TokenCategory
 from tokens.models import TokenFind
 from utils.slugs import unique_slugify
 from villages.models import Village

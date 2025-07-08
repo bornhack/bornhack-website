@@ -36,11 +36,11 @@ class TestTokenViews(BornhackTestBase):
         kwargs = {"camp_slug": cls.camp.slug}
         cls.url_dashboard = reverse(
             "tokens:dashboard",
-            kwargs=kwargs
+            kwargs=kwargs,
         )
         cls.url_submit = reverse(
             "tokens:submit",
-            kwargs=kwargs
+            kwargs=kwargs,
         )
 
         # create test category
@@ -102,9 +102,7 @@ class TestTokenViews(BornhackTestBase):
         cls.token_timed_new.save()
 
     def test_player_stats_in_context(self) -> None:
-        """
-        Test `player stats` values in context (only active tokens gets counted)
-        """
+        """Test `player stats` values in context (only active tokens gets counted)"""
         self.client.force_login(self.users[0])
 
         response = self.client.get(self.url_dashboard)

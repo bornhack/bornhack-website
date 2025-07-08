@@ -26,20 +26,20 @@ class TokenCategory(CreatedUpdatedModel):
     name = models.CharField(
         max_length=64,
         unique=True,
-        help_text="Name of the category"
+        help_text="Name of the category",
     )
 
     description = models.TextField(
         null=True,
         blank=True,
-        help_text="Description of the category"
+        help_text="Description of the category",
     )
 
     class Meta:
         """Meta definition for TokenCategory."""
 
-        verbose_name = 'Token category'
-        verbose_name_plural = 'Token categories'
+        verbose_name = "Token category"
+        verbose_name_plural = "Token categories"
 
     def __str__(self):
         """Unicode representation of TokenCategory."""
@@ -59,7 +59,7 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         TokenCategory,
         on_delete=models.PROTECT,
         null=True,
-        help_text="Token category"
+        help_text="Token category",
     )
 
     camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
@@ -69,20 +69,18 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         validators=[
             RegexValidator(
                 r"^[0-9a-zA-Z\.@]{12,32}$",
-                ("The token did not match the regex of 12-32 characters, "
-                 "with (letters, numbers, dot(s) and @)")
-            )
+                ("The token did not match the regex of 12-32 characters, with (letters, numbers, dot(s) and @)"),
+            ),
         ],
-        help_text="The secret token (^[0-9a-zA-Z\.@]{12,32}$)"
+        help_text=r"The secret token (^[0-9a-zA-Z\.@]{12,32}$)",
     )
 
     hint = models.TextField(
-        help_text="The hint for this token (always visible to players)"
+        help_text="The hint for this token (always visible to players)",
     )
 
     description = models.TextField(
-        help_text="The description of the token "
-        "(not visible to players until they find the token)"
+        help_text="The description of the token (not visible to players until they find the token)",
     )
 
     active = models.BooleanField(
