@@ -23,6 +23,11 @@ CATEGORIES = {
     "IRC": "Auto created, make a new description",
     "Audio": "Auto created, make a new description",
     "Minecraft": "Auto created, make a new description",
+    "Lights": "Auto created, make a new description",
+    "Badge": "Auto created, make a new description",
+    "Video": "Auto created, make a new description",
+    "Talk": "Auto created, make a new description",
+    "SSH": "Auto created, make a new description",
 }
 
 def create_and_populate_category_fk_for_tokens(apps, schema_editor):
