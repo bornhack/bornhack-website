@@ -67,10 +67,13 @@ class ScanTicketsPosSelectView(
     CampViewMixin,
     ListView,
 ):
+    """Class for the ticket scan index view."""
+
     model = Pos
     template_name = "scan_ticket_pos_select.html"
 
     def dispatch(self, *args, **kwargs):
+        """Method for preventing changes to read-only camps."""
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
         return super().dispatch(*args, **kwargs)
@@ -89,6 +92,7 @@ class ScanTicketsView(
     order_search = False
 
     def dispatch(self, *args, **kwargs):
+        """Method for preventing changes to read-only camps."""
         if self.camp.read_only:
             return HttpResponseForbidden("Camp is read-only")
         return super().dispatch(*args, **kwargs)
@@ -98,6 +102,7 @@ class ScanTicketsView(
         self.pos = Pos.objects.get(team__camp=self.camp, slug=kwargs["pos_slug"])
 
     def get_context_data(self, **kwargs):
+        """Method for loading the page data."""
         context = super().get_context_data(**kwargs)
 
         context["pos"] = self.pos
@@ -179,8 +184,101 @@ class ShopTicketOverview(
     context_object_name = "shop_tickets"
 
     def get_context_data(self, *, object_list=None, **kwargs):
+        """Method for loading the page data."""
         kwargs["ticket_types"] = TicketType.objects.filter(camp=self.camp)
         return super().get_context_data(object_list=object_list, **kwargs)
+
+
+class ScanInventoryView(
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    CampViewMixin,
+    TemplateView,
+):
+    """Class for checking in inventory."""
+
+    template_name = "info_desk/inventory.html"
+
+    opr: None | OrderProductRelation = None
+
+    def dispatch(self, *args, **kwargs):
+        """Method for preventing changes to read-only camps."""
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        """Method for loading the page data."""
+        context = super().get_context_data(**kwargs)
+
+        context["pos"] = Pos.objects.get(team__camp=self.camp, slug=kwargs["pos_slug"])
+
+        if "token" in self.request.POST:
+            context["failed"] = False
+            # Slice to get rid of the first character which is a '#'
+            try:
+                search_token = self.request.POST.get("token")[1:].split("/")
+                token_type = search_token[2]
+                token_id = int(search_token[3])
+            except IndexError:
+                self.opr = None
+                context["failed"] = True
+                return context
+            token_action = None
+            if len(search_token) == 5:
+                token_action = search_token[4]
+            if token_type == "opr" and not token_action:
+                try:
+                    self.opr = OrderProductRelation.objects.get(id=token_id)
+                except OrderProductRelation.DoesNotExist:
+                    self.opr = None
+                    context["failed"] = True
+                context["opr"] = self.opr
+
+        return context
+
+    def post(self, request, **kwargs):
+        """Method for saving the checkin."""
+        try:
+            search_token = self.request.POST.get("token")[1:].split("/")
+            token_type = search_token[2]
+            token_id = int(search_token[3])
+        except IndexError:
+            messages.error(
+                self.request,
+                "Not found.",
+            )
+            return super().get(request, **kwargs)
+        token_action = None
+        if len(search_token) == 5:
+            token_action = search_token[4]
+        if token_type == "opr" and token_action == "checkin":
+            self.opr = OrderProductRelation.objects.get(id=token_id)
+            self.opr.ready_for_pickup = True
+            self.opr.save()
+            messages.success(
+                self.request,
+                "Item checked in.",
+            )
+        return super().get(request, **kwargs)
+
+
+class ScanInventoryIndexView(
+    LoginRequiredMixin,
+    InfoTeamPermissionMixin,
+    CampViewMixin,
+    ListView,
+):
+    """View for selecting the POS location for check-in of items."""
+
+    model = Pos
+    template_name = "info_desk/inventory_index.html"
+
+    def dispatch(self, *args, **kwargs):
+        """Method for preventing changes on read-only camp."""
+        if self.camp.read_only:
+            return HttpResponseForbidden("Camp is read-only")
+        return super().dispatch(*args, **kwargs)
 
 
 ################################

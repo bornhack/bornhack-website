@@ -33,100 +33,133 @@
 
     <br/>
 
-    <table class="table">
-      <tr>
-        <td>
-          <strong>Type:</strong>
+    <table class="table" id="main_table">
+      <tbody>
+        <tr>
+          <td>
+            <strong>Type:</strong>
+          </td>
           <td>
             {{ ticket.ticket_type }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Used?:</strong>
+          </td>
+          <td>
+            {% if ticket.used_at %}
+              True
+            {% else %}
+              False
+            {% endif %}
+          </td>
+        </tr>
 
+        {% if ticket.ticket_type.includes_badge %}
+          <tr>
+            <td>
+              <strong>Badge handed out?:</strong>
+            </td>
+            <td>
+              {{ ticket.badge_handed_out }}
+            </td>
+          </tr>
+        {% endif %}
+
+        {% if ticket.product %}
+          <tr>
+            <td>
+              <strong>Product:</strong>
+            </td>
+            <td>
+              {{ ticket.product }}
+            </td>
+          </tr>
+          {% if ticket.ticket_type.single_ticket_per_product and ticket.shortname == "shop" %}
             <tr>
               <td>
-                <strong>Used?:</strong>
-                <td>
-                  {% if ticket.used_at %}
-                    True
-                  {% else %}
-                    False
-                  {% endif %}
+                <strong>Quantity:</strong>
+              </td>
+              <td>
+                <h2 id="product_quantity">{{ ticket.quantity }}</h2>
+              </td>
+            </tr>
+          {% endif %}
+          {% if ticket.product.category.name == "Merchandise" %}
+            <tr>
+              <td>
+                <strong>ID:</strong>
+              </td>
+              <td>
+                <h2 id="opr">{{ ticket.opr.id }}</h2>
+              </td>
+            </tr>
+          {% endif %}
+          <tr>
+            <td>
+              <strong>Order:</strong>
+            </td>
+            <td>
+              {{ ticket.order }}
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <strong>User Email:</strong>
+            </td>
+            <td>
+              {{ ticket.order.user.email }}
+            </td>
+          </tr>
+        {% endif %}
 
-                  {% if ticket.ticket_type.includes_badge %}
-                    <tr>
-                      <td>
-                        <strong>Badge handed out?:</strong>
-                        <td>
-                          {{ ticket.badge_handed_out }}
-                  {% endif %}
+        {% if ticket.sponsor %}
+          <tr>
+            <td>
+              <strong>Sponsor</strong>
+            </td>
+            <td>
+              {{ ticket.sponsor }}
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
 
-                  {% if ticket.product %}
-                    <tr>
-                      <td>
-                        <strong>Product:</strong>
-                        <td>
-                          {{ ticket.product }}
-                          {% if ticket.ticket_type.single_ticket_per_product and ticket.shortname == "shop" %}
-                            <tr>
-                              <td>
-                                <strong>Quantity:</strong>
-                                <td>
-                                  {{ ticket.quantity }}
-                          {% endif %}
-                          <tr>
-                            <td>
-                              <strong>Order:</strong>
-                              <td>
-                                {{ ticket.order }}
-                                <tr>
-                                  <td>
-                                    <strong>User Email:</strong>
-                                    <td>
-                                      {{ ticket.order.user.email }}
-                  {% endif %}
+    <hr/>
 
-                  {% if ticket.sponsor %}
-                    <tr>
-                      <td>
-                        <strong>Sponsor</strong>
-                        <td>
-                          {{ ticket.sponsor }}
-                  {% endif %}
+    <form id="check_in_form" method="POST" action="">{% csrf_token %}
+      <input type="checkbox"
+             name="check_in_ticket_id"
+             id="check_in_input"
+             value="{{ ticket.pk }}"
+             style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
 
+      <input type="checkbox"
+             name="badge_ticket_id"
+             id="hand_out_badge_input"
+             value="{{ ticket.pk }}"
+             style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
+    </form>
 
-                </table>
+    <div class="row">
+      <div class="col-md-4">
+        {% qr_code "clear" %}
+      </div>
 
-                <hr/>
+      {% if not ticket.used_at %}
+        <div class="col-md-4" id="checkin_qr" {% if ticket.product.category.name == "Merchandise" %}hidden{% endif %}>
+          {% qr_code "checkin" %}
+        </div>
+      {% endif %}
 
-                <form id="check_in_form" method="POST" action="">{% csrf_token %}
-                  <input type="checkbox"
-                         name="check_in_ticket_id"
-                         id="check_in_input"
-                         value="{{ ticket.pk }}"
-                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
-
-                  <input type="checkbox"
-                         name="badge_ticket_id"
-                         id="hand_out_badge_input"
-                         value="{{ ticket.pk }}"
-                         style="color: #fff; background: #fff; border: 0; height: 0; width: 0; opacity: 0;"/>
-                </form>
-
-                <div class="row">
-                  <div class="col-md-4">
-                    {% qr_code "clear" %}
-                  </div>
-
-                  {% if not ticket.used_at %}
-                    <div class="col-md-4">
-                      {% qr_code "checkin" %}
-                    </div>
-                  {% endif %}
-
-                  {% if ticket.ticket_type.includes_badge and not ticket.badge_handed_out %}
-                    <div class="col-md-4">
-                      {% qr_code "handoutbadge" %}
-                    </div>
-                  {% endif %}
-                </div>
+      {% if ticket.ticket_type.includes_badge and not ticket.badge_handed_out %}
+        <div class="col-md-4">
+          {% qr_code "handoutbadge" %}
+        </div>
+      {% endif %}
+    </div>
   {% endif %}
 
   <hr/>
@@ -152,95 +185,109 @@
         <tr>
           <td>
             <strong>Total</strong>
-            <td>
-              {{ order.total }} DKK
+          </td>
+          <td>
+            {{ order.total }} DKK
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Paid?</strong>
+          </td>
+          <td>
+            {{ order.paid }}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <strong>Payment type</strong>
+          </td>
+          <td>
+            {{ order.get_payment_method_display }}
+          </td>
+        </tr>
+
+      </table>
+
+      {% if order.paid %}
+        <h4>Tickets</h4>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Product
+              </th>
+              <th>
+                Quantity
+              </th>
+              <th>
+                Ticket Type
+              </th>
+              <th>
+                Name?
+              </th>
+              <th>
+                OPR?
+              </th>
+              <th>
+                Status?
+              </th>
+          </thead>
+
+          <tbody>
+            {% for ticket in tickets %}
               <tr>
                 <td>
-                  <strong>Paid?</strong>
-                  <td>
-                    {{ order.paid }}
+                  {{ ticket.product.name }}
+                </td>
+                <td>
+                  {% if ticket.ticket_type.single_ticket_per_product and ticket.shortname == "shop" %}
+                    {{ ticket.quantity }}
+                  {% else %}
+                    -
+                  {% endif %}
+                </td>
+                <td>
+                  {{ ticket.ticket_type.name }}
+                </td>
+                <td>
+                  {{ ticket.name }}
+                </td>
+                <td>
+                  {{ ticket.opr.id }}
+                </td>
+                <td>
+                  {% if ticket.used_at %}
+                    <i class="fas fa-check"></i> Checked in
+                  {% else %}
+                    <form method="POST">
+                      {% csrf_token %}
+                      <input type="hidden"
+                             name="find_order_id"
+                             value="{{ order.pk }}">
+                      <button class="btn btn-primary"
+                              name="check_in_ticket_id"
+                              type="submit"
+                              value="{{ ticket.pk }}">Checkin
+                      </button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
 
-                    <tr>
-                      <td>
-                        <strong>Payment type</strong>
-                        <td>
-                          {{ order.get_payment_method_display }}
-
-                        </table>
-
-                        {% if order.paid %}
-                          <h4>Tickets</h4>
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th>
-                                  Product
-                                </th>
-                                <th>
-                                  Quantity
-                                </th>
-                                <th>
-                                  Ticket Type
-                                </th>
-                                <th>
-                                  Name?
-                                </th>
-                                <th>
-                                  Status?
-                                </th>
-
-                                <tbody>
-                                  {% for ticket in tickets %}
-                                    <tr>
-                                      <td>
-                                        {{ ticket.product.name }}
-                                      </td>
-                                      <td>
-                                        {% if ticket.ticket_type.single_ticket_per_product and ticket.shortname == "shop" %}
-                                          {{ ticket.quantity }}
-                                        {% else %}
-                                          -
-                                        {% endif %}
-                                      </td>
-                                      <td>
-                                        {{ ticket.ticket_type.name }}
-                                      </td>
-                                      <td>
-                                        {{ ticket.name }}
-                                      </td>
-                                      <td>
-                                        {% if ticket.used_at %}
-                                          <i class="fas fa-check"></i> Checked in
-                                        {% else %}
-                                          <form method="POST">
-                                            {% csrf_token %}
-                                            <input type="hidden"
-                                                   name="find_order_id"
-                                                   value="{{ order.pk }}">
-                                            <button class="btn btn-primary"
-                                                    name="check_in_ticket_id"
-                                                    type="submit"
-                                                    value="{{ ticket.pk }}">Checkin
-                                            </button>
-                                          </form>
-                                        {% endif %}
-                                      </td>
-                                    </tr>
-                                  {% endfor %}
-                                </tbody>
-
-
-                              </table>
-                        {% endif %}
-
-                        {% if not order.paid and order.payment_method == "in_person" %}
-                          <form method="POST">
-                            {% csrf_token %}
-                            <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as
-                              paid!
-                            </button>
-                          </form>
-                        {% endif %}
+      {% if not order.paid and order.payment_method == "in_person" %}
+        <form method="POST">
+          {% csrf_token %}
+          <button type="submit" name="mark_as_paid" value="{{ order.id }}" class="btn btn-primary">Mark as
+            paid!
+          </button>
+        </form>
+      {% endif %}
 
     {% else %}
 

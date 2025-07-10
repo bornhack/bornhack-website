@@ -689,6 +689,16 @@ class OrderProductRelation(
         ),
     )
 
+    label_printed = models.BooleanField(
+        default=False,
+        help_text="Is the label for this OPR printed",
+    )
+
+    ready_for_pickup = models.BooleanField(
+        default=False,
+        help_text="Is this OPR ready for pickup",
+    )
+
     @property
     def total(self):
         """Returns the total price for this OPR considering quantity."""

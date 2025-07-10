@@ -107,6 +107,7 @@ from .views import MapUserLocationTypeCreateView
 from .views import MapUserLocationTypeDeleteView
 from .views import MapUserLocationTypeListView
 from .views import MapUserLocationTypeUpdateView
+from .views import MerchandiseOrdersLabelsView
 from .views import MerchandiseOrdersView
 from .views import MerchandiseToOrderView
 from .views import MobilePayCSVImportView
@@ -151,6 +152,8 @@ from .views import ReimbursementUpdateView
 from .views import RevenueDetailView
 from .views import RevenueListView
 from .views import RevenueUpdateView
+from .views import ScanInventoryIndexView
+from .views import ScanInventoryView
 from .views import ScanTicketsPosSelectView
 from .views import ScanTicketsView
 from .views import ShopTicketOverview
@@ -438,6 +441,23 @@ urlpatterns = [
                     ),
                 ),
                 path(
+                    "scan_inventory/",
+                    include(
+                        [
+                            path(
+                                "",
+                                ScanInventoryIndexView.as_view(),
+                                name="scan_inventory_index",
+                            ),
+                            path(
+                                "<slug:pos_slug>/",
+                                ScanInventoryView.as_view(),
+                                name="scan_inventory",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
                     "orders/",
                     include(
                         [
@@ -570,6 +590,11 @@ urlpatterns = [
         "merchandise_orders/",
         MerchandiseOrdersView.as_view(),
         name="merchandise_orders",
+    ),
+    path(
+        "merchandise_orders_labels/",
+        MerchandiseOrdersLabelsView.as_view(),
+        name="merchandise_orders_labels",
     ),
     path(
         "merchandise_to_order/",

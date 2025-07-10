@@ -24,6 +24,26 @@ document.addEventListener("DOMContentLoaded", () => {
       check_in_form.submit();
     } else if (ticket_token_input.value.length === 65) {
       search_form.submit();
+    } else if (ticket_token_input.value.startsWith("#bornhack://opr/")) {
+      var oprelement = document.getElementById("opr");
+      if (oprelement) {
+        var opr = oprelement.innerHTML
+        var quantity = document.getElementById("product_quantity");
+        var opr_scanned = ticket_token_input.value.split("/")[3]
+        if (opr == opr_scanned) {
+          if (quantity && quantity.innerHTML=="1") {
+            quantity.innerHTML = Number(quantity.innerHTML) - 1;
+          } else {
+            document.getElementById("checkin_qr").removeAttribute("hidden");
+          }
+          ticket_token_input.value = "";
+        } else {
+          ticket_token_input.value = "WRONG ITEM";
+        }
+      } else {
+        scan_again.removeAttribute("hidden");
+        ticket_token_input.value = ""
+      }
     } else {
       scan_again.removeAttribute("hidden");
     }

@@ -8,6 +8,10 @@
     <h4 class="list-group-item-heading">Merchandise Orders</h4>
     <p class="list-group-item-text">Use this view to look at Merchandise Orders</p>
   </a>
+  <a href="{% url 'backoffice:merchandise_orders_labels' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
+    <h4 class="list-group-item-heading">Merchandise Orders Labels</h4>
+    <p class="list-group-item-text">Use this view to print Merchandise Order labels</p>
+  </a>
   <a href="{% url 'backoffice:merchandise_to_order' camp_slug=camp.slug %}" class="list-group-item list-group-item-action">
     <h4 class="list-group-item-heading">Merchandise To Order</h4>
     <p class="list-group-item-text">Use this view to generate a list of merchandise that needs to be ordered</p>
