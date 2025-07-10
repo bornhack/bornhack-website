@@ -139,11 +139,11 @@ class TokenDashboardListView(LoginRequiredMixin, ListView):
             "no_js": {
                 "Unique finds": {
                     "value": total_finds_count,
-                    "pct": (total_finds_count / token_count) * 100,
+                    "pct": (total_finds_count / token_count) * 100 if token_count else 0,
                 },
                 "Not found": {
                     "value": (token_count - total_finds_count),
-                    "pct": (token_count - total_finds_count) / token_count * 100,
+                    "pct": (token_count - total_finds_count) / token_count * 100 if token_count else 0,
                 },
             },
             "chart": {
