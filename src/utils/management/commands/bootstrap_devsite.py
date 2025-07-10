@@ -10,6 +10,7 @@ from utils.bootstrap.base import Bootstrap
 
 logger = logging.getLogger(f"bornhack.{__name__}")
 
+
 class Command(BaseCommand):
     args = "none"
     help = "Create mock data for development instances"

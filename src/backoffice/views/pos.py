@@ -5,7 +5,6 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse

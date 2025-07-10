@@ -77,12 +77,6 @@
         {% endif %}
 
         <li class="nav-item"><h5>Misc.</h5></li>
-        {% url 'tokens:tokenfind_list' as tokenfind_list_url %}
-        <li class="nav-item">
-          <a class="nav-link{% if request.path == tokenfind_list_url %} active{% endif %}" href="{{ tokenfind_list_url }}">
-            Secret Tokens
-          </a>
-        </li>
 
         {% url 'profiles:permissions_list' as profile_permissions_url %}
         <li class="nav-item">

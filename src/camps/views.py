@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 
-from django.conf import settings
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views import View
