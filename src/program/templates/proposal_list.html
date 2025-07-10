@@ -6,15 +6,6 @@
 
 {% block program_content %}
 
-  {% if camp.call_for_participation_open %}
-    {% include 'includes/event_proposal_type_select.html' %}
-  {% else %}
-    <div class="alert alert-danger">
-      <strong>Note!</strong> This Call for Participation is not open. You can not submit or change proposals.
-    </div>
-  {% endif %}
-
-
   {% if speaker_proposal_list or event_proposal_list %}
     <div class="card">
       <h3 class="card-header"><i class="fas fa-pencil"></i> Existing Proposals</h3>
@@ -35,6 +26,14 @@
           <i>Nothing found.</i>
         {% endif %}
       </div>
+    </div>
+  {% endif %}
+
+  {% if camp.call_for_participation_open %}
+    {% include 'includes/event_proposal_type_select.html' %}
+  {% else %}
+    <div class="alert alert-danger">
+      <strong>Note!</strong> This Call for Participation is not open. You can not submit or change proposals.
     </div>
   {% endif %}
 
