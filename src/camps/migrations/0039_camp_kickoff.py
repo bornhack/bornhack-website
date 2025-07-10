@@ -15,7 +15,10 @@ class Migration(migrations.Migration):
             model_name="camp",
             name="kickoff",
             field=django.contrib.postgres.fields.ranges.DateTimeRangeField(
-                blank=True, help_text="The camp kickoff period.", null=True, verbose_name="Camp Kickoff"
+                blank=True,
+                help_text="The camp kickoff period.",
+                null=True,
+                verbose_name="Camp Kickoff",
             ),
         ),
     ]

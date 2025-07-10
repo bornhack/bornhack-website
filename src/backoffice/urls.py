@@ -70,8 +70,8 @@ from .views import EventTypeDetailView
 from .views import EventTypeListView
 from .views import EventUpdateView
 from .views import ExpenseDetailView
-from .views import ExpenseUpdateView
 from .views import ExpenseListView
+from .views import ExpenseUpdateView
 from .views import FacilityCreateView
 from .views import FacilityDeleteView
 from .views import FacilityDetailView
@@ -149,8 +149,8 @@ from .views import ReimbursementDetailView
 from .views import ReimbursementListView
 from .views import ReimbursementUpdateView
 from .views import RevenueDetailView
-from .views import RevenueUpdateView
 from .views import RevenueListView
+from .views import RevenueUpdateView
 from .views import ScanTicketsPosSelectView
 from .views import ScanTicketsView
 from .views import ShopTicketOverview
@@ -165,6 +165,11 @@ from .views import SpeakerProposalListView
 from .views import SpeakerUpdateView
 from .views import TeamPermissionIndexView
 from .views import TeamPermissionManageView
+from .views import TokenCategoryCreateView
+from .views import TokenCategoryDeleteView
+from .views import TokenCategoryDetailView
+from .views import TokenCategoryListView
+from .views import TokenCategoryUpdateView
 from .views import TokenCreateView
 from .views import TokenDeleteView
 from .views import TokenDetailView
@@ -944,9 +949,9 @@ urlpatterns = [
                                 "<uuid:pk>/",
                                 include(
                                     [
-                                        path("", ExpenseDetailView.as_view(), name="expense_detail",),
-                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update",),
-                                    ]
+                                        path("", ExpenseDetailView.as_view(), name="expense_detail"),
+                                        path("update/", ExpenseUpdateView.as_view(), name="expense_update"),
+                                    ],
                                 ),
                             ),
                         ],
@@ -972,7 +977,7 @@ urlpatterns = [
                                             RevenueUpdateView.as_view(),
                                             name="revenue_update",
                                         ),
-                                    ]
+                                    ],
                                 ),
                             ),
                         ],
@@ -1433,6 +1438,45 @@ urlpatterns = [
                                 "delete/",
                                 TokenDeleteView.as_view(),
                                 name="token_delete",
+                            ),
+                        ],
+                    ),
+                ),
+                path(
+                    "categories/",
+                    include(
+                        [
+                            path(
+                                "",
+                                TokenCategoryListView.as_view(),
+                                name="token_category_list",
+                            ),
+                            path(
+                                "create/",
+                                TokenCategoryCreateView.as_view(),
+                                name="token_category_create",
+                            ),
+                            path(
+                                "<int:pk>/",
+                                include(
+                                    [
+                                        path(
+                                            "",
+                                            TokenCategoryDetailView.as_view(),
+                                            name="token_category_detail",
+                                        ),
+                                        path(
+                                            "update/",
+                                            TokenCategoryUpdateView.as_view(),
+                                            name="token_category_update",
+                                        ),
+                                        path(
+                                            "delete/",
+                                            TokenCategoryDeleteView.as_view(),
+                                            name="token_category_delete",
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),

@@ -4,7 +4,6 @@ import logging
 from typing import TYPE_CHECKING
 
 from django.conf import settings
-
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -39,8 +38,10 @@ class RaisePermissionRequiredMixin(PermissionRequiredMixin):
 
     raise_exception = True
 
+
 class IsTeamPermContextMixin:
     """Mixing for adding is_team_{perm} to context"""
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         perms = self.request.user.get_all_permissions()
@@ -56,6 +57,7 @@ class IsTeamPermContextMixin:
             else:
                 context[f"is_team_{perm}"] = False
         return context
+
 
 class BaseTeamPermRequiredMixin:
     """Base class for Team<foo>RequiredMixins."""

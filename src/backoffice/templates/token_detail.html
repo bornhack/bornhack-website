@@ -18,20 +18,32 @@
       <table class="table">
         <tbody>
           <tr>
-            <th>Token</th>
-            <td>{{ token.tokene }}</td>
+            <th>Token:</th>
+            <td>{{ token.token }}</td>
           </tr>
           <tr>
-            <th>Category</th>
-            <td>{{ token.category }}</p>
+            <th>Category:</th>
+            <td><a href="{% url 'backoffice:token_category_detail' camp_slug=camp.slug pk=token.category.pk %}">{{ token.category.name }}</a></p>
           </tr>
           <tr>
-            <th>Description</th>
+            <th>Hint:</th>
+            <td>{{ token.hint }}</p>
+          </tr>
+          <tr>
+            <th>Description:</th>
             <td>{{ token.description }}</p>
           </tr>
           <tr>
-            <th>Finds</th>
+            <th>Finds:</th>
             <td>{{ token.tokenfind_set.count }} times</p>
+          </tr>
+          <tr>
+            <th>Created:</th>
+            <td>{{ token.created }}</p>
+          </tr>
+          <tr>
+            <th>Last updated:</th>
+            <td>{{ token.updated }}</p>
           </tr>
         </tbody>
       </table>
@@ -39,14 +51,16 @@
       <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
         <thead>
           <tr>
-            <th>Email</th>
+              <th>Public credit name</th>
+              <th>Username</th>
             <th>Timestamp</th>
           </tr>
         </thead>
         <tbody>
           {% for tf in token.tokenfind_set.all %}
             <tr>
-              <td>{{ tf.user.email }}</td>
+              <td>{{ tf.user.profile.public_credit_name }}</td>
+              <td>{{ tf.user.username }}</td>
               <td>{{ tf.created }}</td>
             </tr>
           {% endfor %}

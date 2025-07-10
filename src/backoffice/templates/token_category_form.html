@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{% if form.instance.pk %}Update{% else %}Create new{% endif %} Token Category</h3>
+    </div>
+    <div class="card-body">
+      <form method="POST">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save</button>
+        <button type="submit" class="btn btn-success" name="_addanother"><i class="fas fa-check"></i> Save and add another</button>
+        <button type="submit" class="btn btn-success" name="_addtoken"><i class="fas fa-check"></i> Save and add token</button>
+        <a href="{% url 'backoffice:token_category_list' camp_slug=camp.slug %}" class="btn btn-secondary"><i class="fas fa-undo"></i> Cancel</a>
+      </form>
+    </div>
+  </div>
+{% endblock content %}
