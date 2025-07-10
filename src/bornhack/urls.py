@@ -147,7 +147,7 @@ urlpatterns = [
     path(
         "token/",
         CampRedirectView.as_view(),
-        kwargs={"page": "tokens:token_find_list"},
+        kwargs={"page": "tokens:dashboard"},
         name="token_find_list_redirect",
     ),
     path("people/", PeopleView.as_view(), name="people"),
