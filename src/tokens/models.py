@@ -5,12 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django.contrib.postgres.fields import DateTimeRangeField
+from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 
 from utils.models import CampRelatedModel
+from utils.models import CreatedUpdatedModel
 
 if TYPE_CHECKING:
     from typing import ClassVar
@@ -18,18 +20,68 @@ if TYPE_CHECKING:
     from camps.models import Camp
 
 
+class TokenCategory(CreatedUpdatedModel):
+    """Model definition for TokenCategory."""
+
+    name = models.CharField(
+        max_length=64,
+        unique=True,
+        help_text="Name of the category",
+    )
+
+    description = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Description of the category",
+    )
+
+    class Meta:
+        """Meta definition for TokenCategory."""
+
+        verbose_name = "Token category"
+        verbose_name_plural = "Token categories"
+
+    def __str__(self):
+        """Unicode representation of TokenCategory."""
+        return f"{self.name} ({self.description})"
+
+
 class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
     """Token model."""
 
-    camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
+    class Meta:
+        """Meta class definition for Token model"""
 
-    token = models.CharField(max_length=32, help_text="The secret token")
+        unique_together = ("camp", "token")
+        ordering: ClassVar[list[str]] = ["camp"]
 
-    category = models.TextField(
-        help_text="The category/hint for this token (physical, website, whatever)",
+    category = models.ForeignKey(
+        TokenCategory,
+        on_delete=models.PROTECT,
+        null=True,
+        help_text="Token category",
     )
 
-    description = models.TextField(help_text="The description of the token")
+    camp = models.ForeignKey("camps.Camp", on_delete=models.PROTECT)
+
+    token = models.CharField(
+        max_length=32,
+        validators=[
+            RegexValidator(
+                r"^[0-9a-zA-Z\.@]{12,32}$",
+                ("The token did not match the regex of 12-32 characters, with (letters, numbers, dot(s) and @)"),
+            ),
+        ],
+        help_text=r"The secret token (^[0-9a-zA-Z\.@]{12,32}$)",
+    )
+
+    hint = models.TextField(
+        help_text="The hint for this token (always visible to players)",
+    )
+
+    description = models.TextField(
+        help_text="The description of the token (not visible to players until they find the token)",
+    )
 
     active = models.BooleanField(
         default=False,
@@ -51,11 +103,6 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         """String formatter."""
         return f"{self.description} ({self.camp})"
 
-    class Meta:
-        """Meta."""
-
-        ordering: ClassVar[list[str]] = ["camp"]
-
     def get_absolute_url(self) -> str:
         """Get absolute url."""
         return reverse(
@@ -76,6 +123,9 @@ class Token(ExportModelOperationsMixin("token"), CampRelatedModel):
         elif self.valid_when.upper and self.valid_when.upper < timezone.now():
             # not valid anymore
             valid = False
+        elif self.valid_when.lower and self.valid_when.lower < timezone.now():
+            # is valid
+            valid = True
         return valid
 
 

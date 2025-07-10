@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load commonmark %}$
+{% load token_tags %}
+{% load humanize %}
+
+{% block title %}
+  Token game | {{ block.super }}
+{% endblock %}
+
+{% block extra_head %}
+<script src="{% static 'vendor/apexcharts/apexcharts.min.js' %}"></script>
+{{ widgets|json_script:"widgets" }}
+<script src="{% static 'js/tokens/token_charts.js' %}"></script>
+{% endblock extra_head %}
+
+{% block content %}
+
+  <div class="row my-5">
+    <div class="col-12 col-lg-6">
+      <div class="mb-5">
+        <h2>Token game dashboard</h2>
+      </div>
+      <div class="row justify-content-between g-4">
+        <div class="col-12 col-md-auto me-4">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="unhide-for-no-js-users fs-2">&#127942;</i>
+             <i class="hide-for-no-js-users fa-solid fa-trophy fa-3x text-success"></i>
+            </span>
+            <div class="ms-3">
+              <h5>{{ player_stats.tokens_found }} found</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-auto">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="unhide-for-no-js-users fs-2">&#128269;</i>
+             <i class="hide-for-no-js-users fa-solid fa-magnifying-glass fa-3x text-warning"></i>
+            </span>
+            <div class="ms-3">
+              <h5>{{ player_stats.tokens_missing }} missing</h5>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-auto">
+          <div class="d-flex align-items-center">
+            <span>
+             <i class="unhide-for-no-js-users fs-2">&#128196;</i>
+             <i class="hide-for-no-js-users fa-regular fa-rectangle-list fa-3x text-primary"></i>
+            </span>
+            <div class="ms-3">
+              <h5>{{ player_stats.tokens_count }} total</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr class="mt-4 mb-5">
+      <div class="row">
+        <div class="col-12 col-md-auto">
+          <h3 class="mb-4">How to play?</h3>
+          <p>The <b>token game</b> lasts the whole event and is about finding little text strings matching the regular expression:</p>
+          <p><code>[0-9a-zA-Z\.@]{12,32}</code></p>
+          <p>Token examples:</p>
+          <p>
+          <ul>
+            <li><code>BornHack{{ camp.camp.lower.year }}</code></li>
+            <li><code>cm9sbGllczIwMjR5b3V3aW4K</code></li>
+            <li><code>Ly5caCRLKRHrpiF6SQwe9geUKAxSsLQE</code></li>
+          </ul>
+          </p>
+          <p>Tokens are hidden or in plain sight physically or virtually on the BornHack venue, online and offline.</p>
+          <p class="mb-0">Submit the tokens you find in the field below. You can start with this one: <b>HelloTokenHunters{{ camp.camp.lower.year }}</b></p>
+        </div>
+        <div class="col-12 my-4">
+          <form action="{% url 'tokens:submit' camp_slug=camp.slug %}" method="post">
+            {% csrf_token %}
+            <div class="input-group shadow-sm">
+              <input type="text" class="form-control" placeholder="Token" name="token">
+              <button type="submit" class="btn btn-outline-secondary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6 token-widgets">
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total players</h5>
+                  <p><b>Last join:</b> <small>{{ widgets.total_players.last_join_time | timesince }} ago.</small></p>
+                </div>
+                <p class="h4">{{ widgets.total_players.count }}</p>
+              </div>
+              <div class="hide-for-no-js-users" id="total_players_chart"></div>
+              <div class="unhide-for-no-js-users mt-3">
+                <div class="widget-content-no-js">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Status</th>
+                      <th scope="col">Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {% for key, value in widgets.total_players.no_js.items %}
+                      <tr>
+                        <td scope="row">{{ key }}</td>
+                        <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <p class="my-0">
+                    <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <h5>Total finds</h5>
+                  <p><b>Latest find:</b> <small>{{ widgets.total_finds.latest_find | timesince }} ago.</small></p>
+                </div>
+                <p class="h4">{{ widgets.total_finds.count }}</p>
+              </div>
+              <div class="hide-for-no-js-users" id="total_finds_chart"></div>
+              <div class="unhide-for-no-js-users mt-3">
+                <div class="widget-content-no-js">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Status</th>
+                      <th scope="col">Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {% for key, value in widgets.total_finds.no_js.items %}
+                      <tr>
+                        <td scope="row">{{ key }}</td>
+                        <td>{{ value.value }} ({{ value.pct|floatformat:'0' }}%)</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  <p class="my-0">
+                    <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="mb-0">
+                  <h5>Token categories</h5>
+                </div>
+                <p class="h4">{{ widgets.token_categories.count }}</p>
+              </div>
+              <div class="hide-for-no-js-users" id="token_category_chart"></div>
+              <div class="unhide-for-no-js-users mt-3">
+                <div class="widget-content-no-js">
+                <table class="table table-sm table-striped">
+                  <thead>
+                  <tr>
+                    <th scope="col">Category</th>
+                    <th scope="col">Found</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for key, value in widgets.token_categories.no_js.items %}
+                    <tr>
+                      <td scope="row">{{ key }}</td>
+                      <td>
+                        <progress class="progress w-75 d-inline" max="100" value="{{ value|floatformat:'0' }}"></progress> <small>{{ value|floatformat:'0' }}%</small>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+                </div>
+                <p class="my-0">
+                  <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="card h-100 shadow">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div class="mb-0">
+                  <h5>Token activity</h5>
+                  <p class="mb-4"><small>Finds in last 60 min.</small></p>
+                </div>
+                <p class="h4">{{ widgets.token_activity.last_60m_count }}</p>
+              </div>
+              <div class="hide-for-no-js-users" id="token_activity_chart"></div>
+              <div class="unhide-for-no-js-users mt-3">
+                <div class="widget-content-no-js">
+                  <table class="table table-sm table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Hour</th>
+                      <th scope="col">Tokens found</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      {% for key, value  in widgets.token_activity.no_js.items %}
+                      <tr>
+                        <td scope="row">{{ key }}</td>
+                        <td>{{ value }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <p class="my-0">
+                  <span class="badge rounded-pill text-bg-secondary">no-js widget</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row my-4">
+    <div class="col-12 mb-3">
+      <h3>Your submitted tokens</h3>
+    </div>
+    <div class="col-12">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover datatable submitted-tokens">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Active</th>
+              <th>Time Limits</th>
+              <th>Hint</th>
+              <th>Token</th>
+              <th>Description</th>
+              <th>Found</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for token in object_list %}
+              {% with token|found_by_user:user as user_has_found_token %}
+              {% if user_has_found_token %}
+              <tr class="table-success">
+              {% else %}
+              <tr>
+              {% endif %}
+                <td>{{ token.category.name }}</td>
+                <td>
+                  {% if token.valid_now %}
+                    <i class="unhide-for-no-js-users text-success">&#10004;</i>
+                    <i class="hide-for-no-js-users fas fa-check text-success"></i>
+                  {% else %}
+                    <i class="unhide-for-no-js-users text-danger">&#10060;</i>
+                    <i class="hide-for-no-js-users fas fa-xmark text-danger"></i>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if token.valid_when.lower %}
+                    From {{ token.valid_when.lower }}<br>
+                  {% endif %}
+                  {% if token.valid_when.upper %}
+                    To {{ token.valid_when.upper  }}
+                  {% endif %}
+                  {% if not token.valid_when %}
+                    -
+                  {% endif %}
+                </td>
+                <td>{{ token.hint }}</td>
+
+                  {% if user_has_found_token %}
+                    <td>{{ token.token }}</td>
+                    <td>{{ token.description }}</td>
+                    <td>{{ user_has_found_token }}</td>
+                  {% else %}
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                  {% endif %}
+              </tr>
+              {% endwith %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

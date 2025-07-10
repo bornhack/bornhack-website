@@ -486,3 +486,11 @@ img {
     margin-top: -94px; /*same height as header*/
     visibility: hidden;
 }
+
+/* Token styling */
+
+.token-widgets .widget-content-no-js {
+    max-height: 20vh;
+    overflow-y: auto;
+    display: block;
+}

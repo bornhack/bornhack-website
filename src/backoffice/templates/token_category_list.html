@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load bornhack %}
+
+{% block title %}
+  Token Category List | Backoffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Token Category List - BackOffice</h3>
+    </div>
+    <div class="card-body">
+      <p>This is a list of all token categories.</p>
+      {% if not object_list %}
+        <p class="lead">No categories found.</p>
+      {% else %}
+        <p>
+          <a class="btn btn-success" href="{% url 'backoffice:token_category_create' camp_slug=camp.slug %}"><i class="fas fa-plus"></i> Create category</a>
+          <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
+          <table class="table table-striped{% if not nodatatable %} datatable{% endif %}">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th class="text-start">Used by</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for category in object_list %}
+                <tr>
+                  <td><a href="{% url 'backoffice:token_category_detail' camp_slug=camp.slug pk=category.pk %}">{{ category.name }}</a></td>
+                  <td>{{ category.description }}</td>
+                  <td class="text-start">{{ category.token_set.count }}</td>
+                  <td>
+                    <a href="{% url 'backoffice:token_create' camp_slug=camp.slug %}" class="me-1"><i class="fas fa-add text-success"></i></a>
+                    <a href="{% url 'backoffice:token_category_detail' camp_slug=camp.slug pk=category.pk %}" class="me-1"><i class="fas fa-search text-info"></i></a>
+                    <a href="{% url 'backoffice:token_category_update' camp_slug=camp.slug pk=category.pk %}" class="me-1"><i class="fas fa-edit"></i></a>
+                    <a href="{% url 'backoffice:token_category_delete' camp_slug=camp.slug pk=category.pk %}" class="me-1"><i class="fas fa-trash text-danger"></i></a>
+                </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </p>
+      {% endif %}
+      <p>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#game"><i class="fas fa-undo"></i> Backoffice</a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

@@ -27,7 +27,9 @@
       <div class="tab-content">
         {% for item, value in backoffice_tabs.items %}
           <div role="tabpanel" class="tab-pane fade{% if forloop.first %} show active{% endif %}" id="{{ item }}">
+            <div class="list-group list-group-flush">
             {% include "includes/index_"|add:item|add:".html" %}
+            </div>
           </div>
         {% endfor %}
       </div>

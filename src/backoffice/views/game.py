@@ -19,6 +19,7 @@ from django.views.generic.edit import UpdateView
 from backoffice.mixins import RaisePermissionRequiredMixin
 from camps.mixins import CampViewMixin
 from tokens.models import Token
+from tokens.models import TokenCategory
 from tokens.models import TokenFind
 
 logger = logging.getLogger(f"bornhack.{__name__}")
@@ -50,7 +51,7 @@ class TokenCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
     permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_form.html"
-    fields = ["token", "category", "description", "active", "valid_when"]
+    fields = ["token", "category", "hint", "description", "active", "valid_when"]
 
     def form_valid(self, form):
         token = form.save(commit=False)
@@ -74,6 +75,8 @@ class TokenUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
 
 
 class TokenDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
+    """Delete a token."""
+
     permission_required = "camps.game_team_member"
     model = Token
     template_name = "token_delete.html"
@@ -117,4 +120,78 @@ class TokenStatsView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
                 last_token_find=Subquery(last_token_find_subquery),
             )
             .exclude(token_find_count=0)
+        )
+
+
+class TokenCategoryListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
+    """Show list of token categories"""
+
+    permission_required = "camps.game_team_member"
+    model = TokenCategory
+    template_name = "token_category_list.html"
+
+
+class TokenCategoryCreateView(CampViewMixin, RaisePermissionRequiredMixin, CreateView):
+    """Create a new token category."""
+
+    permission_required = "camps.game_team_member"
+    model = TokenCategory
+    template_name = "token_category_form.html"
+    fields = ["name", "description"]
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"{self.object.name} was created successfully",
+        )
+        if "_addanother" in self.request.POST:
+            return reverse("backoffice:token_category_create", kwargs=self.kwargs)
+        if "_addtoken" in self.request.POST:
+            return reverse("backoffice:token_create", kwargs=self.kwargs)
+        return reverse("backoffice:token_category_list", kwargs=self.kwargs)
+
+
+class TokenCategoryDetailView(CampViewMixin, RaisePermissionRequiredMixin, DetailView):
+    """Show details for a token category."""
+
+    permission_required = "camps.game_team_member"
+    model = TokenCategory
+    template_name = "token_category_detail.html"
+
+
+class TokenCategoryDeleteView(CampViewMixin, RaisePermissionRequiredMixin, DeleteView):
+    """Delete a token category"""
+
+    permission_required = "camps.game_team_member"
+    model = TokenCategory
+    template_name = "token_category_delete.html"
+
+    def get_success_url(self):
+        """Return to category list after deletion"""
+        messages.success(
+            self.request,
+            "The Token category has been deleted",
+        )
+        return reverse(
+            "backoffice:token_category_list",
+            kwargs={"camp_slug": self.camp.slug},
+        )
+
+
+class TokenCategoryUpdateView(CampViewMixin, RaisePermissionRequiredMixin, UpdateView):
+    """Update a token category."""
+
+    permission_required = "camps.game_team_member"
+    model = TokenCategory
+    template_name = "token_category_form.html"
+    fields = ["name", "description"]
+
+    def get_success_url(self):
+        messages.success(
+            self.request,
+            f"{self.object.name} was updated successfully",
+        )
+        return reverse(
+            "backoffice:token_category_list",
+            kwargs={"camp_slug": self.camp.slug},
         )
