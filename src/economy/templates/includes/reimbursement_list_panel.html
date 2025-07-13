@@ -25,7 +25,7 @@
           {% else %}
             <td>{{ reim.camp }}</td>
           {% endif %}
-          <td>{{ reim.user.username }}</td>
+          <td>{{ reim.user.profile.get_name }}</td>
           <td>{{ reim.reimbursement_user.profile.get_name }}</td>
           <td>{{ reim.bank_account|default:"N/A" }}</td>
           <td>{{ reim.notes|default:"N/A" }}</td>
