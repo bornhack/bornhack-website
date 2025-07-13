@@ -1204,7 +1204,7 @@ class UrlUpdateView(
     def form_valid(self, form):
         """Set proposal as pending if it isn't already."""
         if hasattr(self, "event_proposal") and self.event_proposal:
-            # this URL belongs to a speaker_proposal
+            # this URL belongs to an event_proposal
             form.save()
             if self.event_proposal.proposal_status != models.SpeakerProposal.PROPOSAL_PENDING:
                 self.event_proposal.proposal_status = models.SpeakerProposal.PROPOSAL_PENDING
