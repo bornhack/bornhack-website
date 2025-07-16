@@ -20,6 +20,7 @@ from teams.views.members import TeamMemberApproveView
 from teams.views.members import TeamMemberRemoveView
 from teams.views.members import TeamMembersView
 from teams.views.shifts import MemberDropsShift
+from teams.views.shifts import MemberSellsShift 
 from teams.views.shifts import MemberTakesShift
 from teams.views.shifts import ShiftCreateMultipleView
 from teams.views.shifts import ShiftCreateView
@@ -175,6 +176,11 @@ urlpatterns = [
                                             "drop",
                                             MemberDropsShift.as_view(),
                                             name="shift_member_drop",
+                                        ),
+                                        path(
+                                            "sell",
+                                            MemberSellsShift.as_view(),
+                                            name="shift_member_sell",
                                         ),
                                     ],
                                 ),

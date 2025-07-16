@@ -2389,6 +2389,7 @@ class Bootstrap:
 
         self.camp = self.camps[1][0]
         self.add_team_permissions(self.camp)
+        self.camp.activate_team_permissions()
         self.teams = teams[self.camp.camp.lower.year]
         for member in TeamMember.objects.filter(team__camp=self.camp):
             member.save()

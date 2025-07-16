@@ -33,10 +33,14 @@
           </td>
           <td>
             {{ shift.shift_range.upper|date:'H:i' }}
-          </td>
-          <td>
-            <a class="btn btn-danger"
-               href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=shift.team.slug pk=shift.pk %}">
+        </td>
+	<td>
+          <a class="btn btn-warning"
+             href="{% url 'teams:shift_member_sell' camp_slug=camp.slug team_slug=shift.team.slug pk=shift.pk %}">
+              <i class="fas fa-thumbs-down"></i> Sell shift
+        <td>
+          <a class="btn btn-danger"
+             href="{% url 'teams:shift_member_drop' camp_slug=camp.slug team_slug=shift.team.slug pk=shift.pk %}">
               <i class="fas fa-thumbs-down"></i> Unassign me
             </a>
           </td>
