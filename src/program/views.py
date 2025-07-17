@@ -101,6 +101,7 @@ class ICSView(CampViewMixin, View):
         cal = icalendar.Calendar()
         cal.add("prodid", "-//BornHack Website iCal Generator//bornhack.dk//")
         cal.add("version", "2.0")
+        cal.add("NAME", "BornHack")
         cal.add("X-WR-CALNAME", "BornHack")
         for slot in event_slots:
             cal.add_component(slot.get_ics_event())
