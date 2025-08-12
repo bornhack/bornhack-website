@@ -1,4 +1,5 @@
 """All models for teams application."""
+
 from __future__ import annotations
 
 import logging
@@ -6,14 +7,11 @@ from typing import TYPE_CHECKING
 
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.db import models
 from django.urls import reverse_lazy
 from django_prometheus.models import ExportModelOperationsMixin
 
-from camps.models import Permission as CampPermission
 from utils.models import CampRelatedModel
 from utils.models import CreatedUpdatedModel
 from utils.models import UUIDModel
@@ -58,6 +56,7 @@ TEAM_GUIDE_TEMPLATE = """
 
 class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
     """Model for team."""
+
     camp = models.ForeignKey(
         "camps.Camp",
         related_name="teams",
@@ -211,6 +210,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["name"]
         unique_together = (("name", "camp"), ("slug", "camp"))
 
@@ -394,6 +394,7 @@ class Team(ExportModelOperationsMixin("team"), CampRelatedModel):
 
 class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
     """Model for team member."""
+
     user = models.ForeignKey(
         "auth.User",
         on_delete=models.PROTECT,
@@ -425,6 +426,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["-lead", "-approved"]
 
     def __str__(self) -> str:
@@ -471,6 +473,7 @@ class TeamMember(ExportModelOperationsMixin("team_member"), CampRelatedModel):
 
 class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
     """Model for team tasks."""
+
     team = models.ForeignKey(
         "teams.Team",
         related_name="tasks",
@@ -498,6 +501,7 @@ class TeamTask(ExportModelOperationsMixin("team_task"), CampRelatedModel):
 
     class Meta:
         """Meta."""
+
         ordering: ClassVar[list[str]] = ["completed", "when", "name"]
         unique_together = (("name", "team"), ("slug", "team"))
 
@@ -539,6 +543,7 @@ class TaskComment(
     CreatedUpdatedModel,
 ):
     """Model for task comments."""
+
     task = models.ForeignKey(
         "teams.TeamTask",
         on_delete=models.PROTECT,
@@ -548,10 +553,40 @@ class TaskComment(
     comment = models.TextField()
 
 
+class TeamShiftAssignment(CampRelatedModel):
+    """Through model for the shift<>member m2m storing the for_sale state of the shift assignment."""
+
+    team_shift = models.ForeignKey(
+        "teams.TeamShift",
+        on_delete=models.CASCADE,
+        help_text="The shift",
+    )
+
+    team_member = models.ForeignKey(
+        "teams.TeamMember",
+        on_delete=models.CASCADE,
+        help_text="The team member on shift",
+    )
+
+    for_sale = models.BooleanField(
+        default=False,
+        help_text="Is the shift assignment for sale?",
+    )
+
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def camp(self) -> Camp:
+        """All CampRelatedModels must have a camp FK or a camp property."""
+        return self.team_shift.camp
+
+
 class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     """Model for team shifts."""
+
     class Meta:
         """Meta."""
+
         ordering = ("shift_range",)
 
     team = models.ForeignKey(
@@ -563,7 +598,7 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
 
     shift_range = DateTimeRangeField()
 
-    team_members = models.ManyToManyField(TeamMember, blank=True)
+    team_members = models.ManyToManyField("teams.TeamMember", blank=True, through=TeamShiftAssignment)
 
     people_required = models.IntegerField(default=1)
 
@@ -582,3 +617,13 @@ class TeamShift(ExportModelOperationsMixin("team_shift"), CampRelatedModel):
     def users(self) -> list[TeamMember]:
         """Returns a list of team members on this shift."""
         return [member.user for member in self.team_members.all()]
+
+    @property
+    def for_sale_users(self) -> list[TeamMember]:
+        """Returns a list of team members who marked this shift for sale."""
+        return [member.user for member in self.team_members.filter(teamshiftassignment__for_sale=True)]
+
+    @property
+    def shifts_taken(self) -> int:
+        """Returns the number of taken shifts that are not for sale."""
+        return self.team_members.filter(teamshiftassignment__for_sale=False).count()
