@@ -1,4 +1,5 @@
 """Base view for teams."""
+
 from __future__ import annotations
 
 import logging
@@ -33,6 +34,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 class TeamListView(CampViewMixin, ListView):
     """View for the list of teams."""
+
     template_name = "team_list.html"
     model = Team
     context_object_name = "teams"
@@ -47,7 +49,7 @@ class TeamListView(CampViewMixin, ListView):
         # also the getting of team leads and their profiles do not use the prefetching
         # :( /tyk
 
-    def get_context_data(self, *, object_list: list|None =None, **kwargs) -> dict:
+    def get_context_data(self, *, object_list: list | None = None, **kwargs) -> dict:
         """Method for adding user_teams to the context."""
         context = super().get_context_data(object_list=object_list, **kwargs)
         if self.request.user.is_authenticated:
@@ -59,6 +61,7 @@ class TeamListView(CampViewMixin, ListView):
 
 class TeamGeneralView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """General view for a team."""
+
     template_name = "team_general.html"
     context_object_name = "team"
     model = Team
@@ -75,6 +78,7 @@ class TeamGeneralView(CampViewMixin, IsTeamPermContextMixin, DetailView):
 
 class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for mananaging team members."""
+
     model = Team
     template_name = "team_manage.html"
     fields = (
@@ -113,6 +117,7 @@ class TeamManageView(CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin,
 
 class FixIrcAclView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, UpdateView):
     """View for fixing IRC ACL's."""
+
     template_name = "fix_irc_acl.html"
     model = Team
     fields = ()

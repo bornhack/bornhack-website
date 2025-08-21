@@ -22,7 +22,7 @@ class TeamInfoViewTest(BornhackTestBase):
         super().setUpTestData()
 
         cls.categories = cls.bootstrap.create_camp_info_categories(camp=cls.camp, teams=cls.teams)
-        cls.bootstrap.create_camp_info_items(camp=cls.camp,categories=cls.categories)
+        cls.bootstrap.create_camp_info_items(camp=cls.camp, categories=cls.categories)
 
         permission_content_type = ContentType.objects.get_for_model(CampPermission)
         cls.users[4].user_permissions.add(
@@ -34,33 +34,42 @@ class TeamInfoViewTest(BornhackTestBase):
 
     def test_team_info_view_permissions(self) -> None:
         """Test the team info view permissions."""
-        self.client.force_login(self.users[0]) # Non noc team member
+        self.client.force_login(self.users[0])  # Non noc team member
         # Test access control to the views
-        url = reverse("teams:info_categories", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:info_categories",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 403
 
     def test_team_info_views(self) -> None:
         """Test the team info views."""
-        self.client.force_login(self.users[4]) # Noc teamlead
+        self.client.force_login(self.users[4])  # Noc teamlead
 
         # Test info categories page
-        url = reverse("teams:info_categories", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:info_categories",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
         # Test info categories create page
-        url = reverse("teams:info_item_create", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-            "category_anchor": self.categories["noc"].anchor,
-        })
+        url = reverse(
+            "teams:info_item_create",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+                "category_anchor": self.categories["noc"].anchor,
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -72,18 +81,21 @@ class TeamInfoViewTest(BornhackTestBase):
                 "body": "Some test info",
                 "anchor": "test",
                 "weight": 100,
-                },
+            },
             follow=True,
         )
         assert response.status_code == 200
 
         # Test info categories edit page
-        url = reverse("teams:info_item_update", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-            "category_anchor": self.categories["noc"].anchor,
-            "item_anchor": "test",
-        })
+        url = reverse(
+            "teams:info_item_update",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+                "category_anchor": self.categories["noc"].anchor,
+                "item_anchor": "test",
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -95,18 +107,21 @@ class TeamInfoViewTest(BornhackTestBase):
                 "body": "Some test info",
                 "anchor": "test",
                 "weight": 101,
-                },
+            },
             follow=True,
         )
         assert response.status_code == 200
 
         # Test info categories delete page
-        url = reverse("teams:info_item_delete", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-            "category_anchor": self.categories["noc"].anchor,
-            "item_anchor": "test",
-        })
+        url = reverse(
+            "teams:info_item_delete",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+                "category_anchor": self.categories["noc"].anchor,
+                "item_anchor": "test",
+            },
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 

@@ -16,7 +16,6 @@ class TeamGuideViewTest(BornhackTestBase):
         # first add users and other basics
         super().setUpTestData()
 
-
     def test_team_guide_views_permission(self) -> None:
         """Test the team guide view."""
         self.client.force_login(self.users[0])
@@ -38,4 +37,3 @@ class TeamGuideViewTest(BornhackTestBase):
         url = reverse("teams:guide_print", kwargs={"team_slug": self.teams["noc"].slug, "camp_slug": self.camp.slug})
         response = self.client.get(path=url, follow=True)
         assert response.status_code == 200
-
