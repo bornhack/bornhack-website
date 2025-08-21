@@ -19,7 +19,7 @@
           {% for form, feedback in formset|zip:feedback_list %}
             <div class="card">
               <div class="card-header">
-                <h4 class="card-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.email|default:"Anonymous User" }}</h4>
+                <h4 class="card-title">Feedback for {{ feedback.facility.name }} by {{ feedback.user.profile.public_credit_name|default:"Anonymous User" }}</h4>
               </div>
               <div class="card-body">
                 <table class="table">
