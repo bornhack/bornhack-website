@@ -2379,6 +2379,7 @@ class Bootstrap:
                     ticket_types,
                 )
                 self.create_prize_ticket(camp, ticket_types)
+                self.create_camp_tracks(camp)
 
             teams[year] = self.create_camp_teams(camp)
             self.create_camp_team_memberships(camp, teams[year], self.users)
