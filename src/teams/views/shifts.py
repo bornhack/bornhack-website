@@ -358,7 +358,7 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
         return HttpResponseRedirect(reverse("teams:shifts", kwargs=kwargs))
 
 
-class UserShifts(CampViewMixin, TemplateView):
+class UserShifts(LoginRequiredMixin, CampViewMixin, TemplateView):
     """View for showing shifts for current user."""
     template_name = "team_user_shifts.html"
 

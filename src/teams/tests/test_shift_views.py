@@ -29,6 +29,14 @@ class TeamShiftViewTest(BornhackTestBase):
             ),
         )
 
+    def test_team_shift_requires_login(self) -> None:
+        """Test viewing users team shifts requires to be signed in"""
+        url = reverse("teams:user_shifts", kwargs={
+            "camp_slug": self.camp.slug,
+        })
+        response = self.client.get(url)
+        self.assertRedirects(response, f"/login/?next={url}")
+
     def test_team_shift_view_permissions(self) -> None:
         """Test the team shift view permissions."""
         self.client.force_login(self.users[0]) # Non noc team member
