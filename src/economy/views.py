@@ -6,9 +6,8 @@ import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import OuterRef
-from django.db.models import Q
 from django.db.models import Prefetch
+from django.db.models import Q
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -67,8 +66,8 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         ).count()
         reimbursement_total = 0
         for reimbursement in Reimbursement.objects.filter(
-                reimbursement_user=self.request.user,
-                camp=self.camp,
+            reimbursement_user=self.request.user,
+            camp=self.camp,
         ):
             reimbursement_total += reimbursement.amount
         context["reimbursement_total"] = reimbursement_total
@@ -158,18 +157,14 @@ class ChainListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     permission_required = "camps.expense_create_permission"
 
     def get_queryset(self):
-        queryset = (Chain.objects
-                    .filter(credebtors__expenses__camp=self.camp)
-                    .order_by('name'))
+        queryset = Chain.objects.filter(credebtors__expenses__camp=self.camp).order_by("name")
 
         return queryset
 
     def get_context_data(self, **kwargs):
         """Add chains with expenses in past years"""
         context = super().get_context_data(**kwargs)
-        context['past_year_chains'] = (Chain.objects
-                                       .filter(~Q(credebtors__expenses__camp=self.camp))
-                                       .order_by('name'))
+        context["past_year_chains"] = Chain.objects.filter(~Q(credebtors__expenses__camp=self.camp)).order_by("name")
         return context
 
 
@@ -219,23 +214,27 @@ class CredebtorListView(
     permission_required = "camps.expense_create_permission"
 
     def get_queryset(self):
-        expenses=Expense.objects.filter(camp=self.camp)
-        revenues=Revenue.objects.filter(camp=self.camp)
-        return (Credebtor.objects.filter(
-            chain=self.chain
-        ).prefetch_related(
-            Prefetch(
-                'expenses',
-                queryset=expenses,
-                to_attr="current_expenses",
+        expenses = Expense.objects.filter(camp=self.camp)
+        revenues = Revenue.objects.filter(camp=self.camp)
+        return (
+            Credebtor.objects.filter(
+                chain=self.chain,
             )
-        ).prefetch_related(
-            Prefetch(
-                'revenues',
-                queryset=revenues,
-                to_attr="current_revenues",
+            .prefetch_related(
+                Prefetch(
+                    "expenses",
+                    queryset=expenses,
+                    to_attr="current_expenses",
+                ),
             )
-        ))
+            .prefetch_related(
+                Prefetch(
+                    "revenues",
+                    queryset=revenues,
+                    to_attr="current_revenues",
+                ),
+            )
+        )
 
     def get_context_data(self, **kwargs):
         """Add chain to context."""
@@ -422,9 +421,9 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
     def get(self, request, *args, **kwargs):
         """Check if this user has any approved and un-reimbursed expenses."""
         if not request.user.expenses.filter(
-                reimbursement__isnull=True,
-                approved=True,
-                paid_by_bornhack=False,
+            reimbursement__isnull=True,
+            approved=True,
+            paid_by_bornhack=False,
         ):
             messages.error(
                 request,

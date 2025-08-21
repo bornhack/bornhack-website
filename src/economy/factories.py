@@ -6,10 +6,10 @@ import factory
 import faker
 from django.contrib.auth.models import User
 from django.utils import timezone
-from utils.slugs import unique_slugify
 
 from camps.models import Camp
 from teams.models import Team
+from utils.slugs import unique_slugify
 
 from .models import Bank
 from .models import BankAccount
@@ -31,6 +31,7 @@ from .models import ZettleBalance
 from .models import ZettleReceipt
 
 fake = faker.Faker()
+
 
 class BankFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -529,6 +530,7 @@ class CredebtorFactory(factory.django.DjangoModelFactory):
     )
     address = factory.Faker("address", locale="dk_DK")
     notes = factory.Faker("text")
+
 
 class ExpenseFactory(factory.django.DjangoModelFactory):
     """Factory for creating expense data."""
