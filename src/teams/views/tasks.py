@@ -1,4 +1,5 @@
 """All views for the teams task application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -25,8 +26,10 @@ from .mixins import TeamViewMixin
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
+
 class TeamTasksView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """List view of the team tasks."""
+
     template_name = "team_tasks.html"
     context_object_name = "team"
     model = Team
@@ -36,14 +39,17 @@ class TeamTasksView(CampViewMixin, IsTeamPermContextMixin, DetailView):
 
 class TaskCommentForm(forms.ModelForm):
     """Form for commenting on a Task."""
+
     class Meta:
         """Meta."""
+
         model = TaskComment
         fields = ("comment",)
 
 
 class TaskDetailView(TeamViewMixin, IsTeamPermContextMixin, DetailView):
     """Task detail view."""
+
     template_name = "task_detail.html"
     context_object_name = "task"
     model = TeamTask
@@ -75,8 +81,10 @@ class TaskDetailView(TeamViewMixin, IsTeamPermContextMixin, DetailView):
 
 class TaskForm(forms.ModelForm):
     """Form for creating or edditing Tasks."""
+
     class Meta:
         """Meta."""
+
         model = TeamTask
         fields = ("name", "description", "when", "completed")
 
@@ -97,6 +105,7 @@ class TaskCreateView(
     CreateView,
 ):
     """View for creating a team task."""
+
     model = TeamTask
     template_name = "task_form.html"
     form_class = TaskForm
@@ -131,6 +140,7 @@ class TaskUpdateView(
     UpdateView,
 ):
     """Update task view used for updating tasks."""
+
     model = TeamTask
     template_name = "task_form.html"
     form_class = TaskForm

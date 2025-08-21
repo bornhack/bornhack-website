@@ -1,4 +1,5 @@
 """Views for team members."""
+
 from __future__ import annotations
 
 import logging
@@ -32,6 +33,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 
 class TeamMembersView(CampViewMixin, IsTeamPermContextMixin, DetailView):
     """List view for team members."""
+
     template_name = "team_members.html"
     context_object_name = "team"
     model = Team
@@ -41,6 +43,7 @@ class TeamMembersView(CampViewMixin, IsTeamPermContextMixin, DetailView):
 
 class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View displayed when joining a team."""
+
     template_name = "team_join.html"
     model = Team
     fields = ()
@@ -78,6 +81,7 @@ class TeamJoinView(LoginRequiredMixin, CampViewMixin, UpdateView):
 
 class TeamLeaveView(LoginRequiredMixin, CampViewMixin, UpdateView):
     """View for leaving a team."""
+
     template_name = "team_leave.html"
     model = Team
     fields = ()
@@ -112,6 +116,7 @@ class TeamMemberRemoveView(
     UpdateView,
 ):
     """View for removing a team member."""
+
     template_name = "teammember_remove.html"
     model = TeamMember
     fields = ()
@@ -144,6 +149,7 @@ class TeamMemberApproveView(
     UpdateView,
 ):
     """View to approve team member."""
+
     template_name = "teammember_approve.html"
     model = TeamMember
     fields = ()

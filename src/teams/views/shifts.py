@@ -1,4 +1,5 @@
 """View for shifts in teams application."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -40,6 +41,7 @@ if TYPE_CHECKING:
 
 class ShiftListView(LoginRequiredMixin, CampViewMixin, IsTeamPermContextMixin, ListView):
     """Shift list view."""
+
     model = TeamShift
     template_name = "team_shift_list.html"
     context_object_name = "shifts"
@@ -66,7 +68,7 @@ def date_choices(camp: Camp) -> list:
     minute_choices = []
     # To begin with we assume a shift can not be shorter than an hour
     shift_minimum_length = 60
-    while index * shift_minimum_length < 60: # noqa: PLR2004
+    while index * shift_minimum_length < 60:  # noqa: PLR2004
         minutes = int(index * shift_minimum_length)
         minute_choices.append(minutes)
         index += 1
@@ -94,12 +96,14 @@ def date_choices(camp: Camp) -> list:
 
 class ShiftForm(forms.ModelForm):
     """Form for shifts."""
+
     class Meta:
         """Meta."""
+
         model = TeamShift
         fields = ("from_datetime", "to_datetime", "people_required")
 
-    def __init__(self, instance: TeamShift|None=None, **kwargs) -> None:
+    def __init__(self, instance: TeamShift | None = None, **kwargs) -> None:
         """Method for setting up the form."""
         camp = kwargs.pop("camp")
         super().__init__(instance=instance, **kwargs)
@@ -151,6 +155,7 @@ class ShiftForm(forms.ModelForm):
 
 class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, CreateView):
     """View for creating a single shift."""
+
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
@@ -184,6 +189,7 @@ class ShiftCreateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, UpdateView):
     """View for updating a single shift."""
+
     model = TeamShift
     template_name = "team_shift_form.html"
     form_class = ShiftForm
@@ -209,6 +215,7 @@ class ShiftUpdateView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, DeleteView):
     """View for deleting a shift."""
+
     model = TeamShift
     template_name = "team_shift_confirm_delete.html"
     active_menu = "shifts"
@@ -230,7 +237,8 @@ class ShiftDeleteView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, Is
 
 class MultipleShiftForm(forms.Form):
     """Form for creating multple shifts."""
-    def __init__(self, instance: dict|None=None, **kwargs) -> None:
+
+    def __init__(self, instance: dict | None = None, **kwargs) -> None:
         """Method for form init setting camp to kwargs."""
         camp = kwargs.pop("camp")
         super().__init__(**kwargs)
@@ -249,6 +257,7 @@ class MultipleShiftForm(forms.Form):
 
 class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadMixin, IsTeamPermContextMixin, FormView):
     """View for creating multiple shifts."""
+
     template_name = "team_shift_form.html"
     form_class = MultipleShiftForm
     active_menu = "shifts"
@@ -304,6 +313,7 @@ class ShiftCreateMultipleView(LoginRequiredMixin, CampViewMixin, EnsureTeamLeadM
 
 class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
     """View for adding a user to a shift."""
+
     http_methods = ("get",)
 
     def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
@@ -342,6 +352,7 @@ class MemberTakesShift(LoginRequiredMixin, CampViewMixin, View):
 
 class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
     """View for remove a user from a shift."""
+
     http_methods = ("get",)
 
     def get(self, request: HttpRequest, **kwargs) -> HttpResponseRedirect:
@@ -360,6 +371,7 @@ class MemberDropsShift(LoginRequiredMixin, CampViewMixin, View):
 
 class UserShifts(LoginRequiredMixin, CampViewMixin, TemplateView):
     """View for showing shifts for current user."""
+
     template_name = "team_user_shifts.html"
 
     def get_context_data(self, **kwargs) -> dict:
