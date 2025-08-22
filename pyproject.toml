@@ -27,16 +27,16 @@ dependencies = [
     "django-leaflet==0.31.0",
     "django-jsonview==2.0.0",
     "django-oauth-toolkit==3.0.1",
-    "django-otp==1.6.0",
+    "django-otp==1.6.1",
     "django-prometheus==2.3.1",
-    "django-reversion==5.0.12",
-    "django_stubs_ext==5.2.0",
+    "django-reversion==5.1.0",
+    "django-stubs-ext==5.2.2",
     "django-tables2==2.7.5",
     "django-taggit==6.1.0",
     "django-weasyprint==2.4.0",
     "future==1.0.0",
     "html5lib==1.1",
-    "icalendar==6.2.0",
+    "icalendar==6.3.1",
     "irc3==1.1.10",
     "lxml==5.4.0",
     "nh3==0.2.21",
@@ -49,33 +49,31 @@ dependencies = [
     "service-identity==24.2.0",
     "Unidecode==1.4.0",
     # pillow is only here to make old migrations run
-    "Pillow==11.2.1",
-    "weasyprint==65.1",
+    "pillow==11.3.0",
+    "weasyprint==66.0",
 ]
 
 [project.optional-dependencies]
 
 bootstrap = [
     "factory_boy==3.3.3",
+    "unittest-xml-reporting==3.2.0",
 ]
 
 dev = [
     "bornhack-website[bootstrap]",
-    "pre-commit==4.2.0",
-    "setuptools_scm==8.3.1",
-    "django-debug-toolbar==5.2.0",
+    "pre-commit==4.3.0",
+    "setuptools-scm==9.2.0",
+    "django-debug-toolbar==6.0.0",
     "tblib==3.1.0",
-    "unittest-xml-reporting==3.2.0",
-    "pipdeptree==2.26.1",
+    "pipdeptree==2.28.0",
 ]
 
 test = [
     "bornhack-website[bootstrap]",
     "beautifulsoup4==4.13.4",
-    "coverage==7.8.0",
-    "hypothesis==6.131.15",
-    "beautifulsoup4==4.13.4",
-    "unittest-xml-reporting==3.2.0",
+    "coverage==7.10.4",
+    "hypothesis==6.138.2",
 ]
 
 
