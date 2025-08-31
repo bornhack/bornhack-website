@@ -92,6 +92,13 @@
           </a>
         </li>
 
+        {% url 'profiles:facility_feedback_list' as profile_facility_feedback_url %}
+        <li class="nav-item">
+          <a class="nav-link{% if request.path == profile_facility_feedback_url %} active{% endif %}" href="{{ profile_facility_feedback_url }}">
+            Facility Feedback
+          </a>
+        </li>
+
         <li class="nav-item">
           <a class="nav-link" href="{% url 'maps_user_location_redirect' %}">
             User Locations
