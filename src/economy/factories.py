@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 import random
+from datetime import timezone
 
 import factory
 import faker
 from django.contrib.auth.models import User
-from django.utils import timezone
 from utils.slugs import unique_slugify
 
 from camps.models import Camp

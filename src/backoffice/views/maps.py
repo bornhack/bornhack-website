@@ -297,7 +297,6 @@ class MapFeatureCreateView(LayerMapperViewMixin, LayerMapMixin, CreateView):
         form.fields["geom"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "geom_type": "GeometryCollection",
                 "class": "form-control",
             },
@@ -342,7 +341,6 @@ class MapFeatureUpdateView(LayerMapperViewMixin, LayerMapMixin, UpdateView):
         form.fields["geom"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "geom_type": "GeometryCollection",
                 "class": "form-control",
             },

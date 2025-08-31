@@ -182,6 +182,7 @@
 /* visual tweaks */
 
 .leaflet-container {
+    height: 500px;
 	background: #ddd;
 	outline: 0;
 	}
