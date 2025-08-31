@@ -18,7 +18,7 @@
   <tbody>
     {% for order in order_list %}
       <tr>
-        <td>BH{{ order.id }}</td>
+        <td data-order="{{ order.id }}">BH{{ order.id }}</td>
         <td>{{ order.user.email }}</td>
         <td data-order="{{ order.created|sortable }}">{{ order.created }}</td>
         <td data-order="{{ order.updated|sortable }}">{{ order.updated }}</td>
