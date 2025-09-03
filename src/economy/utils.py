@@ -345,6 +345,23 @@ class ZettleExcelImporter:
 
         The receipts sheet has 16 rows header and 3 rows footer to skip.
         Also skip columns B (redundant) and J (part of cardnumber).
+
+        Column titles as of September 2025:
+        A=Dato
+        B=Tid
+        C=Kvitteringsnummer
+        D=Moms (25.0%)
+        E=Total
+        F=Afgift
+        G=Netto
+        H=Betalingsmetode
+        I=Hændelsestype
+        J=Kortudsteder
+        K=Sidste cifre
+        L=Personale
+        M=Beskrivelse
+        N=Solgt via
+
         """
         return pd.read_excel(
             fh,
@@ -392,11 +409,19 @@ class ZettleExcelImporter:
 
     @staticmethod
     def load_zettle_balances_excel(fh):
-        """Load an Excel file wi th Zettle balances and account movements.
+        """Load an Excel file with Zettle balances and account movements.
 
         Zettle exports data in Excel files (not CSV), so this importer uses pandas for the file parsing.
 
-        The receipts sheet has no header or footer rows, and no columns to skip.
+        The balances sheet has no header or footer rows, and no columns to skip.
+
+        Column titles as of September 2025:
+          A=Afregningsdato
+          B=Betalingsdato
+          C=Reference
+          D=Type
+          E=Netto
+          F=Saldo
         """
         return pd.read_excel(
             fh,
@@ -406,7 +431,7 @@ class ZettleExcelImporter:
             },
             converters={
                 "Reference": optional_int,  # C
-                "Beløb": to_decimal,  # E
+                "Netto": to_decimal,  # E
                 "Saldo": to_decimal,  # F
             },
         )
@@ -418,7 +443,7 @@ class ZettleExcelImporter:
         for _index, row in df.iterrows():
             # create balance
             zb, created = ZettleBalance.objects.get_or_create(
-                statement_time=timezone.make_aware(row["Opgørelsesdato"], timezone=cph),
+                statement_time=timezone.make_aware(row["Afregningsdato"], timezone=cph),
                 payment_time=(
                     timezone.make_aware(row["Betalingsdato"], timezone=cph)
                     if not pd.isnull(row["Betalingsdato"])
@@ -426,7 +451,7 @@ class ZettleExcelImporter:
                 ),
                 payment_reference=(row["Reference"] if not pd.isnull(row["Reference"]) else None),
                 description=row["Type"],
-                amount=row["Beløb"],
+                amount=row["Netto"],
                 balance=row["Saldo"],
             )
             if created:
