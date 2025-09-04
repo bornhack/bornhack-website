@@ -7,6 +7,7 @@
       <th>Created</th>
       <th>Updated</th>
       <th>Products</th>
+      <th>Total Amount</th>
       <th>Payment Method</th>
       <th>Paid</th>
       <th>Cancelled</th>
@@ -23,6 +24,7 @@
         <td data-order="{{ order.created|sortable }}">{{ order.created }}</td>
         <td data-order="{{ order.updated|sortable }}">{{ order.updated }}</td>
         <td><ul>{% for opr in order.oprs.all %}<li>{{ opr.product.name }} ({{ opr.quantity }}){% endfor %}</ul></td>
+        <td data-order="{{ order.total }}">{{ order.total|currency }}</td>
         <td>{{ order.payment_method }}</td>
         <td>{{ order.paid|truefalseicon }} {% if order.paid %}paid{% else %}unpaid{% endif %}</td>
         <td>{{ order.cancelled|truefalseicon }}</td>
