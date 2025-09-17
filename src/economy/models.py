@@ -1313,11 +1313,11 @@ class BankAccount(ExportModelOperationsMixin("bank_account"), CreatedUpdatedUUID
             # use update_or_create() so we can import a new CSV with the same transactions
             # but with updated descriptions, in case we fix a description in the bank
             tx, created = self.transactions.update_or_create(
-                date=cph.localize(datetime.strptime(row[0], "%d-%m-%Y")),
+                date=cph.localize(datetime.strptime(row[0], "%d/%m/%Y")),
                 amount=Decimal(row[3].replace(".", "").replace(",", ".")),
                 balance=Decimal(row[4].replace(".", "").replace(",", ".")),
                 defaults={
-                    "text": row[2],
+                    "text": row[1],
                 },
             )
             if created:

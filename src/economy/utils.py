@@ -92,7 +92,7 @@ def import_epay_csv(csvreader):
 class CoinifyCSVImporter:
     @staticmethod
     def import_coinify_payment_intent_csv(csvreader):
-        """Import a CSV file from Coinify payment intents exporeted from there webinterface.
+        """Import a CSV file from Coinify payment intents exported from there webinterface.
 
         Assumes a CSV structure like this:
         referenceId,referenceType,merchantId,merchantName,subaccountId,subaccountName,state,stateReason,orderId,customerEmail,requestedAmount,requestedCurrency,createTime,amount,currency
