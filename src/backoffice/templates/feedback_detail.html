@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Feedback Detail | Orga | BackOffice | {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Feedback detail</h3>
+    </div>
+    <div class="card-body">
+      <div class="mb-4">
+        <figure>
+          <blockquote class="blockquote">
+            <p>{{ feedback.feedback }}</p>
+          </blockquote>
+          <figcaption class="blockquote-footer">
+            <cite title="Source Title">{{ feedback.user.profile.public_credit_name }}</cite>
+          </figcaption>
+        </figure>
+      </div>
+      <div>
+        <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#orga"><i class="fas fa-undo"></i> Backoffice</a>
+        <a class="btn btn-primary" href="{% url 'backoffice:feedback_list' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Feedback list</a>
+        {% if not feedback.processed_by %}
+        <form method="post" action="{% url 'backoffice:feedback_process' camp_slug=camp.slug pk=feedback.pk %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Processed</a>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
