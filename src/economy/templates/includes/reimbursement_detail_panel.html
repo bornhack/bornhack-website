@@ -5,11 +5,11 @@
     <table class="table">
       <tr>
         <th>Reimbursement User</th>
-        <td>{{ reimbursement.reimbursement_user }}</td>
+        <td>{{ reimbursement.reimbursement_user.profile.get_name }}</td>
       </tr>
       <tr>
         <th>Created By</th>
-        <td>{{ reimbursement.user }}</td>
+        <td>{{ reimbursement.user.profile.get_name }}</td>
       </tr>
       <tr>
         <th>Total Amount</th>
