@@ -457,7 +457,7 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             reimbursement__isnull=True,
             payment_status="PAID_NEEDS_REIMBURSEMENT",
         )
-        expenses_total = expenses.aggregate(Sum("amount"))["amount__sum"]
+        expenses_total = expenses.aggregate(Sum("amount"))["amount__sum"] or 0
 
         # get the revenues for this user
         revenues = Revenue.objects.filter(
@@ -466,7 +466,7 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             reimbursement__isnull=True,
             payment_status="PAID_NEEDS_REDISBURSEMENT",
         )
-        revenues_total = revenues.aggregate(Sum("amount"))["amount__sum"]
+        revenues_total = revenues.aggregate(Sum("amount"))["amount__sum"] or 0
         if not expenses and not revenues:
             messages.error(self.request, "No approved unhandled expenses or revenues found")
             return redirect(
