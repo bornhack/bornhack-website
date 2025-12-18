@@ -273,18 +273,33 @@ class ReimbursementUpdateView(
 ):
     model = Reimbursement
     template_name = "reimbursement_form.html"
-    fields = ["notes", "paid"]
+    fields = ["notes"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
-        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["total_amount"] = self.object.amount
         context["reimbursement_user"] = self.object.reimbursement_user
         context["cancelurl"] = reverse(
             "backoffice:reimbursement_list",
             kwargs={"camp_slug": self.camp.slug},
         )
         return context
+
+    def form_valid(self, form):
+        """We have two submit buttons in this form, 'Just Save', and 'Mark as Paid'."""
+        reimbursement = form.save()
+        if "paid" in form.data:
+            # mark as paid button was pressed
+            reimbursement.mark_as_paid()
+            messages.success(self.request, "Reimbursement marked as paid, related expenses and revenues payment_status set accordingly")
+        elif "save" in form.data:
+            messages.success(self.request, "Expense updated")
+        else:
+            messages.error(self.request, "Unknown submit action")
+        return redirect(
+            reverse("backoffice:expense_list", kwargs={"camp_slug": self.camp.slug}),
+        )
 
     def get_success_url(self):
         return reverse(

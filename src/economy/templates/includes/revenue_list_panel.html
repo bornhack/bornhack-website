@@ -9,9 +9,7 @@
         {% endif %}
         <th>Invoice Date</th>
         <th>Created By</th>
-        {% if not reimbursement %}
-          <th>Payment Status</th>
-        {% endif %}
+        <th>Payment Status</th>
         <th>Debtor</th>
         <th>Amount</th>
         <th>Description</th>
@@ -34,12 +32,7 @@
 
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
           <td>{{ revenue.user.profile.get_name }}</td>
-
-          {# to save space do not show payment status column in reimbursements #}
-          {% if not reimbursement %}
-            <td>{{ revenue.payment_status }}</td>
-          {% endif %}
-
+          <td>{{ revenue.payment_status }}</td>
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
           <td>{{ revenue.description }}</td>
