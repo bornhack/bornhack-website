@@ -19,7 +19,7 @@
   {% endif %}
 
   {% if object.revenues %}
-  <div class="card">
+  <div class="card mb2">
     <h3 class="card-header">Revenues in this Reimbursement:</h3>
     <div class="card-body">
       {% include 'includes/revenue_list_panel.html' with revenue_list=reimbursement.covered_revenues.all %}

@@ -14,7 +14,7 @@
       <tr>
         <th>Total Amount</th>
         <td>{{ reimbursement.amount }} DKK<br>
-<i>Note: a negative number here means you owe BornHack money, while a positive number means that BornHack owes you money.</i>
+            <i>Note: a negative number here means {% if request.resolver_match.app_name == "backoffice" %}the participant owes{% else %}you owe{% endif %} BornHack money, while a positive number means that BornHack owes {% if request.resolver_match.app_name == "backoffice" %}the participant{% else %}you{% endif %} money.</i>
         </td>
       </tr>
       <tr>
