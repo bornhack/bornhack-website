@@ -6,9 +6,8 @@ import magic
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import OuterRef
-from django.db.models import Q
 from django.db.models import Prefetch
+from django.db.models import Q
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -67,8 +66,8 @@ class EconomyDashboardView(LoginRequiredMixin, CampViewMixin, TemplateView):
         ).count()
         reimbursement_total = 0
         for reimbursement in Reimbursement.objects.filter(
-                reimbursement_user=self.request.user,
-                camp=self.camp,
+            reimbursement_user=self.request.user,
+            camp=self.camp,
         ):
             reimbursement_total += reimbursement.amount
         context["reimbursement_total"] = reimbursement_total
@@ -158,18 +157,14 @@ class ChainListView(CampViewMixin, RaisePermissionRequiredMixin, ListView):
     permission_required = "camps.expense_create_permission"
 
     def get_queryset(self):
-        queryset = (Chain.objects
-                    .filter(credebtors__expenses__camp=self.camp)
-                    .order_by('name'))
+        queryset = Chain.objects.filter(credebtors__expenses__camp=self.camp).order_by("name")
 
         return queryset
 
     def get_context_data(self, **kwargs):
         """Add chains with expenses in past years"""
         context = super().get_context_data(**kwargs)
-        context['past_year_chains'] = (Chain.objects
-                                       .filter(~Q(credebtors__expenses__camp=self.camp))
-                                       .order_by('name'))
+        context["past_year_chains"] = Chain.objects.filter(~Q(credebtors__expenses__camp=self.camp)).order_by("name")
         return context
 
 
@@ -219,23 +214,27 @@ class CredebtorListView(
     permission_required = "camps.expense_create_permission"
 
     def get_queryset(self):
-        expenses=Expense.objects.filter(camp=self.camp)
-        revenues=Revenue.objects.filter(camp=self.camp)
-        return (Credebtor.objects.filter(
-            chain=self.chain
-        ).prefetch_related(
-            Prefetch(
-                'expenses',
-                queryset=expenses,
-                to_attr="current_expenses",
+        expenses = Expense.objects.filter(camp=self.camp)
+        revenues = Revenue.objects.filter(camp=self.camp)
+        return (
+            Credebtor.objects.filter(
+                chain=self.chain,
             )
-        ).prefetch_related(
-            Prefetch(
-                'revenues',
-                queryset=revenues,
-                to_attr="current_revenues",
+            .prefetch_related(
+                Prefetch(
+                    "expenses",
+                    queryset=expenses,
+                    to_attr="current_expenses",
+                ),
             )
-        ))
+            .prefetch_related(
+                Prefetch(
+                    "revenues",
+                    queryset=revenues,
+                    to_attr="current_revenues",
+                ),
+            )
+        )
 
     def get_context_data(self, **kwargs):
         """Add chain to context."""
@@ -274,11 +273,8 @@ class ExpenseCreateView(
     form_class = ExpenseCreateForm
 
     def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown."""
+        """Set creditor and fixup choices for payment method."""
         context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
         context["creditor"] = self.credebtor
         return context
 
@@ -303,7 +299,7 @@ class ExpenseCreateView(
             ),
             text_template="emails/expense_awaiting_approval_email.txt",
             formatdict={"expense": expense},
-            subject=f"New {expense.camp.title} expense for {expense.responsible_team.name} Team is awaiting approval",
+            subject=f"New {expense.camp.title} expense is awaiting approval",
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 
@@ -333,9 +329,6 @@ class ExpenseUpdateView(CampViewMixin, ExpensePermissionMixin, UpdateView):
     def get_context_data(self, **kwargs):
         """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
         context["creditor"] = self.get_object().creditor
         return context
 
@@ -419,31 +412,35 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
     template_name = "reimbursement_form.html"
     fields = ["bank_account"]
 
-    def get(self, request, *args, **kwargs):
-        """Check if this user has any approved and un-reimbursed expenses."""
-        if not request.user.expenses.filter(
-                reimbursement__isnull=True,
-                approved=True,
-                paid_by_bornhack=False,
-        ):
+    def dispatch(self, request, *args, **kwargs):
+        """Get any approved and un-reimbursed expenses and revenues, or return error."""
+        self.expenses = request.user.expenses.filter(
+            reimbursement__isnull=True,
+            approved=True,
+            payment_status="PAID_NEEDS_REIMBURSEMENT",
+        )
+        self.revenues = request.user.revenues.filter(
+            reimbursement__isnull=True,
+            approved=True,
+            payment_status="PAID_NEEDS_REDISBURSEMENT",
+        )
+        if not self.expenses and not self.revenues:
             messages.error(
                 request,
-                "You have no approved and unreimbursed expenses!",
+                "You have no approved and unreimbursed expenses or revenues!",
             )
             return redirect(
                 reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
             )
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["expenses"] = Expense.objects.filter(
-            user=self.request.user,
-            approved=True,
-            reimbursement__isnull=True,
-            paid_by_bornhack=False,
-        )
-        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["expenses"] = self.expenses
+        context["revenues"] = self.revenues
+        context["total_expense_amount"] = self.expenses.aggregate(Sum("amount"))["amount__sum"] or 0
+        context["total_revenue_amount"] = self.revenues.aggregate(Sum("amount"))["amount__sum"] or 0
+        context["total_amount"] = context["total_expense_amount"] - context["total_revenue_amount"]
         context["reimbursement_user"] = self.request.user
         context["cancelurl"] = reverse(
             "economy:reimbursement_list",
@@ -458,10 +455,20 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             user=self.request.user,
             approved=True,
             reimbursement__isnull=True,
-            paid_by_bornhack=False,
+            payment_status="PAID_NEEDS_REIMBURSEMENT",
         )
-        if not expenses:
-            messages.error(self.request, "No expenses found")
+        expenses_total = expenses.aggregate(Sum("amount"))["amount__sum"]
+
+        # get the revenues for this user
+        revenues = Revenue.objects.filter(
+            user=self.request.user,
+            approved=True,
+            reimbursement__isnull=True,
+            payment_status="PAID_NEEDS_REDISBURSEMENT",
+        )
+        revenues_total = revenues.aggregate(Sum("amount"))["amount__sum"]
+        if not expenses and not revenues:
+            messages.error(self.request, "No approved unhandled expenses or revenues found")
             return redirect(
                 reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
             )
@@ -472,6 +479,19 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             return redirect(
                 reverse("economy:dashboard", kwargs={"camp_slug": self.camp.slug}),
             )
+
+        # calculate the reimbursement total
+        reimbursement_total = expenses_total - revenues_total
+        if reimbursement_total > 0:
+            # make sure there is a bank account
+            if not form.cleaned_data["bank_account"]:
+                form.add_error(
+                    "bank_account",
+                    ValidationError(
+                        "Bank account is required when the reimbursement total is > 0",
+                    ),
+                )
+                return super().form_invalid(form)
 
         # create reimbursement in database
         reimbursement = form.save(commit=False)
@@ -485,13 +505,33 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
             expense.reimbursement = reimbursement
             expense.save()
 
-        # create payback expense for this reimbursement
-        reimbursement.create_payback_expense()
+        # add all revenues to reimbursement
+        for revenue in revenues:
+            revenue.reimbursement = reimbursement
+            revenue.save()
 
         messages.success(
             self.request,
-            f"Reimbursement {reimbursement.pk} has been created. It will be paid by the economy team to the specified bank account.",
+            f"Reimbursement {reimbursement.pk} has been created.",
         )
+
+        if reimbursement.amount > 0:
+            # create payback expense for this reimbursement
+            reimbursement.create_payback_expense()
+            messages.success(
+                self.request,
+                "Your money will be transferred to the specified bank account soon.",
+            )
+        elif reimbursement.amount < 0:
+            # create payback revenue for this reimbursement
+            reimbursement.create_payback_revenue()
+            messages.success(
+                self.request,
+                "It will be paid by the economy team to the specified bank account.",
+            )
+        else:
+            # The two even out what now
+            pass
 
         # send an email to the economy team
         add_outgoing_email(
@@ -510,34 +550,6 @@ class ReimbursementCreateView(CampViewMixin, ExpensePermissionMixin, CreateView)
                 "economy:reimbursement_detail",
                 kwargs={"camp_slug": self.camp.slug, "pk": reimbursement.pk},
             ),
-        )
-
-
-class ReimbursementUpdateView(
-    CampViewMixin,
-    ReimbursementPermissionMixin,
-    ReimbursementUnpaidMixin,
-    UpdateView,
-):
-    model = Reimbursement
-    template_name = "reimbursement_form.html"
-    fields = ["bank_account"]
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
-        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
-        context["reimbursement_user"] = self.request.user
-        context["cancelurl"] = reverse(
-            "economy:reimbursement_list",
-            kwargs={"camp_slug": self.camp.slug},
-        )
-        return context
-
-    def get_success_url(self):
-        return reverse(
-            "economy:reimbursement_detail",
-            kwargs={"camp_slug": self.camp.slug, "pk": self.get_object().pk},
         )
 
 
@@ -593,9 +605,6 @@ class RevenueCreateView(
     def get_context_data(self, **kwargs):
         """Do not show teams that are not part of the current camp in the dropdown."""
         context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
         context["debtor"] = self.credebtor
         return context
 
@@ -620,7 +629,7 @@ class RevenueCreateView(
             ),
             text_template="emails/revenue_awaiting_approval_email.txt",
             formatdict={"revenue": revenue},
-            subject=f"New {revenue.camp.title} revenue for {revenue.responsible_team.name} Team is awaiting approval",
+            subject=f"New {revenue.camp.title} revenue is awaiting approval",
             to_recipients=[settings.ECONOMYTEAM_EMAIL],
         )
 
@@ -646,14 +655,6 @@ class RevenueUpdateView(CampViewMixin, RevenuePermissionMixin, UpdateView):
                 reverse("economy:revenue_list", kwargs={"camp_slug": self.camp.slug}),
             )
         return response
-
-    def get_context_data(self, **kwargs):
-        """Do not show teams that are not part of the current camp in the dropdown."""
-        context = super().get_context_data(**kwargs)
-        context["form"].fields["responsible_team"].queryset = Team.objects.filter(
-            camp=self.camp,
-        )
-        return context
 
     def get_success_url(self):
         messages.success(

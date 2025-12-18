@@ -7,10 +7,6 @@
         <td>{{ revenue.user }}</td>
       </tr>
       <tr>
-        <th>Amount</th>
-        <td>{{ revenue.amount }} DKK</td>
-      </tr>
-      <tr>
         <th>Chain</th>
         <td>{{ revenue.debtor.chain.name }}</td>
       </tr>
@@ -19,8 +15,16 @@
         <td>{{ revenue.debtor.name }}</td>
       </tr>
       <tr>
+        <th>Amount</th>
+        <td>{{ revenue.amount }} DKK</td>
+      </tr>
+      <tr>
         <th>Invoice Date</th>
         <td>{{ revenue.invoice_date }}</td>
+      </tr>
+      <tr>
+        <th>Payment Status</th>
+        <td>{{ revenue.payment_status }}</td>
       </tr>
       <tr>
         <th>Description</th>
@@ -34,6 +38,22 @@
         <th>Approved?</th>
         <td>{{ revenue.approval_status }}</td>
       </tr>
+      {% if revenue.payment_status == "PAID_NEEDS_REDISBURSEMENT" or revenue.payment_status == "PAID_AND_REDISBURSED" %}
+      <tr>
+        <th>Reimbursement?</th>
+        <td>
+          {% if revenue.reimbursement %}
+            {% if request.resolver_match.app_name == "backoffice" %}
+              <a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=revenue.reimbursement.pk %}">{{ revenue.reimbursement.pk }}</a>
+            {% else %}
+              <a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=revenue.reimbursement.pk %}">{{ revenue.reimbursement.pk }}</a>
+            {% endif %}
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
+      {% endif %}
       <tr>
         <th>Invoice</th>
         <td>

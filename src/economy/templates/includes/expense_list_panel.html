@@ -10,7 +10,7 @@
         <th>Invoice Date</th>
         <th>Created By</th>
         {% if not reimbursement %}
-          <th>Paid by</th>
+          <th>Payment Status</th>
         {% endif %}
         <th>Creditor</th>
         <th>Amount</th>
@@ -25,23 +25,26 @@
     <tbody>
       {% for expense in expense_list %}
         <tr>
-          {% if request.resolver_match.app_name == "backoffice" %}
-            <td class="text-break"><a href="{% url 'backoffice:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
-          {% else %}
-            <td class="text-break"><a href="{% url 'economy:expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
-          {% endif %}
+          <td class="text-break"><a href="{% url request.resolver_match.app_name|add:':expense_detail' camp_slug=expense.camp.slug pk=expense.pk %}">{{ expense.pk }}</a></td>
+
+          {# camp identifier if needed #}
           {% if past_camps %}
           <td data-order="{{ expense.camp.title|sortable }}">{{ expense.camp.title }}</td>
           {% endif %}
+
           <td data-order="{{ expense.invoice_date|sortable }}">{{ expense.invoice_date }}</td>
           <td>{{ expense.user.profile.get_name }}</td>
+
+          {# to save space do not show payment status column in reimbursements #}
           {% if not reimbursement %}
-            <td>{% if expense.paid_by_bornhack %}BornHack{% else %}{{ expense.user.profile.get_name }}{% endif %}</td>
+            <td>{{ expense.payment_status }}</td>
           {% endif %}
+
           <td>{{ expense.creditor.name }}</td>
           <td data-order="{{ expense.amount }}">{{ expense.amount }} DKK</td>
           <td>{{ expense.description }}</td>
 
+          {# to save space do not show approval status and reimbursement link in reimbursements #}
           {% if not reimbursement %}
             <td>{{ expense.approval_status }}</td>
             <td>
@@ -57,6 +60,7 @@
             </td>
           {% endif %}
 
+          {# actions #}
           <td>
             <div class="btn-group-vertical">
               <a class="btn btn-sm btn-primary" href="{% url request.resolver_match.app_name|add:':expense_detail' camp_slug=expense.camp.slug pk=expense.uuid %}"><i class="fas fa-search"></i> Details</a>

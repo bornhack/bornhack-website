@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load bornhack %}
 {% load django_bootstrap5 %}
 
 {% block title %}
@@ -7,8 +8,9 @@
 
 {% block content %}
   <h3>{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
-  <div class="card">
-    <h3 class="card-header">This reimbursement covers the following approved expenses:</h3>
+  <div class="card mb-2">
+    {% if expenses %}
+    <h3 class="card-header">This reimbursement covers the following expenses:</h3>
     <div class="card-body">
       <table class="table">
         <thead>
@@ -16,24 +18,49 @@
             <th>Description</th>
             <th>Amount</th>
             <th>Invoice</th>
-            <th>Responsible Team</th>
           </tr>
         </thead>
         <tbody>
           {% for expense in expenses %}
             <tr>
               <td>{{ expense.description }}</td>
-              <td>{{ expense.amount }}</td>
+              <td>{{ expense.amount|currency }}</td>
               <td>{{ expense.invoice }}</td>
-              <td>{{ expense.responsible_team }} Team</td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+  {% endif %}
 
-  <p class="lead">The total amount for this reimbursement will be <b>{{ total_amount.amount__sum }} DKK</b></p>
+  {% if revenues %}
+  <div class="card">
+    <h3 class="card-header">This reimbursement covers the following revenues:</h3>
+    <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Invoice</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for revenue in revenues %}
+            <tr>
+              <td>{{ revenue.description }}</td>
+              <td>{{ revenue.amount|currency }}</td>
+              <td>{{ revenue.invoice }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <p>The total amount for this reimbursement will be <b>{{ total_amount }} DKK</b>. <i>Note: a negative number here means you owe BornHack money, while a positive number means that BornHack owes you money.</i></p>
 
   <form method="POST">
     {% csrf_token %}

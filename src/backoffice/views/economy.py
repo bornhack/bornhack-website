@@ -160,21 +160,21 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
         context["expenses"] = Expense.objects.filter(
             camp=self.camp,
             creditor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "creditor")
+        ).prefetch_related("user", "creditor")
         context["revenues"] = Revenue.objects.filter(
             camp=self.camp,
             debtor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "debtor")
+        ).prefetch_related("user", "debtor")
 
         # Include past years expenses and revenues for the Chain in context as separate querysets
         context["past_expenses"] = Expense.objects.filter(
             camp__camp__lt=self.camp.camp,
             creditor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "creditor")
+        ).prefetch_related("user", "creditor")
         context["past_revenues"] = Revenue.objects.filter(
             camp__camp__lt=self.camp.camp,
             debtor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "debtor")
+        ).prefetch_related("user", "debtor")
 
         return context
 
@@ -187,10 +187,10 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["expenses"] = (
-            self.get_object().expenses.filter(camp=self.camp).prefetch_related("responsible_team", "user", "creditor")
+            self.get_object().expenses.filter(camp=self.camp).prefetch_related("user", "creditor")
         )
         context["revenues"] = (
-            self.get_object().revenues.filter(camp=self.camp).prefetch_related("responsible_team", "user", "debtor")
+            self.get_object().revenues.filter(camp=self.camp).prefetch_related("user", "debtor")
         )
         return context
 
@@ -209,7 +209,6 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "creditor",
             "user",
-            "responsible_team",
         )
 
     def get_context_data(self, **kwargs):
@@ -221,7 +220,6 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         ).prefetch_related(
             "creditor",
             "user",
-            "responsible_team",
         )
         return context
 
@@ -339,7 +337,6 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "debtor",
             "user",
-            "responsible_team",
         )
 
     def get_context_data(self, **kwargs):

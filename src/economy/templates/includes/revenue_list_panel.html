@@ -1,6 +1,6 @@
 {% load bornhack %}
 {% if revenue_list %}
-  <table class="table table-hover">
+  <table class="table table-hover datatable">
     <thead>
       <tr>
         <th>ID</th>
@@ -9,38 +9,67 @@
         {% endif %}
         <th>Invoice Date</th>
         <th>Created By</th>
+        {% if not reimbursement %}
+          <th>Payment Status</th>
+        {% endif %}
         <th>Debtor</th>
         <th>Amount</th>
         <th>Description</th>
-        <th>Responsible Team</th>
-        <th>Approved</th>
+        {% if not reimbursement %}
+          <th>Approved</th>
+          <th>Reimbursement</th>
+        {% endif %}
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for revenue in revenue_list %}
         <tr>
-          <td>{{ revenue.pk }}</td>
+          <td class="text-break"><a href="{% url request.resolver_match.app_name|add:':revenue_detail' camp_slug=revenue.camp.slug pk=revenue.pk %}">{{ revenue.pk }}</a></td>
+
+          {# camp identifier if needed #}
           {% if past_camps %}
           <td data-order="{{ revenue.camp.title|sortable }}">{{ revenue.camp.title }}</td>
           {% endif %}
+
           <td data-order="{{ revenue.invoice_date|sortable }}">{{ revenue.invoice_date }}</td>
-          <td>{{ revenue.user.email }}</td>
+          <td>{{ revenue.user.profile.get_name }}</td>
+
+          {# to save space do not show payment status column in reimbursements #}
+          {% if not reimbursement %}
+            <td>{{ revenue.payment_status }}</td>
+          {% endif %}
+
           <td>{{ revenue.debtor }}</td>
           <td data-order="{{ revenue.amount }}">{{ revenue.amount }} DKK</td>
           <td>{{ revenue.description }}</td>
-          <td>{{ revenue.responsible_team.name }} Team</td>
-          <td>{{ revenue.approval_status }}</td>
+
+          {# to save space do not show approval status and reimbursement link in reimbursements #}
+          {% if not reimbursement %}
+            <td>{{ revenue.approval_status }}</td>
+            <td>
+              {% if revenue.reimbursement and not revenue.created_for_reimbursement %}
+                {% if request.resolver_match.app_name == "backoffice" %}
+                  <a href="{% url 'backoffice:reimbursement_detail' camp_slug=revenue.camp.slug pk=revenue.reimbursement.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Show</a>
+                {% else %}
+                  <a href="{% url 'economy:reimbursement_detail' camp_slug=revenue.camp.slug pk=revenue.reimbursement.pk %}" class="btn btn-sm btn-primary"><i class="fas fa-search"></i> Show</a>
+                {% endif %}
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          {% endif %}
+
+          {# actions #}
           <td>
             <div class="btn-group-vertical">
-            {% if request.resolver_match.app_name == "backoffice" %}
-              <a class="btn btn-sm btn-primary" href="{% url 'backoffice:revenue_detail' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-search"></i> Details</a>
+              <a class="btn btn-sm btn-primary" href="{% url request.resolver_match.app_name|add:':revenue_detail' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-search"></i> Details</a>
               <a class="btn btn-sm btn-primary" href="{% url 'economy:revenue_invoice' camp_slug=camp.slug pk=revenue.pk %}" target="_blank"><i class="fas fa-file-download"></i> Invoice</a>
+            {% if request.resolver_match.app_name == "backoffice" %}
               {% if not camp.read_only %}
               <a class="btn btn-sm btn-primary" href="{% url 'backoffice:revenue_update' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-edit"></i> Update</a>
               {% endif %}
             {% else %}
-              <a class="btn btn-primary" href="{% url 'economy:revenue_detail' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-search"></i> Details</a>
               {% if not camp.read_only and not revenue.approved %}
               <a class="btn btn-primary" href="{% url 'economy:revenue_update' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-edit"></i> Update</a>
               <a class="btn btn-danger" href="{% url 'economy:revenue_delete' camp_slug=revenue.camp.slug pk=revenue.uuid %}"><i class="fas fa-times"></i> Delete</a>
