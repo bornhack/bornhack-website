@@ -51,7 +51,7 @@
                   Team {% if member.lead %}Lead{% else %}Member{% endif %}
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
-                {% if request.user in team.leads.all %}
+                {% if 'camps.'|add:team.slug|add:'_team_lead' in perms %}
                   <td>
                     {{ member.user.profile.name }}
                   </td>
