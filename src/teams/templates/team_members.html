@@ -42,7 +42,7 @@
         </thead>
         <tbody>
           {% for member in team.memberships.all %}
-            {% if member.approved or not member.approved and 'camps.'|add:team.slug|add:'_team_lead' in perms %}
+            {% if member.approved or not member.approved and team.lead_permission_set in perms %}
               <tr>
                 <td>
                   {{ member.user.profile.get_public_credit_name }} {% if member.user == request.user %}(this is you!){% endif %}
@@ -51,7 +51,7 @@
                   Team {% if member.lead %}Lead{% else %}Member{% endif %}
                   {% if not member.approved %}(pending approval){% endif %}
                 </td>
-                {% if 'camps.'|add:team.slug|add:'_team_lead' in perms %}
+                {% if team.lead_permission_set in perms %}
                   <td>
                     {{ member.user.profile.name }}
                   </td>
