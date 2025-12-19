@@ -67,7 +67,19 @@
                          href="{% url 'teams:member_remove' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                         <i class="fas fa-trash"></i> Remove
                       </a>
-                      {% if not member.approved %}
+                      {% if member.approved %}
+                        {% if member.lead %}
+                          <a class="btn btn-danger btn-sm text-nowrap"
+                             href="{% url 'teams:member_take_lead' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
+                            <i class="fas fa-times"></i> Take Team Lead
+                          </a>
+                          {% else %}
+                          <a class="btn btn-success btn-sm text-nowrap"
+                             href="{% url 'teams:member_make_lead' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
+                            <i class="fas fa-check"></i> Make Team Lead
+                          </a>
+                        {% endif %}
+                      {% else %}
                         <a class="btn btn-success btn-sm text-nowrap"
                            href="{% url 'teams:member_approve' camp_slug=camp.slug team_slug=team.slug pk=member.id %}">
                           <i class="fas fa-check"></i> Approve
