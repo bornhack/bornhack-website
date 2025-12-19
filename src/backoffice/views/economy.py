@@ -277,7 +277,8 @@ class ReimbursementUpdateView(
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
+        context["expenses"] = self.object.covered_expenses.all()
+        context["revenues"] = self.object.covered_revenues.all()
         context["total_amount"] = self.object.amount
         context["reimbursement_user"] = self.object.reimbursement_user
         context["cancelurl"] = reverse(
@@ -287,14 +288,15 @@ class ReimbursementUpdateView(
         return context
 
     def form_valid(self, form):
-        """We have two submit buttons in this form, 'Just Save', and 'Mark as Paid'."""
-        reimbursement = form.save()
+        """Backoffice has two submit buttons in this form, 'Just Save', and 'Mark as Paid'."""
         if "paid" in form.data:
             # mark as paid button was pressed
+            reimbursement = form.save()
             reimbursement.mark_as_paid()
             messages.success(self.request, "Reimbursement marked as paid, related expenses and revenues payment_status set accordingly")
         elif "save" in form.data:
-            messages.success(self.request, "Expense updated")
+            reimbursement = form.save()
+            messages.success(self.request, "Reimbursement notes updated")
         else:
             messages.error(self.request, "Unknown submit action")
         return redirect(
@@ -312,7 +314,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
     model = Reimbursement
     template_name = "reimbursement_delete.html"
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if self.get_object().paid:
             messages.error(
                 request,
@@ -325,7 +327,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
                 ),
             )
         # continue with the request
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         messages.success(

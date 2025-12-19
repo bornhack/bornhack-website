@@ -7,36 +7,40 @@
 {% endblock %}
 
 {% block content %}
-  <h3>{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
-
-  <div class="card mb-2">
-    {% if object.expenses %}
-    <h3 class="card-header">Expenses in this Reimbursement:</h3>
-    <div class="card-body">
-      {% include 'includes/expense_list_panel.html' with expense_list=reimbursement.covered_expenses.all %}
-    </div>
-  </div>
-  {% endif %}
-
-  {% if object.revenues %}
-  <div class="card mb2">
-    <h3 class="card-header">Revenues in this Reimbursement:</h3>
-    <div class="card-body">
-      {% include 'includes/revenue_list_panel.html' with revenue_list=reimbursement.covered_revenues.all %}
-    </div>
-  </div>
-  {% endif %}
-
   <div class="card">
-    <h3 class="card-header">Reimbursement:</h3>
+    <h3 class="card-header">{% if request.resolver_match.url_name == "reimbursement_create" %}Create{% else %}Update{% endif %} Reimbursement</h3>
     <div class="card-body">
+      <div class="card mb-2">
+        {% if expenses %}
+        <h4 class="card-header">Expenses in this Reimbursement:</h4>
+        <div class="card-body">
+          {% include 'includes/expense_list_panel.html' with expense_list=expenses %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if revenues %}
+      <div class="card mb2">
+        <h4 class="card-header">Revenues in this Reimbursement:</h4>
+        <div class="card-body">
+          {% include 'includes/revenue_list_panel.html' with revenue_list=revenues %}
+        </div>
+      </div>
+      {% endif %}
+
       <p>The total amount for this reimbursement will be <b>{{ total_amount }} DKK</b>.<br>
       <i>Note: a negative number here means you owe BornHack money, while a positive number means that BornHack owes you money.</i></p>
       <form method="POST">
         {% csrf_token %}
         {% bootstrap_form form %}
-        <button type="submit" class="btn btn-success" name="save"><i class='fas fa-check'></i> Just Save</button>
-        <button type="submit" class="btn btn-success" name="paid"><i class='fas fa-check'></i> Mark as Paid</button>
+        {% if request.resolver_match.app_name == "backoffice" %}
+          <button type="submit" class="btn btn-success" name="save"><i class='fas fa-check'></i> Just Save Notes</button>
+          {% if not object.paid %}
+            <button type="submit" class="btn btn-success" name="paid"><i class='fas fa-check'></i> Save + Mark as Paid</button>
+          {% endif %}
+        {% else %}
+          <button type="submit" class="btn btn-success" name="create"><i class='fas fa-check'></i> Create Reimbursement</button>
+        {% endif %}
         <a href="{{ cancelurl }}" class="btn btn-primary"><i class="fas fa-undo"></i> Cancel</a>
       </form>
     </div>
