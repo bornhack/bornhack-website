@@ -6,7 +6,6 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from utils.bootstrap.base import Bootstrap
 from camps.models import Camp
 from teams.models import Team
 
