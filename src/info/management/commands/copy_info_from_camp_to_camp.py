@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     },
                 )
                 if created:
-                    print(f"Created new InfoCategory {infocat}")
+                    print(f"Created new InfoCategory {newcat}")
                 for info in infocat.infoitems.all():
                     newinfo, created = InfoItem.objects.get_or_create(
                         category=newcat,
