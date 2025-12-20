@@ -854,12 +854,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["facilities"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-100-hax",
             ticket_type=ticket_types["facilities"],
         )
 
