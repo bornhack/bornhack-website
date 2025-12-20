@@ -24,7 +24,7 @@
             <th>
               Status
             </th>
-            {% if request.user in team.leads.all %}
+            {% if team.lead_permission_set in perms %}
               <th>
                 Name
               </th>
@@ -35,7 +35,7 @@
                 Description
               </th>
               <th>
-                Action
+                Actions
               </th>
             {% endif %}
           </tr>
