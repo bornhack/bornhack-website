@@ -664,12 +664,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-standard-ticket",
             ticket_type=ticket_types["adult_full_week"],
         )
 
@@ -683,12 +678,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-hacker-ticket",
             ticket_type=ticket_types["adult_full_week"],
         )
 
@@ -702,12 +692,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-child-ticket",
             ticket_type=ticket_types["child_full_week"],
         )
 
@@ -721,12 +706,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-one-day-ticket",
             ticket_type=ticket_types["adult_one_day"],
         )
 
@@ -740,12 +720,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["tickets"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-one-day-child-ticket",
             ticket_type=ticket_types["child_one_day"],
         )
 
@@ -759,12 +734,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["villages"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-village-tent-3x3m-no-floor",
             ticket_type=ticket_types["village"],
         )
 
@@ -778,12 +748,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["villages"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-village-tent-3x3m-with-floor",
             ticket_type=ticket_types["village"],
         )
 
@@ -797,12 +762,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-tshirt-large",
             ticket_type=ticket_types["merchandise"],
         )
 
@@ -816,12 +776,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-tshirt-medium",
             ticket_type=ticket_types["merchandise"],
         )
 
@@ -835,12 +790,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["merchandise"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-tshirt-small",
             ticket_type=ticket_types["merchandise"],
         )
 
@@ -868,12 +818,7 @@ class Bootstrap:
                 datetime(year, 1, 1, 12, 0, tzinfo=tz),
                 datetime(year, 12, 20, 12, 0, tzinfo=tz),
             ),
-            slug=unique_slugify(
-                name,
-                slugs_in_use=Product.objects.filter(
-                    category=categories["packages"],
-                ).values_list("slug", flat=True),
-            ),
+            slug=f"{camp.slug}-corporate-hackers-small",
         )
         products["corporate_hackers_small"].sub_products.add(
             products["ticket1"],
@@ -2321,6 +2266,37 @@ class Bootstrap:
                 "read_only": False,
                 "light_text": False,
             },
+            {
+                "year": 2027,
+                "tagline": "Undecided",
+                "colour": "#004dff",
+                "read_only": True,
+            },
+            {
+                "year": 2028,
+                "tagline": "Undecided",
+                "colour": "#750787",
+                "read_only": True,
+            },
+            {
+                "year": 2029,
+                "tagline": "Undecided",
+                "colour": "#008026",
+                "read_only": True,
+            },
+            {
+                "year": 2030,
+                "tagline": "Undecided",
+                "colour": "#ffed00",
+                "read_only": True,
+                "light_text": False,
+            },
+            {
+                "year": 2031,
+                "tagline": "Undecided",
+                "colour": "#ff8c00",
+                "read_only": True,
+            },
         ]
         self.create_camps(camps)
         self.bootstrap_base(options)
@@ -2397,7 +2373,7 @@ class Bootstrap:
                 f"----------[ Bornhack {camp.camp.lower.year} ]----------",
             )
 
-            if camp.camp.lower.year <= settings.UPCOMING_CAMP_YEAR:
+            if camp.camp.lower.year <= timezone.now().year:
                 ticket_types = self.create_camp_ticket_types(camp)
 
                 camp_products = self.create_camp_products(
