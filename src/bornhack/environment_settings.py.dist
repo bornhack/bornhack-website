@@ -13,16 +13,13 @@ DATABASES = {
         'HOST': '{{ django_postgres_host }}',
         # comment this out for non-tls connection to postgres
         'OPTIONS': {'sslmode': 'verify-full', 'sslrootcert': 'system'},
+        # always use transactions
+        'ATOMIC_REQUESTS': True,
     },
 }
 
 DEBUG={{ django_debug }}
 DEBUG_TOOLBAR_ENABLED={{ django_debug_toolbar_enabled }}
-
-
-# start redirecting to the next camp instead of the previous camp after
-# this much of the time between the camps has passed
-CAMP_REDIRECT_PERCENT=15
 
 ### changes below here are only needed for production
 
