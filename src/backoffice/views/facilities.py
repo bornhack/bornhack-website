@@ -372,7 +372,6 @@ class FacilityUpdateView(FacilityFacilitatorViewMixin, UpdateView):
         form.fields["location"].widget = LeafletWidget(
             attrs={
                 "display_raw": "true",
-                "map_height": "500px",
                 "class": "form-control",
                 "geom_type": "Point",
             },

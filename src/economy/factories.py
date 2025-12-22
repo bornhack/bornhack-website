@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import random
+from datetime import timezone
 
 import factory
 import faker
 from django.contrib.auth.models import User
-from django.utils import timezone
-from utils.slugs import unique_slugify
-
 from camps.models import Camp
 from teams.models import Team
+from utils.slugs import unique_slugify
 
 from .models import Bank
 from .models import BankAccount
@@ -31,6 +30,7 @@ from .models import ZettleBalance
 from .models import ZettleReceipt
 
 fake = faker.Faker()
+
 
 class BankFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -530,6 +530,7 @@ class CredebtorFactory(factory.django.DjangoModelFactory):
     address = factory.Faker("address", locale="dk_DK")
     notes = factory.Faker("text")
 
+
 class ExpenseFactory(factory.django.DjangoModelFactory):
     """Factory for creating expense data."""
 
@@ -548,9 +549,9 @@ class ExpenseFactory(factory.django.DjangoModelFactory):
         color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
     )
     invoice_date = factory.Faker("date")
-    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
     approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")
+    payment_status = factory.Faker("random_element", elements=["PAID_IN_NETBANK", "PAID_WITH_TYKLINGS_MASTERCARD", "PAID_WITH_AHFS_MASTERCARD", "PAID_NEEDS_REIMBURSEMENT"])
 
 
 class RevenueFactory(factory.django.DjangoModelFactory):
@@ -570,6 +571,6 @@ class RevenueFactory(factory.django.DjangoModelFactory):
         color=random.choice(["#ff0000", "#00ff00", "#0000ff"]),
     )
     invoice_date = factory.Faker("date")
-    responsible_team = factory.Faker("random_element", elements=Team.objects.all())
     approved = factory.Faker("random_element", elements=[True, True, False, None])
     notes = factory.Faker("text")
+    payment_status = factory.Faker("random_element", elements=["PAID_IN_NETBANK", "PAID_TO_TYKLINGS_MASTERCARD", "PAID_TO_AHFS_MASTERCARD", "PAID_NEEDS_REDISBURSEMENT"])

@@ -42,7 +42,6 @@
               {% else %}
                 <a class="btn btn-primary" href="{% url "economy:reimbursement_detail" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-search"></i> Details</a>
                 {% if not reim.paid %}
-                  <a class="btn btn-primary" href="{% url "economy:reimbursement_update" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-edit"></i> Update</a>
                   <a class="btn btn-danger" href="{% url "economy:reimbursement_delete" camp_slug=camp.slug pk=reim.pk %}"><i class="fas fa-times"></i> Delete</a>
                 {% endif %}
               {% endif %}

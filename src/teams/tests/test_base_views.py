@@ -22,7 +22,7 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         super().setUpTestData()
 
         cls.categories = cls.bootstrap.create_camp_info_categories(camp=cls.camp, teams=cls.teams)
-        cls.bootstrap.create_camp_info_items(camp=cls.camp,categories=cls.categories)
+        cls.bootstrap.create_camp_info_items(camp=cls.camp, categories=cls.categories)
 
         permission_content_type = ContentType.objects.get_for_model(CampPermission)
         cls.users[4].user_permissions.add(
@@ -31,40 +31,53 @@ class TeamBaseMemberViewTest(BornhackTestBase):
                 codename="noc_team_lead",
             ),
         )
+
     def test_team_general_view(self) -> None:
         """Test the team general view."""
-        url = reverse("teams:general", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:general",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
     def test_team_list_view(self) -> None:
         """Test the team list view."""
-        url = reverse("teams:list", kwargs={
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:list",
+            kwargs={
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
     def test_team_manage_view(self) -> None:
         """Test the team manage view."""
         self.client.force_login(self.users[4])
-        url = reverse("teams:manage", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:manage",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
     def test_team_join_leave_view(self) -> None:
         """Test the team member join and leave view."""
         self.client.force_login(self.users[0])
-        url = reverse("teams:join", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:join",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
@@ -86,10 +99,13 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         self.assertEqual(len(matches), 1, "member was able to join twice.")
 
         # Try to join a team that does not need members
-        url = reverse("teams:join", kwargs={
-            "team_slug": self.teams["orga"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:join",
+            kwargs={
+                "team_slug": self.teams["orga"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url, follow=True)
 
         content = response.content.decode()
@@ -99,10 +115,13 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         self.assertEqual(len(matches), 1, "member was able to join a team which does not need members.")
 
         # Test leaving the team.
-        url = reverse("teams:leave", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:leave",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
@@ -117,10 +136,13 @@ class TeamBaseMemberViewTest(BornhackTestBase):
     def test_team_approve_remove_views(self) -> None:
         """Test team member approve and remove views."""
         self.client.force_login(self.users[8])
-        url = reverse("teams:join", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-        })
+        url = reverse(
+            "teams:join",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+            },
+        )
         response = self.client.post(path=url)
         assert response.status_code == 302
 
@@ -128,11 +150,14 @@ class TeamBaseMemberViewTest(BornhackTestBase):
 
         self.client.force_login(self.users[4])
         # Approve the team member
-        url = reverse("teams:member_approve", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-            "pk": member.pk,
-        })
+        url = reverse(
+            "teams:member_approve",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+                "pk": member.pk,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 
@@ -143,13 +168,15 @@ class TeamBaseMemberViewTest(BornhackTestBase):
         matches = [s for s in rows if "Team member approved" in str(s)]
         self.assertEqual(len(matches), 1, "failed to approve a team member.")
 
-
         # Remove the team member
-        url = reverse("teams:member_remove", kwargs={
-            "team_slug": self.teams["noc"].slug,
-            "camp_slug": self.camp.slug,
-            "pk": member.pk,
-        })
+        url = reverse(
+            "teams:member_remove",
+            kwargs={
+                "team_slug": self.teams["noc"].slug,
+                "camp_slug": self.camp.slug,
+                "pk": member.pk,
+            },
+        )
         response = self.client.get(path=url)
         assert response.status_code == 200
 

@@ -29,7 +29,7 @@ class TokenAdmin(admin.ModelAdmin):
 
     list_filter: ClassVar[list[str]] = ["camp", "hint", "active", "category"]
     list_display: ClassVar[list[str]] = ["token", "description", "camp", "hint", "active", "category", "valid_when"]
-    search_fields: ClassVar[list[str]] = ["token", "description", "hint", "category"]
+    search_fields: ClassVar[list[str]] = ["token", "description", "hint", "category__name"]
 
 
 @admin.register(TokenFind)
@@ -38,4 +38,4 @@ class TokenFindAdmin(admin.ModelAdmin):
 
     list_filter: ClassVar[list[str]] = ["token__camp", "user"]
     list_display: ClassVar[list[str]] = ["token", "user", "created"]
-    search_fields: ClassVar[list[str]] = ["user", "token"]
+    search_fields: ClassVar[list[str]] = ["user__username", "token__description"]

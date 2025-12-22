@@ -68,7 +68,6 @@ class ExpenseAdmin(admin.ModelAdmin):
         "camp",
         "creditor__chain",
         "creditor",
-        "responsible_team",
         "approved",
         "user",
     ]
@@ -79,7 +78,6 @@ class ExpenseAdmin(admin.ModelAdmin):
         "amount",
         "camp",
         "creditor",
-        "responsible_team",
         "approved",
         "reimbursement",
     ]
@@ -109,14 +107,13 @@ def reject_revenues(modeladmin, request, queryset) -> None:
 
 @admin.register(Revenue)
 class RevenueAdmin(admin.ModelAdmin):
-    list_filter = ["camp", "responsible_team", "approved", "user"]
+    list_filter = ["camp", "approved", "user"]
     list_display = [
         "user",
         "description",
         "invoice_date",
         "amount",
         "camp",
-        "responsible_team",
         "approved",
     ]
     search_fields = ["description", "amount", "user"]

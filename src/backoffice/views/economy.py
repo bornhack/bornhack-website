@@ -160,21 +160,21 @@ class ChainDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView):
         context["expenses"] = Expense.objects.filter(
             camp=self.camp,
             creditor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "creditor")
+        ).prefetch_related("user", "creditor")
         context["revenues"] = Revenue.objects.filter(
             camp=self.camp,
             debtor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "debtor")
+        ).prefetch_related("user", "debtor")
 
         # Include past years expenses and revenues for the Chain in context as separate querysets
         context["past_expenses"] = Expense.objects.filter(
             camp__camp__lt=self.camp.camp,
             creditor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "creditor")
+        ).prefetch_related("user", "creditor")
         context["past_revenues"] = Revenue.objects.filter(
             camp__camp__lt=self.camp.camp,
             debtor__chain=self.get_object(),
-        ).prefetch_related("responsible_team", "user", "debtor")
+        ).prefetch_related("user", "debtor")
 
         return context
 
@@ -187,10 +187,10 @@ class CredebtorDetailView(CampViewMixin, EconomyTeamPermissionMixin, DetailView)
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context["expenses"] = (
-            self.get_object().expenses.filter(camp=self.camp).prefetch_related("responsible_team", "user", "creditor")
+            self.get_object().expenses.filter(camp=self.camp).prefetch_related("user", "creditor")
         )
         context["revenues"] = (
-            self.get_object().revenues.filter(camp=self.camp).prefetch_related("responsible_team", "user", "debtor")
+            self.get_object().revenues.filter(camp=self.camp).prefetch_related("user", "debtor")
         )
         return context
 
@@ -209,7 +209,6 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "creditor",
             "user",
-            "responsible_team",
         )
 
     def get_context_data(self, **kwargs):
@@ -221,7 +220,6 @@ class ExpenseListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         ).prefetch_related(
             "creditor",
             "user",
-            "responsible_team",
         )
         return context
 
@@ -275,18 +273,35 @@ class ReimbursementUpdateView(
 ):
     model = Reimbursement
     template_name = "reimbursement_form.html"
-    fields = ["notes", "paid"]
+    fields = ["notes"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["expenses"] = self.object.expenses.filter(paid_by_bornhack=False)
-        context["total_amount"] = context["expenses"].aggregate(Sum("amount"))
+        context["expenses"] = self.object.covered_expenses.all()
+        context["revenues"] = self.object.covered_revenues.all()
+        context["total_amount"] = self.object.amount
         context["reimbursement_user"] = self.object.reimbursement_user
         context["cancelurl"] = reverse(
             "backoffice:reimbursement_list",
             kwargs={"camp_slug": self.camp.slug},
         )
         return context
+
+    def form_valid(self, form):
+        """Backoffice has two submit buttons in this form, 'Just Save', and 'Mark as Paid'."""
+        if "paid" in form.data:
+            # mark as paid button was pressed
+            reimbursement = form.save()
+            reimbursement.mark_as_paid()
+            messages.success(self.request, "Reimbursement marked as paid, related expenses and revenues payment_status set accordingly")
+        elif "save" in form.data:
+            reimbursement = form.save()
+            messages.success(self.request, "Reimbursement notes updated")
+        else:
+            messages.error(self.request, "Unknown submit action")
+        return redirect(
+            reverse("backoffice:expense_list", kwargs={"camp_slug": self.camp.slug}),
+        )
 
     def get_success_url(self):
         return reverse(
@@ -299,7 +314,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
     model = Reimbursement
     template_name = "reimbursement_delete.html"
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         if self.get_object().paid:
             messages.error(
                 request,
@@ -312,7 +327,7 @@ class ReimbursementDeleteView(CampViewMixin, EconomyTeamPermissionMixin, DeleteV
                 ),
             )
         # continue with the request
-        return super().get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         messages.success(
@@ -339,7 +354,6 @@ class RevenueListView(CampViewMixin, EconomyTeamPermissionMixin, ListView):
         return queryset.exclude(approved__isnull=True).prefetch_related(
             "debtor",
             "user",
-            "responsible_team",
         )
 
     def get_context_data(self, **kwargs):

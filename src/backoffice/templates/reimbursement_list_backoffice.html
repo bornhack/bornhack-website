@@ -10,12 +10,12 @@
   <p class="lead">This view shows all existing reimbursements for {{ camp.title }}. Users have to create their own reimbursements when they are done adding expenses. The user will be asked for a bank account when creating the reimbursement.</p>
 
   <p>
-    <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+    <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#economy"><i class="fas fa-undo"></i> Backoffice</a>
   </p>
 
   {% include 'includes/reimbursement_list_panel.html' %}
 
   <p>
-    <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}"><i class="fas fa-undo"></i> Backoffice</a>
+    <a class="btn btn-secondary" href="{% url 'backoffice:index' camp_slug=camp.slug %}#economy"><i class="fas fa-undo"></i> Backoffice</a>
   </p>
 {% endblock content %}

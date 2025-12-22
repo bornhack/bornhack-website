@@ -2,10 +2,12 @@
   <div class="card-header">Expense Details for {{ expense.pk }}</div>
   <div class="card-body">
     <table class="table">
-      <tr>
-        <th>Created By</th>
-        <td>{{ expense.user.profile.get_name }}</td>
-      </tr>
+      {% if request.resolver_match.app_name == "backoffice" %}
+        <tr>
+          <th>Created By</th>
+          <td>{{ expense.user.profile.get_name }}</td>
+        </tr>
+      {% endif %}
       <tr>
         <th>Amount</th>
         <td>{{ expense.amount }} DKK</td>
@@ -23,12 +25,12 @@
         <td>{{ expense.invoice_date }}</td>
       </tr>
       <tr>
-        <th>Description</th>
-        <td>{{ expense.description }}</td>
+        <th>Payment Status</th>
+        <td>{{ revenue.get_payment_status_display }}</td>
       </tr>
       <tr>
-        <th>Paid by BornHack?</th>
-        <td>This expense was paid by {% if expense.paid_by_bornhack %}<b>BornHack</b>{% else %}<b>{{ expense.user.profile.get_name }}</b>, and will be reimbursed.{% endif %}</td>
+        <th>Description</th>
+        <td>{{ expense.description }}</td>
       </tr>
       <tr>
         <th>Filename</th>
@@ -38,20 +40,21 @@
         <th>Approved?</th>
         <td>{{ expense.approval_status }}</td>
       </tr>
-      {% if not expense.paid_by_bornhack %}
-        <tr>
-          <th>Reimbursement?</th>
-          <td>
-            {% if expense.reimbursement %}
-              {% if request.resolver_match.app_name == "backoffice" %}
-                <a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
-              {% else %}
-                <a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
-              {% endif %}
+      {% if expense.payment_status == "PAID_NEEDS_REIMBURSEMENT" or expense.payment_status == "PAID_AND_REIMBURSED" %}
+      <tr>
+        <th>Reimbursement?</th>
+        <td>
+          {% if expense.reimbursement %}
+            {% if request.resolver_match.app_name == "backoffice" %}
+              <a class="btn btn-primary" href="{% url 'backoffice:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
             {% else %}
-              N/A
+              <a class="btn btn-primary" href="{% url 'economy:reimbursement_detail' camp_slug=camp.slug pk=expense.reimbursement.pk %}">{{ expense.reimbursement.pk }}</a>
             {% endif %}
-          </tr>
+          {% else %}
+            N/A
+          {% endif %}
+        </td>
+      </tr>
       {% endif %}
       <tr>
         <th>Invoice</th>
