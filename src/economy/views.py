@@ -274,7 +274,7 @@ class ExpenseCreateView(
     form_class = ExpenseCreateForm
 
     def get_context_data(self, **kwargs):
-        """Set creditor and fixup choices for payment method."""
+        """Set creditor."""
         context = super().get_context_data(**kwargs)
         context["creditor"] = self.credebtor
         return context
