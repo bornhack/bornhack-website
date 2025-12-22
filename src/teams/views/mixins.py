@@ -1,4 +1,5 @@
 """Mixins for the teams application views."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -15,6 +16,7 @@ from utils.mixins import RaisePermissionRequiredMixin
 if TYPE_CHECKING:
     from django.http import HttpRequest
     from django.http import HttpResponse
+
 
 class EnsureTeamLeadMixin:
     """Use to make sure request.user has team lead permission for the team specified by kwargs['team_slug']."""
@@ -53,6 +55,7 @@ class EnsureTeamMemberLeadMixin(SingleObjectMixin):
 
 class TeamViewMixin(CampViewMixin):
     """View mixin for all Team views."""
+
     def setup(self, *args, **kwargs) -> None:
         """Method for setting team object."""
         super().setup(*args, **kwargs)

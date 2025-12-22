@@ -1,4 +1,5 @@
 """Views for the guide of the teams application."""
+
 from __future__ import annotations
 
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -13,6 +14,7 @@ from utils.mixins import IsTeamPermContextMixin
 
 class TeamGuideView(LoginRequiredMixin, CampViewMixin, UserPassesTestMixin, IsTeamPermContextMixin, DetailView):
     """View for the team guide."""
+
     template_name = "team_guide.html"
     context_object_name = "team"
     model = Team
@@ -38,4 +40,5 @@ class TeamGuidePrintView(TeamGuideView):
 
     Includes permissions from TeamGuideView
     """
+
     template_name = "team_guide_print.html"
