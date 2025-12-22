@@ -17,7 +17,7 @@ logger = logging.getLogger(f"bornhack.{__name__}")
 class CampRedirectView(View):
     def dispatch(self, request, *args, **kwargs):
         """Find closest camp and redirect to it."""
-        camp = get_closest_camp(timezone.now())
+        camp = get_closest_camp(timezone.now(), max_days_from_prev=60)
         return redirect(kwargs["page"], camp_slug=camp.slug)
 
 
