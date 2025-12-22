@@ -188,13 +188,9 @@ class Credebtor(
 
 
 class Revenue(ExportModelOperationsMixin("revenue"), CampRelatedModel, UUIDModel):
-    """The Revenue model represents any type of income for BornHack.
+    """The Revenue model represents any type of income for BornHack not handled by an Invoice.
 
-    Most Revenue objects will have a FK to the Invoice model,
-    but only if the revenue relates directly to an Invoice in our system.
-
-    Other Revenue objects (such as money returned from bottle deposits) will
-    not have a related BornHack Invoice object.
+    Revenues are mostly returned bottle deposit, returned items in shops etc.
     """
 
     camp = models.ForeignKey(
