@@ -10,7 +10,7 @@
   <p class="lead">Expenses and Revenues for {{ camp.title }} must be associated with a Creditor or Debtor. Each Creditor and Debtor belongs to a Chain - e.g. the Creditor <i>Netto Gelsted</i> Belongs to the Chain <i>Netto</i>.</p>
   <p class="lead">To continue, pick an existing Chain, or create a new.</p>
 
-  {% if chain_list %}
+  {% if chain_list or past_year_chains %}
     <div class="card">
       <h3 class="card-header">Existing Chains</h3>
       <span class="card-header"><i>Italic</i>: No current expenses for this year</span>

@@ -137,13 +137,13 @@ class DectRegistration(
             .exclude(pk=self.pk)
             .exists()
         ):
-            raise PhonebookConflictLongError
+            raise PhonebookConflictLongError(number=self.number)
 
         # check if a shorter number is blocking
         i = len(self.number) - 1
         while i:
             if DectRegistration.objects.filter(camp=self.camp, number=self.number[:i]).exclude(pk=self.pk).exists():
-                raise PhonebookConflictShortError
+                raise PhonebookConflictShortError(number=self.number)
             i -= 1
 
     def clean_letters(self) -> None:
@@ -155,7 +155,7 @@ class DectRegistration(
         # if we have a letter representation of this number they should have the same length
         if self.letters:
             if len(self.letters) != len(self.number):
-                raise LettersNumberSizeError
+                raise LettersNumberSizeError(number=self.number, letters=self.letters)
 
             # loop over the digits in the phonenumber
             combinations = list(dectutil.get_dect_letter_combinations(self.number))

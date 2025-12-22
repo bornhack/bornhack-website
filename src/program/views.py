@@ -1364,6 +1364,21 @@ class FeedbackCreateView(LoginRequiredMixin, EventViewMixin, CreateView):
 
     def setup(self, *args, **kwargs) -> None:
         super().setup(*args, **kwargs)
+        if not self.request.user.is_authenticated:
+            messages.error(
+                self.request,
+                "You must be logged in to provide Event Feedback",
+            )
+            raise RedirectException(
+                reverse(
+                    "program:event_detail",
+                    kwargs={
+                        "camp_slug": self.camp.slug,
+                        "event_slug": self.event.slug,
+                    },
+                ),
+            )
+
         if models.EventFeedback.objects.filter(
             event=self.event,
             user=self.request.user,

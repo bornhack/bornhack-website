@@ -226,6 +226,30 @@ class SpeakerProposalForm(forms.ModelForm):
             # no free tickets for meetups
             del self.fields["needs_oneday_ticket"]
 
+        elif event_type.name == "Demo":
+            # fix label and help_text for the name field
+            self.fields["name"].label = "Host Name"
+            self.fields["name"].help_text = "The name of the demo host. Can be a real name or an alias (public)."
+
+            # fix label and help_text for the email field
+            self.fields["email"].label = "Host Email"
+            self.fields[
+                "email"
+            ].help_text = (
+                "The email for the host. Will default to the logged-in users email if left empty (not public)."
+            )
+
+            # fix label and help_text for the biograpy field
+            self.fields["biography"].label = "Host Biography"
+            self.fields["biography"].help_text = "The biography of the host."
+            self.fields["biography"].widget = MarkdownWidget()
+
+            # fix label and help_text for the submission_notes field
+            self.fields["submission_notes"].help_text = "Private notes regarding this host (not public)."
+
+            # no free tickets for demos
+            del self.fields["needs_oneday_ticket"]
+
         else:
             raise ImproperlyConfigured(
                 f"Unsupported event type '{event_type.name}', don't know which form class to use",
@@ -287,6 +311,7 @@ class EventProposalForm(forms.ModelForm):
         RECREATIONAL_EVENT = "Recreational Event"
         WORKSHOP = "Workshop"
         MEETUP = "Meetup"
+        DEMO = "Demo"
 
         # disable the empty_label for the track select box
         self.fields["track"].empty_label = None
@@ -468,6 +493,26 @@ class EventProposalForm(forms.ModelForm):
             # no video recording for meetups
             del self.fields["allow_video_recording"]
             del self.fields["allow_video_streaming"]
+
+        elif event_type.name == DEMO:
+            # fix label and help_text for the title field
+            self.fields["title"].label = "Demo Title"
+            self.fields["title"].help_text = "The title of this demo."
+
+            # fix label and help_text for the submission_notes field
+            self.fields[
+                "submission_notes"
+            ].help_text = "Private notes regarding this demo. Only visible to yourself and the BornHack organisers."
+
+            # fix label and help_text for the abstract field
+            self.fields["abstract"].label = "Demo Abstract"
+            self.fields[
+                "abstract"
+            ].help_text = "The description/abstract of this demo. Explain what the demo is about and who should attend."
+            self.fields["abstract"].widget = MarkdownWidget()
+
+            # no duration for demos
+            del self.fields["duration"]
 
         else:
             raise ImproperlyConfigured(

@@ -244,8 +244,8 @@ class InvoiceDownloadForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         return {
-            "invoices": cleaned_data.get("invoices", "").split(),
-            "orders": cleaned_data.get("orders", "").split(),
+            "invoices": [x for x in cleaned_data.get("invoices", "").split() if x.isdigit()],
+            "orders": [x for x in cleaned_data.get("orders", "").split() if x.isdigit()],
         }
 
 
