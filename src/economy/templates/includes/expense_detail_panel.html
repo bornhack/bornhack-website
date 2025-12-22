@@ -25,6 +25,10 @@
         <td>{{ expense.invoice_date }}</td>
       </tr>
       <tr>
+        <th>Payment Status</th>
+        <td>{{ revenue.get_payment_status_display }}</td>
+      </tr>
+      <tr>
         <th>Description</th>
         <td>{{ expense.description }}</td>
       </tr>
